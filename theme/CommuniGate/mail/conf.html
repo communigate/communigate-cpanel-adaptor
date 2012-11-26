@@ -1,0 +1,46 @@
+<cpanel setvar="headerimg=../images/tools.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+<style type="text/css"><cpanel include="boxtrapper.css"></style>
+<div class="body-content">
+
+<style type="text/css">
+<?cp Branding::spritelist(.spriteicon_img_mini {float:left;margin-right:5px;background: url\{leftparenthesis}"%"\{rightparenthesis};} %,@spriteurl,images::#icon-${img}_mini {background-position\{colon}0 -${cssposition}px;width\{colon}${width}px;height\{colon}${height}px; }:) imgtype=icon,subtype=img,method=scale_60percent,format=png,img=boxtrapper ?>
+</style>
+
+<div class="h1Title"><div class="spriteicon_img_mini" id="icon-boxtrapper_mini"></div><cpanel langprint="configlegend-BoxTrapper"></div>
+
+<p><cpanel langprint="configurefor-BoxTrapper"> <span class="status"><cpanel print="$FORM{'account'}"></span></p>
+
+<form action="saveconf.html" method="post">
+<table>
+<tr><td><cpanel langprint="emailin-BoxTrapper"></td>
+<td><input type="text" name="froms" value="<cpanel BoxTrapper="showemails($FORM{'account'})">"></td></tr>
+
+<tr><td><cpanel langprint="fromname-BoxTrapper"></td>
+<td><input type="text" name="fromname" value="<cpanel BoxTrapper="showfromname($FORM{'account'})">"></td></tr>
+
+
+<tr><td><cpanel langprint="daystokeep-BoxTrapper"></td>
+<td><input type="text" name="queue" value="<cpanel BoxTrapper="showqueuetime($FORM{'account'})">"></td></tr>
+
+<tr><td><cpanel Locale="maketext('Minimum SpamAssassin Spam Score required to bypass BoxTrapper:')"></td>
+<td><input type="text" name="min_spam_score_deliver" value="<cpanel BoxTrapper="showmin_spam_score_deliver($FORM{'account'})">"></td></tr>
+
+<tr><td><cpanel langprint="autowhitelist-BoxTrapper"></td>
+<td><input type="checkbox" name="autowhitelist" value="1" <cpanel BoxTrapper="showautowhitelist($FORM{'account'})"> ></td></tr>
+
+<tr><td><cpanel Locale="maketext('Auto Whitelist To and From lines from whitelisted senders (whitelist by association):')"></td>
+<td><input type="checkbox" name="whitelist_by_assoc" value="1" <cpanel BoxTrapper="showwhitelist_by_assoc($FORM{'account'})"> ></td></tr>
+
+</table>
+
+<p><cpanel langprint="BoxTrapperWhiteClari"></p>
+
+<input type="hidden" name="account" value="<cpanel print="$FORM{'account'}">">
+<input type="submit" value="<cpanel langprint="Save">" class="input-button" />
+</form>
+
+<div class="return-link"><a href="manage.html?account=<cpanel uriprint="$FORM{'account'}">">&larr; <cptext "Go Back"></a></div>
+</div>
+<cpanel Branding="include(stdfooter.html)">

@@ -1,0 +1,196 @@
+<cpanel setvar="headerimg=../images/tools.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+
+<style type="text/css">
+<?cp Branding::spritelist(.spriteicon_img_mini {float:left;margin-right:5px;background: url\{leftparenthesis}"%"\{rightparenthesis};} %,@spriteurl,images::#icon-${img}_mini {background-position\{colon}0 -${cssposition}px;width\{colon}${width}px;height\{colon}${height}px; }:) imgtype=icon,subtype=img,method=scale_60percent,format=png,img=keys ?>
+</style>
+
+<div class="body-content">
+
+<div class="h1Title"><div class="spriteicon_img_mini" id="icon-keys_mini"></div><cpanel langprint="PGPMainHead"></div>
+
+<p class="description"><cpanel langprint="PGPDescription"></p>
+
+<cpanel setvar="vidtut_name=gnupgkeys">
+<cpanel setvar="vidtut_header=PGPMainHead">
+<cpanel setvar="vidtut_description=VidGpgDesc">
+<cpanel setvar="vidtut_video_name=gnupgkeys_lo">
+<cpanel setvar="vidtut_width=450">
+<cpanel setvar="vidtut_height=322">	
+<cpanel include="../video_tutorial_include.html">
+
+<h2><cpanel langprint="PGPCreateKey"></h2>
+<form name="addkeyform" action="live_doaddkey.html" id="addkeyform" method="get">
+<table>
+	<tr>
+		<td align="right"><cpanel langprint="PGPUsersName"></td>
+		<td><input type="text" name="name" id="name" style="width: 150px" /></td>
+		<td><div id="name_error"></div></td>
+	</tr>
+	<tr>
+		<td align="right"><cpanel langprint="PGPUsersEmail"></td>
+		<td><input type="text" name="email" id="email" style="width: 150px" /></td>
+		<td><div id="email_error"></div></td>
+	</tr>
+	<tr>
+		<td align="right"><cpanel langprint="PGPKeyComment"></td>
+		<td><input type="text" name="comment" id="comment" style="width: 150px" /></td>
+		<td><div id="comment_error"></div></td>
+	</tr>
+	<tr>
+		<td align="right" style="width: 120px"><cpanel langprint="PGPKeyPass"></td>
+		<td><input type="password" name="password" id="password" style="width: 150px" /></td>
+		<td><div id="password_error"></div></td>
+	</tr>
+	<tr>
+		<td align="right"><cpanel langprint="ASIReadOtherPasswordAgain"></td>
+		<td><input type="password" name="password2" id="password2" style="width: 150px" /></td>
+		<td><div id="password2_error"></div></td>
+	</tr>
+	<tr>
+		<td align="right">
+			<cpanel langprint="email_strength"> (<div style="display: inline" id="why_strong_passwords_link" class="action_link"><cpanel langprint="email_why"></div>):
+			<div id="why_strong_passwords_text" style="display: none"><cpanel langprint="email_password_why"><br /><br /><cpanel langprint="email_password_tip"></div>
+		</td>
+		<td><div id="password_strength" style="width: 150px; height: 20px; border: 1px solid black; margin: 5px 0px 3px 0px"></div></td>
+		<td><input type="button" id="create_strong_password" class="input-button" value="<cpanel langprint="cjt_password_generator">" tabindex="-1" /></td>
+	</tr>
+	<tr>
+		<td align="right"><cpanel langprint="PGPKeyExpires"></td>
+		<td><input type="text" name="expire" id="expire" value="1y" /></td>
+		<td><div id="expire_error"></div></td>
+	</tr>
+	<tr>
+		<td>&nbsp;</td>
+		<td colspan="2">
+			<!-- this would be better in an <ul> -->
+			<table>
+				<tr>
+					<td align="right"><cpanel Locale="maketext('Format:')"></td>
+					<td>1y (<cpanel Locale="maketext('[quant,_1,year,years]',1)">)</td>
+				</tr>
+				<tr>
+					<td>&nbsp;</td>
+					<td>3w (<cpanel Locale="maketext('[quant,_1,week,weeks]',3)">)</td>
+				</tr>
+				<tr>
+					<td>&nbsp;</td>
+					<td>5d (<cpanel Locale="maketext('[quant,_1,day,days]',5)">)</td>
+				</tr>
+				<tr>
+					<td>&nbsp;</td>
+					<td><cpanel Locale="maketext('etc')"><br /><br /></td>
+				</tr>					
+			</table>
+		</td>
+	</tr>
+	<tr>
+		<td align="right"><cpanel langprint="PGPKeySize"></td>
+		<td>
+			<select name="keysize" id="keysize">
+				<option value="1024"><cpanel langprint="PGP1024"></option>
+				<option value="2048"><cpanel langprint="PGP2048"></option>
+				<option value="4096"><cpanel langprint="PGP4096"></option>
+			</select>
+		</td>
+		<td><div id="keysize_error"></div></td>
+	</tr>
+	<tr><td colspan="3"><br /></td></tr>
+	<tr>
+		<td>&nbsp;</td>
+		<td colspan="2"><input type="submit" id="submit" class="input-button" value="<cpanel langprint="PGPGenerateButton">" /></td>
+	</tr>
+</table>
+</form>
+<script type="text/javascript">
+//<![CDATA[
+var REQUIRED_PASSWORD_STRENGTH = parseInt('<?cp PasswdStrength::get_required_strength(%,strength) app=gpg ?>') || 0;
+
+var name_validator = new CPANEL.validate.validator("<cpanel Locale="maketext('Name')">");
+var email_validator = new CPANEL.validate.validator("<cpanel Locale="maketext('Email')>");
+var comment_validator = new CPANEL.validate.validator("<cpanel Locale="maketext('Comment')>");
+var expire_validator = new CPANEL.validate.validator("<cpanel Locale="maketext('Expire Date')>");
+
+// custom validation function for expire date
+var validate_expire_input = function() {
+	var str = YAHOO.util.Dom.get("expire").value;
+	var last_char = str.charAt(str.length-1);
+	if (last_char != 'y' && last_char != 'w' && last_char != 'd') return false;
+	var number = str.substring(0, str.length-1);
+	return CPANEL.validate.positive_integer(number);
+};
+
+var init_page = function() {
+	
+	name_validator.add("name", "min_length(%input%, 5)", "<cpanel langprint="gpg_name_validation">");
+	name_validator.attach();
+	
+	email_validator.add("email", "email", "<cptext "Must be a valid email address.">");
+	email_validator.attach();
+	
+	comment_validator.add("comment", "anything", "");
+	comment_validator.attach();
+	
+	expire_validator.add("expire", validate_expire_input, "<cpanel langprint="gpg_expire_validation">");
+	expire_validator.attach();
+	
+	var password_validators = CPANEL.password.setup("password", "password2", "password_strength", REQUIRED_PASSWORD_STRENGTH, "create_strong_password", "why_strong_passwords_link", "why_strong_passwords_text");
+	
+	password_validators.push(name_validator, email_validator, comment_validator, expire_validator);
+	CPANEL.validate.attach_to_form("submit", password_validators);
+	
+	YAHOO.util.Dom.get("name").focus();
+	
+	expire_validator.verify();
+};
+YAHOO.util.Event.onDOMReady(init_page);
+//]]>
+</script>
+<br />
+<br />
+
+<h2><cpanel langprint="PGPImport"></h2>
+<a class="create-button" href="importkey.html" style="text-decoration:none;"><cpanel langprint="PGPImport"></a>
+<br />
+<br />
+
+<!-- <?cp Gpg::number_of_public_keys(%, count) ?> -->
+<cpanelif !$CPVAR{'gpg_number_of_public_keys'}==0>
+	<h2><cpanel langprint="PGPListPublic">:</h2>
+	<table cellpadding="5" cellspacing="0" width="100%">
+	
+		<?cp Gpg::listgpgkeys(
+		[tr]
+			[td]%[/td]
+			[td][a class="create-button" href="delkey.html?key=%"]$LANG{'PGPDelete'}[/a][/td]
+			[td][a class="create-button" href="editkey.html?key=%"]$LANG{'PGPView'}[/a][/td]
+		[/tr]
+		,key,keyid,keyid) ?>
+		
+	</table>
+	<br />
+	<br />
+</cpanelif>
+
+<!-- <?cp Gpg::number_of_private_keys(%, count) ?> -->
+<cpanelif !$CPVAR{'gpg_number_of_private_keys'}==0>
+	<h2><cpanel langprint="PGPListPrivate">:</h2>
+	<table cellpadding="5" cellspacing="0" width="100%">
+	
+		<?cp Gpg::listsecretgpgkeys(
+		[tr]
+			[td]%[/td]
+			[td][a class="create-button" href="delpkey.html?key=%"]$LANG{'PGPDelete'}[/a][/td]
+			[td][a class="create-button" href="editpkey.html?key=%"]$LANG{'PGPView'}[/a][/td]
+		[/tr]
+		,key,keyid,keyid) ?>
+		
+	</table>
+	<br />
+	<br />
+</cpanelif>
+
+</div><!-- end body-content -->
+
+<cpanel Branding="include(stdfooter.html)">

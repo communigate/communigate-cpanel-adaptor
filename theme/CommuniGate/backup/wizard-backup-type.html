@@ -1,0 +1,90 @@
+<cpanel setvar="headerimg=../images/tools.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+<div class="body-content">
+<h1><cpanel langprint="BUWizard"></h1>
+
+<div id="backup-nav">
+	<ol class="clear">
+		<li class="one"><a href="wizard.html"><span><cpanel langprint="BURes"></span></a></li>
+		<li class="two"><a href="wizard-backup.html"><span><cpanel langprint="FullorPart"></span></a></li>
+		<li class="three"><span class="current"><cpanel langprint="FMDL"></span></li>
+	</ol>
+</div>
+<!-- END #backup-nav -->
+
+<div class="clear" id="br-wrap">
+	
+	<div id="br-content-header">
+		<h2><cpanel langprint="FinStep"></h2>
+		<p><cpanel langprint="DLPartBUType"></p>
+	</div>
+	
+	<div id="br-content-wide">
+	<cpanelif $FORM{'type'}==homedir>
+		<h4><cpanel langprint="BUHomeBackupTitle"></h4>
+		<p><a class="create-button" href="<cpanel Cgi="backuplink()">"><cpanel langprint="BUFullOptHome"></a></p>
+	</cpanelif>
+	<cpanelif $FORM{'type'}==mysql>
+		<h4><cpanel langprint="BUSQLBackupTitle"></h4>
+		<table fixedtruncate="1" class="sortable truncate-table" id="sqlbackuptbl" cellspacing="0" cellpadding="0">
+		<tr>
+			<th><cpanel langprint="Databases"></th>
+		</tr>
+                <tbody><?cp MysqlFE::listdbsbackup([tr][td class="cell nobrd-left truncate" truncatefixed="25"][a href="$ENV{'cp_security_token'}/getsqlbackup/%.sql.gz"]%[/a][/td][/tr],db,db) ?>
+			</tbody>
+		</table>
+	</cpanelif>
+	<cpanelif $FORM{'type'}==email>
+		<h4><cpanel langprint="BUAliasFilterTitle"></h4>
+		<table border="0">
+			<tr>
+                   <td>
+                     <cpanelfeature forwarders><table fixedtruncate="1" class="sortable truncate-table" id="aliastbl" border="0" cellspacing="0" cellpadding="0">
+			       <tr>    
+                   	<th valign=top>
+				    	<cpanel langprint="BUAliasList">
+				    </th>
+			        </tr>
+                        <tbody>
+                         <?cp Email::listaliasbackups([tr][td class="cell nobrd-left truncate" truncatefixed="25"][a href="$ENV{'cp_security_token'}/getaliasbackup/aliases-%.gz"]%[/a][/td][/tr],domain,domain) ?>
+                        </tbody>
+                       </tr>
+                       </table>
+					</cpanelfeature>
+                   </td>
+				<td>
+					&nbsp;&nbsp;&nbsp;
+				</td>
+                   <td>
+                    <cpanelfeature blockers> <table fixedtruncate="1" class="sortable truncate-table" id="filtertbl" border="0" cellspacing="0" cellpadding="0">
+			       <tr>    
+				    <th valign=top>
+					    <cpanel langprint="System Filter Info">
+	    			</th>
+			        </tr>
+                        <tbody>
+
+                         <?cp Email::list_system_filter_info(
+[tr][td class="cell nobrd-left truncate" truncatefixed="25"]
+  [a href="$ENV{'cp_security_token'}/getfilterbackup/%"]%[/a]
+[/td][/tr]
+,filter_info,filter_info) ?>
+
+                        </tbody>
+                       </tr>
+                       </table></cpanelfeature>
+                   </td>
+			</tr>
+		</table>
+	</cpanelif>
+	</div>
+	
+</div>
+<!-- END #br-wrap -->
+
+<div class="return-link"><a href="wizard-backup.html">&larr; <cptext "Go Back"></a></div>
+
+</div><!-- end body-content -->
+
+<cpanel Branding="include(stdfooter.html)">

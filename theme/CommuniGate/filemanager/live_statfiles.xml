@@ -1,0 +1,18 @@
+<xml>
+<?cp Fileman::statfiles(
+        [file]
+            [name]%[/name]
+            [path]%[/path]
+            [type]%[/type]
+            [perms]%[/perms]
+            [size]%[/size]
+            [mtime]%[/mtime]
+            [ctime]%[/ctime]
+            [mimeinfo]%[/mimeinfo]
+            [user]%[/user]
+            [group]%[/group]
+            [uid]%[/uid]
+            [gid]%[/gid]
+        [/file]
+    ,^file,^path,^type,^mode,^size,^mtime,^ctime,^mimeinfo,^user,^group,^uid,^gid) files=$FORM{'files'} ?>
+</xml>

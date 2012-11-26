@@ -1,0 +1,114 @@
+<cpanel setvar="headerimg=../images/mailmenu.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+
+
+	
+<style type="text/css">
+<?cp Branding::spritelist(.spriteicon_img_mini {float:left;margin-right:5px;background: url\{leftparenthesis}"%"\{rightparenthesis};} %,@spriteurl,images::#icon-${img}_mini {background-position\{colon}0 -${cssposition}px;width\{colon}${width}px;height\{colon}${height}px; }:) imgtype=icon,subtype=img,method=scale_60percent,format=png,img=maillist ?>
+</style>	
+	
+<div class="body-content">
+
+<div class="h1Title"><div class="spriteicon_img_mini" id="icon-maillist_mini"></div> <cpanel langprint="GGPGroupSettings"> <cpanel print="$FORM{'email'}"></div>
+
+<cpanel setvar="vidtut_name=mailinglists">
+<cpanel setvar="vidtut_header=VidMailingList">
+<cpanel setvar="vidtut_description=VidMailingListDesc">
+<cpanel setvar="vidtut_video_name=mailinglists-low">
+<cpanel setvar="vidtut_width=450">
+<cpanel setvar="vidtut_height=269">	
+
+<p class="description"><cpanel langprint="CGPGroupSettingsDesc"></p>
+<div class="return-link"><a href="http://www.communigate.com/communigatepro/Groups.html#Settings" target="_blank"><cptext "Documentation"></a></div>
+<br>
+<br>
+
+
+
+<cpanelif $FORM{'SubmitMLSettings'}>
+<?cp CommuniGate::SetGroupSettings() email=$FORM{'email'},RemoveToAndCc=$FORM{'RemoveToAndCc'},Expand=$FORM{'Expand'},FinalDelivery=$FORM{'FinalDelivery'},RealName=$FORM{'RealName'},RejectAutomatic=$FORM{'RejectAutomatic'},RemoveAuthor=$FORM{'RemoveAuthor'},SetReplyTo=$FORM{'SetReplyTo'},spectre=$FORM{'spectre'} ?>
+</cpanelif>
+
+<cpanelif $CPERROR{'CommuniGate'} && $FORM{'SubmitMLSettings'}>
+<p><cpanel print="CGP ERROR : $CPERROR{'CommuniGate'}"></p>
+</cpanelif>
+
+<cpanelif !$CPERROR{'CommuniGate'} && $FORM{'SubmitMLSettings'}>
+<p><b><cpanel print="Settings were successfully saved."></b></p>
+</cpanelif>
+
+
+<?cp CommuniGate::GetGroupSettings() email=$FORM{'email'}?>
+
+
+<cpanelif $CPERROR{'CommuniGate'}>
+<p><cpanel print="CGP ERROR : $CPERROR{'CommuniGate'}"></p>
+</cpanelif>
+
+
+<form action="groupsettings.html">
+
+<input type=hidden name="SubmitMLSettings" value="true">
+<input type=hidden name="email" value="<cpanel print="$FORM{'email'}">">
+
+<div class="highlight">
+
+
+<table width="100%" class="settingsBox">
+ <tr>
+                <td style="width: 150px" align="right"><cpanel langprint="CGPGroupRealName">:</td>
+                <td><input type="text" name="RealName" id="RealName" value="<cpanel print=$CPDATA{'RealName'}>" style="width: 150px" /></td>
+                <td><div id="email_error"></div></td>
+        </tr>
+  <tr><td nowrap="nowrap" align="RIGHT">Posting Policy:</td>
+	<td>&nbsp;<select name="spectre" id="spectre">
+        <option value="0"<cpanelif $CPDATA{'spectre'}==0><cpanel print=' selected="selected"'></cpanelif>>Private - Members Only</option>
+        <option value="1"<cpanelif $CPDATA{'spectre'}==1><cpanel print=' selected="selected"'></cpanelif>>Public - Anyone</option
+	</select>
+</td>
+</tr>
+
+
+<tr>
+<td></td>
+<td nowrap="nowrap" ><input type="checkbox" name="RemoveToAndCc" value="1" <cpanelif $CPDATA{'RemoveToAndCc'}=='YES'><cpanel print=' checked'></cpanelif>/>Remove To and Cc from Distribution</td>
+</tr>
+<tr>
+<td></td>
+<td nowrap="nowrap" ><input type="checkbox" name="Expand" value="1" <cpanelif $CPDATA{'Expand'}=='YES'><cpanel print=' checked'></cpanelif>/>Expand Group Members</td>
+</tr>
+<tr>
+<td></td>
+<td nowrap="nowrap" ><input type="checkbox" name="FinalDelivery" value="1" <cpanelif $CPDATA{'FinalDelivery'}=='YES'><cpanel print=' checked'></cpanelif>/>Report Delivery to Group</td>
+</tr>
+<tr>
+<td></td>
+<td nowrap="nowrap" ><input type="checkbox" name="RejectAutomatic" value="1" <cpanelif $CPDATA{'RejectAutomatic'}=='YES'><cpanel print=' checked'></cpanelif>/>Reject Automatic Messages</td>
+</tr>
+<tr>
+<td></td>
+<td nowrap="nowrap" ><input type="checkbox" name="RemoveAuthor" value="1" <cpanelif $CPDATA{'RemoveAuthor'}=='YES'><cpanel print=' checked'></cpanelif>/>Remove Author from Distribution</td>
+</tr>
+<tr>
+<td></td>
+<td nowrap="nowrap" ><input type="checkbox" name="SetReplyTo" value="1" <cpanelif $CPDATA{'SetReplyTo'}=='YES'><cpanel print=' checked'></cpanelif>/>Set Reply-To to Group</td>
+</tr>
+
+</table>
+</div>
+
+
+
+<BR>
+
+<p>
+<center><p><input type="submit" value="<cpanel langprint="CGPMailListSubmitSettings">" class="input-button"></p></center>
+</form>
+</p>
+<div class="return-link"><a href="groups.html">&larr; <cptext "Go Back"></a></div>
+
+
+</div><!-- end body-content -->
+
+<cpanel Branding="include(stdfooter.html)">

@@ -1,0 +1,15 @@
+<cpanel setvar="headerimg=../images/tools.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+<style type="text/css">
+<?cp Branding::spritelist(.spriteicon_img_mini {float:left;margin-right:5px;background: url\{leftparenthesis}"%"\{rightparenthesis};} %,@spriteurl,images::#icon-${img}_mini {background-position\{colon}0 -${cssposition}px;width\{colon}${width}px;height\{colon}${height}px; }:) imgtype=icon,subtype=img,method=scale_60percent,format=png,img=index ?>
+</style>
+
+<div class="body-content">	
+<div class="h1Title"><div class="spriteicon_img_mini" id="icon-index_mini"></div><cpanel langprint="indexmantitle"></div>
+<p class="description"><cpanel langprint="indexmandesc"></p>
+<h2><cpanel langprint="indexmaninst"></h2>
+<br /><br />
+<cpanel Htaccess="htdirls($FORM{'dir'},1)">
+</div>
+<cpanel Branding="include(stdfooter.html)">

@@ -1,0 +1,3 @@
+<xml>
+    <?cp NVData::get([key][name]%[/name][value]%[/value][/key],name,value) encoded=1,names=$FORM{'names'} ?>
+</xml>

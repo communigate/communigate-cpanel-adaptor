@@ -1,0 +1,43 @@
+/* Reset IE6 browser styles */
+html,body {overflow: hidden;}
+body {font-size:small;font:x-small;}
+pre, code {font-size:100%;}
+.clear {height: 0.01%; overflow: visible;}
+
+/* Custom IE6 styles */
+
+body#index div#subright {
+	width: expression(
+		document.getElementById('index').offsetWidth - 308
+	);
+	}
+	
+body#index div#subleft {
+	height: expression(
+		document.getElementById('index').offsetHeight - 170
+	);
+	}
+	
+body#index div#subright {
+	height: expression(
+		document.getElementById('index').offsetHeight - 125
+	);
+	}
+	
+.yui-dt-scrollable .yui-dt-bd {overflow: auto;}
+	
+#topnav li a {
+	color: #666;
+	display: block;
+	font-size: 72%;
+	padding: 0 3px;
+	text-align: center;
+	text-decoration: none;
+	width: 42px;
+	}
+#topnav ul {
+	background: #fff url(../img/icons/topgradient.jpg) repeat-x 0 0;
+	float: left;
+	padding: 10px 5px;
+	width: 100%;
+	}		

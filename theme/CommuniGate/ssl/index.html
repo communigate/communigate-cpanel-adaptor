@@ -1,0 +1,47 @@
+<cpanel setvar="headerimg=../images/toperrorpages.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+<style type="text/css">
+<?cp Branding::spritelist(.spriteicon_img_mini {float:left;margin-right:5px;background: url\{leftparenthesis}"%"\{rightparenthesis};} %,@spriteurl,images::#icon-${img}_mini {background-position\{colon}0 -${cssposition}px;width\{colon}${width}px;height\{colon}${height}px; }:) imgtype=icon,subtype=img,method=scale_60percent,format=png,img=ssl-manager ?>
+</style>
+<div class="body-content">
+
+	<div class="h1Title"><div class="spriteicon_img_mini" id="icon-ssl-manager_mini"></div><cpanel langprint="TSSLManager"></div>
+	<p class="description"><cpanel langprint="SSLDesc"></p>
+	<br />
+<h2> <cpanel langprint="SSLKey"></h2>
+<p><a href="keys.html"><cpanel langprint="SSLKeyGen"></a></p>
+<br />
+<h2><cpanel langprint="SSLCSR"></h2>
+<p><a href="csrs.html"><cpanel langprint="SSLCSRGen"></a></p>
+<br />
+<h2><cpanel langprint="SSLCRT"></h2>
+<p><a href="crts.html"><cpanel langprint="SSLCRTGen"></a></p>
+<br />
+  <cpanelif $hasdedicatedip && $isallowedssl>
+      <cpanelfeature sslinstall>
+			<h2><cpanel langprint="SSLHTTPS"></h2>
+			<p><a href="install.html"><cpanel langprint="SSLHTTPSSetUp"></a></p>
+			<br />
+			<noscript>
+			<p class="errors"><cpanel langprint="SSLNote"></p>
+			</noscript>
+      </cpanelfeature>
+  </cpanelif>
+ <!--
+ <cpanel SSL="installedhost()">
+ -->
+    <cpanelif $isreseller && !$CPVAR{'sslhost'}==>
+        <h2><cpanel langprint="CertSharing"></h2>
+        <p><a href="manageshare.html"><cpanel langprint="CertSharingPerm"></a></p>
+    <br />
+    </cpanelif>
+
+    <!-- <cpanel SSL="checksharedcrt()"> -->
+    <cpanelif $CPVAR{'hassharedcrt'}>
+        <h2><cpanel langprint="CertShareSSLURL"></h2>
+        <p><a target="_blank" href="https://<cpanel print="$CPVAR{'sharedsslhost'}">/~<cpanel print="$user">/">https://<cpanel print="$CPVAR{'sharedsslhost'}">/~<cpanel print="$user">/</a></p>
+</cpanelif>
+
+</div>            
+<cpanel Branding="include(stdfooter.html)">

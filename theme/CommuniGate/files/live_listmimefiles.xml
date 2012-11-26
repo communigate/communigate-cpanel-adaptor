@@ -1,0 +1,3 @@
+<xml>
+<?cp Fileman::listfiles([file][name]%[/name][path]%[/path][type]%[/type][mimetype]%[/mimetype][mtime]%[/mtime][humansize]%[/humansize][nicemode]%[/nicemode][/file],^file,^path,^type,^mimetype,mtime,^humansize,nicemode) dir=$FORM{'dir'},needmime=1,filelist=$FORM{'filelist'} ?>
+</xml>

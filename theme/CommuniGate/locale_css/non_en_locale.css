@@ -1,0 +1,65 @@
+#menu_drag_el .item,
+div.anim_proxy .item,
+#main .item {
+xbackground: #f55;
+float: left;
+height: auto;
+margin: 3px 0;
+padding: 0;	
+text-align: left;
+width: 245px;
+display:inline;
+}
+/*#main .item a {
+display: block;
+padding: 5px 0 0 0;
+}*/
+
+#menu_drag_el .item .icon_wrap,
+div.anim_proxy .item .icon_wrap,
+#main .item .icon_wrap{
+	float: left;
+	display:inline;
+	height: 40px;
+	margin:0;
+	padding:0;
+	width:58px;
+	display:block;
+}
+#menu_drag_el .item .link,
+div.anim_proxy .item .link,
+#main .item .link{
+display:inline;
+height:32px;
+margin: 0 13px 0 0;
+padding: 0;
+}
+#menu_drag_el .item a.itemlink,
+div.anim_proxy .item a.itemlink,
+#main .item a.itemlink {
+float: left;
+margin: 15px 10px 0 5px;
+padding: 0;
+background-repeat:none;
+width: 50px;
+height: 32px;
+overflow: hidden;
+}
+#x .item {
+	float:left;
+	width:200px;
+	height:60px;
+	text-align: left;
+}
+#x .item a{
+	display: block;
+	padding: 5px 0 0 0;
+}
+#x .item a.itemlink {
+float: left;
+margin:0;
+padding: 0;
+width: 55px;
+height: 32px;
+overflow: hidden;
+}

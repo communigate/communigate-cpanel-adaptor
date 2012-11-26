@@ -1,0 +1,153 @@
+<html>
+<head>
+<title>cPanel X</title>
+<cpanel relinclude="files/files_head.html">
+</head>
+<body class="topright">
+<form method="post" action="htmledit.html" target="editor">
+<b><cpanel langprint="htmleditTitle"></b>
+<div>
+<cpanel langprint="htmledit_file_edit"> <i><cpanel print="$FORM{'dir'}">/<cpanel print="$FORM{'file'}"></i>
+</div>
+<p>
+<select style="display:none;" name="basedir" id="basedir">
+</select>
+<cpanel langprint="htmledit_land_select">
+<select name="url" id="urls" onchange="document.getElementById('basedir').selectedIndex =this.selectedIndex;"></select>
+<br />
+<div style="text-align:justify; padding-left: 10px;" align="justify"><cpanel langprint="htmledit_land_desc"></div>
+
+<br />
+<div id="htmledit-encodings">
+<cpanel langprint="htmledit_select_encode"><select id="charset" name="charset"></select><br />
+<div style="text-align:justify; padding-left: 10px;" align="justify"> <cpanel langprint="htmledit_long_desc"> <img src="../images/encoding_lang_broken.png" align="absmiddle"><img src="../images/encoding_lang_broken2.png" align="absmiddle"> <cpanel langprint="htmledit_or"> <img src="../images/encoding_special_broken.png" align="absmiddle"> <cpanel langprint="htmledit_long_desc2">
+</div>
+</div>
+<input type="hidden" name="dir" id="dir" value="<cpanel unsafeprint="$FORM{'dir'}">" />
+<input type="hidden" name="file" id="file" value="<cpanel unsafeprint="$FORM{'file'}">" />
+</p>
+
+<div align="center"><input type="submit" value="<cpanel Locale="maketext('Edit')">"></center>
+</div>
+</form>
+<script type="text/javascript" src="<cpanel MagicRevision="uri("/yui/utilities_container/utilities_container.js")">"></script>
+<script type="text/javascript" src="<cpanel MagicRevision="uri("/cjt/cpanel-all-min.js")">"></script>
+<script type="text/javascript" src="<cpanel MagicRevision="uri("js/filemanager_legacy_optimized.js")">"></script>
+
+<script type="text/javascript">
+if (!self['NVData']) { NVData={}; }
+<?cp NVData::get(NVData.%=unescape\{leftparenthesis}'%'\{rightparenthesis};,name,^value) html_encoded=1,names=ignorecharencoding ?>
+
+var web_docroots = {
+<?cp DomainLookup::getdocroots('%': '%'\{comma},domain,docroot) ?>
+'': ''
+};
+delete web_docroots[''];
+var current_charset = '<cpanel getcharset="">';
+var maindomain = '<cpanel print="$CPDATA{'DNS'}">';
+var charmaps = [
+<?cp Email::fetchcharmaps(
+    '%'\{comma},map) ?>
+    ''
+];
+charmaps.pop();
+
+
+var waitpanel;
+function show_loading(action,body) {
+
+    if (!waitpanel) {    waitpanel =
+        new YAHOO.widget.Panel("waitpanel",
+                { width:"252px",
+fixedcenter:true,
+close:false,
+draggable:false,
+modal:true,
+visible:false
+}
+                );
+        }
+waitpanel.setHeader(action);
+var loadingimg = '<img src="img/yui/rel_interstitial_loading.gif" />';
+if (body) {
+    waitpanel.setBody(body + '<br />' + loadingimg);
+}  else {
+    waitpanel.setBody(loadingimg);
+}
+waitpanel.render(document.body);
+waitpanel.show();
+}
+
+function populate_charset(charEl) {
+    charEl.options.length=0;
+    for(var i=0;i<charmaps.length;i++) {
+        charEl.options[charEl.options.length] = new Option(charmaps[i],charmaps[i]);
+    }
+}
+
+function select_charset(charEl,charset) {
+   var lccharset = charset.toLowerCase();
+    for(var i=0;i<charEl.options.length;i++) {
+        if (charEl.options[i].value == lccharset) {
+            charEl.selectedIndex=i;
+            break;
+        }
+    }
+
+}
+
+
+show_loading('<cpanel Locale="maketext('Loading HTML Editor')">','');
+
+var htmleditSEl=document.getElementById('urls');
+var htmleditBSEl=document.getElementById('basedir');
+htmleditSEl.options.length = 0;
+var fileName = '<cpanel print="$FORM{'file'}">';
+var decoded_cwd = '<?cp Fileman::getabsdir(%,absdir) dir=$FORM{'dir'} ?>';
+var didsel=0;
+var itemcount = -1;
+
+for(var domain in web_docroots) {
+    var docroot = web_docroots[domain];
+    var begin_cwd = decoded_cwd.substring(0,docroot.length);
+    var end_cwd = decoded_cwd.substring(docroot.length);
+    if (begin_cwd == docroot) {
+        itemcount++;
+        htmleditSEl.options[itemcount] = new Option('http://' + domain + end_cwd + '/' + fileName, 'http://' + domain + end_cwd);
+        htmleditBSEl.options[itemcount] = new Option(docroot,docroot);
+        if (domain == maindomain) {
+            htmleditSEl.options[itemcount].selected=true;
+            htmleditBSEl.options[itemcount].selected=true;
+            didsel=1;
+        }
+    }
+}
+if (!didsel) {
+    if (!htmleditSEl.options.length) {
+        itemcount++;
+        htmleditSEl.options[itemcount] = new Option('http://' + maindomain + '/' + fileName, 'http://' + maindomain);
+        htmleditBSEl.options[itemcount] = new Option(decoded_cwd,decoded_cwd);
+    }
+    htmleditSEl.options[itemcount].selected=true;
+    htmleditBSEl.options[itemcount].selected=true;
+}
+var encoding_callback = function(encodings) {
+    var encoding = encodings[0]['encoding'];
+    var htmledit_charset_SEl = document.getElementById('charset');
+    if (!htmledit_charset_SEl.options || !htmledit_charset_SEl.options.length ) { populate_charset(htmledit_charset_SEl); };
+    select_charset(htmledit_charset_SEl,encoding);
+
+    waitpanel.hide();
+};
+
+
+
+cpanel_jsonapi2(encoding_callback,'Encoding','guess_file','file',decoded_cwd + '/' + fileName);
+if (NVData['ignorecharencoding']) {
+    document.getElementById('htmledit-encodings').style.display='none';
+}
+</script>
+
+</body>
+</html>
+

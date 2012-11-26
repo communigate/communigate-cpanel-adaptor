@@ -1,0 +1,29 @@
+<cpanel setvar="headerimg=../../images/mailmenu.gif">
+<cpanel setvar="dprefix=../../">
+<cpanel Branding="include(stdheader.html)">
+<div class="body-content">
+
+<style type="text/css">
+<?cp Branding::spritelist(.spriteicon_img_mini {float:left;margin-right:5px;background: url\{leftparenthesis}"%"\{rightparenthesis};} %,@spriteurl,images::#icon-${img}_mini {background-position\{colon}0 -${cssposition}px;width\{colon}${width}px;height\{colon}${height}px; }:) imgtype=icon,subtype=img,method=scale_60percent,format=png,img=ufiltering ?>
+</style>
+
+<div class="h1Title"><div class="spriteicon_img_mini" id="icon-ufiltering_mini"></div><cpanel langprint="EFDelfilter"></div>
+
+<cpanelif !$CPERROR{'userfiltering'}>
+<p><?cp Email::deletefilter(%,filtername) account=$FORM{'account'},filtername=$FORM{'filtername'} ?> <cpanel langprint="EFDeleted"></p>
+</cpanelif>
+<cpanelif $CPERROR{'userfiltering'}>
+    <p class="errors"><cpanel langprint="AODErr">.
+    <a href="#" onclick="document.getElementById('details').style.display='block'; return false;"><cpanel langprint="AODShowDetails"></a> </p>
+    <div class="details" id="details">
+        <cpanel print="$CPERROR{'userfiltering'}">
+    </div>
+	<noscript>
+		<div class="details-noscript"  id="details">
+			<cpanel print="$CPERROR{'userfiltering'}">
+		</div>
+	</noscript>
+</cpanelif>
+<div class="return-link"><a href="userfilters.html?account=<cpanel formprint="$FORM{'account'}">">&larr; <cptext "Go Back"></a></div>
+</div>
+<cpanel Branding="include(stdfooter.html)">

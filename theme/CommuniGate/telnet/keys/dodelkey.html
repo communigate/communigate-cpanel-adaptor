@@ -1,0 +1,15 @@
+<cpanel setvar="headerimg=../../images/topmysql.gif">
+<cpanel setvar="dprefix=../../">
+<cpanel Branding="include(stdheader.html)">
+<style type="text/css">
+<?cp Branding::spritelist(.spriteicon_img_mini {float:left;margin-right:5px;background: url\{leftparenthesis}"%"\{rightparenthesis};} %,@spriteurl,images::#icon-${img}_mini {background-position\{colon}0 -${cssposition}px;width\{colon}${width}px;height\{colon}${height}px; }:) imgtype=icon,subtype=img,method=scale_60percent,format=png,img=ssh-shell-access ?>
+</style>
+<div class="body-content">
+<div class="h1Title"><div class="spriteicon_img_mini" id="icon-ssh-shell-access_mini"></div><cpanel langprint="SSHDeltePubKey"></div>
+<p>
+<?cp SSH::delkey(maketext('The key with the name “[_1]” which was located at “[_2]” has been removed.',%,%),name,keyfile) name=$FORM{'key'},pub=$FORM{'pub'} ?>
+</p>	
+
+<div class="return-link"><a href="index.html">&larr; <cptext "Go Back"></a></div>
+</div>       
+<cpanel Branding="include(stdfooter.html)">

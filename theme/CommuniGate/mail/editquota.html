@@ -1,0 +1,125 @@
+<cpanel setvar="headerimg=../images/mailmenu.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+
+<script type="text/javascript">
+//<![CDATA[
+var QUOTA_VAL = new CPANEL.validate.validator("<cpanel Locale="maketext('Quota Input')">");
+
+// custom validation function for the quota input
+var mailbox_quota = function () {
+   var quota = DOM.get("quota").value;
+   if (quota === "<cpanel langprint="email_unlimited">") return true;
+   if (CPANEL.validate.integer(quota) === true) return true;
+   return false;
+};
+
+// custom validation function for the mailbox quota
+// this function is a little weird; basically I needed a way to show the user something if they enter a number over 2 gigs, but
+// I didn't want to show them the same error text for the other validator function
+var quota_over_2gigs = function() {
+   var quota = DOM.get("quota").value;
+   if (CPANEL.validate.integer(quota) == true && quota > 2048) {
+	  return false;
+   }
+   return true;
+};
+
+var check_quota = function() {
+	if (quota_over_2gigs() == false) {
+		DOM.get("quota").value = "<cpanel langprint="email_unlimited">";
+		QUOTA_VAL.verify();
+	}
+};
+
+// set the quota value to 0 before we submit the form if it's set to unlimited in the interface
+var fill_in_quota = function() {
+	DOM.get("real_quota").value = DOM.get("quota").value;
+	if (DOM.get("quota").value === "<cpanel langprint="email_unlimited">") DOM.get("real_quota").value = 0;
+};
+
+function page_init() {
+   QUOTA_VAL.add("quota", quota_over_2gigs, "<cpanel langprint="email_quota_2gig">");
+   QUOTA_VAL.add("quota", mailbox_quota, "<cpanel langprint="email_quota_number_or_unlimited">" + " " + "<cpanel langprint="email_unlimited">.");
+   QUOTA_VAL.attach();	
+	
+   YAHOO.util.Event.on("quota", "blur", check_quota);
+   
+   CPANEL.validate.attach_to_form("submit_quota", QUOTA_VAL, fill_in_quota);
+}
+
+YAHOO.util.Event.onDOMReady(page_init);
+//]]>
+</script>
+
+
+<div class="body-content">
+
+<style type="text/css">
+<?cp Branding::spritelist(.spriteicon_img_mini {float:left;margin-right:5px;background: url\{leftparenthesis}"%"\{rightparenthesis};} %,@spriteurl,images::#icon-${img}_mini {background-position\{colon}0 -${cssposition}px;width\{colon}${width}px;height\{colon}${height}px; }:) imgtype=icon,subtype=img,method=scale_60percent,format=png,img=manageaccounts ?>
+</style>
+
+<div class="h1Title">
+   <div class="spriteicon_img_mini" id="icon-manageaccounts_mini"></div> 
+   <cpanel langprint="MENUMailChange">
+</div>
+
+<p class="description"><cpanel langprint="ChangeQuotaDesc"></p>
+<form name="quotaform" id="quotaform" method="post" action="doeditquota.html">
+   <input type="hidden" name="email" value="<cpanel print="$FORM{'email'}">" />
+   <input type="hidden" name="domain" value="<cpanel print="$FORM{'domain'}">" />
+
+	<table>
+		<tr>
+			<td>
+				<div align="left"><cpanel langprint="GBEmail"></div>
+			</td>
+			<td colspan="2">
+				<em><cpanel sprint="$FORM{'email'},=,0">@<cpanel print="$FORM{'domain'}"></em>
+			</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>
+				<div align="left"><cpanel langprint="usage">:</div>
+			</td>
+			<td class="status">
+				<?cp Email::getdiskusage(%,diskused) user=$FORM{'email'},domain=$FORM{'domain'} ?>
+		    </td>
+            <td align="left">
+        		<acronym title="<cpanel langprint="EAdoaddmegs">">MB</acronym>
+			</td>
+			<td></td>
+		</tr>
+
+		<tr>
+			<td>
+				<div align="left"><cpanel langprint="EANewquota"></div>
+			</td>
+			<td>
+                           <noscript>
+				<input type="text" name="quota" size="10" id="quota" value="<cpanel Email="getpopquota($FORM{'email'},$FORM{'domain'})">" />
+                           </noscript>
+                           <script type="text/javascript">
+                                <!-- to work in tandem with the noscript tag above. -->
+                                document.writeln('<input type="text" size="10" id="quota" value="<cpanel Email="getpopquota($FORM{'email'},$FORM{'domain'})">" />');
+				document.writeln('<input type="hidden" name="quota" id="real_quota" value="250" />');
+                           </script>
+			</td>
+            <td align="left">
+                <acronym title="<cpanel langprint="EAdoaddmegs">">MB</acronym>
+			</td>
+			<td>
+			   <div id="quota_error" style="height: 16px; width: 16px"></div>
+			</td>
+		</tr>
+	</table>
+
+   <input type="submit" class="input-button" id="submit_quota" value="<cpanel langprint="EAChange">" />
+</form>
+
+<div class="return-link"><a href="pops_noscript.html?domain=<cpanel print="$FORM{'domain'}">">&larr; <cptext "Go Back"></a></div>
+
+</div><!-- end body-content -->
+
+<cpanel Branding="include(stdfooter.html)">

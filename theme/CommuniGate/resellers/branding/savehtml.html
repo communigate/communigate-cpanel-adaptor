@@ -1,0 +1,27 @@
+<cpanel Branding="tempsetbrandingpkg($RAW_FORM{'brandingpkg'})">
+<cpanel setvar="headerimg=../../images/tools.gif">
+<cpanel setvar="dprefix=../../">
+<cpanel include="../../stdbheader.html">
+<cpanel include="../../ajaxhelp.html">
+
+<div class="body-content">
+<div class="breadcrumbs" id="breadcrumbs">
+	<a class="crumb_highlight" href="index.html"><cpanel Locale="maketext('Branding Editor')"></a> > 
+	<a class="crumb_highlight" href="edit_bpkg.html?brandingpkg=<?cp Branding::getbrandingpkg(%,^brandingpkg)?>"><cpanel langprint="Branding_edit_title"></a> > 
+	<a href="edithtml-code.html?file=<cpanel uriprint="$FORM{'file'}">&edittype=html&brandingpkg=<?cp Branding::getbrandingpkg(%,^brandingpkg)?>"><cpanel langprint="BrandingEditHTML"> </a>
+</div>
+
+<cpanel Branding="setupdirs()">
+<br />
+
+<cpanel langprint="BrandingHTMLSaved">: <cpanel print="$FORM{'file'}">
+
+<cpanel Fileman="fmsavefile($RAW_FORM{'dir'},$RAW_FORM{'file'},$RAW_FORM{'page'})">
+<!--
+<cpanel Branding="migrate_branding($RAW_FORM{'brandingpkg'})">
+-->
+<cpanel Branding="clearcache()">
+
+<cpanel include="gobackwhere.html">
+</div>
+<cpanel Branding="include(stdfooter.html)">

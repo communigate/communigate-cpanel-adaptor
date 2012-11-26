@@ -1,0 +1,24 @@
+<cpanel setvar="headerimg=../images/mailmenu.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+<div class="body-content">
+
+<style type="text/css">
+<?cp Branding::spritelist(.spriteicon_img_mini {float:left;margin-right:5px;background: url\{leftparenthesis}"%"\{rightparenthesis};} %,@spriteurl,images::#icon-${img}_mini {background-position\{colon}0 -${cssposition}px;width\{colon}${width}px;height\{colon}${height}px; }:) imgtype=icon,subtype=img,method=scale_60percent,format=png,img=defaultemailacct ?>
+</style>
+<div class="h1Title"><div class="spriteicon_img_mini" id="icon-defaultemailacct_mini"></div> <cpanel langprint="EmailPipe"></div>
+
+<cpanel langprint="FWPipeCheckPipeTo">
+<i>"<img src="../images/homeb.gif" alt="" align="absmiddle" />/<cpanel print="$FORM{'prog'}">"</i>
+<cpanel Email="fixuppipedprog($FORM{'prog'})">
+
+<cpanel langprint="EmailPipeRepaired">
+
+<cpanelif $FORM{'return'}==fwd>
+	<div class="return-link"><a href="fwds.html">&larr; <cptext "Go Back"></a></div>
+</cpanelif>
+<cpanelif !$FORM{'return'}==fwd>
+	<div class="return-link"><a href="def.html">&larr; <cptext "Go Back"></a></div>
+</cpanelif>
+</div>
+<cpanel Branding="include(stdfooter.html)">

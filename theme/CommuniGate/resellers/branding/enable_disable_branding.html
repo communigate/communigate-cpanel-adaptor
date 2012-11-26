@@ -1,0 +1,135 @@
+<cpanel setvar="headerimg=../../images/tools.gif">
+<cpanel setvar="dprefix=../../">
+<cpanel relinclude="stdbheader.html">
+<script type="text/javascript" src="ajaxloader.js"></script>
+<script type="text/javascript">
+//<![CDATA[
+function getQSV(qv) {
+  var queryString = window.location.search.substring(1);
+  var vars = queryString.split("&");
+  for (var i=0;i<vars.length;i++) {
+    var pair = vars[i].split("=");
+    if (pair[0] == qv) {
+      return pair[1];
+    }
+  }
+  return -1;
+}
+
+function checkbranding_table() {
+   var brandingpkg = getQSV('brandingpkg');
+   if (brandingpkg != -1) {
+        var brandingTblEl = document.getElementById('bpkg-list');
+        var bRows = brandingTblEl.getElementsByTagName('tr');
+        for(var i=1;i<bRows.length;i++) {
+            if (bRows[i].id != "brandingpkg-" + brandingpkg) {
+                bRows[i].style.display='none';
+            } else {
+                bRows[i].style.display='';
+            }
+        }
+        document.getElementById('showall_branding').style.display='';
+   }
+}
+function showall_branding() {
+        document.getElementById('showall_branding').style.display='none';
+        var brandingTblEl = document.getElementById('bpkg-list');
+        var bRows = brandingTblEl.getElementsByTagName('tr');
+        for(var i=1;i<bRows.length;i++) {
+                bRows[i].style.display='';
+        }
+}
+function checkmakepack() {
+    var pack = document.makepack.pkg.value;
+    if (pack == '') {
+        alert("<cpanel Locale="maketext('You must type a name for your package.')">");
+        return false;
+    }
+}
+function checkuppack(){
+	var uppack = document.uploadpack.file1.value;
+	if (uppack == '') {
+        alert("<cpanel Locale="maketext('You must select a package to upload.')">");
+        return false;
+    }
+}
+
+function Branding_SetAllCheckBoxes(FormName, FieldName, CheckValue)
+{
+	if(!document.forms[FormName])
+		return;
+	var objCheckBoxes = document.forms[FormName].elements[FieldName];
+	if(!objCheckBoxes)
+		return;
+	var countCheckBoxes = objCheckBoxes.length;
+	if(!countCheckBoxes)
+		objCheckBoxes.checked = CheckValue;
+	else
+		// set the check value for all check boxes
+		for(var i = 0; i < countCheckBoxes; i++) {
+			objCheckBoxes[i].checked = CheckValue;
+            toggle_pkg(objCheckBoxes[i]);
+        }
+}
+YAHOO.util.Event.onDOMReady(checkbranding_table):
+//]]>
+</script>
+<div class="body-content">
+
+<style type="text/css">
+<?cp Branding::spritelist(.spriteicon_img_mini {float:left;margin-right:5px;background: url\{leftparenthesis}"%"\{rightparenthesis};} %,@spriteurl,images::#icon-${img}_mini {background-position\{colon}0 -${cssposition}px;width\{colon}${width}px;height\{colon}${height}px; }:) imgtype=icon,subtype=img,method=scale_60percent,format=png,img=branding ?>
+</style>
+
+<h1><cpanel Locale="maketext('Enable/Disable Branding Packages')"></h1>
+
+<p class="description"><cpanel langprint="BrandingPkgDisableDesc"></p>
+
+<style type="text/css">
+.brandingpkg-1 { text-decoration: line-through; }
+</style>
+<script type="text/javascript">
+//<![CDATA[
+function toggle_pkg(mybox) {
+    var bpkgenabledname = mybox.id;
+    var bpkga = bpkgenabledname.split('-');
+    bpkga.pop();
+    var bpkg = bpkga.join('-');
+    var sUrl = 'branding_status.xml';
+    var newstatus = 'disable';
+    if (mybox.checked) { newstatus='enable'; }
+    var postData = 'brandingpkg=' + bpkg + '&status=' + newstatus;
+    YAHOO.util.Connect.asyncRequest('POST', sUrl, null, postData);   
+    if (newstatus == 'disable') {    
+        document.getElementById(bpkg + '-display').className='brandingpkg-1';
+    } else {
+        document.getElementById(bpkg + '-display').className='brandingpkg-0';
+    }
+}
+//]]>
+</script>
+
+<form method="get" action="none" name="myForm" onsubmit="return false;">
+<table id="bpkg-list" border="0" cellspacing="0" cellpadding="0">
+	<tr>
+		<th><cpanel langprint="Branding_enable_th1"></th>
+		<th><cpanel langprint="Branding_enable_th2"></th>
+		<th><cpanel langprint="Branding_enable_th3"></th>
+	</tr>
+
+<?cp Branding::showpkgs(
+	[tr class="info-%" id="brandingpkg-%"]
+		[td align="center"][input autocomplete="off" autofill="off" type="checkbox" % id="%-enabled" name="myCheckbox" onclick="toggle_pkg[[this]];"][/td]
+		[td][span class="brandingpkg-%" id="%-display"]%[/span][/td]
+		[td align="center"][a href="%"] [img border="none" src="../../images/trace.gif" /][/a][/td]
+	[/tr],*num,pkg,pkgchecked,pkg,disabled,pkg,pkgname,previewimg) showroot=1 ?>
+</table>
+
+<ul class="clear" id="selections">
+	<li class="all"><a href="#bpkg-list" onclick="Branding_SetAllCheckBoxes('myForm', 'myCheckbox', true);"><cpanel langprint="Branding_select_all"></a></li>
+	<li class="none"><a href="#bpkg-list" onclick="Branding_SetAllCheckBoxes('myForm', 'myCheckbox', false);"><cpanel langprint="Branding_select_none"></a></li>
+</ul>
+</form>
+
+<div class="return-link"><a href="index.html">&larr; <cptext "Go Back"></a></div>
+</div>
+<cpanel Branding="include(stdfooter.html)">

@@ -1,0 +1,52 @@
+<cpanel setvar="headerimg=../../images/topmysql.gif">
+<cpanel setvar="dprefix=../../">
+<cpanel Branding="include(stdheader.html)">
+	
+<style type="text/css">
+<?cp Branding::spritelist(.spriteicon_img_mini {float:left;margin-right:5px;background: url\{leftparenthesis}"%"\{rightparenthesis};} %,@spriteurl,images::#icon-${img}_mini {background-position\{colon}0 -${cssposition}px;width\{colon}${width}px;height\{colon}${height}px; }:) imgtype=icon,subtype=img,method=scale_60percent,format=png,img=ssh-shell-access ?>
+</style>	
+	
+<div class="body-content">
+
+<div class="h1Title"><div class="spriteicon_img_mini" id="icon-ssh-shell-access_mini"></div><cpanel langprint="SSHViewDownKey"> <cpanel print="$FORM{'key'}"></div>
+	
+<h2>
+	<img src="../../images/openssh.jpg" align="middle" alt="" /> 
+	<cpanelif $FORM{'pub'}>
+		<cpanel langprint="SSHPublic">
+	</cpanelif>
+	<cpanelif !$FORM{'pub'}>
+		<cpanel langprint="SSHPrivate">
+	</cpanelif>
+	<cpanel print="$FORM{'key'}"> <cpanel langprint="SSHOpenKey">:
+</h2>
+<textarea cols="75" class="output" rows="10" id="key_area"><?cp SSH::fetchkey(%,key) name=$FORM{'key'},pub=$FORM{'pub'} ?></textarea>
+<script type="text/javascript">
+//<![CDATA[
+// select the text area when it's clicked
+var init_page = function() {
+	YAHOO.util.Event.on("key_area", "click", function() {
+		YAHOO.util.Dom.get("key_area").select();
+	});
+};
+YAHOO.util.Event.onDOMReady(init_page);
+//]]>
+</script>
+
+
+<p><a class="create-button" href="<cpanel print="$ENV{'cp_security_token'}">/download<?cp SSH::listkeys(%,file) keys=$FORM{'key'},pub=$FORM{'pub'} ?><cpanelif $FORM{'pub'}>.pub</cpanelif>"><cpanel langprint="SSHDownloadKey"></a></p>
+<br />
+
+<cpanelif !$FORM{'pub'}>
+    <h2><img src="../../images/putty.gif" align="middle" alt="" /> <cpanel langprint="SSHPrivate"> <cpanel print="$FORM{'key'}"> <cpanel langprint="SSHPuttyPPK"></h2>
+	<form action="puttyexport.html" method="post">
+		<input type="hidden" name="key" value="<cpanel print="$FORM{'key'}">" />
+		<cpanel langprint="SSHKeyEditText1"> <b><cpanel print="$FORM{'key'}"></b> <cpanel langprint="SSHKeyEditText2">:
+		<input type="password" name="pass" />
+		<input type="submit" class="input-button" value="<cpanel langprint="SSHKeyConvert">" />
+	</form>
+</cpanelif>
+
+<div class="return-link"><a href="index.html">&larr; <cptext "Go Back"></a></div>
+</div><!-- end body-content -->
+<cpanel Branding="include(stdfooter.html)">

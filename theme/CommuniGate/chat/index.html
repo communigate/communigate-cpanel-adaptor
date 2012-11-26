@@ -1,0 +1,25 @@
+<cpanel setvar="headerimg=../images/topchatroom.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+<div class="body-content">
+<form target="entropychat" action="http://<cpanel print="$CPDATA{'DNS'}">:2084/">
+	<cpanel Locale="maketext('Nickname:')"> <input type="text" name="nick" value="" />
+	<input type="hidden" name="channel" value="<cpanel print="$CPDATA{'DNS'}">" />
+	<input type="submit" class="input-button" value="<cpanel Locale="maketext('Enter Chat')">" />
+</form>
+<br />
+<cpanel Locale="maketext('Put this HTML in your webpage to make a chat room gateway:')">
+<pre>
+&lt;form target="entropychat" action="http://<cpanel print="$CPDATA{'DNS'}">:2084/"&gt;
+<cpanel Locale="maketext('Nickname:')"> &lt;input type="text" name="nick" value=""&gt;
+&lt;input type="hidden" name="channel" value="<cpanel print="$CPDATA{'DNS'}">"&gt;
+&lt;input type="submit" value="<cpanel Locale="maketext('Enter Chat')">"&gt;
+&lt;/form&gt;
+</pre>
+
+<h2><cpanel Locale="maketext('Java Chat')"></h2>
+<cpanel Locale="maketext('If you would prefer a java chat, just the link below in any of your pages:')"><br />
+<b>http://<cpanel print="$CPDATA{'DNS'}">/cgi-sys/mchat.cgi?channel=<cpanel print="$CPDATA{'DNS'}"></b>
+<br /><br />
+</div>
+<cpanel Branding="include(stdfooter.html)">

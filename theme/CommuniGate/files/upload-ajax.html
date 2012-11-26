@@ -1,0 +1,73 @@
+<cpanel setvar="dprefix=../">
+<html>
+<head>
+<title>cPanel X</title>
+<cpanel relinclude="files/files_head.html">
+<script type="text/javascript" src="<cpanel MagicRevision="uri("/yui/utilities_container/utilities_container.js")">"></script>
+<script type="text/javascript" src="<cpanel MagicRevision="uri("/cjt/cpanel-all-min.js")">"></script>
+<script type="text/javascript">
+var uploadkey = '<?cp Rand::getranddata(%,random) ?>';
+var dir = '<cpanel print="$FORM{'dir'}">';
+</script>
+<script type="text/javascript" src="<cpanel MagicRevision="uri("js/filemanager_upload_optimized.js")">"></script>
+<style type="text/css">
+<cpanel Branding="include(sprites.html)">
+#uploadlimits b {
+    font-weight: bold;
+    font-size: 13px;
+}
+#uploadlimits td {
+    font-size: 13px;
+}
+#overWriteDlg .myButtonClass { padding:3px; font-size:20px; width:100px; } 
+#overWriteDlg .ok_button { color:#2F2; } 
+#overWriteDlg .cancel_button { color:#F88; }
+#uploaders {
+    padding:0px;
+}
+.smtxt {
+    font-size: 11px;
+
+}
+.smtxt a {
+    font-size: 11px;
+    text-decoration: none;
+}
+.uploadtable {
+    font-size: 11px;
+}
+.progresstxt {
+    font-size: 11px;
+    color: #333;
+    padding: 0px;
+}
+</style>
+</head>
+<body id="leftmain">
+<h1 style="font-size:16px;"><img src="img/actions/upload.png" align="absmiddle" alt="upload"><cpanel langprint="FMUploadHead"></h1>
+<div style="clear:left;">
+   <p> <cpanel langprint="FMfreespaceBEGIN"><span class="highlight"> <?cp Fileman::getdiskinfo(%,file_upload_remain_humansize) ?></span></p>
+   <p><cpanel langprint="FMUploadSelectDirPre"> <strong><cpanel print="$FORM{'dir'}"></strong></p>
+
+
+<!--page content ends here-->
+<div id='alertbox'></div>
+   
+<!--
+    <cpanel langprint="FMfreespaceBEGIN"><cpanel Quota="showquotaremain()"><cpanel langprint="FMfreespaceEND">
+    <cpanel langprint="FMUploadMaxBytesBEGIN"><cpanel print="$CONF{'file_upload_max_bytes'}"><cpanel langprint="FMUploadMaxBytesEND">
+    <cpanel langprint="FMUploadLeaveBytesBEGIN"><cpanel print="$CONF{'file_upload_must_leave_bytes'}"><cpanel langprint="FMUploadLeaveBytesEND">
+-->
+
+<div id="uploaders"></div> <!-- uploaders -->
+<cpanel langprint="FMUploadOverwriteCheckbox">
+<input id="overwrite_checkbox" type="checkbox" name="overwrite" value="1" />
+<br />
+<div align="center"><a class="smtxt" href=# onclick="adduploader(); return false;"><img align="absmiddle" src="../images/symbol-add.gif" width="16" height="16" border="0" /> <cpanel langprint="FMAddUploadBox"></a></div>
+<div id="sdlg1"></div>
+<br /><br />
+
+
+<div align="center"><a href="dir.html?dir=<cpanel print="$FORM{'dir'}">"><cpanel langprint="FMBackto"> <cpanel print="$FORM{'dir'}"></a></div>
+</body>
+</html>

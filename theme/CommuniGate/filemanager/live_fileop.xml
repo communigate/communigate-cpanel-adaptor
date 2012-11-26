@@ -1,0 +1,3 @@
+<xml>
+<?cp Fileman::fileop([fileop][result]%[/result][source]%[/source][dest]%[/dest][error]%[/error][output]%[/output][/fileop],result,^src,^dest,^err,^output) ?>
+</xml>

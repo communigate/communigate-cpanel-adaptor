@@ -1,0 +1,109 @@
+<cpanel setvar="headerimg=../images/topsubdomains.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+	<style type="text/css">
+	p.description img {
+	float:none;
+	margin:0pt;
+	}
+	</style>
+	<cpanelif $FORM{'itemsperpage'}>
+	    <cpanel setvar="itemsperpage=$FORM{'itemsperpage'}">
+	</cpanelif>
+	<cpanelif !$FORM{'itemsperpage'} || !$CPVAR{'itemsperpage'}>
+	    <cpanel setvar="itemsperpage=10">
+	</cpanelif>
+<script type="text/javascript">
+    ajaxloader_on = 1;
+
+var init = function() {
+	var validation = new CPANEL.validate.validator("<cpanel langprint="domain_input">");
+	validation.add("domain", "host", "<cpanel langprint="domain_invalid">");
+	validation.attach();
+	
+	CPANEL.validate.attach_to_form("domain_submit", validation);
+
+	YAHOO.util.Dom.get("domain").focus();
+};
+YAHOO.util.Event.onDOMReady(init);
+</script>
+<style type="text/css">
+<?cp Branding::spritelist(.spriteicon_img_mini {float:left;margin-right:5px;background: url\{leftparenthesis}"%"\{rightparenthesis};} %,@spriteurl,images::#icon-${img}_mini {background-position\{colon}0 -${cssposition}px;width\{colon}${width}px;height\{colon}${height}px; }:) imgtype=icon,subtype=img,method=scale_60percent,format=png,img=parkeddomains ?>
+</style>
+
+<div class="body-content">
+
+<div class="h1Title"><div class="spriteicon_img_mini" id="icon-parkeddomains_mini"></div> <cpanel langprint="PDHead"></div>
+<p class="description"><cpanel langprint="PDCreateText"></p>
+
+<cpanel setvar="vidtut_name=parked">
+<cpanel setvar="vidtut_header=INDXParkedDomains">
+<cpanel setvar="vidtut_description=VidParkDesc">
+<cpanel setvar="vidtut_video_name=parked_lo">
+<cpanel setvar="vidtut_width=450">
+<cpanel setvar="vidtut_height=324">
+<cpanel include="../video_tutorial_include.html">
+
+<h2><cpanel langprint="PDCreate"></h2>
+			<?cp StatsBar::stat( [p class="caution"]$LANG{'statsattention'}&nbsp;%&nbsp;$LANG{'statsoutof'}&nbsp;%$LANG{'available'}&nbsp;$LANG{'PDHead'}[/p],count,max) display=parkeddomains,warnings=1,warninglevel=80,infinitylang=true ?>
+				<cpanelif $CPVAR{'statsbar_parkeddomains_maxed'}>
+				 	<style type="text/css">
+						.highlight, .note{
+								display:none;
+								}			
+					</style>
+					<p class="alert_box"><strong><cpanel langprint="Warning2">:</strong> <cpanel langprint="ParkedDomainsMax"> </span></p> 
+				</cpanelif>
+<div class="highlight">
+	<form action="doaddparked.html" name="domainform" id="domainform">
+		<table><tr>
+		<td><input type="text" name="domain" id="domain" /></td>
+		<td><input type="submit" class="input-button" id="domain_submit" name="go" value="<cpanel langprint="PARKAddSubmit">" /></td>
+		<td><div id="domain_error" style="height: 16px; width: 16px"></div></td>
+		</tr></table>
+	</form>
+</div>
+<p class="note"><cpanel langprint="PDNote"></p>
+<br />
+
+<h2><cpanel langprint="RemovePrkDomains"></h2>
+<p class="description"><cpanel langprint="INDXParkedDomains"><cpanel langprint="subDesc5"> <cpanel print="$homedir">.</p>
+<br />
+ 	<div class="search-panel">
+		<form method="get"><span class="boldit"><cpanel langprint="SESearchButton"></span><input type="text" size="15" name="searchregex" value="<cpanel print="$FORM{'searchregex'}">"><input type="submit" class="input-button" value="<cpanel langprint="go">"></form>
+	</div>
+	
+<table border="0" cellpadding="5" cellspacing="0" id="parkeddomaintbl" class="sortable">
+ <COLGROUP>
+<COL width="30%" >
+<COL width="30%" >
+<COL width="10%">
+<COL width="13%">
+<COL width="17%">
+</COLGROUP>
+  <tr>
+    <th scope="col" ><cpanel langprint="PDDomain"></th>
+    <th scope="col" ><cpanel langprint="PDDomainRoot"></th>
+   <th align="center" scope="col" class="cell" nonsortable="true"><cpanel langprint="AD-RedirectsTo"></th>
+  <th colspan="2" scope="col" align="center" nonsortable="true"><cpanel langprint="Actions"></th>
+  </tr>
+  <tbody>
+
+<?cp Park::listparkeddomains([tr class="row-%"][td class="nobrd-center-t"]%[/td]
+
+    [td align="left" nowrap="nowrap"][a href="../files/index.html?dir=%" target="_blank" class="ajaxfiles"][img src="../images/homeb.gif" border="0" alt=""]/%[/a][/td][td align="center"]%[/td]
+     [td align="center" class="nobrd"][a href="dodelparkedconfirm.html?domain=%"]Remove[/a][/td]
+    [td align="center"]  [a href="doredirectdomain.html?domain=%"]$LANG{'ManRedirect'}[/a][/td] [/tr]
+,*num,domain,dir,basedir,status,domain,domain,domain,domain) api2_paginate=1,api2_paginate_start=$FORM{'api2_paginate_start'},api2_paginate_size=$CPVAR{'itemsperpage'},regex=$FORM{'searchregex'} || '[tr][td colspan=5 class=errors]$LANG{'PDNoParkD'}[/td][/tr]' ?>
+  </tbody>
+</table>
+<?cp UI::paginate(%,paginator) currentpage=$CPVAR{'currentpage'},pages=$CPVAR{'pages'},itemsperpage=$CPVAR{'itemsperpage'} ?>
+<cpanelif $CPVAR{'pages'} && !$CPVAR{'pages'}==1>
+<div style="float:right"><form>
+<cpanel langprint="PaginatorShowing"> <select name="itemsperpage" onchange="this.form.submit();">
+<?cp UI::paginate_list([option value="%" %]%[/option],item,selected=1?selected:,item) itemsperpage=$CPVAR{'itemsperpage'},itemlist=10:25:50:100:250:500 ?>
+</select><noscript><button id="my_button" onclick="" type="submit" Value=""><cpanel langprint="FTPChange"></button></noscript>  <cpanel langprint="PaginatorResults"> 
+</form></div>
+</cpanelif>
+</div>
+<cpanel Branding="include(stdfooter.html)">

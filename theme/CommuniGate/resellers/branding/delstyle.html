@@ -1,0 +1,20 @@
+<?cp Branding::delpkg(,) pkg=$RAW_FORM{'pkg'} ?>
+<cpanel setvar="headerimg=../../images/tools.gif">
+<cpanel setvar="dprefix=../../">
+<cpanel include="../../stdbheader.html">
+<cpanel include="../../ajaxhelp.html">
+
+<div class="body-content">
+<h1><cpanel Locale="maketext('Style Selector')"></h1>
+
+<cpanelif !$CPERROR{'Branding'}>
+	<p><cpanel Locale="maketext('The branding package “[output,class,_1,status]” was deleted.',$FORM{'pkg'})"></p>
+</cpanelif>
+
+<cpanelif $CPERROR{'Branding'}>
+	<p><cpanel Locale="maketext('The branding package [output,class,_1,status] [output,strong,was not] deleted.',$FORM{'pkg'})"></p>
+</cpanelif>
+
+<div class="return-link"><a href="download_delete_branding.html">&larr; <cptext "Go Back"></a></div>
+</div>
+<cpanel Branding="include(stdfooter.html)">

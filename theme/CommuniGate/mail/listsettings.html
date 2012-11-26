@@ -1,0 +1,536 @@
+<cpanel setvar="headerimg=../images/mailmenu.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+
+
+	
+<style type="text/css">
+<?cp Branding::spritelist(.spriteicon_img_mini {float:left;margin-right:5px;background: url\{leftparenthesis}"%"\{rightparenthesis};} %,@spriteurl,images::#icon-${img}_mini {background-position\{colon}0 -${cssposition}px;width\{colon}${width}px;height\{colon}${height}px; }:) imgtype=icon,subtype=img,method=scale_60percent,format=png,img=maillist ?>
+</style>	
+	
+<div class="body-content">
+
+<div class="h1Title"><div class="spriteicon_img_mini" id="icon-maillist_mini"></div> <cpanel langprint="GGPMLSettings"> <cpanel print="$FORM{'email'}"></div>
+
+<cpanel setvar="vidtut_name=mailinglists">
+<cpanel setvar="vidtut_header=VidMailingList">
+<cpanel setvar="vidtut_description=VidMailingListDesc">
+<cpanel setvar="vidtut_video_name=mailinglists-low">
+<cpanel setvar="vidtut_width=450">
+<cpanel setvar="vidtut_height=269">	
+
+<p class="description"><cpanel langprint="CGPMLSettingsDesc"></p>
+
+<div class="return-link"><a href="http://www.communigate.com/communigatepro/LIST.html" target="_blank"><cptext "Mailing Lists Documentation"></a></div>
+
+<br>
+
+<cpanelif $FORM{'SubmitMLSettings'}>
+<?cp CommuniGate::SetListSettings() email=$FORM{'email'},OwnerCheck=$FORM{'OwnerCheck'},Charset=$FORM{'Charset'},Subscribe=$FORM{'Subscribe'},SaveRequests=$FORM{'SaveRequests'},Distribution=$FORM{'Distribution'},Confirmation=$FORM{'Confirmation'},ConfirmationSubject=$FORM{'ConfirmationSubject'},ConfirmationText=$FORM{'ConfirmationText'},Postings=$FORM{'Postings'},FirstModerated=$FORM{'FirstModerated'},Format=$FORM{'Format'},SizeLimit=$FORM{'SizeLimit'},CheckCharset=$FORM{'CheckCharset'},CheckDigestSubject=$FORM{'CheckDigestSubject'},HideFromAddress=$FORM{'HideFromAddress'},ListFields=$FORM{'ListFields'},TillConfirmed=$FORM{'TillConfirmed'},CoolOffPeriod=$FORM{'CoolOffPeriod'},MaxBounces=$FORM{'MaxBounces'},UnsubBouncedPeriod=$FORM{'UnsubBouncedPeriod'},FatalWeight=$FORM{'FatalWeight'}i,FailureNotification=$FORM{'FailureNotification'},CleanupPeriod=$FORM{'CleanupPeriod'},SaveReports=$FORM{'SaveReports'},WarningText=$FORM{'WarningText'},WarningSubject=$FORM{'WarningSubject'},FeedSubject=$FORM{'FeedSubject'},Reply=$FORM{'Reply'},FeedPrefixMode=$FORM{'FeedPrefixMode'},FeedTrailer=$FORM{'FeedTrailer'},FeedHeader=$FORM{'FeedHeader'},PolicySubject=$FORM{'PolicySubject'},PolicyText=$FORM{'PolicyText'},ByeSubject=$FORM{'ByeSubject'},ByeText=$FORM{'ByeText'},Store=$FORM{'Store'},ArchiveSizeLimit=$FORM{'ArchiveSizeLimit'},ArchiveMessageLimit=$FORM{'ArchiveMessageLimit'},ArchiveSwapPeriod=$FORM{'ArchiveSwapPeriod'},Browse=$FORM{'Browse'},DigestPeriod=$FORM{'DigestPeriod'},DigestSizeLimit=$FORM{'DigestSizeLimit'},DigestMessageLimit=$FORM{'DigestMessageLimit'},DigestTimeOfDay=$FORM{'DigestTimeOfDay'},DigestSubject=$FORM{'DigestSubject'},DigestFormat=$FORM{'DigestFormat'},DigestHeader=$FORM{'DigestHeader'},TOCLine=$FORM{'TOCLine'},TOCTrailer=$FORM{'TOCTrailer'},DigestTrailer=$FORM{'DigestTrailer'}?>
+</cpanelif>
+
+<cpanelif $CPERROR{'CommuniGate'} && $FORM{'SubmitMLSettings'}>
+<p><cpanel print="CGP ERROR : $CPERROR{'CommuniGate'}"></p>
+</cpanelif>
+
+<cpanelif !$CPERROR{'CommuniGate'} && $FORM{'SubmitMLSettings'}>
+<p><b><cpanel print="Settings were successfully saved."></b></p>
+</cpanelif>
+
+
+<?cp CommuniGate::GetListSettings() email=$FORM{'email'}?>
+
+
+<cpanelif $CPERROR{'CommuniGate'}>
+<p><cpanel print="CGP ERROR : $CPERROR{'CommuniGate'}"></p>
+</cpanelif>
+
+
+<form action="listsettings.html">
+
+<input type=hidden name="SubmitMLSettings" value="true">
+<input type=hidden name="email" value="<cpanel print="$FORM{'email'}">">
+
+<div class="highlight">
+
+
+<table width="100%" class="settingsBox">
+  <caption>General</caption>
+ <tr><th nowrap="nowrap" align="RIGHT">Owner:</th><td class="arrow">&nbsp; <cpanel print="$CPDATA{'Owner'}"></td></tr>
+  <tr><th nowrap="nowrap" align="RIGHT">Preferred Character Set:</th><td>&nbsp;<select name="Charset">
+        <option value="0"<cpanelif $CPDATA{'Charset'}==0><cpanel print=' selected="selected"'></cpanelif>>Western European (ISO)</option>
+        <option value="1"<cpanelif $CPDATA{'Charset'}==1><cpanel print=' selected="selected"'></cpanelif>>Western European (Windows)</option>
+        <option value="2"<cpanelif $CPDATA{'Charset'}==2><cpanel print=' selected="selected"'></cpanelif>>Japanese (ISO)</option>
+        <option value="3"<cpanelif $CPDATA{'Charset'}==3><cpanel print=' selected="selected"'></cpanelif>>Japanese (EUC)</option>
+        <option value="4"<cpanelif $CPDATA{'Charset'}==4><cpanel print=' selected="selected"'></cpanelif>>Japanese (Shift-JIS)</option>
+        <option value="5"<cpanelif $CPDATA{'Charset'}==5><cpanel print=' selected="selected"'></cpanelif>>Cyrillic (KOI)</option>
+        <option value="6"<cpanelif $CPDATA{'Charset'}==6><cpanel print=' selected="selected"'></cpanelif>>Cyrillic (ISO)</option>
+        <option value="7"<cpanelif $CPDATA{'Charset'}==7><cpanel print=' selected="selected"'></cpanelif>>Cyrillic (Windows)</option><
+        <option value="8"<cpanelif $CPDATA{'Charset'}==8><cpanel print=' selected="selected"'></cpanelif>>Cyrillic (Alt-DOS)</option>
+        <option value="9"<cpanelif $CPDATA{'Charset'}==9><cpanel print=' selected="selected"'></cpanelif>>Ukrainian (KOI)</option>
+        <option value="10"<cpanelif $CPDATA{'Charset'}==10><cpanel print=' selected="selected"'></cpanelif>>Central European (ISO)</option>
+        <option value="11"<cpanelif $CPDATA{'Charset'}==11><cpanel print=' selected="selected"'></cpanelif>>Central European (Windows)</option>
+        <option value="12"<cpanelif $CPDATA{'Charset'}==12><cpanel print=' selected="selected"'></cpanelif>>Greek (ISO)</option>
+        <option value="13"<cpanelif $CPDATA{'Charset'}==13><cpanel print=' selected="selected"'></cpanelif>>Greek (Windows)</option>
+        <option value="14"<cpanelif $CPDATA{'Charset'}==14><cpanel print=' selected="selected"'></cpanelif>>Hebrew (ISO)</option>
+        <option value="15"<cpanelif $CPDATA{'Charset'}==15><cpanel print=' selected="selected"'></cpanelif>>Hebrew (Windows)</option>
+        <option value="16"<cpanelif $CPDATA{'Charset'}==16><cpanel print=' selected="selected"'></cpanelif>>Turkish (ISO)</option>
+        <option value="17"<cpanelif $CPDATA{'Charset'}==17><cpanel print=' selected="selected"'></cpanelif>>Turkish (Windows)</option>
+        <option value="18"<cpanelif $CPDATA{'Charset'}==18><cpanel print=' selected="selected"'></cpanelif>>Baltic (ISO)</option>
+        <option value="19"<cpanelif $CPDATA{'Charset'}==19><cpanel print=' selected="selected"'></cpanelif>>Baltic (Windows)</option>
+        <option value="20"<cpanelif $CPDATA{'Charset'}==20><cpanel print=' selected="selected"'></cpanelif>>Chinese (Big5)</option>
+        <option value="21"<cpanelif $CPDATA{'Charset'}==21><cpanel print=' selected="selected"'></cpanelif>>Chinese (Simplified)</option>
+        <option value="22"<cpanelif $CPDATA{'Charset'}==22><cpanel print=' selected="selected"'></cpanelif>>Chinese (Standard)</option>
+        <option value="23"<cpanelif $CPDATA{'Charset'}==23><cpanel print=' selected="selected"'></cpanelif>>Chinese (GBK)</option>
+        <option value="24"<cpanelif $CPDATA{'Charset'}==24><cpanel print=' selected="selected"'></cpanelif>>Chinese (EUC)</option>
+        <option value="25"<cpanelif $CPDATA{'Charset'}==25><cpanel print=' selected="selected"'></cpanelif>>Korean (ISO)</option>
+        <option value="26"<cpanelif $CPDATA{'Charset'}==26><cpanel print=' selected="selected"'></cpanelif>>Korean (EUC)</option>
+        <option value="27"<cpanelif $CPDATA{'Charset'}==27><cpanel print=' selected="selected"'></cpanelif>>Korean (Windows)</option>
+        <option value="28"<cpanelif $CPDATA{'Charset'}==28><cpanel print=' selected="selected"'></cpanelif>>Arabic (ISO)</option>
+        <option value="29"<cpanelif $CPDATA{'Charset'}==29><cpanel print=' selected="selected"'></cpanelif>>Arabic (Windows)</option>
+        <option value="30"<cpanelif $CPDATA{'Charset'}==30><cpanel print=' selected="selected"'></cpanelif>>Thai (ISO)</option>
+        <option value="31"<cpanelif $CPDATA{'Charset'}==31><cpanel print=' selected="selected"'></cpanelif>>Thai (Windows)</option>
+        <option value="32"<cpanelif $CPDATA{'Charset'}==32><cpanel print=' selected="selected"'></cpanelif>>Southern European (ISO)</option>
+        <option value="33"<cpanelif $CPDATA{'Charset'}==33><cpanel print=' selected="selected"'></cpanelif>>Nordic (ISO)</option>
+        <option value="34"<cpanelif $CPDATA{'Charset'}==34><cpanel print=' selected="selected"'></cpanelif>>New Baltic (ISO)</option>
+        <option value="35"<cpanelif $CPDATA{'Charset'}==35><cpanel print=' selected="selected"'></cpanelif>>Celtic (ISO)</option>
+        <option value="36"<cpanelif $CPDATA{'Charset'}==36><cpanel print=' selected="selected"'></cpanelif>>New European (ISO)</option>
+        <option value="37"<cpanelif $CPDATA{'Charset'}==37><cpanel print=' selected="selected"'></cpanelif>>East European (ISO)</option>
+        <option value="38"<cpanelif $CPDATA{'Charset'}==38><cpanel print=' selected="selected"'></cpanelif>>Vietnamese (Windows)</option>
+        <option value="39"<cpanelif $CPDATA{'Charset'}==39><cpanel print=' selected="selected"'></cpanelif>>Unicode (UTF8)</option
+</select></td></tr>
+  <tr><th nowrap="nowrap" align="RIGHT">Verify Owner Using:</th><td>&nbsp;<select name="OwnerCheck">
+	<option value="0"<cpanelif $CPDATA{'OwnerCheck'}==0><cpanel print=' selected="selected"'></cpanelif>>Return-Path</option>
+	<option value="1"<cpanelif $CPDATA{'OwnerCheck'}==1><cpanel print=' selected="selected"'></cpanelif>>IP Addresses</option>
+	<option value="2"<cpanelif $CPDATA{'OwnerCheck'}==2><cpanel print=' selected="selected"'></cpanelif>>Authentication</option></select></td></tr>
+</table>
+
+</div>
+
+<div class="highlight">
+<table width="100%" class="settingsBox">
+  <caption>Subscription Policy</caption>
+	<tr>
+	  <td nowrap="nowrap" align="RIGHT">Subscribe:</td>		<td><select name="Subscribe">
+	<option value="0"<cpanelif $CPDATA{'Subscribe'}==0><cpanel print=' selected="selected"'></cpanelif>>nobody</option>
+	<option value="1"<cpanelif $CPDATA{'Subscribe'}==1><cpanel print=' selected="selected"'></cpanelif>>moderated</option>
+	<option value="2"<cpanelif $CPDATA{'Subscribe'}==2><cpanel print=' selected="selected"'></cpanelif>>this domain only</option>
+	<option value="3"<cpanelif $CPDATA{'Subscribe'}==3><cpanel print=' selected="selected"'></cpanelif>>locals only</option>
+	<option value="4"<cpanelif $CPDATA{'Subscribe'}==4><cpanel print=' selected="selected"'></cpanelif>>anybody</option>
+</select></td>
+
+	  <td nowrap="nowrap" align="RIGHT">Requests to Save</td>	<td><select name="SaveRequests">
+	<option value="0"<cpanelif $CPDATA{'SaveRequests'}==0><cpanel print=' selected="selected"'></cpanelif>>no</option>
+	<option value="1"<cpanelif $CPDATA{'SaveRequests'}==1><cpanel print=' selected="selected"'></cpanelif>>accepted</option>
+	<option value="2"<cpanelif $CPDATA{'SaveRequests'}==2><cpanel print=' selected="selected"'></cpanelif>>rejected</option>
+	<option value="3"<cpanelif $CPDATA{'SaveRequests'}==3><cpanel print=' selected="selected"'></cpanelif>>all</option></select></td>
+	</tr><tr>
+	  <td nowrap="nowrap" align="RIGHT">Default Mode:</td><td><select name="Distribution">
+	<option value="0"<cpanelif $CPDATA{'Distribution'}==0><cpanel print=' selected="selected"'></cpanelif>>feed</option>
+	<option value="1"<cpanelif $CPDATA{'Distribution'}==1><cpanel print=' selected="selected"'></cpanelif>>null</option>
+	<option value="2"<cpanelif $CPDATA{'Distribution'}==2><cpanel print=' selected="selected"'></cpanelif>>banned</option>
+	<option value="3"<cpanelif $CPDATA{'Distribution'}==3><cpanel print=' selected="selected"'></cpanelif>
+			 <cpanelif $CPDATA{'Store'}=='NO'><cpanel print=' disabled="disabled"'></cpanelif>>digest</option>
+	<option value="4"<cpanelif $CPDATA{'Distribution'}==4><cpanel print=' selected="selected"'></cpanelif>
+			<cpanelif $CPDATA{'Store'}=='NO'><cpanel print=' disabled="disabled"'></cpanelif>>index</option></select></td>
+	  <td></td><td nowrap="nowrap"><input type="checkbox" name="Confirmation" value="1" <cpanelif $CPDATA{'Confirmation'}=='YES'><cpanel print=' checked'></cpanelif>/>Request Confirmation</td>
+	</tr>
+  <tr><th colspan="4">Confirmation Request Message</th></tr>
+	<tr>
+	  <td align="RIGHT">Subject:</td><td colspan="3"><input type="text" name="ConfirmationSubject" size="40" maxlength="200" value="<cpanel CommuniGate="PrintTextArea_api1($CPDATA{'ConfirmationSubject'})">" /></td>
+	</tr><tr valign="top">
+	  <td align="RIGHT">Text:</td><td colspan="3"><textarea name="ConfirmationText" cols="50" rows="5"><cpanel CommuniGate="PrintTextArea_api1($CPDATA{'ConfirmationText'})"></textarea></td>
+	</tr>
+</table>
+
+</div>
+<div class="highlight">
+
+<table width="100%" class="settingsBox">
+  <caption>Posting Policy</caption>
+	<tr>
+	  <td nowrap="nowrap" align="RIGHT">Accept Postings:</td><td><select name="Postings">
+	<option value="0"<cpanelif $CPDATA{'Postings'}==0><cpanel print=' selected="selected"'></cpanelif>>from owner only</option>
+	<option value="1"<cpanelif $CPDATA{'Postings'}==1><cpanel print=' selected="selected"'></cpanelif>>moderated</option>
+	<option value="2"<cpanelif $CPDATA{'Postings'}==2><cpanel print=' selected="selected"'></cpanelif>>from subscribers</option>
+	<option value="3"<cpanelif $CPDATA{'Postings'}==3><cpanel print=' selected="selected"'></cpanelif>>moderate guests</option>
+	<option value="4"<cpanelif $CPDATA{'Postings'}==4><cpanel print=' selected="selected"'></cpanelif>>from anybody</option></select></td>
+
+
+	  <td nowrap="nowrap" align="RIGHT">New Subscribers:</td><td><select class="popup" name="FirstModerated">
+	<option value="0"<cpanelif $CPDATA{'FirstModerated'}==0><cpanel print=' selected="selected"'></cpanelif>>Unmoderated</option>
+	<option value="1"<cpanelif $CPDATA{'FirstModerated'}==1><cpanel print=' selected="selected"'></cpanelif>>Moderate first</option>
+	<option value="2"<cpanelif $CPDATA{'FirstModerated'}==2><cpanel print=' selected="selected"'></cpanelif>>Moderate first 2</option>
+	<option value="3"<cpanelif $CPDATA{'FirstModerated'}==3><cpanel print=' selected="selected"'></cpanelif>>Moderate first 3</option>
+	<option value="5"<cpanelif $CPDATA{'FirstModerated'}==5><cpanel print=' selected="selected"'></cpanelif>>Moderate first 5</option>
+	<option value="10000"<cpanelif $CPDATA{'FirstModerated'}==10000><cpanel print=' selected="selected"'></cpanelif>>Moderate All</option>
+	<option value="10001"<cpanelif $CPDATA{'FirstModerated'}==10001><cpanel print=' selected="selected"'></cpanelif>>Prohibit</option>
+	</select></td>
+	</tr><tr>
+	  <td nowrap="nowrap" align="RIGHT">Allowed Format:</td><td><select name="Format">
+	<option value="0"<cpanelif $CPDATA{'Format'}==0><cpanel print=' selected="selected"'></cpanelif>>plain text only</option>
+	<option value="1"<cpanelif $CPDATA{'Format'}==1><cpanel print=' selected="selected"'></cpanelif>>text only</option>
+	<option value="2"<cpanelif $CPDATA{'Format'}==2><cpanel print=' selected="selected"'></cpanelif>>text alternative</option>
+	<option value="3"<cpanelif $CPDATA{'Format'}==3><cpanel print=' selected="selected"'></cpanelif>>anything</option></select></td>
+
+	  <td nowrap="nowrap" align="RIGHT">Maximum Size:</td><td><select class="popup" name="SizeLimit">
+	<option value="0"<cpanelif $CPDATA{'SizeLimit'}==0><cpanel print=' selected="selected"'></cpanelif>>unlimited</option>
+	<option value="1"<cpanelif $CPDATA{'SizeLimit'}==1><cpanel print=' selected="selected"'></cpanelif>>0</option>
+	<option value="2"<cpanelif $CPDATA{'SizeLimit'}==2><cpanel print=' selected="selected"'></cpanelif>>1024</option>
+	<option value="3"<cpanelif $CPDATA{'SizeLimit'}==3><cpanel print=' selected="selected"'></cpanelif>>3K</option>
+	<option value="4"<cpanelif $CPDATA{'SizeLimit'}==4><cpanel print=' selected="selected"'></cpanelif>>10K</option>
+	<option value="5"<cpanelif $CPDATA{'SizeLimit'}==5><cpanel print=' selected="selected"'></cpanelif>>30K</option>
+	<option value="6"<cpanelif $CPDATA{'SizeLimit'}==6><cpanel print=' selected="selected"'></cpanelif>>100K</option>
+	<option value="7"<cpanelif $CPDATA{'SizeLimit'}==7><cpanel print=' selected="selected"'></cpanelif>>300K</option>
+	<option value="8"<cpanelif $CPDATA{'SizeLimit'}==8><cpanel print=' selected="selected"'></cpanelif>>1024K</option>
+	<option value="9"<cpanelif $CPDATA{'SizeLimit'}==9><cpanel print=' selected="selected"'></cpanelif>>3M</option>
+	<option value="10"<cpanelif $CPDATA{'SizeLimit'}==10><cpanel print=' selected="selected"'></cpanelif>>10M</option>
+	<option value="11"<cpanelif $CPDATA{'SizeLimit'}==11><cpanel print=' selected="selected"'></cpanelif>>300M</option>
+</select></td>
+	</tr><tr>
+	  <td align="RIGHT" rowspan="2">Prohibit:</td>
+	  <td nowrap="nowrap" colspan="3"><input type="checkbox" name="CheckCharset" value="1" <cpanelif $CPDATA{'CheckCharset'}=='YES'><cpanel print=' checked'></cpanelif> />Non-matching Character Set</td>
+	</tr><tr>
+	  <td nowrap="nowrap" colspan="3"><input type="checkbox" name="CheckDigestSubject" value="1" <cpanelif $CPDATA{'CheckDigestSubject'}=='YES'><cpanel print=' checked'></cpanelif>/>Unmodified Digest Subjects</td>
+	</tr><tr valign="top">
+	  <td align="RIGHT">Service Fields:</td><td colspan="3"><textarea name="ListFields" rows="3" cols="50"><cpanel CommuniGate="PrintTextArea_api1($CPDATA{'ListFields'})"></textarea></td>
+	</tr><tr>
+	  <td></td><td colspan="3"><input type="checkbox" name="HideFromAddress" value="1"  <cpanelif $CPDATA{'HideFromAddress'}=='YES'><cpanel print=' checked'></cpanelif> /> Hide &#39;From&#39; Addresses</td>
+	</tr>
+</table>
+</div>
+<div class="highlight">
+
+<table width="100%" class="settingsBox">
+  <caption>Bounced Messages Processor</caption>
+	<tr valign="top">
+	  <td nowrap="nowrap" align="RIGHT" colspan="2">On a Non-Fatal Bounce:</td>
+	  <td><table border="0" cellspacing="0" cellpadding="1">
+		<tr><td><input type="radio" name="TillConfirmed" value="0" <cpanelif $CPDATA{'TillConfirmed'}=='NO'><cpanel print=' checked'></cpanelif>  /></td>
+			<td nowrap="nowrap" align="RIGHT">suspend subscription for:</td>
+			<td><select class="popup" name="CoolOffPeriod">
+<option value="0"<cpanelif $CPDATA{'CoolOffPeriod'}==0><cpanel print=' selected="selected"'></cpanelif>>60 min</option>
+<option value="1"<cpanelif $CPDATA{'CoolOffPeriod'}==1><cpanel print=' selected="selected"'></cpanelif>>2 hour(s)</option>
+<option value="2"<cpanelif $CPDATA{'CoolOffPeriod'}==2><cpanel print=' selected="selected"'></cpanelif>>3 hour(s)</option>
+<option value="3"<cpanelif $CPDATA{'CoolOffPeriod'}==3><cpanel print=' selected="selected"'></cpanelif>>6 hour(s)</option>
+<option value="4"<cpanelif $CPDATA{'CoolOffPeriod'}==4><cpanel print=' selected="selected"'></cpanelif>>12 hour(s)</option>
+<option value="5"<cpanelif $CPDATA{'CoolOffPeriod'}==5><cpanel print=' selected="selected"'></cpanelif>>24 hour(s)</option>
+<option value="6"<cpanelif $CPDATA{'CoolOffPeriod'}==6><cpanel print=' selected="selected"'></cpanelif>>2 day(s)</option>
+<option value="7"<cpanelif $CPDATA{'CoolOffPeriod'}==7><cpanel print=' selected="selected"'></cpanelif>>3 day(s)</option>
+<option value="8"<cpanelif $CPDATA{'CoolOffPeriod'}==8><cpanel print=' selected="selected"'></cpanelif>>5 day(s)</option>
+<option value="9"<cpanelif $CPDATA{'CoolOffPeriod'}==9><cpanel print=' selected="selected"'></cpanelif>>7 day(s)</option>
+<option value="10"<cpanelif $CPDATA{'CoolOffPeriod'}==10><cpanel print=' selected="selected"'></cpanelif>>10 day(s)</option>
+</select></td>
+	    </tr><tr>
+		  <td align="RIGHT" nowrap="nowrap" colspan="2">unsubscribe after:</td>
+		  <td><select class="popup" name="MaxBounces">
+<option value="0"<cpanelif $CPDATA{'MaxBounces'}==0><cpanel print=' selected="selected"'></cpanelif>>0</option>
+<option value="1"<cpanelif $CPDATA{'MaxBounces'}==1><cpanel print=' selected="selected"'></cpanelif>>1</option>
+<option value="2"<cpanelif $CPDATA{'MaxBounces'}==2><cpanel print=' selected="selected"'></cpanelif>>2</option>
+<option value="3"<cpanelif $CPDATA{'MaxBounces'}==3><cpanel print=' selected="selected"'></cpanelif>>3</option>
+<option value="5"<cpanelif $CPDATA{'MaxBounces'}==5><cpanel print=' selected="selected"'></cpanelif>>5</option>
+<option value="10"<cpanelif $CPDATA{'MaxBounces'}==10><cpanel print=' selected="selected"'></cpanelif>>10</option>
+<option value="20"<cpanelif $CPDATA{'MaxBounces'}==20><cpanel print=' selected="selected"'></cpanelif>>20</option>
+<option value="50"<cpanelif $CPDATA{'MaxBounces'}==50><cpanel print=' selected="selected"'></cpanelif>>50</option>
+<option value="100"<cpanelif $CPDATA{'MaxBounces'}==100><cpanel print=' selected="selected"'></cpanelif>>100</option>
+<option value="200"<cpanelif $CPDATA{'MaxBounces'}==200><cpanel print=' selected="selected"'></cpanelif>>200</option>
+</select> bounces</td>
+		</tr><tr>
+		  <td><input type="radio" name="TillConfirmed" value="1"  <cpanelif $CPDATA{'TillConfirmed'}=='YES'><cpanel print=' checked'></cpanelif> /></td>
+		  <td nowrap="nowrap" colspan="2">suspend till confirmation</td>
+		</tr><tr>
+		  <td align="RIGHT" nowrap="nowrap" colspan="2">unsubscribe after:</td>
+<td><select class="popup" name="UnsubBouncedPeriod">
+<option value="0"<cpanelif $CPDATA{'UnsubBouncedPeriod'}==0><cpanel print=' selected="selected"'></cpanelif>>60 min</option>
+<option value="1"<cpanelif $CPDATA{'UnsubBouncedPeriod'}==1><cpanel print=' selected="selected"'></cpanelif>>2 hour(s)</option>
+<option value="2"<cpanelif $CPDATA{'UnsubBouncedPeriod'}==2><cpanel print=' selected="selected"'></cpanelif>>3 hour(s)</option>
+<option value="3"<cpanelif $CPDATA{'UnsubBouncedPeriod'}==3><cpanel print=' selected="selected"'></cpanelif>>6 hour(s)</option>
+<option value="4"<cpanelif $CPDATA{'UnsubBouncedPeriod'}==4><cpanel print=' selected="selected"'></cpanelif>>12 hour(s)</option>
+<option value="5"<cpanelif $CPDATA{'UnsubBouncedPeriod'}==5><cpanel print=' selected="selected"'></cpanelif>>24 hour(s)</option>
+<option value="6"<cpanelif $CPDATA{'UnsubBouncedPeriod'}==6><cpanel print=' selected="selected"'></cpanelif>>2 day(s)</option>
+<option value="7"<cpanelif $CPDATA{'UnsubBouncedPeriod'}==7><cpanel print=' selected="selected"'></cpanelif>>3 day(s)</option>
+<option value="8"<cpanelif $CPDATA{'UnsubBouncedPeriod'}==8><cpanel print=' selected="selected"'></cpanelif>>5 day(s)</option>
+<option value="9"<cpanelif $CPDATA{'UnsubBouncedPeriod'}==9><cpanel print=' selected="selected"'></cpanelif>>7 day(s)</option>
+<option value="10"<cpanelif $CPDATA{'UnsubBouncedPeriod'}==10><cpanel print=' selected="selected"'></cpanelif>>10 day(s)</option>
+</select></td>
+
+		</tr>
+	  </table></td>
+	</tr><tr>
+	  <td nowrap="nowrap" align="RIGHT" colspan="2">Process a Fatal Bounce as:</td><td><select name="FatalWeight">
+<option value="1"<cpanelif $CPDATA{'FatalWeight'}==1><cpanel print=' selected="selected"'></cpanelif>>Non-Fatal</option>
+<option value="3"<cpanelif $CPDATA{'FatalWeight'}==3><cpanel print=' selected="selected"'></cpanelif>>3 Non-Fatal</option>
+<option value="10"<cpanelif $CPDATA{'FatalWeight'}==10><cpanel print=' selected="selected"'></cpanelif>>10 Non-Fatal</option>
+<option value="10000"<cpanelif $CPDATA{'FatalWeight'}==10000><cpanel print=' selected="selected"'></cpanelif>>Fatal</option>
+</select></td>
+    </tr><tr>
+	  <td nowrap="nowrap" align="RIGHT" colspan="2">&nbsp;</td><td><input type="checkbox" name="FailureNotification" value="1" <cpanelif $CPDATA{'FailureNotification'}=='YES'><cpanel print=' checked'></cpanelif>/>Notify Owner when Unsubscribing</td>
+    </tr><tr>
+	  <td nowrap="nowrap" align="RIGHT" colspan="2">Cleanup List every:</td>
+<td><select class="popup" name="CleanupPeriod">
+<option value="0"<cpanelif $CPDATA{'CleanupPeriod'}==0><cpanel print=' selected="selected"'></cpanelif>>60 min</option>
+<option value="1"<cpanelif $CPDATA{'CleanupPeriod'}==1><cpanel print=' selected="selected"'></cpanelif>>2 hour(s)</option>
+<option value="2"<cpanelif $CPDATA{'CleanupPeriod'}==2><cpanel print=' selected="selected"'></cpanelif>>3 hour(s)</option>
+<option value="3"<cpanelif $CPDATA{'CleanupPeriod'}==3><cpanel print=' selected="selected"'></cpanelif>>6 hour(s)</option>
+<option value="4"<cpanelif $CPDATA{'CleanupPeriod'}==4><cpanel print=' selected="selected"'></cpanelif>>12 hour(s)</option>
+<option value="5"<cpanelif $CPDATA{'CleanupPeriod'}==5><cpanel print=' selected="selected"'></cpanelif>>24 hour(s)</option>
+<option value="6"<cpanelif $CPDATA{'CleanupPeriod'}==6><cpanel print=' selected="selected"'></cpanelif>>2 day(s)</option>
+<option value="7"<cpanelif $CPDATA{'CleanupPeriod'}==7><cpanel print=' selected="selected"'></cpanelif>>3 day(s)</option>
+<option value="8"<cpanelif $CPDATA{'CleanupPeriod'}==8><cpanel print=' selected="selected"'></cpanelif>>5 day(s)</option>
+<option value="9"<cpanelif $CPDATA{'CleanupPeriod'}==9><cpanel print=' selected="selected"'></cpanelif>>7 day(s)</option>
+<option value="10"<cpanelif $CPDATA{'CleanupPeriod'}==10><cpanel print=' selected="selected"'></cpanelif>>10 day(s)</option>
+</select></td>
+
+	</tr><tr>
+ 	  <td nowrap="nowrap" align="RIGHT" colspan="2">Bounce Reports to Save:</td><td nowrap="nowrap"><select name="SaveReports">
+<option value="0"<cpanelif $CPDATA{'SaveReports'}==0><cpanel print=' selected="selected"'></cpanelif>>no</option>
+<option value="1"<cpanelif $CPDATA{'SaveReports'}==1><cpanel print=' selected="selected"'></cpanelif>>unprocessed</option>
+<option value="2"<cpanelif $CPDATA{'SaveReports'}==2><cpanel print=' selected="selected"'></cpanelif>>all</option></select></td>
+	</tr>
+
+  <tr><th colspan="3">Warning Message</th></tr>
+
+	<tr>
+	  <td align="RIGHT">Subject:</td><td colspan="2"><input type="text" name="WarningSubject" size="40" maxlength="200" value="<cpanel CommuniGate="PrintTextArea_api1($CPDATA{'WarningSubject'})">" /></td>
+	</tr><tr valign="top">
+	  <td align="RIGHT">Text:</td><td colspan="2"><textarea name="WarningText" cols="50" rows="3"><cpanel CommuniGate="PrintTextArea_api1($CPDATA{'WarningText'})"></textarea></td>
+	</tr>
+</table>
+
+</div>
+<div class="highlight">
+<table width="100%" class="settingsBox">
+  <caption>Feed Mode Format</caption>
+ 	<tr>
+	  <td nowrap="nowrap" align="RIGHT">Subject Prefix:</td><td><input type="text" name="FeedSubject" size="20" maxlength="100" value="<cpanel CommuniGate="PrintTextArea_api1($CPDATA{'FeedSubject'})">" /></td>
+	  <td nowrap="nowrap" align="RIGHT">Direct Replies:</td><td><select name="Reply">
+<option value="0"<cpanelif $CPDATA{'Reply'}==0><cpanel print=' selected="selected"'></cpanelif>>to List</option>
+<option value="1"<cpanelif $CPDATA{'Reply'}==1><cpanel print=' selected="selected"'></cpanelif>>to Sender</option></select></td>
+	</tr>
+	<tr>
+	  <td nowrap="nowrap" align="RIGHT">&nbsp;</td><td><input type="checkbox" name="FeedPrefixMode" value="1"  <cpanelif $CPDATA{'FeedPrefixMode'}=='YES'><cpanel print=' checked'></cpanelif>  /> insert after Reply Prefix</td>
+	  <td nowrap="nowrap" align="RIGHT">&nbsp;</td><td>&nbsp;</td>
+	</tr>
+	<tr>
+	  <td colspan="4" align="center">Header<br/><textarea name="FeedHeader" cols="50" rows="3"><cpanel CommuniGate="PrintTextArea_api1($CPDATA{'FeedHeader'})"></textarea></td>
+	</tr>
+	<tr>
+	  <td colspan="4" align="center">Trailer<br/><textarea name="FeedTrailer" cols="50" rows="3"><cpanel CommuniGate="PrintTextArea_api1($CPDATA{'FeedTrailer'})"></textarea></td>
+	</tr>
+</table>
+
+</div>
+<div class="highlight">
+<table width="100%" class="settingsBox">
+  <caption>Welcome/Policy Message</caption>
+	<tr>
+	  <td align="RIGHT">Subject:</td><td><input type="text" name="PolicySubject" size="40" maxlength="200" value="<cpanel CommuniGate="PrintTextArea_api1($CPDATA{'PolicySubject'})">" /></td>
+	</tr><tr valign="top">
+	  <td align="RIGHT">Text:</td><td><textarea name="PolicyText" cols="50" rows="3"><cpanel CommuniGate="PrintTextArea_api1($CPDATA{'PolicyText'})"></textarea></td>
+	</tr>
+</table>
+
+</div>
+<div class="highlight">
+<table width="100%" class="settingsBox">
+  <caption>Good Bye Message</caption>
+	<tr>
+	  <td align="RIGHT">Subject:</td><td><input type="text" name="ByeSubject" size="40" maxlength="200" value="<cpanel CommuniGate="PrintTextArea_api1($CPDATA{'ByeSubject'})">" /></td>
+	</tr><tr valign="top">
+	  <td align="RIGHT">Text:</td><td><textarea name="ByeText" cols="50" rows="3"><cpanel CommuniGate="PrintTextArea_api1($CPDATA{'ByeText'})"></textarea></td>
+	</tr>
+</table>
+
+</div>
+<div class="highlight">
+<table width="100%" class="settingsBox">
+  <caption>Archiving <select name="Store">
+<option value="0"<cpanelif $CPDATA{'Store'}=='NO'><cpanel print=' selected="selected"'></cpanelif>>Disabled</option>
+<option value="1"<cpanelif $CPDATA{'Store'}=='YES'><cpanel print=' selected="selected"'></cpanelif>>Enabled</option>
+</select></caption>
+	<tr>
+<td nowrap="nowrap" align="RIGHT">Maximum Archive Size:</td><td><select class="popup" name="ArchiveSizeLimit">
+<option value="0"<cpanelif $CPDATA{'ArchiveSizeLimit'}==0><cpanel print=' selected="selected"'></cpanelif>>unlimited</option>
+<option value="1"<cpanelif $CPDATA{'ArchiveSizeLimit'}==1><cpanel print=' selected="selected"'></cpanelif>>0</option>
+<option value="2"<cpanelif $CPDATA{'ArchiveSizeLimit'}==2><cpanel print=' selected="selected"'></cpanelif>>1024</option>
+<option value="3"<cpanelif $CPDATA{'ArchiveSizeLimit'}==3><cpanel print=' selected="selected"'></cpanelif>>3K</option>
+<option value="4"<cpanelif $CPDATA{'ArchiveSizeLimit'}==4><cpanel print=' selected="selected"'></cpanelif>>10K</option>
+<option value="5"<cpanelif $CPDATA{'ArchiveSizeLimit'}==5><cpanel print=' selected="selected"'></cpanelif>>30K</option>
+<option value="6"<cpanelif $CPDATA{'ArchiveSizeLimit'}==6><cpanel print=' selected="selected"'></cpanelif>>100K</option>
+<option value="7"<cpanelif $CPDATA{'ArchiveSizeLimit'}==7><cpanel print=' selected="selected"'></cpanelif>>300K</option>
+<option value="8"<cpanelif $CPDATA{'ArchiveSizeLimit'}==8><cpanel print=' selected="selected"'></cpanelif>>1024K</option>
+<option value="9"<cpanelif $CPDATA{'ArchiveSizeLimit'}==9><cpanel print=' selected="selected"'></cpanelif>>3M</option>
+<option value="10"<cpanelif $CPDATA{'ArchiveSizeLimit'}==10><cpanel print=' selected="selected"'></cpanelif>>10M</option>
+<option value="11"<cpanelif $CPDATA{'ArchiveSizeLimit'}==11><cpanel print=' selected="selected"'></cpanelif>>30M</option>
+<option value="12"<cpanelif $CPDATA{'ArchiveSizeLimit'}==12><cpanel print=' selected="selected"'></cpanelif>>100M</option>
+<option value="13"<cpanelif $CPDATA{'ArchiveSizeLimit'}==13><cpanel print=' selected="selected"'></cpanelif>>300M</option>
+<option value="14"<cpanelif $CPDATA{'ArchiveSizeLimit'}==14><cpanel print=' selected="selected"'></cpanelif>>1024M</option>
+<option value="15"<cpanelif $CPDATA{'ArchiveSizeLimit'}==15><cpanel print=' selected="selected"'></cpanelif>>3G</option>
+<option value="16"<cpanelif $CPDATA{'ArchiveSizeLimit'}==16><cpanel print=' selected="selected"'></cpanelif>>10G</option>
+<option value="17"<cpanelif $CPDATA{'ArchiveSizeLimit'}==17><cpanel print=' selected="selected"'></cpanelif>>30G</option>
+</select></td>
+	  <td nowrap="nowrap" align="RIGHT">Messages to Keep:</td><td><select class="popup" name="ArchiveMessageLimit">
+<option value="0"<cpanelif $CPDATA{'ArchiveMessageLimit'}==0><cpanel print=' selected="selected"'></cpanelif>>0</option>
+<option value="1"<cpanelif $CPDATA{'ArchiveMessageLimit'}==1><cpanel print=' selected="selected"'></cpanelif>>1</option>
+<option value="2"<cpanelif $CPDATA{'ArchiveMessageLimit'}==2><cpanel print=' selected="selected"'></cpanelif>>2</option>
+<option value="3"<cpanelif $CPDATA{'ArchiveMessageLimit'}==3><cpanel print=' selected="selected"'></cpanelif>>3</option>
+<option value="5"<cpanelif $CPDATA{'ArchiveMessageLimit'}==5><cpanel print=' selected="selected"'></cpanelif>>5</option>
+<option value="10"<cpanelif $CPDATA{'ArchiveMessageLimit'}==10><cpanel print=' selected="selected"'></cpanelif>>10</option>
+<option value="20"<cpanelif $CPDATA{'ArchiveMessageLimit'}==20><cpanel print=' selected="selected"'></cpanelif>>20</option>
+<option value="50"<cpanelif $CPDATA{'ArchiveMessageLimit'}==50><cpanel print=' selected="selected"'></cpanelif>>50</option>
+<option value="100"<cpanelif $CPDATA{'ArchiveMessageLimit'}==100><cpanel print=' selected="selected"'></cpanelif>>100</option>
+<option value="200"<cpanelif $CPDATA{'ArchiveMessageLimit'}==200><cpanel print=' selected="selected"'></cpanelif>>200</option>
+<option value="1000"<cpanelif $CPDATA{'ArchiveMessageLimit'}==1000><cpanel print=' selected="selected"'></cpanelif>>1000</option>
+<option value="3000"<cpanelif $CPDATA{'ArchiveMessageLimit'}==3000><cpanel print=' selected="selected"'></cpanelif>>3000</option>
+<option value="10000"<cpanelif $CPDATA{'ArchiveMessageLimit'}==10000><cpanel print=' selected="selected"'></cpanelif>>10000</option>
+<option value="30000"<cpanelif $CPDATA{'ArchiveMessageLimit'}==30000><cpanel print=' selected="selected"'></cpanelif>>30000</option>
+<option value="100000"<cpanelif $CPDATA{'ArchiveMessageLimit'}==100000><cpanel print=' selected="selected"'></cpanelif>>100000</option>
+</select></td>
+	</tr><tr>
+	  <td nowrap="nowrap" align="RIGHT">Start new Archive every:</td><td><select class="popup" name="ArchiveSwapPeriod">
+<option value="-1"<cpanelif $CPDATA{'ArchiveSwapPeriod'}=='-1'><cpanel print=' selected="selected"'></cpanelif>>never</option>
+<option value="1"<cpanelif $CPDATA{'ArchiveSwapPeriod'}==1><cpanel print=' selected="selected"'></cpanelif>>month</option>
+<option value="2"<cpanelif $CPDATA{'ArchiveSwapPeriod'}==2><cpanel print=' selected="selected"'></cpanelif>>2 months</option>
+<option value="3"<cpanelif $CPDATA{'ArchiveSwapPeriod'}==3><cpanel print=' selected="selected"'></cpanelif>>3 months</option>
+<option value="6"<cpanelif $CPDATA{'ArchiveSwapPeriod'}==6><cpanel print=' selected="selected"'></cpanelif>>6 months</option>
+<option value="12"<cpanelif $CPDATA{'ArchiveSwapPeriod'}==12><cpanel print=' selected="selected"'></cpanelif>>year</option>
+<option value="24"<cpanelif $CPDATA{'ArchiveSwapPeriod'}==24><cpanel print=' selected="selected"'></cpanelif>>2 years</option>
+<option value="36"<cpanelif $CPDATA{'ArchiveSwapPeriod'}==36><cpanel print=' selected="selected"'></cpanelif>>3 years</option>
+<option value="60"<cpanelif $CPDATA{'ArchiveSwapPeriod'}==60><cpanel print=' selected="selected"'></cpanelif>>5 years</option>
+</select></td>
+	  <td nowrap="nowrap" align="RIGHT">Browse Access:</td><td><select name="Browse">
+<option value="nobody"<cpanelif $CPDATA{'Browse'}=='nobody'><cpanel print=' selected="selected"'></cpanelif>>nobody</option>
+<option value="subscribers"<cpanelif $CPDATA{'Browse'}=='subscribers'><cpanel print=' selected="selected"'></cpanelif>>subscribers</option>
+<option value="clients"<cpanelif $CPDATA{'Browse'}=='clients'><cpanel print=' selected="selected"'></cpanelif>>clients</option>
+<option value="anybody"<cpanelif $CPDATA{'Browse'}=='anybody'><cpanel print=' selected="selected"'></cpanelif>>anybody</option>
+</select></td>
+	</tr>
+</table>
+
+</div>
+<div class="highlight">
+<table width="100%" class="settingsBox">
+  <caption>Digest Generator</caption>
+	<tr>
+	  <td nowrap="nowrap" align="RIGHT">Generate every:</td><td><select class="popup" name="DigestPeriod">
+<option value="1m"<cpanelif $CPDATA{'DigestPeriod'}=='1m'><cpanel print=' selected="selected"'></cpanelif>>60 sec</option>
+<option value="10m"<cpanelif $CPDATA{'DigestPeriod'}=='10m'><cpanel print=' selected="selected"'></cpanelif>>10 min</option>
+<option value="30m"<cpanelif $CPDATA{'DigestPeriod'}=='30m'><cpanel print=' selected="selected"'></cpanelif>>30 min</option>
+<option value="1h"<cpanelif $CPDATA{'DigestPeriod'}=='1h'><cpanel print=' selected="selected"'></cpanelif>>60 min</option>
+<option value="3h"<cpanelif $CPDATA{'DigestPeriod'}=='3h'><cpanel print=' selected="selected"'></cpanelif>>3 hour(s)</option>
+<option value="6h"<cpanelif $CPDATA{'DigestPeriod'}=='6h'><cpanel print=' selected="selected"'></cpanelif>>6 hour(s)</option>
+<option value="1d"<cpanelif $CPDATA{'DigestPeriod'}=='1d'><cpanel print=' selected="selected"'></cpanelif>>24 hour(s)</option>
+<option value="3d"<cpanelif $CPDATA{'DigestPeriod'}=='3d'><cpanel print=' selected="selected"'></cpanelif>>3 day(s)</option>
+<option value="7d"<cpanelif $CPDATA{'DigestPeriod'}=='7d'><cpanel print=' selected="selected"'></cpanelif>>7 day(s)</option>
+<option value="10d"<cpanelif $CPDATA{'DigestPeriod'}=='10d'><cpanel print=' selected="selected"'></cpanelif>>10 day(s)</option>
+<option value="20d"<cpanelif $CPDATA{'DigestPeriod'}=='20d'><cpanel print=' selected="selected"'></cpanelif>>20 day(s)</option>
+<option value="100d"<cpanelif $CPDATA{'DigestPeriod'}=='100d'><cpanel print=' selected="selected"'></cpanelif>>100 day(s)</option>
+</select></td>
+	  <td colspan="2">&nbsp;</td>
+	</tr><tr>
+	  <td nowrap="nowrap" align="RIGHT">or if Larger than:</td><td><select class="popup" name="DigestSizeLimit">
+<option value="unlimited"<cpanelif $CPDATA{'DigestSizeLimit'}=='unlimited'><cpanel print=' selected="selected"'></cpanelif>>unlimited</option>
+<option value="0"<cpanelif $CPDATA{'DigestSizeLimit'}=='0'><cpanel print=' selected="selected"'></cpanelif>>0</option>
+<option value="1024"<cpanelif $CPDATA{'DigestSizeLimit'}=='1024'><cpanel print=' selected="selected"'></cpanelif>>1024</option>
+<option value="3K"<cpanelif $CPDATA{'DigestSizeLimit'}=='3K'><cpanel print=' selected="selected"'></cpanelif>>3K</option>
+<option value="10K"<cpanelif $CPDATA{'DigestSizeLimit'}=='10K'><cpanel print=' selected="selected"'></cpanelif>>10K</option>
+<option value="30K"<cpanelif $CPDATA{'DigestSizeLimit'}=='30K'><cpanel print=' selected="selected"'></cpanelif>>30K</option>
+<option value="100K"<cpanelif $CPDATA{'DigestSizeLimit'}=='100K'><cpanel print=' selected="selected"'></cpanelif>>100K</option>
+<option value="300K"<cpanelif $CPDATA{'DigestSizeLimit'}=='300K'><cpanel print=' selected="selected"'></cpanelif>>300K</option>
+<option value="1M"<cpanelif $CPDATA{'DigestSizeLimit'}=='1M'><cpanel print=' selected="selected"'></cpanelif>>1024K</option>
+<option value="3M"<cpanelif $CPDATA{'DigestSizeLimit'}=='3M'><cpanel print=' selected="selected"'></cpanelif>>3M</option>
+<option value="10M"<cpanelif $CPDATA{'DigestSizeLimit'}=='10M'><cpanel print=' selected="selected"'></cpanelif>>10M</option>
+<option value="30M"<cpanelif $CPDATA{'DigestSizeLimit'}=='30M'><cpanel print=' selected="selected"'></cpanelif>>30M</option>
+<option value="100M"<cpanelif $CPDATA{'DigestSizeLimit'}=='100M'><cpanel print=' selected="selected"'></cpanelif>>100M</option>
+<option value="300M"<cpanelif $CPDATA{'DigestSizeLimit'}=='300M'><cpanel print=' selected="selected"'></cpanelif>>300M</option>
+<option value="1G"<cpanelif $CPDATA{'DigestSizeLimit'}=='1G'><cpanel print=' selected="selected"'></cpanelif>>1024M</option>
+<option value="3G"<cpanelif $CPDATA{'DigestSizeLimit'}=='3G'><cpanel print=' selected="selected"'></cpanelif>>3G</option>
+<option value="10G"<cpanelif $CPDATA{'DigestSizeLimit'}=='10G'><cpanel print=' selected="selected"'></cpanelif>>10G</option>
+<option value="30G"<cpanelif $CPDATA{'DigestSizeLimit'}=='30G'><cpanel print=' selected="selected"'></cpanelif>>30G</option>
+</select></td>
+ <td nowrap="nowrap" align="RIGHT">Messages to Keep:</td><td><select class="popup" name="DigestMessageLimit">
+<option value="0"<cpanelif $CPDATA{'DigestMessageLimit'}==0><cpanel print=' selected="selected"'></cpanelif>>0</option>
+<option value="1"<cpanelif $CPDATA{'DigestMessageLimit'}==1><cpanel print=' selected="selected"'></cpanelif>>1</option>
+<option value="2"<cpanelif $CPDATA{'DigestMessageLimit'}==2><cpanel print=' selected="selected"'></cpanelif>>2</option>
+<option value="3"<cpanelif $CPDATA{'DigestMessageLimit'}==3><cpanel print=' selected="selected"'></cpanelif>>3</option>
+<option value="5"<cpanelif $CPDATA{'DigestMessageLimit'}==5><cpanel print=' selected="selected"'></cpanelif>>5</option>
+<option value="10"<cpanelif $CPDATA{'DigestMessageLimit'}==10><cpanel print=' selected="selected"'></cpanelif>>10</option>
+<option value="20"<cpanelif $CPDATA{'DigestMessageLimit'}==20><cpanel print=' selected="selected"'></cpanelif>>20</option>
+<option value="50"<cpanelif $CPDATA{'DigestMessageLimit'}==50><cpanel print=' selected="selected"'></cpanelif>>50</option>
+<option value="100"<cpanelif $CPDATA{'DigestMessageLimit'}==100><cpanel print=' selected="selected"'></cpanelif>>100</option>
+<option value="200"<cpanelif $CPDATA{'DigestMessageLimit'}==200><cpanel print=' selected="selected"'></cpanelif>>200</option>
+<option value="1000"<cpanelif $CPDATA{'DigestMessageLimit'}==1000><cpanel print=' selected="selected"'></cpanelif>>1000</option>
+<option value="3000"<cpanelif $CPDATA{'DigestMessageLimit'}==3000><cpanel print=' selected="selected"'></cpanelif>>3000</option>
+<option value="10000"<cpanelif $CPDATA{'DigestMessageLimit'}==10000><cpanel print=' selected="selected"'></cpanelif>>10000</option>
+<option value="30000"<cpanelif $CPDATA{'DigestMessageLimit'}==30000><cpanel print=' selected="selected"'></cpanelif>>30000</option>
+<option value="100000"<cpanelif $CPDATA{'DigestMessageLimit'}==100000><cpanel print=' selected="selected"'></cpanelif>>100000</option>
+</select></td>
+	</tr><tr>
+	  <td nowrap="nowrap" align="RIGHT">First Digest at:</td><td><select name="DigestTimeOfDay">
+<option value="0"<cpanelif $CPDATA{'DigestTimeOfDay'}==0><cpanel print=' selected="selected"'></cpanelif>>12 AM</option>
+<option value="1h"<cpanelif $CPDATA{'DigestTimeOfDay'}=='1h'><cpanel print=' selected="selected"'></cpanelif>>1 AM</option>
+<option value="2h"<cpanelif $CPDATA{'DigestTimeOfDay'}=='2h'><cpanel print=' selected="selected"'></cpanelif>>2 AM</option>
+<option value="3h"<cpanelif $CPDATA{'DigestTimeOfDay'}=='3h'><cpanel print=' selected="selected"'></cpanelif>>3 AM</option>
+<option value="4h"<cpanelif $CPDATA{'DigestTimeOfDay'}=='4h'><cpanel print=' selected="selected"'></cpanelif>>4 AM</option>
+<option value="5h"<cpanelif $CPDATA{'DigestTimeOfDay'}=='5h'><cpanel print=' selected="selected"'></cpanelif>>5 AM</option>
+<option value="6h"<cpanelif $CPDATA{'DigestTimeOfDay'}=='6h'><cpanel print=' selected="selected"'></cpanelif>>6 AM</option>
+<option value="7h"<cpanelif $CPDATA{'DigestTimeOfDay'}=='7h'><cpanel print=' selected="selected"'></cpanelif>>7 AM</option>
+<option value="8h"<cpanelif $CPDATA{'DigestTimeOfDay'}=='8h'><cpanel print=' selected="selected"'></cpanelif>>8 AM</option>
+<option value="9h"<cpanelif $CPDATA{'DigestTimeOfDay'}=='9h'><cpanel print=' selected="selected"'></cpanelif>>9 AM</option>
+<option value="10h"<cpanelif $CPDATA{'DigestTimeOfDay'}=='10h'><cpanel print=' selected="selected"'></cpanelif>>10 AM</option>
+<option value="11h"<cpanelif $CPDATA{'DigestTimeOfDay'}=='11h'><cpanel print=' selected="selected"'></cpanelif>>11 AM</option>
+<option value="12h"<cpanelif $CPDATA{'DigestTimeOfDay'}=='12h'><cpanel print=' selected="selected"'></cpanelif>>12 PM</option>
+<option value="13h"<cpanelif $CPDATA{'DigestTimeOfDay'}=='13h'><cpanel print=' selected="selected"'></cpanelif>>1 PM</option>
+<option value="14h"<cpanelif $CPDATA{'DigestTimeOfDay'}=='14h'><cpanel print=' selected="selected"'></cpanelif>>2 PM</option>
+<option value="15h"<cpanelif $CPDATA{'DigestTimeOfDay'}=='15h'><cpanel print=' selected="selected"'></cpanelif>>3 PM</option>
+<option value="16h"<cpanelif $CPDATA{'DigestTimeOfDay'}=='16h'><cpanel print=' selected="selected"'></cpanelif>>4 PM</option>
+<option value="17h"<cpanelif $CPDATA{'DigestTimeOfDay'}=='17h'><cpanel print=' selected="selected"'></cpanelif>>5 PM</option>
+<option value="18h"<cpanelif $CPDATA{'DigestTimeOfDay'}=='18h'><cpanel print=' selected="selected"'></cpanelif>>6 PM</option>
+<option value="19h"<cpanelif $CPDATA{'DigestTimeOfDay'}=='19h'><cpanel print=' selected="selected"'></cpanelif>>7 PM</option>
+<option value="20h"<cpanelif $CPDATA{'DigestTimeOfDay'}=='20h'><cpanel print=' selected="selected"'></cpanelif>>8 PM</option>
+<option value="21h"<cpanelif $CPDATA{'DigestTimeOfDay'}=='21h'><cpanel print=' selected="selected"'></cpanelif>>9 PM</option>
+<option value="22h"<cpanelif $CPDATA{'DigestTimeOfDay'}=='22h'><cpanel print=' selected="selected"'></cpanelif>>10 PM</option>
+<option value="23h"<cpanelif $CPDATA{'DigestTimeOfDay'}=='23h'><cpanel print=' selected="selected"'></cpanelif>>11 PM</option>
+</select></td>
+	  <td colspan="2">&nbsp;</td>
+	</tr>
+</table>
+
+</div>
+<div class="highlight">
+<table width="100%" class="settingsBox">
+  <caption>Digest Format</caption>
+	<tr>
+	  <td align="RIGHT">Subject:</td><td><input type="text" name="DigestSubject" value="<cpanel CommuniGate="PrintTextArea_api1($CPDATA{'DigestSubject'})">" size="20" maxlength="100" /></td>
+	  <td align="RIGHT">Body Format:</td><td><select name="DigestFormat">
+<option value="plain text"<cpanelif $CPDATA{'DigestFormat'}=='plain_text'><cpanel print=' selected="selected"'></cpanelif>>plain text</option>
+<option value="standard MIME"<cpanelif $CPDATA{'DigestFormat'}=='standard_MIME'><cpanel print=' selected="selected"'></cpanelif>>standard MIME</option>
+<option value="embedded MIME"<cpanelif $CPDATA{'DigestFormat'}=='embedded_MIME'><cpanel print=' selected="selected"'></cpanelif>>embedded MIME</option>
+</select></td>
+	</tr><tr>
+	  <td colspan="4" align="center"><b>Header</b><br/><textarea name="DigestHeader" cols="70" rows="3"><cpanel CommuniGate="PrintTextArea_api1($CPDATA{'DigestHeader'})"></textarea></td>
+	</tr><tr>
+	  <td colspan="4" align="center"><b>Index Line</b><br/><textarea name="TOCLine" cols="70" rows="3"><cpanel CommuniGate="PrintTextArea_api1($CPDATA{'TOCLine'})"></textarea></td>
+	</tr><tr>
+	  <td colspan="4" align="center"><b>Index Trailer</b><br/><textarea name="TOCTrailer" cols="70" rows="3"><cpanel CommuniGate="PrintTextArea_api1($CPDATA{'TOCTrailer'})"></textarea></td>
+	</tr><tr>
+	  <td colspan="4" align="center"><b>Trailer</b><br/><textarea name="DigestTrailer" cols="70" rows="3"><cpanel CommuniGate="PrintTextArea_api1($CPDATA{'DigestTrailer'})"></textarea></td>
+	</tr>
+</table>
+
+</div>
+
+
+
+<BR>
+
+<p>
+<center><p><input type="submit" value="<cpanel langprint="CGPMailListSubmitSettings">" class="input-button"></p></center>
+</form>
+</p>
+<div class="return-link"><a href="lists.html">&larr; <cptext "Go Back"></a></div>
+
+
+</div><!-- end body-content -->
+
+<cpanel Branding="include(stdfooter.html)">

@@ -1,0 +1,51 @@
+<cpanel setvar="headerimg=../images/tools.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+<style type="text/css">
+<?cp Branding::spritelist(.spriteicon_img_mini {float:left;margin-right:5px;background: url\{leftparenthesis}"%"\{rightparenthesis};} %,@spriteurl,images::#icon-${img}_mini {background-position\{colon}0 -${cssposition}px;width\{colon}${width}px;height\{colon}${height}px; }:) imgtype=icon,subtype=img,method=scale_60percent,format=png,img=keys ?>
+</style>
+
+<div class="body-content">
+<div class="h1Title"><div class="spriteicon_img_mini" id="icon-keys_mini"></div><cpanel langprint="PGPKeyGen"></div>
+<form action="live_doaddkey.html">
+  <table>
+    <tr>
+      <td><div align="right"><cpanel langprint="PGPUsersName"></div></td>
+      <td><input type="text" name="name" />
+        <cpanel langprint="PGPMin5char"></td>
+    </tr>
+    <tr>
+      <td><div align="right"><cpanel langprint="PGPUsersEmail"> </div></td>
+      <td><input type="text" name="email" /></td>
+    </tr>
+    <tr>
+      <td><div align="right"><cpanel langprint="PGPKeyComment"> </div></td>
+      <td><input type="text" name="comment" /></td>
+    </tr>
+    <tr>
+      <td><div align="right"><cpanel langprint="PGPKeyPass"> </div></td>
+      <td><input type="text" name="password" /></td>
+    </tr>
+    <tr>
+      <td><div align="right"><cpanel langprint="PGPKeyExpires"> </div></td>
+      <td><input type="text" name="expire" value="1y"><cpanel langprint="PGPDateExample"></td>
+    </tr>
+    <tr>
+      <td><div align="right"><cpanel langprint="PGPKeySize"> </div></td>
+      <td><select name="keysize">
+          <option value="1024"><cpanel langprint="PGP1024"></option>
+          <option value="2048"><cpanel langprint="PGP2048"></option>
+          <option value="4096"><cpanel langprint="PGP4096"></option>
+        </select>
+      </td>
+    </tr>
+	<tr>
+		<td>&nbsp;</td>
+		<td><input type="submit" class="input-button" value="<cpanel langprint="PGPGenerateButton">"></td>
+	</tr>
+  </table>
+</form>
+<div class="return-link"><a href="index.html">&larr; <cptext "Go Back"></a></div>
+</div>
+
+<cpanel Branding="include(stdfooter.html)">

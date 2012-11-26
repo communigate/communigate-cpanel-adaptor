@@ -1,0 +1,17 @@
+<cpanel setvar="headerimg=../images/mailmenu.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+<div class="body-content">
+
+<style type="text/css">
+<?cp Branding::spritelist(.spriteicon_img_mini {float:left;margin-right:5px;background: url\{leftparenthesis}"%"\{rightparenthesis};} %,@spriteurl,images::#icon-${img}_mini {background-position\{colon}0 -${cssposition}px;width\{colon}${width}px;height\{colon}${height}px; }:) imgtype=icon,subtype=img,method=scale_60percent,format=png,img=filtering ?>
+
+</style>
+<div class="h1Title"><div class="spriteicon_img_mini" id="icon-filtering_mini"></div> <cpanel langprint="EFRemove"></div>
+
+<p><span class="status"><cpanel print="$FORM{'email'}"></span> <cpanel langprint="EFDeleted">
+<cpanel Email="delfilter($FORM{'email'},$FORM{'dest'})"></p>
+
+<div class="return-link"><a href="blocks.html">&larr; <cptext "Go Back"></a></div>
+</div>
+<cpanel Branding="include(stdfooter.html)">

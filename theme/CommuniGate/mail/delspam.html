@@ -1,0 +1,14 @@
+<cpanel setvar="headerimg=../images/mailmenu.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+<div class="body-content">
+<h2><cpanel langprint="SPADisableDo"></h2>
+<div align="center">
+<pre>
+<textarea class="output" name="tracefilter" cols="80" rows="5" readonly="readonly"><cpanel Email="delspam()"></textarea>
+</pre>
+<cpanel langprint="SPAStatusSwitchPre"> <span class="status"><cpanel Email="spamstatus()"></span>
+</div>
+<div class="return-link"><a href="spam/spam.html">&larr; <cptext "Go Back"></a></div>
+</div><!-- end body-content -->
+<cpanel Branding="include(stdfooter.html)">

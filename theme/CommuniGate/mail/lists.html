@@ -1,0 +1,130 @@
+<cpanel setvar="headerimg=../images/mailmenu.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+<cpanelif $FORM{'itemsperpage'}>
+	<cpanel setvar="itemsperpage=$FORM{'itemsperpage'}">
+</cpanelif>
+<cpanelif !$FORM{'itemsperpage'} || !$CPVAR{'itemsperpage'}>
+	<cpanel setvar="itemsperpage=10">
+</cpanelif>
+	
+<style type="text/css">
+<?cp Branding::spritelist(.spriteicon_img_mini {float:left;margin-right:5px;background: url\{leftparenthesis}"%"\{rightparenthesis};} %,@spriteurl,images::#icon-${img}_mini {background-position\{colon}0 -${cssposition}px;width\{colon}${width}px;height\{colon}${height}px; }:) imgtype=icon,subtype=img,method=scale_60percent,format=png,img=maillist ?>
+</style>	
+	
+<div class="body-content">
+
+<div class="h1Title"><div class="spriteicon_img_mini" id="icon-maillist_mini"></div> <cpanel langprint="INDXMailingLists"></div>
+
+<cpanel setvar="vidtut_name=mailinglists">
+<cpanel setvar="vidtut_header=VidMailingList">
+<cpanel setvar="vidtut_description=VidMailingListDesc">
+<cpanel setvar="vidtut_video_name=mailinglists-low">
+<cpanel setvar="vidtut_width=450">
+<cpanel setvar="vidtut_height=269">	
+
+<p class="description"><cpanel langprint="MLDesc"></p>
+
+<div class="return-link"><a href="http://www.communigate.com/communigatepro/LIST.html" target="_blank"><cptext "Mailing Lists Documentation"></a></div>
+
+
+<h2><cpanel langprint="MLCreate"></h2>
+<?cp StatsBar::stat( [p class="caution"]$LANG{'statsattention'}&nbsp;%&nbsp;$LANG{'statsoutof'}&nbsp;%$LANG{'available'}&nbsp;$LANG{'INDXMailingLists'}[/p],count,max) display=mailinglists,warnings=1,warninglevel=80,infinitylang=true ?>
+
+
+
+<div class="highlight">
+<form method="post" action="doaddlist.html" id="userform" name="userform">
+<!-- <?cp Email::listmaildomains(,) ?> -->
+<cpanelif $CPVAR{'maildomainscount'}==1>
+	<?cp Email::listmaildomains([input type="hidden" name="domain" value="%" /],domain) ?>
+</cpanelif>
+<table>
+	<tr>
+		<td style="width: 150px" align="right"><cpanel langprint="MLListName">:</td>
+		<td><input type="text" name="email" id="email" style="width: 150px" /></td>
+		<td><div id="email_error"></div></td>
+	</tr>
+	<cpanelif $CPVAR{'maildomainscount'}=gt=1>
+		<tr>
+			<td align="right"><cpanel langprint="MLDomain"></td>
+			<td colspan="2">
+				<select name="domain" id="domain"><?cp Email::listmaildomains([option value="%"]%[/option],domain,domain) ?></select>
+			</td>
+		</tr>
+	</cpanelif>	
+	<tr>
+		<td align="right"><cpanel langprint="CGPListOwner"></td>
+		<td><input type="text" size="15" name="owner" id="owner" style="width: 150px" /></td>
+	</tr>
+	<tr><td colspan="3"><br /></td></tr>
+	<tr>
+		<td>&nbsp;</td>
+		<td colspan="2"><input type="submit" id="submit" value="<cpanel langprint="MLAddHead">" class="input-button" style="width: 150px" /></td>
+	</tr>
+</table>
+</form>
+<div id="why_strong_passwords_text" style="display: none"><cpanel langprint="email_password_why"><br /><br /><cpanel langprint="email_password_tip"></div>
+</div><!-- end highlight -->
+<script type="text/javascript">
+//<![CDATA[
+var REQUIRED_PASSWORD_STRENGTH = parseInt('<?cp PasswdStrength::get_required_strength(%,strength) app=list ?>') || 0;
+
+var init_lists = function() {
+	var lname_validator = new CPANEL.validate.validator("List Name");
+	lname_validator.add("email", "min_length(%input%, 1)", "<cpanel langprint="MLJAlertNameBlank">");
+	lname_validator.attach();
+	YAHOO.util.Dom.get("email").focus();
+};
+
+YAHOO.util.Event.onDOMReady(init_lists);
+//]]>
+</script>
+
+
+<h2><cpanel langprint="MLColumnHead"></h2>
+
+<table border="0" cellpadding="5" cellspacing="0" id="mailtbl" class="sortable" width="650">
+
+    <tr >
+		<th class="cell"><cpanel langprint="MLListName"></th>
+		<th class="cell-end sorttable_nosort" colspan="4"><cpanel langprint="AHFucn"></th>
+	</tr>
+
+
+<?cp CommuniGate::ListMailingLists(
+	[tr class="row-%"]
+		[td class="cell nobrd-center-t"]%[/td]
+		[td class="nobrd" align="center"]
+			[a href="dodellist.html?email=%&amp;domain=$FORM{'domain'}"]$LANG{'Delete'}[/a]
+		[/td]
+		[td class="nobrd" align="center"]
+                        [a href="dorenamelist.html?email=%&amp;domain=%"]$LANG{'CGPMailListRename'}[/a]
+                [/td]
+		[td class="nobrd" align="center"]
+			[a href="listsettings.html?email=%&amp;domain=$FORM{'domain'}"]$LANG{'CGPMailListSettings'} [/a]
+		[/td]
+                [td class="nobrd" align="center"]
+                        [a href="listsubscribers.html?listname=%"]$LANG{'CGPMailListSubs'} [/a]
+                [/td]
+	[/tr]
+,*num,list,list,list,domain,list,list) domain=$FORM{'domain'},regex=$FORM{'searchregex'},api2_paginate=1,api2_paginate_start=$FORM{'api2_paginate_start'},api2_paginate_size=$CPVAR{'itemsperpage'} || '[tr][td colspan="4" class="errors"]$LANG{'NoLists'}[/td][/tr]' ?>
+
+
+
+</table>
+
+<?cp UI::paginate(%,paginator) currentpage=$CPVAR{'currentpage'},pages=$CPVAR{'pages'},itemsperpage=$CPVAR{'itemsperpage'} ?>
+<cpanelif $CPVAR{'pages'} && !$CPVAR{'pages'}==1>
+	<div style="float:right">
+		<form method="get" action="">
+			<cpanel langprint="PaginatorShowing"> <select name="itemsperpage" onchange="this.form.submit();">
+			<?cp UI::paginate_list([option value="%" %]%[/option],item,selected=1?selected:,item) itemsperpage=$CPVAR{'itemsperpage'},itemlist=10:25:50:100:250:500 ?>
+			</select><noscript><button id="my_button" onclick="" type="submit" Value=""><cpanel Locale="maketext('Change')"></button></noscript>  <cpanel langprint="PaginatorResults"> 
+		</form>
+	</div>
+</cpanelif>
+
+</div><!-- end body-content -->
+
+<cpanel Branding="include(stdfooter.html)">

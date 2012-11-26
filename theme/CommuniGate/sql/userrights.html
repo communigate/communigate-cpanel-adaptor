@@ -1,0 +1,43 @@
+<cpanel setvar="headerimg=../images/topmysql.gif">
+<cpanel setvar="dprefix=../">
+<cpanel setvar="headerinclude=sql/index_head.html">
+<cpanel Branding="include(stdheader.html)">
+
+<div class="body-content">
+
+<div class="h1Title"><div class="spriteicon_img_mini" id="icon-mysql_mini"></div> <cpanel langprint="SQLAMaint"></div>
+
+<h2><cpanel langprint="ManageUPrivs"></h2>
+
+<cpanelif !$FORM{'user'}>
+  <p>Username not given!</p>
+</cpanelif>
+
+<cpanelif !$FORM{'db'}>
+  <p>Database not given!</p>
+</cpanelif>
+
+
+<cpanelif $FORM{'user'} && $FORM{'db'}>
+<p><cpanel langprint="FTPUser">: <b><cpanel print="$FORM{'user'}"></b><br />
+ <cpanel langprint="BUDatabase">: <b><cpanel print="$FORM{'db'}"> </b></p>
+
+<form method="post" action="addusertodb.html" name="adduserdb">
+	<input type="hidden" name="db" value="<cpanel print="$FORM{'db'}">" />
+	<input type="hidden" name="user" value="<cpanel print="$FORM{'user'}">" />
+	<input type="hidden" name="update" value="<cpanel print="$FORM{'update'}">" />
+	<br />
+        <?cptt sql/userrights.tmpl ?>
+<br />
+<cpanelif $FORM{'user'} && $FORM{'db'}>
+<input type="submit" value="<cpanel langprint="MakeChanges">" class="input-button" />
+</cpanelif>
+
+</form>
+
+</cpanelif>
+<div class="return-link"><a href="index.html">&larr; <cptext "Go Back"></a></div>
+
+</div><!-- end body-content -->
+
+<cpanel Branding="include(stdfooter.html)">

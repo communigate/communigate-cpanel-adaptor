@@ -1,0 +1,89 @@
+#!/usr/bin/perl
+# cpanel - hooks/passwd/change_password.example   Copyright(c) 2009 cPanel, Inc.
+#                                                           All rights Reserved.
+# copyright@cpanel.net                                         http://cpanel.net
+
+BEGIN { unshift @INC, '/usr/local/cpanel'; }
+
+use XML::Simple;
+use Data::Dumper;
+use CLI;
+
+# uid of the user who did the action
+my $uid = $ARGV[0];
+
+# treat any of the xml data inside the CPDATA tag as trusted
+#
+# NEVER treat any of the xml data inside the cpanelevent as trusted
+# as a malicous user could inject bogus data.
+# It's probably never going to be an issue as most people do not want to break
+# their own account.
+
+sub postmaster_pass { 
+my $file = "/var/CommuniGate/Accounts/postmaster.macnt/account.settings";
+my %hash;
+open (MYFILE, "$file"); 
+while (<MYFILE>) {          
+       chomp;              
+       my @line = split("=",$_);
+       $hash{@line[0]} = @line[1];
+}  
+if ($hash{' Password '} =~ /^ ".*";$/) {
+         return  substr $hash{' Password '}, 2, length($hash{' Password '})-4;
+} else {
+         return  substr $hash{' Password '}, 1, length($hash{' Password '})-2;
+}
+}
+
+open (MYFILE, '>>logs/communigate.log');
+
+my $xmldoc;
+while (<STDIN>) {
+    $xmldoc .= $_;
+}
+chomp($xmldoc);
+
+
+if ( substr( $xmldoc, 0, 1 ) ne '<' || substr( $xmldoc, -1, 1 ) ne '>' ) { 
+	print MYFILE "$xmldoc is malformed\n";
+	die 'XML not well formed'; 
+}    # prevent XMLin from opening a file
+
+my $dref           = XMLin($xmldoc);
+my $user           = ( getpwuid($uid) )[0];
+
+my $domain 	   = $$dref{'cpanelevent'}{'params'}{'domain'};
+my $user= $$dref{'cpanelevent'}{'params'}{'email'};
+my $quota = $$dref{'cpanelevent'}{'params'}{'quota'};
+if ($quota == 0) {
+	$quota="unlimited" ;
+}else{
+	$quota .= "M";
+}
+
+my $CGServerAddress = "127.0.0.1";
+my $PostmasterLogin = 'postmaster';
+my $PostmasterPassword = postmaster_pass();
+
+my $cli = new CGP::CLI( { PeerAddr => $CGServerAddress,
+                            PeerPort => 106,
+                            login => $PostmasterLogin,
+                            password => $PostmasterPassword } );
+  unless($cli) {
+    print MYFILE "Can't login to CGPro: ".$CGP::ERR_STRING,"\n";
+    die("Can't login to CGPro: ".$CGP::ERR_STRING);
+}
+
+my $data=$cli->GetDomainSettings("$domain");
+
+if (!$data) {
+	$cli->CreateDomain("$domain");
+} 
+my $UserData;
+@$UserData{'MaxAccountSize'}=$quota;
+
+$cli->UpdateAccountSettings("$user\@$domain", { MaxAccountSize => $quota });
+
+$cli->Logout();
+close (MYFILE);
+

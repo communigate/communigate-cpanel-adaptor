@@ -1,0 +1,21 @@
+<html>
+<head>
+<title>cPanel X</title>
+<cpanel relinclude="charset.html">
+<cpanel relinclude="files/files_head.html">
+</head>
+<body  class="topright">
+<b><cpanel Fileman="changeperm($FORM{'dir'},$FORM{'file'},$FORM{'ur'},$FORM{'uw'},$FORM{'ux'},$FORM{'gr'},$FORM{'gw'},$FORM{'gx'},$FORM{'wr'},$FORM{'ww'},$FORM{'wx'},$FORM{'doubledecode'})"></b> <cpanel langprint="FMin"> <i><cpanel print="$FORM{'udir'}"></i> 
+<script type="text/javascript">
+if (parent.dirwindow.window.location.href.indexOf("?") > 0) {
+        parent.dirwindow.window.location.href = parent.dirwindow.window.location.href + "&refresh=<cpanel print="$random">";
+}
+</script>
+<script type="text/javascript">
+if (parent.dirwindow.window.location.href.indexOf("?") == -1) {
+        parent.dirwindow.window.location.href = parent.dirwindow.window.location.href + "?refresh=<cpanel print="$random">";
+}
+</script>
+</body>
+</html>
+

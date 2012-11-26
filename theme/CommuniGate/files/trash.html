@@ -1,0 +1,35 @@
+<html>
+<head>
+<title>cPanel X</title>
+<cpanel relinclude="files/files_head.html">
+<!--[if IE]>
+<style type="text/css">
+.bottomright a.trash { 
+height: 60px;
+}
+
+<![endif]-->
+
+</style>
+</head>
+<body class="bottomright">
+<a href="dumpitconf.html" class="trash"><cpanel langprint="Trash_Empty"><br /><cpanel langprint="Trash_Trash"></a>
+<br />
+<font class=med><cpanel langprint="FMTrashEmpty"><br /><cpanel langprint="FMTrashRestoreInfo"></font> 
+<hr>
+
+<table width="99%" id="listfiles" class="sortable" cellpadding="0" cellspacing="0">
+<?cp Fileman::listfiles(
+    [tr class="row-%"]
+        [td][span style="display:none;"]%[/span][a href="restore.html?file=%" target="filewindow"][img src="../mimeicons/%.png" border="0" alt="%"][/a][/td]
+        [td][a href="restore.html?file=%" target="filewindow"]%[/a][/td]
+        [td]%[/td]
+        [td]%[/td]
+
+    [/tr],*num,type,^file,mimename,mimetype,^file,&file,humansize,nicemode) needmime=1,dir=/.trash
+?>
+</table>
+
+</body>
+</html>
+

@@ -1,0 +1,202 @@
+<cpanel setvar="headerimg=../images/topsubdomains.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+    <cpanel setvar="itemsperpage=$FORM{'itemsperpage'}">
+</cpanelif>
+<cpanelif !$FORM{'itemsperpage'} || !$CPVAR{'itemsperpage'}>
+    <cpanel setvar="itemsperpage=10">
+</cpanelif>
+
+<script type="text/javascript">
+//<![CDATA[
+truncate_on = 1;
+truncate_wrap = 1;
+truncate_tooltips = 0;
+ajaxloader_on = 1;
+register_truncate_table('subdomaintbl');
+var VALID = [];    
+	
+var updatedir = function() {
+	var subdomain = document.domainform.domain.value;
+	if (subdomain == '*') { subdomain = ''; }
+    subdomain = subdomain.replace('*','_wildcard_');
+	document.domainform.dir.value = 'public_html/' + subdomain;
+	VALID['dir'].verify();
+};
+
+var valid_regex = new RegExp( "<?cp SubDomain::validregex(%,*0) ?>" );
+var reserved_subdomains = {
+    <?cp SubDomain::getreservedsubdomains("%":true\{comma},*subdomain) ?>
+    "": false
+};
+delete reserved_subdomains[""];
+function is_valid_subdomain() {
+    var normalized = DOM.get("domain").value.trim().toLowerCase()
+    return !reserved_subdomains[normalized] && valid_regex.test(normalized);
+}
+
+var LANG = {
+    ftp_directory_path: "<cptext "ftp_directory_path">",
+    validation_directory_paths: "<cptext "validation_directory_paths">"
+};
+
+var init = function() {
+	VALID['domain'] = new CPANEL.validate.validator("<cpanel langprint="subdomain_input">");
+	VALID['domain'].add("domain", is_valid_subdomain, "<cpanel langprint="subdomain_invalid">");
+	VALID['domain'].attach();
+	
+	VALID['dir'] = new CPANEL.validate.validator( LANG.ftp_directory_path );
+	VALID['dir'].add("dir", "dir_path", LANG.validation_directory_paths );
+	VALID['dir'].attach();	
+	
+	CPANEL.validate.attach_to_form("subdomain_submit", VALID);
+	
+	YAHOO.util.Dom.get("domain").focus();
+};
+
+YAHOO.util.Event.onDOMReady(init);
+
+function MM_jumpMenu(selObj,targ,restore){ //v3.0
+  if (selObj.options[selObj.selectedIndex].value == "") { return; }
+  targ.action=selObj.options[selObj.selectedIndex].value;
+  targ.submit();
+  confirmation();
+  if (restore) selObj.selectedIndex=0;
+}
+//]]>
+</script>
+
+<style type="text/css">
+<?cp Branding::spritelist(.spriteicon_img_mini {float:left;margin-right:5px;background: url\{leftparenthesis}"%"\{rightparenthesis};} %,@spriteurl,images::#icon-${img}_mini {background-position\{colon}0 -${cssposition}px;width\{colon}${width}px;height\{colon}${height}px; }:) imgtype=icon,subtype=img,method=scale_60percent,format=png,img=subdomains ?>
+</style>
+<style type="text/css">
+td { word-wrap: break-word; }
+.imgfix img { margin-top: -9px }
+</style>
+<div class="body-content">
+
+
+		<div class="h1Title"><div class="spriteicon_img_mini" id="icon-subdomains_mini"></div><cpanel langprint="NavSubdomains"></div>
+
+		  <p class="description">
+		    <cpanel langprint="SubDesc"> <cpanel print="$CPDATA{'DNS'}"> <cpanel langprint="subDesc2">.<cpanel print="$CPDATA{'DNS'}">.
+		  <p>
+          
+<cpanelif !$CPVAR{'mobile'}><cpanelfeature videotut>
+<!-- Start Video Tutorial Pop Up Used to  inject swf into html-->
+<div id="embeded_video_tut" style="display:none;">
+	<p><button id="tutorial_show" onclick="injectVideo('subdomain_lo',450,323);"><cpanel langprint="VidTutButton"></button></p>
+	
+	<div id="tutorial_overlay" style="visibility:hidden;">
+		<div class="content">
+			<h4><cpanel langprint="NavSubdomains"></h4>
+			<p><cpanel langprint="VidSubdomDesc"></p>
+			<a id="high_quality_vid_link"  href="http://www.cpanel.net/media/tutorials/subdomain.htm" target="_blank"><cpanel langprint="link_help_video"></a>
+		</div>
+		<div class="video" id="video"></div>
+		<div class="close">
+			<button id="tutorial_hide" onclick="removeVideo();"><cpanel langprint="VidTutClose"></button>
+		</div>
+	</div>				
+</div><!-- End of Video Tutorial Popup -->
+</cpanelfeature></cpanelif>
+          
+          
+	<p class="imgfix"><cpanel langprint="subDesc5"> <a class="ajaxfiles" href="../files/index.html" target="_blank"><cpanel print="$homedir"></a>.</p>
+
+		  
+		<h2><cpanel langprint="CreateSubDomain"></h2>
+				<?cp StatsBar::stat( [p class="caution"]$LANG{'statsattention'}&nbsp;%&nbsp;$LANG{'statsoutof'}&nbsp;%$LANG{'available'}&nbsp;$LANG{'NavSubdomains'}[/p],count,max) display=subdomains,warnings=1,warnout=1,warninglevel=80,infinitylang=true ?>
+				
+				<cpanelif $CPVAR{'statsbar_subdomains_maxed'}>
+				 	
+					<p class="alert_box"><cpanel langprint="QuotaWarning1"> <cpanel langprint="NavSubdomains">. <cpanel langprint="QuotaWarning2"> </p> 
+				</cpanelif>
+
+
+	<div class="highlight"> 
+		<form id="domainform" name="domainform" action="../subdomain/doadddomain.html" >
+			<table>
+				<tr>
+					<td align="right"><b><cpanel langprint="SUBAddedPre"></b> :&nbsp; </td>
+					<td><input type="text" onchange="updatedir(this);" id="domain" name="domain" />&nbsp;.&nbsp;
+						<select name="rootdomain" style="width: 300px">
+							<cpanel Email="listmaildomainsopt()">
+						</select>
+					</td>
+					<td><div id="domain_error" style="height: 16px; width: 16px"></div></td>
+				</tr>
+				<tr>
+					<td align="right"><b><cpanel langprint="SUBDocRoot"></b> :&nbsp; </td>
+					<td>
+						<cpanel setvar="autodirsonly=1">
+						<cpanel setvar="autoinput=dir">
+						<cpanel setvar="autofunc=dirComplete">
+						<script type="text/javascript">
+						function dirComplete(inputObj) {}   
+						</script>
+						<table cellpadding="0" cellspacing="0" style="padding:0;margin:0;">
+							<tr>
+								<td><img src="<cpanel MagicRevision="uri("images/homeb.gif")">" alt="<cpanel Locale="maketext('home')">" align="absmiddle" />/</td>
+								<td><cpanel relinclude="autodir/dirbox.html"></td>
+							</tr>
+						</table>
+					</td>
+					<td></td>
+				</tr>
+				<tr><td colspan="3"><br /></td></tr>
+				<tr>
+					<td>&nbsp;</td>
+					<td><input class="input-button" id="subdomain_submit" type="submit" value="<cpanel langprint="EAAddcreate">" name="go" />
+                      <cpanelif $FORM{'from_cpaddon'}>
+                        <input type="hidden" name="from_cpaddon" value="<cpanel print="$FORM{'from_cpaddon'}">" />
+                        <span class="return-link"><a href="../addoncgi/cpaddons.html?addon=<cpanel print="$FORM{'from_cpaddon'}">">Back to cPAddon Page</a></span>
+                      </cpanelif> 
+                    </td>
+					<td></td>
+				</tr>
+		    </table>
+		</form>
+	</div>
+		
+	  <br />
+	  <h2>
+	    <cpanel langprint="SUBModify">
+	  </h2>
+	
+
+<!-- This needs to be before the <form> element below
+     or else browsers will not recognize its contained <form> element. -->
+<cpanel relinclude="subdomain/include_changedocroot.html">
+
+	<div class="search-panel">
+		<form method="get"><span class="boldit"><cpanel langprint="SESearchButton"></span>&nbsp;<input type="text" size="15" name="searchregex" value="<cpanel print="$FORM{'searchregex'}">">&nbsp;<input type="submit" class="input-button" value="<cpanel langprint="go">">
+	</div>
+	<table id="subdomaintbl" style="table-layout: fixed;" class="sortable truncate-table" border="0" cellpadding="5" cellspacing="0">
+	    <tr>
+	      <th  style="padding-right:0px;" width="17%" align="right" class="cell"><cpanel langprint="NavSubdomains"></th>
+	      <th  style="padding-left:0px;" width="17%" align="left" class="cell">.<cpanel langprint="SUBRoot"></th>
+	      <th  align="center" class="cell" width="20%"><cpanel langprint="SUBDocRoot"></th>
+	      <th align="center" class="cell" width="20%"><cpanel langprint="Redirection"></th>
+	      <th  align="center" class="cell" nonsortable="true" colspan="2"><cpanel langprint="Actions"></th>
+	    </tr>
+	    <tbody>
+            <?cptt subdomain/live_subdomains_list_content.tmpl ?>
+	    </tbody>
+	  </table>
+	<?cp UI::paginate(%,paginator) currentpage=$CPVAR{'currentpage'},pages=$CPVAR{'pages'},itemsperpage=$CPVAR{'itemsperpage'} ?>
+	<cpanelif $CPVAR{'pages'} && !$CPVAR{'pages'}==1>
+	<div style="float:right"><form>
+	<cpanel langprint="PaginatorShowing"> <select name="itemsperpage" onchange="this.form.submit();">
+	<?cp UI::paginate_list([option value="%" %]%[/option],item,selected=1?selected:,item) itemsperpage=$CPVAR{'itemsperpage'},itemlist=10:25:50:100:250:500 ?>
+	</select><noscript><button id="my_button" onclick="" type="submit" Value=""><cpanel langprint="Change"></button></noscript>  <cpanel langprint="PaginatorResults"> 
+	</form></div>
+	</cpanelif>
+	
+	
+</div>
+
+<script type="text/javascript" src="<cpanel MagicRevision="uri("js/statusbox_optimized.js")">"></script>
+
+<!-- END #body-content -->
+<cpanel Branding="include(stdfooter.html)">

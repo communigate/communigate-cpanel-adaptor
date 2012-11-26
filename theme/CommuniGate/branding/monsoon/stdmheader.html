@@ -1,0 +1,49 @@
+<!-- START stdmheader.html -->
+<cpanelif $NVDATA{'x3_litegraphics'}>
+<style type="text/css">
+#heading-top-header-bg, #cpanel #border-efx #heading-top-header-bg { 
+    height: 41px;
+}
+#heading-top-billboard, #cpanel #border-efx #heading-top-header-bg #heading-top-billboard {
+    height: 0;
+    background: none;
+}
+.toplogo, #logo-top-logo {
+    display: none;
+}
+</style>
+</cpanelif>
+
+</head>
+<body class="yui-skin-sam">
+<div id="cpanel">
+
+	<div id="border-efx">
+   
+		<!--Start Header-->
+		<div class="clear" id="header_bg">
+			<div class="clear" id="header_nav">
+				<ul class="clear">
+					<li class="home"><a onclick="top.window.location.href='<cpanel printvar="dprefix">index.html'; return false;" target="_top" href="<cpanel printvar="dprefix">index.html"><cpanel Locale="maketext('Home')"></a></li>
+		       <cpanelif !$CPVAR{'hidehelp'}>
+                        <li><a onclick="show_help(); return false;"  target="_blank" href="<cpanel printvar="dprefix">help.html?url=<cpanel print="$ENV{'REQUEST_URI'}">"><cpanel Locale="maketext('Help')"></a></li>
+                </cpanelif>
+					<li class="last"><a onclick="top.window.location.href='/logout'; return false;"target="_top" href="/logout/"><cpanel Locale="maketext('Logout')"></a></li>
+				</ul>
+			</div>
+			<div id="logo">
+				<cpanelif !$NVDATA{'x3_litegraphics'}>
+                <img id="logo-top-logo" src="<cpanel Branding="image(top-logo)">" class="toplogo"  />
+                </cpanelif>
+			</div>
+			<div id="header_bar">
+				<span>cPanel 11</span>
+			</div>
+		</div>
+		
+		<!-- <div class="clearitsm">&nbsp;</div> -->
+		
+		<!--End Header-->
+		<!--Start Content-->
+		<div id="content">
+<!-- END stdmheader.html -->

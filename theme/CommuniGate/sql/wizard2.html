@@ -1,0 +1,106 @@
+<cpanel setvar="headerimg=../images/topmysql.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+
+
+<div class="body-content">
+
+<div class="h1Title"><div class="spriteicon_img_mini" id="icon-mysql_mini"></div> <cpanel langprint="SQLWizard"></div>
+
+
+<cpanel Mysql="adddb($FORM{'db'})"></p>
+
+<cpanelif $CPERROR{'mysql'}>
+  <p class="errors"><cpanel langprint="SQLCreateError">.
+  <a href="#" onclick="document.getElementById('details').style.display='block'; return false;"><cpanel langprint="AODShowDetails"></a> </p>
+  <div class="details" id="details">
+    <cpanel print="$CPERROR{'mysql'}">
+  </div>
+  <noscript>
+    <div class="details-noscript" id="details">
+      <cpanel print="$CPERROR{'mysql'}">
+    </div>
+  </noscript>
+</cpanelif>
+
+<br />
+
+<cpanelif !$CPERROR{'mysql'}>
+    <p><cpanel langprint="SQLAddMsg"><span class="status"><cpanel print="$dbownerprefix"><cpanel print="$FORM{'db'}"></span>.
+</cpanelif>
+
+<h2><cpanel langprint="SQLCreateStep2"></h2>
+
+<form method="post" action="wizard3.html" name="userform" id="userform">
+    <input type="hidden" name="db" value="<cpanel print="$dbownerprefix"><cpanel print="$FORM{'db'}">" />
+    <table cellpadding="3" cellspacing="0" class="tbl">
+    <tr>
+      <td align="right"><cpanel langprint="SQLGrantPermUser"></td>
+      <td><cpanel print="$dbownerprefix"><input maxlength="7" type="text" size="15" name="user" id="user" style="width: 150px" /></td>
+      <td><div id="user_error"></div></td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td colspan="2"><cpanel langprint="SQLMaxChars"></td>
+    </tr>
+    <tr>
+      <td align="right"><cpanel langprint="ASIReadOtherPassword"></td>
+      <td><input size="15" type="password" name="pass" id="password" style="width: 150px" /></td>
+      <td><div id="password_error"></div></td>
+    </tr>
+    <tr>
+      <td align="right"><cpanel langprint="ASIReadOtherPasswordAgain"></td>
+      <td><input type="password" size="15" name="pass2" id="password2" style="width: 150px" /></td>
+      <td><div id="password2_error"></div></td>
+    </tr>
+    <tr>
+      <td align="right">
+        <cpanel langprint="email_strength"> (<div style="display: inline" id="why_strong_passwords_link" class="action_link"><cpanel langprint="email_why"></div>):
+        <div id="why_strong_passwords_text" style="display: none"><cpanel langprint="email_password_why"><br /><br /><cpanel langprint="email_password_tip"></div>
+      </td>
+      <td><div id="password_strength" style="width: 150px; height: 20px; border: 1px solid black; margin: 5px 0px 3px 0px"></div></td>
+      <td><input type="button" class="input-button" id="create_strong_password" value="<cpanel langprint="cjt_password_generator">" tabindex="-1" /></td>
+    </tr>
+    <tr><td colspan="3"><br /></td></tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td><center><input type="submit" value="<cpanel langprint="PSDCreateButton">" class="input-button" id="submit_new_user" style="width: 150px" /></center></td>
+      <td>&nbsp;</td>
+    </tr>
+  </table>
+</form>
+
+<script type="text/javascript">
+//<![CDATA[
+
+var user_length = parseInt('<cpanel print="$dbprefix">');
+var dbprefix = '<cpanel print="$dbowner">';
+
+var max_length = user_length ? ( 16-(dbprefix.length+1) ) : ( 16 );
+document.getElementById('user').maxLength=max_length;  // Restrict the input field to the allowed length
+
+var REQUIRED_PASSWORD_STRENGTH = parseInt('<?cp PasswdStrength::get_required_strength(%,strength) app=mysql ?>') || 0;
+
+var init_user_validation = function() {
+    var user_validator = new CPANEL.validate.validator("<cpanel Locale="maketext('MySQL Username')">");
+    user_validator.add("user", "alphanumeric", "<cpanel langprint="mysql_username_alpha">");
+    user_validator.add("user", "max_length(%input%, "+max_length+")", "<cpanel langprint="mysql_dbname_length">");
+    user_validator.add("user", "min_length(%input%, 1)", '<cptext "The user name can not be empty">');
+    user_validator.attach();
+
+    var password_validators = CPANEL.password.setup("password", "password2", "password_strength", REQUIRED_PASSWORD_STRENGTH, "create_strong_password", "why_strong_passwords_link", "why_strong_passwords_text");
+    password_validators.push(user_validator);
+    CPANEL.validate.attach_to_form("submit_new_user", password_validators);
+
+    YAHOO.util.Dom.get("user").focus();
+};
+
+YAHOO.util.Event.onDOMReady(init_user_validation);
+//]]>
+</script>
+
+<div class="return-link"><a href="wizard1.html">&larr; <cptext "Go Back"></a> | <a href="index.html"><cptext "Go Back"> <cpanel langprint="ToMainSQL"></a></div>
+
+</div><!-- end body-content -->
+
+<cpanel Branding="include(stdfooter.html)">

@@ -1,0 +1,130 @@
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+<div class="body-content">
+
+<h1><cpanel include="mini_icon.html">
+<?cp LangMods::getkey(%,key) key=name,lang=$FORM{'lang'} ?>
+<cpanel langprint="moduleinstallheader"></h1>
+
+<cpanelif $FORM{'lang'}==perl><p><cpanel langprint="module_perl"></p></cpanelif>
+<cpanelif $FORM{'lang'}==php-pear><p><cpanel langprint="module_php_pear"></p></cpanelif>
+<cpanelif $FORM{'lang'}==php-pecl><p><cpanel langprint="module_php_pecl"></p></cpanelif>
+<cpanelif $FORM{'lang'}==ruby><p><cpanel langprint="module_ruby"></p></cpanelif>
+<br />
+
+<h2><cpanel langprint="module_location_header">
+<?cp LangMods::getkey(%,key) key=names,lang=$FORM{'lang'} ?>
+</h2>
+<p><span><cpanel langprint="module_path"></span>
+<code class="module-path"><?cp LangMods::getprefix(%,prefix) lang=$FORM{'lang'} ?></code>
+</p>
+
+<br />
+<h2><cpanel langprint="module_using">
+<?cp LangMods::getkey(%,key) key=names,lang=$FORM{'lang'} ?>
+</h2>
+<p>
+<?cp LangMods::magic_status(%,status) lang=$FORM{'lang'} ?>
+<cpanelif $CPVAR{'magic_status'}>
+    <cpanel langprint="admin_auto_loading"> <?cp LangMods::getkey(%,key) key=name,lang=$FORM{'lang'} ?>
+    <cpanel langprint="module_from"> <code class="module-path"><?cp LangMods::getprefix(%,prefix) lang=$FORM{'lang'} ?></code>.  <cpanel langprint="module_modify_script">
+</cpanelif>
+<cpanelif !$CPVAR{'magic_status'} && $FORM{'lang'}==module_php-pear>
+    <cpanel langprint="module_need_add"> <code class="module-path"><?cp LangMods::getprefix(%,prefix) lang=$FORM{'lang'} ?></code> <cpanel langprint="module_include_path">
+<code><pre>
+ini_set("include_path", '<?cp LangMods::getprefix(%,prefix) lang=$FORM{'lang'} ?>:' . ini_get("include_path")  );
+</pre></code>
+</cpanelif>
+<cpanelif !$CPVAR{'magic_status'} && $FORM{'lang'}==perl>
+    <cpanel langprint="module_need_add"> <code class="module-path"><?cp LangMods::getprefix(%,prefix) lang=$FORM{'lang'} ?></code> <cpanel langprint="module_include_path">
+<div class="pre_output">
+<pre>
+BEGIN {
+    my $b__dir = (-d '<?cp LangMods::getprefix(%,prefix) lang=$FORM{'lang'} ?>'?'<?cp LangMods::getprefix(%,prefix) lang=$FORM{'lang'} ?>':( getpwuid($>) )[7].'/perl');
+    unshift @INC,$b__dir.'5/lib/perl5',$b__dir.'5/lib/perl5/<?cp LangMods::getarchname(%,archname) lang=$FORM{'lang'} ?>',map { $b__dir . $_ } @INC;
+}
+</pre>
+</div>
+</cpanelif>
+<cpanelif $FORM{'lang'}==ruby>
+<p><strong>!!!!At this time Rails 3.0 is not supported and can cause a broken ruby/rails environment!!!!</strong></p>
+</cpanelif>
+<cpanelif !$CPVAR{'magic_status'} && $FORM{'lang'}==ruby>
+    <cpanel langprint="module_need_add"> <code class="module-path"><?cp LangMods::getprefix(%,prefix) lang=$FORM{'lang'} ?></code> <cpanel langprint="module_include_path">
+<code><pre>
+$:.push("<?cp LangMods::getprefix(%,prefix) lang=$FORM{'lang'} ?>")
+</pre></code>
+</cpanelif>
+
+</p>
+
+<div class="highlight">
+<h2><cpanel langprint="module_find_a"> 
+<?cp LangMods::getkey(%,key) key=name,lang=$FORM{'lang'} ?>
+
+</h2>
+
+<table border="0" cellspacing="5" cellpadding="0">
+	<tr>
+		<td>
+			<form action="search.html" method="get">
+				<label for="searchterm"><cpanel langprint="module_search_text"></label> 
+				<input type="text" id="searchterm" name="searchterm" size="15" />
+				<input type="hidden" name="lang" value="<cpanel print="$FORM{'lang'}">" /> 
+				<input type="hidden" name="searchtype" value="1" />
+				<input class="input-button" type="submit" value="<cpanel langprint="module_go">" />
+			</form>
+		</td>
+	    <td>
+			<span class="or_spacer"> <cpanel langprint="mpduleor"> </span>
+		</td>
+		<td>
+			<form action="search.html" method="get">
+			    <input type="hidden" name="lang" value="<cpanel print="$FORM{'lang'}">" /> 
+				<input type="hidden" name="searchtype" value="0" />
+				<input class="input-button" type="submit" value="<cpanel langprint="ShowAvailable"> <?cp LangMods::getkey(%,key) key=names,lang=$FORM{'lang'} ?>" />
+			</form>
+		</td>
+    </tr>
+</table>
+<h2><cpanel langprint="module_install_a"> 
+<?cp LangMods::getkey(%,key) key=name,lang=$FORM{'lang'} ?>
+</h2>
+<form action="live_install.html" method="get">
+	<p>
+    <input type="text" id="installname" name="mod" />
+    <input type="hidden" name="lang" value="<cpanel print="$FORM{'lang'}">" /> 
+	<input class="input-button" type="submit" value="<cpanel langprint="module_install_now">" />
+	</p>
+</form>
+</div>
+<h4><cpanel langprint="module_installed_text"> 
+<?cp LangMods::getkey(%,key) key=names,lang=$FORM{'lang'} ?>
+</h4>
+<table id="maintbl" class="sortable" border="0" cellspacing="0" cellpadding="0">
+	<tr>
+		<th><cpanel langprint="module_name"></th>
+		<th><cpanel langprint="module_version_header"></th>
+		<th nonsortable="true"><cpanel langprint="Actions"></th>
+	</tr>
+    <?cp LangMods::list_installed(
+	[tr]
+		[td]%[/td]
+		[td]%[/td]
+		[td]
+            [a href="live_update.html?lang=$FORM{'lang'}&mod=%" class="create-button"]$LANG{'module_update'}[/a]
+            [a href="live_install.html?lang=$FORM{'lang'}&mod=%" class="create-button"]$LANG{'module_reinstall'}[/a]
+            [a href="live_uninstall.html?lang=$FORM{'lang'}&mod=%" class="create-button"]$LANG{'module_uninstall'}[/a]
+            [a href="%" target="_blank" class="create-button"]$LANG{'module_show_docs'}[/a]
+	    [/td]
+    [/tr]
+,module,latest,module,module,module,docurl) lang=$FORM{'lang'} ?>
+</table>
+<br />
+<div style="text-align:center;" align="center">
+            <a href="syslist.html?lang=<cpanel print="$FORM{'lang'}">" class="create-button"><cpanel langprint="module_show_system"></a>
+</div>
+
+</div>
+
+<cpanel Branding="include(stdfooter.html)">

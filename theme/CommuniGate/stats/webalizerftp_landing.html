@@ -1,0 +1,14 @@
+<cpanel setvar="headerimg=../images/topwebftpstats.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+<style type="text/css">
+<?cp Branding::spritelist(.spriteicon_img_mini {float:left;margin-right:5px;background: url\{leftparenthesis}"%"\{rightparenthesis};} %,@spriteurl,images::#icon-${img}_mini {background-position\{colon}0 -${cssposition}px;width\{colon}${width}px;height\{colon}${height}px; }:) imgtype=icon,subtype=img,method=scale_60percent,format=png,img=webalizerftp ?>
+</style>
+<div class="body-content">
+<div class="h1Title"><div class="spriteicon_img_mini" id="icon-webalizerftp_mini"></div> <cpanel langprint="SLWeblizerFTPHead"></div>
+<p class="description"><cpanel langprint="SLWeblizerFTPDesc"></p>
+  	
+<p><img border="0" src="../images/trace.gif" alt="<cpanel Locale="maketext('view stats')">" />&nbsp;<a href="<cpanel Stats="webalizerftp($CPDATA{'DNS'})">" target="_blank"><cpanel langprint="WebalizerFTPLink"> <cpanel print="$CPDATA{'DNS'}">.</a></p>
+
+</div>
+<cpanel Branding="include(stdfooter.html)">

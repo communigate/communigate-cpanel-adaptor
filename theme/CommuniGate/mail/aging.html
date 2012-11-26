@@ -1,0 +1,28 @@
+<cpanel setvar="headerimg=../images/mailmenu.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+<div class="body-content">
+<table width="90%" cellspacing="0" cellpadding="0" border="0">
+<td valign="bottom">&nbsp;</td>
+<td valign="middle" width="90%"><font class="big"><cpanel langprint="PAHead"> <cpanel print="$FORM{'user'}"></font><br /><br /></td>
+<td valign="bottom">&nbsp;</td>
+<tr>
+<td colspan=3>
+
+<font class="med"><b><cpanel langprint="Instructions"></b></font>
+<br />
+<cpanel langprint="PAInfo">
+<br /><br />
+<b><cpanel langprint="Note"></b><i><cpanel langprint="PANote"></i>
+<br /><br />
+<form method="post" action="doaging.html">
+	<cpanel langprint="PANumDays">&nbsp;<input type="text" name="numdays" size="3" value="<cpanel Email="getaging($FORM{'user'})">" />
+	<input type="hidden" name="user" value="<cpanel print="$FORM{'user'}">" />
+	<input type="submit" value="<cpanel langprint="Submit">" />
+</form>
+</td>
+</tr>
+</table>
+<div class="return-link"><a href="pops<cpanelif $brandingpkg==mobile>_noscript</cpanelif>.html">&larr; <cptext "Go Back"></a></div>
+</div>
+<cpanel Branding="include(stdfooter.html)">

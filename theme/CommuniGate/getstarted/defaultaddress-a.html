@@ -1,0 +1,30 @@
+<cpanel setvar="headerimg=../images/mailmenu.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+<div class="body-content">
+
+<style type="text/css">
+<?cp Branding::spritelist(.spriteicon_img_mini {float:left;margin-right:5px;background: url\{leftparenthesis}"%"\{rightparenthesis};} %,@spriteurl,images::#icon-${img}_mini {background-position\{colon}0 -${cssposition}px;width\{colon}${width}px;height\{colon}${height}px; }:) imgtype=icon,subtype=img,method=scale_60percent,format=png,img=defaultemailacct ?>
+<?cp Branding::spritelist(.spriteicon_img_mini {float:left;margin-right:5px;background: url\{leftparenthesis}"%"\{rightparenthesis};} %,@spriteurl,images::#icon-${img}_mini {background-position\{colon}0 -${cssposition}px;width\{colon}${width}px;height\{colon}${height}px; }:) imgtype=icon,subtype=img,method=scale_60percent,format=png,img=getstart ?>
+</style>
+<cpanelfeature !defaultaddress>
+        <meta http-equiv="refresh" content="0;url=webmail.html" />
+</cpanelfeature>
+
+<cpanelfeature defaultaddress>
+
+<h1><div class="spriteicon_img_mini" id="icon-getstart_mini"></div><cpanel langprint="gswtitle"></h1>
+<cpanel include="jumpmenu.html">
+
+<div class="h1Title"><div class="spriteicon_img_mini" id="icon-defaultemailacct_mini"></div> <cpanel langprint="EADefaultmaint"></div>
+
+	<br />
+<?cp Email::setdefaultaddress($LANG{'EADefaultallfor'} [b]%[/b] $LANG{'EADefaultallgoing'} [b]%[/b][br /],domain,dest) email=$FORM{'email'},domain=$FORM{'domain'},fwdopt=$FORM{'fwdopt'},failmsgs=$FORM{'failmsgs'},pipefwd=$FORM{'pipefwd'},fwdemail=$FORM{'fwdemail'} ?>
+<br />
+<br />
+<div align="right"><a class="create-button" href="webmail.html"><cpanel langprint="NextStep"></a>
+</div>
+</cpanelfeature>
+
+</div>
+<cpanel Branding="include(stdfooter.html)">

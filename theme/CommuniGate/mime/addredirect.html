@@ -1,0 +1,32 @@
+<cpanel setvar="headerimg=../images/tools.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+<style type="text/css">
+<?cp Branding::spritelist(.spriteicon_img_mini {float:left;margin-right:5px;background: url\{leftparenthesis}"%"\{rightparenthesis};} %,@spriteurl,images::#icon-${img}_mini {background-position\{colon}0 -${cssposition}px;width\{colon}${width}px;height\{colon}${height}px; }:) imgtype=icon,subtype=img,method=scale_60percent,format=png,img=redirects ?>
+</style>
+<div class="body-content">
+
+<!--<cpanel Mime="add_redirect($FORM{'path'},$FORM{'type'},$FORM{'url'},$FORM{'domain'},$FORM{'wildcard'},$FORM{'rdwww'})">
+<cpanel print="$CPERROR{'mime'}">-->
+
+<div class="h1Title"><div class="spriteicon_img_mini" id="icon-redirects_mini"></div> <cpanel langprint="RDHead"></div>
+
+<cpanelif $CPERROR{'mime'}>
+<p><cpanel langprint="RedirectAddError"></p>
+	<a href="#" onclick="document.getElementById('details').style.display='block'; return false;"><cpanel langprint="AODShowDetails"></a> </p>
+    <div class="details" id="details">
+		<cpanel print="$CPERROR{'mime'}">  
+    </div>
+	<noscript>
+	<div class="details-noscript" id="details">
+		<cpanel print="$CPERROR{'mime'}">
+    </div>
+	</noscript>
+</cpanelif>
+<cpanelif !$CPERROR{'mime'}>
+	<span class="status"><?cp Mime::redirectname(%,domain) domain=$FORM{'domain'} ?>/<cpanel print="$FORM{'path'}"></span>&nbsp;<cpanel langprint="RDTo">&rarr; <span class="status"><cpanel print="$FORM{'url'}"></span>
+</cpanelif>
+
+<div class="return-link"><a href="redirect.html">&larr; <cptext "Go Back"></a></div>
+</div>
+<cpanel Branding="include(stdfooter.html)">

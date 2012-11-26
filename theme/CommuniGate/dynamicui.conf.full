@@ -1,0 +1,198 @@
+####menu boxes on index####
+description=>$LANG{'PrefHead'},file=>group_pref,group=>pref,groupdesc=>$LANG{'PrefHead'},grouporder=>1,imgtype=>icon,subtype=>img,height=>32,type=>image,width=>32
+#description=>$LANG{'MENUMail'},file=>group_mail,group=>mail,groupdesc=>$LANG{'MENUMail'},grouporder=>2,imgtype=>icon,subtype=>img,height=>32,type=>image,width=>32
+description=>$LANG{'MENUCommuniGate'},file=>group_communigate,group=>communigate,groupdesc=>$LANG{'MENUCommuniGate'},grouporder=>2,imgtype=>icon,subtype=>img,height=>32,type=>image,width=>32
+description=>$LANG{'FilesHead'},file=>group_files,group=>files,groupdesc=>$LANG{'FilesHead'},grouporder=>3,imgtype=>icon,subtype=>img,height=>32,type=>image,width=>32
+description=>$LANG{'SLLogs'},file=>group_logs,group=>logs,groupdesc=>$LANG{'SLLogs'},grouporder=>4,imgtype=>icon,subtype=>img,height=>32,type=>image,width=>32
+description=>$LANG{'MENUSecurity'},file=>group_sec,group=>sec,groupdesc=>$LANG{'MENUSecurity'},grouporder=>5,imgtype=>icon,subtype=>img,height=>32,type=>image,width=>32
+description=>$LANG{'MENUDomains'},file=>group_domains,group=>domains,groupdesc=>$LANG{'MENUDomains'},grouporder=>6,imgtype=>icon,subtype=>img,height=>32,type=>image,width=>32
+description=>$LANG{'Databases'},file=>group_db,group=>db,groupdesc=>$LANG{'Databases'},grouporder=>7,imgtype=>icon,subtype=>img,height=>32,type=>image,width=>32
+description=>$LANG{'MENUSoftware'},file=>group_software,group=>software,groupdesc=>$LANG{'MENUSoftware'},grouporder=>8,imgtype=>icon,subtype=>img,height=>32,type=>image,width=>32
+description=>$LANG{'AdvHead'},file=>group_advanced,group=>advanced,groupdesc=>$LANG{'AdvHead'},grouporder=>9,imgtype=>icon,subtype=>img,height=>32,type=>image,width=>32
+
+####icons w/ links inside menu boxes####
+#advanced
+description=>$LANG{'AHHead'},feature=>handlers,file=>apache,group=>advanced,height=>30,imgtype=>icon,itemdesc=>$LANG{'THandlers'},subtype=>img,type=>image,url=>mime/handle.html,width=>45,itemorder=>1,searchtext=>$LANG{'handler-searchtxt'}
+description=>$LANG{'VirusScan'},feature=>clamavconnector_scan,file=>clam,group=>advanced,height=>32,imgtype=>icon,itemdesc=>$LANG{'VirusScan'},subtype=>img,type=>image,url=>clamavconnector/index.html,width=>32,itemorder=>10,module=>ClamScanner,searchtext=>$LANG{'clamav-searchtxt'}
+description=>$LANG{'TCron'},feature=>cron,file=>cron,group=>advanced,height=>32,imgtype=>icon,itemdesc=>$LANG{'TCron'},subtype=>img,type=>image,url=>cron/index.html,width=>32,itemorder=>7,searchtext=>$LANG{'cron-searchtxt'}
+description=>$LANG{'EPHead'},feature=>errpgs,file=>errorpage,group=>advanced,height=>32,imgtype=>icon,itemdesc=>$LANG{'TErrorPages'},subtype=>img,type=>image,url=>err/index.html,width=>32,itemorder=>6,searchtext=>$LANG{'errorlog-searchtxt'}
+description=>$LANG{'TImageMan'},feature=>cpanelpro_images,file=>image-manager,group=>advanced,height=>32,imgtype=>icon,itemdesc=>$LANG{'TImageMan'},subtype=>img,type=>image,url=>cpanelpro/images.html,width=>32,itemorder=>4,module=>ImageManager,searchtext=>$LANG{'imgmgr-searchtxt'}
+description=>$LANG{'TIndexMan'},feature=>indexmanager,file=>index,group=>advanced,height=>32,imgtype=>icon,itemdesc=>$LANG{'indexmantitle'},subtype=>img,type=>image,url=>indexmanager/index.html,width=>32,itemorder=>5,onclick=>show_optionselect('index'); return false;,searchtext=>$LANG{'indexmgr-searchtxt'}
+description=>$LANG{'TMIME'},feature=>mime,file=>mime-types,group=>advanced,height=>32,imgtype=>icon,itemdesc=>$LANG{'TMIME'},subtype=>img,type=>image,url=>mime/mime.html,width=>32,searchtext=>$LANG{'mime-searchtxt'}
+description=>$LANG{'INDXNetworkTools'},feature=>nettools,file=>nettools,group=>advanced,height=>32,imgtype=>icon,itemdesc=>$LANG{'INDXNetworkTools'},subtype=>img,type=>image,url=>net/index.html,width=>32,itemorder=>8,searchtext=>$LANG{'network-searchtxt'}
+description=>$LANG{'TFrontpage'},feature=>frontpage,file=>frontpage,group=>advanced,height=>32,imgtype=>icon,itemdesc=>$LANG{'TFrontpage'},subtype=>img,type=>image,url=>fp/index.html,width=>32,itemorder=>8,searchtext=>$LANG{'frontpage-searchtxt'}
+description=>$LANG{'SupportRequest'},feature=>cpanelpro_support,file=>submit-support,group=>advanced,height=>32,if=>$CPFLAGS{'pro'},imgtype=>icon,itemdesc=>$LANG{'SupportRequest'},subtype=>img,type=>image,url=>cpanelpro/support.html,width=>32,itemorder=>9,module=>SupportRequest,searchtext=>$LANG{'support-searchtxt'}
+description=>$LANG{'WHMHead'},file=>whm,group=>advanced,height=>32,if=>$isreseller,imgtype=>icon,itemdesc=>$LANG{'WHMHead'},subtype=>img,type=>image,url=>/xferwhm/,width=>45,searchtext=>$LANG{'whm-searchtxt'}
+
+
+
+#databases
+description=>$LANG{'NavMySQL'},feature=>mysql,file=>mysql,group=>db,height=>31,imgtype=>icon,itemdesc=>$LANG{'TMySQL'},subtype=>img,type=>image,url=>sql/index.html,width=>45,itemorder=>1,searchtext=>$LANG{'mysql-searchtxt'}
+description=>$LANG{'MySQLHost'},feature=>mysql,file=>mysql-remoteaccess,group=>db,height=>31,imgtype=>icon,itemdesc=>$LANG{'MySQLHost'},subtype=>img,type=>image,url=>sql/managehost.html,width=>45,itemorder=>4,searchtext=>$LANG{'mysqlremote-searchtxt'}
+description=>$LANG{'SQLWizard'},feature=>mysql,file=>mysql-wizard3,group=>db,height=>31,imgtype=>icon,itemdesc=>$LANG{'SQLWizard'},subtype=>img,type=>image,url=>sql/wizard1.html,width=>45,itemorder=>2,searchtext=>$LANG{'mysqlwizard-searchtxt'}
+description=>$LANG{'SQLPhpAdminHead'},feature=>phpmyadmin,file=>phpMyAdmin,group=>db,height=>34,imgtype=>icon,itemdesc=>$LANG{'phpMyAdmin'},subtype=>img,type=>image,url=>sql/PhpMyAdmin.html,width=>45,itemorder=>3,acontent=>target="_blank",searchtext=>$LANG{'phpmyadmin-searchtxt'}
+description=>$LANG{'PSDAdmin'},feature=>phppgadmin,if=>$haspostgres,file=>phpPgAdmin,group=>db,height=>32,imgtype=>icon,itemdesc=>$LANG{'PSDAdmin'},subtype=>img,type=>image,url=>/3rdparty/phpPgAdmin/index.php,width=>50,itemorder=>7,feature=>postgres,acontent=>target="_blank",searchtext=>$LANG{'phppgadmin-searchtxt'}
+description=>$LANG{'TPostgre'},feature=>postgres,file=>postgresql,group=>db,height=>32,if=>$haspostgres,imgtype=>icon,itemdesc=>$LANG{'TPostgre'},subtype=>img,type=>image,url=>psql/index.html,width=>32,itemorder=>5,searchtext=>$LANG{'psql-searchtxt'}
+description=>$LANG{'PSDWizard'},feature=>postgres,file=>postgresql-wizard,group=>db,height=>31,if=>$haspostgres,imgtype=>icon,itemdesc=>$LANG{'PSQLWizard'},subtype=>img,type=>image,url=>psql/wizard1.html,width=>45,,itemorder=>6,searchtext=>$LANG{'psqlwizard-searchtxt'}
+
+#domains
+description=>$LANG{'TAddondomains'},feature=>addondomains,file=>addondomain,group=>domains,height=>32,imgtype=>icon,itemdesc=>$LANG{'TAddondomains'},subtype=>img,type=>image,url=>addon/index.html,width=>33,itemorder=>2,searchtext=>$LANG{'addon-searchtxt'}
+description=>$LANG{'TParkdomains'},feature=>parkeddomains,file=>parkeddomains,group=>domains,height=>32,imgtype=>icon,itemdesc=>$LANG{'TParkdomains'},subtype=>img,type=>image,url=>park/index.html,width=>32,itemorder=>3,searchtext=>$LANG{'park-searchtxt'}
+description=>$LANG{'TRedirects'},feature=>redirects,file=>redirects,group=>domains,height=>32,imgtype=>icon,itemdesc=>$LANG{'TRedirects'},subtype=>img,type=>image,url=>mime/redirect.html,width=>33,itemorder=>4,searchtext=>$LANG{'redirect-searchtxt'}
+description=>$LANG{'TSubdomains'},feature=>subdomains,file=>subdomains,group=>domains,height=>32,imgtype=>icon,itemdesc=>$LANG{'TSubdomains'},subtype=>img,type=>image,url=>subdomain/index.html,width=>43,itemorder=>1,searchtext=>$LANG{'subdomain-searchtxt'}
+description=>$LANG{'zoneedit_head'},feature=>zoneedit,file=>zoneedit,group=>domains,height=>32,imgtype=>icon,itemdesc=>$LANG{'zoneedit_head'},subtype=>img,type=>image,url=>zoneedit/advanced.html,width=>32,itemorder=>10,searchtext=>$LANG{'zoneedit_searchtxt'}
+description=>$LANG{'simplezoneedit_head'},feature=>simplezoneedit,file=>simplezoneedit,group=>domains,height=>32,imgtype=>icon,itemdesc=>$LANG{'simplezoneedit_head'},subtype=>img,type=>image,url=>zoneedit/simple.html,width=>32,itemorder=>10,searchtext=>$LANG{'zoneedit_searchtxt'}
+
+#files
+description=>$LANG{'MENUSetupAnonAccess'},if=>$hasanonftp,feature=>ftpaccts,file=>anonymousftp,group=>files,height=>32,imgtype=>icon,itemdesc=>$LANG{'MENUFTPAnonFTP'},subtype=>img,type=>image,url=>ftp/anonymous.html,width=>32 =>$imgtype,description=>$LANG{'MENUSetupAnonMessage'},file=>anonymousmsg,height=>32,subtype=>img,type=>image,width=>32,searchtext=>$LANG{'anon-searchtxt'}
+description=>$LANG{'TFileManagerLegacy'},feature=>filemanager,file=>legacy_filemanager,group=>files,height=>32,imgtype=>icon,itemdesc=>$LANG{'TFileManagerLegacy'} ,subtype=>img,type=>image,url=>files/index.html?showhidden=1&amp;dir=/public_html,width=>32,itemorder=>2,acontent=>target="_blank",onclick=>show_optionselect('files'); return false;,searchtext=>$LANG{'filemgrleg-searchtxt'}
+description=>$LANG{'TFileManager'},feature=>filemanager,file=>filemanager,group=>files,height=>32,imgtype=>icon,itemdesc=>$LANG{'TFileManager'},subtype=>img,type=>image,url=>filemanager/index.html?showhidden=1&amp;dir=/public_html,width=>32,itemorder=>2,acontent=>target="_blank",onclick=>show_optionselect('filemanager'); return false;,searchtext=>$LANG{'filemgr-searchtxt'}
+description=>$LANG{'INDXFtpAccounts'},feature=>ftpaccts,file=>ftpaccounts,group=>files,height=>32,imgtype=>icon,itemdesc=>$LANG{'MENUFTPAccounts'},subtype=>img,type=>image,url=>ftp/accounts.html,width=>32,itemorder=>4,searchtext=>$LANG{'ftpacct-searchtxt'}
+description=>$LANG{'MENUFTPSessions'},feature=>ftpaccts,,file=>ftpcontrol,group=>files,height=>32,imgtype=>icon,itemdesc=>$LANG{'MENUFTPSessions'},subtype=>img,type=>image,url=>ftp/session.html,width=>32,itemorder=>6,searchtext=>$LANG{'ftpsession-searchtxt'}
+description=>$LANG{'BUBackupHead'},feature=>backup,file=>hd,group=>files,height=>32,imgtype=>icon,itemdesc=>$LANG{'BUBackupHead'},subtype=>img,type=>image,url=>backup/index.html,width=>32,itemorder=>1,searchtext=>$LANG{'backup-searchtxt'}
+description=>$LANG{'BUWizard'},feature=>backup,file=>backup-wizard,group=>files,height=>32,imgtype=>icon,itemdesc=>$LANG{'BUWizard'},subtype=>img,type=>image,url=>backup/wizard.html,width=>45,itemorder=>2,searchtext=>$LANG{'backupwzrd-searchtxt'}
+description=>$LANG{'INDXDiskUsage'},feature=>diskusageviewer,file=>hdspace,group=>files,height=>32,imgtype=>icon,itemdesc=>$LANG{'INDXDiskUsage'},subtype=>img,type=>image,url=>diskusage/index.html,width=>32,itemorder=>3,searchtext=>$LANG{'diskusage-searchtxt'}
+description=>$LANG{'MENUWebDisk'},feature=>webdisk,file=>webdav,group=>files,height=>32,imgtype=>icon,itemdesc=>$LANG{'MENUWebDisk'},subtype=>img,type=>image,url=>webdav/accounts_webdav.html,width=>32,itemorder=>3,searchtext=>$LANG{'webdav-searchtxt'}
+
+
+#CommuniGate
+
+description=>$LANG{'CGPAccounts'},file=>cgpaccounts,group=>communigate,height=>32,imgtype=>icon,itemdesc=>$LANG{'CGPAccounts'},subtype=>img,type=>image,url=>mail/pops.html,width=>32,itemorder=>1
+description=>$LANG{'Webmail'},file=>webemail,group=>communigate,height=>32,imgtype=>icon,itemdesc=>$LANG{'ASIWebmail'},subtype=>img,type=>image,url=>mail/cgpwebmail.html,width=>32,itemorder=>11,searchtext=>$LANG{'webmail-searchtxt'}
+description=>$LANG{'CGPPronto'},file=>pronto,group=>communigate,height=>32,imgtype=>icon,itemdesc=>$LANG{'CGPPronto'},subtype=>img,type=>image,url=>mail/pronto.html,width=>32,itemorder=>3
+description=>$LANG{'CGPProntoosx'},file=>prontoosx,group=>communigate,height=>32,imgtype=>icon,itemdesc=>$LANG{'CGPProntoosx'},subtype=>img,type=>image,url=>http://$CPDATA{'DNS'}:8100/SkinFiles/$CPDATA{'DNS'}/Pronto4/pronto4.dmg,width=>32,itemorder=>4
+description=>$LANG{'CGPProntoios'},file=>prontoios,group=>communigate,height=>32,imgtype=>icon,itemdesc=>$LANG{'CGPProntoios'},subtype=>img,type=>image,url=>http://itunes.apple.com/ph/app/pronto!/id490538357?mt=8,width=>32,itemorder=>5
+description=>$LANG{'CGPProntoms'},file=>prontoms,group=>communigate,height=>32,imgtype=>icon,itemdesc=>$LANG{'CGPProntoms'},subtype=>img,type=>image,url=>http://$CPDATA{'DNS'}:8100/SkinFiles/$CPDATA{'DNS'}/Pronto4/pronto4.exe,width=>32,itemorder=>5
+description=>$LANG{'CGPMobile'},file=>mobile,group=>communigate,height=>32,imgtype=>icon,itemdesc=>$LANG{'CGPMobile'},subtype=>img,type=>image,url=>http://$CPDATA{'DNS'}:8100/SkinFiles/$CPDATA{'DNS'}/Pronto4/pronto.apk,width=>32,itemorder=>6
+description=>$LANG{'CGPiphone'},file=>iphone,group=>communigate,height=>32,imgtype=>icon,itemdesc=>$LANG{'CGPiphone'},subtype=>img,type=>image,url=>mail/iphone.html,width=>32,itemorder=>7
+#description=>$LANG{'CGPipad'},file=>ipad,group=>communigate,height=>32,imgtype=>icon,itemdesc=>$LANG{'CGPipad'},subtype=>img,type=>image,url=>mail/ipad.html,width=>32,itemorder=>8
+description=>$LANG{'CGPiphone'},file=>iphone,group=>communigate,height=>32,imgtype=>icon,itemdesc=>$LANG{'CGPiphone'},subtype=>img,type=>image,url=>mail/iphone.html,width=>32,itemorder=>9
+description=>$LANG{'CGPGWAccounts'},file=>groupware,group=>communigate,height=>32,imgtype=>icon,itemdesc=>$LANG{'CGPGWAccounts'},subtype=>img,type=>image,url=>mail/groupware.html,width=>32,itemorder=>2
+description=>$LANG{'CGPAliases'},file=>aliasesemail,group=>communigate,height=>32,imgtype=>icon,itemdesc=>$LANG{'CGPAliases'},subtype=>img,type=>image,url=>mail/aliases.html,width=>32,itemorder=>15
+description=>$LANG{'TForwarders'},feature=>forwarders || emaildomainfwd,file=>forwardersemail,group=>communigate,height=>32,imgtype=>icon,itemdesc=>$LANG{'NavForwarders'},subtype=>img,type=>image,url=>mail/fwds.html,width=>32,itemorder=>15,searchtext=>$LANG{'forwarders-searchtxt'}
+description=>$LANG{'MENUDefaultAddress'},feature=>defaultaddress,file=>defaultemailacct,group=>communigate,height=>32,imgtype=>icon,itemdesc=>$LANG{'MENUDefaultAddress'},subtype=>img,type=>image,url=>mail/def.html,width=>32,itemorder=>16,searchtext=>$LANG{'defaultmail-searchtxt'}
+description=>$LANG{'SpamAssassin'},feature=>spamassassin,file=>spamassasin,group=>communigate,height=>32,if=>!$CONF{'skipspamassassin'} $CPDATA{'FEATURE-SPAMASSASSIN'},imgtype=>icon,itemdesc=>$LANG{'SpamAssassin'},subtype=>img,type=>image,url=>mail/spam/spam.html,width=>46,itemorder=>17,searchtext=>$LANG{'spamassassin-searchtxt'}
+description=>$LANG{'EmailDelivery'},feature=>traceaddy || deliveryreport,file=>emailroute,group=>communigate,height=>32,imgtype=>icon,itemdesc=>$LANG{'EmailDelivery'},subtype=>img,type=>image,url=>mail/route.html,width=>32,itemorder=>19,searchtext=>$LANG{'mailroute-searchtxt'}
+description=>$LANG{'MXEntry'},feature=>changemx,file=>emailmx,group=>communigate,height=>32,imgtype=>icon,itemdesc=>$LANG{'MXEntry'},subtype=>img,type=>image,url=>mail/mx.html,width=>32,itemorder=>20,searchtext=>$LANG{'mx-searchtxt'}
+description=>$LANG{'EmailAuth'},feature=>emailauth,file=>emailauth,group=>communigate,height=>32,imgtype=>icon,itemdesc=>$LANG{'CGPEmailAuth'},subtype=>img,type=>image,url=>mail/auth.html,width=>32,itemorder=>21,searchtext=>$LANG{'domainkeys-searchtxt'}
+description=>$LANG{'CGPMailImport'},feature=>csvimport,file=>csvimport,group=>communigate,height=>32,imgtype=>icon,itemdesc=>$LANG{'CGPMailImport'},subtype=>img,type=>image,url=>mail/csvimport.html,width=>35,itemorder=>22,module=>CSVImport,searchtext=>$LANG{'csvimport-searchtxt'}
+
+
+#preferences
+description=>$LANG{'gswtitle'},feature=>getstart,file=>getstart,group=>pref,height=>32,imgtype=>icon,itemdesc=>$LANG{'gswtitle'},subtype=>img,type=>image,url=>getstarted/index.html,width=>33,itemorder=>1,searchtext=>$LANG{'getstarted-searchtxt'}
+description=>$LANG{'VideoTutorialsLinkHelp'},feature=>videotut,file=>tutorials,group=>pref,height=>32,imgtype=>icon,itemdesc=>$LANG{'VideoTutorialsLinkHelp'},subtype=>img,type=>image,url=>tutorial.html,width=>33,itemorder=>2,acontent=>target="_blank",searchtext=>$LANG{'tutorials-searchtxt'}
+description=>$LANG{'BrandingEdit'},file=>branding,group=>pref,height=>32,if=>$isreseller,imgtype=>icon,itemdesc=>$LANG{'BrandingEdit'},subtype=>img,type=>image,url=>resellers/branding/index.html,width=>32,itemorder=>5,searchtext=>$LANG{'branding-searchtxt'}
+description=>$LANG{'ChangeLook'},file=>lookandfeel,group=>pref,height=>32,imgtype=>icon,itemdesc=>$LANG{'ChangeLook'},feature=>style,subtype=>img,type=>image,url=>style/index.html,width=>32,itemorder=>5,searchtext=>$LANG{'style-searchtxt'}
+description=>$LANG{'ChangeLang'},file=>changelang,group=>pref,height=>32,imgtype=>icon,itemdesc=>$LANG{'ChangeLang'},feature=>setlang,subtype=>img,type=>image,url=>setlang/index.html,width=>32,itemorder=>6,searchtext=>$LANG{'language-searchtxt'} language setlang
+description=>$LANG{'Shortcuts'},file=>favorites,group=>pref,height=>32,imgtype=>icon,itemdesc=>$LANG{'Shortcuts'},feature=>setlang,subtype=>img,type=>image,url=>shortcuts/index.html,width=>32,itemorder=>7,searchtext=>$LANG{'shortcuts-searchtxt'}
+description=>$LANG{'ChangePassword'},feature=>password,file=>password,group=>pref,height=>32,imgtype=>icon,itemdesc=>$LANG{'TChangePass'},subtype=>img,type=>image,url=>passwd/index.html,width=>32,itemorder=>3,searchtext=>$LANG{'password-searchtxt'}
+description=>$LANG{'SecurityPolicy'},if=>$CONF{'SecurityPolicy::SourceIPCheck'},file=>sec_policy,group=>pref,height=>32,imgtype=>icon,itemdesc=>$LANG{'SecurityPolicy'},subtype=>img,type=>image,url=>security/index.html,width=>32,itemorder=>17,searchtext=>$LANG{'securitypolicy-searchtxt'}
+description=>$LANG{'UpdateContactHead'},feature=>updatecontact,file=>updatecontact,group=>pref,height=>32,imgtype=>icon,itemdesc=>$LANG{'UpdateContactHead'},subtype=>img,type=>image,url=>contact/index.html,width=>32,itemorder=>4,searchtext=>$LANG{'contactemail-searchtxt'}
+
+#security
+description=>$LANG{'HLHead'},feature=>hotlink,file=>hotlinkprotect,group=>sec,height=>32,imgtype=>icon,itemdesc=>$LANG{'THotLink'},subtype=>img,type=>image,url=>mime/hotlink.html,width=>32,itemorder=>5,searchtext=>$LANG{'hotlink-searchtxt'}
+description=>$LANG{'IPDMMainHead'},feature=>ipdeny,file=>ipdeny,group=>sec,height=>32,imgtype=>icon,itemdesc=>$LANG{'IPDMMainHead'},subtype=>img,type=>image,url=>denyip/index.html,width=>32,itemorder=>2,searchtext=>$LANG{'denyip-searchtxt'}
+description=>$LANG{'TPGP'},feature=>pgp,file=>keys,group=>sec,height=>32,imgtype=>icon,itemdesc=>$LANG{'TPGP'},subtype=>img,type=>image,url=>gpg/index.html,width=>32,itemorder=>7,searchtext=>$LANG{'gpg-searchtxt'}
+description=>$LANG{'LP'},feature=>cpanelpro_leechprotect,file=>leechprotect,group=>sec,height=>32,imgtype=>icon,itemdesc=>$LANG{'LP'},subtype=>img,type=>image,url=>htaccess/leechprotect/leechprotect.html,width=>32,itemorder=>6,module=>LeechProtect,onclick=>show_optionselect('leechprotect'); return false;,searchtext=>$LANG{'leechprotect-searchtxt'}
+description=>$LANG{'NavProtectDir'},feature=>webprotect,file=>password-protect,group=>sec,height=>32,imgtype=>icon,itemdesc=>$LANG{'NavProtectDir'},subtype=>img,type=>image,url=>htaccess/index.html,width=>32,itemorder=>1,onclick=>show_optionselect('password-protect'); return false;,searchtext=>$LANG{'passwdprotect-searchtxt'}
+description=>$LANG{'TTelnetApp'},feature=>ssh,file=>ssh-shell-access,group=>sec,height=>32,imgtype=>icon,itemdesc=>$LANG{'TTelnetApp'},subtype=>img,type=>image,url=>telnet/index.html,width=>37,itemorder=>4,searchtext=>$LANG{'telnet-searchtxt'}
+description=>$LANG{'TSSLManager'},feature=>sslmanager,file=>ssl-manager,group=>sec,height=>32,imgtype=>icon,itemdesc=>$LANG{'TSSLManager'},subtype=>img,type=>image,url=>ssl/index.html,width=>32,itemorder=>3,searchtext=>$LANG{'ssl-searchtxt'}
+
+#software/services
+description=>$LANG{'INDXCgiCenter'},feature=>cgi,file=>cgi-center,group=>software,height=>32,imgtype=>icon,itemdesc=>$LANG{'INDXCgiCenter'},subtype=>img,type=>image,url=>cgi/index.html,width=>32,itemorder=>1,searchtext=>$LANG{'cgi-searchtxt'}
+description=>$LANG{'PerlMod'},feature=>modules-perl,if=>$hasperl,file=>perl,group=>software,height=>32,imgtype=>icon,itemdesc=>$LANG{'PerlMod'},subtype=>img,type=>image,url=>module_installers/index.html?lang=perl,width=>32,itemorder=>4,searchtext=>$LANG{'perlmod-searchtxt'}
+description=>$LANG{'RubyMod'},feature=>modules-ruby,if=>$hasgem,file=>ruby,group=>software,height=>32,imgtype=>icon,itemdesc=>$LANG{'RubyMod'},subtype=>img,type=>image,url=>module_installers/index.html?lang=ruby,width=>32,itemorder=>7,searchtext=>$LANG{'rubyinstall-searchtxt'} 
+#description=>$LANG{'RubyOnRails'},feature=>ror,if=>$hasmodproxy && $hasgem,file=>rails,group=>software,height=>32,imgtype=>icon,itemdesc=>$LANG{'RubyOnRails'},subtype=>img,type=>image,url=>ror/index.html,width=>32,itemorder=>8,module=>RoR,searchtext=>$LANG{'ror-searchtxt'}
+description=>$LANG{'RubyOnRails'},feature=>ror,if=>$hasrails,file=>rails,group=>software,height=>32,imgtype=>icon,itemdesc=>$LANG{'RubyOnRails'},subtype=>img,type=>image,url=>ror/index.html,width=>32,itemorder=>8,module=>RoR,searchtext=>$LANG{'ror2-searchtxt'}
+description=>$LANG{'PHPPearMod'},feature=>modules-php-pear,if=>$haspear,file=>php-pear,group=>software,height=>32,imgtype=>icon,itemdesc=>$LANG{'PHPPearMod'},subtype=>img,type=>image,url=>module_installers/index.html?lang=php-pear,width=>32,itemorder=>5,searchtext=>$LANG{'pear-searchtxt'}
+description=>$LANG{'PHPModConfig'},feature=>php-config,file=>php,group=>software,height=>32,imgtype=>icon,itemdesc=>$LANG{'PHPModConfig'},subtype=>img,type=>image,url=>php/index.html?lang,width=>32,itemorder=>6,searchtext=>$LANG{'phpmod-searchtxt'}
+description=>$LANG{'MENUInterchangeCart'},feature=>interchange,file=>inter_icon,group=>software,height=>32,if=>$CONF{'interchangever'},imgtype=>icon,itemdesc=>$LANG{'TInterchangeCart'},subtype=>img,type=>image,url=>interchange.html,width=>32,searchtext=>$LANG{'interchange-searchtxt'}
+description=>$LANG{'MENUScriptsLibrary'},feature=>addoncgi,file=>scripts-library,group=>software,height=>32,imgtype=>icon,itemdesc=>$LANG{'MENUScriptsLibrary'},subtype=>img,type=>image,url=>addoncgi/cpaddons.html,width=>32,itemorder=>2,searchtext=>$LANG{'cpaddons-searchtxt'}
+description=>$LANG{'OptimizeWS'},file=>optimizews,if=>$hasmoddeflate,group=>software,height=>32,imgtype=>icon,itemdesc=>$LANG{'OptimizeWS'},subtype=>img,type=>image,url=>optimize/index.html,width=>45,itemorder=>20,searchtext=>$LANG{'optimize-searchtxt'}
+
+#stats and logs
+description=>$LANG{'SLLVHead'},feature=>lastvisits,file=>latestvisitors,group=>logs,height=>32,imgtype=>icon,itemdesc=>$LANG{'MENULatestVisitors'},subtype=>img,type=>image,url=>stats/lastvisitors_landing.html,width=>32,itemorder=>1,searchtext=>$LANG{'lastvisitors-searchtxt'}
+description=>$LANG{'SLBandHead'},feature=>bandwidth,file=>networkmonitor,group=>logs,height=>32,imgtype=>icon,itemdesc=>$LANG{'SLBandHead'},subtype=>img,type=>image,url=>stats/bandwidth.html,width=>32,itemorder=>2,searchtext=>$LANG{'bandwidth-searchtxt'}
+description=>$LANG{'WLHead'},feature=>webalizer,file=>webalizerlog,group=>logs,height=>32,if=>!$CONF{'skipwebalizer'} $CPDATA{'FEATURE-WEBALIZER'},imgtype=>icon,itemdesc=>$LANG{'SLWeblizer'},subtype=>img,type=>image,url=>stats/webalizer_landing.html,width=>32,itemorder=>3,searchtext=>$LANG{'webalizer-searchtxt'}
+description=>$LANG{'SLWeblizerFTPHead'},feature=>webalizer,file=>webalizerftp,group=>logs,height=>32,if=>!$CONF{'skipwebalizer'} $CPDATA{'FEATURE-WEBALIZER'},imgtype=>icon,itemdesc=>$LANG{'SLWeblizerFTPHead'},subtype=>img,type=>image,url=>stats/webalizerftp_landing.html,width=>32,itemorder=>4,searchtext=>$LANG{'webalizerftp-searchtxt'}
+description=>$LANG{'TRawLogs'},feature=>rawlog,file=>rawaccesslogs,group=>logs,height=>32,imgtype=>icon,itemdesc=>$LANG{'TRawLogs'},subtype=>img,type=>image,url=>raw/index.html,width=>32,,itemorder=>5,searchtext=>$LANG{'rawlogs-searchtxt'}
+description=>$LANG{'SLAnalogStats'},feature=>analog,file=>analogstats,group=>logs,height=>32,if=>!$CONF{'skipanalog'} $CPDATA{'FEATURE-ANALOG'},imgtype=>icon,itemdesc=>$LANG{'SLAnalogStats'},subtype=>img,type=>image,url=>stats/analog_landing.html,width=>32,itemorder=>6,searchtext=>$LANG{'analog-searchtxt'}
+description=>$LANG{'ELHead'},feature=>errlog,file=>errorlogs,group=>logs,height=>32,imgtype=>icon,itemdesc=>$LANG{'MENUErrorLog'},subtype=>img,type=>image,url=>stats/errlog.html,width=>32,itemorder=>7,searchtext=>$LANG{'errorlog-searchtxt'}
+description=>$LANG{'ChooseLog'},feature=>statselect,file=>chooselog,group=>logs,height=>32,imgtype=>icon,itemdesc=>$LANG{'ChooseLog'},subtype=>img,type=>image,url=>statmanager/index.html,width=>32,itemorder=>8,searchtext=>$LANG{'statsmanager-searchtxt'}
+description=>$LANG{'TAwstats'},feature=>awstats,file=>awstats,group=>logs,height=>32,if=>!$CONF{'skipawstats'} $CPDATA{'FEATURE-AWSTATS'},imgtype=>icon,itemdesc=>$LANG{'TAwstats'},subtype=>img,type=>image,url=>stats/awstats_landing.html,width=>32,searchtext=>$LANG{'awstats-searchtxt'}
+description=>$LANG{'SLUrchin'},if=>$hasurchin,file=>urchin,group=>logs,height=>32,imgtype=>icon,itemdesc=>$LANG{'SLUrchin'},subtype=>img,type=>image,url=>stats/urchin.html,width=>43,searchtext=>$LANG{'urchin-searchtxt'}
+description=>$LANG{'CPU and Concurrent Connection Usage'},if=>$hascloudlinux,itemorder=>999,version=>1.0,itemdesc=>$LANG{'Resource Usage'},group=>logs,url=>stats/resourceusage.html,feature=>enduserlve,imgtype=>icon,subtype=>img,type=>image,width=>32,height=>32,file=>enduserlve
+
+
+####Header####
+#Action Icons in Header
+description=>$LANG{'BrandingHelp'},file=>help_off,height=>35,imgtype=>heading,subtype=>img,type=>image,width=>41
+description=>$LANG{'BrandingHelpHover'},file=>help_on,height=>35,imgtype=>heading,subtype=>img,type=>image,width=>41
+description=>$LANG{'BrandingHomeBtnOff'},file=>home_off,height=>35,imgtype=>heading,subtype=>img,type=>image,width=>44
+description=>$LANG{'BrandingHomeBtnOn'},file=>home_on,height=>35,imgtype=>heading,subtype=>img,type=>image,width=>44
+description=>$LANG{'BrandingLOBtnOff'},file=>logout_off,height=>41,imgtype=>heading,subtype=>img,type=>image,width=>44
+description=>$LANG{'BrandingLOBtnOn'},file=>logout_on,height=>41,imgtype=>heading,subtype=>img,type=>image,width=>44
+
+#Header billboard and Logo
+description=>$LANG{'BrandingBillimg'},file=>top-billboard,imgtype=>heading,subtype=>compleximg,type=>image,height=>145,width=>$LANG{'BrandingSzVary'}
+description=>$LANG{'BrandingBillBg'},file=>top-header-bg,imgtype=>heading,subtype=>bg,type=>image,height=>145,width=>$LANG{'BrandingSzVary'}
+description=>$LANG{'Logo'},file=>top-logo,imgtype=>logo,subtype=>logo,type=>image,height=>$LANG{'BrandingSzVary'},width=>$LANG{'BrandingSzVary'}
+description=>$LANG{'Logo'} (VPS Optimized),file=>top-logo_vps2,imgtype=>logo,subtype=>logo,type=>image,height=>$LANG{'BrandingSzVary'},width=>$LANG{'BrandingSzVary'}
+description=>$LANG{'Logo'} (Accelerated),file=>top-logo_opt,imgtype=>logo,subtype=>logo,type=>image,height=>$LANG{'BrandingSzVary'},width=>$LANG{'BrandingSzVary'}
+
+
+####Footer####
+description=>$LANG{'BrandingFootBg'},file=>bottom_bg,height=>23,imgtype=>heading,subtype=>bg,type=>image,width=>$LANG{'BrandingSzVary'}
+
+####Background####
+description=>Background,file=>bg,imgtype=>ui,subtype=>bg,type=>image
+
+####UI Images####
+description=>$LANG{'BrandingFormBut'},file=>button-bg,height=>14,imgtype=>ui,subtype=>bg,type=>image,width=>22
+description=>$LANG{'BrandingFormButOver'},file=>button-bg-over,height=>14,imgtype=>ui,subtype=>bg,type=>image,width=>22
+description=>$LANG{'BrandingFormAccept'},file=>accept,height=>16,imgtype=>ui,subtype=>img,type=>image,width=>16
+description=>$LANG{'BrandingFormReject'},file=>reject,height=>16,imgtype=>ui,subtype=>img,type=>image,width=>16
+description=>$LANG{'Favitxt'},file=>favicon,height=>16,width=>16,type=>image,subtype=>img,imgtype=>ui
+description=>$LANG{'BrandingExpandDown'} $LANG{'mustbetransgif'},file=>collapse,height=>14,imgtype=>ui,subtype=>img,type=>image,width=>14
+description=>$LANG{'BrandingExpandDown'} $LANG{'mustbetransgif'},file=>expand,height=>14,imgtype=>ui,subtype=>img,type=>image,width=>14
+description=>$LANG{'BrandingPrevImg'},file=>preview,height=>&nbsp;,imgtype=>preview,subtype=>img,type=>image,width=>&nbsp;
+description=>$LANG{'BrandingSmlPrevImg'},file=>previewsm,height=>($LANG{'BrandingSugSize'}) 290,imgtype=>preview,subtype=>img,type=>image,width=>($LANG{'BrandingSugSize'}) 200
+#####description=>$LANG{'SwitchTheme'},file=>swiththeme,height=>32,imgtype=>icon,subtype=>img,type=>image,width=>44
+description=>$LANG{'BrandingtblbgImg'},file=>tbl-bg,height=>21,imgtype=>ui,subtype=>bg,type=>image,width=>22
+description=>$LANG{'BrandingtblbgImgOver'},file=>tbl-bg-over,height=>21,imgtype=>ui,subtype=>bg,type=>image,width=>2
+description=>$LANG{'HomeBtnTxt'},file=>homeb,height=>19,imgtype=>ui,subtype=>img,type=>image,width=>20
+description=>$LANG{'GetStIcoTxt'},file=>getstart-icon,height=>72,imgtype=>ui,subtype=>img,type=>image,width=>72
+description=>$LANG{'StartBtnTxt'},file=>start32,height=>32,imgtype=>ui,subtype=>img,type=>image,width=>32
+description=>$LANG{'StopBtnTxt'},file=>stop32,height=>32,imgtype=>ui,subtype=>img,type=>image,width=>32
+
+#Getting Started and Help container
+description=>$LANG{'UIHelpHeadBg'},file=>aqua-hd-bg,height=>22,imgtype=>ui,subtype=>bg,type=>image,width=>18
+description=>$LANG{'UIHelpHeadBglt'},file=>aqua-hd-lt,height=>22,imgtype=>ui,subtype=>img,type=>image,width=>7
+description=>$LANG{'UIHelpHeadBgrt'},file=>aqua-hd-rt,height=>22,imgtype=>ui,subtype=>img,type=>image,width=>7
+description=>$LANG{'UIHelpButClose'} $LANG{'mustbetransgif'},file=>x3-hd-close,height=>18,imgtype=>ui,subtype=>img,type=>image,width=>17
+description=>$LANG{'UIHelpButCloseOver'} $LANG{'mustbetransgif'},file=>x3-hd-closehover,height=>18,imgtype=>ui,subtype=>img,type=>image,width=>17
+
+
+####Included Files####
+#HTML
+description=>$LANG{'CPCSSHTMLLocal'},file=>cpanel_parsed_css_local.html,type=>html
+description=>$LANG{'CPCSSHTML'},file=>cpanel_parsed_css.html,type=>html
+description=>$LANG{'GetStInclTxt'},file=>getstarted-pop.html,type=>html
+description=>$LANG{'OpSelInclTxt'},file=>optionselect-pop.html,type=>html
+description=>$LANG{'YuiSprIncTxt'},file=>sprites_yui.html,type=>html
+description=>$LANG{'UISprIncTxt'},file=>sprites_ui.html,type=>html
+description=>$LANG{'AllSprIncTxt'},file=>sprites.html,type=>html
+description=>$LANG{'EntryPage'},file=>index.html,type=>html
+description=>$LANG{'HeadMidSec'},file=>stdmheader.html,type=>html
+description=>$LANG{'HeadTopSec'},file=>stdheader.html,type=>html
+description=>$LANG{'Footer'},file=>stdfooter.html,type=>html
+description=>$LANG{'WebMailLogInc'},file=>webmaillogininclude.html,type=>html
+description=>$LANG{'GetStInclTxt'},file=>getstarted-pop.html,type=>html
+description=>Extended Stats Bar,file=>extended_statsbar.html,type=>html
+description=>$LANG{'contactInfoHead'},file=>contactinfo_include.html,type=>html,global=>1
+description=>Support Information Include (Global),file=>supportinfo_include.html,type=>html,global=>1
+description=>Public Contact Info Include (Global),file=>publiccontact_include.html,type=>html,global=>1
+
+#Style Sheets
+$LANG{'CSS'},file=>local.css,height=>0,imgtype=>css,subtype=>css,type=>css,width=>0
+

@@ -1,0 +1,15 @@
+<cpanel setvar="headerimg=../images/topwebftpstats.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+<style type="text/css">
+<?cp Branding::spritelist(.spriteicon_img_mini {float:left;margin-right:5px;background: url\{leftparenthesis}%\{rightparenthesis};} %,spriteurl,images::#icon-${img}_mini {background-position\{colon}0 -${cssposition}px;width\{colon}${width}px;height\{colon}${height}px; }:) imgtype=icon,subtype=img,method=scale_60percent,format=png,img=enduserlve ?>
+</style>
+<div class="body-content">
+<div class="h1Title"><div class="spriteicon_img_mini" id="icon-enduserlve_mini"></div> <cpanel langprint="Resource Usage Overview"></div>
+<p>
+<cpanel LVEInfo="print_usage_overview()">
+<p>
+<a href='resourceusagedetails.html'>[Details]</a>
+<p>
+</div>
+<cpanel Branding="include(stdfooter.html)">

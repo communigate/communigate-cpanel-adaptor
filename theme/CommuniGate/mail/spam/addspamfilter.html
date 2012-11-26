@@ -1,0 +1,22 @@
+<cpanel setvar="headerimg=../images/mailmenu.gif">
+<cpanel setvar="dprefix=../../">
+<cpanel Branding="include(stdheader.html)">
+<div class="body-content">
+<h2><cpanel langprint="SpamADEnable-HD"></h2>	
+<p><font class="med"><cpanel langprint="SPAAddSpamFilter"></font></p>
+<p>
+<cpanel langprint="SPAaddspamfilterresultbegin">
+<cpanel print="$FORM{'score'}">
+<cpanel langprint="SPAaddspamfilterresultend">
+</p>
+<pre>
+
+<?cp CommuniGate::DisableSpamAssassinAutoDelete(%) domain=$CPDATA{'DOMAIN'},score=$FORM{'score'}?>
+<?cp CommuniGate::EnableSpamAssassinAutoDelete(%,status) domain=$CPDATA{'DOMAIN'},score=$FORM{'score'}?>
+</pre>
+<div align="center">
+<cpanel langprint="SPAStatusSwitchPre"> <font color="#FF0000"><?cp CommuniGate::SpamAssassinStatus(%,status) domain=$CPDATA{'DOMAIN'}?></font>
+</div>
+<div class="return-link"><a href="spam.html">&larr; <cptext "Go Back"></a></div>
+</div>
+<cpanel Branding="include(stdfooter.html)">

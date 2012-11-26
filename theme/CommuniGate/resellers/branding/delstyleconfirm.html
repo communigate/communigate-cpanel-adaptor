@@ -1,0 +1,15 @@
+<cpanel setvar="headerimg=../../images/tools.gif">
+<cpanel setvar="dprefix=../../">
+<cpanel include="../../stdbheader.html">
+<cpanel include="../../ajaxhelp.html">
+<div class="body-content">
+<h1><cpanel Locale="maketext('Style Selector')"></h1>
+<p><cpanel Locale="maketext('Are you sure you want to [output,strong,permanently] remove the branding package “[output,class,_1,status]”?',$FORM{'pkg'})"></p>
+<p>
+	 <a class="create-button" href="delstyle.html?pkg=<cpanel print="$URI_ENCODED_FORM{'pkg'}">"><cpanel Locale="maketext('Remove Branding Package')"></a>
+		<a class="cancel_link" href="download_delete_branding.html"><cpanel Locale="maketext('cancel')"></a>
+</p>
+
+<div class="return-link"><a href="download_delete_branding.html">&larr; <cptext "Go Back"></a></div>
+</div>
+<cpanel Branding="include(stdfooter.html)">

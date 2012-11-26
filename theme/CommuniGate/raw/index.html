@@ -1,0 +1,39 @@
+<cpanel setvar="headerimg=../images/topsubdomains.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+<div class="body-content">
+<style type="text/css">
+<?cp Branding::spritelist(.spriteicon_img_mini {float:left;margin-right:5px;background: url\{leftparenthesis}"%"\{rightparenthesis};} %,@spriteurl,images::#icon-${img}_mini {background-position\{colon}0 -${cssposition}px;width\{colon}${width}px;height\{colon}${height}px; }:) imgtype=icon,subtype=img,method=scale_60percent,format=png,img=rawaccesslogs ?>
+
+</style>
+
+<div class="h1Title"><div class="spriteicon_img_mini" id="icon-rawaccesslogs_mini"></div><cpanel langprint="SLRawAccLogs"></div>
+<p class="description"><cptext "Raw Access Logs allow you to see who has visited your website without displaying graphs, charts or other graphics. You can use the Raw Access Logs menu to download a zipped version of the server’s access log for your site. This can be very useful when you want to quickly be able to see who is visiting your site."></p>
+<h2><cpanel langprint="SLConfigLogs"></h2>
+
+<form action="../logmanager/savesettings.html">
+<p><cpanel LogManager="showsettings()"></p>
+<br />
+<input type="submit" class="input-button" value="<cpanel langprint="Save">">
+</form>
+<br />
+<h2><cpanel langprint="SLDownAccessLogs"></h2>
+<p><cpanel langprint="SLRawLogDown"></p>
+<table class="sortable" id="rtt" cellpadding="0" cellspacing="0">
+    <tr>
+        <th><cpanel langprint="SLDomain"></th>
+        <th>Last Update</th>
+        <th>Disk Usage</th>
+        <th>Linked Domains</th>
+    </tr>
+    <tbody>
+      <?cp Stats::listrawlogs([tr][td class="row1"][a href="%"]%[/a][/td][td class="raw1" align="right"]%[/td][td class="raw1" align="right"]%[/td][td class="row1-end"][div class="linked_domains"]%[/div][/td][/tr],link,domain,humanupdatetime,humansize,linked_domains::[div class="linked_domain"]${domain}[/div]:) ?>
+    </tbody>
+</table>
+
+<br />
+<h2><cpanel langprint="SLArchivedRawLogs"></h2>
+<p><cpanel langprint="SLArchivedRawLogsDesc"></p>
+<i><cpanel LogManager="listdownloads()"></i>
+</div>
+<cpanel Branding="include(stdfooter.html)">

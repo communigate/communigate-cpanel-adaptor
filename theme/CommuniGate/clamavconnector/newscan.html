@@ -1,0 +1,29 @@
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+<cpanel setvar="headerimg=../images/topcrontab.gif">
+<head>
+<style type="text/css">
+<?cp Branding::spritelist(.spriteicon_img_mini {float:left;margin-right:5px;background: url\{leftparenthesis}"%"\{rightparenthesis};} %,@spriteurl,images::#icon-${img}_mini {background-position\{colon}0 -${cssposition}px;width\{colon}${width}px;height\{colon}${height}px; }:) imgtype=icon,subtype=img,method=scale_60percent,format=png,img=clam ?>
+</style>
+<link rel="stylesheet" href="cleanstyle.css">
+</head>
+<body>
+<div class="body-content">
+	<cpanelfeature clamavconnector_scan>
+<div class="h1Title"><div class="spriteicon_img_mini" id="icon-clam_mini"></div><cpanel langprint="VirusScan"> <cpanel langprint="VSClamAV"></div>
+<!cpanel ClamScanner="showvirii()">
+<br /><br />
+<h2><cpanel langprint="VSStart"></h2>
+<cpanel ClamScanner="printScans()"></cpanelfeature>
+</div>
+<!---Start Help Code--->
+		<cpanel include="help/help-pop.html">
+<cpanel include="../help/clamavconnector/index-pop.html">
+<!---End Help Code--->
+<cpanel Branding="include(stdfooter.html)">
+
+<script type="text/javascript">
+	if (parent.frames.actfr && parent.frames.actfr.document) {
+		parent.frames.actfr.document.location.href = 'live_go.html';
+	}
+</script>

@@ -1,0 +1,8 @@
+<xml>
+<cpanelif $FORM{'loadonboot'}==1>
+    <?cp RoR::changeapp([status]%[/status]) newloadonboot=$FORM{'loadonboot'},appname=$FORM{'appname'} ?>
+</cpanelif>
+<cpanelif !$FORM{'loadonboot'}==1>
+    <?cp RoR::changeapp([status]%[/status]) newloadonboot=0,appname=$FORM{'appname'} ?>
+</cpanelif>
+</xml>

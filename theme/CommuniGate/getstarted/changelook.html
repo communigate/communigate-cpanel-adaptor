@@ -1,0 +1,34 @@
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+	<style type="text/css">
+	<?cp Branding::spritelist(.spriteicon_img_mini {float:left;margin-right:5px;background: url\{leftparenthesis}"%"\{rightparenthesis};} %,@spriteurl,images::#icon-${img}_mini {background-position\{colon}0 -${cssposition}px;width\{colon}${width}px;height\{colon}${height}px; }:) imgtype=icon,subtype=img,method=scale_60percent,format=png,img=getstart ?>
+
+	</style>
+
+<div class="body-content">
+<h1><div class="spriteicon_img_mini" id="icon-getstart_mini"></div><cpanel langprint="gswtitle"></h1>
+
+<cpanel include="jumpmenu.html">
+
+<cpanelfeature !style>
+	<meta http-equiv="refresh" content="0;url=finished.html" />
+</cpanelfeature>
+
+
+
+<cpanelfeature style>
+<style type="text/css">
+<?cp Branding::spritelist(.spriteicon_img_mini {float:left;margin-right:5px;background: url\{leftparenthesis}"%"\{rightparenthesis};} %,@spriteurl,images::#icon-${img}_mini {background-position\{colon}0 -${cssposition}px;width\{colon}${width}px;height\{colon}${height}px; }:) imgtype=icon,subtype=img,method=scale_60percent,format=png,img=lookandfeel ?>
+
+</style>
+<div class="h1Title"><div class="spriteicon_img_mini" id="icon-lookandfeel_mini"></div><cpanel langprint="ChangeLook"></div>
+<form action="changelook-a.html">
+<cpanel include="../style/indexform.html">
+</form>
+</cpanelfeature>
+<br />
+<form method="link" action="ssh.html"><div align="right"><input type="submit" class="input-button" value="<cpanel langprint="GSWSkip">"></div></form>
+
+
+</div>
+<cpanel Branding="include(stdfooter.html)">

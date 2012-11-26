@@ -1,0 +1,93 @@
+<cpanel setvar="headerimg=../images/topsubdomains.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+<div class="body-content">
+
+<h1><cpanel Locale="maketext('Manage Interface Elements')"></h1>
+<p><cpanel Locale="maketext('Manage Interface Elements allows you to manage your boxes and icons. You can rename/delete your boxes and reorder/edit your icons.')"></p>
+
+<div class="ife-module">
+	<h2><cpanel Locale="maketext('Manage Boxes')"></h2>
+	<table class="sortable" border="0" cellspacing="0" cellpadding="0">
+		<tr>
+			<th><cpanel Locale="maketext('Box Name')"></th>
+			<th><cpanel Locale="maketext('Actions')"></th>
+		</tr>
+		<tr>
+			<td><input type="text" name="box_name" value="<cpanel Locale="maketext('Billing')">" id="box_name" size="30" maxlength="30" /></td>
+			<td>
+				<ul class="clear" id="actions">
+					<li><a href="ife-manage-box-save.html"><cpanel Locale="maketext('Save')"></a></li>
+					<li><a href="ife-manage-box-delete.html"><cpanel Locale="maketext('Delete')"></a></li>
+				</ul>
+			</td>
+		</tr>
+		<tr>
+			<td><input type="text" name="box_name" value="<cpanel Locale="maketext('My Website')">" id="box_name" size="30" maxlength="30" /></td>
+			<td>
+				<ul class="clear" id="actions">
+					<li><a href="ife-manage-box-save.html"><cpanel Locale="maketext('Save')"></a></li>
+					<li><a href="ife-manage-box-delete.html"><cpanel Locale="maketext('Delete')"></a></li>
+				</ul>
+			</td>
+		</tr>
+		<tr>
+			<td><input type="text" name="box_name" value="<cpanel Locale="maketext('Ecommerce Store')">" id="box_name" size="30" maxlength="30" /></td>
+			<td>
+				<ul class="clear" id="actions">
+					<li><a href="ife-manage-box-save.html"><cpanel Locale="maketext('Save')"></a></li>
+					<li><a href="ife-manage-box-delete.html"><cpanel Locale="maketext('Delete')"></a></li>
+				</ul>
+			</td>
+		</tr>
+		
+	</table>
+</div>
+
+<div class="ife-module">
+	<form action="ife-manage-reorder.html" method="post">
+		<h2><cpanel Locale="maketext('Manage Icons')"></h2>
+		<table class="sortable" border="0" cellspacing="0" cellpadding="0">
+			<tr>
+				<th><cpanel Locale="maketext('Order')"></th>
+				<th><cpanel Locale="maketext('Icon Name')"></th>
+				<th><cpanel Locale="maketext('Actions')"></th>
+			</tr>
+			<tr>
+				<td><input type="text" name="order1" value="1" id="order1" size="2" maxlength="2" /></td>
+				<td><cpanel Locale="maketext('ModernBill')"></td>
+				<td>
+					<ul class="clear" id="actions">
+						<li><a href="ife-edit-icons.html"><cpanel Locale="maketext('Edit Icon')"></a></li>
+						<li><a href="ife-edit-icons-delete.html"><cpanel Locale="maketext('Delete')"></a></li>
+					</ul>
+				</td>
+			</tr>
+			<tr>
+				<td><input type="text" name="order1" value="2" id="order2" size="2" maxlength="2" /></td>
+				<td><cpanel Locale="maketext('R1Soft[boolean,_1,:,]')"></td>
+				<td>
+					<ul class="clear" id="actions">
+						<li><a href="ife-edit-icons.html"><cpanel Locale="maketext('Edit Icon')"></a></li>
+						<li><a href="ife-edit-icons-delete.html"><cpanel Locale="maketext('Delete')"></a></li>
+					</ul>
+				</td>
+			</tr>
+			<tr>
+				<td><input type="text" name="order1" value="3" id="order3" size="2" maxlength="2" /></td>
+				<td><cpanel Locale="maketext('WHIR[boolean,_1,:,]')"></td>
+				<td>
+					<ul class="clear" id="actions">
+						<li><a href="ife-edit-icons.html"><cpanel Locale="maketext('Edit Icon')"></a></li>
+						<li><a href="ife-edit-icons-delete.html"><cpanel Locale="maketext('Delete')"></a></li>
+					</ul>
+				</td>
+			</tr>
+		</table>
+		<p><input type="submit" id="submit" class="input-button" value="<cpanel Locale="maketext('Save Your Icon Order')">" /></p>
+	</form>
+</div>
+
+<div class="return-link"><a href="index.html">&larr; <cptext "Go Back"></a></div>
+</div><!-- end body-content -->
+<cpanel Branding="include(stdfooter.html)">

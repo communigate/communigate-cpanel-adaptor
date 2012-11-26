@@ -1,0 +1,33 @@
+<cpanel setvar="headerimg=../images/topftp.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+<style type="text/css">
+<?cp Branding::spritelist(.spriteicon_img_mini {float:left;margin-right:5px;background: url\{leftparenthesis}"%"\{rightparenthesis};} %,@spriteurl,images::#icon-${img}_mini {background-position\{colon}0 -${cssposition}px;width\{colon}${width}px;height\{colon}${height}px; }:) imgtype=icon,subtype=img,method=scale_60percent,format=png,img=anonymousftp ?>
+</style>
+<div class="body-content">
+	<div class="h1Title"><div class="spriteicon_img_mini" id="icon-anonymousftp_mini"></div><cpanel langprint="MENUAnonFTP"></div>
+	<p class="description"><cpanel langprint="AFTPDesc"></p>
+		<form action="ftpset.html" method="post">
+			<p><input <cpanel Ftp="get_anonftp()"> name="allowanonftp" type="checkbox" value="1"><cpanel langprint="ANONSetupAllowOut"> ftp://ftp.<cpanel print="$CPDATA{'DNS'}"></p>
+			<p><input <cpanel Ftp="get_anonftpin()"> name="allowanonftpin" type="checkbox" value="1"><cpanel langprint="ANONSetupAllowIn"> ftp://ftp.<cpanel print="$CPDATA{'DNS'}">/incoming</p>
+			<input type="submit" class="input-button" value="<cpanel langprint="ANONSave">">
+		</form>
+
+<br />
+<br />
+<h2><cpanel langprint="ANONMessageHead"></h2>
+<p class="description"><cpanel langprint="ANONMessageText"></p>
+<form action="dochmsg.html" method="post">
+  <div align="left">
+  <textarea cols="40" name="ftpwelcome" rows="7"><cpanel Ftp="get_welcomemsg()">
+</textarea>
+  <br />
+  <input type="submit" class="input-button" value="<cpanel langprint="ANONSaveMessage">" />
+  </div>
+</form>
+</div>
+<br />
+</div>
+
+<cpanel Branding="include(stdfooter.html)">
+

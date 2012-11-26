@@ -1,0 +1,65 @@
+<cpanel setvar="headerimg=../images/topmysql.gif">
+<cpanel setvar="dprefix=../">
+<cpanel setvar="headerinclude=sql/index_head.html">
+<cpanel Branding="include(stdheader.html)">
+
+  <div class="body-content">
+    <h2><cpanel langprint="SQLAMaint"></h2>
+    <form method="post" action="dochangepassword.html" name="userform" id="userform">
+      <input type="hidden" name="user" value="<cpanel print="$FORM{'user'}">">
+      <div class="formbox">
+        <table cellpadding="3" cellspacing="0" class="tbl">
+          <tr>
+            <td align="right"><cpanel langprint="SQLGrantPermUser"></td>
+            <td><strong><cpanel print="$FORM{'user'}"></strong></td>
+          </cpanelif>
+        </tr>
+        <tr>
+          <td align="right"><cptext "Old password:"></td>
+          <td><input size="15" type="password" name="oldpass" id="oldpassword" style="width: 100%" /></td>
+        </tr>
+        <tr>
+          <td align="right"><cpanel langprint="ASIReadOtherPassword"></td>
+          <td><input size="15" type="password" name="pass" id="password" style="width: 100%" /></td>
+          <td><div id="password_error"></div></td>
+        </tr>
+        <tr>
+          <td align="right"><cpanel langprint="ASIReadOtherPasswordAgain"></td>
+          <td><input type="password" size="15" name="pass2" id="password2" style="width: 100%" /></td>
+          <td><div id="password2_error"></div></td>
+        </tr>
+        <tr>
+          <td align="right">
+            <cpanel langprint="email_strength"> (<div style="display: inline" id="why_strong_passwords_link" class="action_link"><cpanel langprint="email_why"></div>):
+            <div id="why_strong_passwords_text" style="display: none"><cpanel langprint="email_password_why"><br /><br /><cpanel langprint="email_password_tip"></div>
+          </td>
+          <td><div id="password_strength" style="width: 100%; height: 20px; border: 1px solid black; margin: 5px 0px 3px 0px"></div></td>
+          <td><input type="button" id="create_strong_password" class="input-button" value="<cpanel langprint="cjt_password_generator">" tabindex="-1" /></td>
+        </tr>
+        <tr><td colspan="3"><br /></td></tr>
+        <tr>
+          <td>&nbsp;</td>
+          <td><center><input type="submit" value="<cpanel langprint="submit-change-password">" class="input-button" id="submit_new_user" style="width: 150px" /></center></td>
+          <td>&nbsp;</td>
+        </tr>
+      </table>
+    </div>
+  </form>
+  <script type="text/javascript">
+    //<![CDATA[
+            var REQUIRED_PASSWORD_STRENGTH = parseInt('<?cp PasswdStrength::get_required_strength(%,strength) app=mysql ?>') || 5;
+
+            var init_user_validation = function() {
+                    var password_validators = CPANEL.password.setup("password", "password2", "password_strength", REQUIRED_PASSWORD_STRENGTH, "create_strong_password", "why_strong_passwords_link", "why_strong_passwords_text");
+                    CPANEL.validate.attach_to_form("submit_new_user", password_validators);
+
+            };
+
+            YAHOO.util.Event.onDOMReady(init_user_validation);
+
+    //]]>
+  </script>
+
+</div>
+
+<cpanel Branding="include(stdfooter.html)">

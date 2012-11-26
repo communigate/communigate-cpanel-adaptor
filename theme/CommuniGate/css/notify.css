@@ -1,0 +1,44 @@
+#cjt_notice_container .cjt_notice_content {
+    font-family: helvetica, arial;
+    font-size: 13px;
+    padding: 15px 0;
+}
+
+#cjt_notice_container .cjt_notice,
+#cjt_notice_container .cjt_notice_error,
+#cjt_notice_container .cjt_notice_warn,
+#cjt_notice_container .cjt_notice_success,
+#cjt_notice_container .cjt_notice_info {
+    margin-top: 5px;
+    min-height: 35px;
+    padding-left: 50px;
+    border: 1px solid white;
+    outline-width: 1px;
+    outline-style: solid;
+    background: no-repeat 10px 45%;
+}
+
+#cjt_notice_container .cjt_notice_error {
+    color: #BE3735;
+    outline-color: #DDBFBD;
+    background-color: #F8E7E6;
+    background-image: url(/images/error.png);
+}
+#cjt_notice_container .cjt_notice_warn {
+    color: #9D8949;
+    outline-color: #E6E0BC;
+    background-color: #FFF6CF;
+    background-image: url(/images/warning.png);
+}
+#cjt_notice_container .cjt_notice_success {
+    color: #82907E;
+    outline-color: #D8E1CE;
+    background-color: #E6F1DB;
+    background-image: url(/images/success.png);
+}
+#cjt_notice_container .cjt_notice_info {
+    color: #666666;
+    outline-color: #DDDDDD;
+    background-color: #F0F0F0;
+    background-image: url(/images/general.png);
+}

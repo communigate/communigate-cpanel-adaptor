@@ -1,0 +1,85 @@
+<cpanel setvar="headerimg=../images/toperrorpages.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+	
+<script type="text/javascript">	
+//<![CDATA[
+
+	var init = function() {
+		var validation = new CPANEL.validate.validator("<cptext "SSL Certificates">");
+		validation.add('country', 'min_length(%input%, 2)', '<cpanel langprint="ValidatorCountryChars">');
+                validation.add('country', 'alpha(%input%)', '<cptext "Field can contain only alpha characters">');
+        validation.add('state', 'min_length(%input%, 1)', '<cpanel langprint="ValidatorState">');
+        validation.add('city', 'min_length(%input%, 1)', '<cpanel langprint="ValidatorCity">');
+        validation.add('company', 'min_length(%input%, 1)', '<cpanel langprint="ValidatorCompany">');
+        validation.add('companydivision', 'min_length(%input%, 1)', '<cpanel langprint="ValidatorCompanyDiv">');
+        validation.add('email', 'min_length(%input%, 1)', '<cpanel langprint="ForwarderEmailNotEmpty">');
+        validation.add('email', 'email(%input%)', '<cpanel langprint="ValidatorEmailFormat">');
+		validation.add('pass', 'min_length(%input%, 1)', '<cpanel langprint="ValidatorPassPhrase">');
+                validation.add('pass', 'alphanumeric', '<cptext "CSR passwords can contain only alphanumeric characters">');
+
+
+		validation.attach();
+
+		CPANEL.validate.attach_to_form("submit-button", validation);
+
+	};
+
+	YAHOO.util.Event.onDOMReady(init);
+
+//]]>
+</script>
+	
+<div class="body-content">
+
+<style type="text/css">
+<?cp Branding::spritelist(.spriteicon_img_mini {float:left;margin-right:5px;background: url\{leftparenthesis}"%"\{rightparenthesis};} %,@spriteurl,images::#icon-${img}_mini {background-position\{colon}0 -${cssposition}px;width\{colon}${width}px;height\{colon}${height}px; }:) imgtype=icon,subtype=img,method=scale_60percent,format=png,img=ssl-manager ?>
+</style>
+<div class="h1Title"><div class="spriteicon_img_mini" id="icon-ssl-manager_mini"></div> <cpanel langprint="SSLCertSignReq"></div>
+<p class="description"><cpanel langprint="CSRDesc"></p>
+<h2><cpanel langprint="SSLCertReqServer"></h2>
+<table border="0" cellpadding="0" width="500" cellspacing="0" class="sortable" id="ssltable">
+	<thead>
+	<tr>
+		<th><cpanel langprint="SSLHost"></th>
+		<th class="sorttable_nosort" colspan="2"><cpanel langprint="SSLFunc"></th>
+	</tr>
+	</thead>
+	<tbody>
+	<?cp SSL::listcsrs(
+	[tr class="row-%"]
+	[td][div align="center"]%[/div][/td] 
+	[td align="center" class="nobrd"][a href="viewcsr.html?host=%&amp;item=csr&amp;itemname=Certificate+Signing+Request"]$LANG{'AODShowDetails'}[/a][/td]
+	[td align="center"][a href="deletecsrconfirm.html?host=%&amp;item=csr&amp;itemname=Certificate+Signing+Request"]$LANG{'Remove'}[/a][/td][/tr]
+	,*num,host,host,host,host) || '[tr][td colspan="3" class="errors"]$LANG{'SSLNoCSR'}[/td][/tr]' ?>
+	</tbody>
+</table>
+<br /><br />
+
+<h2><cpanel langprint="SSLGenNewCert"></h2>
+<form action="gencsr.html" method="post" id="csrform" name="csrform">
+<table>
+	<tr><td align="right"><cpanel langprint="SSLHost"></td><td align="left"><select id="host" name="host"><cpanel SSL="listkeysopt()"></select></td></tr>
+	<tr><td align="right"><cpanel langprint="SSLCountry"></td><td align="left"><input type="text" id="country" name="country" size="5" maxlength="2" class="validator_position_right" /> <span id="country_error"></span></td></tr>
+	<tr><td align="right"><cpanel langprint="SSLState"></td><td align="left"><input type="text" id="state" name="state" class="validator_position_right" /> <span id="state_error"></span></td></tr>
+	<tr><td align="right"><cpanel langprint="SSLCity"></td><td align="left"><input type="text" id="city" name="city" class="validator_position_right" /> <span id="city_error"></span></td></tr>
+	<tr><td align="right"><cpanel langprint="SSLCompany"></td><td align="left"><input type="text" id="company" name="company" class="validator_position_right" /> <span id="company_error" ></span></td></tr>
+	<tr><td align="right"><cpanel langprint="SSLCoDivision"></td><td align="left"><input type="text" id="companydivision" name="companydivision" class="validator_position_right" /> <span id="companydivision_error"></span></td></tr>
+	<tr><td align="right"><cpanel langprint="SSLEmail"></td><td align="left"><input type="text" id="email" name="email" class="validator_position_right" /> <span id="email_error"></span></td></tr>
+	<tr><td align="right"><cpanel langprint="SSLPassPhrase"></td><td align="left"><input type="text" id="pass" name="pass" class="validator_position_right" /> <span id="pass_error"></span></td></tr>
+	<tr>
+		<td>&nbsp;</td>
+		<td align="left">
+			<input type="hidden" name="item" value="csr" />
+			<input type="hidden" name="itemname" value="Certificate Signing Request" />
+			<input id="submit-button" type="submit" value="<cpanel langprint="SSLGen">" class="input-button" />
+		</td>
+	</tr>
+</table>
+</form>
+<br />
+<p>* <cpanel langprint="SSLGenNewCertNote"></p>
+
+<div class="return-link"><a href="index.html">&larr; <cptext "Go Back"></a></div>
+</div><!-- end body-content -->
+<cpanel Branding="include(stdfooter.html)">

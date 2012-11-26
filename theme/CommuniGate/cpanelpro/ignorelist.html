@@ -1,0 +1,29 @@
+<cpanel setvar="headerimg=../images/tools.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+<div class="body-content">
+<font class="big"><cpanel langprint="BoxTrapper"></font>
+<br /><br />
+<cpanel langprint="BTignore"><b><cpanel print="$FORM{'account'}"></b><br /><br />
+<cpanel langprint="BTignoreList">
+<br />
+<br />
+<cpanel langprint="examples-BoxTrapper">
+<div style="background-color: #ccc; padding: 15px">
+  <em>subject <cpanel Locale="maketext('you are evil')"></em><br />
+  <em>from nick@evildomain.org</em><br />
+  <em>from dave@evilplace.org</em>
+</div>
+<br /><br />
+<center>
+<form action="savefile.html" method="post">
+<textarea name="page" cols="60" rows="40"><cpanel Fileman="fmpushfile($FORM{'emaildir'},"ignore-list.txt")"></textarea><br />
+<input type="hidden" name="dir" value="<cpanel print="$FORM{'emaildir'}">">
+<input type="hidden" name="account" value="<cpanel print="$FORM{'account'}">">
+<cpanel Locale="maketext('Save file as:')"> <input type="text" value="ignore-list.txt" name="file" /> <input type="submit" class="input-button" value="<cpanel langprint="Save">" />
+</form>
+</center>
+
+<div class="return-link"><a href="manage.html?account=<cpanel print="$FORM{'account'}">">&larr; <cptext "Go Back"></a></div>
+</div>
+<cpanel Branding="include(stdfooter.html)">

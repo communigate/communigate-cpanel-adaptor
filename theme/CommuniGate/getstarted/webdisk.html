@@ -1,0 +1,39 @@
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+<script type="text/javascript">
+function MM_jumpMenu(targ,selObj,restore){ //v3.0
+  eval(targ+".location='"+selObj.options[selObj.selectedIndex].value+"'");
+  if (restore) selObj.selectedIndex=0;
+}		
+	
+</script>
+<style type="text/css">
+p.description img{float:none;margin:0;}
+<?cp Branding::spritelist(.spriteicon_img_mini {float:left;margin-right:5px;background: url\{leftparenthesis}"%"\{rightparenthesis};} %,@spriteurl,images::#icon-${img}_mini {background-position\{colon}0 -${cssposition}px;width\{colon}${width}px;height\{colon}${height}px; }:) imgtype=icon,subtype=img,method=scale_60percent,format=png,img=webdav ?>
+<?cp Branding::spritelist(.spriteicon_img_mini {float:left;margin-right:5px;background: url\{leftparenthesis}"%"\{rightparenthesis};} %,@spriteurl,images::#icon-${img}_mini {background-position\{colon}0 -${cssposition}px;width\{colon}${width}px;height\{colon}${height}px; }:) imgtype=icon,subtype=img,method=scale_60percent,format=png,img=getstart ?>
+
+</style>
+<div class="body-content">
+<h1><div class="spriteicon_img_mini" id="icon-getstart_mini"></div><cpanel langprint="gswtitle"></h1>
+
+<cpanel include="jumpmenu.html">
+<cpanelfeature !webdisk>
+        <meta http-equiv="refresh" content="0;url=newemail.html" />
+</cpanelfeature>
+<cpanelfeature webdisk>
+<div class="h1Title"><div class="spriteicon_img_mini" id="icon-webdav_mini"></div><cpanel langprint="MENUWebDAVAccounts"></div>
+ <p class="description"><cpanel langprint="GSWWebDAVDescription"><br />
+<br /><cpanel langprint="WebDAVDisks"> <cpanel langprint="subDesc5"> <cpanel print="$homedir">.</p>
+
+
+
+           <div class="highlight"><h2><cpanel langprint="WebDAVMainUser"></h2>
+
+<p class="description"><cpanel langprint="WebDavMainDesc"></p><a href="webdiskinstall.html?domain=<cpanel print="$CPDATA{'DNS'}">" class="create-button"><cpanel langprint="WebDAVthAccess"></a></div>
+</cpanelfeature>
+<br /><br />
+<div align="right"><form method="link" action="newemail.html"><input type="submit" class="input-button" value="<cpanel langprint="GSWSkip">"></form>
+</div>
+</cpanelfeature>
+</div>
+<cpanel Branding="include(stdfooter.html)">

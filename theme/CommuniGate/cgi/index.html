@@ -1,0 +1,123 @@
+<cpanel setvar="headerimg=../images/topcgi.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+
+<div class="body-content">
+<!--
+Let's Not see the results of the install of cgiemail ...
+<cpanel Fileman="installfile("/usr/local/cpanel/cgi-sys/cgiemail","$homedir/public_html/cgi-bin/cgiemail")">
+<cpanel Fileman="installfile("/usr/local/cpanel/cgi-sys/cgiecho","$homedir/public_html/cgi-bin/cgiecho")">
+<cpanel Fileman="installfile("/usr/local/cpanel/cgi-sys/entropybanner.cgi-wrap","$homedir/public_html/cgi-bin/entropybanner.cgi")">
+<cpanel Fileman="installfile("/usr/local/cpanel/cgi-sys/randhtml.cgi-wrap","$homedir/public_html/cgi-bin/randhtml.cgi")">
+-->
+<style type="text/css">
+<?cp Branding::spritelist(.spriteicon_img_mini {float:left;margin-right:5px;background: url\{leftparenthesis}"%"\{rightparenthesis};} %,@spriteurl,images::#icon-${img}_mini {background-position\{colon}0 -${cssposition}px;width\{colon}${width}px;height\{colon}${height}px; }:) imgtype=icon,subtype=img,method=scale_60percent,format=png,img=cgi-center ?>
+</style>
+<div class="h1Title"><div class="spriteicon_img_mini" id="icon-cgi-center_mini"></div><cpanel langprint="INDXCgiCenter"></div>
+
+<table width="650" border="0" cellspacing="0" cellpadding="0" align="center">
+  <tr> 
+    <td colspan="2" valign="top"><b><cpanel langprint="CGIHead"></b><br /><br /><br />
+    </td>
+  </tr>
+<cpanelfeature scgiwrap>
+  <tr> 
+    <td width="22" valign="top"><img src="../images/arrow-t.gif"></td>
+    <td width="628"><a href="setupcgiwrap.html"><strong><cpanel langprint="SCGIWrapHead"></strong></a> <br />
+     <cpanel langprint="CGIWHint"> <br />
+      <br />    </td>
+  </tr>
+</cpanelfeature>
+<cpanelfeature randhtml>
+  <tr> 
+    <td width="22" valign="top"><img src="../images/arrow-t.gif"></td>
+    <td width="628"><a href="setuprandhtml.html"><strong><cpanel langprint="CGIRandHtmlHead"></strong></a><br />
+      <cpanel langprint="CGIRandDesc"> <br />
+      <br />    </td>
+  </tr>
+</cpanelfeature>
+<cpanelfeature guest>
+  <tr> 
+    <td width="22" valign="top"><img src="../images/arrow-t.gif"></td>
+    <td width="628"><a href="setupguestbook.html"><strong><cpanel langprint="SGGuestBook"></strong></a><br />
+     <cpanel langprint="SGDesc"><br />
+      <br />    </td>
+  </tr>
+</cpanelfeature>
+<cpanelfeature advguest>
+  <tr> 
+    <td width="22" valign="top"><img src="../images/arrow-t.gif"></td>
+    <td width="628"><a href="advguest.html"><strong><cpanel langprint="AdvGuestBook"></strong></a><br />
+     <cpanel langprint="AdvGuestBookDesc"><br />
+      <br />    </td>
+  </tr>
+</cpanelfeature>
+<cpanelfeature counter>
+  <tr> 
+    <td width="22" valign="top"><img src="../images/arrow-t.gif"></td>
+    <td width="628"><a href="Counter/index.html" target="_blank"><!-- security problem 
+<p><font face="Arial">Form tools, this allows you to be emailed the form results.<br />
+<a href="cgiformemail.html">FormMail-cgiemail</a></font></p>
+-->
+        <strong><cpanel langprint="CNT"></strong></a><br />
+      <cpanel langprint="CNTDesc"> <br />
+      <br />
+    </td>
+  </tr>
+</cpanelfeature>
+<cpanelfeature clock>
+  <tr> 
+    <td width="22" valign="top"><img src="../images/arrow-t.gif"></td>
+    <td width="628"><a href="Clock/index.html" target="_blank"><strong><cpanel langprint="CLHead"></strong></a> <br />
+      <cpanel langprint="ClDesc"> <br />
+      <br />    </td>
+  </tr>
+</cpanelfeature>
+<cpanelfeature countdown>
+  <tr> 
+    <td width="22" valign="top"><img src="../images/arrow-t.gif"></td>
+    <td width="628"><a href="Countdown/index.html" target="_blank"><strong><cpanel langprint="CDHead"></strong></a> <br />
+      <cpanel langprint="CDDesc"> <br />
+      <br />    </td>
+  </tr>
+</cpanelfeature>
+<cpanelfeature emailscripts>
+  <tr> 
+    <td width="22" valign="top"><img src="../images/arrow-t.gif"></td>
+    <td width="628">
+	<a href="http://<cpanel print="$CPDATA{'DNS'}">/cgi-bin/cgiemail"><strong><cpanel langprint="MENUCGIEmail"></strong></a><br />
+      <cpanel langprint="CGIEInfo2"><br />
+      <br />
+    </td>
+  </tr>
+<cpanelif !$CONF{'skipformmail'}>
+  <tr> 
+    <td width="22" valign="top"><img src="../images/arrow-t.gif"></td>
+    <td width="628"><a href="FormMail.html"><strong><cpanel langprint="CGIFormMail"></strong></a><br />
+      <cpanel langprint="CGIFormMailDesc"> <br />
+      <br />    </td>
+  </tr>
+</cpanelif>
+</cpanelfeature>
+<cpanelfeature entropysearch>
+  <tr> 
+    <td width="22" valign="top"><img src="../images/arrow-t.gif"></td>
+    <td width="628"><strong><cpanel langprint="CGIESHead"></strong><br />
+      <a href="setupsearch.html"><cpanel langprint="CGIESSetupEng"></a><br />
+      <a href="indexsearch.html"><cpanel langprint="CGIESRebuild"></a> <br />
+      <br />
+    </td>
+  </tr>
+</cpanelfeature>
+<cpanelfeature entropybanner>
+  <tr> 
+    <td width="22" valign="top" height="2"><img src="../images/arrow-t.gif"></td>
+    <td width="628" height="2"><a href="begin.html"><strong><cpanel langprint="CGIBE"> </strong></a><br />
+      <cpanel langprint="CGIBannerDesc"> </td>
+  </tr>
+</cpanelfeature>
+</table>
+  
+
+</div> 
+<cpanel Branding="include(stdfooter.html)"> 

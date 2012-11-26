@@ -1,0 +1,95 @@
+<cpanel setvar="headerinclude=mail/report_head.html">
+<cpanel setvar="headerimg=../images/mailmenu.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+
+<style type="text/css">
+<?cp Branding::spritelist(.spriteicon_img_mini {float:left;margin-right:5px;background: url\{leftparenthesis}"%"\{rightparenthesis};} %,@spriteurl,images::#icon-${img}_mini {background-position\{colon}0 -${cssposition}px;width\{colon}${width}px;height\{colon}${height}px; }:) imgtype=icon,subtype=img,method=scale_60percent,format=png,img=deliveryreport ?>
+</style>
+
+<div class="body-content">
+    
+<div class="h1Title"><div class="spriteicon_img_mini" id="icon-emailroute_mini"></div> Delivery Reports</div>
+
+This tool will show email delivery reports.
+
+<br />
+<cpanelfeature deliveryreport>
+<br /><br />
+<div id="deliverystats">
+<form>
+<table cellpadding="20" class="emailctls">
+<tr>
+    <td>
+        <table id="deliverystats_tbl" cellpadding="6">
+            <tr>
+                <th colspan="3" align="center">Total Data Available</th>
+            </tr>
+            <tr id="deliverystats_row_send">   
+                <td></td></td><th>Sends</th><td id="deliverystats_send"></td>
+            </tr>
+            <tr id="deliverystats_row_success">
+                <td><input type="checkbox" id="success" name="success" value="1" checked></td><th>Successes</th><td id="deliverystats_success"></td>
+            </tr>
+            <tr id="deliverystats_row_defer">
+                <td><input type="checkbox" id="defer" name="defer" value="1" checked></td><th>Defers</th><td id="deliverystats_defer"></td>
+            </tr>
+            <tr id="deliverystats_row_fail">
+                <td><input type="checkbox" id="failure" name="failure" value="1" checked></td><th>Failures</th><td id="deliverystats_fail"></td>
+            </tr>
+        </table>
+    </td>
+    <td>
+        <div id="dateSelect"></div>
+        <div id="dates">
+            <p><label for="startdate">Start Date:</label><input type="text" name="startdate" id="startdate"></p>
+            <p><label for="starttime">Start Time:</label><input type="text" name="starttime" id="starttime" value="00:00:00"></p>
+            <p><label for="enddate">End Date:</label><input type="text" name="enddate" id="enddate"></p>
+            <p><label for="endtime">End Time:</label><input type="text" name="endtime" id="endtime" value="23:59:59"></p>
+        </div>
+    </td>
+    <td>
+        <input type="button" name="update" value="Update" onclick="eximstatstbl.updatedata();" class="input-button">
+    </td>
+</tr>
+</table>
+</form>
+</div>
+<div id="deliveryreport"></div>
+
+* Failures and deferals are only tracked for 72 hours.  Successes are tracked for 30 days.
+
+</cpanelfeature>
+
+
+
+<div class="return-link"><a href="javascript:window.history.back()">&larr; <cptext "Go Back"></a></div>
+
+</div><!-- end body-content -->
+
+<cpanelfeature deliveryreport>
+<br />
+<script type="text/javascript" src="<cpanel MagicRevision="uri("/yui/data/data.js")">"></script>
+<script type="text/javascript" src="<cpanel MagicRevision="uri("/yui/calendar_interval/calendar_interval.js")">"></script>
+<script type="text/javascript" src="<cpanel MagicRevision="uri("/sharedjs/emailstats_datatable.js")">"></script>
+<script type="text/javascript">
+
+var eximstatstbl = new CPANEL.EximStatsDataTable(
+        {
+            
+            deliverystats: 1,
+            columns: ['type','sender','sendunixtime','recipient','transport','actionunixtime','msgid','host','size','message']
+
+        }
+);
+
+
+</script>
+</cpanelfeature>
+
+
+<div id="emailreport"></div>
+<div style="width: 1px; height: 1px; position:absolute; top:-999999px; left:-999999px;" id="printpanel"></div>
+
+
+<cpanel Branding="include(stdfooter.html)">

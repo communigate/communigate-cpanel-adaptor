@@ -1,0 +1,14 @@
+<xml>
+<?cp Fileman::getabsdir([dir]%[/dir],^absdir) dir=$FORM{'dir'} ?>
+<?cp Fileman::listfiles(
+    [file]
+        [ename]%[/ename]
+        [name]%[/name]
+        [mimetype]%[/mimetype]
+        [mimeicon]%[/mimeicon]
+        [humansize]%[/humansize]
+        [nicemode]%[/nicemode]
+    [/file]
+
+,^file,&file,&mimetype,mimename,&humansize,&nicemode) dir=$FORM{'dir'},needmime=1,filelist=$FORM{'filelist'},showdotfiles=$FORM{'showhidden'} ?>
+</xml>

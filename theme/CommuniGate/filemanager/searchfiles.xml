@@ -1,0 +1,8 @@
+<xml>
+<?cp Fileman::search(
+    [file]
+        [name]%[/name]
+        [mimeinfo]%[/mimeinfo]
+    [/file]
+,^file,^mimeinfo) dir=$FORM{'dir'},regex=$FORM{'regex'} ?>
+</xml>

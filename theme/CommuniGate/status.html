@@ -1,0 +1,21 @@
+<cpanel setvar="headerimg=images/home.gif">
+<cpanel Branding="include(stdheader.html)">
+<div class="body-content">
+<br />
+<h1><cpanel langprint="TabsServStatus"></h1>
+
+<table align="center" border="0" cellpadding="3" cellspacing="0"  class="sortable" id="statustbl">
+<tr>
+   <th><cpanel langprint="SSService"></th>
+   <th><cpanel langprint="SSDetails"></th>
+   <th><cpanel langprint="SSStatus"></th>
+</tr>
+<cpanelfeature serverstatus>
+	<cpanel Serverinfo="servicestatus()">
+</cpanelfeature>
+</table>
+<br />
+<div class="return-link"><a href="index.html">&larr; <cptext "Go Back"></a></div>
+</div>
+<cpanel Branding="include(stdfooter.html)">
+

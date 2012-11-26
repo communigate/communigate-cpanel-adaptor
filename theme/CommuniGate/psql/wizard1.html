@@ -1,0 +1,67 @@
+<cpanel setvar="headerimg=../images/topmysql.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+
+<style type="text/css">
+<?cp Branding::spritelist(.spriteicon_img_mini {float:left;margin-right:5px;background: url\{leftparenthesis}"%"\{rightparenthesis};} %,@spriteurl,images::#icon-${img}_mini {background-position\{colon}0 -${cssposition}px;width\{colon}${width}px;height\{colon}${height}px; }:) imgtype=icon,subtype=img,method=scale_60percent,format=png,img=postgresql ?>
+</style>
+
+<div class="body-content">
+
+<div class="h1Title"><div class="spriteicon_img_mini" id="icon-postgresql_mini"></div> <cpanel langprint="PSDWizard"></div>
+
+<p class="description"><cpanel langprint="PostgreSQLDesc"></p><br />
+
+<cpanelif !$pgrunning>
+  <p class="alert_box"><cpanel Locale="maketext('The PostgreSQL server is currently [boolean,_1,online,offline].',$pgrunning)"></p>
+  <script>
+        YAHOO.util.Event.onDOMReady(function() { CPANEL.animate.slide_up("#postgres_main") });
+  </script>
+</cpanelif>
+
+<div id="postgres_main">
+    <h2><cpanel langprint="PSDCD1"></h2>
+        
+    <form method="post" action="wizard2.html" name="mainform" id="mainform">
+    <table cellpadding="4" cellspacing="1">
+        <tr>
+            <td align="right"><cpanel langprint="PSDCDNew"></td>
+<cpanelif $dbprefix>
+            <td><cpanel print="$user">_<input type="text" name="db" id="db" /></td>
+</cpanelif>
+<cpanelif !$dbprefix>
+            <td><input type="text" name="db" id="db" /></td>
+</cpanelif>
+            <td><div id="db_error"></div></td>
+        </tr>
+        <tr>
+            <td>&nbsp;</td>
+            <td colspan="2"> <input class="input-button" type="submit" id="submit" value="<cpanel langprint="PSDDBCreateButton">" /></td>
+        </tr>
+    </table>
+    </form>
+    <script type="text/javascript">
+    //<![CDATA[
+    var user = "<cpanel print="$user">";
+    var max_length = 16 - user.length + 1;	// postgres database names have a max length of 16 characters
+    var init_newdb_validation = function() {
+            var dbname_validator = new CPANEL.validate.validator("<cpanel Locale="maketext('New Database')">");
+            dbname_validator.add("db", "sql_alphanumeric", "<cpanel langprint="mysql_dbname_alpha">");
+            dbname_validator.add("db", "max_length(%input%, " + max_length + ")", "<cpanel langprint="mysql_dbname_length">");
+            dbname_validator.attach();
+            
+            CPANEL.validate.attach_to_form("submit", dbname_validator);
+            
+            YAHOO.util.Dom.get("db").focus();
+        };
+        YAHOO.util.Event.onDOMReady(init_newdb_validation);
+    //]]>
+    </script>
+
+</div> <!-- end postgres_main -->
+        
+</div><!-- end body-content -->
+
+<cpanel Branding="include(stdfooter.html)">
+
+

@@ -1,0 +1,28 @@
+<cpanel setvar="headerimg=../../images/mailmenu.gif">
+<cpanel setvar="dprefix=../../">
+<cpanel Branding="include(stdheader.html)">
+<div class="body-content">
+
+<style type="text/css">
+<?cp Branding::spritelist(.spriteicon_img_mini {float:left;margin-right:5px;background: url\{leftparenthesis}"%"\{rightparenthesis};} %,@spriteurl,images::#icon-${img}_mini {background-position\{colon}0 -${cssposition}px;width\{colon}${width}px;height\{colon}${height}px; }:) imgtype=icon,subtype=img,method=scale_60percent,format=png,img=ufiltering ?>
+</style>
+
+<div class="h1Title"><div class="spriteicon_img_mini" id="icon-ufiltering_mini"></div><cpanel langprint="EFAddfilter"> for <?cp Email::accountname(%,account) display=1,account=$FORM{'account'} ?></div>
+
+<?cp Email::storefilter(%,filter) account=$FORM{'account'} || '$CPERROR{'email'}' ?>
+
+<cpanelif $CPERROR{'email'}>
+	<p><cpanel langprint="filter_file_error"></p>
+	<textarea rows="30" cols="85" readonly="readonly">
+		<cpanel print="$CPERROR{'email'}">
+	</textarea>
+	<div class="return-link"><a href="editfilter.html?account=<cpanel formprint="$FORM{'account'}">&filtername=<cpanel formprint="$FORM{'filtername'}">">&larr; <cptext "Go Back"></a></div>
+</cpanelif>
+
+<cpanelif !$CPERROR{'email'}>
+	<p><cpanel langprint="filter_updated"></p>
+	<div class="return-link"><a href="userfilters.html?account=<cpanel formprint="$FORM{'account'}">">&larr; <cptext "Go Back"></a></div>
+</cpanelif>
+
+</div><!-- end body-content -->
+<cpanel Branding="include(stdfooter.html)">

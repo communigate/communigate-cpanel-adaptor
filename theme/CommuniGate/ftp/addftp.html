@@ -1,0 +1,134 @@
+<cpanel setvar="headerimg=../images/topftp.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+<script type="text/javascript">
+function updateftpbox () {
+    if (checkftpuser()) {
+        document.mainform.homedir.value = 'public_html/' + document.mainform.login.value;
+    }
+}
+
+
+function checkftpuserform () {
+    var ftpuser = document.mainform.login.value;
+    if (ftpuser == '') {
+        alert("<cpanel langprint="FTPMsgUserNull">");
+        return false;
+    }
+    if (ftpuser.indexOf(' ') > -1) {
+        alert("<cpanel langprint="FTPMsgUserSpace">");
+        return false;
+    } 
+    if (ftpuser.indexOf('.') > -1) {
+        alert("<cpanel langprint="FTPMsgUserPeriod">");
+        return false;
+    }
+    if (ftpuser.indexOf('@') > -1) {
+        alert("<cpanel langprint="FTPMsgUserSymbol">");
+        return false;
+    }
+    if (ftpuser.indexOf('/') > -1) {
+        alert("<cpanel langprint="FTPMsgUserSlashes">");
+        return false;
+    }
+    var alphnumpattern = /^[a-z0-9_-]+$/i;
+    if (ftpuser.match(alphnumpattern) == null) {
+        alert("<cpanel langprint="FTPUserAlpha">");
+        return false;
+    }
+    if (ftpuser.length > 25) {
+        alert("<cpanel langprint="FTPMsgUser25Char">");
+        return false;
+    }
+    var pattern = /(?:^[-]|[-]$)/;
+    if (ftpuser.match(pattern) != null) {
+        alert("<cpanel langprint="FTPMsgUserHyphen">");
+        return false;
+    }
+    var login = document.mainform.login.value;
+	var password = document.mainform.password.value;
+
+    if (login == '') {
+        alert("<cpanel langprint="FTPMsgUserSpecified">");
+        return false;
+    }
+    if (login.match(alphnumpattern) == null) {
+        alert("<cpanel langprint="FTPUserAlpha">");
+        return false;
+    }
+    if (password.length < 5) {
+        alert("<cpanel langprint="FTPMsgUser5Char">");
+        return false;
+    }
+    if (login.length > 25) {
+        alert("<cpanel langprint="FTPMgrUser25Long">");
+        return false;
+    }
+<cpanelif $haspureftp>
+    if (document.mainform.quota.value == '') {
+        document.mainform.quota.value = 'unlimited';
+    }
+    var quota = document.mainform.quota.value;
+    var unlimpattern = /^unlimited$/i;
+    var numpattern = /^[0-9]+$/;
+    if (quota.match(unlimpattern) == null && quota.match(numpattern) == null) {
+        alert("<cpanel Locale="maketext('The specified quota may only be \'unlimited\' or a numerical value.')">");
+        return false;
+    }
+</cpanelif>    
+    return true;
+}
+
+function checkftpuser () {
+    var ftpuser = document.mainform.login.value;
+    if (ftpuser == '') {
+        return false;
+    }
+    if (ftpuser.length > 25) {
+        return false;
+    }
+    var pattern = /^[a-z0-9_-]+$/i;
+    if (ftpuser.match(pattern) == null) {
+        return false;
+    }
+    return true;
+}
+</script>
+<div class="body-content">
+<style type="text/css">
+<?cp Branding::spritelist(.spriteicon_img_mini {float:left;margin-right:5px;background: url\{leftparenthesis}"%"\{rightparenthesis};} %,@spriteurl,images::#icon-${img}_mini {background-position\{colon}0 -${cssposition}px;width\{colon}${width}px;height\{colon}${height}px; }:) imgtype=icon,subtype=img,method=scale_60percent,format=png,img=ftpaccounts ?>
+</style>
+<div class="h1Title"><div class="spriteicon_img_mini" id="icon-ftpaccounts_mini"></div><cpanel langprint="FTPAddedHead"></div>
+            <form method="post" onsubmit="return checkftpuserform()" action="doaddftp.html" name="mainform">
+              <table>
+                    <tr>
+                        <td align="right"><cpanel langprint="FTPLogin"></td>
+                        <td align="left"><input type="text" name="login" onblur="updateftpbox();" onchange="updateftpbox();" /></td>
+                    </tr>
+                    <tr>
+                        <td align="right"><cpanel langprint="FTPPassword"></font></td>
+                        <td align="left"><input type="text" name="password" /></td>
+                    </tr>
+                    <cpanelif $haspureftp>
+                    <tr>
+                        <td align="right">Quota:</td>
+                        <td align="left"><input type="text" name="quota" value="unlimited" /></td>
+                    </tr>
+                    </cpanelif>
+                    <tr>
+                        <td><cpanel langprint="FTPDirectory">:</td>
+                        <td align="right"><cpanel print="$homedir">/<input type="text" name="homedir"></td>
+                    </tr>
+                    <tr>
+                        <td align="right"><input type="submit" class="input-button" value="<cpanel langprint="FTPCreate">"></td>
+                        <td><input type="reset" class="input-button" value="<cpanel langprint="FTPClear">"></td>
+                    </tr>
+                </table>
+           		<br />
+               <cpanel langprint="FTPHint3Pre"> <cpanel print="$homedir"> <cpanel langprint="FTPHint3Mid"> <cpanel print="$homedir"> <cpanel langprint="FTPHint3Post">
+              
+            </form>
+<div class="return-link"><a href="accounts.html">&larr; <cptext "Go Back"></a></div>
+</div>
+<cpanel Branding="include(stdfooter.html)">
+

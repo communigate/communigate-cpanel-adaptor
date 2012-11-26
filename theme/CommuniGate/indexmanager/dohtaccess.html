@@ -1,0 +1,43 @@
+<cpanel setvar="headerimg=../images/tools.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+<style type="text/css">
+<?cp Branding::spritelist(.spriteicon_img_mini {float:left;margin-right:5px;background: url\{leftparenthesis}"%"\{rightparenthesis};} %,@spriteurl,images::#icon-${img}_mini {background-position\{colon}0 -${cssposition}px;width\{colon}${width}px;height\{colon}${height}px; }:) imgtype=icon,subtype=img,method=scale_60percent,format=png,img=index ?>
+</style>
+
+<div class="body-content">
+<div class="h1Title"><div class="spriteicon_img_mini" id="icon-index_mini"></div><cpanel langprint="indexmantitle"></div>
+<p class="description"><cpanel langprint="indexmandesc"></p>
+
+<div class="highlight">
+	<img src="images/i-directory.gif" border=0> <b><cpanel print="$FORM{'dir'}"></b>
+<form action="changepro.html">
+<input type="hidden" name="dir" value="<cpanel print="$FORM{'dir'}">">
+<table style="text-align:left;" >
+	<tr>
+		<td><input type="radio" name="indexes" value=-1 <cpanel Htaccess="getindex($FORM{'dir'},-1)"> ></td>
+		<td><cpanel langprint="indexmandefault"></td>
+	</tr>
+	<tr>
+		<td><input type="radio" name="indexes" value=0 <cpanel Htaccess="getindex($FORM{'dir'},0)"> ></td>
+		<td><cpanel langprint="indexmannoindex"</td>
+	</tr>
+	<tr>
+		<td><input type="radio" name="indexes" value=1 <cpanel Htaccess="getindex($FORM{'dir'},1)"> ></td>
+		<td><cpanel langprint="indexmanstandard"></td>
+	</tr>
+	<tr>
+		<td><input type="radio" name="indexes" value=2 <cpanel Htaccess="getindex($FORM{'dir'},2)"> ></td>
+		<td><cpanel langprint="indexmanfancy"></td>
+	</tr>
+	<tr>
+	<td  colspan="2" valign="bottom"><br /><input type="submit" class="input-button" value="<cpanel langprint="Save">"></td></tr>
+</table>
+</form>
+
+</div>
+<div class="return-link"><a href="index.html?dir=<cpanel print="$FORM{'dir'}">">&larr; <cpanel langprint="FMBackto"> <cpanel print="$FORM{'dir'}"></a></div>
+
+</div>
+<br />
+<cpanel Branding="include(stdfooter.html)">

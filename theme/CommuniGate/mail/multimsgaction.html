@@ -1,0 +1,22 @@
+<cpanel setvar="headerimg=../images/tools.gif">
+<cpanel setvar="dprefix=../">
+	<cpanel setvar="debug=0">
+<cpanel Branding="include(stdheader.html)">
+<style type="text/css"><cpanel include="boxtrapper.css"></style>
+<div class="body-content">
+<fieldset><legend><cpanel langprint="multimsgaction-BoxTrapper"></legend>
+<div align="center"><p><cpanel langprint="queuefor-BoxTrapper"> <font class="blacktext"><cpanel print="$FORM{'account'}"></font></p></div>
+<cpanel BoxTrapper="multimessageaction(%FORM)">
+</fieldset>
+
+<div class="return-link">
+	<cpanelif !$FORM{'mystring'}>
+		<a href="showq.html?account=<cpanel print="$FORM{'account'}">&logdate=<cpanel print="$FORM{'mydate'}">">&larr; <cptext "Go Back"></a> | 
+	</cpanelif>
+	<cpanelif $FORM{'mystring'}>
+		<a href="queuesearch.html?field=<cpanel print="$FORM{'myfield'}">&account=<cpanel print="$FORM{'account'}">&string=<cpanel print="$FORM{'mystring'}">">&larr; <cptext "Go Back"></a> | 
+	</cpanelif>
+	<a href="manage.html?account=<cpanel print="$FORM{'account'}">"><cptext "Go Back"> <cpanel langprint="EFaddedto"> <cpanel langprint="configlegend-BoxTrapper"></a>
+</div>
+</div>
+<cpanel Branding="include(stdfooter.html)">

@@ -1,0 +1,30 @@
+<cpanel setvar="headerimg=../images/topwebprotect.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+<style type="text/css">
+<?cp Branding::spritelist(.spriteicon_img_mini {float:left;margin-right:5px;background: url\{leftparenthesis}"%"\{rightparenthesis};} %,@spriteurl,images::#icon-${img}_mini {background-position\{colon}0 -${cssposition}px;width\{colon}${width}px;height\{colon}${height}px; }:) imgtype=icon,subtype=img,method=scale_60percent,format=png,img=password-protect ?>
+</style>
+
+<div class="body-content">
+<div class="h1Title"><div class="spriteicon_img_mini" id="icon-password-protect_mini"></div><cpanel langprint="PPDHead"></div>
+
+<!-- <cpanel Htaccess="set_pass($FORM{'dir'},$FORM{'user'},$FORM{'pass'})"> -->
+    <cpanelif !$CPERROR{'htaccess'}>
+        <p><cpanel langprint="PPDUserSetUserPre"> <span class="status"><cpanel print="$FORM{'user'}"></span> <cpanel langprint="PPDNowHasPaswd"> <span class="status"><cpanel print="$FORM{'pass'}"></span>.</p>
+    </cpanelif>
+    <cpanelif $CPERROR{'htaccess'}>
+        <p class="errors"><cpanel langprint="htaccess-adduser-fail">
+        <a href="#" onclick="document.getElementById('details').style.display='block'; return false;"><cpanel langprint="AODShowDetails"></a></p>
+        <div class="details" id="details">
+            <cpanel print="$CPERROR{'htaccess'}">
+        </div>
+        <noscript>
+        <div class="details-noscript" id="details">
+            <cpanel print="$CPERROR{'htaccess'}">
+        </div>
+        </noscript>
+    </cpanelif>
+
+<div class="return-link"><a href="dohtaccess.html?dir=<cpanel formprint="$FORM{'dir'}">">&larr; <cptext "Go Back"></a></div>
+</div>
+<cpanel Branding="include(stdfooter.html)">

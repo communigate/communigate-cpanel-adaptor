@@ -1,0 +1,44 @@
+<cpanel setvar="headerimg=../images/mailmenu.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+
+<div class="body-content">
+
+<style type="text/css">
+<?cp Branding::spritelist(.spriteicon_img_mini {float:left;margin-right:5px;background: url\{leftparenthesis}"%"\{rightparenthesis};} %,@spriteurl,images::#icon-${img}_mini {background-position\{colon}0 -${cssposition}px;width\{colon}${width}px;height\{colon}${height}px; }:) imgtype=icon,subtype=img,method=scale_60percent,format=png,img=manageaccounts ?>
+
+</style>
+	<div class="h1Title"><div class="spriteicon_img_mini" id="icon-manageaccounts_mini"></div> <cpanel langprint="MENUMailChange"></div>
+
+    <!--
+	<cpanel Email="editquota($FORM{'email'},$FORM{'domain'},$FORM{'quota'})">
+    -->
+
+    <cpanelif !$CPERROR{'email'}>
+
+	<p class="status"><cpanel langprint="EASettingschanged"></p>
+	
+	<p>
+        <cptext 'The email account “[output,class,_1,status]” was successfully [boolean,_2,created,modified,removed].',"$FORM{'email'}@$FORM{'domain'}",0>
+	</p>
+
+    </cpanelif>
+    <cpanelif $CPERROR{'email'}>
+        <p class="errors"> <cpanel langprint="EAModifyQuotasProblem">.
+        <a href="#" onclick="document.getElementById('details').style.display='block'; return false;">
+   <cpanel langprint="AODShowDetails"></a> </p>
+
+  <div class="details" id="details">
+        <cpanel print="$CPERROR{'email'}">
+    </div>
+    <noscript>
+    <div class="details-noscript" id="details">
+      <cpanel print="$CPERROR{'email'}">
+    </div>
+    </noscript>
+
+    </cpanelif>
+
+<div class="return-link"><a href="pops_noscript.html">&larr; <cptext "Go Back"></a></div>
+</div>
+<cpanel Branding="include(stdfooter.html)">

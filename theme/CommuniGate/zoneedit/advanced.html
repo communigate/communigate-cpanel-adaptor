@@ -1,0 +1,165 @@
+<cpanel setvar="headerimg=../images/mailmenu.gif">
+<cpanel setvar="dprefix=../">
+<cpanel setvar="headerinclude=zoneedit/advanced_head.html">
+<cpanel Branding="include(stdheader.html)">
+<cpanelfeature zoneedit>
+
+<script type="text/javascript">
+//<[CDATA[
+var LANG = {
+	zone_file_reset : "<cpanel langprint="ZE_zone_file_reset">",
+	restoring_defaults : "<cpanel langprint="ZE_restoring_defaults">",
+	not_valid_zone_name : "<cpanel langprint="ZE_not_valid_zone_name">",
+	ttl_positive_integer : "<cpanel langprint="ZE_ttl_positive_integer">",
+	address_valid_ip : "<cpanel langprint="ZE_address_valid_ip">",
+	address_not_local_ip : "<cpanel langprint="ZE_address_not_local_ip">",
+	cname_valid_name : "<cpanel langprint="ZE_cname_valid_name">",
+        txtdata_valid : "<cpanel langprint="ZE_txtdata_valid">",
+	no_zone_records_found : "<cpanel langprint="ZE_no_zone_records_found">",
+	Edit : "<cpanel langprint="ZE_Edit">",
+	Delete : "<cpanel langprint="ZE_Delete">",
+	edit_record : "<cpanel langprint="ZE_edit_record">",
+	content_changed : "<cpanel langprint="ZE_content_changed">",
+	must_change_something : "<cpanel langprint="ZE_must_change_something">",
+	delete_this_record : "<cpanel langprint="ZE_delete_this_record">",
+	deleting : "<cpanel langprint="ZE_deleting">",
+	updated_record : "<cpanel langprint="ZE_updated_record">",
+	editing_record : "<cpanel langprint="ZE_editing_record">",
+	added_record : "<cpanel langprint="ZE_added_record">",
+	unknown_error : "<cpanel langprint="ZE_unknown_error">",
+	adding_record : "<cpanel langprint="ZE_adding_record">",
+	Name : "<cpanel Locale="maketext('Name')">",
+	Address : "<cpanel Locale="maketext('Address')">",
+	Type : "<cpanel Locale="maketext('Type')">",
+	Record : "<cpanel Locale="maketext('Record')">",
+	Action : "<cpanel Locale="maketext('Action')">",
+	cname_must_be_unique : "<cptext 'Name matches an existing CNAME.'>",
+	cname_must_be_unique2 : "<cptext 'All CNAMEs must be unique.'>"
+};
+//]]>
+</script>
+
+<div class="body-content">
+
+<div class="h1Title"><div class="spriteicon_img_mini" id="icon-zoneedit_mini"></div> <cpanel langprint="zoneedit_head"></div>
+
+<p class="description"><cpanel langprint="zonefile_desc"></p>
+
+<!-- <?cp DomainLookup::countbasedomains(,) ?> -->
+<cpanelif $CPVAR{'basedomainscount'}==1>
+	<?cp DomainLookup::getbasedomains([input type="hidden" id="domain" value="%" /],domain) ?>
+</cpanelif>
+
+<cpanelif $CPVAR{'basedomainscount'}=gt=1>
+<h4><cpanel langprint="SLSelectDomain"></h4>
+<div class="highlight" style="padding-left: 20px">
+	<div id="domain_select_exists" style="display: none"></div>
+	<table cellpadding="3" cellspacing="0"><tr>
+		<td class="col1"><cpanel langprint="MLDomain"></td>
+		<td class="col2">
+			<select id="domain">
+				<option value="_select_"><cpanel langprint="MXSelectDomain"></option>
+				<?cp DomainLookup::getbasedomains([option value="%"]%[/option],domain,domain) ?>
+			</select>
+		</td>
+	</tr></table>
+</div>
+
+</cpanelif>
+
+<div id="add_record_and_zone_table" <cpanelif $CPVAR{'basedomainscount'}=gt=1>style="display: none"</cpanelif> >
+
+<h4><cpanel langprint="ZoneResetTitle"></h4>
+<div class="highlight" style="padding-left: 20px">
+	<cpanel langprint="ZoneResetDesc"> <span class="action_link" onclick="CPANEL.util.toggle_more_less(this, 'reset_zone_warning');"><cpanel langprint="cjt_toggle_more"></span>
+	<div style="display: none" id="reset_zone_warning">
+		<br />
+		<img src="/cjt/images/icons/warning.gif" alt="Warning" /> <em><cpanel langprint="ZoneResetWarning"></em>
+		<br /><br />
+		<input type="checkbox" id="reset_zone_file_checkbox" onclick="toggle_confirm_reset_zone()" /> <label for="reset_zone_file_checkbox"><cpanel langprint="ZoneResetVerify"></label>
+		<br /><br />
+		<input type="button" class="input-button" id="reset_zone_file" disabled="disabled" value="<cpanel Locale="maketext('Reset Zone File')">" onclick="reset_zone_file()" /> <span id="reset_zone_status"></span>
+		<div id="reset_zone_status_bar" class="cjt_status_bar" style="margin: 10px -5px 0px -20px"></div>
+	</div>
+	<script type="text/javascript">
+	//<![CDATA[
+	var toggle_confirm_reset_zone = function() {
+		YAHOO.util.Dom.get("reset_zone_file").disabled = YAHOO.util.Dom.get("reset_zone_file_checkbox").checked ? false : true;
+	};
+	//]]>
+	</script>
+</div>	 
+
+<h4><cpanel langprint="add_record"></h4>
+<div id="entry_edit_box" class="highlight">
+<input type="hidden" name="class" id="class" value="IN" />
+<table cellpadding="3" cellspacing="0" style="margin-left: 20px">
+	<tr>
+		<td class="col1"><cpanel langprint="ZF_name"></td>
+		<td class="col2"><input class="input_text" type="text" id="name" value="" /></td>
+		<td><div id="name_error"></div></td>
+	</tr>
+	<tr>
+		<td class="col1"><cpanel langprint="ZF_TTL"></td>
+		<td class="col2"><input class="input_text" type="text" id="ttl" value="" /></td>
+		<td><div id="ttl_error"></div></td>
+	</tr>
+	<tr>
+		<td class="col1"><cpanel langprint="ZF_type"></td>
+		<td class="col2">
+			<select id="type">
+				<option selected="selected" value="A">A</option>
+				<option value="CNAME"><cpanel langprint="DNSCNAME"></option>
+				<option value="TXT"><cpanel langprint="ZoneTypeTXT"></option>
+			</select>
+		</td>
+		<td></td>
+	</tr>
+	<tr id="type_A">
+		<td class="col1"><cpanel langprint="ZF_address"></td>
+		<td class="col2"><input class="input_text" type="text" id="address" /></td>
+		<td><div id="address_error"></div></td>
+	</tr>
+	<tr id="type_CNAME" style="display: none">
+		<td class="col1"><cpanel langprint="DNSCNAME">:</td>
+		<td class="col2"><input class="input_text" type="text" id="cname" /></td>
+		<td><div id="cname_error"></div></td>
+	</tr>
+	<tr id="type_TXT" style="display: none">
+		<td class="col1"><cpanel langprint="ZF_TXTdata"></td>
+		<td class="col2"><input class="input_text" type="text" id="txtdata" /></td>
+		<td><div id="txtdata_error"></div></td>
+	</tr>
+	<tr>
+		<td class="col1"></td>
+		<td colspan="2">
+            <div id="add_new_zone_line_submit"><input type="button" class="input-button" value="<cpanel langprint="add_record_btn">" id="submit" /></div>
+            <span id="add_new_zone_line_status"></span>
+        </td>
+	</tr>
+</table>
+<div id="add_record_status_bar" class="cjt_status_bar"></div>
+</div><!-- end entry_edit_box -->
+
+<h4><cpanel langprint="ZF_records"></h4>
+<div id="zone_table_status_bar" class="cjt_status_bar"></div>
+<div id="dns_zone_table"></div>
+
+</div><!-- end add_record_and_zone_table -->
+
+</div><!-- end body-content div -->
+
+</cpanelfeature><!-- end cpanelfeature zoneedit -->
+
+<script type="text/javascript">
+   // if there are multiple domains, ensure the server didn't send us an empty option and delete it if it did.
+   var select_id = document.getElementById('domain');
+   if (select_id && /select/i.test(select_id.tagName)) {
+      for (i=0; i<select_id.options.length; i++) {
+         if (select_id.options[i].value.length==0) { select_id.options[i].disabled=true; }
+      }
+   }
+</script>
+
+
+<cpanel Branding="include(stdfooter.html)">

@@ -1,0 +1,21 @@
+{
+        "files":
+               [
+
+<?cp Email::browseboxes(
+{
+"id":"%\{percent}2f%"\{comma}
+"name":"%"\{comma}
+"path":"%"\{comma}
+"relpath":"%"\{comma}
+"type":"%"\{comma}
+"ismailbox":"%"\{comma}
+"isleaf":"%"
+}\{comma}
+,^path,^file,*file,^path,^relpath,^type,ismailbox,isleaf) checkleaf=1,dir=$FORM{'dir'},types=$FORM{'types'},showdotfiles=1,account=$FORM{'account'} ?>
+   {}
+    ],
+
+    "absdir":"<?cp Email::getabsbrowsedir(%,^absdir) dir=$FORM{'dir'},account=$FORM{'account'} ?>"
+}
+

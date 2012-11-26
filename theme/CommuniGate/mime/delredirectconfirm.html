@@ -1,0 +1,17 @@
+<cpanel setvar="headerimg=../images/tools.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+<div class="body-content">
+<style type="text/css">
+<?cp Branding::spritelist(.spriteicon_img_mini {float:left;margin-right:5px;background: url\{leftparenthesis}"%"\{rightparenthesis};} %,@spriteurl,images::#icon-${img}_mini {background-position\{colon}0 -${cssposition}px;width\{colon}${width}px;height\{colon}${height}px; }:) imgtype=icon,subtype=img,method=scale_60percent,format=png,img=redirects ?>
+</style>
+<div class="h1Title"><div class="spriteicon_img_mini" id="icon-redirects_mini"></div> <cpanel Locale="maketext('Redirect Removal')"></div>
+<p><cpanel langprint="SQLDelteMsg1">the redirect &nbsp;<span class="status"><?cp Mime::redirecturlname(%,url) url=$FORM{'path'} ?></span> on <span class="status"><?cp Mime::redirectname(%,domain) domain=$FORM{'domain'} ?></span></p>
+<p>
+	<a class="create-button" href="delredirect.html?docroot=<cpanel formprint="$FORM{'docroot'}">&domain=<cpanel formprint="$FORM{'domain'}">&path=<cpanel formprint="$FORM{'path'}">"><cpanel Locale="maketext('Remove Redirect')"></a>
+		<a class="cancel_link" href="redirect.html"><cpanel Locale="maketext('cancel')"></a>
+<p>
+
+<div class="return-link"><a href="redirect.html">&larr; <cptext "Go Back"></a></div>
+</div>
+<cpanel Branding="include(stdfooter.html)">

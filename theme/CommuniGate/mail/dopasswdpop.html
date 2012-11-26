@@ -1,0 +1,42 @@
+<cpanel setvar="headerimg=../images/mailmenu.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+<style type="text/css">
+<?cp Branding::spritelist(.spriteicon_img_mini {float:left;margin-right:5px;background: url\{leftparenthesis}"%"\{rightparenthesis};} %,@spriteurl,images::#icon-${img}_mini {background-position\{colon}0 -${cssposition}px;width\{colon}${width}px;height\{colon}${height}px; }:) imgtype=icon,subtype=img,method=scale_60percent,format=png,img=manageaccounts ?>
+</style>
+<div class="body-content">
+
+<div class="h1Title"><div class="spriteicon_img_mini" id="icon-manageaccounts_mini"></div> <cpanel langprint="MENUMailChange"></div>
+
+	<!--<cpanel Email="passwdpop($FORM{'email'},$FORM{'password'},$FORM{'quota'},$FORM{'domain'})">-->
+	
+	<cpanelif !$CPERROR{'email'}>
+		<p>
+			<cptext 'The email account “[output,class,_1,status]” was successfully [boolean,_2,created,modified,removed].',"$FORM{'email'}@$FORM{'domain'}",0>
+		</p>
+	</cpanelif>
+	<cpanelif $CPERROR{'email'}>
+    	<p class="errors"><cpanel langprint="CPError"> <cpanel langprint="PassError"> 
+    	<a href="#" onclick="document.getElementById('details').style.display='block'; return false;"><cpanel langprint="AODShowDetails"></a> </p>
+    	
+		<div class="details" id="details">
+			<cpanel print="$CPERROR{'email'}">
+		</div>
+		<noscript>
+		<div class="details-noscript" id="details">
+			<cpanel print="$CPERROR{'email'}">
+		</div>
+		</noscript>
+	</cpanelif>
+	
+
+<cpanelif $appname==webmail>
+	<div class="return-link"><a href="../index.html">&larr; <cptext "Go Back"></a></div>
+</cpanelif>
+
+<cpanelif !$appname==webmail>
+	<div class="return-link"><a href="pops_noscript.html">&larr; <cptext "Go Back"></a></div>
+</cpanelif>
+
+</div>
+<cpanel Branding="include(stdfooter.html)">

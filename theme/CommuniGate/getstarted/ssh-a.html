@@ -1,0 +1,103 @@
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+
+<style type="text/css">
+<?cp Branding::spritelist(.spriteicon_img_mini {float:left;margin-right:5px;background: url\{leftparenthesis}"%"\{rightparenthesis};} %,@spriteurl,images::#icon-${img}_mini {background-position\{colon}0 -${cssposition}px;width\{colon}${width}px;height\{colon}${height}px; }:) imgtype=icon,subtype=img,method=scale_60percent,format=png,img=ssh-shell-access ?>
+<?cp Branding::spritelist(.spriteicon_img_mini {float:left;margin-right:5px;background: url\{leftparenthesis}"%"\{rightparenthesis};} %,@spriteurl,images::#icon-${img}_mini {background-position\{colon}0 -${cssposition}px;width\{colon}${width}px;height\{colon}${height}px; }:) imgtype=icon,subtype=img,method=scale_60percent,format=png,img=getstart ?>
+</style>
+
+<script type="text/javascript">
+//<![CDATA[
+var REQUIRED_PASSWORD_STRENGTH = parseInt('<?cp PasswdStrength::get_required_strength(%,strength) app=sshkey ?>') || 0;
+
+var init_page = function() {
+	var name_validator = new CPANEL.validate.validator("<cpanel Locale="maketext('Key Name')">");
+	name_validator.add("name", "filename", "<cpanel langprint="SSH_key_name_filename">");
+	name_validator.attach();
+	
+	var password_validators = CPANEL.password.setup("password", "password2", "password_strength", REQUIRED_PASSWORD_STRENGTH, "create_strong_password", "why_strong_passwords_link", "why_strong_passwords_text");
+	
+	password_validators.push(name_validator);
+	CPANEL.validate.attach_to_form("submit", password_validators);
+	
+	YAHOO.util.Dom.get("password").focus();
+	name_validator.verify();
+};
+YAHOO.util.Event.onDOMReady(init_page);
+//]]>
+</script>
+
+<script type="text/javascript">pwstrapp='sshkey';</script>
+
+<div class="body-content">
+	
+<h1><div class="spriteicon_img_mini" id="icon-getstart_mini"></div><cpanel langprint="gswtitle"></h1>
+
+<cpanel include="jumpmenu.html">
+	
+<div class="h1Title"><div class="spriteicon_img_mini" id="icon-ssh-shell-access_mini">&nbsp;</div><cpanel langprint="SSHKeyGenHead"></div>
+
+<p><cpanel langprint="SSHGenDesc"></p>
+<p><cpanel langprint="SSHGenDesc2"></p>
+<br />
+
+<form method="post" action="ssh-aa.html" name="passform" id="passform">
+<table class="formtbl" cellpadding="3" cellspacing="0">
+	<tr>
+		<td align="right" style="width: 130px"><cpanel langprint="SSHKeyName">:</td>
+		<td><input type="text" name="name" id="name" style="width: 150px" value="id_dsa" /></td>
+		<td><div id="name_error"></div></td>
+	</tr>
+	<tr>
+		<td align="right"><cpanel langprint="PGPKeyPass">:</td>
+		<td><input type="password" name="password" id="password" style="width: 150px" /></td>
+		<td><div id="password_error"></div></td>
+	</tr>
+	<tr>
+		<td align="right"><cpanel langprint="ASIReadOtherPasswordAgain"></td>
+		<td><input type="password" name="password2" id="password2" style="width: 150px" /></td>
+		<td><div id="password2_error"></div></td>
+	</tr>
+	<tr>
+		<td align="right">
+			<cpanel langprint="email_strength"> (<div style="display: inline" id="why_strong_passwords_link" class="action_link"><cpanel langprint="email_why"></div>):
+			<div id="why_strong_passwords_text" style="display: none"><cpanel langprint="email_password_why"><br /><br /><cpanel langprint="email_password_tip"></div>
+		</td>
+		<td><div id="password_strength" style="width: 150px; height: 20px; border: 1px solid black; margin: 5px 0px 3px 0px"></div></td>
+		<td><input type="button" class="input-button" id="create_strong_password" value="<cpanel langprint="cjt_password_generator">" tabindex="-1" /></td>
+	</tr>
+	<tr>
+		<td align="right"><cpanel langprint="SSHType"></td>
+		<td>
+			<select name="type">
+				<option value="dsa"><cpanel langprint="SSHDSA"></option>
+				<option value="rsa"><cpanel langprint="SSHRSA"></option>
+			</select>
+		</td>
+		<td>&nbsp;</td>
+	</tr>
+	<tr>
+		<td align="right"><cpanel langprint="PGPKeySize"></td>
+		<td>
+			<select name="keysize">
+				<option value="1024"><cpanel langprint="PGP1024"></option>
+				<option value="2048"><cpanel langprint="PGP2048"></option>
+				<option value="4096"><cpanel langprint="PGP4096"></option>
+			</select>
+		</td>
+		<td>&nbsp;</td>
+	</tr>
+	<tr><td colspan="3"><br /></td></tr>
+	<tr>
+		<td>&nbsp;</td>
+		<td><input type="submit" class="input-button" value="<cpanel langprint="PGPGenerateButton">" id="submit" /></td>
+		<td>&nbsp;</td>
+	</tr>
+</table>
+</form>
+
+<br />
+
+</div><!-- end body-content -->
+
+<cpanel Branding="include(stdfooter.html)">

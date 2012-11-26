@@ -1,0 +1,122 @@
+[%
+USE CPBranding;
+USE JSON;
+
+SET graph_dirs = {
+    'backups'     => 1,
+    'etc'         => 1,
+    'logs'        => 1,
+    'mail'        => 1,
+    'perl'        => 1,
+    'php'         => 1,
+    'public_ftp'  => 1,
+    'public_html' => 1,
+    'ruby'        => 1,
+    'tmp'         => 1,
+};
+SET LANG = {
+    no_subdir      => '(not in a subdirectory)',
+    other_subs     => '(other subdirectories)',
+    open_in_fm     => 'Open this directory in File Manager',
+    see_children   => 'See disk usage for this directory’s child directories',
+    hide_children  => 'Hide disk usage for this directory’s child directories',
+    see_mysql      => 'Manage MySQL databases',
+    see_pgsql      => 'Manage PostgreSQL databases',
+    other          => 'Other',
+    db_unavailable => 'Database usage data is not available at this time. Please check later; if the problem persists, contact your system administrator.',
+};
+FOR key = LANG.keys;
+    LANG.$key = locale.maketext(LANG.$key);
+END;
+
+SET home_image = CPBranding.image('homeb');
+home_image_html = home_image FILTER html;
+SET minus_image = CPBranding.image('minus');
+SET spinner_image = CPBranding.image('spinner9x9');
+%]
+
+<script type="text/javascript">
+var USER = [% CPANEL.user.json() || 'null' %];
+var GRAPH_DIRS = [% graph_dirs.json() || 'null' %];
+var LANG = [% LANG.json() || 'null' %];
+var PLUS_IMAGE = [% CPBranding.image('plus').json() || 'null' %];
+var PLUS_IMAGE_HTML = PLUS_IMAGE.html_encode();
+var MINUS_IMAGE = [% minus_image.json() || 'null' %];
+var MINUS_IMAGE_HTML = MINUS_IMAGE.html_encode();
+var SPINNER_IMAGE = [% spinner_image.json() || 'null' %];
+var HOME_IMAGE_HTML = [% home_image_html.json() || 'null' %];
+var SPACER = '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
+var HOMEDIR = [% CPANEL.homedir.json() %];
+</script>
+
+<img style="display:none" alt="" src="[% minus_image FILTER html %]" />
+<img style="display:none" alt="" src="[% spinner_image FILTER html %]" />
+
+<script id="dirs_table_template" type="text/html">
+<table id="disk_usage_table">
+<thead>
+<tr>
+    <th rowspan="2"></th>
+    <th id="directory_header" rowspan="2" style="vertical-align:middle">[% locale.maketext('Directory') %]</th>
+    <th id="contained_header" colspan="2">[% locale.maketext('Contained disk usage') %]</th>
+    <th id="owner_header" colspan="99" rowspan="2"></th>
+</tr>
+<tr>
+    <th id="megabytes_header"><abbr title="[% locale.maketext('1 MB = 1,024 kB = 1,048,576 bytes') %]">MB</abbr></th>
+    <th id="bytes_header">[% locale.maketext('bytes') %]</th>
+</tr>
+</thead>
+<tfoot></tfoot>
+<tbody id="directory_rows_tbody"></tbody>
+</table>
+</script>
+
+<script id="expander_img_template" type="text/html">
+<img title="[% LANG.see_children -%]" class="expand_control expander" id="{path}-icon" src="{img_src}" onclick="if (!(&quot;{path}&quot; in Expanding)) toggle_children(&quot;{path}&quot;)" />
+</script>
+
+<script id="nonexpander_img_template" type="text/html">
+<img class="expand_control expander" src="[% minus_image FILTER html -%]" style="visibility:hidden" />
+</script>
+
+<script id="dirs_table_row_template" type="text/html">
+<tr id="{path}-row">
+<td></td>
+<td class="directory">
+    <div>{indentation_html}{expander_html}
+        <a title="[% LANG.open_in_fm %]" href="../filemanager/index.html?dirselect=homedir&dir={path_uri}" target="_blank">{dir_name}</a>
+    </div>
+</td>
+<td class="formatted_bytes"><div>{formatted_bytes}</div></td>
+<td class="raw_bytes"><div>{raw_bytes}</div></td>
+<td></td>
+</tr>
+</script>
+
+<script id="dirs_other_owner_table_row_template" type="text/html">
+<tr id="{path}-row">
+<td class="owner"><span style="visibility:hidden">[% locale.maketext('Owner: [_1]','{owner}') %]</span></td>
+<td class="directory">
+    <div>{indentation_html}{expander_html}
+        <a title="[% LANG.open_in_fm %]" href="../filemanager/index.html?dirselect=homedir&dir={path_uri}" target="_blank">{dir_name}</a>
+    </div>
+</td>
+<td class="formatted_bytes"><div>{formatted_bytes}</div></td>
+<td class="raw_bytes"><div>{raw_bytes}</div></td>
+<td class="owner">[% locale.maketext('Owned by [_1]','{owner}') %]</td>
+</tr>
+</script>
+
+<script id="dirs_untraversible_table_row_template" type="text/html">
+<tr id="{path}-row">
+<td class="owner"><span style="visibility:hidden">[% locale.maketext('Owned by [_1]','{owner}') %]</span></td>
+<td class="directory untraversible">
+    <div>{indentation_html}{expander_html}
+        <span class="untraversible">{dir_name}</span>
+    </div>
+</td>
+<td class="formatted_bytes untraversible"><div>[% locale.maketext('unknown') %]</div></td>
+<td class="raw_bytes untraversible"><div>[% locale.maketext('unknown') %]</div></td>
+<td class="owner">[% locale.maketext('Owned by [_1]','{owner}') %]</td>
+</tr>
+</script>

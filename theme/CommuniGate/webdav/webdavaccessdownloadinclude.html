@@ -1,0 +1,484 @@
+<style type="text/css">
+a {behavior: url(#default#AnchorClick);}
+.instruction_brd{
+border:1px dashed #ccc;padding:5px;
+}
+</style>
+
+<script type="text/javascript">
+var domain='<cpanel print="$FORM{'domain'}">';
+var sslport='<cpanel print="$FORM{'sslport'}">';
+var standardport='<cpanel print="$FORM{'mainport'}">';
+
+function MM_jumpMenu(targ,selObj,restore){ //v3.0
+  eval(targ+".location='"+selObj.options[selObj.selectedIndex].value+"'");
+  if (restore) selObj.selectedIndex=0;
+}
+var apps=new Array();
+apps[0]='nautilus';
+apps[1]='konqueror';
+apps[2]='mac';
+apps[3]='win32';
+apps[4]='winvista';
+apps[5]='macleopard';
+
+
+function davdownload(os) {
+	var ssl = document.davdown[os + '-ssl'].checked;
+	var osmethod = document.davdown[os].options[document.davdown[os].selectedIndex].value;  
+
+	document.getElementById('spacer').style.display='block';
+	hideapp();
+	if (os == "mac") {
+		showapp('mac');
+		if (ssl) {
+			document.getElementById('macwebdiskname').innerHTML = domain + ' Secure WebDisk';
+		  frames.davaction.location.href='<cpanel print="$ENV{'cp_security_token'}">/backend/webdisksetup.cgi?' + domain + '|1|' + (osmethod == 'osx105' ? '10.5' : '10.4') + '|' + sslport;
+		} else {
+			document.getElementById('macwebdiskname').innerHTML = domain + ' WebDisk';
+			frames.davaction.location.href='<cpanel print="$ENV{'cp_security_token'}">/backend/webdisksetup.cgi?' + domain + '|0|' + (osmethod == 'osx105' ? '10.5' : '10.4') + '|' + standardport;
+		}
+	} 
+
+
+	if (osmethod == "win2000" || osmethod == "winxp") {
+		showapp('win32');
+		if (ssl) {
+			document.getElementById('win32-ssl').style.display='block';
+			document.getElementById('win32-nossl').style.display='none';
+			document.getElementById('win32-ssl-vbs-txt').innerHTML = '"' + domain + ' Secure WebDisk.vbs"';
+			document.getElementById('win32-ssl-vbs').setAttribute('href','/backend/webdiskvbs.cgi?' + domain + '|1|' + sslport);
+			frames.davaction.location.href='<cpanel print="$ENV{'cp_security_token'}">/backend/webdiskvbs.cgi?' + domain + '|1|' + sslport;
+		} else {
+			document.getElementById('win32-ssl').style.display='none';
+			document.getElementById('win32-nossl').style.display='block';
+			document.getElementById('win32-nossl-vbs-txt').innerHTML = '"' + domain + ' WebDisk.vbs"';
+			document.getElementById('win32-ssl-vbs').setAttribute('href','/backend/webdiskvbs.cgi?' + domain + '|0|' + standardport);
+			frames.davaction.location.href='<cpanel print="$ENV{'cp_security_token'}">/backend/webdiskvbs.cgi?' + domain + '|0|' + standardport;
+		}
+	}
+	
+	if (osmethod == "winvista") {
+		showapp('winvista');
+		if (ssl) {
+			document.getElementById('winvista-ssl').style.display='block';
+			//document.getElementById('winvista-nossl').style.display='none';
+			//document.getElementById('winvista-ssl-vbs-txt').innerHTML = '"' + domain + ' Secure WebDisk.vbs"';
+			//document.getElementById('winvista-ssl-vbs').setAttribute('href','/backend/webdiskvbs.cgi?' + domain + '|1');
+			frames.davaction.location.href='<cpanel print="$ENV{'cp_security_token'}">/backend/webdiskvbs.cgi?' + domain + '|1';
+		} else {
+			document.getElementById('winvista-ssl').style.display='none';
+			//document.getElementById('winvista-nossl').style.display='block';
+			//document.getElementById('winvista-nossl-vbs-txt').innerHTML = '"' + domain + ' WebDisk.vbs"';
+			//document.getElementById('winvista-ssl-vbs').setAttribute('href','/backend/webdiskvbs.cgi?' + domain + '|0');
+			frames.davaction.location.href='<cpanel print="$ENV{'cp_security_token'}">/backend/webdiskvbs.cgi?' + domain + '|0';
+		}
+	}
+
+	if (osmethod == "konqueror") {
+		if (ssl) {
+			showapp('konqueror');
+			document.getElementById('konqueror-ssl').style.display='block';
+			document.getElementById('konqueror-nossl').style.display='none';
+			setappurl('konqueror','webdavs://'+domain+':' + sslport);
+            document.getElementById('konqueror-ssl-desktop-txt').innerHTML = '"' + domain + ' WebDisk.desktop"';
+            frames.davaction.location.href='<cpanel print="$ENV{'cp_security_token'}">/backend/webdiskdesktop.cgi?' +  domain + '|1|' + sslport;
+        } else {
+			showapp('konqueror');
+			document.getElementById('konqueror-nossl').style.display='block';
+			document.getElementById('konqueror-ssl').style.display='none';
+			setappurl('konqueror','webdav://'+domain+':' + standardport);
+            document.getElementById('konqueror-nossl-desktop-txt').innerHTML = '"' + domain + ' WebDisk.desktop"';
+            frames.davaction.location.href='<cpanel print="$ENV{'cp_security_token'}">/backend/webdiskdesktop.cgi?' + domain + '|0|' + standardport;
+
+        }
+	}	
+
+	if (osmethod == "nautilus") {
+		if (ssl) {
+			showapp('nautilus');
+			document.getElementById('nautilus-nossl').style.display='none';
+			document.getElementById('nautilus-ssl').style.display='block';
+			setappurl('nautilus','davs://'+domain+':' + sslport);
+		} else {
+			showapp('nautilus');
+			document.getElementById('nautilus-ssl').style.display='none';
+			document.getElementById('nautilus-nossl').style.display='block';
+			setappurl('nautilus','dav://'+domain+':' + standardport);
+		}
+	}	
+}
+
+function hideapp() {
+	for(i=0;i<apps.length;i++) {
+		var dl = document.getElementById(apps[i]);
+		if (!dl) { continue; }
+		dl.style.display='none';
+	}
+}
+
+function showapp(tApp) {
+	var thisdl = document.getElementById(tApp);
+	if (thisdl) {
+		thisdl.style.display='block';
+	}
+}
+function setappurl(tApp,tUrl) {
+	document.davdown[tApp+'_url'].value=tUrl;	
+}
+
+</script>
+
+<h1><cpanel langprint="AccessWebDiskTitle"></h1>
+<p class="description"><cpanel langprint="AccessWebDiskDesc"></p>
+<cpanelif !$ENV{'HTTP_PROXIED'}>
+    <p><span class="error"><cpanel langprint="AccessWebDiskDescPorts"></span></p>
+</cpanelif>
+<iframe style="visibility:hidden;width:0;height:0;" name="davaction"></iframe>
+
+<form name="davdown">
+
+<div id="win32" style="display:none;border: solid #000 1px;">
+<table>
+	<tr>
+		<td>
+			<!-- <img src="win32.png">&reg; -->
+		</td>
+		<td>
+			<strong><cpanel langprint="WebDAVWinHead"></strong>
+		</td>
+	</tr>
+</table>
+
+<div style="display:none;" id="win32-nossl">
+<ul>
+<li><b><cpanel langprint="WebDAVConfigShortcut">: </b><br />
+1.	<a id="win32-nossl-vbs" href="<cpanel print="$ENV{'cp_security_token'}">/backend/webdiskvbs.cgi?<cpanel print="$FORM{'domain'}">|0|<cpanel print="$FORM{'mainport'}">"><cpanel langprint="WebDavRightClick"></a><br />
+2.	<cpanel langprint="WebDavDoubleClick"> <span id="win32-nossl-vbs-txt">Create_Web_Disk.vbs</span> <cpanel langprint="WebDavLaunch">.<br />
+</li>
+</ul>
+<br />
+<ul>
+<li><b><cpanel langprint="WebDAVIE"> </b><br />
+1.	<A HREF="http://<cpanel print="$FORM{'domain'}">:<cpanel print="$FORM{'mainport'}">" FOLDER="http://<cpanel print="$FORM{'domain'}">:<cpanel print="$FORM{'mainport'}">" TARGET="_blank"><cpanel langprint="WebDavClickHere"> http://<cpanel print="$FORM{'domain'}">:<cpanel print="$FORM{'mainport'}"></A><br />
+2.	<cpanel langprint="WebDavClickStart"><br />
+3.	<cpanel langprint="WebDavClickIcon"> <cpanel print="$FORM{'domain'}">.<br />
+</li>
+</ul>
+
+</div>
+
+<div style="display:none;padding:5px;" id="win32-ssl">
+<ul>
+<li><b><cpanel langprint="WebDAVConfigShortcut">: </b><br />
+1.      <a id="win32-ssl-vbs" href="<cpanel print="$ENV{'cp_security_token'}">/backend/webdiskvbs.cgi?<cpanel print="$FORM{'domain'}">|1|<cpanel print="$FORM{'sslport'}">"><cpanel langprint="WebDavRightClick"></a><br />
+2.      <cpanel langprint="WebDavDoubleClick"> <span id="win32-ssl-vbs-txt">Create_Web_Disk.vbs</span> <cpanel langprint="WebDavLaunch">.<br />
+</li>
+</ul>
+<br />
+<ul>
+<li><b><cpanel langprint="WebDAVIE"> </b><br />
+1.      <A HREF="https://<cpanel print="$FORM{'domain'}">:<cpanel print="$FORM{'sslport'}">" FOLDER="https://<cpanel print="$FORM{'domain'}">:<cpanel print="$FORM{'sslport'}">" TARGET="_blank"><cpanel langprint="WebDavClickHere"> https://<cpanel print="$FORM{'domain'}">:<cpanel print="$FORM{'sslport'}"></A><br />
+2.      <cpanel langprint="WebDavClickStart"><br />
+3.      <cpanel langprint="WebDavClickIcon"> <cpanel print="$FORM{'domain'}">.<br />
+</li>
+<br />
+
+<b><cpanel langprint="WebDiskSetUpXPHead"></b><br />
+
+<div class="instruction_brd">
+	<cpanel langprint="WebDiskSetUpXP1">
+		<br /><br />
+		<img src="<cpanel printvar="webdavprefix">images/WebDav1.png"><br /><br />
+</div>
+<br /><br />
+
+
+<div class="instruction_brd">
+	<cpanel langprint="WebDiskSetUpXP2">
+		<br /><br />
+		<img src="<cpanel printvar="webdavprefix">images/WebDav2.png">
+</div>
+<br /><br />
+
+
+<div class="instruction_brd">
+	<cpanel langprint="WebDiskSetUpXP3">
+		<br /><br />
+		<img src="<cpanel printvar="webdavprefix">images/WebDav3.png">
+</div>
+<br /><br />
+
+<div class="instruction_brd">
+	<cpanel langprint="WebDiskSetUpXP4">
+		<br /><br />
+		<img src="<cpanel printvar="webdavprefix">images/WebDav4.png">
+</div>
+<br /><br />
+
+<div class="instruction_brd">
+	<cpanel langprint="WebDiskSetUpXP5">
+		<br /><br />
+		<cpanel langprint="WebDiskNonSSLPort">:&nbsp;<span class="status">http://<cpanel print="$FORM{'domain'}">:<cpanel print="$FORM{'mainport'}"></span><Br />
+		<cpanel langprint="WebDiskSSLPort">:&nbsp;<span class="status">https://<cpanel print="$FORM{'domain'}">:<cpanel print="$FORM{'sslport'}"></span>
+		<br /><br />
+
+		<br /><br />
+		<img src="<cpanel printvar="webdavprefix">images/WebDav5.png">
+</div>
+<br /><br />
+
+<div class="instruction_brd">
+	<cpanel langprint="WebDiskSetUpXP6">
+		<br /><br />
+		<img src="images/WebDav6.png">
+</div>
+		<br /><br />
+
+<div class="instruction_brd"><cpanel langprint="WebDiskSetUpXP7">
+	<br /><br />
+	<img src="<cpanel printvar="webdavprefix">images/WebDav7.png">
+</div>
+<br /><br />
+
+<div class="instruction_brd">
+	<cpanel langprint="WebDiskSetUpXP8">
+	<br /><br />
+	<img src="<cpanel printvar="webdavprefix">images/WebDav8.png">
+</div>
+<br /><br />
+
+<cpanel langprint="WebDiskSetUpXP9">
+<br /><br />
+
+<cpanel langprint="WebDiskSetUpXP10">
+<br /><br />
+
+</ul>
+</div>
+</div>
+
+<div id="winvista" style="display:none;border: solid #000 1px;">
+<table>
+	<tr>
+		<td>
+			<!-- <img src="win32.png">&reg; -->
+		</td>
+		<td>
+			<strong><cpanel langprint="WebDAVVistaHead"></strong>
+		</td>
+	</tr>
+</table>
+
+<div style="display" id="winvista-ssl">
+		<p class="description error" style="margin-left:5px"><cpanel langprint="WebDAVVistaWarn"><!-- https://<cpanel print="$FORM{'domain'}">:<cpanel print="$FORM{'sslport'}"> <cpanel langprint="WebDAVVistaWarn2">--></p>
+<!--<ul>
+<li><b><cpanel langprint="WebDAVConfigShortcut">: </b><br />
+1.	<a id="winvista-nossl-vbs" href="<cpanel print="$ENV{'cp_security_token'}">/backend/webdiskvbs.cgi?<cpanel print="$FORM{'domain'}">|0|<cpanel print="$FORM{'mainport'}">"><cpanel langprint="WebDavRightClick"></a><br />
+2.	<cpanel langprint="WebDavDoubleClick"> <span id="winvista-nossl-vbs-txt">Create_Web_Disk.vbs</span> <cpanel langprint="WebDavLaunch">.<br />
+</li>
+</ul>-->
+
+<ul>
+<li><b><cpanel langprint="WebDAVVista"> </b><br />
+1.	<cpanel langprint="WebDavVista1"><br />
+2.	<cpanel langprint="WebDavVista2"><br />
+3.	<cpanel langprint="WebDavVista3"><br />
+4.	<cpanel langprint="WebDavVista4"><br />
+5.  <cpanel langprint="WebDavVista5"><br />
+		<ul>
+			<li>http://<cpanel print="$FORM{'domain'}">:<cpanel print="$FORM{'mainport'}"></li>
+		</ul>
+6.  <cpanel langprint="WebDavVista6"><br />
+7.  <cpanel langprint="WebDavVista7"><br />
+8.  <cpanel langprint="WebDavVista8"><br />
+9.  <cpanel langprint="WebDavVista9"><br />
+</li>
+</ul>
+</div>
+
+<!--<div style="display:none;" id="winvista-ssl">
+		<p class="description error" style="margin-left:5px"><cpanel langprint="WebDAVVistaWarn"></p>
+<ul>
+<li><b><cpanel langprint="WebDAVConfigShortcut">: </b><br />
+1.      <a id="winvista-ssl-vbs" href="<cpanel print="$ENV{'cp_security_token'}">/backend/webdiskvbs.cgi?<cpanel print="$FORM{'domain'}">|1|<cpanel print="$FORM{'sslport'}">"><cpanel langprint="WebDavRightClick"></a><br />
+2.      <cpanel langprint="WebDavDoubleClick"> <span id="winvista-ssl-vbs-txt">Create_Web_Disk.vbs</span> <cpanel langprint="WebDavLaunch">.<br />
+</li>
+</ul>
+<br />
+<ul>
+<li><b><cpanel langprint="WebDAVVista"> </b><br />
+1.	<cpanel langprint="WebDavVista1"><br />
+2.	<cpanel langprint="WebDavVista2"><br />
+3.	<cpanel langprint="WebDavVista3"><br />
+4.	<cpanel langprint="WebDavVista4"><br />
+5.  <cpanel langprint="WebDavVista5"><br />
+		<ul>
+			<li>https://<cpanel print="$FORM{'domain'}">:<cpanel print="$FORM{'sslport'}"></li>
+		</ul>
+6.  <cpanel langprint="WebDavVista6"><br />
+</li>
+</ul>
+</div>-->
+</div>
+
+<div id="konqueror" style="display:none;border: solid #000 1px;">
+<table>
+	<tr>
+		<td>
+			<img src="../images/konqueror.png" />&reg;
+		</td>
+		<td>
+			<strong><cpanel langprint="WebDavKonHead"></strong>
+		</td>
+	</tr>
+</table>
+
+<div style="display:none;" id="konqueror-nossl">
+<ul>
+<li><b><cpanel langprint="WebDAVConfigShortcut">: </b><br />
+1.  <a id="konqueror-nossl-desktop" href="<cpanel print="$ENV{'cp_security_token'}">/backend/webdiskdesktop.cgi?<cpanel print="$FORM{'domain'}">|0|<cpanel print="$FORM{'mainport'}">"><cpanel langprint="WebDavKRightClick"></a><br />
+2.  <cpanel langprint="WebDavDoubleClick"> <span id="konqueror-nossl-desktop-txt">Create_Web_Disk.desktop</span> <cpanel langprint="WebDavLaunch">.<br />
+</li>
+</ul>
+<br />
+<ul><li><b><cpanel langprint="WebDAVfrombrowser">: </b><br />
+1. <cpanel langprint="WebDavKonOpen"> <br />
+2. <cpanel langprint="WebDavKonURL"> <input type="text" name="konqueror_url" value="webdav://<cpanel print="$FORM{'domain'}">:<cpanel print="$FORM{'mainport'}">" size="50"> <br />
+3. <cpanel langprint="WebDavKonAccess">. <br />
+4. <cpanel langprint="WebDavKonBookmark">. <br />
+</li>
+</ul>
+</div>
+<div style="display:none;" id="konqueror-ssl">
+<ul>
+<li><b><cpanel langprint="WebDAVConfigShortcut">: </b><br />
+1.  <a id="konqueror-ssl-desktop" href="<cpanel print="$ENV{'cp_security_token'}">/backend/webdiskdesktop.cgi?<cpanel print="$FORM{'domain'}">|1|<cpanel print="$FORM{'sslport'}">"><cpanel langprint="WebDavKRightClick"></a><br />
+2.  <cpanel langprint="WebDavDoubleClick"> <span id="konqueror-ssl-desktop-txt">Create_Web_Disk.desktop</span> <cpanel langprint="WebDavLaunch">.<br />
+</li>
+</ul>
+<br />
+<ul><li><b><cpanel langprint="WebDAVfrombrowser">: </b><br />
+1. <cpanel langprint="WebDavKonOpen"> <br />
+2. <cpanel langprint="WebDavKonURL"> <input type="text" name="konqueror_url" value="webdavs://<cpanel print="$FORM{'domain'}">:<cpanel print="$FORM{'sslport'}">" size="50"> <br />
+3. <cpanel langprint="WebDavKonAccess">. <br />
+4. <cpanel langprint="WebDavKonBookmark">. <br />
+</li>
+</ul>
+</div>
+</div>
+
+<div id="mac" style="display:none;border: solid #000 1px;">
+<table>
+	<tr>
+		<td>
+			<!-- <img src="finder.png">&reg; -->
+		</td>
+		<td>
+			<strong><cpanel langprint="WebDavMacHead"></strong>
+		</td>
+	</tr>
+</table>
+1. <cpanel langprint="WebDavMacSave">. <br />
+2. <cpanel langprint="WebDavMacClick">.<br />
+3. <cpanel langprint="WebDavMacFindApp"> '<div style="display:inline;" id="macwebdiskname"></div>'<br />
+4. <cpanel langprint="WebDavMacClickApp"><br />
+</div>
+
+<div id="nautilus" style="display:none;border: solid #000 1px;">
+<table>
+	<tr>
+		<td>
+			<img src="../images/nautilus.png" />&reg;
+		</td>
+		<td>
+			<strong><cpanel langprint="WebDavNautilusHead"></strong>
+		</td>
+	</tr>
+</table>
+<div style="display:none;" id="nautilus-nossl">
+1. <cpanel langprint="WebDavNautilusOpen">. <br />
+2. <cpanel langprint="WebDavNautilusURL"> <input type="text" name="nautilus_url" value="dav://<cpanel print="$FORM{'domain'}">:<cpanel print="$FORM{'mainport'}">" size="50"> <br />
+3. <cpanel langprint="WebDavNautilusAccess">. <br />
+4. <cpanel langprint="WebDavNautilusBookmark">. <br />
+</div>
+<div style="display:none;" id="nautilus-ssl">
+1. <cpanel langprint="WebDavNautilusOpen">. <br />
+2. <cpanel langprint="WebDavNautilusURL"> <input type="text" name="nautilus_url" value="davs://<cpanel print="$FORM{'domain'}">:<cpanel print="$FORM{'sslport'}">" size="50"> <br />
+3. <cpanel langprint="WebDavNautilusAccess">. <br />
+4. <cpanel langprint="WebDavNautilusBookmark">. <br />
+</div>
+</div>
+
+<div id="spacer" style="height:20px;width:2px;display:none;">&nbsp;</div>
+
+<div class="highlight"><table border="0" align="center" cellpadding="0" cellspacing="0">
+  <tr>
+    <td width="232"><div align="center"><img src="../images/applelogo_grey.jpg" width="123" height="123" /></div></td>
+    <td width="232"><div align="center"><img src="../images/windowslogo_grey.jpeg" width="120" height="106" /></div></td>
+    <td width="232"><div align="center"><img src="../images/linuxpenguin_grey.jpg" width="199" height="120" /></div></td>
+  </tr>
+  <tr>
+    <td width="232"><div align="center">
+        <br />
+		<select name="mac" onchange="davdownload('mac');">
+          <option value="none">
+            <cpanel langprint="AppleOSSelect">
+            </option>
+              <option value="osx">
+                MacOS 10.4 (Tiger)
+                </option>
+                <option value="osx105">
+                MacOS 10.5+ (Leopard)
+                </option>
+        </select>
+	<br /><br />  
+        <input name="mac-ssl" type="checkbox" value="checkbox" checked />
+        <cpanel langprint="SSLRecommended"><br /><br />
+        <input onclick="davdownload('mac');" type="button" name="Submit" value="<cpanel langprint="go">" class="input-button">
+		</div>
+   	</td>
+    <td width="232"><div align="center">
+       <br />
+	    <select name="win32" onchange="davdownload('win32');">
+          <option value="none">
+            <cpanel langprint="MicrosoftOSSelect">
+          </option>
+          <option value="win2000">
+            <cpanel langprint="Windows98_2000_2003">
+          </option>
+          <option value="winxp">
+            <cpanel langprint="WindowsXP">
+          </option>
+          <option value="winvista">
+			<cpanel langprint="WindowsVista">
+		  </option>
+        </select>
+	<br /><br />  
+      <input onclick="davdownload('win32');" name="win32-ssl" type="checkbox" value="checkbox" checked />
+<cpanel langprint="SSLRecommended"><br /><br />
+        <input onclick="davdownload('win32');" type="button" name="Submit2" value="<cpanel langprint="go">" class="input-button">
+    </div></td>
+    <td width="232"><div align="center">
+        <br />
+		<select name="unix" onchange="davdownload('unix');">
+          <option value="none" selected="selected">
+            <cpanel langprint="UnixOSSelect">
+            </option>
+          <option value="nautilus">
+            <cpanel langprint="Nautilus">
+            </option>
+          <option value="konqueror">
+            <cpanel langprint="Konqueror">
+            </option>
+        </select>
+	<br /><br />  
+        <input onclick="davdownload('unix');" name="unix-ssl" type="checkbox" value="checkbox" checked />
+<cpanel langprint="SSLRecommended"><br /><br />
+        <input onclick="davdownload('unix');" type="button" name="Submit3" value="<cpanel langprint="go">" class="input-button">
+    </div></td>
+  </tr>
+</table>
+</div>
+</form>
+

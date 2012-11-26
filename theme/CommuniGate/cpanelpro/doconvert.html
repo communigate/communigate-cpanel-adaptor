@@ -1,0 +1,13 @@
+<cpanel setvar="headerimg=../images/topcrontab.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+<style type="text/css">
+<?cp Branding::spritelist(.spriteicon_img_mini {float:left;margin-right:5px;background: url\{leftparenthesis}"%"\{rightparenthesis};} %,@spriteurl,images::#icon-${img}_mini {background-position\{colon}0 -${cssposition}px;width\{colon}${width}px;height\{colon}${height}px; }:) imgtype=icon,subtype=img,method=scale_60percent,format=png,img=image-manager ?>
+</style>
+<div class="body-content">
+<div class="h1Title"><div class="spriteicon_img_mini" id="icon-image-manager_mini"></div><cpanel langprint="IMConvert"></div>
+<textarea wrap="off" nowrap name="imgconvert" id="errtext" class="output" cols="80" rows="15" readonly><cpanel ImageManager="convert($FORM{'target'},$FORM{'newtype'})"></textarea>
+<p class="status"><cpanel langprint="IMImgCon"></p>
+<div class="return-link"><a href="images.html">&larr; <cptext "Go Back"></a></div>
+</div>
+<cpanel Branding="include(stdfooter.html)">

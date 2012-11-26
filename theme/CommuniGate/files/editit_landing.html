@@ -1,0 +1,40 @@
+<html>
+<head>
+<title>cPanel X</title>
+<cpanel relinclude="files/files_head.html">
+</head>
+<body class="topright">
+<form method="post" action="editit.html" target="editor" id="mainform">
+<b><cpanel langprint="html_text_edit_title">
+</b>
+<div>
+<cpanel langprint="htmledit_file_edit"> <i><cpanel print="$FORM{'dir'}">/<cpanel print="$FORM{'file'}"></i>
+</div>
+<p>
+<cpanel langprint="htmledit_select_encode"> <select id="charset" name="__cpanel__temp__charset__">
+<?cp Encoding::guess_file_opts([option value="%" %]%[/option],map,selected,map) file=$FORM{'dir'}/$FORM{'file'} ?> 
+</select><br />
+<div style="text-align:justify; padding-left: 10px;" align="justify"> <cpanel langprint="htmledit_long_desc"> <img src="../images/encoding_lang_broken.png" align="absmiddle"><img src="../images/encoding_lang_broken.png" align="absmiddle"> <cpanel langprint="htmledit_or">
+ <img src="../images/encoding_lang_broken2.png" align="absmiddle"> <cpanel langprint="htmledit_long_desc2">
+</div>
+<input type="hidden" name="dir" id="dir" value="<cpanel unsafeprint="$FORM{'dir'}">" />
+<input type="hidden" name="file" id="file" value="<cpanel unsafeprint="$FORM{'file'}">" />
+</p>
+
+<div align="center"><input type="submit" value="<cpanel Locale="maketext('Edit')">"></center>
+</div>
+</form>
+
+<script type="text/javascript">
+if (!self['NVData']) { NVData={}; }
+<?cp NVData::get(NVData.%=unescape\{leftparenthesis}'%'\{rightparenthesis};,name,^value) html_encoded=1,names=ignorecharencoding ?>
+if (NVData['ignorecharencoding']) {
+    document.getElementById('mainform').submit();
+}
+
+</script>
+
+
+</body>
+</html>
+

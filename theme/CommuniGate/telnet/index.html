@@ -1,0 +1,47 @@
+<cpanel setvar="headerimg=../images/topmysql.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+
+<style type="text/css">
+<?cp Branding::spritelist(.spriteicon_img_mini {float:left;margin-right:5px;background: url\{leftparenthesis}"%"\{rightparenthesis};} %,@spriteurl,images::#icon-${img}_mini {background-position\{colon}0 -${cssposition}px;width\{colon}${width}px;height\{colon}${height}px; }:) imgtype=icon,subtype=img,method=scale_60percent,format=png,img=ssh-shell-access ?>
+</style>
+
+<div class="body-content">
+
+<div class="h1Title"><div class="spriteicon_img_mini" id="icon-ssh-shell-access_mini"></div>&nbsp;<cpanel langprint="SSH"></div>
+
+<p class="description"><cpanel langprint="SSHDesc"></p>	
+
+<cpanelif $hasvalidshell>
+<cpanelfeature ssh>
+	<p class="description"><cpanel langprint="SSHDesc2"></p>
+</cpanelfeature>
+</cpanelif>
+
+<cpanel setvar="vidtut_name=ssh">
+<cpanel setvar="vidtut_header=TNHead">
+<cpanel setvar="vidtut_description=VidSSHDesc">
+<cpanel setvar="vidtut_video_name=ssh_lo">
+<cpanel setvar="vidtut_width=450">
+<cpanel setvar="vidtut_height=323">	
+<cpanel include="../video_tutorial_include.html">
+
+<h2><cpanel langprint="SSHManage"></h2>
+	<p class="description"><cpanel langprint="SSHKeyDesc"></p>
+ <p><span class="heading4"><a href="keys/index.html" class="create-button"><cpanel langprint="SSHManage"></a></span><br />
+ </p>
+<cpanelif $hasvalidshell>
+<cpanelfeature ssh>
+	<h2><cpanel langprint="SSHJavaLog"></h2>
+<p><span class="heading4"><a href="sshterm.html" class="create-button"><cpanel langprint="SSHTerm"></a></span><br /></p>
+<p class="description"><cpanel langprint="SSHTDesc" ></p>
+<p><span class="heading4"><a href="java.html" class="create-button"><cpanel langprint="SSHTelnet"></a></span><br /></p>
+<p class="description"><cpanel langprint="JavaTDesc"></p>
+<br />
+</cpanelfeature>
+</cpanelif>
+<br /><br />
+
+</div><!-- end body-content -->
+
+<cpanel Branding="include(stdfooter.html)">

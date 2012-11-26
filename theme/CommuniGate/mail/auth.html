@@ -1,0 +1,339 @@
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+
+
+<div class="body-content">
+<cpanelfeature emailauth>
+
+
+<style type="text/css">
+.jsdisplay {
+    display: none;
+}
+
+#domain_keys {
+border-bottom: 1px solid #ddd;
+margin: 0 0 20px;
+}
+
+.spf_set .input-button {
+	margin-bottom: 5px;
+}
+
+.spf_set tr {
+background: #f5f5f5;
+}
+
+.spf_set td {
+border-bottom: 1px solid #ccc;
+padding: 8px;
+}
+
+.spf_advance {
+	border: 1px solid #ddd;
+}
+
+.spf_advance h4 {
+	margin: 0 0 5px;
+}
+
+.success {color: #009900;}
+.disabled {color: #999;}
+
+<?cp Branding::spritelist(.spriteicon_img_mini {float:left;margin-right:5px;background: url\{leftparenthesis}"%"\{rightparenthesis};} %,@spriteurl,images::#icon-${img}_mini {background-position\{colon}0 -${cssposition}px;width\{colon}${width}px;height\{colon}${height}px; }:) imgtype=icon,subtype=img,method=scale_60percent,format=png,img=emailauth ?>
+
+</style>
+
+<div class="h1Title"><div class="spriteicon_img_mini" id="icon-emailauth_mini"></div> <cpanel langprint="CGPEmailAuth"></div>
+
+
+
+<!-- <?cp SPFUI::installed(%,installed) ?> -->
+<!-- <?cp DomainKeysUI::installed(%,installed) ?> -->
+
+<script type="text/javascript">
+var has_spf=<?cp SPFUI::available(%,available) ?>;
+var has_domain_keys=<?cp DomainKeysUI::available(%,available) ?>;
+function preSubmit() {
+    selectEls(true);
+}
+function unsel() {
+    selectEls(false);
+}
+function selectEls(opt) {
+    var selectEls = document.getElementsByTagName('select');
+    for(var j=0;j<selectEls.length;j++) {
+        var thisEl = selectEls[j];
+        for (var i=0;i<thisEl.options.length;i++) {
+            thisEl.options[i].selected=opt;
+        }
+    }
+}
+function checkvaliddomain (key) {
+    /* if it fails the check return a reason message otherwise return nothing */
+    if (! key.match(/^[\w\.\-]+$/)) {
+        return '<cpanel langprint="invalid-host-spec">';
+    } 
+    return; 
+}
+
+function checkvalidipcidr (key) {
+    /* if it fails the check return a reason message otherwise return nothing */
+    if (! key.match(/^\d+\.\d+\.\d+\.\d+\/?\d*$/)) {
+        return '<cpanel langprint="invalid-ipcidr-spec">';
+    }    
+    return; 
+}
+
+var entrytypes = {
+    'a': '<cpanel langprint="host-item-entry">',
+    'mx': '<cpanel langprint="host-item-entry">',
+    'include': '<cpanel langprint="host-item-entry">',
+    'ip4': '<cpanel langprint="ipcidr-item-entry">'
+};
+
+function add_opt(selectId,entrytype,syntaxchecker) {
+    var selectEl = document.getElementById(selectId);
+    var name = prompt('<cpanel langprint="item-entry">',entrytypes[entrytype]);
+
+	if (name) {
+		var message = syntaxchecker(name);
+		   
+		if (message) {
+			alert(message);
+		}
+		else {	
+			var icount = selectEl.options.length;
+			selectEl.options[icount] = new Option(name,name);
+			selectEl.setAttribute('size',parseInt(selectEl.getAttribute('size'))+1);
+		}
+	}
+}
+function remove_opt(selectId,entrytype,syntaxchecker) {
+    var selectEl = document.getElementById(selectId);
+    var i;
+    var size = parseInt(selectEl.getAttribute('size'));
+    for(i=selectEl.options.length-1;i>=0;i--)
+    {
+        if(selectEl.options[i].selected) {
+            selectEl.remove(i);
+            size--;
+        }
+    }
+    selectEl.setAttribute('size',size);
+}
+function initemailauth() {
+    var jshides = YAHOO.util.Dom.getElementsByClassName('jshide', 'div');
+    var jsdisplays = YAHOO.util.Dom.getElementsByClassName('jsdisplay', 'div');
+    var updateButtonEl = document.getElementById('update_button');     
+
+    if ( updateButtonEl ) {
+        document.getElementById('update_button_sub_ct').style.display='none';
+        document.getElementById('update_button_btn_ct').style.display='';
+    }
+    for(var i=0;i<jshides.length;i++) {
+            jshides[i].parentNode.removeChild(jshides[i]);
+    }
+    for(var i=0;i<jsdisplays.length;i++) {
+            jsdisplays[i].className='';
+    }
+ 
+    unsel();
+}
+
+YAHOO.util.Event.onDOMReady(initemailauth);
+</script>
+<!--
+<?cp SPFUI::load_current_values(%,status) ?>
+-->
+
+
+        <form action="set_spf.html" onsubmit="preSubmit();" method="post">
+<div 
+style="display: <?cp SPFUI::available(%,available=1?block:none) ?>;"
+id='spf'>
+    <p class="description"><cpanel langprint="EmailSPFDesc"> </p>
+	<table border="0" cellpadding="5" cellspacing="0">
+		    <tr>
+		        <td><cpanel langprint="currentstatus-BoxTrapper"></td>
+		        <td><strong><cpanel langprint="spf_status"> </strong>
+		<cpanelif $CPVAR{'spf_installed'}==1 && $CPVAR{'spf_active'}==1> 
+		           <span class="success"><cpanel langprint="BrandingEnabled"> <cpanel langprint="active-dns"></span>
+		</cpanelif>
+		<cpanelif $CPVAR{'spf_installed'}==1 && $CPVAR{'spf_active'}==0> 
+		            <span class="redtext"><cpanel langprint="BrandingEnabled"><cpanel langprint="inactive-dns"> <cpanel print="$CPDATA{'DNS'}"> [<a href="<cpanel printvar="dprefix">help.html?url=<cpanel print="$ENV{'SCRIPT_URI'}">" target="_blank" onclick="show_help(); return false;">?</a>] </span>
+		</cpanelif>
+		<cpanelif $CPVAR{'spf_installed'}==0>
+		            <span class="disabled"><cpanel langprint="SADisabled"></span>
+		</cpanelif>
+		        </td>
+		        <td valign="top">
+		<cpanelif $CPVAR{'spf_installed'}==1>
+		        <input class="input-button" type="submit" value="<cpanel langprint="HLDis">" />
+		</cpanelif>
+		<cpanelif $CPVAR{'spf_installed'}==0>
+		    <input class="input-button" type="submit" value="<cpanel langprint="Enable">" />
+		</cpanelif>
+		        </td>
+		    </tr>
+            <tr>
+                <td colspan="3">
+                    <cpanel langprint="spf_record_current"> : <span class="status"><?cp SPFUI::get_raw_record(%,record) ?></span>
+                </td>
+            </tr>
+	</table>
+<table class="spf_advance" cellspacing=10>
+</tr>
+    <tr>
+        <td colspan="3">
+			<h4><cpanel langprint="spf_advance_settings"></h4>
+                <table class="spf_set" border="0" cellpadding="0" cellspacing="0">
+                    <tr>
+                        <td valign="top"><strong><cpanel langprint="spf-addtl-hosts">:</strong>
+                            <br /><blockquote><em><cpanel langprint="spf-addtl-hosts-msg"></em></blockquote>
+                        </td>
+                        <td width="30%" align="center" valign="top">
+                            <div class="jsdisplay"> 
+								<input type="button" class="input-button" onclick="add_opt('spf_a_hosts','a',checkvaliddomain);" value="<cpanel langprint="RDAdd">" />&nbsp;
+                                <input type="button" class="input-button" onclick="remove_opt('spf_a_hosts','a',checkvaliddomain);" value="<cpanel langprint="Remove">" />
+                                <br />
+								<div style="overflow:auto; width:220px;">
+                                <select multiple size="<?cp SPFUI::count_settings(%,count) settings=a_hosts ?>" id="spf_a_hosts" name="spf_a_hosts"><?cp SPFUI::list_settings([option selected value="%"]%[/option],opt,opt) settings=a_hosts ?></select>
+                            	</div>
+								</div>
+                            <div class="jshide">
+                                <textarea name="spf_a_hosts"><?cp SPFUI::list_settings(% ,opt) settings=a_hosts ?></textarea>                            
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td valign="top"><strong><cpanel langprint="spf-addtl-mxserv">:</strong>
+                            <br /><blockquote><em><cpanel langprint="spf-addtl-mxserv-msg"></em></blockquote>
+                        </td>
+                        <td width="30%" align="center" valign="top">
+                           <div class="jsdisplay"> 
+	                        	<input type="button" class="input-button" onclick="add_opt('spf_mx_hosts','mx',checkvaliddomain);" value="<cpanel langprint="RDAdd">" />&nbsp;
+                               <input type="button" class="input-button" onclick="remove_opt('spf_mx_hosts','mx',checkvaliddomain);" value="<cpanel langprint="Remove">" />
+                                <br />
+							<div style="overflow:auto; width:220px;">
+                            <select multiple size="<?cp SPFUI::count_settings(%,count) settings=mx_hosts ?>" id="spf_mx_hosts" name="spf_mx_hosts"><?cp SPFUI::list_settings([option selected value="%"]%[/option],opt,opt) settings=mx_hosts ?></select>
+                            </div>
+							</div>
+                            <div class="jshide">
+                                <textarea name="spf_mx_hosts"><?cp SPFUI::list_settings(% ,opt) settings=mx_hosts ?></textarea>                            
+                            </div>
+ 
+                        </td>
+                    </tr>
+                    <tr>
+                        <td valign="top"><strong><cpanel langprint="spf-addtl-ipblks">:</strong>
+                            <br /><blockquote><i><cpanel langprint="spf-addtl-ipblks-msg">
+<!-- <?cp SPFUI::getmainserverip(%,mainserverip) ?>  -->
+<cpanelif $CPVAR{'mainserverip'}>
+<br />
+<br />
+<cpanel langprint="spf-mainserverip-msg">
+<span class="status"><cpanel print="$CPVAR{'mainserverip'}"></span>
+</cpanelif>
+</i></blockquote>
+                        </td>
+                        <td width="30%" align="center" valign="top">
+                            <div class="jsdisplay">
+								<input type="button" class="input-button" onclick="add_opt('spf_ip4_hosts','ip4',checkvalidipcidr);" value="<cpanel langprint="RDAdd">" />&nbsp;
+                                <input type="button" class="input-button" onclick="remove_opt('spf_ip4_hosts','ip4',checkvalidipcidr);" value="<cpanel langprint="Remove">" />
+                                <br />
+							<div style="overflow:auto; width:220px;">
+                            <select multiple size="<?cp SPFUI::count_settings(%,count) settings=ip4_hosts ?>" id="spf_ip4_hosts" name="spf_ip4_hosts"><?cp SPFUI::list_settings([option selected value="%"]%[/option],opt,opt) settings=ip4_hosts ?></select>
+                            </div>
+							</div>
+                            <div class="jshide">
+                            <textarea name="spf_ip4_hosts"><?cp SPFUI::list_settings(% ,opt) settings=ip4_hosts ?></textarea>
+                            </div>
+
+                        </td>
+                    </tr>
+                    <tr>
+                        <td valign="top"><strong><cpanel langprint="spf-incl-list">:</strong>
+                            <br /><blockquote><i><cpanel langprint="spf-incl-list-msg"> </i></blockquote>
+                        </td>
+                        <td width="30%" align="center" valign="top">
+                            <div class="jsdisplay">
+								<input type="button" class="input-button" onclick="add_opt('spf_include_hosts','include',checkvaliddomain);" value="<cpanel langprint="RDAdd">" />&nbsp;
+                                <input type="button" class="input-button" onclick="remove_opt('spf_include_hosts','include',checkvaliddomain);" value="<cpanel langprint="Remove">" />
+                                <br />
+							<div style="overflow:auto; width:220px;">
+                            <select multiple size="<?cp SPFUI::count_settings(%,count) settings=include_hosts ?>" id="spf_include_hosts" name="spf_include_hosts"><?cp SPFUI::list_settings([option selected value="%"]%[/option],opt,opt) settings=include_hosts ?></select>
+                            </div>
+							</div>
+                            <div class="jshide">
+                                <textarea name="spf_include_hosts"><?cp SPFUI::list_settings(% ,opt) settings=include_hosts ?></textarea>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td valign="top">
+                            <strong><cpanel langprint="spf-all-entry">:</strong><br /><blockquote><i><cpanel langprint="spf-all-entry-msg"></i></blockquote> 
+                        </td>
+                        <td valign="top">
+                            <input type="checkbox" value="1" name="entries_complete" <?cp SPFUI::entries_complete(%,+complete) ?> />
+                            
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td valign="top">
+                            <strong><cpanel langprint="spf_overwriting_entries"></strong><br /><blockquote><i><cpanel langprint="spf_overwriting_entries_statement"></i></blockquote> 
+                        </td>
+                        <td valign="top">
+                            <input type="checkbox" value="1" name="overwrite" checked="checked" />
+
+                            
+                        </td>
+                    </tr>
+
+
+							<cpanelif $CPVAR{'spf_installed'}==1>
+					<tr>
+						<td valign="top">
+								<strong><cpanel langprint="spf_save_changes"></strong>
+						</td>
+						<td valign="top">
+							        <span style="display:none;" id="update_button_btn_ct"><input id="update_button_btn" onclick="this.form.faction.value='install';preSubmit();this.form.submit();" type="button" class="input-button" name="update" value="<cpanel langprint="module_update">" /></span>
+							        <span id="update_button_sub_ct"><input id="update_button" onclick="this.form.faction.value='install';preSubmit();this.form.submit();" type="submit" class="input-button" name="update" value="<cpanel langprint="module_update">" /></span>
+						</td>
+					</tr>
+							</cpanelif>
+
+                </table>
+        </td>
+    </tr>
+</table>
+</div>
+<br />
+	<cpanelif !$CPVAR{'spf_installed'}==1>
+		<input type="hidden" name="faction" value="install" />
+	</cpanelif>
+	
+	<cpanelif $CPVAR{'spf_installed'}==1>
+		<input type="hidden" name="faction" value="uninstall" />
+	</cpanelif>
+</form>
+
+
+
+<div id='noauth' style='display:none;'>
+<p><cpanel langprint="EmailNoAuth"></p>
+</div>
+<script type="text/javascript">
+if (!has_spf && !has_domain_keys) {
+    document.getElementById('noauth').style.display='';
+}
+</script>
+<cpanelif $appname==webmail>
+    <div class="return-link"><a href="../index.html">&larr; <cptext "Go Back"></a></div>
+</cpanelif>
+
+
+</cpanelfeature emailauth>
+<cpanel Branding="include(stdfooter.html)">

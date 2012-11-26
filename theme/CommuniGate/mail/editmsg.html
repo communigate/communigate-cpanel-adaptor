@@ -1,0 +1,43 @@
+<cpanel setvar="headerimg=../images/tools.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+
+<style type="text/css">
+<?cp Branding::spritelist(.spriteicon_img_mini {float:left;margin-right:5px;background: url\{leftparenthesis}"%"\{rightparenthesis};} %,@spriteurl,images::#icon-${img}_mini {background-position\{colon}0 -${cssposition}px;width\{colon}${width}px;height\{colon}${height}px; }:) imgtype=icon,subtype=img,method=scale_60percent,format=png,img=boxtrapper ?>
+
+</style>
+<div class="body-content"><div class="h1Title"><div class="spriteicon_img_mini" id="icon-boxtrapper_mini"></div> <cpanel langprint="msgeditlegend-BoxTrapper">
+
+</div>
+<div>
+<p><cpanel langprint="editmsgfor-BoxTrapper"> <span class="status"><cpanel print="$FORM{'account'}"></span></p>
+
+<p><em><cpanel langprint="editmsgdsc-BoxTrapper"></em></p>
+<h4 style="margin:0"><cpanel langprint="YouAreEditing">
+<strong><cpanelif $FORM{'form'}==verify.txt>
+verify.txt
+</cpanelif> 
+<cpanelif $FORM{'form'}==blacklist.txt>
+blacklist.txt
+</cpanelif>
+<cpanelif $FORM{'form'}==returnverify.txt>
+returnverify.txt
+</cpanelif>
+<cpanelif $FORM{'form'}==verifyreleased.txt>
+verifyreleased.txt
+</cpanelif></strong></h4>
+<cpanel BoxTrapper="editmsg($FORM{'account'},$FORM{'form'})">
+<form action="savefile.html" method="post">
+<textarea name="page" cols="80" rows="40"><cpanel BoxTrapper="fetchcfgfile($FORM{'account'},"msg",$FORM{'form'})"></textarea><br/>
+<input type="hidden" name="account" value="<cpanel print="$FORM{'account'}">">
+<input type="hidden" name="filetype" value="msg">
+
+<input type="hidden" name="dir" value="<cpanel print="$FORM{'emaildir'}">">
+<input type="hidden" value="<cpanel print="$FORM{'form'}">" name="file"><br/>
+<input type="submit" value="<cpanel langprint="Save">" class="input-button">
+</form>
+</div>
+
+<div class="return-link"><a href="editmsgs.html?account=<cpanel uriprint="$FORM{'account'}">">&larr; <cptext "Go Back"></a></div>
+</div>
+<cpanel Branding="include(stdfooter.html)">

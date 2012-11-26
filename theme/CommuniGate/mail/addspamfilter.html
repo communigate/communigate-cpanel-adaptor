@@ -1,0 +1,19 @@
+<cpanel setvar="headerimg=../images/mailmenu.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+<div class="body-content">
+<p><font class="med"><cpanel langprint="SPAAddSpamFilter"></font></p>
+<p>
+<cpanel langprint="SPAaddspamfilterresultbegin">
+<cpanel Email="addspamfilter($FORM{'score'})">
+<cpanel langprint="SPAaddspamfilterresultend">
+</p>
+<pre>
+<cpanel Email="addspam()">
+</pre>
+<div align="center">
+<cpanel langprint="SPAStatusSwitchPre"> <font color="#FF0000"><cpanel Email="spamstatus()"></font>
+</div>
+<div class="return-link"><a href="spam/spam.html">&larr; <cptext "Go Back"></a></div>
+</div>
+<cpanel Branding="include(stdfooter.html)">

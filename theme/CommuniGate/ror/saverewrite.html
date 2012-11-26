@@ -1,0 +1,36 @@
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+<style type="text/css">
+<?cp Branding::spritelist(.spriteicon_img_mini {float:left;margin-right:5px;background: url\{leftparenthesis}"%"\{rightparenthesis};} %,@spriteurl,images::#icon-${img}_mini {background-position\{colon}0 -${cssposition}px;width\{colon}${width}px;height\{colon}${height}px; }:) imgtype=icon,subtype=img,method=scale_60percent,format=png,img=rails?>
+</style>
+<div class="body-content">
+<div class="h1Title"><div class="spriteicon_img_mini" id="icon-rails_mini"></div><cpanel langprint="RubyAppsAdded"></div>
+<div class="message-status">
+
+<cpanelif $FORM{'oldurl'}>
+<!--<p><?cp RoR::removerewrite(%,statusmsg) appname=$FORM{'appname'},rewriteurl=$FORM{'oldurl'},rewritedomain=$FORM{'domain'} ?></p>-->
+</cpanelif>
+
+<!--<p><?cp RoR::setuprewrite(%,statusmsg) appname=$FORM{'appname'},rewriteurl=$FORM{'url'},rewritedomain=$FORM{'domain'} ?></p>-->
+
+<cpanelif $CPERROR{'ror'}>
+<p><cpanel langprint="RubyAppsRedirectError"></p>
+	<a href="#" onclick="document.getElementById('details').style.display='block'; return false;"><cpanel langprint="AODShowDetails"></a> </p>
+    <div class="details" id="details">
+		<cpanel print="$CPERROR{'ror'}">    
+    </div>
+	<noscript>
+	<div class="details-noscript" id="details">
+		<cpanel print="$CPERROR{'ror'}">    
+    </div>
+	</noscript>
+</cpanelif>
+<cpanelif !$CPERROR{'ror'}>
+<p>todo</p>
+<p>http://<cpanel print="$FORM{'domain'}">/<cpanel print="$FORM{'url'}"> <img src="../images/arrowto.gif" align="absmiddle" /> will now be transparently rewritten to http://<cpanel print="$CPDATA{'DNS'}">:<cpanel print="$CPVAR{'ror_app_port'}">/ (<cpanel print="$FORM{'appname'}">)</p>
+</cpanelif>
+</div>
+
+<div class="return-link"><a href="index.html">&larr; <cptext "Go Back"></a></div>
+</div>
+<cpanel Branding="include(stdfooter.html)">

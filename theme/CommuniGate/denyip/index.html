@@ -1,0 +1,182 @@
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+	<cpanelif $FORM{'itemsperpage'}>
+	    <cpanel setvar="itemsperpage=$FORM{'itemsperpage'}">
+	</cpanelif>
+	<cpanelif !$FORM{'itemsperpage'} || !$CPVAR{'itemsperpage'}>
+	    <cpanel setvar="itemsperpage=10">
+	</cpanelif>
+
+	<script type="text/javascript">
+	//<![CDATA[
+
+	var ip_range = function () {
+		var str = YAHOO.util.Dom.get("ip").value;
+
+		// if it's a number hostname, we're good
+		if (CPANEL.validate.positive_integer(str) == true) return true;
+
+		// has alpha so assume hostname/domain name
+		if ( /[A-Za-z]/.test(str) ) { 
+			if ( CPANEL.validate.host(str) ) return true;
+			if ( CPANEL.validate.fqdn(str) ) return true;
+		}
+		// looks like all digits so test as an ip address
+		else {
+			// single IP
+			if ( CPANEL.validate.ip(str) ) return true; 
+
+			// IP range - has hyphen
+			if (/-/.test(str)) { 
+				range = str.split('-');
+
+				// split should be exactly 2 chunks
+				if (range.length != 2) return false;
+
+				// if the first chunk is not an IP, return false
+				if ( ! CPANEL.validate.ip(range[0]) ) return false;
+
+				// if the second chunk is a valid IP, return TRUE
+				if ( CPANEL.validate.ip(range[1]) ) return true;
+
+				// first chunk is valid IP, second chunk is a group of 1-3 digits (class C range)
+				if ( /^\d{1,3}$/.test(range[1]) ) {
+					// check that the second range is between 0 and 255
+					if ( range[1] < 256 ) return true;
+				}
+
+				return false;
+			} 
+
+			// CIDR test - has forward slash
+			if ( /\//.test(str) ) { 
+				range = str.split('/');
+
+				// there should be exactly two chunks
+				if (range.length != 2) return false;
+
+				// first chunk should be a valid IP
+				if (! CPANEL.validate.ip(range[0])) return false;
+
+				// second chunk is two digits
+				if ( /^\d{1,2}$/.test(range[1]) ) {
+					// digits are less than 33
+					if ( range[1] < 33 ) return true;
+				}
+
+				return false;
+			} 
+
+			// wildcards (1-3 groups of 1-3 digits)
+			if ( /^(\d{1,3}\.){1,3}$/.test(str) ) { 
+				values = str.split('.');
+
+				// don't need to check the last chunk					
+				for (var i = 0; i < (values.length-1); i++) {
+					if ( values[i] > 255 ) return false
+				}
+
+				return true;
+			}
+
+			return false;
+		} 
+	};
+
+	var init = function() {
+		var validation = new CPANEL.validate.validator("<cptext "IP Address or Domain">");
+		validation.add("ip", ip_range, "<cpanel langprint="Invalid IP Range">");
+		validation.attach();
+
+		CPANEL.validate.attach_to_form("add_ip_button", validation);
+
+		YAHOO.util.Dom.get("ip").focus();
+	};
+
+	YAHOO.util.Event.onDOMReady(init);
+
+	//]]>
+</script>
+<div class="body-content">
+<style type="text/css">
+.add_ip{margin:0 15px;}
+.note_txt{margin:15px 15px;border-top:1px solid #ccc;padding-top:10px;}
+ul.ul_note{margin:0;padding:0 15px;}
+ul.ul_note li{margin:9px 0;}
+<?cp Branding::spritelist(.spriteicon_img_mini {float:left;margin-right:5px;background: url\{leftparenthesis}"%"\{rightparenthesis};} %,@spriteurl,images::#icon-${img}_mini {background-position\{colon}0 -${cssposition}px;width\{colon}${width}px;height\{colon}${height}px; }:) imgtype=icon,subtype=img,method=scale_60percent,format=png,img=ipdeny ?>
+</style>
+<div class="h1Title"><div class="spriteicon_img_mini" id="icon-ipdeny_mini"></div><cpanel langprint="IPDMMainHead"></div>
+<p class="description"><cpanel langprint="IPDMHint"></p>
+
+<cpanel setvar="vidtut_name=ipdeny">
+<cpanel setvar="vidtut_header=IPDMMainHead">
+<cpanel setvar="vidtut_description=VidIPDDesc">
+<cpanel setvar="vidtut_video_name=ipdeny_lo">
+<cpanel setvar="vidtut_width=460">
+<cpanel setvar="vidtut_height=320">	
+<cpanel include="../video_tutorial_include.html">
+
+<h2><cpanel langprint="IPDMAdd"></h2>
+<div class="highlight">
+	<form action="add.html" id="mainform" name="mainform">
+	<p class="add_ip">
+		<cpanel langprint="IPDMIPorDomain"> <input type="text" id="ip" name="ip" /> <input type="submit" id="add_ip_button" class="input-button" value="<cpanel langprint="IPDMAddButton">" /> <span id="ip_error"></span>
+	</p>
+</form>
+<!-- <p><cpanel UI="showresult(adddenyip)"></p> -->
+
+<p class="note_txt"><cpanel langprint="IPDNote"></p>	
+	<table border="0" cellpadding="5">
+      <tr>
+        <td><div align="right">10.5.3.333</div></td>
+        <td><em><cpanel langprint="IPSingle"></em></td>
+      </tr>
+      <tr>
+        <td><div align="right">10.5.3.3-10.5.3.40</div></td>
+        <td><em><cpanel langprint="IPRange"></em></td>
+      </tr>
+      <tr>
+        <td><div align="right">10.5.3.5-40</div></td>
+        <td><em><cpanel langprint="IPImpliedRange"></em></td>
+      </tr>
+      <tr>
+        <td><div align="right">10.5.3.3/32</div></td>
+        <td><em><cpanel langprint="IPCIDR"></em></td>
+      </tr>
+      <tr>
+        <td><div align="right">10.</div></td>
+        <td><em><cpanel langprint="IPImplies"></em></td>
+      </tr>
+    </table>
+	
+</div>
+    
+	
+<h2><cpanel langprint="IPDMCurrent">:</h2>
+<table align="center" width="600" border="0" cellpadding="5" cellspacing="0" class="sortable" id="denyiptbl">
+  <tr >
+    <th class="cell"><cpanel langprint="servset"></th>
+    <th class="cell"><cpanel langprint="IPStartRange"></th>
+    <th class="cell" nonsortable="true">&nbsp;</th>
+    <th class="cell"><cpanel langprint="IPEndRange"></th>
+    <th  nonsortable="true" class="cell-end" width="25%"><cpanel langprint="Remove"></th>
+  </tr>
+	<?cp listdenyips(  
+	[tr class="info-%"] 
+		[td class="cell" align="center"]%[/td]
+		[td class="nobrd" align="center"]%[/td]
+		[td class="nobrd"]-[/td]
+		[td align="center"]%[/td]   
+		[td][div align="center"][span class="errors"][a href="delconfirm.html?ip=%"][img src="../images/remove.gif" alt="" border="0" /][/a][/span][/div][/td][/tr],*num,ip,start,end,ip) || ''[tr][td colspan="5" class="errors"]$LANG{'denyip_none'}[/td][/tr]'>
+</table>
+<?cp UI::paginate(%,paginator) currentpage=$CPVAR{'currentpage'},pages=$CPVAR{'pages'},itemsperpage=$CPVAR{'itemsperpage'} ?>
+<cpanelif $CPVAR{'pages'} && !$CPVAR{'pages'}==1>
+<div style="float:right"><form>
+<cpanel langprint="PaginatorShowing"> <select name="itemsperpage" onchange="this.form.submit();">
+<?cp UI::paginate_list([option value="%" %]%[/option],item,selected=1?selected:,item) itemsperpage=$CPVAR{'itemsperpage'},itemlist=10:25:50:100:250:500 ?>
+</select><noscript><button id="my_button" onclick="" type="submit" Value=""><cpanel Locale="maketext('Change')"></button></noscript>  <cpanel langprint="PaginatorResults"> 
+</form></div>
+</cpanelif>
+
+</div>
+<cpanel Branding="include(stdfooter.html)">

@@ -1,0 +1,41 @@
+﻿  <h2>Configure SpamAssassin</h2>
+<p>The SpamAssassin™ configuration feature allows you to blacklist (block) and whitelist (approve) email addresses, as well as specify the scores that will be used for each particular test.</p>
+<h2>What is a blacklist?</h2>
+<p>A blacklist contains a list of addresses, hosts, and content that are not allowed to pass the filter. This option also automatically sends a customized warning message to the sender.</p>
+<h2>What is a whitelist?</h2>
+<p>A whitelist contains a list of email addresses, hosts, and content that are allowed past the filter.</p>
+<h2>Add addresses to the blacklist</h2>
+<p>Enter addresses whose email is often allowed past the spam filter, but from whom you do not wish to receive email.</p>
+<p>You may use * as a wildcard for multiple characters, or ? as a single-character wildcard.</p>
+<p><strong>Examples:</strong> user@example.com<br />
+    *@example.com<br />
+    ?ser@example.com</p>
+<h2>Set overall spam score</h2>
+<p>SpamAssassin examines every email message for spam characteristics, then assigns it an overall score. Enter the score required for a message to be considered spam.</p>
+<p>5.0 is the default setting, and is aggressive. It would be suitable for a single user, but an <span class="caps">ISP</span> should set the default to be more conservative (8.0 or 10.0).</p>
+<h2>Set individual test scores</h2>
+<p>You can precisely tailor SpamAssassin for your server by assigning scores to individual tests. SpamAssassin uses hundreds of tests; please see its documentation at http://spamassassin.apache.org/tests.html for more information. You will need to know which version of SpamAssassin is running on your server.</p>
+<p>You can enter individual test scores in the following format:<br />
+“score” “TEST_NAME” “1 or 4 positive or negative numbers”</p>
+<p><strong>Example:</strong> score INVALID_DATE 3.2 3.3 2.5 2.1</p>
+<p>This example sets the scores that SpamAssassin assigns to a message with an invalid date in its header. Please note that:</p>
+<ul>
+	<li>If only one number is listed, that score is always used for the test.</li>
+	<li>Setting a score to 0 will disable the test.</li>
+</ul>
+<p>In the example above, 3.2 is the first score, 3.3 is the second, 2.5 is the third, and 2.1 is the fourth. If you enter 4 numbers, as in the example, then the score that is used depends on whether Bayes and network tests are enabled in your installation of SpamAssassin:</p>
+<ul>
+	<li>The first score is used when both Bayes and network tests are disabled.</li>
+	<li>The second score is used when Bayes is disabled, but network tests are enabled.</li>
+	<li>The third score is used when Bayes is enabled and network tests are disabled.</li>
+	<li>The fourth score is used when Bayes is enabled and network tests are enabled.</li>
+</ul>
+<h2>Add addresses to the whitelist</h2>
+<p>Enter addresses whose email is often blocked, but from whom you wish to receive email.</p>
+<p>You may use * as a wildcard for multiple characters, or ? as a single-character wildcard.</p>
+<p><strong>Examples:</strong> user@example.com<br />
+    *@example.com<br />
+    ?ser@example.com</p>
+<ul>
+	<li>Remember to click <em>Save</em> after you enter your settings.</li>
+</ul>

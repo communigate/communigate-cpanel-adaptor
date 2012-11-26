@@ -1,0 +1,40 @@
+﻿  <h2>What are MX entries?</h2>
+<p>MX entries, also known as mail exchanger entries, are resource records in the domain name system (<span class="caps">DNS</span>).  A domain&#8217;s MX records dictate how email is routed through Simple Mail Transfer Protocol (<span class="caps">SMTP</span>).</p>
+<p>If your mail is delivered to the server that your domain is on, you will not need to edit your MX entries.</p>
+<p>However, should you want your mail delivered to an external mail server or another domain, you need to point your MX entry to that location.</p>
+<p>This interface allows you to add new MX entries and assign a priority to each MX entry.  Priorities dictate which record will be used to route incoming and outgoing email.  For example, an MX record with a priority value of &#8216;0&#8217; will be the first record attempted.  If this record fails (due to bad <span class="caps">DNS</span> information or an outage), the second MX record (usually with a priority value of &#8216;5&#8217;) will be attempted.  This process will continue until messages are delivered to the proper location.</p>
+<p>Generally, MX record priority values are divisible by 5, with 0 being the first priority (&#8216;lowest priority&#8217;) MX entry.</p>
+<p><strong>Note:</strong> A valid MX entry is the hostname of a server, formatted like mail.example.com. IP addresses, such as 127.0.0.1, are not valid.</p>
+<h2>Email routing</h2>
+<p>This section of the screen allows you to specify what kind of mail exchanger your domain is using.  You may select from 4 options:</p>
+<ul>
+	<li><b>Automatically Detect Configuration</b> &mdash;  We strongly recommend using this option.  Specifying this option allows cPanel to detect what type of mail exchanger your domain should use.</li>
+	<li><b>Local Mail Exchanger</b> &mdash; This option specifies that the mail server associated with your domain will always accept mail.  Mail will be delivered locally on the server whether it is sent from your server or another mail server.</li>
+	<li><b>Backup Mail Exchanger</b> &mdash; This option specifies that you wish to use the mail server associated with your domain as a backup mail exchanger.  Using this option allows mail to be held at this exchanger until a lower priority exchanger is available.</li>
+	<li><b>Remote Mail Exchanger</b> &mdash; This option specifies that the mail server associated with your domain should not accept mail locally.  Instead, mail will be transferred to the lowest-numbered MX record.</li>
+</ul>
+<ul>
+	<li>Make your selection, then click <em>Change</em>.</li>
+</ul>
+<h2>Add new MX record</h2>
+<p>1. Enter the priority and destination in the appropriate boxes.</p>
+<ul>
+	<li>Lower values denote higher priority, with 0 being the highest possible priority.</li>
+</ul>
+<ul>
+	<li>The primary mail server(s) (with the lowest-numbered priority) will receive mail sent to your domain.</li>
+</ul>
+<ul>
+	<li>Secondary mail servers (those with higher priority values) can be used for backup or other purposes.</li>
+</ul>
+<ul>
+	<li>If you assign multiple mail servers the same priority, then when that level of mail server is needed, mail will be distributed to those servers randomly.</li>
+</ul>
+<p>2. Click <em>Add New Record</em>.</p>
+<h2>Edit MX record</h2>
+<p>1. Click <em>Edit</em> to the right of the appropriate record.</p>
+<p>2. Enter the priority and destination in the appropriate boxes.</p>
+<p>3. Click <em>Edit</em> to save changes or click <em>cancel</em> to cancel changes.</p>
+<h2>Delete MX record</h2>
+<p>1. Click <em>Delete</em> to the right of the appropriate record.</p>
+<p>2. Click <em>Delete</em> to save changes or click <em>cancel</em> to cancel changes.</p>

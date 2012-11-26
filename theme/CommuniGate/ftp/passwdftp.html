@@ -1,0 +1,86 @@
+<cpanel setvar="headerimg=../images/topftp.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+
+<style type="text/css">
+<?cp Branding::spritelist(.spriteicon_img_mini {float:left;margin-right:5px;background: url\{leftparenthesis}"%"\{rightparenthesis};} %,@spriteurl,images::#icon-${img}_mini {background-position\{colon}0 -${cssposition}px;width\{colon}${width}px;height\{colon}${height}px; }:) imgtype=icon,subtype=img,method=scale_60percent,format=png,img=ftpaccounts ?>
+</style>
+
+<div class="body-content">
+
+<div class="h1Title"><div class="spriteicon_img_mini" id="icon-ftpaccounts_mini"></div><cpanel langprint="FTPModifyPassHead"></div>
+<br />
+
+<cpanelif !$FORM{'type'}==anonymous && !$FORM{'type'}==main>
+
+<form method="post" id="mainform" name="mainform" action="dopasswdftp.html" >
+<input type="hidden" name="acct" value="<cpanel print="$FORM{'acct'}">" />
+	<table>
+		<tr>
+			<td align="right"><cpanel langprint="FTPModAccount"></td>
+			<td colspan="2"><cpanel sprint="$FORM{'acct'},=,0"></td>
+		</tr>
+		<tr>
+			<td align="right"><cpanel langprint="FTPModPass"></td>
+			<td align="left"><input style="width: 150px" type="password" name="password" id="password" /></td>
+			<td><div id="password_error"></div></td>
+		</tr>
+		<tr>
+			<td align="right"><cpanel langprint="FTPPasswordAgain"></td>
+			<td align="left"><input style="width: 150px" value="" type="password" name="password2" id="password2" /></td>
+			<td><div id="password2_error"></div></td>
+		</tr>
+		<tr>
+			<td align="right">
+				<cpanel langprint="email_strength"> (<div style="display: inline" id="why_strong_passwords_link" class="action_link"><cpanel langprint="email_why"></div>):
+				<div id="why_strong_passwords_text" style="display: none"><cpanel langprint="email_password_why"><br /><br /><cpanel langprint="email_password_tip"></div>
+			</td>
+			<td><div id="password_strength" style="width: 150px; height: 20px; border: 1px solid black; margin: 5px 0px 3px 0px"></div></td>
+			<td><input type="button" id="create_strong_password" value="<cpanel langprint="cjt_password_generator">" tabindex="-1" /></td>
+		</tr>
+		<tr><td colspan="3"><br /></td></tr>
+		<tr>
+			<td>&nbsp;</td>
+			<td><input type="submit" class="input-button" id="submit_password" value="<cpanel langprint="FTPChange">" /></td>
+			<td>&nbsp;</td>
+		</tr>
+	</table>
+</form>
+<script type="text/javascript">
+//<![CDATA[
+var REQUIRED_PASSWORD_STRENGTH = parseInt('<?cp PasswdStrength::get_required_strength(%,strength) app=ftp ?>') || 0;
+var init_validation = function() {
+	var password_validators = CPANEL.password.setup("password", "password2", "password_strength", REQUIRED_PASSWORD_STRENGTH, "create_strong_password", "why_strong_passwords_link", "why_strong_passwords_text");
+	CPANEL.validate.attach_to_form("submit_password", password_validators);
+	
+	YAHOO.util.Dom.get("password").focus();
+};
+YAHOO.util.Event.onDOMReady(init_validation);
+//]]>
+</script>
+
+</cpanelif>
+
+
+<cpanelif $FORM{'type'}==anonymous>
+<p><cpanel langprint="ANONNoPswd"></p>
+</cpanelif>
+
+
+<cpanelfeature password>
+	<cpanelif $FORM{'type'}==main>
+<p><cpanel langprint="FTPMainAccountPswdChangeNo"></p>
+</cpanelif>
+</cpanelfeature>
+
+<cpanelfeature !password>
+<cpanelif $FORM{'type'}==main>
+	<cpanel langprint="ftpNotChangePass">
+</cpanelif>
+</cpanelfeature>
+
+<div class="return-link"><a href="accounts.html">&larr; <cptext "Go Back"></a></div>
+
+</div><!-- end body-content -->
+
+<cpanel Branding="include(stdfooter.html)">

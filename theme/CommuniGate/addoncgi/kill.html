@@ -1,0 +1,25 @@
+<cpanel setvar="headerimg=../images/topcgi.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+
+<div class="body-content">
+
+	<cpanel langprint="WebDAVDelconfirm"> <i><cpanel print="$FORM{'url'}"></i>?
+
+	<center>
+	<form action="dokill.html">
+		<input type="hidden" name="addonname" value="<cpanel print="$FORM{'addonname'}">">
+		<input type="hidden" name="url" value="<cpanel print="$FORM{'url'}">">
+		<input type="submit" class="input-button" value="<cpanel langprint="CLYes">">
+	</form>
+	<form action="main.html">
+		<input type="hidden" name="addonname" value="<cpanel print="$FORM{'addonname'}">">
+		<input type="submit" class="input-button" value="<cpanel langprint="CLNo">">
+	</form>
+	</center>
+
+<div class="return-link"><a href="main.html?addonname=<cpanel print="$FORM{'addonname'}">">&larr; <cptext "Go Back"></a></div>
+
+</div><!-- end body-content -->
+
+<cpanel Branding="include(stdfooter.html)">

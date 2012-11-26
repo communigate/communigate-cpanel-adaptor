@@ -1,0 +1,354 @@
+<cpanel setvar="headerimg=../images/topcrontab.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+
+<style type="text/css">
+<?cp Branding::spritelist(.spriteicon_img_mini {float:left;margin-right:5px;background: url\{leftparenthesis}"%"\{rightparenthesis};} %,@spriteurl,images::#icon-${img}_mini {background-position\{colon}0 -${cssposition}px;width\{colon}${width}px;height\{colon}${height}px; }:) imgtype=icon,subtype=img,method=scale_60percent,format=png,img=cron ?>
+</style>
+
+<div class="body-content">
+<cpanelfeature cron>
+
+<div class="h1Title"><div class="spriteicon_img_mini" id="icon-cron_mini"></div><cpanel langprint="CRHead"></div>
+
+<p class="description"><cpanel langprint="CRDesc"></p>
+<p class="description"><cpanel langprint="CRWarn"></p>
+
+<div id="crontab_permissions_error" style="display: none"><cpanel Cron="crontab_perms()"></div>
+
+<style type="text/css">
+.cjt_notice { margin-bottom: 12px }
+</style>
+<div id="cjt_notice_container"></div>
+
+<div id="crontab_interface">
+<h2><cpanel langprint="cron_email"></h2>
+<div class="highlight2">
+	<cpanel langprint="cron_send_an_email_every_time"> <span class="action_link" onclick="CPANEL.util.toggle_more_less(this, 'edit_cron_email')" id="email_toggle_more_less"><cpanel langprint="cjt_toggle_more"></span>
+	<div id="edit_cron_email" style="display: none">
+		<br />
+		<span class="description"><cpanel langprint="cron_email_description"></span> <code>mycommand &gt;/dev/null 2&gt;&amp;1</code>
+		<br /><br />
+		<table cellpadding="3">
+			<tr>
+				<td colspan="3"><cpanel langprint="cron_current_email">: <span id="current_email" style="font-weight: bold"><?cp Cron::get_email(%, email) ?></span></td>
+			</tr>
+			<tr>
+				<td align="right"><cpanel langprint="SSLEmail">:</td>
+				<td><input type="text" id="email" style="width: 200px" /></td>
+				<td width="400px"><div id="email_error"></div></td>
+			</tr>
+			<tr>
+				<td></td>
+				<td colspan="2"><input id="update_email" type="button" value="<cpanel langprint="cron_update_email">" /> <span id="email_status"></span></td>
+			</tr>
+		</table>
+	</div>
+	<div id="email_status_bar" class="cjt_status_bar" style="margin-top: 4px; margin-left: -10px"></div>
+</div>
+
+<h2><cpanel langprint="cron_add_new_cron_job"></h2>
+<div class="highlight">
+    <table cellpadding="3" border="0">
+		<tr>
+			<td align="right"><cpanel langprint="cron_common_br_settings">:</td>
+			<td>
+				<select id="common_options" onchange="select_common_option()">
+					<option value="--">-- <cpanel langprint="cron_common_settings"> --</option>
+					<option value="* * * * *"><cpanel langprint="cron_every_minute"> (* * * * *)</option>
+					<option value="*/5 * * * *"><cpanel langprint="cron_every_5_minutes"> (*/5 * * * *)</option>
+					<option value="0,30 * * * *"><cpanel langprint="cron_twice_an_hour"> (0,30 * * * *)</option>
+					<option value="0 * * * *"><cpanel langprint="cron_once_an_hour"> (0 * * * *)</option>
+					<option value="0 0,12 * * *"><cpanel langprint="cron_twice_a_day"> (0 0,12 * * *)</option>
+					<option value="0 0 * * *"><cpanel langprint="cron_once_a_day"> (0 0 * * *)</option>
+					<option value="0 0 * * 0"><cpanel langprint="cron_once_a_week"> (0 0 * * 0)</option>
+					<option value="0 0 1,15 * *"><cpanel langprint="cron_1st_and_15th"> (0 0 1,15 * *)</option>
+					<option value="0 0 1 * *"><cpanel langprint="cron_once_a_month"> (0 0 1 * *)</option>
+					<option value="0 0 1 1 *"><cpanel langprint="cron_once_a_year"> (0 0 1 1 *)</option>
+				</select>
+			</td>
+			<td width="300px">&nbsp;</td>
+		</tr>
+		<tr>
+			<td align="right"><cpanel langprint="cron_minute">:</td>
+			<td>
+				<input type="text" size="4" id="minute" />&nbsp;
+				<select style="width: 175px" id="minute_options" onchange="select_single_option('minute')">
+					<option value="--">-- <cpanel langprint="cron_common_settings"> --</option>
+					<option value="*"><cpanel langprint="cron_every_minute"> (*)</option>
+					<option value="*/2"><cpanel langprint="cron_every_other_minute"> (*/2)</option>
+					<option value="*/5"><cpanel langprint="cron_every_5_minutes"> (*/5)</option>
+					<option value="*/10"><cpanel langprint="cron_every_10_minutes"> (*/10)</option>
+					<option value="*/15"><cpanel langprint="cron_every_15_minutes"> (*/15)</option>
+					<option value="0,30"><cpanel langprint="cron_every_30_minutes"> (0,30)</option>
+					<option value="--">-- <cpanel langprint="cron_minutes"> --</option>
+					<option value="0">:00 <cpanel langprint="cron_top_of_the_hour"> (0)</option>
+					<option value="1">:01 (1)</option>
+					<option value="2">:02 (2)</option>
+					<option value="3">:03 (3)</option>
+					<option value="4">:04 (4)</option>
+					<option value="5">:05 (5)</option>
+					<option value="6">:06 (6)</option>
+					<option value="7">:07 (7)</option>
+					<option value="8">:08 (8)</option>
+					<option value="9">:09 (9)</option>
+					<option value="10">:10 (10)</option>
+					<option value="11">:11 (11)</option>
+					<option value="12">:12 (12)</option>
+					<option value="13">:13 (13)</option>
+					<option value="14">:14 (14)</option>
+					<option value="15">:15 <cpanel langprint="cron_quarter_past"> (15)</option>
+					<option value="16">:16 (16)</option>
+					<option value="17">:17 (17)</option>
+					<option value="18">:18 (18)</option>
+					<option value="19">:19 (19)</option>
+					<option value="20">:20 (20)</option>
+					<option value="21">:21 (21)</option>
+					<option value="22">:22 (22)</option>
+					<option value="23">:23 (23)</option>
+					<option value="24">:24 (24)</option>
+					<option value="25">:25 (25)</option>
+					<option value="26">:26 (26)</option>
+					<option value="27">:27 (27)</option>
+					<option value="28">:28 (28)</option>
+					<option value="29">:29 (29)</option>
+					<option value="30">:30 <cpanel langprint="cron_half_past"> (30)</option>
+					<option value="31">:31 (31)</option>
+					<option value="32">:32 (32)</option>
+					<option value="33">:33 (33)</option>
+					<option value="34">:34 (34)</option>
+					<option value="35">:35 (35)</option>
+					<option value="36">:36 (36)</option>
+					<option value="37">:37 (37)</option>
+					<option value="38">:38 (38)</option>
+					<option value="39">:39 (39)</option>
+					<option value="40">:40 (40)</option>
+					<option value="41">:41 (41)</option>
+					<option value="42">:42 (42)</option>
+					<option value="43">:43 (43)</option>
+					<option value="44">:44 (44)</option>
+					<option value="45">:45 <cpanel langprint="cron_quarter_til"> (45)</option>
+					<option value="46">:46 (46)</option>
+					<option value="47">:47 (47)</option>
+					<option value="48">:48 (48)</option>
+					<option value="49">:49 (49)</option>
+					<option value="50">:50 (50)</option>
+					<option value="51">:51 (51)</option>
+					<option value="52">:52 (52)</option>
+					<option value="53">:53 (53)</option>
+					<option value="54">:54 (54)</option>
+					<option value="55">:55 (55)</option>
+					<option value="56">:56 (56)</option>
+					<option value="57">:57 (57)</option>
+					<option value="58">:58 (58)</option>
+					<option value="59">:59 (59)</option>
+				</select>
+			</td>
+			<td><div id="minute_error"></div></td>
+		</tr>
+		<tr>
+			<td align="right"><cpanel langprint="cron_hour">:</td>
+			<td>
+				<input type="text" size="4" id="hour" />&nbsp;
+				<select style="width: 175px" id="hour_options" onchange="select_single_option('hour')">
+					<option value="--">-- <cpanel langprint="cron_common_settings"> --</option>
+					<option value="*"><cpanel langprint="cron_every_hour"> (*)</option>
+					<option value="*/2"><cpanel langprint="cron_every_other_hour"> (*/2)</option>
+					<option value="*/3"><cpanel langprint="cron_every_3_hours"> (*/3)</option>
+					<option value="*/4"><cpanel langprint="cron_every_4_hours"> (*/4)</option>
+					<option value="*/6"><cpanel langprint="cron_every_6_hours"> (*/6)</option>
+					<option value="0,12"><cpanel langprint="cron_every_12_hours"> (0,12)</option>
+					<option value="--">-- <cpanel langprint="cron_hours"> --</option>
+					<option value="0">12:00 a.m. <cpanel langprint="cron_midnight"> (0)</option>
+					<option value="1">1:00 a.m. (1)</option>
+					<option value="2">2:00 a.m. (2)</option>
+					<option value="3">3:00 a.m. (3)</option>
+					<option value="4">4:00 a.m. (4)</option>
+					<option value="5">5:00 a.m. (5)</option>
+					<option value="6">6:00 a.m. (6)</option>
+					<option value="7">7:00 a.m. (7)</option>
+					<option value="8">8:00 a.m. (8)</option>
+					<option value="9">9:00 a.m. (9)</option>
+					<option value="10">10:00 a.m. (10)</option>
+					<option value="11">11:00 a.m. (11)</option>
+					<option value="12">12:00 p.m. <cpanel langprint="cron_noon"> (12)</option>
+					<option value="13">1:00 p.m. (13)</option>
+					<option value="14">2:00 p.m. (14)</option>
+					<option value="15">3:00 p.m. (15)</option>
+					<option value="16">4:00 p.m. (16)</option>
+					<option value="17">5:00 p.m. (17)</option>
+					<option value="18">6:00 p.m. (18)</option>
+					<option value="19">7:00 p.m. (19)</option>
+					<option value="20">8:00 p.m. (20)</option>
+					<option value="21">9:00 p.m. (21)</option>
+					<option value="22">10:00 p.m. (22)</option>
+					<option value="23">11:00 p.m. (23)</option>
+				</select>
+			</td>
+			<td><div id="hour_error"></div></td>
+		</tr>
+		<tr>
+			<td align="right"><cpanel langprint="cron_day">:</td>
+			<td>
+				<input type="text" size="4" id="day" />&nbsp;
+				<select style="width: 175px" id="day_options" onchange="select_single_option('day')">
+					<option value="--">-- <cpanel langprint="cron_common_settings"> --</option>
+					<option value="*"><cpanel langprint="cron_every_day"> (*)</option>
+					<option value="*/2"><cpanel langprint="cron_every_other_day"> (*/2)</option>
+					<option value="1,15"><cpanel langprint="cron_1st_and_15th"> (1,15)</option>
+					<option value="--">-- <cpanel langprint="cron_days"> --</option>
+					<option value="1">1st (1)</option>
+					<option value="2">2nd (2)</option>
+					<option value="3">3rd (3)</option>
+					<option value="4">4th (4)</option>
+					<option value="5">5th (5)</option>
+					<option value="6">6th (6)</option>
+					<option value="7">7th (7)</option>
+					<option value="8">8th (8)</option>
+					<option value="9">9th (9)</option>
+					<option value="10">10th (10)</option>
+					<option value="11">11th (11)</option>
+					<option value="12">12th (12)</option>
+					<option value="13">13th (13)</option>
+					<option value="14">14th (14)</option>
+					<option value="15">15th (15)</option>
+					<option value="16">16th (16)</option>
+					<option value="17">17th (17)</option>
+					<option value="18">18th (18)</option>
+					<option value="19">19th (19)</option>
+					<option value="20">20th (20)</option>
+					<option value="21">21st (21)</option>
+					<option value="22">22nd (22)</option>
+					<option value="23">23rd (23)</option>
+					<option value="24">24th (24)</option>
+					<option value="25">25th (25)</option>
+					<option value="26">26th (26)</option>
+					<option value="27">27th (27)</option>
+					<option value="28">28th (28)</option>
+					<option value="29">29th (29)</option>
+					<option value="30">30th (30)</option>
+					<option value="31">31st (31)</option>
+				</select>
+			</td>
+			<td><div id="day_error"></div></td>
+		</tr>
+		<tr>
+			<td align="right"><cpanel langprint="cron_month">:</td>
+			<td>
+				<input type="text" size="4" id="month" />&nbsp;
+				<select style="width: 175px" id="month_options" onchange="select_single_option('month')">
+					<option value="--">-- <cpanel langprint="cron_common_settings"> --</option>
+					<option value="*"><cpanel langprint="cron_every_month"> (*)</option>
+					<option value="*/2"><cpanel langprint="cron_every_other_month"> (*/2)</option>
+					<option value="*/4"><cpanel langprint="cron_every_3_months"> (*/4)</option>
+					<option value="1,7"><cpanel langprint="cron_every_6_months"> (1,7)</option>
+					<option value="--">-- <cpanel langprint="cron_months"> --</option>
+					<option value="1"><cpanel langprint="CRJan"> (1)</option>
+					<option value="2"><cpanel langprint="CRFeb"> (2)</option>
+					<option value="3"><cpanel langprint="CRMar"> (3)</option>
+					<option value="4"><cpanel langprint="CRApr"> (4)</option>
+					<option value="5"><cpanel langprint="CRMay"> (5)</option>
+					<option value="6"><cpanel langprint="CRJune"> (6)</option>
+					<option value="7"><cpanel langprint="CRJuly"> (7)</option>
+					<option value="8"><cpanel langprint="CRAug"> (8)</option>
+					<option value="9"><cpanel langprint="CRSep"> (9)</option>
+					<option value="10"><cpanel langprint="CROct"> (10)</option>
+					<option value="11"><cpanel langprint="CRNov"> (11)</option>
+					<option value="12"><cpanel langprint="CRDec"> (12)</option>
+				</select>
+			</td>
+			<td><div id="month_error"></div></td>
+		</tr>
+		<tr>
+			<td align="right"><cpanel langprint="cron_weekday">:</td>
+			<td>
+				<input type="text" size="4" id="weekday" />&nbsp;
+				<select style="width: 175px" id="weekday_options" onchange="select_single_option('weekday')">
+					<option value="--">-- <cpanel langprint="cron_common_settings"> --</option>
+					<option value="*"><cpanel langprint="cron_every_weekday"> (*)</option>
+					<option value="1-5"><cpanel langprint="cron_mon_thru_fri"> (1-5)</option>
+					<option value="0,6"><cpanel langprint="cron_sat_and_sun"> (6,0)</option>
+					<option value="1,3,5"><cpanel langprint="cron_MWF"> (1,3,5)</option>
+					<option value="2,4"><cpanel langprint="cron_TT"> (2,4)</option>
+					<option value="--">-- <cpanel langprint="cron_weekdays"> --</option>
+					<option value="0"><cpanel langprint="CRDaySun"> (0)</option>
+					<option value="1"><cpanel langprint="CRDayMon"> (1)</option>
+					<option value="2"><cpanel langprint="CRDayTues"> (2)</option>
+					<option value="3"><cpanel langprint="CRDayWed"> (3)</option>
+					<option value="4"><cpanel langprint="CRDayThurs"> (4)</option>
+					<option value="5"><cpanel langprint="CRDayFri"> (5)</option>
+					<option value="6"><cpanel langprint="CRDaySat"> (6)</option>
+				</select>
+			</td>
+			<td><div id="weekday_error"></div></td>
+		</tr>
+		<tr>
+			<td align="right"><cpanel langprint="cron_command">:</td>
+			<td colspan="2" style="width: 500px">
+				<input type="text" size="45" id="command" /> <span id="command_error"></span>
+			</td>
+		</tr>
+		<tr>
+			<td>&nbsp;</td>
+			<td colspan="2">
+				<input type="button" id="add_new_cron" value="<cpanel langprint="cron_add_new_cron_job">" /> <span id="add_new_cron_status"></span>
+			</td>
+		</tr>
+	</table>
+	<div style="height: 4px"></div>
+	<div id="add_cron_status_bar" class="cjt_status_bar"></div>
+</div>
+
+<h2><cpanel langprint="cron_current_cron_jobs"></h2>
+
+<div id="cron_jobs"></div>
+
+</div><!-- end crontab_interface -->
+
+<script type="text/javascript">
+//<![CDATA[
+var SYSTEM_ACCOUNT = '<cpanel print="$user">';
+var CRONTAB_PERMISSIONS_ERROR;
+(YAHOO.util.Dom.get("crontab_permissions_error").innerHTML == "") ? CRONTAB_PERMISSIONS_ERROR = false : CRONTAB_PERMISSIONS_ERROR = true;
+var LANG = {
+	cron_field_not_valid : "<cpanel langprint="cron_cron_field_not_valid">",
+	command_not_empty : "<cpanel langprint="cron_command_not_empty">",
+	edit_successful : "<cpanel langprint="cron_edit_successful">",
+	editing_cron_job : "<cpanel langprint="cron_editing_cron_job">",
+	added_cron_job : "<cpanel langprint="cron_added_cron_job">",
+	adding_cron_job : "<cpanel langprint="cron_adding_cron_job">",
+	unknown_error : "<cpanel langprint="ZE_unknown_error">",
+	cron_job_deleted : "<cpanel langprint="cron_cron_job_deleted">",
+	deleting_cron_job : "<cpanel langprint="cron_deleting_cron_job">",
+	cron_valid_email : "<cpanel langprint="cron_cron_valid_email">",
+	email_address : "<cpanel langprint="cron_email_address">",
+	confirm_empty_email : "<cpanel langprint="cron_confirm_empty_email">",
+	email_updated : "<cpanel langprint="cron_email_updated">",
+	changing_email : "<cpanel langprint="cron_changing_email">",
+	none : "<cpanel langprint="cron_none">",
+	Minute : "<cpanel Locale="maketext('Minute')">",
+	Hour : "<cpanel Locale="maketext('Hour')">",
+	Day : "<cpanel Locale="maketext('Day')">",
+	Month : "<cpanel Locale="maketext('Month')">",
+	Weekday : "<cpanel Locale="maketext('Weekday')">",
+	Command : "<cpanel Locale="maketext('Command')">"
+};
+//]]>
+
+<cpanelif $CPDATA{'DEMO'}>
+var demo_mode = true;
+EVENT.onDOMReady( function() {
+    new CPANEL.widgets.Notice( {
+        content: "<cptext "This feature is disabled in demo mode. The controls on this page will not submit.">",
+        level:   "info"
+    } );
+} );
+<cpanelelse>
+var demo_mode = false;
+</cpanelif>
+</script>
+
+</cpanelfeature><!-- end cpanelfeature cron -->
+</div><!-- end body-content -->
+    
+<cpanel Branding="include(stdfooter.html)">

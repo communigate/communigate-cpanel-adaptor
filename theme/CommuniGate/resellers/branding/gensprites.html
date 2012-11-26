@@ -1,0 +1,31 @@
+<cpanel Branding="tempsetbrandingpkg($RAW_FORM{'brandingpkg'})">
+
+<cpanel include="gensprites_work_include.html">
+
+
+<cpanel setvar="headerimg=../../images/tools.gif">
+<cpanel setvar="dprefix=../../">
+<cpanel include="../../stdbheader.html">
+
+<div class="body-content">
+
+<style type="text/css">
+<?cp Branding::spritelist(
+.sprite$FORM{'imgtype'}_img_disp { float: left; position: relative; background: url\{leftparenthesis}"%"\{rightparenthesis}; }
+%,@spriteurl,images: 
+:#$FORM{imgtype}-${img} { background-position\{colon} 0px -${cssposition}px; width\{colon} ${width}px; height\{colon} ${height}px; }
+: 
+) imgtype=$FORM{'imgtype'},subtype=img ?>
+</style>
+<table cellpadding="5px">
+<?cp Branding::spritelist(%,
+images::[tr][td][div class="spacer"][div class="sprite$FORM{imgtype}_img_disp" id="$FORM{imgtype}-${img}"][/div][/div][/td][td][div class="imgName" style="text-valign\{colon}middle;"]${img}[/div][/div][/td][/tr]
+: ) imgtype=$FORM{'imgtype'},subtype=img ?>
+</table>
+<cpanel include="gobackwhere.html">
+
+
+</div>
+
+<cpanel Branding="include(stdfooter.html)">
+

@@ -1,0 +1,22 @@
+perl: warning: Setting locale failed.
+perl: warning: Please check that your locale settings:
+	LANGUAGE = (unset),
+	LC_ALL = (unset),
+	LC_CTYPE = "UTF-8",
+	LANG = "en_US.UTF-8"
+    are supported and installed on your system.
+perl: warning: Falling back to the standard locale ("C").
+Mar  6 13:29:26.013 [30131] warn: Argument "" isn't numeric in addition (+) at /usr/lib/perl5/site_perl/5.8.8/Mail/SpamAssassin/NetSet.pm line 122.
+Mar  6 13:29:26.015 [30131] warn: oops! unparseable IPv6 address for 127/8: 153209700 at /usr/lib/perl5/site_perl/5.8.8/Mail/SpamAssassin/NetSet.pm line 128.
+Mar  6 13:29:26.018 [30131] warn: oops! unparseable IPv6 address for 127/8: 153210072 at /usr/lib/perl5/site_perl/5.8.8/Mail/SpamAssassin/NetSet.pm line 128.
+perl: warning: Setting locale failed.
+perl: warning: Please check that your locale settings:
+	LANGUAGE = (unset),
+	LC_ALL = (unset),
+	LC_CTYPE = "UTF-8",
+	LANG = "en_US.UTF-8"
+    are supported and installed on your system.
+perl: warning: Falling back to the standard locale ("C").
+Aug 10 14:53:53.524 [20439] warn: Argument "" isn't numeric in addition (+) at /usr/lib/perl5/site_perl/5.8.8/Mail/SpamAssassin/NetSet.pm line 122.
+Aug 10 14:53:53.527 [20439] warn: oops! unparseable IPv6 address for 127/8: 165472880 at /usr/lib/perl5/site_perl/5.8.8/Mail/SpamAssassin/NetSet.pm line 128.
+Aug 10 14:53:53.530 [20439] warn: oops! unparseable IPv6 address for 127/8: 165473252 at /usr/lib/perl5/site_perl/5.8.8/Mail/SpamAssassin/NetSet.pm line 128.

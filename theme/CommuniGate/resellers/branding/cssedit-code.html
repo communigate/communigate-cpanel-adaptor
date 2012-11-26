@@ -1,0 +1,101 @@
+<cpanel Branding="tempsetbrandingpkg($RAW_FORM{'brandingpkg'})">
+<cpanel setvar="headerimg=../../images/tools.gif">
+<cpanel setvar="dprefix=../../">
+<cpanel include="../../stdbheader.html">
+<cpanel include="../../ajaxhelp.html">
+<cpanel Branding="setupdirs()">
+
+<script type="text/javascript" src="<cpanel MagicRevision="uri("/editarea/edit_area/edit_area_full.js")">"></script>
+
+<cpanel relinclude="editarea/safari_fix.html">
+
+<?cptt _ajaxapp.tmpl ?>
+<script type="text/javascript">
+
+// initialisation
+editAreaLoader.init({
+id: "codepage" // id of the textarea to transform      
+,start_highlight: true  // if start with highlight
+,allow_resize: "both"
+,allow_toggle: false
+,language: "en"
+,toolbar: "search, go_to_line,|, undo, redo, |, select_font,|, change_smooth_selection, highlight, reset_highlight, |, help" 
+,syntax: "css"
+});
+
+function loadfdata(clicked_el) {
+    var pp = new CPANEL.ajax.Progress_Panel( {
+        show_status:true,
+        status_html: "<cptext "Saving…">",
+    } );
+    pp.show_from_source(clicked_el);
+
+    var callback = CPANEL.ajax.build_callback( function() {
+        new CPANEL.ajax.DynamicNotice( { level:"success", content:"<cptext 'Success!'>" } );
+    }, { current:pp } );
+    CPANEL.api( {
+        module:   "Branding",
+        func:     "savelocalcss",
+        data:     {
+            css: editAreaLoader ? editAreaLoader.getValue("codepage") : DOM.get("codepage").value,
+            brandingpkg: <cpanel jsprint="$FORM{'brandingpkg'}">
+        },
+        callback: callback
+    } );
+}
+
+// Event processing for the "reset to default" button
+var confirm_wrapper = function( e ) {
+
+	var confirm = window.confirm('<cptext "Are you sure you want to revert this file?">');
+
+	// If the user choses to abort we need to tell the browser not to follow the anchor
+	if ( ! confirm ) {
+		YAHOO.util.Event.preventDefault(e);
+
+	}
+}
+
+var init = function() {
+
+	// Get all the revert buttons and attach a confirmation box to them
+	var els = YAHOO.util.Dom.getElementsByClassName("revert-button");
+	for (var i = 0; i < els.length; i++ ) {
+		YAHOO.util.Event.on(els[i].id, "click", confirm_wrapper);
+	}
+
+};
+
+YAHOO.util.Event.onDOMReady(init);
+
+</script>
+<div class="body-content">
+<div class="breadcrumbs"><a class="crumb_highlight" href="index.html"><cpanel Locale="maketext('Branding Editor')"></a> > <a class="crumb_highlight" href="edit_bpkg.html?brandingpkg=<?cp Branding::getbrandingpkg(%,^brandingpkg)?>"><cpanel langprint="Branding_edit_title"></a>  > <cpanel langprint="BrandingEditCSS"> </div>
+
+
+<style type="text/css">
+<?cp Branding::spritelist(.spriteicon_img_mini {float:left;margin-right:5px;background: url\{leftparenthesis}"%"\{rightparenthesis};} %,@spriteurl,images::#icon-${img}_mini {background-position\{colon}0 -${cssposition}px;width\{colon}${width}px;height\{colon}${height}px; }:) imgtype=icon,subtype=img,method=scale_60percent,format=png,img=branding ?>
+</style>
+<div class="h1Title"><div class="spriteicon_img_mini" id="icon-branding_mini"></div> <a href="index.html"> <cpanel langprint="BrandingEditCSS"></a></div>
+<p class="description"><cpanel langprint="BrandingCSSEditDesc"></p>
+
+<cpanel langprint="BrandingStyle">
+<strong><?cp Branding::getbrandingpkg(%,&brandingpkgname) ?></strong>
+
+<!-- show the file we are editing as it may be local_vps.css based on the envtype -->
+
+<?cp Branding::resolvelocalcss(%,&file) brandingpkg=$RAW_FORM{'brandingpkg'} ?>
+
+<form action="javascript:void(0)" method="post" name="sform">
+<textarea style="width:660px;height:400px;" id="codepage" class="codepress css"><?cp Branding::resolvelocalcss(%,&css) getcss=1,brandingpkg=$RAW_FORM{'brandingpkg'} ?></textarea>
+<input type="button" onclick="loadfdata(this);" class="input-button" value="<cpanel langprint="BrandingCSSUpload">">
+</form>
+
+<p><cpanel langprint="BrandingCSSRevert"> <a class="create-button revert-button" id="revertFile" href="resetcss.html?brandingpkg=<cpanel uriprint="$RAW_FORM{'brandingpkg'}">&imgtype=css"><cpanel langprint="BrandingResetCSS"></a></p>
+
+
+<cpanel include="gobackwhere.html">
+
+
+</div>
+<cpanel Branding="include(stdfooter.html)">

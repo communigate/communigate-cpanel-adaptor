@@ -1,0 +1,89 @@
+<link rel="stylesheet" type="text/css" href="/unprotected/yui/container/assets/container.css" />
+<script type="text/javascript" src="/unprotected/yui/utilities_container/utilities_container.js"></script>
+<script type="text/javascript" src="/unprotected/js/validate_optimized.js"></script>
+<script>
+function mk_question_update( n ) {
+    var src = document.userform['q'+n];
+    var dest = document.userform['q'+n+'ques'];
+    var start = document.getElementById('q'+n+'start');
+    var div = document.getElementById('q'+n+'div');
+    return function() {
+        start.disabled=true;
+        div.style.display = (src.value == 'makeown') ? 'block' : 'none'; 
+        if ( '' !== src.value ) {
+            dest.value = (src.value != 'makeown') ? src.options[src.selectedIndex].text : '';
+        }
+    };
+}
+function register_validators() {
+    for(var i=1;i<=4;i++) {
+        register_validator('maxlength',128,[document.userform['q'+i+'ques']],'[% locale.maketext("security-question-question-maxlength") %]');
+        register_validator('minlength',2,[document.userform['q'+i+'ques']],'[% locale.maketext("security-question-question-minlength") %]');
+        register_validator('maxlength',128,[document.userform['q'+i+'answer']],'[% locale.maketext("security-question-answer-maxlength") %]');
+        register_validator('minlength',2,[document.userform['q'+i+'answer']],'[% locale.maketext("security-question-answer-minlength") %]');
+        YAHOO.util.Event.addListener(document.userform['q'+i], "change", mk_question_update( i ), false);        
+        document.getElementById('q'+i+'div').style.display = 'none';
+    }
+    realtime_validate_init('userform');
+};
+
+YAHOO.util.Event.addListener(window, "load", register_validators, false);
+</script>
+<style>
+   select { width : 75% }
+</style>
+<div id="h1Title" class="h1Title">[% locale.maketext("security-questions-title") %]</div>
+<p class="description">[% locale.maketext("security-desc") %]</p>
+<div align="center">[% result.questions %]</div>
+<form name="userform" id="userform" action="[% cp_security_token %]/?key=[% acct_randkey %]" method="post" onSubmit="return do_validate(this.id);">
+<input type="hidden" name="formaction" value="verifyquestions">
+<ol id="sec-ques">
+<li><select name="q1">
+<option value="" id='q1start'>[% locale.maketext("select-security-ques") %]</option>
+<option value="makeown">[% locale.maketext("Create my own question.") %]</option>
+[% FOREACH n = [ 1, 2, 3, 4, 5, 6, 7 ] -%]
+<option [% IF q1 == n %]selected [% END %]value="[%n%]">[% securityquestion.$n %]</option>
+[% END -%]
+</select>
+<div id='q1div' class="q"><p><label>Q: <input type="text" size="60" name="q1ques" value="[% userquestion.1 %]"></label></p></div>
+<p><label>A: <input type="text" size="60" name="q1answer" value="[% q1answer %]"></label></p>
+</li>
+<li><select name="q2">
+<option value="" id='q2start'>[% locale.maketext("select-security-ques") %]</option>
+<option value="makeown">[% locale.maketext("Create my own question.") %]</option>
+[% FOREACH n = [ 8, 9, 10, 11, 12, 13, 14 ] -%]
+<option [% IF q1 == n %]selected [% END %]value="[%n%]">[% securityquestion.$n %]</option>
+[% END -%]
+</select>
+<div id='q2div' class='q'><p><label>Q: <input type="text" size="60" name="q2ques" value="[% userquestion.2 %]"></label></p></div>
+<p><label>A: <input type="text" size="60" name="q2answer" value="[% q2answer %]"></label></p>
+</li>
+<li><select name="q3">
+<option value="" id='q3start'>[% locale.maketext("select-security-ques") %]</option>
+<option value="makeown">[% locale.maketext("Create my own question.") %]</option>
+[% FOREACH n = [ 15, 16, 17, 18, 19, 20, 21 ] -%]
+<option [% IF q1 == n %]selected [% END %]value="[%n%]">[% securityquestion.$n %]</option>
+[% END -%]
+</select>
+<div id='q3div' class='q'><p><label>Q: <input type="text" size="60" name="q3ques" value="[% userquestion.3 %]"></label></p></div>
+<p><label>A: <input type="text" size="60" name="q3answer" value="[% q3answer %]"></label></p>
+</li>
+<li><select name="q4">
+<option value="" id='q4start'>[% locale.maketext("select-security-ques") %]</option>
+<option value="makeown">[% locale.maketext("Create my own question.") %]</option>
+[% FOREACH n = [ 22, 23, 24, 25, 26, 27, 28 ] -%]
+<option [% IF q1 == n %]selected [% END %]value="[%n%]">[% securityquestion.$n %]</option>
+[% END -%]
+</select>
+<div id='q4div'><p><label>Q: <input type="text" size="60" name="q4ques" value="[% userquestion.4 %]"></label></p></div>
+<p><label>A: <input type="text" size="60" name="q4answer" value="[% q4answer %]"></label></p>
+</li>
+</ol>
+<div style="float:right;clear:both;">
+<input type="submit" value="[% locale.maketext("continue") %]" class="input-button">
+</div>
+<input type="button" value="[% locale.maketext("LOLogout") %]" class="input-button" onClick="document.location.replace( '/logout' );">
+<br />
+<br />
+</form>
+

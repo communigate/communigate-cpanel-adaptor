@@ -1,0 +1,42 @@
+<cpanel setvar="headerimg=../images/mailmenu.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+
+<div class="body-content">	
+<h1><cpanel langprint="SPAConfiguration"></h1>
+<div align = "center">
+
+<cpanel include="includeautospam.html">
+
+<table width="550" cellspacing="0" cellpadding="0" border="0">
+<tr>
+<td></td>
+<td>
+<form method="post" action="dospamassassinconfig.html">
+<table border=1 bordercolor="#e6e6e6" cellspacing=3 cellpadding=5>
+<cpanel SpamAssassin="config()">
+<tr><td colspan=2 align="center">
+<cpanel Email="has_spam_as_acl()">
+<input type=submit value="<cpanel langprint="SPAConfigurationButton">" class="input-button">
+
+</td></tr>
+</table>
+</form>
+</td>
+<td></td>
+</tr>
+<tr>
+<td valign="bottom">&nbsp;</td>
+<td valign="middle" width="522">
+</td>
+<td valign = "bottom">&nbsp;</td>
+</tr>
+</table>
+<cpanelif !$CPVAR{'rewrites_subjects'}>
+    <br />
+<cpanel langprint="SPNoRewrites">
+</cpanelif>
+
+<div class="return-link"><a href="spam/spam.html">&larr; <cptext "Go Back"></a></div>
+</div>
+<cpanel Branding="include(stdfooter.html)">

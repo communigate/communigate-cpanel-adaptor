@@ -1,0 +1,238 @@
+<cpanel setvar="headerimg=../images/topftp.gif">
+<cpanel setvar="dprefix=../">
+
+<cpanel Branding="include(stdheader.html)">
+
+<cpanelfeature ftpaccts>
+
+<div class="body-content">
+    
+<style type="text/css">
+<?cp Branding::spritelist(.spriteicon_img_mini {float:left;margin-right:5px;background: url\{leftparenthesis}"%"\{rightparenthesis};} %,@spriteurl,images::#icon-${img}_mini {background-position\{colon}0 -${cssposition}px;width\{colon}${width}px;height\{colon}${height}px; }:) imgtype=icon,subtype=img,method=scale_60percent,format=png,img=ftpaccounts ?>
+</style>
+
+<div class="h1Title"><div class="spriteicon_img_mini" id="icon-ftpaccounts_mini"></div><cpanel langprint="MENUFTPAccounts"></div>
+
+<p class="description"><cpanel langprint="FTPDescription"></p>
+
+<h2><cpanel langprint="FTPAddedHead"></h2>
+<script type="text/javascript">
+var FTP_ACCOUNTS_MAXED = false;
+</script>
+
+<?cp StatsBar::stat( [p class="caution"]$LANG{'statsattention'}&nbsp;%&nbsp;$LANG{'statsoutof'}&nbsp;%$LANG{'available'}&nbsp;$LANG{'MENUFTPAccounts'}[/p],count,max) display=ftpaccounts,warnings=1,warninglevel=80,infinitylang=true ?>
+<cpanelif $CPVAR{'statsbar_ftpaccounts_maxed'}>
+	<script type="text/javscript">
+	FTP_ACCOUNTS_MAXED = true;
+	</script>
+    <style type="text/css">
+    .highlight { 
+		display: none
+	}
+    </style>
+    <p class="alert_box" id="max_ftp_accounts_alert_box"><cpanel langprint="QuotaWarning1"> <cpanel langprint="MENUFTPAccounts">. <cpanel langprint="QuotaWarning2"></p> 
+</cpanelif>
+
+<div class="highlight" id="new_ftp_account_input_div">
+	<table cellpadding="3" cellspacing="0">
+		<tr>
+			<td style="width: 125px; text-align: right"><cpanel langprint="FTPLogin"></td>
+			<td style="width: 150px"><input type="text" name="login" id="login" style="width: 150px" onchange="suggest_homedir()" /></td>
+			<td>@<cpanel print="$CPDATA{'DNS'}"> <span id="login_error" ></span></td>
+		</tr>
+		<tr>
+			<td align="right"><cpanel langprint="FTPPassword"></td>
+			<td align="left"><input type="password" name="password" id="password" style="width: 150px" /></td>
+			<td><span id="password_error"></span></td>
+		</tr>
+		<tr>
+			<td align="right"><cpanel langprint="FTPPasswordAgain"></td>
+			<td align="left"><input type="password" name="password2" id="password2" style="width: 150px" /></td>
+			<td><span id="password2_error"></span></td>
+		</tr>
+		<tr>
+			<td align="right">
+				<cpanel langprint="email_strength"> <span id="why_strong_passwords_link" class="action_link">(?)</span>:
+				<div id="why_strong_passwords_text" style="display: none"><cpanel langprint="email_password_why"><br /><br /><cpanel langprint="email_password_tip"></div>
+			</td>
+			<td><div id="password_strength" class="password_strength"></div></td>
+			<td><input type="button" id="create_strong_password" class="input-button" value="<cpanel langprint="cjt_password_generator">" tabindex="-1" /></td>
+		</tr>
+		<tr>
+			<td style="text-align: right"><cpanel langprint="FTPDirectory">: </td>
+			<td colspan="2">
+				<cpanel setvar="autoinput=homedir">
+				<cpanel setvar="autodirsonly=1">
+				<cpanel setvar="autofunc=dirComplete">
+				<script type="text/javascript">
+				function dirComplete(inputObj) {modeddir=1;}   
+				</script>
+				<table cellpadding="0" cellspacing="0" style="padding:0;margin:0;"><tr>
+				<td><cpanel print="$homedir">/<cpanel relinclude="autodir/dirbox.html"></td>
+				</tr></table>
+			</td>
+		</tr>
+		<tr id="add_new_quota_row">
+			<td align="right"><cpanel langprint="quota_title">:</td>
+			<td align="left" colspan="2">
+				<input type="radio" name="quota" value="250" id="quota_number" onclick="toggle_add_account_quota()" /> <input type="text" id="quota_value" size="5" maxlength="5" style="color: #888888;" value="2000" onclick="toggle_add_account_quota(true)" /> <span class="megabyte_font">MB</span> <span id="quota_value_error"></span><br />
+				<input type="radio" name="quota" value="unlimited" id="quota_unlimited" checked="checked" onclick="toggle_add_account_quota()" /> <label for="quota_unlimited"><cpanel langprint="FTPUnlimited"></label> <span id="quota_unlimited_error"></span>
+			</td>
+		</tr>
+		<tr>
+			<td>&nbsp;</td> 
+			<td align="left" colspan="2">
+				<div style="height: 8px"></div>
+				<input type="button" class="input-button" id="ftp_create_submit" value="<cpanel langprint="FTPCreate">" />
+				<div id="add_ftp_status"></div>
+			</td>
+		</tr>
+	</table>
+	<div style="height: 5px"></div>
+	<div id="add_ftp_status_bar" class="cjt_status_bar"></div>
+</div><!-- end highlight -->
+
+<h2><cpanel langprint="INDXFtpAccounts"></h2>
+<table border="0" cellspacing="0" cellpadding="0" width="100%" style="margin: 0 0 5px 0">
+	<tr>
+		<td align="left">
+			<input id="search_input" type="text" style="width: 200px; color: #888888" value="<cpanel langprint="ftp_Search_Accounts">" onfocus="search_field_focus()" onblur="search_field_blur()" />
+			<input type="button" id="search_button" class="input-button" value="<cpanel langprint="ftp_Search_Accounts">" onclick="search_accounts()" />
+			<input type="button" id="clear_search" class="input-button" value="<cpanel langprint="ftp_Clear_Search">" style="display: none" onclick="clear_search()" />
+		</td>
+		<td align="right">
+	        <cpanel langprint="PaginatorResults">: 
+			<select id="items_per_page" onchange="change_items_per_page()">
+				<option value="10">10</option>
+				<option value="25">25</option>
+				<option value="50">50</option>
+				<option value="100">100</option>
+			</select>
+		</td>
+	</tr>
+</table>
+	
+<table class="nonsortable" cellspacing="0" border="0" cellpadding="0" width="100%" style="margin: 0px" id="pure_table_header"><tr>
+	<th class="col1"><span class="action_link" onclick="toggle_sort('serverlogin')"><cpanel langprint="WebDAVthLogin"></span> <input type="hidden" id="pure_sort_direction_serverlogin" value="asc" /><span id="pure_sort_direction_serverlogin_img"></span></th>
+	<th class="col2"><span class="action_link" onclick="toggle_sort('dir')"><cpanel langprint="RubyAppsPath"></span> <input type="hidden" id="pure_sort_direction_dir" value="asc" /><span id="pure_sort_direction_dir_img"></span></th>
+	<th class="col3"><span class="action_link" onclick="toggle_sort('diskused')"><cpanel langprint="usage"></span> <input type="hidden" id="pure_sort_direction_diskused" value="asc" /><span id="pure_sort_direction_diskused_img"></span> / <span class="action_link" onclick="toggle_sort('diskquota')"><cpanel langprint="ftp_Quota"></span> <input type="hidden" id="pure_sort_direction_diskquota" value="asc" /><span id="pure_sort_direction_diskquota_img"></span></th>
+	<th class="col4"><cpanel langprint="WebDAVActions"></th>
+</tr></table>
+
+<table class="nonsortable" cellspacing="0" border="0" cellpadding="0" width="100%" style="margin: 0px; display: none" id="pro_table_header"><tr>
+	<th class="pro_col1"><span class="action_link" onclick="toggle_sort('serverlogin')"><cpanel langprint="WebDAVthLogin"></span> <input type="hidden" id="pro_sort_direction_serverlogin" value="asc" /><span id="pro_sort_direction_serverlogin_img"></span></th>
+	<th class="pro_col2"><span class="action_link" onclick="toggle_sort('dir')"><cpanel langprint="RubyAppsPath"></span> <input type="hidden" id="pro_sort_direction_dir" value="asc" /><span id="pro_sort_direction_dir_img"></span></th>
+	<th class="pro_col3"><cpanel langprint="WebDAVActions"></th>
+</tr></table>
+
+<div id="accounts_div"></div>
+
+<br /><br />
+
+<h2><cpanel langprint="ftp_Special_FTP_Accounts"> <span id="special_accounts_help" class="action_link" style="cursor: pointer; font-weight: normal">(?)</span></h2>
+
+<table class="nonsortable" cellspacing="0" border="0" cellpadding="0" width="100%" style="margin: 0px" id="pure_special_table_header"><tr>
+	<th class="special_col1"><cpanel langprint="ADType"></th>
+	<th class="special_col2"><cpanel langprint="WebDAVthLogin"></th>
+	<th class="special_col3"><cpanel langprint="RubyAppsPath"></th>
+	<th class="special_col4"><cpanel langprint="usage"> / <cpanel langprint="ftp_Quota"></th>
+	<th class="special_col5"><cpanel langprint="cron_actions"></th>
+</tr></table>
+
+<table class="nonsortable" cellspacing="0" border="0" cellpadding="0" width="100%" style="margin: 0px; display: none" id="pro_special_table_header"><tr>
+	<th class="pro_special_col1"><cpanel langprint="ADType"></th>
+	<th class="pro_special_col2"><cpanel langprint="WebDAVthLogin"></th>
+	<th class="pro_special_col3"><cpanel langprint="RubyAppsPath"></th>
+	<th class="pro_special_col4"><cpanel langprint="cron_actions"></th>
+</tr></table>
+
+<div id="special_accounts_div"></div>
+<input type="hidden" id="list_of_anonymous_account_ids" value="" />
+
+<div style="display: none">
+	<div id="special_accounts_help_text"><cpanel langprint="ftp_special_accounts_description"></div>
+	<div id="special_log_description"><cpanel langprint="LogAccessDesc"></div>
+	<div id="special_anon_description"><cpanel langprint="AnonymousDesc"></div>
+	<div id="special_main_description"><cpanel langprint="MainAccountDesc"></div>
+</div>
+
+<script type="text/javascript">
+//<![CDATA[
+var SFTP_PORT = <cpanel SSH="getport()">;
+var FTP_SERVER = '<cpanel langprint="ftp_address"><cpanel print="$CPDATA{'DNS'}">';
+var DNS = '<cpanel print="$CPDATA{'DNS'}">';
+var REQUIRED_PASSWORD_STRENGTH = parseInt('<?cp PasswdStrength::get_required_strength(%,strength) app=ftp ?>') || 0;
+var LOG_ICON = '<cpanel MagicRevision="uri("images/logaccess.gif")">';
+var MAIN_ICON = '<cpanel MagicRevision="uri("images/main.gif")">';
+var ANON_ICON = '<cpanel MagicRevision="uri("images/anonymous.gif")">';
+var HOME_ICON = '<cpanel MagicRevision="uri("images/homeb.gif")">';
+var HOME_DIR = '<cpanel print="$homedir">';
+<cpanelif $hasdedicatedip>var DEDICATED_IP = true;</cpanelif>
+<cpanelif !$hasdedicatedip>var DEDICATED_IP = false;</cpanelif>
+var SERVER_TYPE = '<cpanel Ftp="ftpservername()">';
+(SERVER_TYPE.search(/pro/i) == -1) ? SERVER_TYPE = "PURE" : SERVER_TYPE = "PRO"; // pro has no quotas
+var LANG = {
+	ftp_login : "<cpanel langprint="ftp_ftp_login">",
+	directory_path : "<cpanel langprint="ftp_directory_path">",
+	FTPUserAlpha : "<cptext "Only letters, numbers, -, and _ are allowed.">",
+	FTPMsgUser25Char : "<cpanel langprint="FTPMsgUser25Char">",
+	validation_directory_paths : "<cpanel langprint="validation_directory_paths">",
+	quota : "<cpanel langprint="ftp_Quota">",
+	email_quota_number : "<cpanel langprint="email_quota_number">",
+	unknown_error : "<cpanel langprint="ftp_Unknown_Error">",
+	no_accounts_found : "<cpanel langprint="ftp_no_accounts_found">",
+	unlimited : "<cpanel langprint="cjt_unlimited">",
+	change_br_password : "<cpanel langprint="ftp_change_br_password">",
+	change_br_quota : "<cpanel langprint="ftp_change_br_quota">",
+	Delete : "<cpanel langprint="BrandingDPackage">",
+	configure_ftp_client : "<cpanel langprint="ftp_configure_ftp_client">",
+	paginate_prev : "<cpanel langprint="email_page_previous">",
+	paginate_next : "<cpanel langprint="Next">",
+	not_applicable : "<cpanel langprint="ftp_not_applicable">",
+	Password : "<cpanel langprint="Password">",
+	Password_again : "<cpanel langprint="email_password_again">",
+	Strength : "<cpanel langprint="email_strength">",
+	Password_Generator : "<cpanel langprint="PWGenTitle">",
+	Change_Password : "<cpanel langprint="ChangePassword">",
+	FTP_Quota : "<cpanel langprint="ftp_ftp_quota">",
+	Unlimited : "<cpanel langprint="FTPUnlimited">",
+	Change_Quota : "<cpanel langprint="ChangeQuota">",
+	Delete_account : "<cpanel langprint="ftp_Delete_account">",
+	delete_all_files_under : "<cpanel langprint="ftp_delete_all_files">",
+	Delete_Account : "<cpanel langprint="ftp_Delete_Account">",
+	Delete_Account_and_Files : "<cpanel langprint="ftp_Delete_Account_and_Files">",
+	Manual_Settings : "<cpanel langprint="ftp_Manual_Settings">",
+	FTP_Username : "<cpanel langprint="ftp_FTP_Username">",
+	FTP_Server : "<cpanel langprint="ftp_FTP_Server">",
+	FTP_Server_Port : "<cpanel langprint="ftp_FTP_Server_Port">",
+	SFTP_Server_Port : "<cpanel langprint="ftp_SFTP_Server_Port">",
+	Configuration_Files : "<cpanel langprint="ftp_Configuration_Files">",
+	for_Windows : "<cpanel langprint="ftp_for_Windows">",
+	for_Mac : "<cpanel langprint="ftp_for_Mac">",
+	Instructions_new_window : "<cpanel langprint="ftp_Instructions_new_window">",
+	FTP_Configuration_File : "<cpanel langprint="ftp_FTP_Configuration_File">",
+	SFTP_Configuration_File : "<cpanel langprint="ftp_SFTP_Configuration_File">",
+	quota_positive_integer : "<cpanel langprint="ftp_quota_positive_integer">",
+	Account_Created : "<cpanel langprint="ftp_Account_Created">",
+	creating_account : "<cpanel langprint="ftp_creating_account">",
+	Changed_Password : "<cpanel langprint="ftp_Changed_Password">",
+	changing_password : "<cpanel langprint="ftp_changing_password">",
+	Changed_Quota : "<cpanel langprint="ftp_Changed_Quota">",
+	changing_quota : "<cpanel langprint="ftp_changing_quota">",
+	deleting_account : "<cpanel langprint="ftp_deleting_account">",
+	deleting_account_and_files : "<cpanel langprint="ftp_deleting_account_and_files">",
+	Search_Accounts : "<cpanel langprint="ftp_Search_Accounts">",
+	anon_quotas_share : "<cpanel langprint="ftp_anon_quotas_share">"
+};
+//]]>
+</script>
+<span style="position: absolute; left: -5000; top: -5000" id="get_path_width"></span>
+</div><!-- end body-content -->
+
+</cpanelfeature><!-- end cpanelfeature ftpaccts -->
+
+<cpanelfeature !ftpaccts>
+	<cpanel include="../refresh.html">
+</cpanelfeature>
+
+<cpanel Branding="include(stdfooter.html)">

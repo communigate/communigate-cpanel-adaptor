@@ -1,0 +1,12 @@
+<cpanel setvar="headerimg=../images/topmysql.gif">
+<cpanel setvar="dprefix=../">
+<cpanel setvar="headerinclude=sql/index_head.html">
+<cpanel Branding="include(stdheader.html)">
+<div class="body-content">
+<div class="h1Title"><div class="spriteicon_img_mini" id="icon-mysql_mini"></div> <cpanel langprint="SQLRemoteDBAcc"></div>
+<p><cptext 'Removed Host “[output,class,_1,status]” from the access list.',$FORM{"host"}>&nbsp;
+<cpanel Mysql="delhost($FORM{'host'})"></p>
+
+<div class="return-link"><a href="managehost.html">&larr; <cptext "Go Back"></a></div>
+</div>
+<cpanel Branding="include(stdfooter.html)">

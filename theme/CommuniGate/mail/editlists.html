@@ -1,0 +1,24 @@
+<cpanel setvar="headerimg=../images/tools.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+<style type="text/css"><cpanel include="boxtrapper.css"></style>
+<style type="text/css">
+<?cp Branding::spritelist(.spriteicon_img_mini {float:left;margin-right:5px;background: url\{leftparenthesis}"%"\{rightparenthesis};} %,@spriteurl,images::#icon-${img}_mini {background-position\{colon}0 -${cssposition}px;width\{colon}${width}px;height\{colon}${height}px; }:) imgtype=icon,subtype=img,method=scale_60percent,format=png,img=boxtrapper ?>
+</style>
+<div class="body-content">
+<div class="h1Title"><div class="spriteicon_img_mini" id="icon-boxtrapper_mini"></div> <cpanel langprint="listslegend-BoxTrapper"></div>
+<div align="center"><p><cpanel langprint="listsfor-BoxTrapper"> <span class="status"><cpanel print="$FORM{'account'}"></span></p>
+
+<table border="0" width="96%">
+<tr>
+<td align="center"><br/>
+<a href="whitelist.html?emaildir=<cpanel BoxTrapper="getboxconfdiruri($FORM{'account'})">&account=<cpanel uriprint="$FORM{'account'}">"><cpanel langprint="editlistwhite-BoxTrapper"></a><br /><br /></td>
+<td align="center"><br/>
+<a href="ignorelist.html?emaildir=<cpanel BoxTrapper="getboxconfdiruri($FORM{'account'})">&account=<cpanel uriprint="$FORM{'account'}">"><cpanel langprint="editlistignore-BoxTrapper"></a><br /><br /></td>
+<td align="center"><br/>
+<a href="blacklist.html?emaildir=<cpanel BoxTrapper="getboxconfdiruri($FORM{'account'})">&account=<cpanel uriprint="$FORM{'account'}">"><cpanel langprint="editlistblack-BoxTrapper"></a><br /><br /></td> </tr>
+</table>
+
+<div class="return-link"><a href="manage.html?account=<cpanel uriprint="$FORM{'account'}">">&larr; <cptext "Go Back"></a></div>
+</div>
+<cpanel Branding="include(stdfooter.html)">

@@ -1,0 +1,105 @@
+<cpanel setvar="headerimg=../images/topmimetypes.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+	
+<cpanelfeature mime>
+	<script type="text/javascript">
+	//<![CDATA[
+	var init_validators = function() {
+		var mimet_validator = new CPANEL.validate.validator("<cpanel Locale="maketext('MIME Type')">");
+		mimet_validator.add("mimet", "mime", "<cpanel langprint="ValidatorMime">");
+		mimet_validator.attach();
+		
+		var ext_validator = new CPANEL.validate.validator("<cpanel Locale="maketext('File Extension')">");
+		ext_validator.add("ext", "mime_extension", "<cpanel langprint="ValidatorMime_ext_valid">");
+		ext_validator.attach();
+		
+		CPANEL.validate.attach_to_form("submit", [mimet_validator, ext_validator]);
+
+		YAHOO.util.Dom.get("mimet").focus();
+	}
+	YAHOO.util.Event.onDOMReady(init_validators);
+	//]]>
+	</script>
+	<style type="text/css">
+	<?cp Branding::spritelist(.spriteicon_img_mini {float:left;margin-right:5px;background: url\{leftparenthesis}"%"\{rightparenthesis};} %,@spriteurl,images::#icon-${img}_mini {background-position\{colon}0 -${cssposition}px;width\{colon}${width}px;height\{colon}${height}px; }:) imgtype=icon,subtype=img,method=scale_60percent,format=png,img=mime-types ?>
+	</style>
+</cpanelfeature>
+
+<div class="body-content">
+
+<cpanelfeature mime>
+	<div class="h1Title"><div class="spriteicon_img_mini" id="icon-mime-types_mini"></div> <cpanel langprint="MIMEHead"></div>
+	<p class="description"><cpanel langprint="MTDesc"></p>
+	<h2><cpanel langprint="MTCreate"></h2>
+    <div class="highlight">
+		<form action="addmime.html" id="mainform" name="mainform">
+		<table cellpadding="2" cellspacing="1">
+			<tr>
+				<td align="right"><strong><cpanel langprint="MIMEAddType">:</strong></td>
+				<td width="150px"><input type="text" style="width: 150px" id="mimet" name="mimet" size="22" /></td>
+				<td><div id="mimet_error"></div></td>
+			</tr>
+			<tr>
+				<td align="right"><strong><cpanel langprint="MTExt">:</strong></td>
+				<td><input type="text" style="width: 150px" id="ext" name="ext" size="22" /></td>
+				<td><div id="ext_error"></div></td>
+			</tr>
+			<tr>
+				<td>&nbsp;</td>
+				<td colspan="2"><em><cpanel langprint="mime_extension_hint"></em></td>
+			</tr>
+			<tr><td colspan="3"><br /></td></tr>
+			<tr>
+				<td>&nbsp;</td>
+				<td><input name="submit" id="submit" type="submit" class="input-button" value="<cpanel langprint="MTAdd">" /></td>
+				<td>&nbsp;</td>
+			</tr>
+		</table>
+		</form>
+	</div>
+    <p><span class="errors"><cpanel UI="showresult(addmime)"></span></p>
+	<br />
+
+	<table class="sortable" width="90%" cellpadding="0" cellspacing="0" id="mimetbl" align="center">
+		<caption align="top"><cpanel langprint="MTUserDef"></caption>
+		<tr>
+			<th><cpanel langprint="MIMEAddType"></th>
+			<th><cpanel langprint="MTExt"></th>
+			<th class="sorttable_nosort"><cpanel langprint="Remove"></th>
+		</tr>
+		<?cp Mime::listmime(
+			[tr class="row-%"]
+				[td]%[/td]
+				[td]%[/td]
+				[td style="text-align: center"][a href="delmimeconfirm.html?usermime=%"][img align="middle" alt="" src="../images/delete_x.gif" width="16" height="16" border="0" /][/a][/td]
+			[/tr]
+			,*num,type,ext,^type) system=no || '[tr][td class="errors" colspan="3"]$LANG{'MTUseConfigNote'}.[/td][/tr]' ?>  
+	</table>
+	
+	<p><span class="errors"><cpanel UI="showresult(delmime)"></span></p>
+   <br />
+   
+	<table class="sortable" cellpadding="0" cellspacing="0" id="sysmimetbl" width="90%" align="center">
+		<caption align="top"><cpanel langprint="MTSysTypes"></caption>
+		<tr>
+			<th><cpanel langprint="MIMEAddType"></th>
+			<th><cpanel langprint="MTExt"></th>
+		</tr>
+		<?cp Mime::listmime(
+		[tr class="row-%"]
+			[td]%[/td]
+			[td]%[/td]
+		[/tr]
+		,*num,type,ext) user=no || '[tr][td class="errors" colspan="2"]$LANG{'MTSysConfigNote'}[/td][/tr]' ?>  
+	</table>
+
+</cpanelfeature>
+
+<cpanelfeature !mime>
+	<cpanel include="../refresh.html">
+</cpanelfeature>
+
+</div><!-- end body-content -->
+
+<cpanel Branding="include(stdfooter.html)">

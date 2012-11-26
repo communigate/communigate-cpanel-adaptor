@@ -1,0 +1,27 @@
+<cpanel setvar="headerimg=../images/accmenu.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+<style type="text/css">
+<?cp Branding::spritelist(.spriteicon_img_mini {float:left;margin-right:5px;background: url\{leftparenthesis}"%"\{rightparenthesis};} %,@spriteurl,images::#icon-${img}_mini {background-position\{colon}0 -${cssposition}px;width\{colon}${width}px;height\{colon}${height}px; }:) imgtype=icon,subtype=img,method=scale_60percent,format=png,img=ssh-shell-access ?>
+</style>
+
+<div class="body-content">
+	<div class="h1Title"><div class="spriteicon_img_mini" id="icon-ssh-shell-access_mini"></div><cpanel langprint="TNHead"></div>
+	<h2><cpanel langprint="TNShellLogin"></h2>
+	<p><cpanel langprint="TNNotice"></p>
+<!--<p><cpanel langprint="TNNotice"></p>-->
+<p class="errors"><cpanel langprint="TNWarning"></p>
+<br />
+  <applet width="640" height="480" 
+  archive="http://<cpanel print="$httphost">/java-sys/SSHTerm/files/gsissh/libbrowser.jar,http://<cpanel print="$httphost">/java-sys/SSHTerm/files/gsissh/SSHTerm-1.0.0.jar,http://<cpanel print="$httphost">/java-sys/SSHTerm/files/gsissh/SSHVnc.jar,http://<cpanel print="$httphost">/java-sys/SSHTerm/files/gsissh/SecureTunneling.jar,http://<cpanel print="$httphost">/java-sys/SSHTerm/files/gsissh/ShiFT.jar,http://<cpanel print="$httphost">/java-sys/SSHTerm/files/gsissh/j2ssh-common-0.2.7.jar,http://<cpanel print="$httphost">/java-sys/SSHTerm/files/gsissh/j2ssh-core-0.2.7.jar,http://<cpanel print="$httphost">/java-sys/SSHTerm/files/gsissh/cog-jglobus.jar,http://<cpanel print="$httphost">/java-sys/SSHTerm/files/gsissh/commons-logging.jar,http://<cpanel print="$httphost">/java-sys/SSHTerm/files/gsissh/cryptix-asn1-signed.jar,http://<cpanel print="$httphost">/java-sys/SSHTerm/files/gsissh/cryptix-signed.jar,http://<cpanel print="$httphost">/java-sys/SSHTerm/files/gsissh/cryptix32-signed.jar,http://<cpanel print="$httphost">/java-sys/SSHTerm/files/gsissh/filedrop.jar,http://<cpanel print="$httphost">/java-sys/SSHTerm/files/gsissh/jce-jdk13-135.jar,http://<cpanel print="$httphost">/java-sys/SSHTerm/files/gsissh/log4j-1.2.6.jar,http://<cpanel print="$httphost">/java-sys/SSHTerm/files/gsissh/openssh-pk-1.1.0.jar,http://<cpanel print="$httphost">/java-sys/SSHTerm/files/gsissh/puretls-signed.jar,http://<cpanel print="$httphost">/java-sys/SSHTerm/files/gsissh/putty-pk-1.1.0.jar,http://<cpanel print="$httphost">/java-sys/SSHTerm/files/gsissh/jlirc-unix-soc.jar"
+  code="com.sshtools.sshterm.SshTermApplet" 
+  style="border-style: solid; border-width: 1; padding-left: 4; padding-right: 4; padding-top: 1; padding-bottom: 1">
+  <param name="sshterm.simple.connection.port" value="22" />
+  <param name="sshterm.autoconnect.host" value="<cpanel print="$httphost">"/>
+  <param name="sshterm.autoconnect.port" value="22" />
+  <param name="sshterm.autoconnect.user" value="<cpanel print="$user">" />
+    </applet>
+
+<div class="return-link"><a href="index.html">&larr; <cptext "Go Back"></a></div>
+</div>
+<cpanel Branding="include(stdfooter.html)">

@@ -1,0 +1,43 @@
+<cpanel setvar="headerimg=../images/topftp.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+<div class="body-content">
+<style type="text/css">
+<?cp Branding::spritelist(.spriteicon_img_mini {float:left;margin-right:5px;background: url\{leftparenthesis}"%"\{rightparenthesis};} %,@spriteurl,images::#icon-${img}_mini {background-position\{colon}0 -${cssposition}px;width\{colon}${width}px;height\{colon}${height}px; }:) imgtype=icon,subtype=img,method=scale_60percent,format=png,img=ftpaccounts ?>
+</style>
+
+
+<div class="h1Title"><div class="spriteicon_img_mini" id="icon-ftpaccounts_mini"></div><cpanel langprint="FTPMaint"></div>
+
+<h2><cpanel langprint="FTPDeletion"></h2>
+
+
+<cpanelif !$FORM{'type'}==anonymous && !$FORM{'type'}==main && !$FORM{'type'}==logaccess>
+<p><cpanel langprint="FTPDelconfirm"> <i><cpanel print="$FORM{'login'}"></i>?</p>
+<p>
+	<a class="create-button" href="realdodelftp.html?login=<cpanel print="$FORM{'login'}">"><cpanel Locale="maketext('Yes')"></a> | 
+	
+	<a class="create-button" href="realdodelftp.html?login=<cpanel print="$FORM{'login'}">&destroy=1"><cpanel Locale="maketext('Yes, and remove all files in “[_1]”.', $FORM{'homedir'}')"></a> |
+	
+     <a class="create-button" href="accounts.html"><cptext 'No'></a>
+</p>
+</cpanelif>
+
+
+<cpanelif $FORM{'type'}==anonymous>
+<p><cpanel langprint="FTPAnonUserNo"></p>
+</cpanelif>      
+
+
+<cpanelif $FORM{'type'}==logaccess>
+<p><cpanel langprint="FTPLogNo"></p>
+</cpanelif> 
+
+
+<cpanelif $FORM{'type'}==main>
+<p><cpanel langprint="FTPMainAccountNo"></p>
+</cpanelif>   
+
+<div class="return-link"><a href="accounts.html">&larr; <cptext "Go Back"></a></div>
+</div>
+<cpanel Branding="include(stdfooter.html)">

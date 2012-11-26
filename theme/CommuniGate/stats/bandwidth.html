@@ -1,0 +1,43 @@
+<cpanel setvar="headerimg=../images/topwebftpstats.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+<style type="text/css">
+<?cp Branding::spritelist(.spriteicon_img_mini {float:left;margin-right:5px;background: url\{leftparenthesis}"%"\{rightparenthesis};} %,@spriteurl,images::#icon-${img}_mini {background-position\{colon}0 -${cssposition}px;width\{colon}${width}px;height\{colon}${height}px; }:) imgtype=icon,subtype=img,method=scale_60percent,format=png,img=networkmonitor ?>
+</style>
+<div class="body-content">
+<div class="h1Title"><div class="spriteicon_img_mini" id="icon-networkmonitor_mini"></div> <cpanel langprint="MENUBandwidth"></div>
+   <?cp StatsBar::stat( [p class="caution"]$LANG{'statsattention'}&nbsp;%&nbsp;$LANG{'statsoutof'}&nbsp;%[/p],count,max) display=bandwidthusage,warnings=1,warninglevel=80,infinitylang=true ?>
+
+
+<p class="description"><cpanel langprint="BandDesc"></p>
+<cpanelif !$CPDATA{'BWLIMIT'}==0>  
+<table width="95%" align="center">
+
+<tr>
+<td>
+<fieldset>
+   <legend><b><cpanel langprint="SLBandWidthLegendLimit"></b></legend>
+<table align="center" width="100%" cellspacing="0" cellpadding="0" border="0">
+<tr><td>
+<div align="center">
+<cpanel Stats="bwbar()">
+</div>
+</td></tr></table>
+</fieldset>
+</td></tr></table>
+</cpanelif>
+<br />
+<br />
+<div align="center">
+<table width="95%">
+  <tr><td>
+<cpanel Bandwidth="displaymainbwheader()">
+</td></tr></table>
+<br />
+<table width="95%">
+  <tr><td>
+<cpanel Stats="showbandwidth()">
+</td></tr></table>
+
+</div>
+<cpanel Branding="include(stdfooter.html)">

@@ -1,0 +1,11 @@
+/* CSS Document */
+/********************************************CGI Center************************************
+These styles are applied to CGI Center
+**************************************************************************************/
+body.top{
+	background:url(../cgi/images/filemantopbg.jpg) repeat-x;
+}
+body.bottom{
+	background-color:#ccc;
+	background:none;
+}

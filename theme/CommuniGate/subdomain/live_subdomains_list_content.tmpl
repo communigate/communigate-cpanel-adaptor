@@ -1,0 +1,34 @@
+[% USE Api2 -%]
+[% SET form_regex = CPANEL.get_raw_form('searchregex') -%]
+[% SET api_response = Api2.exec( 'SubDomain', 'listsubdomains', {
+    regex => form_regex,
+    no_expvar => 1,
+    api2_paginate => 1,
+    api2_paginate_start => CPANEL.FORM.api2_paginate_start,
+    api2_paginate_size => CPANEL.CPVAR.itemsperpage,
+} ); -%]
+[% IF api_response.size -%]
+    [% FOR sub = api_response -%]
+        [% SET oddeven = loop.index % 2 ? 'odd' : 'even' -%]
+        <tr class="row-[% oddeven %]">
+            <td valign="top" style="padding-right: 0px;" class="" truncate="25" colspan="2">[% sub.subdomain FILTER html %].[% sub.rootdomain FILTER html %]</td>
+            <td valign="top" class="cell truncate" truncate="50" style="white-space:nowrap;" nowrap="nowrap"><a href="../files/index.html" target="_blank" class="ajaxfiles" ><img src="[% MagicRevision('images/homeb.gif') %]" border="0" alt="[% locale.maketext('home') %]" /></a><a id="[% sub.domain FILTER html %]_lnk" href="../files/index.html?dir=[% sub.basedir FILTER uri %]" target="_blank" class="ajaxfiles" >/[% sub.basedir FILTER html %]</a> <a href="javascript:void(0)" onClick="start_change_docroot('[% sub.domain FILTER html %]','[% sub.subdomain FILTER html %]','[% sub.rootdomain FILTER html %]','[% sub.basedir FILTER html %]'); return false;"><img border="0" src="[% MagicRevision('../images/change.gif') %]"></a></td>
+
+            <td align="center" valign="top">
+                [% IF (sub.status == 'not redirected') %]
+                    [% sub.status FILTER html %]
+                [% ELSE %]
+                    <a href="[% sub.status FILTER html %]" target="_blank">[% sub.status FILTER html %]</a>
+                [% END %]
+            </td>
+            <td align="center" valign="top" class="nobrd"><a href="doredirectdomain.html?domain=[% sub.domainkey FILTER uri %]">[% locale.maketext('ManRedirect') %]</a></td>
+            <td align="center" valign="top"><a href="dodeldomainconfirm.html?domain=[% sub.domainkey FILTER uri %]">[% locale.maketext('Remove') %]</a></td>
+        </tr>
+    [% END -%]
+[% ELSE -%]
+    [% SET err = form_regex
+        ? locale.maketext('No configured subdomains match the search term “[_1]”', form_regex)
+        : locale.maketext('subdomain_none')
+    ; -%]
+    <tr><td colspan="6" class="errors">[% err FILTER html %]</td></tr>
+[% END -%]

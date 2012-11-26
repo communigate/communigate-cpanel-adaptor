@@ -1,0 +1,32 @@
+<cpanel setvar="headerimg=../images/topmysql.gif">
+<cpanel setvar="dprefix=../">
+<cpanel setvar="headerinclude=sql/index_head.html">
+<cpanel Branding="include(stdheader.html)">
+<div class="body-content">
+<div class="h1Title"><div class="spriteicon_img_mini" id="icon-mysql_mini"></div> <cpanel langprint="SQLWizard"></div>
+
+<h2><cpanel langprint="MySQLStep4"></h2>
+<p><cptext 'User “[output,class,_1,status]” was added to the database “[output,class,_2,status]”.',$FORM{"user"},$FORM{"db"}></p>
+
+<!-- <cpanel Mysql="gethost()"> -->
+<cpanelif $CPVAR{'remotemysqlhost'}==1>
+  <br />
+  <div class="formbox">
+    <h4><cpanel langprint="SQLRemoteHosth4"></h4>
+    <p><cpanel langprint="SQLRemoteHost1"> <span class="status"><cpanel print="$CPVAR{'mysqlhost'}"></span>. <cpanel langprint="SQLRemoteHost2"></p>
+  </div>
+  <br />
+</cpanelif>
+
+<cpanel Mysql="adduserdb($FORM{'db'},$FORM{'user'},$FORM{'ALTER'} $FORM{'CREATEROUTINE'} $FORM{'CREATETEMPORARYTABLES'} $FORM{'CREATE'} $FORM{'DELETE'} $FORM{'DROP'} $FORM{'SELECT'} $FORM{'INSERT'} $FORM{'UPDATE'} $FORM{'REFERENCES'} $FORM{'INDEX'} $FORM{'LOCKTABLES'} $FORM{'EXECUTE'} $FORM{'CREATEVIEW'} $FORM{'TRIGGER'} $FORM{'ALL'})"> 
+<br /><br />
+
+
+<a href="wizard1.html"><cpanel langprint="WizardAddAD"></a><br /><br />
+
+<a href="index.html"><cpanel langprint="WizardAddAU"></a><br /><br />
+
+<a href="../index.html"><cpanel langprint="WizardHome"></a><br />
+
+</div>
+<cpanel Branding="include(stdfooter.html)">

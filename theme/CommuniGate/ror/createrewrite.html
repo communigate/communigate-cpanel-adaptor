@@ -1,0 +1,40 @@
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+<style type="text/css">
+<?cp Branding::spritelist(.spriteicon_img_mini {float:left;margin-right:5px;background: url\{leftparenthesis}"%"\{rightparenthesis};} %,@spriteurl,images::#icon-${img}_mini {background-position\{colon}0 -${cssposition}px;width\{colon}${width}px;height\{colon}${height}px; }:) imgtype=icon,subtype=img,method=scale_60percent,format=png,img=rails?>
+</style>
+<div class="body-content">
+<div class="h1Title"><div class="spriteicon_img_mini" id="icon-rails_mini"></div><cpanel langprint="RubyOnRails"></div>
+<h2><cpanel langprint="RORCreatURLRW"></h2>
+<p class="description"><cpanel langprint="RubyAppsRewriteDesc"></p>
+
+
+<!-- <p><cpanel langprint="RORAppName"> <cpanel print="$FORM{'appname'}"></p> -->
+
+	<table class="sortable" border="0" cellpadding="0" cellspacing="0" width="700">
+		<tr>
+			<th><cpanel langprint="RubyAppsName"></th>
+			<th><cpanel langprint="RORtoDomainURLtxt"></th>
+            <th>&nbsp;</th>
+		<tr>
+			<form action="saverewrite.html" method="get">
+			<td><cpanel print="$FORM{'appname'}"><input type="hidden" name="appname" value="<cpanel formprint="$FORM{'appname'}">"></td>
+<td nowrap>
+<cpanel langprint="RORhttp"><select id=defsel name="domain">
+<cpanel Email="printdomainoptions()">
+<option value=".*"><cpanel langprint="RDAllDomains"></a>
+</select>/<input type="text" name="url" class="text" maxlength="15" /></td>
+		<td><input class="button-create" type="submit" value="<cpanel langprint="RubyAppsSave">" /></td>
+			</form>
+<tr>
+<td colspan="4">
+    <cpanel langprint="RORReqRWto">
+&nbsp; <cpanel langprint="RORhttp"><cpanel print="$CPDATA{'DNS'}">:<cpanel print="$FORM{'port'}">/
+</td>
+
+</tr>
+	</table>
+
+<div class="return-link"><a href="index.html">&larr; <cptext "Go Back"></a></div>
+</div>
+<cpanel Branding="include(stdfooter.html)">

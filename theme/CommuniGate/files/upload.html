@@ -1,0 +1,51 @@
+<html>
+<head>
+<title>cPanel X</title>
+<cpanel relinclude="files/files_head.html">
+<style type="text/css">
+<cpanel Branding="include(sprites.html)">
+</style>
+</head>
+<body id="leftmain">
+<h1 style="font-size:16px;"><img src="img/actions/upload.png" align="absmiddle" alt="upload"><cpanel langprint="FMUploadHead"></h1><br /><br />
+   <p> <cpanel langprint="FMfreespaceBEGIN"><span class="highlight"> <?cp Fileman::getdiskinfo(%,file_upload_remain_humansize) ?></span></p>
+    <!--<cpanel langprint="FMUploadMaxBytesBEGIN"><cpanel print="$CONF{'file_upload_max_bytes'}"><cpanel langprint="FMUploadMaxBytesEND">
+    <cpanel langprint="FMUploadLeaveBytesBEGIN"><cpanel print="$CONF{'file_upload_must_leave_bytes'}"><cpanel langprint="FMUploadLeaveBytesEND">-->
+<h2><cpanel langprint="FMUploadSelectDirPre"> <cpanel print="$FORM{'dir'}">
+</h2>
+<form action="doupload.html" method="post" enctype="multipart/form-data" target="filewindow">
+<font class=med><cpanel Fileman="printdir()">
+
+  <input type="file" name="file1" />
+
+  <input type="file" name="file2" />
+
+  <input type="file" name="file3" />
+
+  <input type="file" name="file4" />
+
+  <input type="file" name="file5" />
+
+  <input type="file" name="file6" />
+
+  <input type="file" name="file7" />
+
+  <input type="file" name="file8" />
+
+  <input type="file" name="file9" />
+
+  <input type="file" name="file10" />
+
+  <input type="file" name="file11" />
+
+  <input type="file" name="file12" />
+   <br />
+  <cpanel langprint="FMUploadOverwriteCheckbox">
+  <input type="checkbox" name="overwrite" value="1" />
+  <br/><br />
+  <input type="submit" class="input-button" value="<cpanel langprint="FMUploadButton">">
+  </font>
+</form>
+<div align="center"><a href="dir.html?dir=<cpanel print="$FORM{'dir'}">"><cpanel langprint="FMBackto"> <cpanel print="$FORM{'dir'}"></a></div>
+</body>
+</html>

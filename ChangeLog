@@ -1,0 +1,71 @@
+1.6 Release notes:
+
+* iOS auto provisionning fixed (issue # 30)
+* WebMail Login now pointing to hostname not domain name (issue # 31)
+* Fix priviledge upgrade C Wrapper (segfault on certain boxes) Issue 29
+* Check username is not empty before creating a group memeber  Issue 14
+* Cross domain group (groups from other domains were shown) Issue 2
+
+1.5 Release notes:
+
+* Groups (Public and Private) functionality has been added. Ability to define a single email address for a group of people. This feature is similar to mailing list in a much more simplified format. Group posting (sending mails to the group address) can be restricted to group members only or can be public.
+* Fix socket resource release on backend CGP provisionning.
+
+1.4 Release notes:
+
+* Installation bug fix CLI.pm copied to alternate perl @INCLUDE
+* Helper for iChat configuration
+* Helper for iCal configuration
+* New name for Cloudware cPanel group.
+
+1.3 Release notes:
+
+* Mechanism for Maximum number of groupware account per box is created. If needed set value into file /var/CommuniGate/cPanel/boxlimit. If 0 or file does not exist the value is set to unlimited (within CommuniGate Pro License limit ). This can be used for VPS hosting where WHM is provided to customers but no SSH / Root access.
+* CommuniGate Pro 5.4.6 & Pronto 4.6 (OSX, Windows & Android)
+* Pronto Connection assistant Page has been added in cPanel Cloudware section (Port 8100 precision)
+
+1.2 Release notes:
+
+* CommmuniGate process monitored by chkservd (including spamd)
+* eDisc enabled by default for GroupWare users
+* Legacy webmail added to CloudWare Web Mail (Horde, RoundCube, SquirrelMail)
+
+1.1 Release notes:
+
+* Compatible with cPanel 11.32
+* Fix start spamd after disabling legacy mail services
+* Fix iPhone Provisioning scripts rights
+
+1.0 Release notes:
+
+* Minor bug and porting fixes.
+* QA Passed
+
+0.5 Release notes:
+
+* Mailing List (Management and Administration with Subscribers management)
+* iPad Auto Configuration
+* Fix suid on CommuniGate cPanel module wrapper
+
+0.4 Release notes:
+
+* Import accounts from xls or csv
+* Quota (Real time used space display / Quota Set / Quota Update)
+* Pronto! iOS Link
+* Email Forwarders
+* Email Aliases
+* Default Address / Mail to Unknown
+* AntiSpam with advanced configuration (BL/WL/Score AutoDelete/SpamBox)
+* DNS Settings Access (Mx & SPF)
+* Email Delivery route Access
+* CommuniGate 5.4.4
+* Pronto 4.4
+
+0.3 Release notes:
+
+* Firewal opening on CommuniGate Ports
+* default theme is set to CommuniGate
+* Library CLI.pm placed in x86_64 location for 64 bits
+* Fix CGP Password reading for CLI access
+* Fix directory and permission read on /var/CommuniGate/cPanel
+* Added a script to disable services automatically disable-services.pl

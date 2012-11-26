@@ -1,0 +1,40 @@
+<cpanel setvar="headerimg=../images/mailmenu.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+<style type="text/css">
+<?cp Branding::spritelist(.spriteicon_img_mini {float:left;margin-right:5px;background: url\{leftparenthesis}"%"\{rightparenthesis};} %,@spriteurl,images::#icon-${img}_mini {background-position\{colon}0 -${cssposition}px;width\{colon}${width}px;height\{colon}${height}px; }:) imgtype=icon,subtype=img,method=scale_60percent,format=png,img=manageaccounts ?>
+</style>
+
+<div class="body-content">
+
+<div class="h1Title"><div class="spriteicon_img_mini" id="icon-manageaccounts_mini"></div> <cpanel langprint="mailaddacc"></div>
+	
+	<!--
+	<cpanel Email="addpop($FORM{'email'},$FORM{'password'},$FORM{'quota'},$FORM{'domain'})">
+	-->
+	<!-- If you make changes to following code you need to make the same changes in getstarted/newemail-a.html -->
+<cpanelif !$CPERROR{'email'}>
+	<h2><cpanel langprint="EAdocreated"></h2>
+	<p<cptext 'The email account “[output,class,_1,status]” was successfully [boolean,_2,created,modified,removed].',"$FORM{'email'}@$FORM{'domain'}",1></p>	
+	<p><cpanel langprint="EAConfMailTxt"></p>
+	<a href="clientconf.html?redirectdomain=<cpanel print="$FORM{'domain'}">&acct=<cpanel print="$FORM{'email'}">@<cpanel print="$FORM{'domain'}">" class="create-button"><cpanel langprint="Yes"></a> <a href="pops_noscript.html" class="create-button"><cpanel langprint="No"></a>
+</cpanelif>
+	
+<cpanelif $CPERROR{'email'}>
+	<p class="errors">
+	<cptext 'There was a problem creating the email account “[output,class,_1,status]”.',"$FORM{'email'}@$FORM{'domain'}">.
+	<a href="#" onclick="document.getElementById('details').style.display='block'; return false;">
+	<cpanel langprint="AODShowDetails"></a> </p>
+
+	<div class="details" id="details"><cpanel print="$CPERROR{'email'}"></div>
+
+	<noscript>
+		<div class="details-noscript" id="details"><cpanel print="$CPERROR{'email'}"></div>
+	</noscript>
+</cpanelif>
+
+<div class="return-link"><a href="pops_noscript.html">&larr; <cptext "Go Back"></a></div>
+
+</div>
+
+<cpanel Branding="include(stdfooter.html)">

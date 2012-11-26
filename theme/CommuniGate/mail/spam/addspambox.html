@@ -1,0 +1,10 @@
+<cpanel setvar="headerimg=../images/mailmenu.gif">
+<cpanel setvar="dprefix=../../">
+<cpanel Branding="include(stdheader.html)">
+<div class="body-content">
+<h2><cpanel langprint="SPBoxEnableDo"></h2>
+<pre><?cp CommuniGate::EnableSpamAssassinSpamBox(%,status) domain=$CPDATA{'DOMAIN'}?></pre>
+<p><cpanel langprint="SPBoxStatusSwitchPre"> <span class="status"><?cp CommuniGate::SpamAssassinStatusSpamBox(%,status) domain=$CPDATA{'DOMAIN'}?></span></p>
+<div class="return-link"><a href="spam.html">&larr; <cptext "Go Back"></a></div>
+</div>
+<cpanel Branding="include(stdfooter.html)">

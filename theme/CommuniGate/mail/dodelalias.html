@@ -1,0 +1,24 @@
+<cpanel setvar="headerimg=../images/mailmenu.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+<div class="body-content">
+<h1><cpanel langprint="CGPAliasMaint"></h1>
+
+<p><?cp CommuniGate::delalias() forwarder=$FORM{'email'} || 'maketext('The alias could not be removed.')' ?></p>
+<cpanelif $CPERROR{'CommuniGate'}>
+<p><cpanel print="$CPERROR{'CommuniGate'}"></p>
+</cpanelif>
+<cpanelif !$CPERROR{'CommuniGate'}>
+    <p><b><cpanel print="$FORM{'email'}">'s</b> <cpanel langprint="FWDelfwd"> <b><cpanel print="$FORM{'emaildest'}"></b>.
+</cpanelif>
+ 
+<cpanelif $appname==webmail>
+		 <div class="return-link"><a href="../index.html">&larr; <cptext "Go Back"></a></div>
+</cpanelif>
+
+<cpanelif !$appname==webmail>
+		 <div class="return-link"><a href="aliases.html">&larr; <cptext "Go Back"></a></div>
+</cpanelif>
+
+</div>
+<cpanel Branding="include(stdfooter.html)">

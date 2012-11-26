@@ -1,0 +1,22 @@
+<cpanel setvar="headerimg=../images/mailmenu.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+<style type="text/css">
+<?cp Branding::spritelist(.spriteicon_img_mini {float:left;margin-right:5px;background: url\{leftparenthesis}"%"\{rightparenthesis};} %,@spriteurl,images::#icon-${img}_mini {background-position\{colon}0 -${cssposition}px;width\{colon}${width}px;height\{colon}${height}px; }:) imgtype=icon,subtype=img,method=scale_60percent,format=png,img=maillist ?>
+</style>
+<div class="body-content">
+<div class="h1Title"><div class="spriteicon_img_mini" id="icon-maillist_mini"></div> <cpanel langprint="CGPGroupMaintenance"></div>
+<h2><b><cpanel langprint="CGPGroupRename"></b></h2>
+
+<cpanel langprint="CGPGroupRenaming"><b><cpanel print="$FORM{'email'}></b><br><br>
+<form method="post" action="realdorenamegroup.html" id="userform" name="userform">
+	<input type="hidden" name="email" id="email" value="<cpanel print="$FORM{'email'}>">
+	<input type="hidden" name="domain" id="email" value="<cpanel print="$FORM{'domain'}>">
+	<cpanel langprint="CGPNewGroupName">
+	<input type="text" name="newname" id="newname">@<cpanel formprint=$FORM{'domain'}><br><br>
+	<input type="submit" value="<cpanel langprint="CGPNewGroupNameSubmit">" class="input-button" style="width: 120px" >
+</form>
+</p>
+<div class="return-link"><a href="groups.html">&larr; <cptext "Go Back"></a></div>
+</div><!-- end body-content -->
+<cpanel Branding="include(stdfooter.html)">

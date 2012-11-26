@@ -1,0 +1,153 @@
+<cpanel setvar="headerimg=../images/tools.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+<cpanelif $FORM{'itemsperpage'}>
+    <cpanel setvar="itemsperpage=$FORM{'itemsperpage'}">
+</cpanelif>
+<cpanelif !$FORM{'itemsperpage'} || !$CPVAR{'itemsperpage'}>
+    <cpanel setvar="itemsperpage=10">
+</cpanelif>
+
+<style type="text/css">
+<?cp Branding::spritelist(.spriteicon_img_mini {float:left;margin-right:5px;background: url\{leftparenthesis}"%"\{rightparenthesis};} %,@spriteurl,images::#icon-${img}_mini {background-position\{colon}0 -${cssposition}px;width\{colon}${width}px;height\{colon}${height}px; }:) imgtype=icon,subtype=img,method=scale_60percent,format=png,img=redirects ?>
+</style>
+
+
+<script type="text/javascript">
+//<![CDATA[
+
+    truncate_on = 1;
+    truncate_wrap = 1;
+    truncate_tooltips = 0;
+    register_truncate_table('redirecttbl');
+
+
+	function EnableDisableRadio() {
+		if(document.mainform.domain.selectedIndex >= 1)	{
+			document.mainform.rdwww[0].disabled = false;
+			document.mainform.rdwww[1].disabled = false;
+			document.mainform.rdwww[2].disabled = false;	
+		} else {
+			document.mainform.rdwww[0].disabled = true;
+			document.mainform.rdwww[1].disabled = true;
+			document.mainform.rdwww[2].disabled = true;
+		}
+		return true;
+	}
+
+    var check_url = function () {
+		url_value = document.getElementById('url').value;
+		
+		// original validation check ( must have no leading white space, must contain leading [no white space]:// )
+		if ( /^\S+[:][/][/]/.test(url_value) ) return true;
+		return false;
+	}
+
+	var init = function() {
+		// URL validation (must have a value and begin with a protocol identifier)
+		var validation = new CPANEL.validate.validator("<cptext "Redirects">");
+		validation.add('url', 'min_length(%input%, 1)', '<cpanel langprint="ValidatorRedirect">');
+		validation.add('url', check_url, '<cpanel langprint="Redirect must begin with a protocol -- ie: http//">');
+
+		validation.attach();
+
+		CPANEL.validate.attach_to_form("submit-button", validation);
+
+	};
+
+	YAHOO.util.Event.onDOMReady(init);
+
+//]]>
+</script>	
+
+
+<div class="body-content">
+
+<div class="h1Title"><div class="spriteicon_img_mini" id="icon-redirects_mini"></div> <cpanel langprint="RDHead"></div>
+
+<p class="description"><cpanel langprint="RedirectDescript">.</p>
+
+<cpanel setvar="vidtut_name=redirects">
+<cpanel setvar="vidtut_header=RDHead">
+<cpanel setvar="vidtut_description=VidRedirDesc">
+<cpanel setvar="vidtut_video_name=redirects_lo">
+<cpanel setvar="vidtut_width=450">
+<cpanel setvar="vidtut_height=361">	
+<cpanel include="../video_tutorial_include.html">
+	
+	<h2><cpanel langprint="RDAddHead"></h2>
+		<p class="description"><cpanel langprint="TempDesc"></p>
+		<div class="highlight">
+			<form id="mainform" name="mainform" action="addredirect.html">
+            <p>
+		    	<cpanel langprint="RDType">
+		    	<select name="type">
+      				<option value="permanent"><cpanel langprint="RDPerm"></option>
+		    		<option value="temp"><cpanel langprint="RDTemp"></option>
+			    </select>
+			</p>
+			<p>
+    			http://<span id="wwwtxt">(www.)?</span><select name="domain" onchange="EnableDisableRadio();">
+      			    <option selected value=".*"><cpanel langprint="RDAllDomains"></a>
+                	<cpanel Email="printdomainoptions()"></select>  
+			    </select>/&nbsp;<input name="path" type="text" size="20" id="urlpath" />
+				&nbsp;<br /><br /><cpanel langprint="RDTo">&rarr;&nbsp;
+				<input id="url" name="url" type="text" size="45" />&nbsp;<span id="url_error"></span>
+                <br />
+                <br />
+				<noscript>
+					<style type="text/css">
+						#radios{display:none;}
+					</style>
+					<cpanel Locale="maketext('www. redirection:')">
+					<input value="2" type="radio" name="rdwww" onclick="document.getElementById('wwwtxt').innerHTML='www.';" /> <cpanel Locale="maketext('Only redirect with www.')">
+                	<input value="0" type="radio" name="rdwww" onclick="document.getElementById('wwwtxt').innerHTML='(www.)?';" checked="checked" /> <cpanel Locale="maketext('Redirect with or without www.')">
+                	<input value="1" type="radio" name="rdwww" onclick="document.getElementById('wwwtxt').innerHTML='';" /> <cpanel Locale="maketext('Do Not Redirect www.')">
+				</noscript>
+                <span id="radios">
+					<cpanel Locale="maketext('www. redirection:')">
+					<input value="2" type="radio" name="rdwww" onclick="document.getElementById('wwwtxt').innerHTML='www.';" disabled="disabled" /> <cpanel Locale="maketext('Only redirect with www.')">
+                	<input value="0" type="radio" name="rdwww" onclick="document.getElementById('wwwtxt').innerHTML='(www.)?';"checked="checked" disabled="disabled" /> <cpanel Locale="maketext('Redirect with or without www.')">
+                	<input value="1" type="radio" name="rdwww" onclick="document.getElementById('wwwtxt').innerHTML='';" disabled="disabled" /> <cpanel Locale="maketext('Do Not Redirect www.')">
+				</span>
+				<br />
+				
+				
+                <label><input value="1" type="checkbox" name="wildcard" id="wildcard"> <cpanel langprint="RDWild"></label>
+                <br /><br /></span>
+                
+                <input id="submit-button" type="submit" class="input-button" value="<cpanel langprint="RDAdd">">
+			</p>
+		</form></div>
+ 	<p class="description">
+	 	<cpanel langprint="RDNote1">
+		</p>
+	<!-- <br /> -->
+	<h2><cpanel langprint="RDCurrent"></h2>
+			<div class="search-panel">
+				<form method="get"><span class="boldit"><cpanel langprint="SESearchButton"></span><input type="text" size="15" name="searchregex" value="<cpanel print="$FORM{'searchregex'}">"><input type="submit" class="input-button" value="<cpanel langprint="go">"></form>
+			</div>
+			
+		<table border="0" align="center" cellpadding="5" cellspacing="0" class="sortable truncate-table" id="redirecttbl">
+  			<tr >
+   			 <th class="cell-end"><cpanel langprint="SLDomain"></th>
+   			 <th class="cell-end"><cpanel langprint="RDDirec"></th>
+    		 <th class="cell" nonsortable="true">&nbsp;</th>
+			 <th class="cell"><cpanel langprint="RDUrl"></th>
+			 <th class="cell"><cpanel langprint="ADType"></th>
+			 <th class="cell"><cpanel Locale="maketext('Match www.')"></th>
+			 <th class="cell"><cpanel Locale="maketext('Wildcard')"></th>
+    		 <th class="cell-end"  nonsortable="true"><cpanel langprint="RedirectRemove"></th>
+  			</tr>
+  			<?cp Mime::listredirects([tr class="row-%"][td class="truncate"]%[/td][td colspan="2" class="cell truncate"][a href="http://%%" target="_blank"]%[/a][/td][td class="truncate cell nobrd-left-t" align="absmiddle"]%[/td][td class="cell"]%[/td][td class="cell" align="center"][img src="../images/box%.gif"][/td][td class="cell" align="center"][img src="../images/box%.gif"][/td][td class="cell-end"][div align="center"][span class="errors"][a href="delredirectconfirm.html?domain=%&path=%&docroot=%"][img border="0" align="absmiddle" src="../images/remove.gif" ][/span][/a][/div][/td][/tr],*num,displaydomain,urldomain,source,&displaysourceurl,&destination,type,matchwww_text,wildcard_text,^domain,^source,^docroot) regex=$FORM{'searchregex'},api2_paginate=1,api2_paginate_start=$FORM{'api2_paginate_start'},api2_paginate_size=$CPVAR{'itemsperpage'} || [tr][td colspan="8" class="errors"]$LANG{'NoRedirects'}[/td][/tr] ?>
+
+		</table>
+		<?cp UI::paginate(%,paginator) currentpage=$CPVAR{'currentpage'},pages=$CPVAR{'pages'},itemsperpage=$CPVAR{'itemsperpage'} ?>
+		<cpanelif $CPVAR{'pages'} && !$CPVAR{'pages'}==1>
+		<div style="float:right"><form>
+		<cpanel langprint="PaginatorShowing"> <select name="itemsperpage" onchange="this.form.submit();">
+		<?cp UI::paginate_list([option value="%" %]%[/option],item,selected=1?selected:,item) itemsperpage=$CPVAR{'itemsperpage'},itemlist=10:25:50:100:250:500 ?>
+		</select><noscript><button id="my_button" onclick="" type="submit" Value=""><cpanel Locale="maketext('Change')"></button></noscript>  <cpanel langprint="PaginatorResults"> 
+		</form></div>
+		</cpanelif></div>
+<cpanel Branding="include(stdfooter.html)">

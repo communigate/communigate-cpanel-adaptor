@@ -1,0 +1,17 @@
+
+<p><strong>What is the Branding Editor used for?</strong></p>
+<p>The Branding Editor allows you to put your custom logo or look onto any cPanel X theme. You'll need to create images that match the exact sizes of the current images in the branding editor. You can either create a new branding package to make changes in, or change the default package. Then you can upload these images through the editor and they will appear in all of your client's cPanel accounts. Branding is customizable per reseller. If you have multiple reseller accounts, you will need to change the branding for each one as it only affects all accounts owned by that specific reseller account. Using gif images is preferred. </p>
+<p>&nbsp;</p>
+<p><strong>Uploading Images/Text Manually</strong></p>
+<p>You can upload images/text for themes that support branding to /home/<cpanel print="user">/cpanelbranding/themename.</p>
+<p>&nbsp;</p>
+<p><strong>How Does Branding Work?</strong></p>
+<p>Each theme includes branding tags where images would normally be included. These tags search the reseller's cpanelbranding directory for the image. If it does not find the image in .gif, .png, or .jpg format, cPanel will use the default image included with the theme.</p>
+<p>&nbsp;</p>
+<p><strong>Custom Branding</strong></p>
+<p>You can add cPanel Branding tags to any page using the following format: <br /> &lt;cpanel Branding="image(image)"&gt; where image is the name of the image you wish to include without an extension. For example &lt;cpanel Branding="image(balloon)"&gt; would work for balloon.jpg, balloon.gif, or balloon.png.<br /><br />These tags can also be used to add custom text to a theme. &lt;cpanel Branding="text(file)"&gt; will look for a file called file.txt in the cpanelbranding directory and put the contents of that file in the page where the tag is.</p>
+<p>&nbsp;</p>
+<p><strong><cpanel Locale="maketext('Branding Packages')"></strong></p>
+<p>Branding Packages allow you to offer multiple choices to your clients. If you leave the default package untouched, your customers will still have access to it. You can provide different logos, color schemes, icons, etc. for your customers to choose from. Your customers will have access to select any branding package that exists, unless you disable the Change Look and Feel function.</p>
+<p>&nbsp;</p>
+

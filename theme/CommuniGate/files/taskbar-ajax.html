@@ -1,0 +1,52 @@
+<html>
+<head>
+<style type="text/css">
+.taskbar {
+    background-color:#ccc;
+border: #777 2px outset;
+height:36;
+clear:both;
+}
+.selectedtaskitem {
+    font-size:11px;
+    font-weight:bold;
+padding:1px;
+        margin-left:1px;
+        margin-right:1px;
+        margin-top:1px;
+        margin-bottom:1px;
+        background-color:#eee;
+cursor:hand;cursor:pointer;
+
+border: #ddd 2px inset;
+float:left;
+clear:right;
+}
+
+.taskitem {
+cursor:hand;cursor:pointer;
+
+       font-size:11px;
+       font-weight:bold;
+padding:1px;
+        margin-left:1px;
+        margin-right:1px;
+        margin-top:1px;
+        margin-bottom:1px;
+        background-color:#ddd;
+border: #555 2px outset;
+float:left;
+clear:right;
+}
+</style>
+
+<script type="text/javascript">
+function showWindow(a,b) {
+    parent.frames.mainFM.showWindow(a,b);
+}
+</script>
+</head>
+<body style="padding:0px;margin:0px;">
+<table class="taskbar" width="100%"><tr><td><img align="absmiddle" id="loading" style="display:none;" src="images/progress.gif"></td><td width="100%"><div id="taskbar"></div></td></tr></table>
+</body>
+</html>

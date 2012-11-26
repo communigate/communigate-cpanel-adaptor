@@ -1,0 +1,141 @@
+<cpanel Branding="tempsetbrandingpkg($FORM{'brandingpkg'})">
+<?cp Branding::preloadconf(,) ?>
+<cpanel setvar="headerimg=../../images/tools.gif">
+<cpanel setvar="dprefix=../../">
+<cpanel relinclude="stdbheader.html">
+<script type="text/javascript">
+
+function handleSelect() {
+    var divselect = document.addform.type;
+    var optval = divselect.options[divselect.selectedIndex].value;
+    if (optval == '') { return; }
+    if (optval == 'image') {
+        document.getElementById('imgtypesel').style.display='';        
+        document.getElementById('finputs').style.display='none';
+        document.getElementById('finputs_image').style.display='';
+        document.getElementById('finputs_group').style.display='none';
+    } else if (optval == 'group') {
+        document.getElementById('imgtypesel').style.display='none';        
+        document.getElementById('finputs').style.display='';
+        document.getElementById('finputs_image').style.display='none';
+        document.getElementById('finputs_group').style.display='';
+    } else  {
+        document.getElementById('imgtypesel').style.display='none';        
+        document.getElementById('finputs').style.display='';
+        document.getElementById('finputs_image').style.display='none';
+        document.getElementById('finputs_group').style.display='none';
+    }
+}
+
+function showform() {
+}
+/*
+   imgtype=icon 
+   type=html
+ */
+function handleImageSel () {
+    var divselect = document.addform.imgtype;
+    var optval = divselect.options[divselect.selectedIndex].value;
+    if (optval == '') { return; }
+    document.getElementById('finputs').style.display='';
+    if (optval == 'icon') {
+        document.getElementById('finputs_image_icon').style.display='';
+    } else {
+        document.getElementById('finputs_image_icon').style.display='none';
+    }
+ //   cpanel_api2(handleTableUpdate,'Branding','brandingeditor','imgtype',optval,'showdeleted',1)
+}
+
+
+function showForm(){
+    handleSelect();
+/*
+	var divids = new Array("ie-html", "ie-img", "ie-css", "ie-feat");
+	var x=0;
+	for (x=0; x<4; x++){
+		document.getElementById(divids[x]).style.display = "none";
+	}
+	var divselect = document.addform.type.selectedIndex;
+	document.getElementById(divids[divselect]).style.display= "inline";
+*/
+}
+
+</script>
+<style type="text/css">
+.hideme {
+	display:none;
+}
+</style>
+
+<div class="body-content">
+
+<h1><cpanel langprint="AddInterfaceElement_Title"></h1>
+<div style="background: #FDA8A8; border:1px solid #ccc; padding: 15px;">
+	<h2 style="margin: 0;"><cpanel Locale="maketext('Developer Feature Only')"></h2>
+	<p><cpanel Locale="maketext('This feature is only for developers. There is no support from cPanel for this feature. Please use at your own risk!')"></p>
+</div>
+
+<p class="description"><cpanel langprint="AddInterfaceElement_Desc"></p>
+<form name="addform" action="elementadd-do.html" method="post">
+ <input type="hidden" name="brandingpkg" value="<?cp Branding::getbrandingpkg(%,brandingpkg) ?>">
+
+<div id="select-type-wrap">
+	<p>
+		<label for="select-type"><cpanel langprint="AddInterfaceElement_SelectType"></label> 
+		<select name="type" onchange="showForm()" id="select-type">
+			<option value="">&nbsp;</option>
+			<?cp Branding::listobjecttypes([option value="%"]%[/option],type,type) ?>
+	    </select>
+	</p>
+</div>
+<!-- END #select-type -->
+<div id="imgcategory-wrap">
+	<span style="display:none;" id="imgtypesel">
+		<p>
+			<label for="imgcategory"><cpanel langprint="AddInterfaceElement_SelectImgCategory"></label> 
+			<select name="imgtype" onchange="handleImageSel(this);" id="imgcategory">
+				<option value="">&nbsp;</option>
+				<?cp Branding::listimgtypes([option value="%"]%[/option],imgtype,imgtype) ?>
+	        </select>
+		</p>
+	</span>
+</div>
+<!-- END #imgcategory-wrap -->
+<div id="finputs" style="display:none;">
+	<p><label><cpanel langprint="AddInterfaceElement_Filename"></label> <input type="text" name="file" /></p>
+	<p><label><cpanel langprint="AddInterfaceElement_Description"></label> <input type="text" name="itemdesc" /></p>
+   
+	<div id="finputs_image" style="display:none;">
+	    <label><cpanel langprint="AddInterfaceElement_SelectImgType"></label> 
+		<select name="subtype" id="subtype">
+			<option value="">&nbsp;</option>
+		    <option value="img"><cpanel langprint="AddInterfaceElement_SelectImgTypeImg"></option>
+		    <option value="bg"><cpanel langprint="AddInterfaceElement_SelectImgTypeBg"></option>
+		    <option value="logo"><cpanel langprint="AddInterfaceElement_SelectImgTypeLogo"></option>
+		    <option value="compleximg"><cpanel Locale="maketext('Complex Image')"></option>
+	    </select>
+	    <p><label><cpanel langprint="AddInterfaceElement_SelectImgTypeH"></label> <input type="text" name="height" /></p>
+	    <p><label><cpanel langprint="AddInterfaceElement_SelectImgTypeW"></label> <input type="text" name="width" /></p>
+	    <div id="finputs_image_icon" style="display:none;">
+	    	<p><label><cpanel langprint="AddInterfaceElement_SelectImgCatDesc"></label> <input type="text" name="description" /> <em class="note"><cpanel langprint="AddInterfaceElement_SelectImgCatDescNote"></em></p>
+		    <p><label><cpanel langprint="AddInterfaceElement_SelectImgCatFeat"></label> <input type="text" name="feature"> <em class="note"><cpanel langprint="AddInterfaceElement_SelectImgCatFeatNote"></em></p>
+		    <p><label><cpanel langprint="AddInterfaceElement_SelectImgCatIf"></label> <input type="text" name="if" /> <em class="note"><cpanel langprint="AddInterfaceElement_SelectImgCatIfNote"></em></p>
+		    <p><label><cpanel langprint="AddInterfaceElement_SelectImgCatURL"></label> <input type="text" name="url" /></p>
+		    <p><label><cpanel langprint="AddInterfaceElement_SelectImgCatGr"></label> <input type="text" name="group" /></p>
+		    <p><label><cpanel langprint="AddInterfaceElement_SelectImgCatIO"></label> <input type="text" name="itemorder" /></p>
+	    </div>
+	</div>
+	    <div id="finputs_group" style="display:none;">
+	    	<p><label><cpanel langprint="AddInterfaceElement_SelectImgCatGN"></label> <input type="text" name="group" /></p>
+	    	<p><label><cpanel langprint="AddInterfaceElement_SelectImgCatGD"></label> <input type="text" name="groupdesc" /></p>
+	    	<p><label><cpanel langprint="AddInterfaceElement_SelectImgCatGO"></label> <input type="text" name="grouporder" /></p>
+	    </div>
+</div>
+<div id="finputs-submit">
+	<input type="submit" class="input-button" value="<cpanel langprint="AHAdd">" />
+</div>
+</form>
+<cpanel include="gobackwhere.html">
+
+</div>
+<cpanel Branding="include(stdfooter.html)">

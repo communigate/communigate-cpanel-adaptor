@@ -1,0 +1,56 @@
+  <script type="text/javascript">
+   function regpop (username) {
+      alert('<cpanel langprint="ClientConfigAlert1">');
+      alert('<cpanel langprint="ClientConfigAlert2">');
+      alert('<cpanel langprint="ClientConfigAlert3">');
+	return true;
+   }
+   </script>
+
+
+
+
+<style type="text/css">
+<?cp Branding::spritelist(.spriteicon_img_mini {float:left;margin-right:5px;background: url\{leftparenthesis}"%"\{rightparenthesis};} %,@spriteurl,images::#icon-${img}_mini {background-position\{colon}0 -${cssposition}px;width\{colon}${width}px;height\{colon}${height}px; }:) imgtype=icon,subtype=img,method=scale_60percent,format=png,img=manageaccounts ?>
+
+</style>
+	<div class="h1Title"><div class="spriteicon_img_mini" id="icon-manageaccounts_mini"></div> <cpanel langprint="ConfigClientFor">&nbsp;<cpanel print="$FORM{'acct'}"></div>
+	
+<cpanelif $hasautoconfig>
+	<p class="description"><cpanel langprint="ConfigMailDesc"></p>
+</cpanelif>
+	<p class="description"><cpanel langprint="ConfigMailNote"></p>
+
+	<h2><cpanel langprint="SelectApp"></h2>
+<cpanelif $hasautoconfig>
+		<a onclick="regpop('<cpanel print="$FORM{'acct'}">');" href="email.reg?acct=<cpanel print="$FORM{'acct'}">&type=imap&app=outlook"><cpanel langprint="OutlookIMAP"></a><br />
+		<a onclick="regpop('<cpanel print="$FORM{'acct'}">');" href="email.reg?acct=<cpanel print="$FORM{'acct'}">&type=imap&app=outlook&usessl=1&host=<cpanel SSL="getcnname($FORM{'acct'},'imap')">"><cpanel langprint="OutlookIMAP"> (SSL)</a><br />
+		
+        <a onclick="regpop('<cpanel print="$FORM{'acct'}">');" href="email.reg?acct=<cpanel print="$FORM{'acct'}">&type=pop3&app=outlook"><cpanel langprint="OutlookPOP"></a><br />
+        <a onclick="regpop('<cpanel print="$FORM{'acct'}">');" href="email.reg?acct=<cpanel print="$FORM{'acct'}">&type=pop3&app=outlook&usessl=1&host=<cpanel SSL="getcnname($FORM{'acct'},'pop3')">"><cpanel langprint="OutlookPOP"> (SSL)</a><br />
+		
+         <a onclick="regpop('<cpanel print="$FORM{'acct'}">');" href="email.reg?acct=<cpanel print="$FORM{'acct'}">&type=imap&app=outlookexpress"><cpanel langprint="ExpressIMAP"></a><br />
+         <a onclick="regpop('<cpanel print="$FORM{'acct'}">');" href="email.reg?acct=<cpanel print="$FORM{'acct'}">&type=imap&app=outlookexpress&usessl=1&host=<cpanel SSL="getcnname($FORM{'acct'},'imap')">"><cpanel langprint="ExpressIMAP"> (SSL)</a><br />
+		
+        <a onclick="regpop('<cpanel print="$FORM{'acct'}">');" href="email.reg?acct=<cpanel print="$FORM{'acct'}">&type=pop3&app=outlookexpress"><cpanel langprint="ExpressPOP"></a><br />
+		<a onclick="regpop('<cpanel print="$FORM{'acct'}">');" href="email.reg?acct=<cpanel print="$FORM{'acct'}">&type=pop3&app=outlookexpress&usessl=1&host=<cpanel SSL="getcnname($FORM{'acct'},'pop3')">"><cpanel langprint="ExpressPOP"> (SSL)</a><br />
+    
+</cpanelif>
+
+   <a href="<cpanel print="$ENV{'cp_security_token'}">/backend/mailappsetup.cgi?<cpanel print="$FORM{'acct'}">|<cpanel Email="getmailserver($FORM{'acct'})">|<cpanel Chkservd="geteximport()">|0|<cpanel Email="hasmaildir()">"><cpanel langprint="MacMailIMAP"></a><br />
+    <a href="<cpanel print="$ENV{'cp_security_token'}">/backend/mailappsetup.cgi?<cpanel print="$FORM{'acct'}">|<cpanel SSL="getcnname($FORM{'acct'},'imap')">|<cpanel Chkservd="geteximport()">|1|<cpanel Email="hasmaildir()">"><cpanel langprint="MacMailIMAP"> (SSL)</a><br />
+		
+	
+<cpanel langprint="ConfigMailImapNote">
+
+	<br />
+
+	
+	<h2><cpanel langprint="ManSettings"></h2>
+		<cpanel langprint="MailServerUser"><cpanel Email="getmailserveruser($FORM{'acct'})"><br />
+		<cpanel langprint="IncomingMailServer"><cpanel Email="getmailserver($FORM{'acct'})"><br />
+		<cpanel langprint="IncomingMailServer"> (SSL) <cpanel SSL="getcnname($FORM{'acct'},'imap')"><br />
+		<cpanel langprint="OutgoingMailServer"><cpanel Email="getmailserver($FORM{'acct'})"><cpanel langprint="ServerRequiresAuth"> <b>port <cpanel Chkservd="geteximport()"></b><br />
+		<cpanel langprint="OutgoingMailServer"> (SSL) <cpanel SSL="getcnname($FORM{'acct'},'smtp')"><cpanel langprint="ServerRequiresAuth"> <b>port <cpanel Chkservd="geteximport_ssl()"></b><br />
+		<cpanel langprint="IncomingProtocols"><br />
+		<cpanel langprint="OutgoingProtocols"><br />

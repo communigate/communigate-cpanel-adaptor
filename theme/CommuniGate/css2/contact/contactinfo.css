@@ -1,0 +1,20 @@
+/*Contact Info Form Styles*/
+table#contact_form{
+	border-collapse:collapse;	
+}
+#contact_form td{
+	border-bottom:1px solid #C1C1C1;
+	padding-top: 5px;
+	padding-bottom: 5px;
+}
+.contact_form_input {
+	width: 285px;
+}
+td.contact_info_td1 {
+	text-align: right;
+	width: 60px;
+	padding-right: 5px;
+}
+td.contact_info_td2 {
+	width: 290px;
+}

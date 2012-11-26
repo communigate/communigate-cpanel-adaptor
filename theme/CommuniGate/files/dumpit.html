@@ -1,0 +1,11 @@
+<html>
+<head>
+<title>cPanel X</title>
+<cpanel relinclude="files/files_head.html">
+<body>
+<img src="../images/TrashFull.png"> <font class=med><cpanel langprint="FMEmptyTrashStatus"><cpanel Fileman="emptytrash()"> </font> 
+<script type="text/javascript">
+document.location.href="trash.html?refresh=<cpanel print="$random">";
+</script>
+</html>
+

@@ -1,0 +1,13 @@
+<script type="text/javascript">
+//<![CDATA[
+var plotkit_script_url;
+if ( YAHOO.env.ua.ie && !document.createElement('canvas').getContext ) {
+    plotkit_script_url = CPANEL.security_token + '/plotkit/plotkit-mochikit-explorercanvas-slim-min.js';
+}
+else {
+    plotkit_script_url = CPANEL.security_token + '/plotkit/plotkit-mochikit-slim-min.js';
+}
+
+document.write('<script type="text/javascript" src="' + plotkit_script_url + '"><\/script>');
+//]]>
+</script>

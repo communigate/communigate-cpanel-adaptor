@@ -1,0 +1,76 @@
+<style type="text/css">
+<?cp Branding::spritelist(.spriteicon_img_mini {float:left;margin-right:5px;background: url\{leftparenthesis}"%"\{rightparenthesis};} %,@spriteurl,images::#icon-${img}_mini {background-position\{colon}0 -${cssposition}px;width\{colon}${width}px;height\{colon}${height}px; }:) imgtype=icon,subtype=img,method=scale_60percent,format=png,img=ftpaccounts ?>
+</style>
+<script type="text/javascript">
+function regzilla() {};
+function regcoreftp() {};
+function regcyberduck() {};
+</script>
+<div class="h1Title"><div class="spriteicon_img_mini" id="icon-ftpaccounts_mini"></div><cpanel langprint="MENUFTPAccounts"></div>
+
+	<p class="description"><cpanel langprint="ConfigFtpDesc"></p>
+	<h2><cpanel langprint="SelectApp"></h2>
+		
+<cpanelif $hasdedicatedip>
+<div class="threecontainer">
+<div class="threebox">
+	<div class="ftplogo"><img src="../images/filezilla.gif" /></div>
+	<cpanel langprint="ftp_filezilla"><br />
+	<a onclick="regzilla('<cpanel print="$FORM{'acct'}">');" href="<cpanel print="$ENV{'cp_security_token'}">/backend/filezillasetup.cgi?<cpanel print="$FORM{'acct'}">@<cpanel print="$CPDATA{'DNS'}">|ftp.<cpanel print="$CPDATA{'DNS'}">|<cpanel print="$FORM{'acct'}">|0"><cpanel langprint="ftp_ftp"></a><br />
+	<a onclick="regzilla('<cpanel print="$FORM{'acct'}">');" href="<cpanel print="$ENV{'cp_security_token'}">/backend/filezillasetup.cgi?<cpanel print="$FORM{'acct'}">@<cpanel print="$CPDATA{'DNS'}">|ftp.<cpanel print="$CPDATA{'DNS'}">|<cpanel print="$FORM{'acct'}">|1"><cpanel langprint="ftp_sftp"></a><br />
+	<a target="_blank" href="instructions/filezilla.html?acct=<cpanel print="$FORM{'acct'}">"><cpanel langprint="ftp_inst"></a>
+</div>		
+<div class="threebox">		
+   	<div class="ftplogo"><img src="../images/coreftp.gif" width="83" height="33"/></div>
+	<cpanel langprint="ftp_core_ftp"><br />
+	<a onclick="regcoreftp('<cpanel print="$FORM{'acct'}">');" href="<cpanel print="$ENV{'cp_security_token'}">/backend/coreftpsetup.cgi?<cpanel print="$FORM{'acct'}">@<cpanel print="$CPDATA{'DNS'}">|ftp.<cpanel print="$CPDATA{'DNS'}">|<cpanel print="$FORM{'acct'}">|0"><cpanel langprint="ftp_ftp"></a><br />
+	<a onclick="regcoreftp('<cpanel print="$FORM{'acct'}">');" href="<cpanel print="$ENV{'cp_security_token'}">/backend/coreftpsetup.cgi?<cpanel print="$FORM{'acct'}">@<cpanel print="$CPDATA{'DNS'}">|ftp.<cpanel print="$CPDATA{'DNS'}">|<cpanel print="$FORM{'acct'}">|1"><cpanel langprint="ftp_sftp"></a><br />
+	<a target="_blank" href="instructions/coreftp.html?acct=<cpanel print="$FORM{'acct'}">"><cpanel langprint="ftp_inst"></a>
+</div>
+<div class="threebox">
+   	<div class="ftplogo"><img src="../images/cyberduck.png" width="64" height="64"/></div>
+	<cpanel langprint="ftp_cyberduck"><br />
+    <a onclick="regcyberduck('<cpanel print="$FORM{'acct'}">');" href="<cpanel print="$ENV{'cp_security_token'}">/backend/cyberducksetup.cgi?<cpanel print="$FORM{'acct'}">@<cpanel print="$CPDATA{'DNS'}">|ftp.<cpanel print="$CPDATA{'DNS'}">|<cpanel print="$FORM{'acct'}">|0"><cpanel langprint="ftp_ftp"></a><br />
+	<a onclick="regcyberduck('<cpanel print="$FORM{'acct'}">');" href="<cpanel print="$ENV{'cp_security_token'}">/backend/cyberducksetup.cgi?<cpanel print="$FORM{'acct'}">@<cpanel print="$CPDATA{'DNS'}">|ftp.<cpanel print="$CPDATA{'DNS'}">|<cpanel print="$FORM{'acct'}">|1"><cpanel langprint="ftp_sftp"></a><br />
+	<a target="_blank" href="instructions/cyberduck.html?acct=<cpanel print="$FORM{'acct'}">"><cpanel langprint="ftp_inst"></a>
+</div>
+</div>
+</cpanelif>
+<div class="clearit">&nbsp;</div>
+<cpanelif !$hasdedicatedip>
+<div class="threecontainer">
+	<div class="threebox">
+		<div class="ftplogo"><img src="../images/filezilla.gif" /></div>
+		<cpanel langprint="ftp_filezilla"><br />
+		<a onclick="regzilla('<cpanel print="$FORM{'acct'}">@<cpanel print="$CPDATA{'DNS'}">');" href="<cpanel print="$ENV{'cp_security_token'}">/backend/filezillasetup.cgi?<cpanel print="$FORM{'acct'}">@<cpanel print="$CPDATA{'DNS'}">|ftp.<cpanel print="$CPDATA{'DNS'}">|<cpanel print="$FORM{'acct'}">@<cpanel print="$CPDATA{'DNS'}">|0"><cpanel langprint="ftp_ftp"></a><br />
+		<a onclick="regzilla('<cpanel print="$FORM{'acct'}">@<cpanel print="$CPDATA{'DNS'}">');" href="<cpanel print="$ENV{'cp_security_token'}">/backend/filezillasetup.cgi?<cpanel print="$FORM{'acct'}">@<cpanel print="$CPDATA{'DNS'}">|ftp.<cpanel print="$CPDATA{'DNS'}">|<cpanel print="$FORM{'acct'}">@<cpanel print="$CPDATA{'DNS'}">|1"><cpanel langprint="ftp_sftp"></a><br />
+		<a target="_blank" href="instructions/filezilla.html?acct=<cpanel print="$FORM{'acct'}">"><cptext 'Instructions (new window)'></a>
+	</div>
+	<div class="threebox">
+		<div class="ftplogo"><img src="../images/coreftp.gif" width="83" height="33"/></div>
+		<cpanel langprint="ftp_core_ftp"><br />
+		<a onclick="regcoreftp('<cpanel print="$FORM{'acct'}">@<cpanel print="$CPDATA{'DNS'}">');" href="<cpanel print="$ENV{'cp_security_token'}">/backend/coreftpsetup.cgi?<cpanel print="$FORM{'acct'}">@<cpanel print="$CPDATA{'DNS'}">|ftp.<cpanel print="$CPDATA{'DNS'}">|<cpanel print="$FORM{'acct'}">@<cpanel print="$CPDATA{'DNS'}">|0"><cpanel langprint="ftp_ftp"></a><br />
+		<a onclick="regcoreftp('<cpanel print="$FORM{'acct'}">@<cpanel print="$CPDATA{'DNS'}">');" href="<cpanel print="$ENV{'cp_security_token'}">/backend/coreftpsetup.cgi?<cpanel print="$FORM{'acct'}">@<cpanel print="$CPDATA{'DNS'}">|ftp.<cpanel print="$CPDATA{'DNS'}">|<cpanel print="$FORM{'acct'}">@<cpanel print="$CPDATA{'DNS'}">|1"><cpanel langprint="ftp_sftp"></a><br />
+		<a target="_blank" href="instructions/coreftp.html?acct=<cpanel print="$FORM{'acct'}">"><cpanel langprint="ftp_inst"></a>
+	</div>
+	<div class="threebox">
+		<div class="ftplogo"><img src="../images/cyberduck.png" width="64" height="64"/></div>
+		<cpanel langprint="ftp_cyberduck"><br />
+        <a onclick="regcyberduck('<cpanel print="$FORM{'acct'}">@<cpanel print="$CPDATA{'DNS'}">');" href="<cpanel print="$ENV{'cp_security_token'}">/backend/cyberducksetup.cgi?<cpanel print="$FORM{'acct'}">@<cpanel print="$CPDATA{'DNS'}">|ftp.<cpanel print="$CPDATA{'DNS'}">|<cpanel print="$FORM{'acct'}">@<cpanel print="$CPDATA{'DNS'}">|0"><cpanel langprint="ftp_ftp"></a><br />
+        <a onclick="regcyberduck('<cpanel print="$FORM{'acct'}">@<cpanel print="$CPDATA{'DNS'}">');" href="<cpanel print="$ENV{'cp_security_token'}">/backend/cyberducksetup.cgi?<cpanel print="$FORM{'acct'}">@<cpanel print="$CPDATA{'DNS'}">|ftp.<cpanel print="$CPDATA{'DNS'}">|<cpanel print="$FORM{'acct'}">@<cpanel print="$CPDATA{'DNS'}">|1"><cpanel langprint="ftp_sftp"></a><br />
+		<a target="_blank" href="instructions/cyberduck.html?acct=<cpanel print="$FORM{'acct'}">"><cpanel langprint="ftp_inst"></a>
+		</div>
+</div>
+</cpanelif>
+<div style="clear:both">&nbsp;</div>
+	<h2><cpanel langprint="ManSettings"></h2>
+<cpanelif $hasdedicatedip>
+        <strong><cpanel langprint="ftp_username">: </strong> <cpanel print="$FORM{'acct'}">
+</cpanelif>
+<cpanelif !$hasdedicatedip>
+        <strong><cpanel langprint="ftp_username">: </strong> <cpanel print="$FORM{'acct'}">@<cpanel print="$CPDATA{'DNS'}">
+</cpanelif>
+        <br />
+        <strong><cpanel langprint="ftp_server">: </strong> <cpanel langprint="ftp_address"><cpanel print="$CPDATA{'DNS'}"><br />
+        <strong><cpanel langprint="ftp_server_port">: </strong> <cpanel langprint="ftp_port_number"><br />	
+        <strong><cpanel langprint="sftp_server_port">: </strong> <cpanel SSH="getport()"><br />

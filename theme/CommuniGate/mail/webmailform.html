@@ -1,0 +1,80 @@
+<cpanel setvar="headerimg=../images/mailmenu.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+<div class="body-content">
+<h1><cpanel Locale="maketext('WebMail Login')"></h1>
+
+<cpanel setvar="useform=1">
+<cpanel setvar="url=/login/">
+
+<cpanelif $ENV{'SERVER_PORT'}==2082>
+    <cpanel setvar="url=http://$ENV{'HTTP_HOST'}:2095/login/">
+</cpanelif>
+
+<cpanelif !$ENV{'SERVER_PORT'}==2082>
+    <cpanel setvar="url=https://$ENV{'HTTP_HOST'}:2096/login/">
+</cpanelif>
+
+<cpanelif $ENV{'HTTP_PROXIED'}>
+    <cpanel ProxyUtils="proxyaddress('webmaild')">
+    <cpanel setvar="url=$CPVAR{'new_proxy_host'}/login/">
+</cpanelif>
+
+<cpanel setvar="autologin=0">
+ 
+<cpanelif $CONF{'domainowner_mail_pass'} && !$isoverridelogin>
+    <cpanel setvar="url=$ENV{'cp_security_token'}/xferwebmail/">
+    <cpanel setvar="autologin=1">
+	<cpanel setvar="useform=0">
+</cpanelif>
+
+<cpanelif $CPVAR{'useform'}>
+	<form id="webform" action="<cpanel print="$CPVAR{'url'}">" method="post">
+	<b><cpanel print="$FORM{'user'}"></b><br /><br />
+	<input type="hidden" name="user" value="<cpanel print="$FORM{'user'}">" />
+	<span id="pass">
+	<cpanel Locale="maketext('Enter Password for “[_1]”:',$FORM{'user'})"> <input type="password" name="pass" size="16" />
+	</span>
+	<input type="submit" value="<cpanel langprint="Login">" class="input-button" />
+	</form>
+	<script type="text/javascript">
+	if (<cpanel print="$CPVAR{'autologin'}">) {
+		document.getElementById('pass').style.display='none';
+		document.getElementById('webform').submit();
+	}
+	</script>
+</cpanelif>
+
+
+<cpanelif !$CPVAR{'useform'}>
+	<div style="text-align:center">
+	<img src="../images/loader.gif" alt="Loading progress image" /><br/>
+	<a id="wmlinkEl" href="<cpanel print="$CPVAR{'url'}">?user=<cpanel print="$URI_ENCODED_FORM{'user'}">"><cpanel Locale="maketext('Login')"></a>
+	<script type="text/javascript">
+	//<![CDATA[
+	var navit = function() {
+		var realEl = document.getElementById('wmlinkEl');
+		var clickok = 0;
+		
+		if ( realEl.click ) {
+			if ( realEl.click() ) { clickok=1; }
+		} else if ( realEl.onclick ) {
+			if ( realEl.onclick() ) { clickok=1; }
+		};
+		
+		if (!clickok) {
+			window.location.href=realEl.href;
+		}
+			
+		realEl.innerHTML='<cpanel Locale="maketext('Logging you in …')">';
+	}
+
+	YAHOO.util.Event.onDOMReady(navit);
+	//]]>
+	</script>
+</div>
+</cpanelif>
+
+<div class="return-link"><a href="pops<cpanelif $brandingpkg==mobile>_noscript</cpanelif>.html">&larr; <cptext "Go Back"></a></div>
+</div>
+<cpanel Branding="include(stdfooter.html)">

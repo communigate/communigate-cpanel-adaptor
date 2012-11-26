@@ -1,0 +1,52 @@
+<cpanel setvar="headerimg=../images/mailmenu.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+<style type="text/css">
+<?cp Branding::spritelist(.spriteicon_img_mini {float:left;margin-right:5px;background: url\{leftparenthesis}"%"\{rightparenthesis};} %,@spriteurl,images::#icon-${img}_mini {background-position\{colon}0 -${cssposition}px;width\{colon}${width}px;height\{colon}${height}px; }:) imgtype=icon,subtype=img,method=scale_60percent,format=png,img=ftpaccounts ?>
+</style>
+<script type="text/javascript">
+function checkquotaform () {
+   var quota = document.quotaform.quota.value;
+   var pattern = /^[0-9]*$|unlimited/;
+   if (quota.match(pattern) == null) {
+        alert("<cpanel langprint="EAAddQNum">");
+        return false;
+   }
+}
+</script>
+
+<div class="body-content">
+<div class="h1Title"><div class="spriteicon_img_mini" id="icon-ftpaccounts_mini"></div><cpanel langprint="FTPChangeQuotaHead"></div>
+
+
+<cpanelif !$FORM{'type'}==main>
+<p><cpanel langprint="QuotaDesc"></p>
+
+<form method="post" name="quotaform" onsubmit="return checkquotaform()" action="doeditquota.html">
+
+<p><cpanel langprint="EAChangingquota"> <b><cpanel print="$FORM{'acct'}"></b>
+</p>
+
+<input type="hidden" name="acct" value="<cpanel print="$FORM{'acct'}">">
+
+<p><cpanel langprint="EANewquota">
+	<input type="text" name="quota" value="<cpanel Ftp="getftpquota($FORM{'acct'})">"> <cpanel langprint="EAdoaddmegs">
+</p>
+
+
+<p><input type="submit" class="input-button" value="<cpanel langprint="EAChange">">
+</p>
+</cpanelif>
+
+
+<cpanelif $FORM{'type'}==main>
+<p><cpanel langprint="FTPMainAccountQ"></p>
+</cpanelif> 
+
+
+
+<div class="return-link"><a href="accounts.html">&larr; <cptext "Go Back"></a></div>
+
+</div>
+<cpanel Branding="include(stdfooter.html)">
+

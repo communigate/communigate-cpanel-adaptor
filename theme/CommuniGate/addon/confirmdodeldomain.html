@@ -1,0 +1,23 @@
+<cpanel setvar="headerimg=../images/topsubdomains.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+
+<style type="text/css">
+<?cp Branding::spritelist(.spriteicon_img_mini {float:left;margin-right:5px;background: url\{leftparenthesis}"%"\{rightparenthesis};} %,@spriteurl,images::#icon-${img}_mini {background-position\{colon}0 -${cssposition}px;width\{colon}${width}px;height\{colon}${height}px; }:) imgtype=icon,subtype=img,method=scale_60percent,format=png,img=addondomain ?>
+</style>
+	
+<div class="body-content">
+
+<div class="h1Title"><div class="spriteicon_img_mini" id="icon-addondomain_mini"></div><cpanel langprint="AODRemoval"></div>
+
+
+<p><cpanel Locale="maketext('Are you sure you wish to [output,strong,permanently] remove the addon domain “[output,class,_1,status]”?', $FORM{'domain'})"></p>
+
+<a class="create-button" href="dodeldomain.html?domain=<cpanel print="$FORM{'domain'}">&amp;subdomain=<cpanel print="$FORM{'subdomain'}">"><cpanel Locale="maketext('Remove “[_1]”',$FORM{'domain'})"></a>
+<a href="index.html" class="cancel_link"><cpanel Locale="maketext('cancel')"></a>
+
+<div class="return-link"><a href="index.html">&larr; <cptext "Go Back"></a></div>
+
+</div><!-- end body-content -->
+
+<cpanel Branding="include(stdfooter.html)">

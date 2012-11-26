@@ -1,0 +1,97 @@
+<cpanel setvar="headerimg=../images/tools.gif">
+<cpanel setvar="dprefix=../">
+
+<cpanel Branding="include(stdheader.html)">
+<style type="text/css"><cpanel include="boxtrapper.css"></style>
+<script type="text/javascript">
+     truncate_on = 1;
+     register_truncate_table('bxq');
+	var checkflag = 0;
+
+	function check(field) {
+		if (checkflag == 0) {
+			for (i = 0; i < field.length; i++) {
+				field[i].checked = 1;
+			}
+			checkflag = 1;
+			return "Uncheck All"; 
+		}
+		else {
+			for (i = 0; i < field.length; i++) {
+				field[i].checked = 0; 
+			}
+			checkflag = 0;
+			return "Check All"; 
+		}
+	}
+ </script>
+
+
+<div class="body-content">
+
+<style type="text/css">
+<?cp Branding::spritelist(.spriteicon_img_mini {float:left;margin-right:5px;background: url\{leftparenthesis}"%"\{rightparenthesis};} %,@spriteurl,images::#icon-${img}_mini {background-position\{colon}0 -${cssposition}px;width\{colon}${width}px;height\{colon}${height}px; }:) imgtype=icon,subtype=img,method=scale_60percent,format=png,img=boxtrapper ?>
+</style>
+<div class="h1Title"><div class="spriteicon_img_mini" id="icon-boxtrapper_mini"></div> <cpanel langprint="searchresultslegend-BoxTrapper"></div>
+<center>
+	<p><cpanel langprint="queuefor-BoxTrapper"> <span class="blacktext"><cpanel print="$FORM{'account'}"></span></p>
+	<br />
+
+   <fieldset>
+   		<legend><cpanel langprint="newsearch-BoxTrapper"></legend>
+   		<table border="0" width="75%">
+			<form name="queuesearch" action="queuesearch.html" method="post">
+			<input type="hidden" name="account" value="<cpanel print="$FORM{'account'}">" /><input type="hidden" name="mydate" value="<cpanel print="$FORM{'logdate'}">" />
+   			<tr>
+				<td>
+					<cpanel langprint="searchin-BoxTrapper"> 
+					<select name="field">
+						<option value="sender"><cpanel langprint="sender-BoxTrapper"></option>
+   						<option value="subject"><cpanel langprint="subject-BoxTrapper"></option>
+   						<option value="body"><cpanel langprint="body-BoxTrapper"></option>
+   					</select>
+				</td>
+   				<td>
+					<cpanel langprint="searchstring-BoxTrapper"> 
+					<input type="text" name="string" />
+				</td>
+				<td><input type="submit" value="<cpanel langprint="submit-BoxTrapper">" class="input-button" /></td>
+			</tr>
+			</form>
+		</table>
+	</fieldset>
+	
+   	<hr color="#FFFFFF">
+	<a href="showq.html?account=<cpanel uriprint="$FORM{'account'}">"><cpanel langprint="BTReturnToCurrentDate"></a><br />
+	<table border="0" width="99%">
+	
+		<tr><cpanel BoxTrapper="logcontrols($FORM{'logdate'},$FORM{'account'})"></tr>
+	</table>
+<form name="input" action="multimsgaction.html" method="get">
+	<input type="hidden" name="mydate" value="<cpanel print="$FORM{'logdate'}">" />
+	<table class="sortable truncate-table" id="bxq" width="100%">
+		<tr>
+			<th class="sorttable_nosort"><input id="bxq_top_check" onclick="selectBoxes(this,'bxq')" type="checkbox" name="select" value="" /></th>
+			<th><cpanel langprint="from-BoxTrapper"></th>
+			<th><cpanel langprint="subject-BoxTrapper"></th>
+			<th><cpanel langprint="time-BoxTrapper"></th>
+		</tr>
+
+<cpanel BoxTrapper="showqueue($FORM{'logdate'},$FORM{'account'},showmsg.html,,1)">
+</table>
+<table border="0" width="99%">
+	<tr><cpanel BoxTrapper="logcontrols($FORM{'logdate'},$FORM{'account'})"></tr>
+</table>
+<a href="showq.html?account=<cpanel uriprint="$FORM{'account'}">"><cpanel langprint="BTReturnToCurrentDate"></a><br />
+	<div align="left">
+		<label><input type="radio" name="multimsg" value="deleteall" /><cpanel langprint="SSHDeleteKey"></label><br />
+		<label><input type="radio" name="multimsg" value="whitelistall" /><cpanel langprint="whitelistdeliver"></label><br />
+		<br />
+		<input type="submit" class="input-button" value="<cptext 'Submit'>" />
+	</div>
+	</form>
+</center>
+
+<div class="return-link"><a href="manage.html?account=<cpanel uriprint="$FORM{'account'}">">&larr; <cptext "Go Back"> <cpanel langprint="EFaddedto"> <cpanel langprint="configlegend-BoxTrapper"></a></div>
+</div>
+<cpanel Branding="include(stdfooter.html)">

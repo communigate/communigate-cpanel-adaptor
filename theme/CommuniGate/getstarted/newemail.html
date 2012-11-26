@@ -1,0 +1,33 @@
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+
+<style type="text/css">
+<?cp Branding::spritelist(.spriteicon_img_mini {float:left;margin-right:5px;background: url\{leftparenthesis}"%"\{rightparenthesis};} %,@spriteurl,images::#icon-${img}_mini {background-position\{colon}0 -${cssposition}px;width\{colon}${width}px;height\{colon}${height}px; }:) imgtype=icon,subtype=img,method=scale_60percent,format=png,img=manageaccounts ?>
+<?cp Branding::spritelist(.spriteicon_img_mini {float:left;margin-right:5px;background: url\{leftparenthesis}"%"\{rightparenthesis};} %,@spriteurl,images::#icon-${img}_mini {background-position\{colon}0 -${cssposition}px;width\{colon}${width}px;height\{colon}${height}px; }:) imgtype=icon,subtype=img,method=scale_60percent,format=png,img=getstart ?>
+</style>
+
+<div class="body-content">
+
+<h1><div class="spriteicon_img_mini" id="icon-getstart_mini"></div><cpanel langprint="gswtitle"></h1>
+
+<cpanel include="jumpmenu.html">
+
+<cpanelfeature !popaccts>
+        <meta http-equiv="refresh" content="0;url=defaultaddress.html" />
+</cpanelfeature>
+
+<cpanelfeature popaccts>
+	<div class="h1Title"><div class="spriteicon_img_mini" id="icon-manageaccounts_mini"></div><cpanel langprint="gswnewemail"></div>
+	<p><class="description"><cpanel langprint="GSWEmailDesc"></p><br />
+	<form method="post" name="mainform" id="mainform" action="newemail-a.html">
+	<cpanel include="../mail/popsinclude.html">
+	</form>
+</cpanelfeature>
+
+<br /><br />
+<div align="right">
+	<form method="link" action="defaultaddress.html"><input type="submit" class="input-button" value="<cpanel langprint="GSWSkip">"></form>
+</div>
+
+</div>
+<cpanel Branding="include(stdfooter.html)">

@@ -1,0 +1,25 @@
+#main .item {
+xbackground: #f55;
+float: left;
+height: auto;
+margin: 3px 0;
+padding: 0;
+text-align: left;
+width: 245px;
+}
+.item a {
+display: block;
+padding: 5px 0 0 0;
+}
+.item a.itemlink {
+float: left;
+margin: 0 10px 0 5px;
+padding: 0;
+width: 55px;
+height: 32px;
+overflow: hidden;
+}
+body{
+	background-color:#000;
+	background-image:#000;
+}

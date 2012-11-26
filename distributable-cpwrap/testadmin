@@ -1,0 +1,100 @@
+#!/usr/bin/perl
+
+# Sanatize @INC
+BEGIN {
+    unshift @INC, '/usr/local/cpanel';
+    @INC = grep( !/(^\.|\.\.|\/\.+)/, @INC );
+    @INC = grep( /^(\/usr\/lib\d*\/perl|\/usr\/local\/lib\d*\/perl|\/usr\/local\/cpanel)/, @INC );
+}
+
+use Storable ();
+
+
+# Parse the arguments passed to the testadmin scripts via stdin
+my $theargs = <STDIN>;
+unless ( $theargs =~ /^(\d+) ([A-Z]+) (\S+)/ ) {
+    print STDERR "$0 : Syntax Mismatch\n";
+    exit 1;
+}
+chomp($theargs);
+
+my ( $uid, $action, @args ) = split( / /, $theargs );
+
+# This command hash contains all the logic for the actions to be run as root
+# to add a new escalated action, add a new key with a value of a coderef to this hash
+my %commands = (
+	'LS' => sub {
+	    # pull in the values that were in @args
+	    my ($dir) = @_;
+        # Sanatize our input
+        if ( !defined $dir || $dir eq '' ) {
+            print "Directory not defined\n";
+            exit;
+        }
+
+        if ( !-d $dir ) {
+            print "provided directory does not exist\n";
+            exit;
+        }
+        my @files;
+        # perform the action
+        opendir( my $dir_dh, $dir ) || die "Can't open directory: $dir";
+        #build our data structure
+        foreach my $file ( readdir $dir_dh ) {
+            push @files, $file;
+        }
+        closedir($dir_dh);
+        # print out in storable format
+        Storable::nstore_fd( \@files, \*STDOUT );
+	},
+	'TOUCH' => sub {
+	    my ( $dir, $file ) = @_;
+
+        if ( !defined $dir || $dir eq '' ) {
+            print "Directory not defined\n";
+            exit;
+        }
+        if ( !-d $dir ) {
+            print "provided directory does not exist\n";
+            exit;
+        }
+        if ( !defined $file || $file eq '' ) {
+            print "No file provided\n";
+            exit;
+        }
+        my $full_path = $dir . '/' . $file;
+        if ( -e $full_path ) {
+    		utime(undef, undef $full_path);
+        }
+        else {
+            open( $tmp_fh, '>', $full_path );
+            close($tmp_fh);
+        }
+        print "File Touched.\n";
+	},
+);
+
+# Verify that the command exists
+if ( !exists $commands{$action} ) {
+    print "not a valid action\n";
+    exit 1;
+}
+
+# Code used to ensure that the correct user is being run.
+my ( $user, $gid, $home ) = ( getpwuid( int($uid) ) )[ 0, 3, 7 ];
+
+if ( $user eq 'root' || $user eq '' ) {
+    print "Admin Binary called with invalid user\n";
+    exit;
+}
+
+if ( !-e "/var/cpanel/users/$user" && $user ne 'cpanel' ) {
+    print "Admin binary called with invalid user\n";
+    exit;
+}
+
+# This is needed by the Cpanel::AdminBin module
+print ".\n";
+
+# Execute the action in question
+$commands{$action}->(  @args );

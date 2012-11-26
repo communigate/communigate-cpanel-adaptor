@@ -1,0 +1,274 @@
+     <div class="h1Title"><div class="spriteicon_img_mini" id="icon-mysql_mini"></div> <cpanel langprint="NavMySQL"></div>
+
+    <p class="description"><cpanel langprint="MySQLDesc"></p>
+    <a name="mysqldbs" id="mysqldbs"></a>
+    <p class="jump"><img src="../images/arrow-down.gif" alt="jump-down" /><a href="#mysqlusers"><cpanel langprint="jump_mysql_users"></a></p>
+
+    <cpanel setvar="vidtut_name=addmysql">
+    <cpanel setvar="vidtut_header=NavMySQL">
+    <cpanel setvar="vidtut_description=VidMysqlDesc">
+    <cpanel setvar="vidtut_video_name=addmysql_lo">
+    <cpanel setvar="vidtut_width=450">
+    <cpanel setvar="vidtut_height=343">
+    <cpanel include="../video_tutorial_include.html">
+
+<br />
+<!--
+<?cp StatsBar::stat(Using % out of % MySQL databases,count,max) display=mysqldatabases ?> # Needed to setup CPVAR statsbar variables used below
+-->
+<cpanelif $CPVAR{'statsbar_mysqldatabases_maxed'}>
+<p class="alert_box"><cpanel langprint="QuotaWarning1"> <cpanel langprint="SQLdatabase">. <cpanel langprint="QuotaWarning2"></p>
+<br />
+</cpanelif>
+<cpanelif !$CPVAR{'statsbar_mysqldatabases_maxed'}>
+<div class="formbox">
+    <h4><cpanel langprint="mysql_create_db"></h4>
+    <form method="post" action="addb.html" name="mainform" id="mainform">
+        <div class="highlight">
+            <table cellpadding="3" cellspacing="0">
+                <tr>
+                    <td><label for="dbname"><cpanel langprint="SQLNewDb"></label></td>
+                    <td><cpanel print="$dbownerprefix"><input type="text" name="db" id="dbname" style="width: 150px" /></td>
+                    <td><div id="dbname_error"></div></td>
+                </tr>
+                <tr>
+                    <td>&nbsp;</td>
+                    <td><center><input type="submit" id="submit_dbname" value="<cpanel langprint="PSDDBCreateButton">" class="input-button" /></center></td>
+                    <td>&nbsp;</td>
+                </tr>
+            </table>
+        </div>
+    </form>
+</div>
+<script type="text/javascript">
+//<![CDATA[
+var user = "<cpanel print="$user">";
+var user_length = parseInt('<cpanel print="$dbprefix">');
+var dbprefix = '<cpanel print="$dbowner">';
+var db_max_length = user_length ? ( 63-(dbprefix.length) ) : ( 64 );
+// document.getElementById('dbname').db_maxLength = db_max_length;
+var init_newdb_validation = function() {
+        var dbname_validator = new CPANEL.validate.validator("New Database");
+        dbname_validator.add("dbname", "sql_alphanumeric", '<cpanel langprint="mysql_dbname_alpha">');
+        dbname_validator.add("dbname", "max_length(%input%, " + db_max_length + ")", '<cptext "The maximum input length for this field is ">'+db_max_length+'<cptext " characters">');
+        dbname_validator.attach();
+
+        CPANEL.validate.attach_to_form("submit_dbname", dbname_validator);
+    };
+    YAHOO.util.Event.onDOMReady(init_newdb_validation);
+//]]>
+</script>
+</cpanelif>
+
+<!-- <cpanel Mysql="gethost()"> -->
+<cpanelif $CPVAR{'remotemysqlhost'}==1>
+    <br />
+    <div class="formbox">
+        <h4><cpanel langprint="SQLRemoteHosth4"></h4>
+        <p><cpanel langprint="SQLRemoteHost1"> <span class="status"><cpanel print="$CPVAR{'mysqlhost'}"></span>. <cpanel langprint="SQLRemoteHost2"></p>
+    </div>
+    <br />
+</cpanelif>
+
+<!-- <cpanel Mysql="number_of_dbs()"> -->
+<cpanelif !$CPVAR{'mysql_number_of_dbs'}==0>
+    <div class="formbox">
+        <h4><cpanel langprint="mysql_modify_db"></h4>
+        <form method="post" action="checkdb.html" name="checkform">
+            <table cellpadding="5" cellspacing="0" class="tbl">
+                <tr>
+                    <td align="right" width="80px"><label for="checkdb"><cpanel langprint="CheckDB">:</label></td>
+                    <td><select name="db" id="checkdb"><cpanel Mysql="listdbsopt()"></select></td>
+                    <td><input type="submit" value="<cpanel langprint="CheckDB">" class="input-button" /></td>
+                </tr>
+            </table>
+        </form>
+        <form method="post" action="repairdb.html" name="checkform">
+            <table cellpadding="5" cellspacing="0" class="tbl">
+                <tr>
+                    <td align="right" width="80px"><label for="repairdb"><cpanel langprint="RepairDB">:</label></td>
+                    <td><select name="db" id="repairdb"><cpanel Mysql="listdbsopt()"></select></td>
+                    <td><input type="submit" value="<cpanel langprint="RepairDB">" class="input-button" /></td>
+                </tr>
+            </table>
+        </form>
+    </div>
+</cpanelif>
+
+<div class="formbox">
+<h4><cpanel langprint="current_databases"></h4>
+    <table style="width: 650px">
+        <tr>
+            <td width="50%"></td>
+            <td width="50%" style="text-align: right">
+                <form method="get" action=""><span class="boldit"><cpanel langprint="SESearchButton"></span><input type="text" size="15" name="searchregex" value="<cpanel print="$FORM{'searchregex'}">" /><input type="submit" class="input-button" value="<cpanel langprint="go">" /></form>
+            </td>
+        </tr>
+    </table>
+    <table border="0" cellpadding="0" cellspacing="0" id="sql_db_tbl" class="sortable" width="650">
+      <thead>
+      <tr>
+        <th class="cell" scope="col"><cpanel langprint="BUDatabase"></th>
+        <th class="cell" scope="col"><cpanel langprint="SQLSize"></th>
+        <th class="cell" scope="col"><cpanel langprint="PSDMDUsers"></th>
+        <th class="cell sorttable_nosort" scope="col"><cpanel langprint="PSDMDAct"></th>
+      </tr>
+    </thead>
+    <tbody>
+<?cp MysqlFE::listdbs(
+[tr class="row-%"]
+    [td align="center"]%[/td]
+    [td align="center"]% $LANG{'EAAddQuotaPost'}[/td]
+    [td align="center"] %[/td]
+    [td align="center"][a href="deldbconfirm.html?db=%"]$LANG{'Delete'} $LANG{'BUDatabase'}[/a][/td]
+[/tr]
+
+,*num,db,sizemeg,userlist:
+
+        :[table width="100\{percent}" border="0" cellpadding="0" cellspacing="0" class="sql"]
+            [tr]
+                [td width="80\{percent}" class="nobrd"][a href="userrights.html?update=1&amp;user=${user}&amp;db=${db}"]${user}[/a][/td]
+                [td width="20\{percent}" align="left" class="nobrd"][a href="deluserfromdbconfirm.html?user=${user}&amp;db=${db}"][img src="../images/delete_x.gif" alt="Delete User" border="none" /][/a][/td]
+            [/tr]
+        [/table]:
+,db) regex=$FORM{'searchregex'},api2_paginate=1,api2_paginate_start=$FORM{'api2_paginate_start'},api2_paginate_size=$CPVAR{'itemsperpage'} || '[tr][td class="errors" colspan="7"][br /]$LANG{'NoMySQLDbs'}[br /][br /][/td][/tr]' ?>
+     </tbody>
+    </table>
+    <?cp UI::paginate(%,paginator) currentpage=$CPVAR{'currentpage'},pages=$CPVAR{'pages'},itemsperpage=$CPVAR{'itemsperpage'} ?>
+        <cpanelif $CPVAR{'api2_paginate_total'}=gt=10 >
+    <div style="text-align:right"><form>
+    Showing <select name="itemsperpage" onchange="this.form.submit();">
+    <?cp UI::paginate_list([option value="%" %]%[/option],item,selected=1?selected:,item) itemsperpage=$CPVAR{'itemsperpage'},itemlist=10:25:50:100:250:500 ?>
+    </select><noscript><button id="my_button" onclick="" type="submit" Value="">Change</button></noscript>  Results per page
+    </form></div>
+        </cpanelif>
+</div><!-- end formbox -->
+
+    <a name="mysqlusers" id="mysqlusers"></a>
+    <p class="jump"><img src="../images/arrow-up.gif" alt="jump-up" /><a href="#mysqldbs"><cpanel langprint="jump_mysql_databases"></a></p>
+        <h2><cpanel langprint="MySQLUsers"></h2>
+    <form method="post" action="adduser.html" name="userform" id="userform">
+    <div class="formbox">
+        <h4><cpanel langprint="NewUser"></h4>
+        <table cellpadding="3" cellspacing="0" class="tbl">
+            <tr>
+                <td align="right"><cpanel langprint="SQLGrantPermUser"></td>
+                <td>
+                    <table style="width:100%" cellpadding="0" cellspacing="0">
+                        <tr>
+                            <td><cpanel print="$dbownerprefix"></td>
+                            <td><input type="text" size="16" name="user" id="user" style="width: 100%" /></td>
+                        </tr>
+                    </table>
+                </td>
+                <td><div id="user_error"></div></td>
+            </tr>
+            <tr>
+                <td>&nbsp;</td>
+            </tr>
+            <tr>
+                <td align="right"><cpanel langprint="ASIReadOtherPassword"></td>
+                <td><input size="15" type="password" name="pass" id="password" style="width: 100%" /></td>
+                <td><div id="password_error"></div></td>
+            </tr>
+            <tr>
+                <td align="right"><cpanel langprint="ASIReadOtherPasswordAgain"></td>
+                <td><input type="password" size="15" name="pass2" id="password2" style="width: 100%" /></td>
+                <td><div id="password2_error"></div></td>
+            </tr>
+            <tr>
+                <td align="right">
+                    <cpanel langprint="email_strength"> (<div style="display: inline" id="why_strong_passwords_link" class="action_link"><cpanel langprint="email_why"></div>):
+                    <div id="why_strong_passwords_text" style="display: none"><cpanel langprint="email_password_why"><br /><br /><cpanel langprint="email_password_tip"></div>
+                </td>
+                <td><div id="password_strength" style="width: 100%; height: 20px; border: 1px solid black; margin: 5px 0px 3px 0px"></div></td>
+                <td><input type="button" id="create_strong_password" class="input-button" value="<cpanel langprint="cjt_password_generator">" tabindex="-1" /></td>
+            </tr>
+            <tr><td colspan="3"><br /></td></tr>
+            <tr>
+                <td>&nbsp;</td>
+                <td><center><input type="submit" value="<cpanel langprint="PSDCreateButton">" class="input-button" id="submit_new_user" style="width: 150px" /></center></td>
+                <td>&nbsp;</td>
+            </tr>
+        </table>
+    </div>
+    </form>
+    <script type="text/javascript">
+    //<![CDATA[
+        var REQUIRED_PASSWORD_STRENGTH = parseInt('<?cp PasswdStrength::get_required_strength(%,strength) app=mysql ?>') || 5;
+        var user_length = parseInt('<cpanel print="$dbprefix">');
+        var dbprefix = '<cpanel print="$dbowner">';
+
+        var max_length = user_length ? ( 15-(dbprefix.length) ) : ( 16 );
+
+//        document.getElementById('user').maxLength=max_length;  // Restrict the input field to the allowed length
+                function leadingnumeric() {
+                    val = document.getElementById('user').value;
+                    if (/^\d/.test(val)) {return false}
+                    return true;
+                }
+
+        var init_user_validation = function() {
+            var user_validator = new CPANEL.validate.validator("MySQL Username");
+            user_validator.add("user", "alphanumeric", '<cpanel langprint="mysql_username_alpha">');
+                        if (!user_length) {
+                           user_validator.add("user", leadingnumeric, '<cptext "Username cannot begin with a number.">');
+                        }
+            user_validator.add("user", "max_length(%input%, "+max_length+")", '<cptext "Username cannot be longer than ">'+max_length+'<cptext " characters.">');
+            user_validator.attach();
+
+            var password_validators = CPANEL.password.setup("password", "password2", "password_strength", REQUIRED_PASSWORD_STRENGTH, "create_strong_password", "why_strong_passwords_link", "why_strong_passwords_text");
+            password_validators.push(user_validator);
+            CPANEL.validate.attach_to_form("submit_new_user", password_validators);
+
+        };
+
+        YAHOO.util.Event.onDOMReady(init_user_validation);
+
+    //]]>
+    </script>
+
+    <!-- <cpanel Mysql="number_of_users()"> -->
+    <cpanelif !$CPVAR{'mysql_number_of_users'}==0 && !$CPVAR{'mysql_number_of_dbs'}==0>
+        <form method="post" action="userrights.html" name="dbuserform" style="margin-top:25px;">
+            <div class="formbox">
+                <h4><cpanel langprint="PSDBAddUser"></h4>
+                <table cellpadding="5" cellspacing="0" class="tbl">
+                    <tr>
+                        <td align="right" style="width: 80px"><label for="add_user_users"><cpanel langprint="FTPUser">:</label></td>
+                        <td><select name="user" id="add_user_users"><cpanel Mysql="listusersopt()"></select></td>
+                    </tr>
+                    <tr>
+                        <td align="right"><label for="add_user_dbs"><cpanel langprint="PSDMDData">:</label></td>
+                        <td><select name="db" id="add_user_dbs"><cpanel Mysql="listdbsopt()"></select></td>
+                    </tr>
+                    <tr>
+                        <td>&nbsp;</td>
+                        <td><input type="submit" value="<cpanel langprint="AHAdd">" class="input-button" /></td>
+                    </tr>
+                </table>
+            </div>
+        </form>
+    </cpanelif>
+
+<div class="formbox">
+    <h4><cpanel langprint="current_users"></h4>
+    <table  border="0" cellpadding="5" cellspacing="0" id="sql_users_tbl" class="sortable" width="500">
+        <thead>
+            <tr>
+                <th class="cell" scope="col"><cpanel langprint="Users"></th>
+                <th class="cell sorttable_nosort" scope="col" colspan="2"><cpanel langprint="Delete"></th>
+            </tr>
+        </thead>
+        <tbody>
+
+<?cp MysqlFE::listusers(
+    [tr class="row-%"]
+        [td align="center"][a href="changepasswd.html?user=%"]%[/a][/td]
+        [td align="center"][a href="deluserconfirm.html?user=%"][img src="../images/delete_x.gif" alt="Delete User" border="none" /][/a][/td]
+    [/tr]
+    ,*num,user,user,user) || '[tr][td class="errors" colspan="3"][br /]$LANG{'NoMySQLUsers'}[br /][br /][/td][/tr]' ?>
+
+        </tbody>
+    </table>
+</div>

@@ -1,0 +1,52 @@
+<cpanel setvar="headerimg=../images/tools.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+
+<div class="body-content">
+
+<h1><cpanel langprint="chlangtitle"></h1>
+
+<p class="description"><cpanel langprint="chlangdesc"></p>
+
+<h2><cpanel langprint="chlangcurrent"> <?cp Locale::get_locale_name(%,name) ?></h2><br />
+
+<form action="goto.html">
+<input name="page" value="setlang.html" type="hidden" />
+<cpanel langprint="chlangsetlang"> 
+<select name="lang">
+<cpanel SetLang="listlangsopt()">
+</select>
+
+<cpanelif $FORM{'be'}==yes>
+<input type="hidden" name="be" value="<cpanel printvar="dprefix">resellers/branding/edithtml-code.html?brandingpkg=<cpanel print="$FORM{'brandingpkg'}">&file=<cpanel print="$FORM{'file'}">&edittype=html">
+</cpanelif>
+<cpanelif $FORM{'ar'}==yes>
+<input type="hidden" name="ar" value="<cpanel printvar="dprefix">mail/addars.html?email=<cpanel print="$FORM{'email'}">">	
+</cpanelif>
+<cpanelif $FORM{'fm'}==yes>
+<input type="hidden" name="fm" value="<cpanel printvar="dprefix">files/editit.html?fileop=&dirop=&dir=<cpanel print="$FORM{'dir'}">&file=<cpanel print="$FORM{'file'}">">	
+</cpanelif>
+<cpanelif $FORM{'css'}==yes>
+<input type="hidden" name="css" value="<cpanel printvar="dprefix">resellers/branding/cssedit-code.html?brandingpkg=<cpanel print="$FORM{'brandingpkg'}">">	
+</cpanelif>
+
+
+<input type="submit" class="input-button" value="<cpanel langprint="Change">" />
+</form>
+
+<cpanelif $FORM{'be'}==yes>
+	 <div class="return-link"><a href="<cpanel printvar="dprefix">resellers/branding/edithtml-code.html?brandingpkg=<cpanel print="$FORM{'brandingpkg'}">&file=<cpanel print="$FORM{'file'}">&edittype=html">&larr; <cptext "Go Back"></a></div> 
+</cpanelif>
+<cpanelif $FORM{'ar'}==yes>
+	 <div class="return-link"><a href="<cpanel printvar="dprefix">mail/addars.html?email=<cpanel print="$FORM{'email'}">">&larr; <cptext "Go Back"></a></div> 
+</cpanelif>
+
+<cpanelif $FORM{'fm'}==yes>
+	 <div class="return-link"><a href="<cpanel printvar="dprefix">files/editit.html?fileop=&dirop=&dir=<cpanel print="$FORM{'dir'}">&file=<cpanel print="$FORM{'file'}">">&larr; <cptext "Go Back"></a></div> 
+</cpanelif>
+<cpanelif $FORM{'css'}==yes>
+	 <div class="return-link"><a href="<cpanel printvar="dprefix">resellers/branding/cssedit-code.html?brandingpkg=<cpanel print="$FORM{'brandingpkg'}">">&larr; <cptext "Go Back"></a></div> 
+</cpanelif>
+
+</div>
+<cpanel Branding="include(stdfooter.html)">

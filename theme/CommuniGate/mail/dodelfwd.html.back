@@ -1,0 +1,15 @@
+<cpanel setvar="headerimg=../images/mailmenu.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+<div class="body-content">
+<h1><cpanel langprint="FWMaint"></h1>
+
+<p><cptext 'Mail for “[output,class,_1,status]” will no longer be forwarded to “[output,class,_2,status]”.',$FORM{'email'},$FORM{'emaildest'}></p>
+<cpanel Email="delforward($FORM{'email'},$FORM{'emaildest'})"></p>
+<cpanelif !$CPERROR{'email'}>
+    <p><b><cpanel print="$FORM{'email'}">'s</b> <cpanel langprint="FWDelfwd"> <b><cpanel print="$FORM{'emaildest'}"></b>.
+</cpanelif>
+
+<div class="return-link"><a href="fwds.html">&larr; <cptext "Go Back"></a></div>
+</div>
+<cpanel Branding="include(stdfooter.html)">

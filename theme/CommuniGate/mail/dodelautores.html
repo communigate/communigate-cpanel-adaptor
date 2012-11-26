@@ -1,0 +1,15 @@
+<cpanel setvar="headerimg=../images/mailmenu.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+<div class="body-content">
+<h1><cpanel langprint="ARMaint"></h1>
+
+<cptext 'The auto responder “[output,class,_1,status]” was deleted.',$FORM{'email'}>
+	
+
+<pre><span size="1"><cpanel Email="delautoresponder($FORM{'email'})"></span></pre>
+
+<div class="return-link"><a href="autores.html">&larr; <cptext "Go Back"></a></div>
+
+</div>
+<cpanel Branding="include(stdfooter.html)">

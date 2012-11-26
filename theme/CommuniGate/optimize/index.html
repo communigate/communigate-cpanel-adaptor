@@ -1,0 +1,29 @@
+<cpanel setvar="headerimg=../images/tools.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+ <!--
+<cpanel OptimizeWS="loadoptimizesettings()">
+-->
+<style type="text/css">
+<?cp Branding::spritelist(.spriteicon_img_mini {float:left;margin-right:5px;background: url\{leftparenthesis}"%"\{rightparenthesis};} %,@spriteurl,images::#icon-${img}_mini {background-position\{colon}0 -${cssposition}px;width\{colon}${width}px;height\{colon}${height}px; }:) imgtype=icon,subtype=img,method=scale_60percent,format=png,img=optimizews ?>
+</style>
+<div class="body-content">
+<div class="h1Title"><div class="spriteicon_img_mini" id="icon-optimizews_mini"></div> <cpanel langprint="OptimizeWS"></div>
+<p class="description"><cpanel langprint="OptimizeWSDescript"></p>
+<form action="dooptimize.html">
+ <h2><cpanel langprint="DeflateHead"></h2>
+	    <p class="description"><cpanel langprint="DeflateDesc"></p>
+		<div class="highlight">
+		    <p>
+                <cpanelif $ENV{'optimize_apache_version'}=='1.3'><cpanel langprint="FunctionalityNotAvailable"> <!-- </cpanelif>
+                <input type='radio' name='deflate' value='disabled' <cpanelif $ENV{'deflate_selected'}=='disabled'>checked</cpanelif> ><cpanel langprint="DeflateDisable"><br />
+                <input type='radio' name='deflate' value='all' <cpanelif $ENV{'deflate_selected'}=='all'>checked</cpanelif> ><cpanel langprint="DeflateAll"><br />
+                <input type='radio' name='deflate' value='list' <cpanelif $ENV{'deflate_selected'}=='list'>checked</cpanelif> ><cpanel langprint="DeflateList"><br />
+                <cpanel langprint="DeflateMimeTypes">&nbsp;<input type='text' name='deflate-mime-list' size='50' value="<cpanel print="$ENV{'deflate_mime_list'}">">
+                <cpanelif $ENV{'optimize_apache_version'}=='1.3'> --> </cpanelif>
+            </p>
+        </div>
+<cpanelif !$ENV{'optimize_apache_version'}=='1.3'>         <input type="submit" class="input-button" value="<cpanel langprint="OptimizeUpdate">"> </cpanelif>
+    </form>
+</div>
+<cpanel Branding="include(stdfooter.html)">

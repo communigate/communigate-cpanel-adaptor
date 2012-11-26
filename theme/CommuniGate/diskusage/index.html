@@ -1,0 +1,276 @@
+<cpanel setvar="headerimg=..//frontend/x3/images/tools.gif">
+<cpanel setvar = "dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+
+<style type = "text/css">
+<?cp Branding::spritelist(.spriteicon_img_mini {float:left;margin-right:5px;background: url\{leftparenthesis}"%"\{rightparenthesis};} %,@spriteurl,images::#icon-${img}_mini {background-position\{colon}0 -${cssposition}px;width\{colon}${width}px;height\{colon}${height}px; }:) imgtype=icon,subtype=img,method=scale_60percent,format=png,img=hdspace ?>
+</style>
+
+<style type="text/css">
+    @charset "UTF-8";
+    /* CSS Document */
+
+    body {
+        font-family: Helvetica, Arial, sans-serif;
+    }
+    a {
+        text-decoration:none;
+    }
+    .clear {
+        clear:both;
+    }
+    .usage-table {
+        width:680px;
+        margin-left:auto;
+        margin-right:auto;
+        background:url(/frontend/x3/images/table-bg.png) repeat-x #ececec;
+        border:1px solid #dadada;
+        border-radius:8px;
+        -moz-border-radius:8px;
+    }
+    #usage-table .directory {
+        width:195px;
+        float:left;
+        text-align:right;
+        padding-right:10px;
+        padding-top:20px;
+        padding-bottom:10px;
+        border-right:1px solid #d6d6d6;
+    }
+    .directory a {
+        font-size:12px;
+        color:#04586C;
+        font-weight:bold;
+    }
+    .usage-bar {
+        width:450px;
+        float:left;
+        padding-left:10px;
+        padding-top:15px;
+        padding-bottom:5px;
+        padding-right:10px;
+        border-left:1px solid #fff;
+        overflow: hidden;
+    }
+    .usage-background {
+        background:url(/frontend/x3/images/filler-bg2.png) repeat-x;
+        border-radius:20px;
+        -moz-border-radius:20px;
+        border:1px solid #d5d5d5;
+        padding:3px;
+        overflow: hidden;
+    }
+    .filler-bg {
+        background:url(/frontend/x3/images/filler-bg.png) repeat-x;
+        border-radius:20px;
+        -moz-border-radius:20px;
+        height:15px;
+        border-bottom:1px solid #fff;
+        width:315px;
+        overflow: hidden;
+        float:left;
+    }
+    .graph-bar {
+        background:url(/frontend/x3/images/filler.png) repeat-x;
+        height:15px;
+        width:35%;
+        border-radius:20px;
+        -moz-border-radius:20px;
+        -moz-border-top-right-radius: 0px;
+        -moz-border-bottom-right-radius: 0px;
+        border-top-right-radius: 0px;
+        border-bottom-right-radius: 0px;
+        overflow: hidden;
+    }
+    .size {
+        float:right;
+        display:inline;
+        margin-left:10px;
+        font-size:12px;
+        color:#666;
+        text-shadow:0px 1px 0px #fff;
+        padding-right:10px;
+        line-height:16px;
+    }
+    .total {
+        padding-top:15px;
+        padding-bottom:15px;
+        padding-right:15px;
+        text-align:right;
+        font-size:13px;
+        font-weight:bold;
+        color:#04586C;
+        text-shadow:0px 1px 0px #fff;
+        background:url(/frontend/x3/images/border.png) repeat-x top;
+    }
+    .desc {
+        font-family: helvetica, arial;
+        font-size: 12px !important;
+        color: #666;
+        line-height: 19px;
+    }
+
+img.home_dir {
+    vertical-align: bottom;
+    float: none ! important;
+    margin: 0 ! important;
+    border: 0;  /* FF3 */
+}
+
+
+#disk_usage_table {
+    border-collapse: collapse;
+    margin-top: 8px;
+}
+
+#disk_usage_table td {
+    padding: 2px;
+}
+
+img.expand_control {
+    margin-right: 4px;
+}
+
+img.expander {
+    cursor: pointer;
+}
+
+#sort_div {
+    text-align: center;
+    clear:both;
+    margin-top: 40px;
+    margin-bottom: 15px;
+}
+#sort_div_contents {
+    padding: 8px;
+    background-color: #f2f2f2;
+    border: 1px solid #999;
+    border-radius: 3px;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+}
+
+#disk_usage_table {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+#disk_usage_table td.raw_bytes,
+#disk_usage_table td.formatted_bytes,
+#megabytes_header,
+#bytes_header {
+    text-align: right;
+}
+
+#megabytes_header,
+#bytes_header {
+    padding-top: 8px;
+}
+
+#megabytes_header,
+#disk_usage_table td.formatted_bytes {
+    padding-right: 20px;
+}
+
+#directory_header {
+    padding-right: 12px;
+    vertical-align: top;
+}
+
+#disk_usage_table td.owner,
+#owner_header {
+    padding-left: 10px;
+}
+
+#home_total_row {
+    font-weight: bold;
+}
+</style>
+
+<!-- YAHOO.util.Number lives here -->
+<script type="text/javascript" src="<cpanel MagicRevision="uri(/yui/datasource/datasource.js)">"></script>
+
+<script type="text/plain" id="total_disk_usage_template">
+<div class="total"><cptext "[_1] MB total disk space used",{mib}></div>
+</script>
+<script type="text/plain" id="quota_usage_template">
+<div class="total"><cptext "[_1] MB quota limit ([_2] MB used)",{limit},{used}></div>
+</script>
+
+<script type="text/javascript">
+var LOCALE = {
+    not_in_subdir:  '<cptext "Files in home directory">',
+    hidden_subdirs: '<cptext "Files in hidden subdirectories">',
+    mailing_lists:  '<cptext "Mailing lists">',
+    other_usage:    '<cptext "Other usage">',
+    over_quota:     '<cptext "This account has exceeded its disk quota.">',
+    warn_quota:     '<cptext "This account is using more than 90% of its disk quota.">'
+};
+
+var has_postgres = Boolean( Number( <cpanel jsprint="$haspostgres"> ) );
+</script>
+
+<div class="body-content">
+
+<div class="h1Title"><div class="spriteicon_img_mini" id="icon-hdspace_mini "></div><cpanel langprint="INDXDiskUsage"></div>
+
+<p class="desc"><cptext 'The cPanel Disk Usage Viewer provides an overview of the disk space that your account is using. It shows disk usage totals for your account’s directories and all of its databases rather than for individual files or databases.'>
+
+<cpanelif $haspostgres>
+<cptext 'Use the [output,url,_1,File Manager] to see disk usage data for individual files, and the [output,url,_2,MySQL] and [output,url,_3,PostgreSQL] main pages to see data for individual databases.',../filemanager/,../sql/,../psql/>
+<cpanelelse>
+<cptext 'Use the [output,url,_1,File Manager] to see disk usage data for individual files, and the [output,url,_2,MySQL] main page to see data for individual databases.',../filemanager/,../sql/>
+</cpanelif>
+</p>
+
+<p class="desc"><strong><cptext 'The bars in the graph represent disk usage figures relative to the largest directory, not according to a fixed scale.'></strong></p>
+
+<div id="cjt_notice_container"></div>
+<br/>
+<script id="table-row-template" type="text/plain">
+    <div class="directory-wrap">
+        <div class="directory">{url}</div>
+        <div class="usage-bar">
+            <div class="usage-background">
+                <div class="filler-bg">
+                    <div class="graph-bar" style="width: {width}%"></div>
+                </div>
+                <div class="size">{usage} MB</div>
+            </div>
+        </div>
+        <div class="clear"></div>
+    </div>
+</script>
+
+<?cptt diskusage/diskusage_extras.tmpl ?>
+
+<div class="usage-table" id="usage-table">
+    <img src="<cpanel MagicRevision=uri("/cjt/images/loading.gif")>" alt="loading" /> <cptext "Loading…">
+</div>
+
+<div id="hidden_copy">
+<p class="desc">
+<strong><cptext 'NOTE: These figures may not reflect the most recent changes to your account’s disk usage.'></strong>
+</p>
+
+<p class="desc"><cptext 'Due to the nature of how files are stored electronically, most files occupy slightly more disk space than their actual size.'>
+    <cptext 'For example, a 300 byte file may occupy 4 kB of actual disk space.'>
+    <cptext 'This may cause discrepancies between the data you see in the [output,url,_1,File Manager] versus the information you find in the table below.',../filemanager/>
+    <cptext 'Moreover, the disk space usage in the table below indicates how much space the directories’ contents use, not how much space the directory itself uses.'>
+    <cptext 'Directories themselves usually use a negligible amount of disk space unless they contain a large number of files or subdirectories.'></p>
+</div>
+
+<div id="sort_div" style="display:none;">
+<span id="sort_div_contents">
+Sort directories by: <label><input type="radio" name="dir_sort" checked="checked" onclick="flip_sort(true)" />&nbsp;name</label>
+&nbsp;&nbsp;
+<label><input type="radio" name="dir_sort" onclick="flip_sort(false)" />&nbsp;disk usage</label>
+</span>
+</div>
+
+<div id="table_container">
+</div>
+
+</div>
+
+<cpanel Branding="include(stdfooter.html)">

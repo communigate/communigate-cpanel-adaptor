@@ -1,0 +1,50 @@
+<cpanel setvar="headerimg=../images/toperrorpages.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+<style type="text/css">
+<?cp Branding::spritelist(.spriteicon_img_mini {float:left;margin-right:5px;background: url\{leftparenthesis}"%"\{rightparenthesis};} %,@spriteurl,images::#icon-${img}_mini {background-position\{colon}0 -${cssposition}px;width\{colon}${width}px;height\{colon}${height}px; }:) imgtype=icon,subtype=img,method=scale_60percent,format=png,img=errorpage ?>
+ ul.errorpagelist{
+	padding:0 0 10px 0;
+	margin:0 0 0 10px;
+}
+.errorpagelist li{
+	margin:5px 0;
+}
+.errorpagelist li a {
+	display:block;
+	height:20px;
+	width:300px;
+	background:#f5f5f5;
+	padding:10px 0 10px 40px;
+	border:solid 1px #e0e0e0;
+
+}
+.errorpagelist li a:hover {
+	text-decoration:none;
+	background:url(../images/pencil.png) 1em .65em no-repeat #eee;
+}
+#error_codes {
+	margin-top:10px;
+	background:#fff;
+	height:360px;
+	overflow:auto;
+	border:solid 1px #e0e0e0;
+	padding:7px;
+}
+#error1,#error1p{
+	display:none;
+}
+</style>
+<div class="body-content">
+	<div id="h1Title" class="h1Title"><div class="spriteicon_img_mini" id="icon-errorpage_mini"></div><cpanel langprint="EPHead"></div>
+	<p><cpanel Locale="maketext('An error page informs a visitor when there is a problem accessing your site. Each type of problem has its own code. For example, a visitor who enters a nonexistent URL will see a 404 error, while an unauthorized user trying to access a restricted area of your site will see a 401 error.')"></p>
+
+<h2 style="margin:20px 0 15px 0;"><cpanel Locale="maketext('Step 2 - Edit Error Pages for [output,class,_1,status].,$FORM{'domain'}"></h2>
+	<div id="error_codes">
+        <cpanel include="error_code_include.html">
+    </div>
+
+<div class="return-link"><a href="index.html">&larr; <cptext "Go Back"></a></div>
+
+</div>
+<cpanel Branding="include(stdfooter.html)">

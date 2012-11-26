@@ -1,0 +1,22 @@
+<cpanel setvar="headerimg=../images/topwebftpstats.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+<style type="text/css">
+<?cp Branding::spritelist(.spriteicon_img_mini {float:left;margin-right:5px;background: url\{leftparenthesis}"%"\{rightparenthesis};} %,@spriteurl,images::#icon-${img}_mini {background-position\{colon}0 -${cssposition}px;width\{colon}${width}px;height\{colon}${height}px; }:) imgtype=icon,subtype=img,method=scale_60percent,format=png,img=latestvisitors ?>
+</style>
+<div class="body-content">
+<div class="h1Title"><div class="spriteicon_img_mini" id="icon-latestvisitors_mini"></div> <cpanel langprint="LVStats"></div>
+<p class="description"><cpanel langprint="LVDesc"></p>
+<h2><cpanel langprint="SLSelectDomain"></h2>
+<table  align="center" border="0" cellpadding="5" cellspacing="0" class="sortable">
+	<tr>
+		<th scope="col"><cpanel langprint="SLDomain"></th>
+		<th nowrap nonsortable="true" scope="col"><cpanel langprint="SLView"></th>
+	</tr>
+	<tbody>
+		<?cp Stats::listlastvisitors([tr class="row-%"][td align="center"]%[/td]
+		[td class="nobrd-center-t" align="center"][a href="lastvisit.html?domain=%&ssl=%"][img src="../images/trace.gif" border="0" width="16" height="16" alt="view stats" /][/a][/td][/tr],*num,txt,domain,ssl) || '[tr][td class="errors" colspan="2"]$LANG{'LV-NoStats'}[/td][/tr]' ?>
+	</tbody>
+</table>
+</div>
+<cpanel Branding="include(stdfooter.html)">

@@ -1,0 +1,48 @@
+<cpanel setvar="headerimg=../images/toppassword.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+<style type="text/css">
+<?cp Branding::spritelist(.spriteicon_img_mini {float:left;margin-right:5px;background: url\{leftparenthesis}"%"\{rightparenthesis};} %,@spriteurl,images::#icon-${img}_mini {background-position\{colon}0 -${cssposition}px;width\{colon}${width}px;height\{colon}${height}px; }:) imgtype=icon,subtype=img,method=scale_60percent,format=png,img=php ?>
+</style>
+	<!--
+    <cpanel Htaccess="phpselectable()">
+	-->
+
+<div class="body-content"> 
+<div class="h1Title"><div class="spriteicon_img_mini" id="icon-php_mini"></div><cpanel langprint="PHPConfig"></div>
+<cpanelif !$ENV{'php_selectable'}><!--</cpanelif>
+<form action="dodefaultphp.html" method="post">
+    <cpanel langprint="phpextprocessedby">
+    <select name="php_version">
+        <option value="4" <cpanelif $ENV{'php_selected'}==4>selected</cpanelif> >PHP 4</option>
+        <option value="5" <cpanelif $ENV{'php_selected'}==5>selected</cpanelif> >PHP 5</option>
+        <option value="0" <cpanelif $ENV{'php_selected'}==0>selected</cpanelif> ><cpanel langprint="SysDef"></option>
+    </select>
+    <input type=submit value='<cpanel langprint="module_update">'>
+</form>
+<hr />
+<cpanelif !$ENV{'php_selectable'}>--></cpanelif>
+<p class="description"><cpanel langprint="phpdesc"></p><br />
+
+        <table id="phptbl" width="660" class="sortable" border="0" cellpadding="5" cellspacing="0">
+             <tr class="row-%">
+                 <th nowrap="nowrap" align="center" scope="col" class="cell">&nbsp;&nbsp;<cpanel langprint="PHPSubSection"></th>
+                 <th align="center" class="cell"><cpanel langprint="PHPDirective"></th>
+                 <th align="center" class="cell"><cpanel langprint="PHPInfo"></th>
+                 <th colspan="2" align="center" class="cell-end"><cpanel langprint="PHPValue"></th>
+              </tr>
+              <tbody>
+
+<?cp PHPINI::getoptions(
+    [tr class="row-%"]
+        [td align="center" class ="cell"]%[/td] 
+        [td align="center" class ="cell"]%[/td] 
+        [td align="center" class ="cell"]%[/td] 
+        [td align="center" class ="cell-end"]%[/td] 
+    [/tr],*num,subsection,directive,info,dirvalue) dirlist=session.save_path|safe_mode|file_uploads|zend_optimizer.version|asp_tags|max_execution_time|max_input_time|memory_limit|include_path|upload_max_filesize|register_globals|dl_enable || '[tr][td colspan=4 class=errors]maketext('No Directives Found')[/td][/tr]' ?>
+</tbody>
+</table>
+
+<div class="return-link"><a href="../index.html">&larr; <cptext "Go Back"></a></div>
+</div>
+<cpanel Branding="include(stdfooter.html)">

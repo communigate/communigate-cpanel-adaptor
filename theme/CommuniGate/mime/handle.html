@@ -1,0 +1,100 @@
+<cpanel setvar="headerimg=../images/topapacheandles.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+<script type="text/javascript">
+//<![CDATA[
+var init_page = function() {
+	var handler_validator = new CPANEL.validate.validator("<cpanel Locale="maketext('Apache Handler')">");
+	handler_validator.add("handle", "apache_handler", "<cpanel langprint="apache_handler_valid">");
+	handler_validator.attach();
+	
+	var ext_validator = new CPANEL.validate.validator("<cpanel Locale="maketext('File Extension')">");
+	ext_validator.add("ext", "mime_extension", "<cpanel langprint="apache_ext_valid">");
+	ext_validator.attach();
+	
+	CPANEL.validate.attach_to_form("submit", [handler_validator, ext_validator]);
+	
+	YAHOO.util.Dom.get("handle").focus();
+}
+YAHOO.util.Event.onDOMReady(init_page);
+//]]>
+</script>
+
+<style type="text/css">
+<?cp Branding::spritelist(.spriteicon_img_mini {float:left;margin-right:5px;background: url\{leftparenthesis}"%"\{rightparenthesis};} %,@spriteurl,images::#icon-${img}_mini {background-position\{colon}0 -${cssposition}px;width\{colon}${width}px;height\{colon}${height}px; }:) imgtype=icon,subtype=img,method=scale_60percent,format=png,img=apache ?>
+</style>
+
+<div class="body-content">
+
+	<div class="h1Title"><div class="spriteicon_img_mini" id="icon-apache_mini"></div> <cpanel langprint="THandlers"></div>
+	<p class="description"><cpanel langprint="AHDesc">.</p>
+	
+	<h2><cpanel langprint="AHCreate"></h2>
+	<div class="highlight">
+	<form action="addhandle.html" onsubmit="return do_validate(this.id);" name="apache" id="apache">
+		<table cellpadding="2" cellspacing="1">
+			<tr>
+				<td align="right"><strong><cpanel langprint="AHHandler">:</strong></td>
+				<td style="width: 150px"><input type="text" id="handle" name="handle" size="22" style="width: 150px" /></td>
+				<td><div id="handle_error"></div></td>
+			</tr>
+			<tr>
+				<td align="right"><strong><cpanel langprint="AHExt">:</strong></td>
+				<td><input type="text" id="ext" name="ext" size="22" style="width: 150px" /></td>
+				<td><div id="ext_error"></div></td>
+			</tr>
+			<tr>
+				<td>&nbsp;</td>
+				<td colspan="2"><i><cpanel langprint="mime_extension_hint"></i></td>
+			</tr>			
+			<tr><td colspan="3"><br /></td></tr>
+			<tr>
+				<td>&nbsp;</td>
+				<td><input name="submit" id="submit" class="input-button" type="submit" value="<cpanel langprint="AHAdd">" /></td>
+				<td>&nbsp;</td>
+			</tr>
+		</table>
+	</form>
+	</div><!-- end highlight -->
+	
+	<p><cpanel UI="showresult(addhandler)"></p>
+	<br />
+	<h2><cpanel langprint="AHHandlerList"></h2> 
+	<table class="sortable" width="90%" cellpadding="0" cellspacing="0" id="userhandletbl" align="center">
+		<caption><cpanel langprint="AHUserDef"></caption>
+		<tr>
+			<th><cpanel langprint="AHHandler"></th>
+			<th><cpanel langprint="AHExt"></th>
+			<th class="sorttable_nosort"><span class="style2"><cpanel langprint="RedirectRemove"></span></th>
+		</tr>
+	
+		<?cp Mime::listhandlers(
+		[tr class="info-%"]
+			[td]%[/td]
+			[td]%[/td]
+			[td][div align="center"][a href="delhandleconfirm.html?userhandle=%"][img align="middle" src="../images/remove.gif" width="16" height="16" border="0" alt="" /][/a][/div][/td]
+		[/tr]
+		,*num,handler,ext,ext) system=no || '[tr][td class="errors" colspan="3"]$LANG{'AHUserConfigNote'}[/td][/tr]' ?>
+	
+	</table>
+	<p><cpanel UI="showresult(delhandler)"></p>
+	<br />
+	<table class="sortable" width="90%" cellpadding="0" cellspacing="0" id="syshandletbl" align="center">
+		<caption align="top"><cpanel langprint="AHSys"></caption>
+		<tr>
+			<th><cpanel langprint="AHHandler"></th>
+			<th><cpanel langprint="AHExt"></th>
+		</tr>
+		
+		<?cp Mime::listhandlers(
+		[tr class="row-%"]
+			[td]%[/td]
+			[td]%[/td]
+		[/tr]
+		,*num,handler,ext) user=no || '[tr][td class="errors" colspan="2"]$LANG{'AHSysConfigNote'}[/td][/tr]' ?>
+	
+	</table>
+
+</div><!-- end body-content -->
+
+<cpanel Branding="include(stdfooter.html)">

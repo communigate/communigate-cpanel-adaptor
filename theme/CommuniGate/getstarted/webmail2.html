@@ -1,0 +1,29 @@
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+
+
+<div class="body-content">
+
+<h1><cpanel langprint="gswtitle"></h1>
+
+<cpanel include="jumpmenu.html">
+
+<p class="description"><cpanel langprint="WebmailDescription"></p>
+<p>
+
+<cpanelif $ENV{'SERVER_PORT'}==2082>
+   <cpanel setvar="webmail_url=http://$httphost:2095">
+</cpanelif>
+<cpanelif !$ENV{'SERVER_PORT'}==2082>
+   <cpanel setvar="webmail_url=https://$httphost:2096">
+</cpanelif>
+<p><cpanel Locale="maketext('Drag this link: [output,url,_1,Access cPanel Webmail,title,Access cPanel Webmail] to your desktop or your bookmarks toolbar.',$CPVAR{'webmail_url'})"></p>
+<cpanelfeature updatecontact>
+<div align="center"><a class="create-button" href="updatecontact.html"><cpanel langprint="Next"></a>
+</cpanelfeature>
+<cpanelfeature !updatecontact>
+<div align="right"><a class="create-button" href="changelook.html"><cpanel langprint="Next"></a>
+</cpanelfeature>
+
+</div>
+<cpanel Branding="include(stdfooter.html)">

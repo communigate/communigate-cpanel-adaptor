@@ -1,0 +1,20 @@
+<cpanel setvar="headerimg=../../images/topmysql.gif">
+<cpanel setvar="dprefix=../../">
+<cpanel Branding="include(stdheader.html)">
+<style type="text/css">
+<?cp Branding::spritelist(.spriteicon_img_mini {float:left;margin-right:5px;background: url\{leftparenthesis}"%"\{rightparenthesis};} %,@spriteurl,images::#icon-${img}_mini {background-position\{colon}0 -${cssposition}px;width\{colon}${width}px;height\{colon}${height}px; }:) imgtype=icon,subtype=img,method=scale_60percent,format=png,img=ssh-shell-access ?>
+</style>	
+<div class="body-content">
+<div class="h1Title"><div class="spriteicon_img_mini" id="icon-ssh-shell-access_mini"></div><cpanel langprint="SSHViewDownKey"> <cpanel print="$FORM{'key'}"></div>
+
+<form>
+<h2><img src="../../images/putty.gif" align="absmiddle"> <cpanel langprint="SSHPrivate">
+<cpanel print="$FORM{'key'}"> <cpanel langprint="SSHPuttyPPK">:</h2>
+<textarea cols="75" rows="10"><?cp SSH::converttoppk(%,key) name=$FORM{'key'},pass=$FORM{'pass'} ?></textarea>
+</form>
+<br />
+<a class="create-button" href="<cpanel print="$ENV{'cp_security_token'}">/download/.ssh/putty/<cpanel print="$FORM{'key'}">.ppk"><cpanel langprint="SSHDownloadKey"></a>
+
+<div class="return-link"><a href="editkey.html?key=<cpanel print="$FORM{'key'}">">&larr; <cptext "Go Back"></a> | <a href="index.html"><cpanel langprint="SSHBack"></a></div>
+</div>            
+<cpanel Branding="include(stdfooter.html)">

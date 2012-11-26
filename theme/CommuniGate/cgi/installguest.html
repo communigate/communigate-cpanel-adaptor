@@ -1,0 +1,13 @@
+<cpanel setvar="headerimg=../images/topcgi.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+<div class="body-content">
+<font class="big"><cpanel Locale="maketext('Advanced Guestbook Setup')"></font><br /><br />
+
+<cpanel Locale="maketext('Please note, the default login is [output,strong,test] and the default password is [output,strong,123].')"> 
+<cpanel Locale="maketext('You should change this as soon as possible [output,url,html,here,plain,at].',http://$CPDATA{'DNS'}/$FORM{'url'}/admin.php)">
+
+<br /><br />
+<cpanel Cgi="installgbook($FORM{'url'})">
+</div>
+<cpanel Branding="include(stdfooter.html)">

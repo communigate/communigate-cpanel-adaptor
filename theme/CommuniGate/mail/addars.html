@@ -1,0 +1,462 @@
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+  
+<script type="text/javascript">
+//<![CDATA[
+var waitpanel;
+
+function stop_is_after_start() {
+    var stop_text = DOM.get("stop_ts").value;
+    if ( !stop_text ) return true;
+
+    var start_text = DOM.get("start_ts").value;
+    if ( !start_text ) {
+        return ( (new Date()).getTime() < (parseInt(stop_text) * 1000) );
+    }
+
+    return parseInt(start_text) < parseInt(stop_text);
+}
+
+var validator;
+var init = function() {
+
+    validator = new CPANEL.validate.validator("<cptext "Modify/Add Auto Responder">");
+
+    validator.add("stop_ts", stop_is_after_start, "<cptext "The stop time must be later than the start time.">");
+
+    validator.add("interval", "positive_integer", "<cptext "The Interval field must be a positive integer.">");
+    if (YAHOO.util.Dom.inDocument("email") == true) {
+        validator.add("email", "min_length(%input%, 1)", "<cptext "The Email field cannot be empty.">");
+        validator.add("email", "no_chars(%input%,'@')", "<cptext 'Cannot use a domain in this field'>");
+    }
+    validator.add("from", "min_length(%input%, 1)", "<cptext "The From field cannot be empty.">");
+    validator.add("subject", "min_length(%input%, 1)", "<cptext "The Subject field cannot be empty.">");
+    validator.add("arbody", "min_length(%input%, 1)", "<cptext "The Body field cannot be empty.">");
+
+    validator.attach();
+
+    CPANEL.validate.attach_to_form("submit-button", validator);
+
+    // TODO: add a description for interval
+    //CPANEL.panels.create_help("interval_help_toggle", "interval_help_description");
+
+    YAHOO.util.Dom.get("charset").focus();
+};
+
+YAHOO.util.Event.onDOMReady(init);
+
+var kill_utfmsg = function() {
+    if (!FORM['autoload']) { checkcharset(); }
+    if (document.getElementById('utfmsg')) {
+        document.getElementById('utfmsg').style.display='none';
+    }
+};
+
+YAHOO.util.Event.onDOMReady(kill_utfmsg);
+
+
+function checkcharset() {
+    var current_encoding = '<cpanel getcharset="">';
+    var charEl = document.getElementById('charset');
+    var req_encoding = charEl.options[charEl.selectedIndex].value;
+
+    if (current_encoding === req_encoding) return;
+
+    FORM['__cpanel__temp__charset__'] = req_encoding;
+    FORM['autoload'] = 1;
+    var QueryString = [];
+    for(var i in FORM) {
+        QueryString.push(i + '=' + FORM[i]);
+    }
+
+    show_loading("<cpanel langprint="CharEncodingSwitch">");
+    window.location.href = 'addars.html?' + QueryString.join('&');
+}
+
+var show_loading = function(action, body) {
+    if (!waitpanel) {
+		var panel_options = {
+			width: "252px",
+            fixedcenter: true,
+            close: false,
+            draggable: false,
+            modal: true,
+            visible: false
+        };
+		waitpanel = new YAHOO.widget.Panel("waitpanel", panel_options);
+    }
+	waitpanel.setHeader(action);
+	var loadingimg = '<img src="img/yui/rel_interstitial_loading.gif" />';
+	if (body) {
+        waitpanel.setBody(body + '<br />' + loadingimg);
+    }
+	else {
+        waitpanel.setBody(loadingimg);
+    }
+	
+	waitpanel.render(document.body);
+	waitpanel.show();
+};
+
+var FORM = {};
+parseForm();
+
+function parseForm() {
+    var query = window.location.search.substring(1);
+    var parms = query.split('&');
+    for (var i=0; i<parms.length; i++) {
+        var pos = parms[i].indexOf('=');
+        if (pos > 0) {
+            var key = parms[i].substring(0,pos);
+            var val = parms[i].substring(pos+1);
+            FORM[key] = val;
+        }
+    }
+}
+//]]>
+</script>
+
+<div class="body-content">
+
+<h1><cpanel langprint="ARModAdd"></h1>
+
+<p><cpanel langprint="ARHint"></p>
+
+<p><cpanel langprint="ARHint2"></p>
+
+<form method="post" id="mainform" name="mainform" action="doaddars.html">
+	<table style="width: 100%" cellspacing="0" cellpadding="3">
+		<tr>
+			<td align="right"><i><cpanel langprint="EASubject"></i></td>
+			<td>-</td>
+			<td><cpanel langprint="EASubjectDesc"></td>
+		</tr>
+		<tr>
+			<td align="right" valign="top"><i><cpanel langprint="EAFrom"></i></td>
+			<td valign="top">-</td>			
+			<td valign="top"><cpanel langprint="EAFromDesc"></td>
+		</tr>
+		<tr>
+			<td align="right"><cpanel langprint="EAEmail"></td>
+			<td>-</td>			
+			<td><cpanel langprint="EAEmailDesc"></td>
+		</tr>
+	</table>
+	<br />
+	<table style="width: 100%" cellspacing="0" cellpadding="3">
+		<tr>
+			<td align="right"><cpanel langprint="ARCharacterset"></td>
+			<td>
+				<table><tr>
+					<td>
+						<select name="charset" onchange="checkcharset(this);" id="charset">
+							<cpanel Email="getarscharset($FORM{'email'},$FORM{'__cpanel__temp__charset__'})">
+						</select>
+					</td>
+					<td><em><cpanel Locale="maketext('Note: You must select this option before changing anything else or you will lose your changes.')"></td>
+				</tr></table>
+			</td>
+		</tr>
+		<tr>
+            <td align="right"><cptext 'Interval:'></td>
+            <td><input size="4" maxlength="4" type="text" autofill="off" autocomplete="off" id="interval" name="interval" value="<cpanel Email="getarsinterval($FORM{'email'})">" /> <cptext '[numerate,_1,hour,hours]'> <span id="interval_error"></span></td>
+        </tr>
+        <tr>
+			<td align="right"><cpanel langprint="AREmail"></td>
+			<cpanelif !$appname==webmail>
+				<td>
+					<input style="width: 150px" type="text" autofill="off" autocomplete="off" id="email" name="email" value="<cpanel sprint="$FORM{'email'},@,0">" /> @
+					<select name="domain">
+						<cpanel Email="printdomainoptions($FORM{'email'})">
+					</select> <span id="email_error"></span>
+				</td>
+			</cpanelif>
+			<cpanelif $appname==webmail>
+				<td><input type="hidden" id="email2" name="email2" value="<cpanel print="$authuser">" /><cpanel print="$authuser"></td>
+			</cpanelif>
+		</tr>
+		<tr>
+			<td align="right"><cpanel langprint="ARFrom"></td>
+			<td><input style="width: 150px" type="text" id="from" name="from" value="<cpanel Email="getarsfrom($FORM{'email'})">" /> <span id="from_error"></span>
+			</td>
+		</tr>
+		<tr>
+			<td align="right"><cpanel langprint="ARSubject">:</td>
+			<td><input type="text" size="39" id="subject" name="subject" value="<cpanel Email="getarssubject($FORM{'email'})">" /> <span id="subject_error"></span>
+			</td>
+		</tr>
+		<tr>
+			<td align="right"><cptext 'HTML[boolean,_1,:,]'></td>
+			<td><input type="checkbox" name="html" id="html_message" value="1" <cpanel Email="getarshtml($FORM{'email'})"> /> <label for="html_message"><cptext 'This message contains HTML.'></label></td>
+		</tr>
+		<tr>
+			<td align="right" valign="top"><cpanel langprint="ARBody"></td>
+			<td>
+				<textarea id="arbody" name="arbody" cols="80" rows="8"><cpanel Email="getarsbody($FORM{'email'})"></textarea>
+			</td>
+		</tr>
+        <tr>
+            <td align="right"><cptext 'Start[boolean,_1,:]',1></td>
+            <td><label><input type="radio" name="start_control" value="0" checked="checked" onclick="DOM.get('start_ts').value = ''; validator.verify()" /> <cptext "Immediately"></label>
+                &nbsp;&nbsp;
+                <label><input type="radio" name="start_control" value="1" onclick="if (!customized_dates.start) custom_start(DOM.getNextSibling(this));" /> <a id="start_link" style="visibility:hidden" href="#" onclick="custom_start(this); return false"><cptext "Custom"></a></label>
+                <span id="start_ts_error"></span>
+                <div id="start_container"></div>
+                <input id="start_ts" name="start" type="hidden" value="<cpanel Email="getarsstart($FORM{'email'})">" />
+            </td>
+        </tr>
+        <tr>
+            <td align="right"><cptext 'Stop[boolean,_1,:]',1></td>
+            <td><label><input type="radio" name="stop_control" value="0" checked="checked" onclick="DOM.get('stop_ts').value = ''; validator.verify()" /> <cptext "Never"></label>
+                &nbsp;&nbsp;
+                <label><input type="radio" name="stop_control" value="1" onclick="if (!customized_dates.stop) custom_stop(DOM.getNextSibling(this));" /> <a id="stop_link" style="visibility:hidden" href="#" onclick="custom_stop(this); return false"><cptext "Custom"></a></label>
+                <span id="stop_ts_error"></span>
+                <div id="stop_container"></div>
+                <input id="stop_ts" name="stop" type="hidden" value="<cpanel Email="getarsstop($FORM{'email'})">" />
+            </td>
+        </tr>
+    </table>
+
+    <br />
+    <div style="text-align:center">
+    <input type="submit" id="submit-button" class="input-button" value="<cpanel langprint="ARCreate">/<cpanel langprint="Modify">" /> <span id="arbody_error"></span>
+    </div>
+</form>
+
+<div id="start_calendar" style="display:none;"></div>
+<div id="stop_calendar" style="display:none;"></div>
+<script src="/yui/calendar/calendar.js"></script>
+<script src="/cjt/calendar.js"></script>
+<?cptt _calendar.tmpl ?>
+<link rel="stylesheet" type="text/css" href="/yui/assets/skins/sam/calendar.css" />
+<link rel="stylesheet" type="text/css" href="../css/calendar.css" />
+<!--[if IE 6]>
+<link rel="stylesheet" type="text/css" href="../css/calendar_ie6.css" />
+<![endif]-->
+<!--[if lt IE 9]>
+<link rel="stylesheet" type="text/css" href="../css/calendar_ie678.css" />
+<![endif]-->
+<!--[if IE 9]>
+<link rel="stylesheet" type="text/css" href="../css/calendar_ie9.css" />
+<![endif]-->
+<style type="text/css">
+.yui-skin-sam .yui-calendar {
+    margin: 0 auto;
+}
+.yui-calcontainer .title {
+    cursor: move;
+}
+</style>
+<!--[if lt IE 8]>
+<style type="text/css">
+/* IE6 and IE7 will take margin:auto and expand the margins.
+   The downside of this fix is that the calendar isn't centered in IE6/IE7. :(
+*/
+.yui-skin-sam .yui-calendar {
+    margin: 0;
+}
+</style>
+<![endif]-->
+<script>
+var now = new Date();
+var calendar_options = {
+    mindate: now,
+    default_hours: now.getHours(),
+    default_minutes: now.getMinutes(),
+    selected: [now.getMonth()+1, now.getDate(), now.getFullYear()].join("/"),
+    locale_weekdays: "1char",
+    close: true,
+    draggable: true,
+    navigator: true,
+    iframe: false  //since Overlay does this already
+};
+
+var start = DOM.get("mainform").start.value.trim();
+var stop = DOM.get("mainform").stop.value.trim();
+
+var customized_dates = { start:start, stop:stop };
+
+var start_options = {
+    title: "<cptext "Start[boolean,_1,:]",0>"
+};
+if (start) {
+    start = new Date( start * 1000 );
+    CPANEL.util.set_text_content( "start_link", start.toCpLocaleString() );
+    DOM.get("mainform")["start_control"][1].checked = true;
+    start_options.default_hours = start.getHours();
+    start_options.default_minutes = start.getMinutes();
+    start_options.selected = [start.getMonth()+1, start.getDate(), start.getFullYear()].join("/");
+}
+YAHOO.lang.augmentObject( start_options, calendar_options );
+var stop_options = {
+    title: "<cptext "Stop[boolean,_1,:]",0>"
+};
+if (stop) {
+    stop = new Date( stop * 1000 );
+    CPANEL.util.set_text_content( "stop_link", stop.toCpLocaleString() );
+    DOM.get("mainform")["stop_control"][1].checked = true;
+    stop_options.default_hours = stop.getHours();
+    stop_options.default_minutes = stop.getMinutes();
+    stop_options.selected = [stop.getMonth()+1, stop.getDate(), stop.getFullYear()].join("/");
+}
+YAHOO.lang.augmentObject( stop_options, calendar_options );
+
+DOM.get("start_link").style.visibility = "";
+DOM.get("stop_link").style.visibility = "";
+
+var start_cal = new CPANEL.widgets.Calendar_With_Time( "start_calendar", start_options );
+var stop_cal  = new CPANEL.widgets.Calendar_With_Time( "stop_calendar", stop_options );
+
+var cals = { start:start_cal, stop:stop_cal };
+
+//YUI Calendar's custom events don't set context to the Calendar object (grr..)
+var update_form = function(type, selected, cal) {
+    var the_date = cals[cal].getSelectedDates()[0];
+    if ( the_date ) {
+        DOM.get("mainform")[cal].value = Math.floor(the_date.getTime() / 1000);
+        CPANEL.util.set_text_content( cal+"_link", the_date.toCpLocaleString() );
+    }
+    customized_dates[cal] = true;
+
+    validator.verify();
+};
+
+start_cal.selectEvent.subscribe(update_form, "start");
+start_cal.hours_change_event.subscribe(update_form, "start");
+start_cal.minutes_change_event.subscribe(update_form, "start");
+start_cal.ampm_change_event.subscribe(update_form, "start");
+
+stop_cal.selectEvent.subscribe(update_form, "stop");
+stop_cal.hours_change_event.subscribe(update_form, "stop");
+stop_cal.minutes_change_event.subscribe(update_form, "stop");
+stop_cal.ampm_change_event.subscribe(update_form, "stop");
+
+start_cal.render();
+stop_cal.render();
+
+EVENT.throwErrors = true;
+CPANEL.util.catch_enter( [start_cal.hours_input,start_cal.minutes_input], function(e) {
+    EVENT.stopPropagation(e);
+    start_cal.hide();
+} );
+CPANEL.util.catch_enter( [stop_cal.hours_input,stop_cal.minutes_input], function(e) {
+    EVENT.stopPropagation(e);
+    stop_cal.hide();
+} );
+
+(function() {
+var _contains = YAHOO.util.Region.prototype.contains;
+var Region = YAHOO.util.Region;
+Region.prototype.contains = function(region_or_point) {
+    if ( region_or_point instanceof Region ) {
+        return _contains.apply(this,arguments);
+    }
+    else return
+        this.left < region_or_point[0]
+        && region_or_point[0] < this.right
+        && this.top < region_or_point[1]
+        && region_or_point[1] < this.bottom
+    ;
+};
+})();
+
+//YUI accommodates a bug in old Mac Gecko versions that no longer
+//appears to be a problem, but it does make the tab loop focus the
+//overlay's container pointlessly. So, we prevent this here.
+YAHOO.widget.Overlay.prototype.showMacGeckoScrollbars
+    = YAHOO.widget.Overlay.prototype.hideMacGeckoScrollbars
+    = function() {}
+;
+
+function custom_start(link_el, stop_instead) {
+    var the_cal = stop_instead ? stop_cal : start_cal;
+
+    var the_radio = DOM.get("mainform")[stop_instead ? "stop_control" : "start_control"][1];
+    the_radio.checked = true;
+
+    if (!the_cal._overlay) {
+        var the_div = the_cal.oDomContainer;
+
+        var insertion_point = link_el;
+        if (link_el.parentNode.tagName.toLowerCase() === "label") {
+            insertion_point = link_el.parentNode;
+        }
+
+        var overlay = the_cal._overlay = new YAHOO.widget.Overlay( DOM.generateId(), {
+            visible : false,
+            zIndex  : 1005,  //so the overlay will sit above validation errors
+            context : [ link_el, "bl", "tl" ]
+        } );
+        overlay.setBody(the_div);
+        overlay.render(document.body);
+        insertion_point.parentNode.insertBefore( overlay.element, insertion_point.nextSibling );
+
+
+        //The callback has to be defined as a local variable or else
+        //IE will not recognize "clicker" as a reference within removeListener.
+        var clicker = function (e) {
+            var target = YAHOO.util.Event.getTarget(e) || this;
+
+            if (target === the_div) return;
+            if (target === link_el) return;
+            if (target === the_radio) return;
+            if (DOM.isAncestor(the_div,target)) return;
+
+            //in case we drag
+            var xy = YAHOO.util.Event.getXY(e);
+            if ( !DOM.getRegion(the_div).contains(xy) ) {
+                the_cal.hide();
+            }
+        };
+
+        overlay.beforeShowEvent.subscribe( function() {
+            update_form(null, null, stop_instead ? "stop" : "start");
+            this.align();
+            EVENT.on( document.body, "click", clicker );
+        } );
+        overlay.hideEvent.subscribe( function() {
+            update_form(null, null, stop_instead ? "stop" : "start");
+            EVENT.removeListener( document.body, "click", clicker );
+        } );
+
+
+        //Calendar rewrites all of its HTML when you change the month,
+        //so we need to refresh the drag/drop listeners whenever that happens.
+        var attach_drag_drop = function() {
+            if ( the_cal._dd ) {
+                the_cal._dd.unreg();
+            }
+
+            var title_el = DOM.getElementsByClassName("title","div",the_div)[0];
+            if ( !title_el.id ) title_el.id = DOM.generateId();
+            the_cal._dd = new YAHOO.util.DD(overlay.element, {
+                dragOnly: true
+            } );
+            if ( overlay.cfg.getProperty("iframe") ) {
+                the_cal._dd.onDrag = function() {
+                    overlay.syncPosition();
+                    overlay.syncIframe();
+                };
+            }
+            the_cal._dd.setHandleElId( title_el.id );
+        };
+
+        attach_drag_drop();
+        the_cal.renderEvent.subscribe( attach_drag_drop );
+        the_cal.hideEvent.subscribe( overlay.hide, overlay, true );
+        the_cal.showEvent.subscribe( overlay.show, overlay, true );
+    }
+
+    the_cal.show();
+}
+
+function custom_stop(link_el) {
+    return custom_start(link_el, true);
+}
+</script>
+
+<div class="return-link"><a href="autores.html">&larr; <cptext "Go Back"></a></div>
+
+</div><!-- end body-content -->
+
+<cpanel Branding="include(stdfooter.html)">

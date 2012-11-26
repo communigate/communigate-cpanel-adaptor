@@ -1,0 +1,21 @@
+<html>
+<head>
+<title>cPanel X</title>
+<cpanel relinclude="charset.html">
+<link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+<cpanel Branding="setupdirs()">
+<cpanel Branding="killimg($FORM{'img'})">
+<cpanel Fileman="uploadfiles()"> 
+<cpanel Branding="installliveimg($FORM{'img'})">
+<cpanel Locale="maketext('Branding Image:')"> <cpanel print="$FORM{'img'}"><br />
+<img class="logo_edit" src="<cpanel Branding="image($FORM{'img'})">?nocache=1" />
+<br />
+<cpanel langprint="DoUploadSucces">
+<script type="text/javascript">
+window.opener.location.reload();
+</script>
+</body>
+</html>
+

@@ -1,0 +1,9 @@
+<cpanel setvar="headerimg=../images/topcgi.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+<div class="body-content">
+<font class="big"><cpanel Locale="maketext('phpBB Setup')"></font>
+<font class="med"><font color=#FF0000"><cpanel Locale="maketext('Your board has been upgraded.')"></font></font>
+<cpanel Cgi="upgradephpbbboard($FORM{'board'})">
+</div>
+<cpanel Branding="include(stdfooter.html)">

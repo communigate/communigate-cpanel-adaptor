@@ -1,0 +1,63 @@
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+
+ <style type="text/css">
+<?cp Branding::spritelist(.spriteicon_img_mini {float:left;margin-right:5px;background: url\{leftparenthesis}"%"\{rightparenthesis};} %,@spriteurl,images::#icon-${img}_mini {background-position\{colon}0 -${cssposition}px;width\{colon}${width}px;height\{colon}${height}px; }:) imgtype=icon,subtype=img,method=scale_60percent,format=png,img=manageaccounts ?>
+<?cp Branding::spritelist(.spriteicon_img_mini {float:left;margin-right:5px;background: url\{leftparenthesis}"%"\{rightparenthesis};} %,@spriteurl,images::#icon-${img}_mini {background-position\{colon}0 -${cssposition}px;width\{colon}${width}px;height\{colon}${height}px; }:) imgtype=icon,subtype=img,method=scale_60percent,format=png,img=getstart ?>
+</style>
+<div class="body-content">
+
+<h1><div class="spriteicon_img_mini" id="icon-getstart_mini"></div><cpanel langprint="gswtitle"></h1>
+
+<cpanel include="jumpmenu.html">
+
+<cpanelfeature !popaccts>
+        <meta http-equiv="refresh" content="0;url=defaultaddress.html" />
+</cpanelfeature>
+
+<cpanelfeature popaccts>
+<div><div class="spriteicon_img_mini" id="icon-manageaccounts_mini"></div> <cpanel langprint="MENUEmailAccounts"></div>
+<!-- If you make changes to following code you need to make the same changes in mail/doaddpop.html -->
+		<!--
+		<cpanel Email="addpop($FORM{'email'},$FORM{'password'},$FORM{'quota'},$FORM{'domain'})">
+		-->
+		<cpanelif !$CPERROR{'email'}>
+			<h2><cpanel langprint="EAdocreated"></h2>
+			<p><cpanel langprint="EAdoadd"> <span class="status"><cpanel print="$FORM{'email'}">@<cpanel print="$FORM{'domain'}"></span> <cpanel langprint="EAdoaddlog"> <span class="status"><cpanel print="$FORM{'email'}">+<cpanel print="$FORM{'domain'}"></span> <cpanel langprint="EAdoaddquota"> <span class="status"><cpanel print="$FORM{'quota'}"></span> <cpanel langprint="EAdoaddmegs"> <cpanel langprint="EAdoaddsuccess"></p>
+		<div class="highlight"><p class="boldit"><cpanel langprint="EAConfMailTxt"></p>
+
+	<a href="clientconf.html?redirectdomain=<cpanel print="$FORM{'domain'}">&acct=<cpanel print="$FORM{'email'}">@<cpanel print="$FORM{'domain'}">" class="create-button"><cpanel langprint="Yes"></a>  <a href="defaultaddress.html?newacct=<cpanel print="$FORM{'domain'}">&acct=<cpanel print="$FORM{'email'}">@<cpanel print="$FORM{'domain'}">" class="create-button"><cpanel langprint="No"></a></div>
+
+
+	    </cpanelif>
+		<cpanelif $CPERROR{'email'}>
+	    	<p class="errors"><cpanel langprint="CPErrorCreateProb"> <cpanel langprint="MailAct">.
+	        <a href="#" onclick="document.getElementById('details').style.display='block'; return false;">
+	<cpanel langprint="AODShowDetails"></a> </p>
+
+	  <div class="details" id="details">
+	        <cpanel print="$CPERROR{'email'}">
+	    </div>
+		<noscript>
+		<div class="details-noscript" id="details">
+	      <cpanel print="$CPERROR{'email'}">
+	    </div>
+		</noscript>
+
+
+
+	</cpanelif>
+
+
+<cpanelif $CPERROR{'email'}>
+<br />
+<br />
+	<div align="left"><a class="create-button" href="newemail.html"><cptext "Go Back"></a></div>
+</cpanelif>
+<cpanelif !$CPERROR{'email'}>
+<br />
+	<div align="right"><a class="create-button" href="defaultaddress.html?acct=<cpanel print="$FORM{'email'}">@<cpanel print="$FORM{'domain'}">"><cpanel langprint="NextStep"></a></div>
+</cpanelif>
+
+</cpanelfeature>
+<cpanel Branding="include(stdfooter.html)">

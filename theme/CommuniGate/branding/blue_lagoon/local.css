@@ -1,0 +1,174 @@
+body {
+	background:#e6e6e6;
+	margin:0;
+	padding:0;
+}
+
+#cpanel,#cpanel #border-efx {
+	border:none;
+}
+
+#cpanel {
+	background:#fff;
+	padding:0;
+	width: 100%;
+	position: relative
+	float: left;
+	min-width: 1080px;
+}
+
+#header_bg ul,#header_bg ul li {
+	list-style-type:none;
+	margin:0;
+	padding:0;
+}
+
+#header_bg ul {
+	padding:10px 15px 0 0;
+	text-align:right;
+}
+
+#header_bg ul li {
+	border-right:1px solid #666;
+	display:inline;
+}
+
+#header_bg ul li.last {
+	border-right:0;
+}
+
+#header_bg ul li a {
+	color:#eee;
+	padding:5px 10px 5px 5px;
+	text-decoration:none;
+}
+
+#header_bg ul li a:hover {
+	text-decoration:underline;
+}
+
+#header_bar {
+	color:#999;
+	margin:15px 15px 0 0;
+	padding-left:0;
+	padding-right:0;
+	padding-bottom:0;
+	padding-top:2px;
+	text-align:right;
+	text-transform:uppercase;
+}
+
+#logo-top-logo {
+	margin:0 0 0 15px;
+	padding:0;
+}
+
+#boxes:after {
+	clear:both;
+	content:".";
+	display:block;
+	height:0;
+	visibility:hidden;
+}
+
+#boxes {
+	display:block;
+	overflow:hidden;
+}
+
+* html #boxes {
+	height:.01%;
+	overflow:visible;
+}
+
+#cpanel #files,#cpanel #logs,#cpanel #mail,#cpanel #domains,#cpanel #db,#cpanel #sec,#cpanel #software,#cpanel #pref,#cpanel #advanced {
+	float:left;
+	margin:0 10px 10px 0;
+	_margin:0 10px 0 0;
+	width:235px;
+}
+
+.cellbox {
+	height:425px;
+	_height:420px;
+}
+
+h3,h6,#notices h6,#quota-warnings h6,#content-stats h6 {
+	padding:5px 5px 0 20px;
+	text-align:left;
+	height:17px;
+}
+
+.itemlink {
+	display:none;
+}
+
+#cpanel #border-efx #content {
+	width: 100%;
+	position: relative;
+	border: 0 none !important;
+}
+
+#cpanel #border-efx #content #sub {
+	float: left;
+	width: 220px;
+}
+
+#cpanel #border-efx #content #main  {
+	float: left;
+	width: 70%;
+	min-height:300px;
+	margin:0 20px 0;
+	padding:0;
+}
+
+#cpanel #main .item {
+	border-bottom:1px solid #ccc;
+	float:none;
+	font-size:11px;
+	height:auto;
+	margin:0 20px 5px;
+	padding:0 2px 5px;
+	text-align:left;
+	width:auto;
+}
+
+h6:hover,h6.sfhover {
+	cursor:default;
+	background:#E3D8D2;
+}
+
+#heading-bottom_bg {
+	background:#eee;
+	padding:5px 0 0;
+}
+
+.footer ul.links li {
+	border-right:1px solid #ccc;
+}
+
+.footer ul.links li a {
+	padding:5px 10px 5px 5px;
+}
+
+#content-stats h3,#content-stats h3:hover {
+	cursor:pointer;
+	margin:0;
+}
+
+#stats {
+	font-size:9px;
+}
+
+.be-screenshot {width:20%;}
+
+.create-button, .input-button,.create-button:hover, .input-button:hover {
+	background:#EEEEEE none repeat scroll 0 bottom;
+	overflow: auto;
+	height: auto;
+}
+
+.body-content textarea {width: 100%;}
+
+
+

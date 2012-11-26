@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+        <key>PayloadContent</key>
+        <array>
+                <dict>
+                        <key>EmailAddress</key>
+                        <string>TAGUSER</string>
+                        <key>Host</key>
+                        <string>TAGDOMAIN</string>
+                        <key>MailNumberOfPastDaysToSync</key>
+                        <integer>31</integer>
+                        <key>Password</key>
+                        <string>TAGPASS</string>
+                        <key>PayloadDescription</key>
+                        <string>Configures device for use with Microsoft Exchange ActiveSync services.</string>
+                        <key>PayloadDisplayName</key>
+                        <string>TAGDOMAIN</string>
+                        <key>PayloadIdentifier</key>
+                        <string>TAGDOMAIN</string>
+                        <key>PayloadOrganization</key>
+                        <string></string>
+                        <key>PayloadType</key>
+                        <string>com.apple.eas.account</string>
+                        <key>PayloadUUID</key>
+                        <string>59D88F86-4D52-4EF1-AED3-E6905EC4C36F</string>
+                        <key>PayloadVersion</key>
+                        <integer>1</integer>
+                        <key>SSL</key>
+                        <false/>
+                        <key>UserName</key>
+                        <string>TAGDOMAIN\TAGUSER</string>
+                </dict>
+        </array>
+        <key>PayloadDescription</key>
+        <string>TAGDOMAIN</string>
+        <key>PayloadDisplayName</key>
+        <string>TAGDOMAIN</string>
+        <key>PayloadIdentifier</key>
+        <string>TAGDOMAIN</string>
+        <key>PayloadOrganization</key>
+        <string></string>
+        <key>PayloadRemovalDisallowed</key>
+        <false/>
+        <key>PayloadType</key>
+        <string>Configuration</string>
+        <key>PayloadUUID</key>
+        <string>67C969EE-F96B-4886-AA52-787181AD1B59</string>
+        <key>PayloadVersion</key>
+        <integer>1</integer>
+</dict>
+</plist>
+

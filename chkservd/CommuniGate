@@ -1,0 +1,1 @@
+service[CommuniGate]=x,x,x,/etc/init.d/CommuniGate stop ; /etc/init.d/CommuniGate start,CGServer,root

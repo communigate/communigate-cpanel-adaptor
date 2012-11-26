@@ -1,0 +1,17 @@
+<div id="manage-list">
+    <form method="get" action="" id="manage_list_form">
+    <div align="right">
+        <span class="highlights1"><cpanel langprint="EAManage"></span>
+        <select name="domain" id="manage_list_select">
+            <option value=""><cpanel langprint="EAAllDomains"></option>
+            <cpanel Email="listmaildomainsoptndef($FORM{'domain'})">
+        </select>
+        <input type="submit" class="input-button" value="<cpanel langprint="go">" />
+    </div>
+    </form>
+</div>
+<script type="text/javascript">
+YAHOO.util.Event.onDOMReady(function() {
+    YAHOO.util.Event.on("manage_list_select", "change", function() { YAHOO.util.Dom.get("manage_list_form").submit(); });
+});
+</script>

@@ -1,0 +1,40 @@
+<cpanel setvar="headerimg=../images/mailmenu.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+
+ <div class="body-content">
+<h1><cpanel langprint="ARAddautores"></h1>
+<!--<cpanel Email="addautoresponder($FORM{'email'},$FORM{'from'},$FORM{'subject'},$FORM{'arbody'},$FORM{'domain'},$FORM{'html'},$FORM{'charset'},$FORM{'interval'},$FORM{'start'},$FORM{'stop'})"></b> -->
+<cpanelif !$CPERROR{'email'} && !$appname==webmail>
+	<cpanel langprint="ARModifiedPre"> <span class="status"><cpanel print="$FORM{'email'}">@<cpanel print="$FORM{'domain'}"></span>
+</cpanelif>
+
+<cpanelif !$CPERROR{'email'} && $appname==webmail>
+	<cpanel langprint="ARModifiedPre"> <span class="status"><cpanel print="$FORM{'email'}">
+</span>
+
+</cpanelif>
+<cpanel langprint="ARSuccess">
+
+
+<cpanelif $CPERROR{'email'}>
+    <p class="errors"><cpanel langprint="CPErrorCreateProb"> <cpanel langprint="ARModifiedPre">
+    <a href="#" onclick="document.getElementById('details').style.display='block'; return false;">
+<cpanel langprint="AODShowDetails"></a> </p>
+  <div class="details" id="details">
+        <cpanel print="$CPERROR{'email'}">
+    </div>
+	<noscript>
+	<div class="details-noscript" id="details">
+      <cpanel print="$CPERROR{'email'}">
+    </div>
+	</noscript>
+</cpanelif>
+<cpanelif $appname==webmail>
+	<div class="return-link"><a href="../index.html">&larr; <cptext "Go Back"></a></div>
+</cpanelif>
+<cpanelif !$appname==webmail>
+	<div class="return-link"><a href="autores.html">&larr; <cptext "Go Back"></a></div>
+</cpanelif>
+</div>
+<cpanel Branding="include(stdfooter.html)">

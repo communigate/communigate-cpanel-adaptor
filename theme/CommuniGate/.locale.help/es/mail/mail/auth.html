@@ -1,0 +1,50 @@
+<H2>¿Qué es la autenticación de correo electrónico?</H2>
+<P>La autenticación de correo electrónico le permite verificar el origen de los 
+mensajes de correo electrónico enviados para o desde su dominio. Esta 
+característica le ayudará a combatir el correo basura, o correo no deseado.</P>
+<H2>¿Qué es DomainKeys?"</H2>
+<P>DomainKeys proporciona una forma de verificar al remitente y la integridad de 
+un mensaje. Permite que un sistema de correo electrónico pruebe que el mensaje 
+no fue alterado durante el tránsito (es decir que no fue falsificado), y por lo 
+tanto que el mensaje proviene del dominio especificado.</P>
+<H2>Activar o desactivar DomainKeys</H2>
+<UL>
+  <LI>Haga clic en <EM>Activar</EM> para activar DomainKeys o haga clic en 
+  <EM>Desactivar</EM> para desactivar DomainKeys. </LI></UL>
+<P><STRONG>Aviso:</STRONG> DomainKeys es efectivo solamente si es activado en el 
+servidor oficial de <SPAN class=caps>DNS</SPAN> para la zona.</P>
+<H2>¿Qué es el <SPAN class=caps>SPF</SPAN>?</H2>
+<P>El sistema Sender Policy Framework (estructura de soporte de políticas de 
+remitente)(<SPAN class=caps>SPF</SPAN>) permite que un servidor destinatario 
+verifique que el mensaje de correo electrónico fue realmente enviado desde el 
+dominio especificado en el campo <EM>De:</EM> . Activar <SPAN 
+class=caps>SPF</SPAN> puede evitar que su servidor reciba respuestas de correo 
+basura que falsificaron su nombre de dominio como parte de la dirección del 
+remitente (esto es conocido como “retrodispersión”).</P>
+<P><SPAN class=caps>SPF</SPAN> trabaja especificando cuáles servidores están 
+autorizados para enviar correo electrónico desde su dominio. Solamente el correo 
+electrónico enviado a través de un servidor autorizado aparecerá como válido 
+cuando un destinatario verifique los registros <SPAN class=caps>SPF</SPAN> del 
+mensaje.</P>
+<H2>Activar o desactivar <SPAN class=caps>SPF</SPAN></H2>
+<UL>
+  <LI>Haga clic en <EM>Activar</EM> para activar <SPAN class=caps>SPF</SPAN> o 
+  haga clic en <EM>Desactivar</EM> para desactivar <SPAN class=caps>SPF</SPAN>. 
+  </LI></UL>
+<P><STRONG>Aviso:</STRONG> El sistema <SPAN class=caps>SPF</SPAN> es efectivo 
+solamente si es activado en el servidor oficial de <SPAN class=caps>DNS</SPAN> 
+de la zona, y si ambos servidores de correo, remitente y destinatario, poseen el 
+<SPAN class=caps>SPF</SPAN> activado.</P>
+<H2>Cambiar las configuraciones avanzadas de <SPAN class=caps>SPF</SPAN></H2>
+<UL>
+  <LI>Haga clic en <EM>Agregar</EM> o <EM>Remover</EM> para agregar o remover 
+  servidores anfitriones adicionales, servidores, y bloques de IP en las listas 
+  correspondientes. </LI></UL>
+<UL>
+  <LI>Haga clic en la casilla <EM>Todas las entradas (<SPAN 
+  class=caps>TODAS</SPAN>)</EM> si ya ha ingresado todos los servidores que 
+  enviarán a su dominio y desea excluir a todos los demás dominios. </LI></UL>
+<UL>
+  <LI>Haga clic en la casilla <EM>Sobrescribir entradas existentes</EM> si desea 
+  sobrescribir todos los registros <SPAN class=caps>SPF</SPAN> de todos sus 
+  dominios con estas configuraciones. </LI></UL>

@@ -1,0 +1,50 @@
+<cpanel setvar="headerimg=../images/tools.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+<div class="body-content">
+<h1><cpanel langprint="BUWizard"></h1>
+
+<div id="backup-nav">
+	<h2><cpanel langprint="BUSteps">:</h2>
+	<ol class="clear">
+		<li class="one"><span class="current"><cpanel langprint="BURes"></span></li>
+		<li class="two"><span><cpanel langprint="FullorPart"></span></li>
+		<li class="three"><span><cpanel langprint="Branding_download_th2"></span></li>
+	</ol>
+</div>
+<!-- END #backup-nav -->
+
+<div class="clear" id="br-wrap">
+	
+	<div id="br-content-main">
+		<h4><cpanel langprint="BU"></h4>
+		<p><cpanel langprint="BUdesc1"></p>
+		<p><cpanel langprint="BUdesc2"></p>
+		<ul>
+			<li><cpanel langprint="BUFullOptHome"></li>
+			<cpanelfeature mysql><li><cpanel langprint="BUMySQL"></li></cpanelfeature>
+			<cpanelfeature forwarders><li><cpanel langprint="BUEmailFwdConfig"></li></cpanelfeature>
+			<cpanelfeature blockers><li><cpanel langprint="BUEmailFiltConfig"></li></cpanelfeature>
+		</ul>
+		<p><a href="wizard-backup.html" id="wizard-backup"><span><cpanel langprint="BU"> &rarr;</span></a></p>
+	</div>
+	
+	<div id="br-content-sec">
+		<h4><cpanel langprint="BURest"></h4>
+		<p><cpanel langprint="BURestDesc1"></p>
+		<p><cpanel langprint="BURestDesc2"></p>
+		<ul>
+			<li><cpanel langprint="BUFullOptHome"></li>
+			<cpanelfeature mysql><li><cpanel langprint="BUMySQL"></li></cpanelfeature>
+			<cpanelfeature forwarders><li><cpanel langprint="BUEmailFwdConfig"></li></cpanelfeature>
+			<cpanelfeature blockers><li><cpanel langprint="BUEmailFiltConfig"></li></cpanelfeature>
+		</ul>
+		<p> </p>
+		<p><a href="wizard-restore.html" id="wizard-restore"><span><cpanel langprint="BURest"> &rarr;</span></a></p>
+	</div>
+	
+</div>
+<!-- END #br-wrap -->
+
+</div>
+<cpanel Branding="include(stdfooter.html)">

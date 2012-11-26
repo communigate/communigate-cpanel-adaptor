@@ -1,0 +1,182 @@
+<cpanel setvar="headerimg=../images/toperrorpages.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+<link rel="stylesheet" type="text/css" href="<cpanel MagicRevision="uri("/yui/tabview/assets/skins/sam/tabview.css")">">
+	
+	<script type="text/javascript">
+	function show_pages(x){
+	 var show_div = document.getElementById('step2_block');
+	 var s_value = x.options[x.selectedIndex].value;
+	var skip_value = '<cpanel print="$FORM{'domain'}">';
+	if(skip_value == ''){
+		skip_value = '<cpanel print="$CPDATA{'DNS'}">';
+	}
+	if(s_value != skip_value){
+			window.location = "index.html?domain="+s_value;
+			return false;
+	}
+	   
+	document.getElementById('working_domain').innerHTML = s_value;
+
+	
+	
+	
+	 var a_s = show_div.getElementsByTagName('a');
+
+	 for (i=0; i <= a_s.length; i++){
+	 	try{
+	 	  a_s[i].href = a_s[i].href.replace(/(domain\=[\w\.-]*)/,'domain='+s_value);  //TODO This also needs to change the directory.  Then we can drop Redirect.
+	 	}catch(e){}
+	 }
+
+	 //I do this to give a little feedback to the user
+	 	show_div.style.display='none';
+		setTimeout(function(){show_div.style.display='block'},100);
+
+	}
+
+	function check_domain_drop_down(){
+		var domain_drop = document.getElementById('domain');
+		if (domain_drop.length === 1){
+			//remove the drop down and replace it with a span and the text
+			var domain_span = document.createElement('span');
+			domain_span.id = 'domain_span';
+			domain_span.innerHTML = domain_drop.options[0].value;
+			domain_span.style.border='1px solid #ccc';
+			domain_span.style.backgroundColor='#fff';
+			domain_span.style.padding='3px';
+
+
+			domain_drop.style.display='none';
+
+			document.getElementById('managing').appendChild(domain_span);
+		}
+	}
+	</script>
+	<!-- Sam Skin CSS for TabView -->
+
+	<script type="text/javascript" src="<cpanel MagicRevision="uri("/yui/tabview/tabview.js")">"></script>
+
+
+
+	
+<style type="text/css">
+<?cp Branding::spritelist(.spriteicon_img_mini {float:left;margin-right:5px;background: url\{leftparenthesis}"%"\{rightparenthesis};} %,@spriteurl,images::#icon-${img}_mini {background-position\{colon}0 -${cssposition}px;width\{colon}${width}px;height\{colon}${height}px; }:) imgtype=icon,subtype=img,method=scale_60percent,format=png,img=errorpage ?>
+</style>
+<style type="text/css">
+.yui-skin-sam .yui-navset .yui-nav, .yui-skin-sam .yui-navset .yui-navset-top .yui-nav {
+border-color:#00576A;	
+}
+.emph {
+	font-weight:bold;
+	margin-right:25px;
+}
+ ul.errorpagelist{
+	padding:0 0 10px 0;
+	margin:0 0 0 10px;
+}
+.errorpagelist li{
+	margin:5px 0;
+}
+.errorpagelist li a {
+	display:block;
+	height:20px;
+	width:300px;
+	background:#f5f5f5;
+	padding:10px 0 10px 40px;
+	border:solid 1px #e0e0e0;
+
+}
+.errorpagelist li a:hover {
+	text-decoration:none;
+	background:url(../images/pencil.png) 1em .65em no-repeat #eee;
+}
+#ep-select-domain {
+	border:solid 1px #eee;
+	padding:10px;
+	background:#f5f5f5;
+}
+/** Tabs **/
+/*
+#ectabs ul.yui-nav li{
+	padding:5px;
+	background:#f5f5f5;
+	margin:0;
+	border:solid 1px #eee;
+	margin-right:2px;
+}
+#ectabs ul.yui-nav li a {
+	font-weight:bold;
+	color:#666;
+}
+#ectabs ul.yui-nav li.selected {
+	background:#e9f0f6;
+}
+#ectabs ul.yui-nav li.selected a {
+	color:#00566a;
+}*/
+#ectabs {
+	margin:25px 0 0 0;
+}
+.yui-skin-sam .yui-navset .yui-content{
+	background:#fff;
+	height:300px;
+	overflow:auto;
+}
+#step2_block{display:none;}
+</style>
+<div class="body-content">
+	
+<div class="h1Title"><div class="spriteicon_img_mini" id="icon-errorpage_mini"></div><cpanel langprint="EPHead"></div>
+<p>	<cpanel langprint="ErrorPageP1"></p>
+
+	<p><cpanel langprint=ErrorPageP2"></p>
+	<h2 style="margin:20px 0 15px 0;"><cpanel langprint=ErrorPageStep1"></h2>
+<noscript>
+	<style type="text/css">
+	#ep-select-domain{display:none;}
+	</style>
+</noscript>
+<div id="ep-select-domain">
+		<span class="highlights1" id='managing'><cpanel langprint="EAManage"></span>
+
+	     <select name="domain" id='domain' onchange="show_pages(this)"><cpanel Email="printdomainoptions($FORM{'domain'})"></select>
+
+</div>
+<noscript>
+<form action="noscript.html">	
+	<span class="highlights1" id='managing'><cpanel langprint="EAManage"></span>
+     <select name="domain" id="domain"><cpanel Email="printdomainoptions($FORM{'domain'})"></select>
+	<input type="submit" value="Select Domain" /></form>
+</noscript>
+
+<div id="step2_block">
+
+<h2 style="margin:20px 0 15px 0;"><cpanel langprint=ErrroPageStep2"> <span id="working_domain" class="status"></span></h2>
+<div class="yui-skin-sam">
+<script type="text/javascript">
+var myTabs = new YAHOO.widget.TabView("ectabs");
+</script> 
+
+
+<div id="ectabs" class="yui-navset">
+    <ul class="yui-nav">
+        <li class="selected"><a href="#tab1"><em><cpanel langprint=ErrorPageTab1"></em></a></li>
+        <li><a href="#tab2"><em><cpanel langprint=ErrorPageTab2"></em></a></li>
+        
+    </ul>            
+    <div class="yui-content">
+        <cpanel include="error_code_include.html">
+    </div>
+</div>
+</div>
+
+</div>
+
+<script type="text/javascript">
+	show_pages(document.getElementById('domain'));
+	check_domain_drop_down();
+</script>
+
+</div><!-- end body-content -->
+<cpanel Branding="include(stdfooter.html)">

@@ -1,0 +1,218 @@
+<cpanel setvar="headerimg=../images/topsubdomains.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+
+<cpanelif $FORM{'itemsperpage'}>
+	<cpanel setvar="itemsperpage=$FORM{'itemsperpage'}">
+</cpanelif>
+
+<cpanelif !$FORM{'itemsperpage'} || !$CPVAR{'itemsperpage'}>
+	<cpanel setvar="itemsperpage=10">
+</cpanelif>
+
+<style type="text/css">
+p.description img {
+float:none;
+margin:0pt;
+}
+#password_strength{line-height:18px;}
+.validation_errors_li{width:280px;}
+</style>
+
+<script type="text/javascript">
+//<![CDATA[
+var REQUIRED_PASSWORD_STRENGTH = parseInt('<?cp PasswdStrength::get_required_strength(%,strength) app=pop ?>') || 1;
+truncate_on = 1;
+truncate_wrap = 1;
+truncate_tooltips = 0;
+ajaxloader_on = 1;
+register_truncate_table('subdomaintbl');
+//]]>
+</script>
+
+<style type="text/css">
+<?cp Branding::spritelist(.spriteicon_img_mini {float:left;margin-right:5px;background: url\{leftparenthesis}"%"\{rightparenthesis};} %,@spriteurl,images::#icon-${img}_mini {background-position\{colon}0 -${cssposition}px;width\{colon}${width}px;height\{colon}${height}px; }:) imgtype=icon,subtype=img,method=scale_60percent,format=png,img=addondomain ?>
+</style>
+
+<div class="body-content">
+	
+<div class="h1Title"><div class="spriteicon_img_mini" id="icon-addondomain_mini"></div><cpanel langprint="INDXAddonDomains"></div>
+
+<cpanel setvar="vidtut_name=addon">
+<cpanel setvar="vidtut_header=INDXAddonDomains">
+<cpanel setvar="vidtut_description=VidAddonDesc">
+<cpanel setvar="vidtut_video_name=addon_lo">
+<cpanel setvar="vidtut_width=450">
+<cpanel setvar="vidtut_height=323">	
+<cpanel include="../video_tutorial_include.html">
+	
+<cpanelfeature addondomains>
+	<p class="description"><cpanel langprint="AODDesc"> <cpanel langprint="INDXAddonDomains"><cpanel langprint="subDesc5"> <cpanel print="$homedir">.</p>
+	<h2><cpanel langprint="AODCreate"></h2>
+	<?cp StatsBar::stat( [p class="caution"]$LANG{'statsattention'} % $LANG{'statsoutof'} % $LANG{'available'} $LANG{'INDXAddonDomains'}[/p],count,max) display=addondomains,warnings=1,warninglevel=80,infinitylang=true ?>
+	<cpanelif $CPVAR{'statsbar_addondomains_maxed'}>
+		<style type="text/css">
+		.highlight{
+		display: none;
+		}			
+		</style>
+		<p class="alert_box"><cpanel Locale="maketext('[output,strong,Warning]: You are currently using the maximum number of addon domains. If you need to add a new addon domain contact your service provider.')"></span></p> 
+	</cpanelif>
+
+	<div class="highlight">
+		<form method="post" action="doadddomain.html" id="mainform" name="mainform">
+		<table cellspacing="0" cellpadding="3">
+			<tr>
+				<td align="right"><cpanel langprint="AODAddDomainName"></td>
+				<td style="width: 150px" align="left"><input type="text" name="domain" id="domain" style="width: 150px" /></td>
+				<td><div id="domain_error"></div></td>
+			</tr>
+			<tr>
+				<td align="right"><cpanel langprint="AODSubDomainFTPUN">:</td>
+				<td align="left"><input type="text" name="user" id="user" style="width: 150px" /></td>
+				<td><div id="user_error"></div></td>
+			</tr>
+			<tr>
+				<td align="right"><cpanel langprint="AODDocRoot">: <img src="../images/homeb.gif" alt="home" align="bottom" />/</td>
+				<td align="left" colspan="2">
+					<cpanel setvar="autodirsonly=1">
+					<cpanel setvar="autoinput=dir">
+					<cpanel setvar="inputsize=150px">
+					<cpanel setvar="autofunc=dirComplete">
+					<script type="text/javascript">
+					function dirComplete(inputObj) {}   
+					</script>
+					<table cellpadding="0" cellspacing="0" style="padding: 0; margin: 0;"><tr><td>
+						<cpanel relinclude="autodir/dirbox.html">
+					</td></tr></table>
+				</td>
+			</tr>
+			<tr>
+				<td align="right"><cpanel langprint="AODAddPassword"></td>
+				<td><input type="password" name="pass" id="password1" style="width: 150px" /></td>
+				<td><div id="password1_error"></div></td>
+			</tr>
+			<tr>
+				<td align="right"><cpanel langprint="AODAddPasswordAgain"></td>
+				<td><input type="password" name="pass2" id="password2" style="width: 150px" /></td>
+				<td><div id="password2_error"></div></td>
+			</tr>
+			<tr>
+				<td align="right">
+					<cpanel langprint="email_strength"> (<div style="display: inline" id="why_strong_passwords_link" class="action_link"><cpanel langprint="email_why"></div>):
+					<div id="why_strong_passwords_text" style="display: none;">
+						<cpanel langprint="email_password_why"><br /><br />
+						<cpanel langprint="email_password_tip">
+					</div>
+				</td>
+				<td><div id="password_strength" style="width: 150px; height: 20px; border: 1px solid black; margin: 5px 0px 3px 0px;"></div></td>
+				<td><input type="button" id="create_strong_password" class="input-button" value="<cpanel langprint="cjt_password_generator">" tabindex="-1" /></td>
+			</tr>
+			<tr>
+				<td>&nbsp;</td>
+				<td><input name="go" type="submit" id="submit_domain" class="input-button" value="<cpanel langprint="AODAddSubmit">" /></td>
+				<td>&nbsp;</td>
+			</tr>
+		</table>
+		<p><cpanel langprint="AODAddHint"></p>
+		</form>
+	</div><!-- end highlight -->
+	<script type="text/javascript">
+	//<![CDATA[
+	var domain_validator = new CPANEL.validate.validator("<cpanel Locale="maketext('New Domain')">");
+	var user_validator = new CPANEL.validate.validator("<cpanel Locale="maketext('Subdomain/FTP Username')">");
+	var dir_validator = new CPANEL.validate.validator("<cpanel Locale="maketext('Document Root')">");
+	
+	var fill_in_values = function() {
+		var domain = YAHOO.util.Dom.get("domain").value;
+		var domain_array = domain.split('.');
+		if ( domain_array[0].length < 26 ) // don't autopopulate the field if the length would break the validation
+			YAHOO.util.Dom.get("user").value = domain_array[0];
+		YAHOO.util.Dom.get("dir").value = 'public_html/' + domain;
+		
+		user_validator.verify();
+		dir_validator.verify();
+	};
+	
+	var init_validation = function() {
+		YAHOO.util.Event.on("domain", "change", fill_in_values);
+		
+		// domain name validator
+		domain_validator.add("domain", "host", "<cpanel langprint="domain_invalid">");
+		domain_validator.attach();
+		
+		// subdomain/ftp username
+		user_validator.add("user", "ftp_username", "<cpanel langprint="not_valid_subdomain_ftp_username">");
+		user_validator.attach();
+		
+		// document root
+		dir_validator.add("dir", "dir_path", "<cpanel langprint="validation_directory_paths">");
+		dir_validator.attach();
+		
+		// password validators and activate strength bar
+		var password_validators = CPANEL.password.setup("password1", "password2", "password_strength", REQUIRED_PASSWORD_STRENGTH, "create_strong_password", "why_strong_passwords_link", "why_strong_passwords_text");
+		
+		// add the other validators to the password_validators array
+		password_validators.push(domain_validator, user_validator, dir_validator);
+		
+		CPANEL.validate.attach_to_form("submit_domain", password_validators);
+		
+		// put the focus on the domain field
+		YAHOO.util.Dom.get("domain").focus();
+	};
+	YAHOO.util.Event.onDOMReady(init_validation);
+	//]]>
+	</script>
+</cpanelfeature><!-- end cpanelfeature addondomains -->
+
+<h2><cpanel langprint="AODModify"></h2>
+<div class="search-panel">
+	<form method="get" action=""><span class="boldit"><cpanel langprint="SESearchButton"></span> <input type="text" size="15" name="searchregex" value="<cpanel print="$FORM{'searchregex'}">" /><input type="submit" class="input-button" value="<cpanel langprint="go">" /></form>
+</div>
+
+<table id="subdomaintbl" class="sortable truncate-table" border="0" cellpadding="5" cellspacing="0">
+	<colgroup>
+		<col width="16%" align="center" />
+		<col width="26%" align="left" />
+		<col width="16%" align="center" />
+		<col width="11%" align="center" />
+		<col width="11%" align="center" />
+		<col width="20%" align="center" />
+	</colgroup>
+	<tr class="row-%">
+		<th style="white-space:nowrap;" nowrap="nowrap" align="center" scope="col" class="cell">&nbsp;&nbsp;<cpanel langprint="INDXAddonDomains"></th>
+		<th align="center" class="cell"><cpanel langprint="AODDR"></th>
+		<th align="center" scope="col" class="cell"><cpanel langprint="PSDUsername"></th>
+		<th align="center" scope="col" class="cell sorttable_nosort"><cpanel langprint="AD-RedirectsTo"></th>
+		<th colspan="2" align="center" class="cell-end sorttable_nosort"><cpanel langprint="Actions"></th>
+	</tr>
+	
+	<?cp Park::listaddondomains(
+    [tr class="row-%"]
+        [td class="truncate"]%[/td]
+        [td class="truncate"][a href="../files/index.html" target="_blank" class="ajaxfiles"][img src="../images/homeb.gif" border="0" alt="maketext('Home')" /][a class="ajaxfiles" id="%_lnk" href="../files/index.html?dir=%"]/%[/a] [a href="#" onClick="start_change_docroot[['%'\{comma}'%'\{comma}'%'\{comma}'%']]; return false;"][img border="0" src="$MAGICREVISION{'images/change.gif'}"][/a][/td]
+        [td class="truncate" truncate="25" align="center"]%[/td]
+        [td align="center"]%[/td] 
+        [td align="center" class="nobrd"][a href="confirmdodeldomain.html?domain=%&amp;subdomain=%"]$LANG{'Remove'}[/a][/td]
+        [td align="center"][a href="doredirectdomain.html?domain=%\{comma}%"]$LANG{'ManRedirect'}[/a][/td] 
+    [/tr]
+	,*num,domain,domain,basedir,basedir,domain,subdomain,rootdomain,basedir,subdomain,status,domain,domainkey,domain,domainkey) regex=$FORM{'searchregex'},api2_paginate=1,api2_paginate_start=$FORM{'api2_paginate_start'},api2_paginate_size=$CPVAR{'itemsperpage'} || '[tr][td colspan="6" class="errors"]$LANG{'AD-AlertNoRedirects'}[/td][/tr]' ?>
+
+</table><!-- end subdomaintbl -->
+
+<?cp UI::paginate(%,paginator) currentpage=$CPVAR{'currentpage'},pages=$CPVAR{'pages'},itemsperpage=$CPVAR{'itemsperpage'} ?>
+
+<cpanelif $CPVAR{'pages'} && !$CPVAR{'pages'}==1>
+	<div style="float: right"><form method="get" action="">
+	<cpanel langprint="PaginatorShowing"> <select name="itemsperpage" onchange="this.form.submit();">
+	<?cp UI::paginate_list([option value="%" %]%[/option],item,selected=1?selected:,item) itemsperpage=$CPVAR{'itemsperpage'},itemlist=10:25:50:100:250:500 ?>
+	</select><noscript><input type="button" id="my_button" type="submit" value="<cpanel Locale="maketext('Change')">"></noscript>  <cpanel langprint="PaginatorResults">
+	</form></div>
+</cpanelif>
+
+</div><!-- end body-content -->
+
+<cpanel relinclude="subdomain/include_changedocroot.html">
+<script type="text/javascript" src="<cpanel MagicRevision="uri("js/statusbox_optimized.js")">"></script>
+
+<cpanel Branding="include(stdfooter.html)">

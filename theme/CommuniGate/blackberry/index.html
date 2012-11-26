@@ -1,0 +1,66 @@
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+<div class="body-content">
+<div class="h1Title"><cptext 'BlackBerry® FastMail Service'></div>
+
+<cpanel Email="checkfastmail()">
+
+<cpanelif $CPVAR{'fastmail'} && !$CONF{'proxysubdomains'}>
+<div class="highlight">
+<cptext 'Service is currently [output,class,Enabled (Version _1),status].',$CPVAR{'fastmail'}>
+</div>
+<p>
+<cptext 'The email server is currently optimized for better performance when using a BlackBerry® device using [output,url,_1,_2,_type,offsite] or later to retrieve email from this server. Once the device has been properly configured, you should receive email with near real time speed. If you have previously configured your device before release of [_2], or the release of cPanel v[_3], you will need to complete the device setup again to realize the performance increase.','http://www.blackberry.com/btsc/dynamickc.do?externalId=KB17394&sliceID=1&command=show&forward=nonthreadedKC&kcId=KB17394','BIS 2.6',11.25>
+</p>
+<p><a class="create-button" href="../mail/pops.html"><cptext 'Go to Email Account Page'></a></p>
+<br />
+<h2><cptext 'BlackBerry® Level 3 Integration'></h2>
+
+<p>
+<cptext 'If Research in Motion (RIM), recognizes you as a Mail Service Provider (MSP), this server can answer subscription requests at the following URLs: [join,_*]','%3Cbr /%3E%3Cbr /%3CE','https://mail.$CPDATA{DNS}:2096/rim-bis/v1'>
+<br />
+<br />
+<cptext '[output,strong,Note:] For security, these URLs can only be accessed by a server running BIS.'>   
+
+</p>
+</cpanelif>
+
+
+<cpanelif $CPVAR{'fastmail'} && $CONF{'proxysubdomains'}>
+<div class="highlight">
+<cptext 'Service is currently [output,class,Enabled (Version _1),status].',$CPVAR{'fastmail'}>
+</div>
+<p>
+<cptext 'If you configured your device before the release of [_1] or cPanel v[_2], you will need to complete the device setup again to realize the performance increase.','BIS 2.6',11.25>
+</p>
+<p><a class="create-button" href="../mail/pops.html"><cptext 'Go to Email Account Page'></a></p>
+
+<p><strong><cptext 'Direct access to sent and spam mail folders'></strong></p>
+
+<p><cptext 'You can configure your BlackBerry® device to open mail from your sent folder (or spam folder) directly in your inbox. Simply configure the device to log into email using your email address, plus /sent or /spam, as the username (for example, user@example.com/sent).'>
+</p>
+<br />
+<h2><cptext 'BlackBerry® Level 3 Integration'></h2>
+
+<p>
+<cptext 'If Research in Motion (RIM), recognizes you as a Mail Service Provider (MSP), this server can answer subscription requests at the following URLs: [join,_*]','%3Cbr /%3E%3Cbr /%3E','https://mail.$CPDATA{DNS}:2096/rim-bis/v1','https://webmail.$CPDATA{DNS}/rim-bis/v1'>
+<br />
+<br />
+<cptext '[output,strong,Note:] For security, these URLs can only be accessed by a server running BIS.'>
+
+</p>
+</cpanelif>
+
+
+
+
+<cpanelif !$CPVAR{'fastmail'}>
+<div class="highlight">
+<h2><cptext 'BlackBerry® FastMail Service Integration not available'></h2>
+<cptext 'cPanel 11.25 supports real time delivery to a BlackBerry® hand held device using [output,url,_1,_2,_type,offsite] or later. Currently this functionality is not yet enabled on this server.','http://www.blackberry.com/btsc/dynamickc.do?externalId=KB17394&sliceID=1&command=show&forward=nonthreadedKC&kcId=KB17394','BIS 2.6'>
+<cptext 'For more information [output,url,_1,please contact the system administrator,class,bottomlink,tagert,_blank].',$CPVAR{'dprefix'}/contact/contactinfo.html'>
+</div>
+</cpanelif>
+
+</div><!-- end body-content div -->
+<cpanel Branding="include(stdfooter.html)">

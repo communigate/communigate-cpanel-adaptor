@@ -1,0 +1,198 @@
+<cpanel setvar="headerimg=../images/mailmenu.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+<cpanelif $FORM{'itemsperpage'}>
+	<cpanel setvar="itemsperpage=$FORM{'itemsperpage'}">
+</cpanelif>
+<cpanelif !$FORM{'itemsperpage'} || !$CPVAR{'itemsperpage'}>
+	<cpanel setvar="itemsperpage=10">
+</cpanelif>
+
+
+<cpanelif $FORM{'updatemodes'}>
+<?cp CommuniGate::SetSubSettings() listname=$FORM{'listname'},subemail=$FORM{'subemail'},CGPMLReceivingMode=$FORM{'CGPMLReceivingMode'},CGPMLPostingMode=$FORM{'CGPMLPostingMode'} ?>
+</cpanelif>
+
+<cpanelif $CPERROR{'CommuniGate'} && $FORM{'updatemodes'}>
+<p><cpanel print="CGP ERROR : $CPERROR{'CommuniGate'}"></p>
+</cpanelif>
+
+
+<cpanelif $FORM{'unsub'}>
+<?cp CommuniGate::UnSub() listname=$FORM{'listname'},subemail=$FORM{'subemail'} ?>
+</cpanelif>
+
+<cpanelif $CPERROR{'CommuniGate'} && $FORM{'unsub'}>
+<p><cpanel print="CGP ERROR : $CPERROR{'CommuniGate'}"></p>
+</cpanelif>
+
+
+
+<cpanelif $FORM{'sub'}>
+<?cp CommuniGate::Sub() listname=$FORM{'listname'},subemail=$FORM{'subemail'},CGPMLReceivingMode=$FORM{'CGPMLReceivingMode'},CGPMLPostingMode=$FORM{'CGPMLPostingMode'} ?>
+</cpanelif>
+
+<cpanelif $CPERROR{'CommuniGate'} && $FORM{'sub'}>
+<p><cpanel print="CGP ERROR : $CPERROR{'CommuniGate'}"></p>
+</cpanelif>
+
+	
+<style type="text/css">
+<?cp Branding::spritelist(.spriteicon_img_mini {float:left;margin-right:5px;background: url\{leftparenthesis}"%"\{rightparenthesis};} %,@spriteurl,images::#icon-${img}_mini {background-position\{colon}0 -${cssposition}px;width\{colon}${width}px;height\{colon}${height}px; }:) imgtype=icon,subtype=img,method=scale_60percent,format=png,img=maillist ?>
+</style>	
+	
+<div class="body-content">
+
+<div class="h1Title"><div class="spriteicon_img_mini" id="icon-maillist_mini"></div> <cpanel langprint="CGPMLSubscribers"> <cpanel print="$FORM{'listname'}"></div>
+
+<p class="description"><cpanel langprint="CGPMLSubscribersDesc"></p>
+
+<div class="return-link"><a href="http://www.communigate.com/communigatepro/LIST.html" target="_blank"><cptext "Mailing Lists Documentation"></a></div>
+
+
+<h2><cpanel langprint="CGPAddSubscriber"></h2>
+<?cp StatsBar::stat( [p class="caution"]$LANG{'statsattention'}&nbsp;%&nbsp;$LANG{'statsoutof'}&nbsp;%$LANG{'available'}&nbsp;$LANG{'INDXMailingLists'}[/p],count,max) display=mailinglists,warnings=1,warninglevel=80,infinitylang=true ?>
+
+
+
+<div class="highlight">
+<form method="post" action="listsubscribers.html" id="subform" name="subform">
+<input type="hidden" name="sub" value="sub">
+<input type="hidden" name="listname" value="<cpanel print="$FORM{'listname'}">">
+
+<table>
+                <tr>
+		<td style="width: 150px" align="right"><cpanel langprint="CGPSubEmailAddress">:</td>
+		<td><input type="text" name="subemail" id="subemail" style="width: 150px" /></td>
+		<td><div id="email_error"></div></td>
+	</tr>
+		<tr>
+			<td align="right"><cpanel langprint="CGPMLReceivingMode"></td>
+			<td colspan="2">
+				<select class="popup" name="CGPMLReceivingMode"> 
+					<option value="feed" selected="selected">Feed (All Messages)</option>
+					<option value="digest">Digest (Periodic Summary with Table of Content + Messages)</option>
+					<option value="index">Index (Periodic Summary with Table of Content only)</option>
+					<option value="null">Null (No Messages) </option>
+					<option value="banned">Banned (No Messages + no self subscription changes)</option>
+				</select>
+			</td>
+		</tr>	
+		<tr>	
+                       <td align="right"><cpanel langprint="CGPMLPostingMode"></td>
+                        <td colspan="2">
+                                <select class="popup" name="CGPMLPostingMode">
+                                        <option value="mod1" selected="selected">Moderate next 1 post</option>
+                                        <option value="mod2">Moderate next 2 posts</option>
+                                        <option value="mod3">Moderate next 3 posts</option>
+                                        <option value="mod4">Moderate next 4 posts</option>
+                                        <option value="mod5">Moderate next 5 posts</option>
+                                        <option value="modall">Moderate all posts</option>
+                                        <option value="unmod">Unmoderated</option>
+                                        <option value="nopost">Prohibit</option>
+                                </select>
+                        </td>
+               </tr>
+	<tr><td colspan="3"><br /></td></tr>
+	<tr>
+		<td>&nbsp;</td>
+		<td colspan="2"><input type="submit" id="submit" value="<cpanel langprint="CGPAddMLSub">" class="input-button" style="width: 150px" /></td>
+	</tr>
+</table>
+</form>
+</div><!-- end highlight -->
+<script type="text/javascript">
+//<![CDATA[
+var REQUIRED_PASSWORD_STRENGTH = parseInt('<?cp PasswdStrength::get_required_strength(%,strength) app=list ?>') || 0;
+
+var init_lists = function() {
+	var lname_validator = new CPANEL.validate.validator("List Name");
+	lname_validator.add("email", "min_length(%input%, 1)", "<cpanel langprint="MLJAlertNameBlank">");
+	lname_validator.attach();
+	YAHOO.util.Dom.get("subemail").focus();
+};
+
+//]]>
+</script>
+
+
+<h2><cpanel langprint="CGPMLSubListCurrent"></h2>
+
+<table border="0" cellpadding="5" cellspacing="0" id="mailtbl" class="sortable" width="650">
+
+    <tr >
+		<th class="cell"><cpanel langprint="CGPMLSubName"></th>
+		<th class="cell"><cpanel langprint="CGPMLRcvMode"></th>
+		<th class="cell"><cpanel langprint="CGPMLPostMode"></th>
+		<th class="cell"><cpanel langprint="CGMLNumPosts"></th>
+		<th class="cell-end sorttable_nosort"><cpanel langprint="AHFucn"></th>
+	</tr>
+
+
+<?cp CommuniGate::ListMailingListsSubs(
+	[tr class="row-%"]
+		[td class="cell nobrd-center-t"]%[/td]
+		[td class="cell nobrd-center-t"]
+				[form method="post" action="listsubscribers.html" id="userform" name="modesform"]
+				[input type="hidden" name="updatemodes" value="updatemodes"]
+				[input type="hidden" name="subemail" value="%"]
+				[input type="hidden" name="listname" value="$FORM{'listname'}"]
+				[select class="popup" name="CGPMLReceivingMode"]
+                                        [option value="feed" %]Feed[/option]
+                                        [option value="digest" %]Digest[/option]
+                                        [option value="index" %]Index[/option]
+                                        [option value="null" %]Null[/option]
+                                        [option value="banned" %]Banned[/option]
+                                        [option value="subscribe" disabled="disabled" %]Subscribed[/option]
+                                        [option value="unsubscribe" disabled="disabled" %]Unsubscribed[/option]
+                                [/select]
+		[/td]
+		[td class="cell nobrd-center-t"]
+                                [select class="popup" name="CGPMLPostingMode"]
+                                        [option value="mod1" %]Moderate 1 post[/option]
+                                        [option value="mod2" %]Moderate 2 posts[/option]
+                                        [option value="mod3" %]Moderate 3 posts[/option]
+                                        [option value="mod4" %]Moderate 4 posts[/option]
+                                        [option value="mod5" %]Moderate 5 posts[/option]
+                                        [option value="modall" %]Moderate all posts[/option]
+                                        [option value="unmod" %]Unmoderated[/option]
+                                        [option value="nopost" %]Prohibit[/option]
+                                [/select]
+		[/td]
+                [td class="nobrd-center-t" align="center"]%
+                [/td]
+		[td class="nobrd" align="center"]
+			[button id="my_button" onclick="" type="submit" Value="Update"]Set Modes[/button]
+			[/form]	
+			[form method="post" action="listsubscribers.html" id="userform" name="unsub"]
+                                [input type="hidden" name="unsub" value="unsub"]
+                                [input type="hidden" name="subemail" value="%"]
+                                [input type="hidden" name="listname" value="$FORM{'listname'}"]
+				[button id="my_button" onclick="" type="submit" Value="Update"]Unsubscribe[/button]
+	
+			[/form]	
+		[/td]
+
+	[/tr]
+,*num,subemail,subemail,r_feedsel,r_digestsel,r_indexsel,r_nullsel,r_bannedsel,r_subscribesel,r_unsubscribesel,mod1sel,mod2sel,mod3sel,mod4sel,mod5sel,modallsel,unmodsel,nopostsel,numpost,subemail,subemail,subemail,subemail,subemail) listname=$FORM{'listname'},regex=$FORM{'searchregex'},api2_paginate=1,api2_paginate_start=$FORM{'api2_paginate_start'},api2_paginate_size=$CPVAR{'itemsperpage'} || '[tr][td colspan="4" class="errors"]$LANG{'CGPMLNoSub'}[/td][/tr]' ?>
+
+
+
+</table>
+
+<?cp UI::paginate(%,paginator) currentpage=$CPVAR{'currentpage'},pages=$CPVAR{'pages'},itemsperpage=$CPVAR{'itemsperpage'} ?>
+<cpanelif $CPVAR{'pages'} && !$CPVAR{'pages'}==1>
+	<div style="float:right">
+		<form method="get" action="">
+			<cpanel langprint="PaginatorShowing"> <select name="itemsperpage" onchange="this.form.submit();">
+			<?cp UI::paginate_list([option value="%" %]%[/option],item,selected=1?selected:,item) itemsperpage=$CPVAR{'itemsperpage'},itemlist=10:25:50:100:250:500 ?>
+			</select><noscript><button id="my_button" onclick="" type="submit" Value=""><cpanel Locale="maketext('Change')"></button></noscript>  <cpanel langprint="PaginatorResults"> 
+		</form>
+	</div>
+</cpanelif>
+
+<div class="return-link"><a href="lists.html">&larr; <cptext "Go Back"></a></div>
+
+</div><!-- end body-content -->
+
+<cpanel Branding="include(stdfooter.html)">

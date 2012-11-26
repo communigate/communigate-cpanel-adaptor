@@ -1,0 +1,162 @@
+[%# This needs to be kept in sync with its WHM counterpart. %]
+[%# action, userquestions (hash) %]
+[% USE Api2 -%]
+[% USE JSON -%]
+<link rel="stylesheet" type="text/css" href="[% MagicRevision('/yui/assets/skins/sam/autocomplete.css') %]" />
+<link rel="stylesheet" type="text/css" href="/unprotected/yui/container/assets/container.css" />
+<!--[if lt IE 8]>
+<style type="text/css">
+/* This stuff is necessary because of the nasty z-index bugs in IE6/7. */
+.yui-skin-sam .yui-ac,
+.yui-skin-sam .yui-ac-input {
+    position: static;
+}
+.yui-skin-sam .yui-ac-container {
+    width: expression(this.parentNode.getElementsByTagName("input")[0].offsetWidth + "px");
+}
+
+.yui-ac-container {
+    z-index: 9050;
+}
+</style>
+<![endif]-->
+
+<style type="text/css">
+.yui-skin-sam input.yui-ac-input {
+    position: static;
+    width: auto;
+}
+
+.combobox {
+    border: 1px solid #aaaaaa;
+    display: inline-block;
+}
+.combobox input {
+    border: 0;
+    border-right: 1px solid #aaaaaa;
+    padding: 2px;
+}
+.combobox a {
+    display: inline-block;
+    padding: 0 2px;
+}
+.combobox a:hover {
+    text-decoration: none;
+}
+.cjt-text-input-helper {
+    opacity: .5;
+    -ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=50)";
+    filter: alpha(opacity=50);
+    text-align: center;
+    font-style: italic;
+}
+
+#userform {
+    margin-left: 20px;
+}
+tr.answer td {
+    padding-bottom: 20px;
+}
+</style>
+
+<script src="[% MagicRevision('/yui/data/data.js') %]"></script>
+<script src="[% MagicRevision('/yui/autocomplete/autocomplete.js') %]"></script>
+<!--TODO: move smart_disable to main CJT -->
+[% PROCESS '_ajaxapp.tmpl' -%]
+<script src="[% MagicRevision('/cjt/combobox.js') %]"></script>
+
+<form name="userform" id="userform" action="[% action FILTER html %]" method="post" onsubmit="return CPANEL.util.values(VALID).every(function(v) { return v.is_valid() });">
+
+<table>
+[% FOR i = [1 .. 4] -%]
+<tr>
+<td>
+<label for="q[%i%]">[% locale.maketext('Question [_1]:',i) %]</label>
+</td>
+<td>
+<div class="combobox">
+<input id="q[%i%]ques" name="q[%i%]ques" value="[% userquestions.$i FILTER html %]" size="50" /><a href="#" onclick="return false" id="q[%i%]_expander">▼</a>
+</div>
+</td>
+<td>
+<span id="q[%i%]ques_error" class="no_panel"></span>
+</td>
+</tr>
+<tr class="answer">
+<td>
+[% locale.maketext('Answer [_1]:',i) %]
+</td>
+<td>
+<input id="q[%i%]answer" name="q[%i%]answer" size="50" />
+</td>
+<td>
+<span id="q[%i%]answer_error" class="no_panel"></span>
+</td>
+</tr>
+[% END -%]
+</table>
+
+<input type="submit" value="[% locale.maketext("continue") %]" id="submit-button" class="input-button" />
+</form>
+
+<script>
+YAHOO.util.Event.throwErrors = true;
+var VALID = {};
+
+var init = function() {
+    for (var i = 1; i <= 4; i++) {
+        var cur_questions = questions.slice(7*(i-1), 7 + 7*(i-1));
+        var q_input = DOM.get("q" + i + "ques");
+        var q_expander = DOM.get("q" + i + "_expander");
+        var cb = new CPANEL.widgets.Combobox( q_input, null, cur_questions, {expander: q_expander} );
+        var answer_input = DOM.get("q" + i + "answer");
+
+        VALID["q" + i] = new CPANEL.validate.validator("Question " + i);
+        VALID["q" + i].add(q_input, 'max_length($input$,128)', '[% locale.maketext("security-question-question-maxlength") %]');
+        VALID["q" + i].add(q_input, 'min_length($input$, 2)','[% locale.maketext("security-question-question-minlength") %]');
+        VALID["q" + i].attach();
+
+        VALID["a" + i] = new CPANEL.validate.validator("Answer " + i);
+        VALID["a" + i].add(answer_input, 'max_length($input$,128)','[% locale.maketext("security-question-answer-maxlength") %]');
+
+        ( function() {
+            var this_i = i;
+            var question_input = q_input;
+            var answer_min_length_validator = function() {
+                var val = this.el.value.trim();
+                return (val.length === 0 && question_input.value === question_input.defaultValue)
+                    || val.length >= 2
+                ;
+            };
+            VALID["a" + i].add('q'+i+'answer', answer_min_length_validator, '[% locale.maketext("security-question-answer-minlength") %]');
+            //validate the answer when the question changes
+            var validate_answer = function() {
+                VALID["a"+this_i].verify()
+                if ( question_input.value === question_input.defaultValue ) {
+                    DOM.setStyle( helper.element, "display", "" );
+                }
+                else {
+                    DOM.setStyle( helper.element, "display", "none" );
+                }
+            };
+            YAHOO.util.Event.on( q_input, "keyup", validate_answer );
+            YAHOO.util.Event.on( q_input, "change", validate_answer );
+
+            var this_cb = cb;
+            this_cb.itemSelectEvent.subscribe( validate_answer );
+            var helper = new CPANEL.widgets.Text_Input_Helper(
+                answer_input,
+                "[% locale.maketext('No change') %]"
+            );
+        } )();
+
+        VALID["a" + i].attach();
+    }
+
+    CPANEL.validate.attach_to_form("submit-button", VALID);
+}
+YAHOO.util.Event.onDOMReady(init);
+
+var questions = [% Api2.exec('SourceIPCheck','samplequestions').json() || '[]' %];
+var selected_questions = [% userquestions.json() || '[]' %];
+</script>

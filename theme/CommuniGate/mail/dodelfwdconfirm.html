@@ -1,0 +1,13 @@
+<cpanel setvar="headerimg=../images/mailmenu.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+<div class="body-content">
+<h1><cpanel langprint="FWMaint"></h1>
+<p><cpanel Locale="maketext('Are you sure you want to delete the[boolean,_3, domain, email,] forwarder “[output,class,_1,status] to [output,class,_2,status]”?',$FORM{'email'}, $FORM{'emaildest'},0)"></p>
+<p> 
+	<a class="create-button" href="dodelfwd.html?email=<cpanel formprint="$FORM{'email'}">&emaildest=<cpanel formprint="$FORM{'emaildest'}">"><cpanel Locale="maketext('Delete Forwarder')"></a> 
+	<a class="cancel_link" href="fwds.html"><cpanel Locale="maketext('cancel')"></a>
+</p>
+<div class="return-link"><a href="fwds.html">&larr; <cptext "Go Back"></a></div>
+</div>
+<cpanel Branding="include(stdfooter.html)">

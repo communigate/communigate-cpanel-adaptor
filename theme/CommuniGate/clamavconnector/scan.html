@@ -1,0 +1,64 @@
+<cpanel setvar="headerimg=../images/topcrontab.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+<link rel="stylesheet" href="cleanstyle.css">
+<style type="text/css">
+<?cp Branding::spritelist(.spriteicon_img_mini {float:left;margin-right:5px;background: url\{leftparenthesis}"%"\{rightparenthesis};} %,@spriteurl,images::#icon-${img}_mini {background-position\{colon}0 -${cssposition}px;width\{colon}${width}px;height\{colon}${height}px; }:) imgtype=icon,subtype=img,method=scale_60percent,format=png,img=clam ?>
+</style>
+<div class="body-content">
+<div class="h1Title"><div class="spriteicon_img_mini" id="icon-clam_mini"></div><cpanel langprint="VSScanVirii"></div>
+<form name="viriiform">
+<br />
+<table class="bordertable" border="1" width="80%" align="center">
+<tr>
+<td>
+
+<table border="0" width="100%">
+<tr>
+	<td>
+		<img src="clam.png" alt="" />
+	</td>
+	<td width="100%" align="left" nowrap style="overflow:hidden;">
+           <div style="overflow:hidden; width: 600px">
+		<b><cpanel langprint="VSScan"></b><br /><div style="width: 99%; overflow: hidden; white-space: nowrap;" class="cleantextarea" wrap="physical" id="viriifile" name="cfile" cols="96" rows="3" scrollbars="no" scrolling="no"> <cpanel langprint="VSScanLoad"> ...</div>
+		<br />
+		<b><cpanel langprint="VSFile">:</b> <input type="text" name="cfilen" size="5" class="cleanright"> /
+		<input type="text" name="tfilen" size="5" class="cleanleft" />
+		<b><cpanel langprint="VSData">:</b> <input type="text" name="cbytes" size="5" class="cleanright"> /
+		 <input type="text" name="tbytes" size="5" class="cleanleft" /> M
+           </div>
+	</td>
+</tr>
+</table>
+
+<table border="0" width="100%">
+<tr>
+	<td nowrap>
+		<iframe name="bars" src="bars.html" scrolling="no" width="609" height="28" marginwidth="0" marginheight="0" leftmargin="0" topmargin="0">
+		</iframe>
+	</td>
+	<td nowrap>
+		<input type="text" name="percent" size="3" class="cleanright" />%
+	</td>
+</tr>
+</table>
+
+</td>
+</tr>
+</table>
+<br />
+<table class="bordertable" border="1" width="80%" align="center">
+<tr>
+<td>
+<b><cpanel langprint="VSInfFiles">:</b><br />
+<select size="8" width="600" style="width: 600px" name="status"></select>
+</td></tr>
+</table>
+</form>
+<br />
+
+<div class="return-link"><a href="index.html" target="_top">&larr; <cptext "Go Back"></a></div>
+
+</div><!-- end body-content -->
+<script type="text/javascript">parent.frames.actfr.document.location.href = 'live_go.html?scan=<cpanel print="$FORM{'scanpath'}">';</script>
+<cpanel Branding="include(stdfooter.html)">

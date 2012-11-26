@@ -1,0 +1,36 @@
+<script type="text/javascript">
+//<![CDATA[
+var init = function() {
+		
+    var restricted_domain = '<cpanel print="$CPDATA{'DNS'}">';
+
+	var validation = new CPANEL.validate.validator("<cptext "Contact Information">");
+
+        var check_domain = function () {
+            var value = document.getElementById('email').value.split('@');
+            if (!value[1]) { value[1] = '' }
+            return CPANEL.validate.not_present(value[1], restricted_domain);
+        }
+        var check_second_domain = function () {
+            var value = document.getElementById('second_email').value.split('@');
+            if (!value[1]) { value[1] = '' }
+            return CPANEL.validate.not_present(value[1], restricted_domain);
+        }
+
+	// Attach validation events
+	validation.add("email", "email", '<cptext "Please use a valid email format.">');
+	validation.add("email", check_domain, '<cptext "Please use an email address that is not at this domain.">')
+	validation.add("second_email", "if_not_empty(%input%, CPANEL.validate.email)", '<cptext "Please use a valid email format.">');
+	validation.add("second_email", check_second_domain, '<cptext "Please use an email address that is not at this domain.">');
+
+	validation.attach();
+
+	CPANEL.validate.attach_to_form("submit-button", validation);
+	
+	YAHOO.util.Dom.get("email").focus();
+};
+
+YAHOO.util.Event.onDOMReady(init);
+
+//]]>
+</script>

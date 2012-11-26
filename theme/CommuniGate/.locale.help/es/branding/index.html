@@ -1,0 +1,41 @@
+<P><STRONG>¿Para qué se utiliza el editor de personalización?</STRONG></P>
+<P>El editor de personalización le permite colocar su logotipo personalizado o 
+personalizar cualquier tema X de cPanel. Necesitará crear imágenes que coincidan 
+con las medidas exactas de las imágenes actuales en el editor de 
+personalización. Puede crear un nuevo paquete de personalización para realizar 
+los cambios, o cambiar el paquete predeterminado. Luego puede cargar dichas 
+imágenes mediante el editor, y ellas aparecerán en todas las cuentas cPanel de 
+sus clientes. La personalización es adaptable por revendedor. Si posee múltiples 
+cuentas de revendedor, necesitará cambiar la personalización para cada una de 
+ellas, ya que solamente afecta a todas las cuentas propiedad de la cuenta 
+específica de revendedor. Se recomienda el uso de imágenes tipo gif. </P>
+<P>&nbsp;</P>
+<P><STRONG>Cargar imágenes o texto manualmente</STRONG></P>
+<P>Se pueden cargar las imágenes o textos de los temas que dan soporte a la 
+personalización en /home/<CPANEL print="user">/cpanelbranding/themename.</P>
+<P>&nbsp;</P>
+<P><STRONG>¿Cómo trabaja la personalización?</STRONG></P>
+<P>Cada tema incluye etiquetas de personalización donde se pueden normalmente 
+incluir las imágenes. Estas etiquetas buscan en el directorio cpanelbranding del 
+revendedor, para encontrar la imagen. Si no se encuentra la imagen en cualquiera 
+de los formatos .gif, .png, o .jpg, cPanel utilizará la imagen predeterminada 
+incluida con el tema.</P>
+<P>&nbsp;</P>
+<P><STRONG>Personalización a la medida</STRONG></P>
+<P>Se pueden agregar etiquetas de personalización de cPanel a cualquier página 
+utilizando el siguiente formato: <BR>&lt;cpanel Branding="image(image)"&gt; 
+donde "image" es el nombre de la imagen que desea incluir sin extensión. Por 
+ejemplo &lt;cpanel Branding="image(balloon)"&gt; funciona para balloon.jpg, 
+balloon.gif, o balloon.png.<BR><BR>Estas etiquetas también pueden ser utilizadas 
+para agregar texto personalizado a un tema. &lt;cpanel Branding="text(file)"&gt; 
+buscará un archivo llamado file.txt en el directorio cpanelbranding y colocará 
+los contenidos de dicho archivo en la página donde se encuentra la etiqueta.</P>
+<P>&nbsp;</P>
+<P><STRONG><CPANEL Locale="maketext('Branding Packages')"></STRONG></P>
+<P>Los paquetes de personalización le permiten ofrecer múltiples opciones a sus 
+clientes. Si deja el paquete predeterminado intacto, sus clientes aún tendrán 
+acceso a él. Puede proporcionar diferentes logotipos, esquemas de color, íconos, 
+etc., para que los clientes elijan entre ellos. Su clientes tendrán acceso a 
+cualquier paquete de personalización que exista, a menos que desactive la 
+función Mudar Apariencia.</P>
+<P>&nbsp;</P>

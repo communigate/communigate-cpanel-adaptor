@@ -1,0 +1,29 @@
+<cpanel setvar="headerimg=../images/topnetworktools.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+<style type="text/css">
+ol#sec-ques {padding:0 0 0 20px;}
+#sec-ques li {margin:5px 0 15px 0;padding:10px;border-bottom:dotted 1px #ccc;background:#eee;}
+ ol#sec-ques li input {margin:15px 0 0 0;}		
+</style>
+<style type="text/css">
+<?cp Branding::spritelist(.spriteicon_img_mini {float:left;margin-right:5px;background: url\{leftparenthesis}"%"\{rightparenthesis};} %,@spriteurl,images::#icon-${img}_mini {background-position\{colon}0 -${cssposition}px;width\{colon}${width}px;height\{colon}${height}px; }:) imgtype=icon,subtype=img,method=scale_60percent,format=png,img=sec_policy ?>
+</style>
+
+<div class="body-content">
+<div class="h1Title"><div class="spriteicon_img_mini" id="icon-sec_policy_mini"></div><cpanel langprint="ManageSecTitle"> <span class="status"><?cp SourceIPCheck::getaccount(%,account) account=$FORM{'account'} ?></span></div>
+<p class="description"></p>
+<h2 style="margin-top:25px;"><cpanel langprint="UpSecQues"></h2>
+<p class="description"><cptext "You will be asked your chosen security questions if you are logging in from an unrecognized IP address."></p>
+<cpanelif $isoverridelogin>
+	<a href="reset.html?account=<?cp SourceIPCheck::getaccount(%,account) account=$FORM{'account'} ?>" class="create-button"><cpanel langprint="ResetSecQuesBtn"></a>
+<cpanelelse>
+	<a onclick="return confirm(&quot;<cptext 'Are you sure you want to reset the security questions?'>&quot;)" href="security-questions.html?account=<?cp SourceIPCheck::getaccount(%,account) account=$FORM{'account'} ?>" class="create-button"><cpanel langprint="UpSecQuesBtn"></a>
+</cpanelif> 
+<h2 style="margin-top:25px;"><cpanel langprint="Manage Recognized IP Addresses"></h2>
+<p><a href="accessip.html?account=<?cp SourceIPCheck::getaccount(%,account) account=$FORM{'account'} ?>" class="create-button"><cpanel langprint="ManageAIBtn"></a></p>
+<cpanelif !$FORM{'account'}== && !$FORM{'account'}==$user>
+    <div class="return-link"><a href="../mail/pops.html?searchregex=<?cp SourceIPCheck::getaccount(%,account) account=$FORM{'account'} ?>">&larr; <cptext "Go Back"></a></div>
+</cpanelif>
+</div>
+<cpanel Branding="include(stdfooter.html)">

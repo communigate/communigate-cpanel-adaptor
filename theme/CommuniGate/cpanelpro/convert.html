@@ -1,0 +1,23 @@
+<cpanel setvar="headerimg=../images/topcrontab.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+<div class="body-content">
+<style type="text/css">
+<?cp Branding::spritelist(.spriteicon_img_mini {float:left;margin-right:5px;background: url\{leftparenthesis}"%"\{rightparenthesis};} %,@spriteurl,images::#icon-${img}_mini {background-position\{colon}0 -${cssposition}px;width\{colon}${width}px;height\{colon}${height}px; }:) imgtype=icon,subtype=img,method=scale_60percent,format=png,img=image-manager ?>
+</style>
+<div class="h1Title"><div class="spriteicon_img_mini" id="icon-image-manager_mini"></div><cpanel langprint="IMConvert"></div>
+<p><cpanel langprint="IMWillConvert"><cpanel print="$FORM{'dir'}">/<cpanel print="$FORM{'file'}">.</p>
+<form action="doconvert.html">
+<select name="newtype">
+<option value=png><cpanel langprint="IMpng"></option>
+<option value=jpg><cpanel langprint="IMjpg"></option>
+<option value=gif><cpanel langprint="IMgif"></option>
+<option value=bmp><cpanel langprint="IMbmp"></option>
+</select>
+<input type="hidden" name="target" value="<cpanel print="$FORM{'dir'}">/<cpanel print="$FORM{'file'}">">
+<input type="submit" class="input-button" value="<cpanel langprint="IMConvertB">"></form>
+<div class="return-link"><a href="images.html">&larr; <cptext "Go Back"></a></div>
+</div>
+<cpanel Branding="include(stdfooter.html)">
+
+

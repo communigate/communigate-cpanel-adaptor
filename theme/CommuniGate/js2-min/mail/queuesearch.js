@@ -1,0 +1,1 @@
+function selectBoxes(a,d){var b=a.checked;var e=document.getElementById(d).getElementsByTagName("input");for(var c=0;c<e.length;c++){if(e[c].type=="checkbox"){e[c].checked=b}}};

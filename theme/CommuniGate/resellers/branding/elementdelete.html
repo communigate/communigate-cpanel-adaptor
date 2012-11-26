@@ -1,0 +1,222 @@
+<cpanel Branding="tempsetbrandingpkg($RAW_FORM{'brandingpkg'})">
+<?cp Branding::preloadconf(,) ?>
+<cpanel setvar="headerimg=../../images/tools.gif">
+<cpanel setvar="dprefix=../../">
+<cpanel relinclude="stdbheader.html">
+<script type="text/javascript">
+
+function handleSelect() {
+    var divselect = document.addform.type;
+    var optval = divselect.options[divselect.selectedIndex].value;
+    if (optval == '') { return; }
+    if (optval == 'image') {
+        document.getElementById('imgtypesel').style.display='';        
+        document.getElementById('nukelist').innerHTML="";
+    } else {
+        document.getElementById('imgtypesel').style.display='none';        
+        cpanel_api2(handleTableUpdate,'Branding','brandingeditor','type',optval,'showdeleted',1,'brandingpkg','<?cp Branding::getbrandingpkg(%,brandingpkg) ?>');
+    }
+}
+
+
+/*
+   imgtype=icon 
+   type=html
+ */
+function handleImageSel () {
+    var divselect = document.addform.imgtype;
+    var optval = divselect.options[divselect.selectedIndex].value;
+    if (optval == '') { return; }
+
+    document.getElementById('nukelist').innerHTML = "<cpanel Locale="maketext('Loading …')">";
+    cpanel_api2(handleTableUpdate,'Branding','brandingeditor','imgtype',optval,'showdeleted',1,'brandingpkg','<?cp Branding::getbrandingpkg(%,brandingpkg) ?>')
+}
+
+function handleTableUpdate(result) {
+    var newhtml='<table class="sortable" cellspacing="3" cellpadding="3">' +
+        '<tbody>'+'<tr>'+
+'<th><cpanel langprint="DelInterfaceEl_BrName"></th>'+
+'<th><cpanel langprint="BrandingOrigin"></th>'+
+'<th><cpanel langprint="DelInterfaceEl_BrAction"></th></tr>';
+    for(var i=0;i<result.length;i++) {
+        var newRow = document.createElement('tr');
+        var file = result[i].getElementsByTagName('file')[0].firstChild.nodeValue;
+        var origin;
+        var originEl = result[i].getElementsByTagName('origin')[0];
+        if (originEl) {
+            if (originEl.firstChild) {
+                origin = originEl.firstChild.nodeValue;
+            }
+        }
+        var deleted = 0;
+        var deletedEl = result[i].getElementsByTagName('deleted')[0];
+        if (deletedEl) {
+            if (deletedEl.firstChild) {
+                deleted = deletedEl.firstChild.nodeValue;
+            }
+        } 
+        newhtml += '<tr><td>' + file + '</td><td>' + origin + '</td>';
+        if (deleted == '1') {
+            newhtml += '<td><a href="elementundelete-do.html?brandingpkg=<?cp Branding::getbrandingpkg(%,brandingpkg) ?>&file=' + file + '" class="create-button"><cpanel Locale="maketext('Undo Delete')"></a></td>';
+        } else {
+            newhtml += '<td><a href="elementdelete-do.html?brandingpkg=<?cp Branding::getbrandingpkg(%,brandingpkg) ?>&file=' + file + '" class="create-button"><cpanel Locale="maketext('Delete')"></a></td>';
+        }
+        newhtml += '</tr>';
+    }
+    newhtml += '</tbody></table>';
+    document.getElementById('nukelist').innerHTML=newhtml;
+}
+
+function showForm(){
+    handleSelect();
+/*    var divids = new Array("ie-html", "ie-img", "ie-css", "ie-feat");
+    var x=0;
+    for (x=0; x<4; x++){
+        document.getElementById(divids[x]).style.display = "none";
+    }
+    var divselect = document.addform.type.selectedIndex;
+    document.getElementById(divids[divselect]).style.display= "inline";*/
+}
+</script>
+<style type="text/css">
+.hideme{
+	display:none;
+}
+</style>
+<script type="text/javascript" src="ajaxloader.js"></script>
+
+<div class="body-content">
+
+<style type="text/css">
+<?cp Branding::spritelist(.spriteicon_img_mini {float:left;margin-right:5px;background: url\{leftparenthesis}"%"\{rightparenthesis};} %,@spriteurl,images::#icon-${img}_mini {background-position\{colon}0 -${cssposition}px;width\{colon}${width}px;height\{colon}${height}px; }:) imgtype=icon,subtype=img,method=scale_60percent,format=png,img=branding ?>
+</style>
+
+<h1><cpanel langprint="DelInterfaceEl_Title"></h1>
+<div style="background: #FDA8A8; border:1px solid #ccc; padding: 15px;">
+	<h2 style="margin: 0;"><cpanel Locale="maketext('Developer Feature Only')"></h2>
+	<p><cpanel Locale="maketext('This feature is only for developers. There is no support from cPanel for this feature. Please use at your own risk!')"></p>
+</div>
+<p class="description"><cpanel langprint="DelInterfaceEl_Desc"></p>
+<h2><cpanel langprint="DelInterfaceEl_SelectEl"></h2>
+<form name="addform">
+ <input type="hidden" name="brandingpkg" value="<?cp Branding::getbrandingpkg(%,brandingpkg) ?>">
+<p><cpanel langprint="DelInterfaceEl_Type"> <select name="type" onchange="showForm()">
+<option value=""><cpanel langprint="DelInterfaceEl_SelectType"></option>
+<?cp Branding::listobjecttypes([option value="%"]%[/option],type,type) ?>
+		</select></p>
+<span style="display:none;" id="imgtypesel"><p><cpanel Locale="maketext('Image Type:')"> <select name="imgtype" onchange="handleImageSel();">
+<option value=""><cpanel langprint="DelInterfaceEl_SelectType"></option>
+<?cp Branding::listimgtypes([option value="%"]%[/option],imgtype,imgtype) ?>
+		</select></p></span>
+
+</form>
+<form action="elementdodelete.html" method="post" name="del form">
+ <input type="hidden" name="brandingpkg" value="<?cp Branding::getbrandingpkg(%,&brandingpkg) ?>">
+<div id="nukelist"></div>
+
+<div id="ie-html" class="ietl hideme" >
+<table class="sortable" cellspacing="3" cellpadding="3">
+<tr>
+<th><cpanel Locale="maketext('Name')"></th>
+<th><cpanel Locale="maketext('Delete')"></th>
+<th><input type="checkbox" /></th>
+</tr>
+<tr>
+<td>test.html</td>
+<td><input type="button" class="input-button" value="<cpanel Locale="maketext('Delete')">" />
+</td>
+<td><input type="checkbox" /></td>
+</tr>
+<tr>
+<td>myscript.html</td>
+<td><input type="button" class="input-button" value="<cpanel Locale="maketext('Delete')">" />
+</td>
+<td><input type="checkbox" /></td>
+</tr>
+</table>
+<input type="button" class="input-button" value="<cpanel Locale="maketext('Delete All')">" />
+</div>
+</form>
+
+<form action="elementdodelete.html" method="post" name="del form">
+<div id="ie-img" class="ietl hideme">
+<table class="sortable" cellspacing="3" cellpadding="3">
+<tr>
+<th><cpanel Locale="maketext('Name')"></th>
+<th><cpanel Locale="maketext('Delete')"></th>
+<th><input type="checkbox" /></th>
+</tr>
+<tr>
+<td><img src="<cpanel Branding="image(addondomain)">" alt="image.png" /> image.png</td>
+<td><input type="button" class="input-button" value="<cpanel Locale="maketext('Delete')">" />
+</td>
+<td><input type="checkbox" /></td>
+</tr>
+<tr>
+<td><img src="<cpanel Branding="image(addondomain)">" alt="image.png" /> image.gif</td>
+<td><input type="button" class="input-button" value="<cpanel Locale="maketext('Delete')">" />
+</td>
+<td><input type="checkbox" /></td>
+</tr>
+</table>
+<input type="button" class="input-button" value="<cpanel Locale="maketext('Delete All')">" />
+</div>
+</form>
+
+<form action="elementdodelete.html" method="post" name="del form">
+<div id="ie-css" class="ietl hideme">
+<table class="sortable" cellspacing="3" cellpadding="3">
+<tr>
+<th><cpanel Locale="maketext('Name')"></th>
+<th><cpanel Locale="maketext('Delete')"></th>
+<th><input type="checkbox" /></th>
+</tr>
+<tr>
+<td>style2.css</td>
+<td><input type="button" class="input-button" value="<cpanel Locale="maketext('Delete')">" />
+</td>
+<td><input type="checkbox" /></td>
+</tr>
+<tr>
+<td>local2.css</td>
+<td><input type="button" class="input-button" value="<cpanel Locale="maketext('Delete')">" />
+</td>
+<td><input type="checkbox" /></td>
+</tr>
+</table>
+<input type="button" class="input-button" value="<cpanel Locale="maketext('Delete All')">" />
+</div>
+</form>
+
+<form action="elementdodelete.html" method="post" name="del form">
+<div id="ie-feat" class="ietl hideme">
+<table class="sortable" cellspacing="3" cellpadding="3">
+<tr>
+<th><cpanel Locale="maketext('Name')"></th>
+<th><cpanel Locale="maketext('Delete')"></th>
+<th><input type="checkbox" /></th>
+</tr>
+<tr>
+<td><cpanel Locale="maketext('RVSkin Manager')"></td>
+<td><input type="button" class="input-button" value="<cpanel Locale="maketext('Delete')">" />
+</td>
+<td><input type="checkbox" /></td>
+</tr>
+<tr>
+<td>Fantastico</td>
+<td><input type="button" class="input-button" value="<cpanel Locale="maketext('Delete')">" />
+</td>
+<td><input type="checkbox" /></td>
+</tr>
+</table>
+<input type="button" class="input-button" value="<cpanel Locale="maketext('Delete All')">" />
+</div>
+</form>
+
+
+
+<cpanel include="gobackwhere.html">
+	
+
+</div>
+<cpanel Branding="include(stdfooter.html)">

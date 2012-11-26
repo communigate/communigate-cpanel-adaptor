@@ -1,0 +1,28 @@
+<cpanel setvar="headerimg=../../images/mailmenu.gif">
+<cpanel setvar="dprefix=../../">
+<cpanel Branding="include(stdheader.html)">
+	
+<style type="text/css">
+<?cp Branding::spritelist(.spriteicon_img_mini {float:left;margin-right:5px;background: url\{leftparenthesis}"%"\{rightparenthesis};} %,@spriteurl,images::#icon-${img}_mini {background-position\{colon}0 -${cssposition}px;width\{colon}${width}px;height\{colon}${height}px; }:) imgtype=icon,subtype=img,method=scale_60percent,format=png,img=ufiltering ?>
+</style>
+
+<div class="body-content">
+
+<div class="h1Title"><div class="spriteicon_img_mini" id="icon-ufiltering_mini"></div> <cpanel langprint="EFTrace"></div>
+	
+<h2><cpanel langprint="EFTraceresults"></h2>
+	
+<br />
+<div align="center">
+<!--
+    x3 stdmheader.html listens for "msg" in the form
+    to disable home and help links, so use test_msg instead.
+-->
+	<div class="output" name="tracefilter" cols="80" rows="15" readonly="readonly" style="text-align:left;"><pre><?cp Email::tracefilter(%,trace) account=$FORM{'account'},msg=$FORM{'test_msg'} ?></pre></div>
+</div>
+	
+<div class="return-link"><a href="userfilters.html?account=<cpanel formprint="$FORM{'account'}">">&larr; <cptext "Go Back"></a></div>
+
+</div>
+
+<cpanel Branding="include(stdfooter.html)">

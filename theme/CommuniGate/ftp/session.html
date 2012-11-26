@@ -1,0 +1,35 @@
+<cpanel setvar="headerimg=../images/topftp.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+<style type="text/css">
+<?cp Branding::spritelist(.spriteicon_img_mini {float:left;margin-right:5px;background: url\{leftparenthesis}"%"\{rightparenthesis};} %,@spriteurl,images::#icon-${img}_mini {background-position\{colon}0 -${cssposition}px;width\{colon}${width}px;height\{colon}${height}px; }:) imgtype=icon,subtype=img,method=scale_60percent,format=png,img=ftpaccounts ?>
+</style>
+<div class="body-content">
+	
+<div class="h1Title"><div class="spriteicon_img_mini" id="icon-ftpaccounts_mini"></div><cpanel langprint="FTPSessionHead"></div>
+<p class="description"><cpanel langprint="FTPSessionDesc"></p>
+
+
+	<h2><cpanel langprint="FTPSessionCurrent"></h2>
+	
+		<p class="description note"><cpanel Locale="maketext('(In order to view the current sessions, you may need to reload your page.)')"></p>
+		<form style="margin-bottom:15px;"><input type="button" value="<cpanel Locale="maketext('Reload')">" onclick="window.location.reload()" class="input-button"></form>
+    <table border="0" width="700" cellpadding="2" cellspacing="0" id="ftptbl" class="sortable">
+      <tr>
+	  	<th width="15%"><cpanel langprint="FTPUser"></th>
+        <th width="20%"><cpanel langprint="FTPLoginHost"></th>
+        <th width="20%"><cpanel langprint="FTPLoginTime"></th>
+        <th width="15%"><cpanel langprint="FTPStatus"></th>
+        <th width="10%" nonsortable="true"><cpanel langprint="FTPDisconnect"></th>
+		<th width="20%"><cpanel langprint="FTPProcessId"></th>
+      </tr>
+      <tbody>
+	
+<?cp Ftp::listftpsessions(
+
+[tr class="row-%"][td align="center"]&nbsp;%[/td][td align="center" ]&nbsp;%[/td][td align="center"]&nbsp;%[/td][td align="center" ]&nbsp;%[/td][td align="center" ][a href="dologoutftpconfirm.html?login=%&user=%"][img src="../images/delete_x.gif" border="0" alt="maketext('Disconnect')" /][/a][/td][td align="center" ]%[/td][/tr]
+
+,*num,user,host,login,status,pid,user,pid) || '[tr][td class="errors" colspan="6"]$LANG{'FTPNoSession'}[/td][/tr]' ?>
+</tbody>
+</table>
+<cpanel Branding="include(stdfooter.html)">

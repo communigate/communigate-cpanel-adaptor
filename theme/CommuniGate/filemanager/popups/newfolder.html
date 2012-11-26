@@ -1,0 +1,25 @@
+<div style="display:none;" id="newfolder">
+    <div class="hd">
+        <div class="lt"></div>
+        <span><cpanel langprint="NFolder"></span>
+    <div class="rt">
+</div></div>
+<div class="bd">
+    <div class="filecontent" id="newfolder-foldercontent">
+<form action="<cpanel print="$ENV{'cp_security_token'}">/json-api/cpanel">
+<input type="hidden" name="cpanel_jsonapi_version" value="2" />
+<input type="hidden" name="cpanel_jsonapi_module" value="Fileman" />
+<input type="hidden" name="cpanel_jsonapi_func" value="mkdir" />
+<h4><cpanel langprint="FMCreateNFolder"></h4>
+<p><label for="newdir"><cpanel langprint="NFoldName"></label> <input type="text" name="name" id="new-folder-name" /></p>
+<p>
+<label for="new-folder-path"><cpanel langprint="NFoldCreatein"></label> <br />
+<img alt="" src="../images/homeb.gif" width="15" height="15" /> <input style="width: 80%;"  type="text" name="path" id="new-folder-path" value="/path/to/location/" />
+</p>
+</form>
+
+ </div>
+</div>
+    <div class="ft"></div>
+
+</div>

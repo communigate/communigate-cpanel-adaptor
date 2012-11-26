@@ -1,0 +1,10 @@
+<cpanel setvar="headerimg=../images/mailmenu.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+<div class="body-content">
+<h2><cpanel langprint="SPBoxEnableDo"></h2>
+<pre><cpanel Email="addspambox()"></pre>
+<p><cpanel langprint="SPBoxStatusSwitchPre"> <span class="status"><cpanel Email="spamboxstatus()"></span></p>
+<div class="return-link"><a href="spam.html">&larr; <cptext "Go Back"></a></div>
+</div>
+<cpanel Branding="include(stdfooter.html)">

@@ -1,0 +1,33 @@
+<?cp NVData::set(,) names=brandingpkg ?>
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+	<style type="text/css">
+	<?cp Branding::spritelist(.spriteicon_img_mini {float:left;margin-right:5px;background: url\{leftparenthesis}"%"\{rightparenthesis};} %,@spriteurl,images::#icon-${img}_mini {background-position\{colon}0 -${cssposition}px;width\{colon}${width}px;height\{colon}${height}px; }:) imgtype=icon,subtype=img,method=scale_60percent,format=png,img=lookandfeel ?>
+	<style type="text/css">
+	<?cp Branding::spritelist(.spriteicon_img_mini {float:left;margin-right:5px;background: url\{leftparenthesis}"%"\{rightparenthesis};} %,@spriteurl,images::#icon-${img}_mini {background-position\{colon}0 -${cssposition}px;width\{colon}${width}px;height\{colon}${height}px; }:) imgtype=icon,subtype=img,method=scale_60percent,format=png,img=getstart ?>
+
+	</style>
+
+	</style>
+
+<div class="body-content" id="gsw">
+<h1><div class="spriteicon_img_mini" id="icon-getstart_mini"></div><cpanel langprint="gswtitle"></h1>
+
+<cpanel include="jumpmenu.html">
+
+<cpanelfeature !style>
+        <meta http-equiv="refresh" content="0;url=finished.html" />
+</cpanelfeature>
+
+
+
+<cpanelfeature style>
+
+<cpanel include="../style/switchstyleinclude.html">
+
+<br /><br />
+
+<div align="right"><form method="link" action="ssh.html"><input type="submit" class="input-button" value="<cpanel langprint="NextStep">"></form>
+</div>
+</cpanelfeature>
+<cpanel Branding="include(stdfooter.html)">

@@ -1,0 +1,619 @@
+<cpanel setvar="headerimg=../../images/mailmenu.gif">
+<cpanel setvar="dprefix=../../">
+<cpanel Branding="include(stdheader.html)">
+<style type="text/css">
+.icon-mailbox { cursor:pointer;display:block; height: 20px; padding-left: 20px; background: transparent url(mailbox.png) no-repeat; }
+</style>
+<link rel="stylesheet" type="text/css" href="assets/css/folders/tree.css"> 
+<cpanel Email="has_spam_as_acl()">
+<!-- <cpanel Email="spamstatus()"> -->
+<div class="body-content">
+<script type="text/javascript" src="/yui/treeview/treeview.js"></script>
+<script type="text/javascript" src="/yui/json/json.js"></script>
+
+
+<script type="text/javascript">
+
+var workingDestEl;
+var itags = ['img','select','input'];
+var has_spam_as_acl = 0;
+<cpanelif $CPVAR{'spam_as_acl'}>
+    has_spam_as_acl = 1;
+</cpanelif>
+var spam_assassin_enabled = 0;
+<cpanelif $CPVAR{'spamstatus'}>
+    spam_assassin_enabled = 1;
+</cpanelif>
+
+function duperow(tblname) {
+    var tblC = document.getElementById(tblname + 'tbl');
+    var rowList = (tblC.getElementsByTagName('tbody'))[0].getElementsByTagName('tr'); 
+    var lastRow = rowList[rowList.length-1];
+    var oldid = lastRow.id;
+    var rowMatch = lastRow.id.match(/([0-9]+)/);
+    var newRowNum = (parseInt(rowMatch[0])+1);
+    var newid = tblname + newRowNum;
+    var newRow = document.createElement('tr');
+    newRow.id = newid;
+    var OldCols = lastRow.getElementsByTagName('td');
+    var newCols = [];
+    for(var i=0;i<OldCols.length;i++) {
+        var colId = newCols.length;
+        newCols.push( document.createElement('td') );
+        newCols[colId].innerHTML = OldCols[colId].innerHTML;
+    }
+    for(var j=0;j<itags.length;j++) {    
+        for (var cols=0;cols<newCols.length;cols++) {
+            var itaglist = newCols[cols].getElementsByTagName(itags[j]);
+            for(var i = 0 ; i < itaglist.length ; i++) {
+                itaglist[i].name = itaglist[i].name.replace(/(\d+)/, newRowNum);
+                if (itaglist[i].type == "button") { continue; }
+                if (itaglist[i].selectedIndex) { itaglist[i].selectedIndex=0; }
+                if (itaglist[i].value) { itaglist[i].value=''; }
+            }
+        }
+    }
+    for(var i=0;i<newCols.length;i++) {
+        newRow.appendChild(newCols[i]);
+    }
+    (tblC.getElementsByTagName('tbody'))[0].appendChild(newRow);
+    checkaddrembuttons(tblname);
+    return newRowNum;
+}
+
+
+function setDisabled (Ellist,Elmatch,key) {
+    for(var i=0;i<Ellist.length;i++) {
+        if (Ellist[i].name.match(Elmatch)) {
+            Ellist[i].disabled=key;
+        }
+    }
+}
+
+function setDisplay (Ellist,Elmatch,key) {
+    for(var i=0;i<Ellist.length;i++) {
+        if (Ellist[i].name.match(Elmatch)) {
+            Ellist[i].style.display=key;
+        }
+    }
+}
+
+function checkaddrembuttons(tblname) {
+    var tblC = document.getElementById(tblname + 'tbl');
+    var rowList = (tblC.getElementsByTagName('tbody'))[0].getElementsByTagName('tr'); 
+    var rowCount = rowList.length;
+    for(var i=0;i<rowList.length;i++) {
+        var selList = rowList[i].getElementsByTagName('select');
+        var inputList = rowList[i].getElementsByTagName('input');
+        if (tblname == 'rule') {
+            if ((i+1) < rowCount) {
+                setDisplay(selList,'opt','');
+            } else {
+                setDisplay(selList,'opt','none');
+            }
+        }
+        if (tblname == 'action') {
+            if (inputList[0].value.match('/dev/null') && !inputList[0].value.match('>') ) {
+                selList[0].selectedIndex=0; /* deliver /dev/null */
+                inputList[0].value='';
+                setDisplay(inputList,'dest','none');
+            }
+        }
+        if (rowCount > 1) {
+            setDisabled(inputList,'remove',false);
+        } else {
+            setDisabled(inputList,'remove',true);
+        }
+    } 
+}
+function addaction(bt) {
+    var newRowNum = duperow('action');
+    handleactionbynum(newRowNum);
+}
+function removeaction (bt) {
+    var matchlist = bt.name.match(/(\d+)/);
+    removeRow('action',matchlist[0]); 
+}
+function addrule (bt) {
+    var newRowNum = duperow('rule');
+    handlepartbynum(newRowNum);
+}
+function removerule (bt) {
+    var matchlist = bt.name.match(/(\d+)/);
+    removeRow('rule',matchlist[0]); 
+}
+function removeRow (tblname,rowid) {
+    var thisrow = document.getElementById(tblname + rowid);
+    thisrow.parentNode.removeChild(thisrow);
+    checkaddrembuttons(tblname);
+}
+function handlepartbynum(snum) {
+        handlepart( document.filterform['part' + snum] );
+}
+function handleactionbynum(snum) {
+        handleaction( document.filterform['action' + snum] );
+}
+
+
+function handlepart(sb) {
+    var matchlist = sb.name.match(/(\d+)/);
+    if (matchlist[0]) {
+        var optval = sb.options[sb.selectedIndex].value;
+        var candonum = 0;
+        var hasopts = 1;
+        if (optval.match(/(not delivered|error_message)/)) {
+            hasopts = 0;
+        }
+        if (optval.match(/Spam-Score/)) {
+            candonum = 1;
+        }
+        var partEl = document.filterform['part' + matchlist[0]];
+        var matchEl = document.filterform['match' + matchlist[0]];
+        var valEl = document.filterform['val' + matchlist[0]];
+
+        if (hasopts) {
+            matchEl.style.display='';
+            valEl.style.display='';
+        } else {
+            matchEl.style.display='none';
+            valEl.style.display='none';
+        }
+
+        for(var i=0;i<partEl.options.length;i++) {
+            if (partEl.options[i].value.match(/(Spam-Status|Spam-Score|Spam-Bar)/)) {
+                if (has_spam_as_acl && spam_assassin_enabled) {
+                    partEl.options[i].disabled = false;
+                } else {
+                    partEl.options[i].disabled = true;
+                }
+            }
+        }
+
+
+        for(var i=0;i<matchEl.options.length;i++) {
+            if (matchEl.options[i].value.match(/(above|below)/)) {
+                if (candonum) {
+                    matchEl.options[i].disabled = false;
+                } else {
+                    matchEl.options[i].disabled = true;
+                }
+            }
+        }
+    }   
+}
+
+var canTXT = '<cpanel Locale="maketext('Cancel')">';
+var changeTXT = '<cpanel Locale="maketext('Change')">';
+var foldertree;
+
+function handlebrowser(sb) {
+    if (workingDestEl) {
+        var matchlist = workingDestEl.name.match(/(\d+)/);
+        document.filterform['changedest' + matchlist[0]].value=changeTXT;
+    }
+
+
+    if (sb.value == changeTXT) {
+        sb.value=canTXT;
+        var matchlist = sb.name.match(/(\d+)/);
+        if (matchlist[0]) {
+            workingDestEl = document.filterform['dest' + matchlist[0]];
+            var p = YAHOO.util.Dom.getRegion(workingDestEl);
+            inittreeview(p,workingDestEl,sb);
+        }
+    } else {
+        document.getElementById('treeviewCont').style.display='none';
+        sb.value=changeTXT;
+        workingDestEl=0;
+    }
+}
+
+
+
+function safeencode(st) {
+    var enc = encodeURIComponent(st);
+    var ecp = -1;
+    var safeenc = '';
+
+    for(var i=0;i<enc.length;i++) {
+
+        if (ecp >= 0) { ecp++; }
+        if (ecp >= 3) { ecp = -1; }
+        if (ecp == 1 || ecp == 2) {
+            safeenc += enc.substring(i,i+1).toLowerCase();
+        } else {
+            safeenc += enc.substring(i,i+1);
+        }
+        if (enc.substring(i,i+1) == '%') {
+            ecp = 0;
+        }
+    }
+    
+    
+    return safeenc.replace('(','%28').replace(')','%29').replace(',','%2c');
+}
+
+
+function html_encode_str(mystr) {
+    return mystr.replace(/\&/g,"&amp;").replace(/\</g,"&lt;").replace(/\>/g,"&gt;").replace(/\"/g,"&quot;");
+/* ie does not like .replace(/\'/g,"&apos;"); */
+}   
+
+function parsejsonFile(o) {
+    var root = YAHOO.lang.JSON.parse(o.responseText);
+    if (root == null) { alert("There was a problem fetching the json file list! Please reload and try again."); return; }
+    var node = o.argument.node;
+    for(var i=0;i<root.files.length;i++) {
+        if (!root.files[i].name) { continue; }
+        var name;
+            name = root.files[i].name;
+        var filePath = root.files[i].path + '%2f' + safeencode(root.files[i].name);
+        var fileRelPath = root.files[i].relpath;
+        var ismailbox = root.files[i].ismailbox;
+        var data = {
+			label: name,
+			path: filePath,
+			relpath: fileRelPath, 
+			type: root.files[i].type,
+			depth: node.data.depth+1
+        };
+
+        var newNode = new YAHOO.widget.TextNode( data, node, false);
+        if (root.files[i].isleaf == "1") {
+            newNode.isLeaf = true;
+        }
+        if (ismailbox == "1") {
+            newNode.labelStyle = "icon-mailbox";
+        }
+    }   
+    o.argument.fnLoadComplete();
+        
+}     
+
+function inittreeview(pnt,destEl,sb) {
+    var thisEl = document.getElementById('treeviewCont');
+    thisEl.style.top = pnt.bottom + 5 + 'px';   
+    thisEl.style.left = pnt.left + 'px';
+    thisEl.style.width = (pnt.right - pnt.left) + 'px';    
+    thisEl.style.height = '200px';
+    thisEl.style.display='';
+    thisEl = document.getElementById('treeview');
+    thisEl.style.top = pnt.bottom + 5 + 'px';   
+    thisEl.style.left = pnt.left + 'px';
+    thisEl.style.width = (pnt.right - pnt.left) + 'px';    
+    thisEl.style.height = '200px';
+    thisEl.style.display='';
+
+
+    if (!foldertree) {
+        var account = '<?cp Email::accountname(%,account) display=1,account=$FORM{'account'} ?>';
+        var loadNodeData = function(node, fnLoadComplete) {
+            var callback =
+            {
+				success:parsejsonFile,
+				argument: { node:node, fnLoadComplete:fnLoadComplete }
+            };
+
+            var sUrl = "mailbrowser.json?types=dir&dir=" + node.data.path + '&account=' + encodeURIComponent(account);;
+            YAHOO.util.Connect.asyncRequest('GET', sUrl , callback, null);
+        };
+
+        foldertree = new YAHOO.widget.TreeView("treeview"); 
+        foldertree.subscribe('clickEvent',nodeClick);
+        foldertree.setDynamicLoad(loadNodeData, 1);
+        var root = foldertree.getRoot(); 
+        var data = {
+			label: 'INBOX',
+			path: 'mail',
+			relpath: '%2f',
+			type: 'dir',
+			depth: 1
+        };
+        
+        if (account.match(/@/)) {
+            var acctpts = account.split('@');
+            var user = acctpts[0];
+            var domain = acctpts[1];
+            data.path += '%2f' + domain + '%2f' + user;
+        }
+
+        var tempNode = new YAHOO.widget.TextNode(data, root, false) 
+        if ("<cpanel print="$CONF{'maildir'}">" == "1") {
+            tempNode.labelStyle = "icon-mailbox";
+        }
+
+        tempNode.expand();
+    }
+    
+    foldertree.draw();
+    var root = foldertree.getRoot(); 
+} 
+
+function nodeClick(oArgs) {
+    var node = oArgs.node;
+    var thisEl = document.getElementById('treeviewCont');
+    thisEl.style.display='none';
+    if (workingDestEl) {
+        var matchlist = workingDestEl.name.match(/(\d+)/);
+        document.filterform['changedest' + matchlist[0]].value=changeTXT;
+        var path = decodeURIComponent(node.data.relpath);
+        if (path == '/') {
+            workingDestEl.value='INBOX';
+        } else {
+            workingDestEl.value=path;
+        } 
+    }
+}
+
+function handleaction(sb) {
+    var matchlist = sb.name.match(/(\d+)/);
+    if (matchlist[0]) {
+        var optval = sb.options[sb.selectedIndex].value;
+        if (optval.match(/save\s*$/i)) {
+            document.filterform['dest' + matchlist[0]].editable = false;
+            document.filterform['dest' + matchlist[0]].style.display='';
+            document.filterform['changedest' + matchlist[0]].style.display='';
+        } else if (optval.match(/finish|null/)) {
+           document.filterform['dest' + matchlist[0]].style.display='none';
+            document.filterform['changedest' + matchlist[0]].style.display='none';
+        } else {
+            document.filterform['dest' + matchlist[0]].editable = true;
+            document.filterform['dest' + matchlist[0]].style.display='';
+            document.filterform['changedest' + matchlist[0]].style.display='none';
+        }
+    }
+}
+
+function getrowfromBtnEl(btEl) {
+    var trEl = btEl.parentNode.parentNode;
+    var matchlist = trEl.id.match(/(\d+)/);
+    return matchlist[0];
+}
+
+function moveup(btEl) {
+    moverow(getrowfromBtnEl(btEl),-1);
+}
+function movedown(btEl) {
+    moverow(getrowfromBtnEl(btEl),1);
+}
+
+function moverow(tid,offset) {
+    tid--;
+    var ruletbl = document.getElementById('ruletbl');
+    var trlist = ruletbl.getElementsByTagName('tr');
+    var lastid = null;
+    for(var i=0;i < trlist.length;i++) {
+        if (i == tid) {
+            var targetoffset = (i+parseInt(offset));
+            if (targetoffset > trlist.length || trlist[targetoffset] == null || (targetoffset) == -1) { return true; }
+            var thisParent = trlist[i].parentNode;
+            var tmpchld = trlist[i];
+            thisParent.removeChild(trlist[i]);
+            thisParent.insertBefore(tmpchld,trlist[targetoffset]);
+            break;
+        }
+    }
+
+    for(var i=0;i < trlist.length;i++) {
+        trlist[i].id = trlist[i].id.replace(/(\d+)/, (i+1));
+        for(var k=0;k<itags.length;k++) {    
+            var itaglist = trlist[i].getElementsByTagName(itags[k]);
+            for(var j= 0 ; j < itaglist.length ; j++) {
+                itaglist[j].name = itaglist[j].name.replace(/(\d+)/, (i+1));
+            }
+        }
+    }
+    checkaddrembuttons('rule');
+}
+
+// Validation rules for #filtername
+var validate_filter_name = function() {
+	var filter_name = document.getElementById('filtername').value;
+
+	// Disallow string "Converted Rule" -- case insensitive
+	if ( /Converted Rule/i.test(filter_name) ) return false;
+	
+	// Disallow string "Rule ##+" -- case insensitive
+	if ( /Rule \d+/i.test(filter_name) ) return false;
+	
+	return true;
+}
+
+// Page initialization script
+var init = function() {
+	var validation = new CPANEL.validate.validator("<cptext 'Filter Name'>");
+	validation.add("filtername", validate_filter_name, '<cptext "_EMAIL_FILTER_VALIDATION_MSG">');
+	validation.add("filtername", "min_length(%input%, 1)", "<cptext 'Filter Name cannot be empty.'>");
+	validation.attach();
+	validation.verify();
+	
+	CPANEL.validate.attach_to_form("activate-button", validation);
+	
+	// Extract the account parameter from the url	
+	var account = '';
+	var args = document.location.search;
+
+	if ( args ) {
+	   args = args.substr(1);
+       args = args.split('&');
+       for ( var i=0; i < args.length; i++ ) {
+	      if ( /account=/i.test(args[i]) ) {
+		     account = args[i].split('=')[1];
+		  }
+	   }
+	}
+	
+	// Case 39117
+	// if Account is not empty or port is 2096, remove the "pipe to a program" menu option
+	// from the action menu. 
+	if ( ( account != '' ) || ( document.location.port == 2096) || ( document.location.port == 2095) ) {
+		var menu = document.getElementById('action_menu');
+	
+		for (var i=0; i < menu.options.length; i++ ) {
+			if ( /^pipe$/i.test( menu.options[i].value ) ) {
+				menu.remove(i);
+			}
+		}				
+	}
+	
+
+	YAHOO.util.Dom.get("filtername").focus();
+};
+
+YAHOO.util.Event.onDOMReady(init);
+
+</script>
+
+<style type="text/css">
+<?cp Branding::spritelist(.spriteicon_img_mini {float:left;margin-right:5px;background: url\{leftparenthesis}"%"\{rightparenthesis};} %,@spriteurl,images::#icon-${img}_mini {background-position\{colon}0 -${cssposition}px;width\{colon}${width}px;height\{colon}${height}px; }:) imgtype=icon,subtype=img,method=scale_60percent,format=png,img=ufiltering ?>
+.frow {
+    padding-top: 3px;
+    padding-bottom: 3px;
+}
+#ruletbl tr {
+	height: 50px;
+}
+
+#actiontbl tr {
+	height: 35px;
+}
+</style>
+
+
+</b>
+<?cp Email::loadfilter(%,filter) account=$FORM{'account'},filtername=$FORM{'filtername'} ?>
+<div class="h1Title"><div class="spriteicon_img_mini" id="icon-ufiltering_mini"></div><cpanel langprint="UFEditF"> <cpanel langprint="for"> <?cp Email::accountname(%,account) display=1,account=$FORM{'account'} ?></div>
+
+
+<p class="description"><cpanel langprint="UFDesc"></p>
+<br />
+<form name="filterform" id="filterform" method="post" action="doeditfilter.html">
+<input name="account" type="hidden" value="<cpanel print="$FORM{'account'}">">
+<input type="hidden" name="oldfiltername" value="<?cp Email::filtername(%,filtername) account=$FORM{'account'},filtername=$FORM{'filtername'} ?>">
+<div style="float: left"><b><cpanel langprint="filter_name"></b>: 
+	 <input id="filtername" type="text" name="filtername" size="30" value="<?cp Email::filtername(%,filtername) account=$FORM{'account'},filtername=$FORM{'filtername'} ?>"></div>
+         <div id="filtername_error" style="float: left; margin-left: 10px"></div>
+<br clear="all"/>
+<p class="description"><cpanel langprint="filter_name_unique"></p>
+<br />
+<b><cpanel langprint="filter_rules"></b>
+<table cellspacing="0" id="ruletbl" border="0" width=100% class="highlight">
+<tbody>
+
+<?cp Email::filterrules(
+[tr id="rule%"]
+[td valign="middle" class="acltd" width="20"][img onclick="moveup[[this]]; this.src='icon_arrow_up_disabled.gif';" id="%-moveup" src="icon_arrow_up_disabled.gif" onmouseover="this.src='icon_arrow_up.gif';" onmouseout="this.src='icon_arrow_up_disabled.gif';" class="moveact"][br /][img onclick="movedown[[this]]; this.src='icon_arrow_down_disabled.gif';" id="%-movedown" src="icon_arrow_down_disabled.gif"  onmouseover="this.src='icon_arrow_down.gif';" onmouseout="this.src='icon_arrow_down_disabled.gif';" class="moveact"][/td]
+[td class="frow"]
+[div style="float: left; display:inline; width: 510px;"]
+[select name="part%" onchange="handlepart[[this]]" style="width:250px;"  autocomplete="off" autofill="off"]
+[option value="$header_from:" %]$LANG{'EFFrom'}[/option]
+[option value="$header_subject:" %]$LANG{'EFSubject'}[/option]
+[option value="$header_to:" %]$LANG{'EFTo'}[/option]
+[option value="$reply_address:" %]$LANG{'UFReply'}[/option]
+[option value="$message_body" %]$LANG{'EFBody'}[/option]
+[option value="$message_headers" %]$LANG{'EFAnyheader'}[/option]
+[option value="foranyaddress $h_to:\{comma}$h_cc:\{comma}$h_bcc:" %]$LANG{'UFRecipient'}[/option]
+[option value="not delivered" %]$LANG{'UFNoDeliver'}[/option]
+[option value="error_message" %]$LANG{'UFIsError'}[/option]
+[option value="$h_X-Spam-Status:" %]$LANG{'UFSpam'}[/option]
+[option value="$h_X-Spam-Bar:" %]$LANG{'UFSpamBar'}[/option]
+[option value="$h_X-Spam-Score:" %]$LANG{'UFSpamScore'}[/option]
+[/select]
+[select name="match%" style="width:250px;" autocomplete="off" autofill="off"]
+[option value="is" %]$LANG{'EFEquals'}[/option]
+[option value="matches" %]$LANG{'EFMatchesregex'}[/option]
+[option value="contains" %]$LANG{'EFContains'}[/option]
+[option value="does not contain" %]$LANG{'UFNoContain'}[/option]
+[option value="begins" %]$LANG{'EFBeginswith'}[/option]
+[option value="ends" %]$LANG{'UFEndsWith'}[/option]
+[option value="does not begin" %]$LANG{'UFNoBegin'}[/option]
+[option value="does not end" %]$LANG{'UFNoEnd'}[/option]
+[option value="does not match" %]$LANG{'UFNoMatch'}[/option]
+[option value="is above" %]$LANG{'UFIsAbove'}[/option]
+[option value="is not above" %]$LANG{'UFNotAbove'}[/option]
+[option value="is below" %]$LANG{'UFIsBelow'}[/option]
+[option value="is not below" %]$LANG{'UFNotBelow'}[/option]
+[/select]
+[input type="text" name="val%" size="60" style="width:498px" value="%"]
+[/div]
+[div style="float: right; display:inline; padding-top: 11px; "]
+[input type="button" value="-" name="ruleremove%" disabled="disabled" onclick="removerule[[this]];"]
+[input type="button" value="+" name="ruleadd%" onclick="addrule[[this]];"]
+[/div]
+
+[div style="float: right; display:inline; padding-top: 11px; padding-left: 3px; padding-right: 10px;"]
+[select name="opt%" style="display:none;"  autocomplete="off" autofill="off"]
+[option value="or" %]$LANG{'UFor'}[/option]
+[option value="and" %]$LANG{'UFand'}[/option]
+[/select]
+[/div]
+[script]handlepartbynum[[%]];[/script]
+[/td]
+[/tr]
+,number,number,number,number,part=$header_from:?selected:,part=$header_subject:?selected:,part=$header_to:?selected:,part=$reply_address:?selected:,part=$message_body?selected:,part=$message_headers?selected:,part=foranyaddress $h_to:\{comma}$h_cc:\{comma}$h_bcc:?selected:,part=not delivered?selected:,part=error_message?selected:,part=$h_X-Spam-Status:?selected:,part=$h_X-Spam-Bar:?selected:,part=$h_X-Spam-Score:?selected:,number,match=is?selected:,match=matches?selected:,match=contains?selected:,match=does not contain?selected:,match=begins?selected:,match=ends?selected:,match=does not begin?selected:,match=does not end?selected:,match=does not match?selected:,match=is above?selected:,match=is not above?selected:,match=is below?selected:,match=is not below?selected:,number,&val,number,number,number,opt=or?selected:,opt=and?selected:,number,number) filtername=$FORM{'filtername'} ?> 
+
+</tbody>
+</table>
+<script type="text/javascript">
+    checkaddrembuttons('rule');
+</script>
+<br />
+
+
+<b><cpanel langprint="filter_actions"></b>
+
+
+<table cellspacing="0" id="actiontbl" border="0" width="100%" class="highlight">
+<tbody>
+
+
+
+<?cp Email::filteractions(
+[tr id="action%"]
+[td class="frow"]
+[div style="float: left; display:inline;"]
+[select name="action%" id="action_menu" onchange="handleaction[[this]];" style="width:220px;"  autocomplete="off" autofill="off"]
+[option % value="save &quot;/dev/null&quot;"]$LANG{'UFDiscard'}[/option]
+[option % value="deliver"]$LANG{'UFRedirect'}[/option]
+[option % value="fail"]$LANG{'UFFail'}[/option]
+[option % value="finish"]$LANG{'UFStopProcess'}[/option]
+[option % value="save"]$LANG{'UFDeliver'}[/option]
+[option % value="pipe"]$LANG{'UFPipe'}[/option]
+[/select]
+[input type="text" name="dest%" size="38" value="%" style="display: none;" style="width:309px;"]
+[input type="button" onclick="handlebrowser[[this]];" name="changedest%" style="display: none;" value="$LANG{'Change'}"]
+[/div]
+[div style="float: right; display:inline;"]
+[input type="button" value="-" name="actionremove%" disabled="disabled" onclick="removeaction[[this]];"]
+[input type="button" value="+" name="actionadd%" onclick="addaction[[this]];"]
+[/div]
+[script]handleactionbynum[[%]];[/script]
+[/td]
+[/tr]
+,number,number,,action=deliver?selected:,action=fail?selected:,action=finish?selected:,action=save?selected:,action=pipe?selected:,number,&dest,number,number,number,number) filtername=$FORM{'filtername'},account=$FORM{'account'} ?>
+
+
+</tbody>
+</table>
+<script type="text/javascript">
+    checkaddrembuttons('action');
+</script>
+<br />
+<div align="center">
+<input type="submit" id="activate-button" class="input-button" value="<cpanel langprint="EFActivate">" />
+</div>
+</form>
+
+<cpanelif $CPVAR{'spam_as_acl'} && $CPVAR{'spamstatus'}>
+<p class="description"><cpanel langprint="EFAddhint2"></p>
+<p class="description"><cpanel langprint="EFAddhint3"></p>
+</cpanelif>
+
+
+<div class="return-link"><a href="userfilters.html?account=<cpanel formprint="$FORM{'account'}">">&larr; <cptext "Go Back"></a></div>
+
+</div>
+<div id="treeviewCont" style='display:none; position:absolute; z-index: 12; border: 1px solid #000; background-color: #fff; padding: 0; margin: 0;'>
+<div id="treeview" style='overflow: auto; padding: 0; margin: 0;'></div>
+</div>
+<cpanel Branding="include(stdfooter.html)">

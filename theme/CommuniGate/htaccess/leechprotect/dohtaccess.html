@@ -1,0 +1,105 @@
+<cpanel setvar="headerimg=../images/tools.gif">
+<cpanel setvar="dprefix=../../">
+<cpanel Branding="include(stdheader.html)">
+
+	<style type="text/css">
+	<?cp Branding::spritelist(.spriteicon_img_mini {float:left;margin-right:5px;background: url\{leftparenthesis}"%"\{rightparenthesis};} %,@spriteurl,images::#icon-${img}_mini {background-position\{colon}0 -${cssposition}px;width\{colon}${width}px;height\{colon}${height}px; }:) imgtype=icon,subtype=img,method=scale_60percent,format=png,img=leechprotect ?>
+	</style>
+<script type="text/javascript">
+var defv = "<cpanel LeechProtect="setup($FORM{'dir'},email,html)">";
+function checkemail() {
+	if (document.leechform.email.value == "") {
+		document.leechform.emailcheck.checked = false;
+	} else {
+		document.leechform.emailcheck.checked = true;
+	}
+}
+function killemail() {
+	if (document.leechform.emailcheck.checked == false) {
+		document.leechform.email.value = "";
+	} else {
+		document.leechform.email.value = defv;
+	}
+
+}
+</script>
+
+<div class="body-content">
+<div class="h1Title"><div class="spriteicon_img_mini" id="icon-image-leechprotect_mini"></div><cpanel langprint="LP"></div>
+<p class="description"><cpanel langprint="LPText"></p>
+<br />
+
+<cpanelfeature cpanelpro_leechprotect>
+<h2><cpanel langprint="LPNote">
+<font color="#FF0000"><cpanel LeechProtect="status($FORM{'dir'})"></font> <cpanel langprint="LPOn"> <cpanel print="$FORM{'dir'}"></h2>
+
+<br /><br />
+<b><cpanel langprint="LPSetUp">:</b>
+<form action="doleech.html" name="leechform" method="post">
+<input type="hidden" name="dir" value="<cpanel print="$FORM{'dir'}">">
+
+<table width="100%" cellpadding="2">
+<tr>
+  <td width="30%"><cpanel langprint="LPNumber">:</td>
+  <td align="left"><input type="text" name="numhits" value="<cpanel LeechProtect="setup($FORM{'dir'},numhits,html)">" size="2"></td>
+</tr>
+<tr>
+  <td>&nbsp;</td>
+  <td><cpanel langprint="LPNumberText"></td>
+</tr>
+<tr><td>&nbsp;</td><td>&nbsp;</td></tr>
+<tr>
+  <td><cpanel langprint="LPURL">:</td>
+  <td align="left"><input type="text" name="rurl" size="40" value="<cpanel LeechProtect="setup($FORM{'dir'},url,html)">"></td>
+</tr>
+<tr>
+  <td>&nbsp;</td>
+  <td><cpanel langprint="LPURLText"></td>
+</tr>
+<tr><td>&nbsp;</td><td>&nbsp;</td></tr>
+<tr>
+  <td>
+<input type="checkbox" name="emailcheck" value="1" onchange="killemail();" <cpanel LeechProtect="setup($FORM{'dir'},email,checkbox)"> >
+<cpanel langprint="LPSendMail"> </td>
+<td><input type="text" name="email" size="30" onchange="checkemail();" value="<cpanel LeechProtect="setup($FORM{'dir'},email,html)">"></td>
+</tr>
+<tr>
+  <td>&nbsp;</td>
+  <td><cpanel langprint="LPSendMailText"></td>
+</tr>
+<tr><td>&nbsp;</td><td>&nbsp;</td></tr>
+<tr>
+  <td colspan="2">
+<input type="checkbox" name="disableacct" value="1" <cpanel LeechProtect="setup($FORM{'dir'},kill,checkbox)"> >
+<cpanel langprint="LPDisable"></td>
+</tr>
+<tr>
+  <td>&nbsp;</td>
+  <td><cpanel langprint="LPDisableText"></td>
+</tr>
+</table>
+<input type="submit" class="input-button" value="<cpanel langprint="LPEnableHead">">
+<br /><br />
+</form>
+<br />
+<h2><cpanel langprint="LPDisableProtect">:</h2>
+<form action="delleech.html">
+<input type="hidden" name="dir" value="<cpanel print="$FORM{'dir'}">">
+<input type=submit class="input-button" value="<cpanel langprint="HLPDisableButton">">
+</form>
+
+<br /><br />
+<h2><cpanel langprint="SQLManageUserHead">:</h2>
+<cpanel langprint="LPManageTxt"> <i><cpanel LeechProtect="showpasswdfile($FORM{'dir'})"></i><br /><br />
+<form action="../dohtaccess.html">
+<input type="hidden" name="dir" value="<cpanel print="$FORM{'dir'}">">
+<input type=submit class="input-button" value="<cpanel langprint="SQLManageUserHead">">
+</form>
+
+</cpanelfeature>
+
+<div class="return-link"><a href="leechprotect.html">&larr; <cptext "Go Back"></a></div>
+</div>
+
+<cpanel Branding="include(stdfooter.html)">
+

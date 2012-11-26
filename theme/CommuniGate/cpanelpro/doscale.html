@@ -1,0 +1,22 @@
+<cpanel setvar="headerimg=../images/topcrontab.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+<div class="body-content">
+<h1><cpanel langprint="TImageMan"></h1>
+
+<p><cpanel langprint="IMScaler"></p>
+<p>
+<cpanel ImageManager="scale($FORM{'dir'},$FORM{'file'},$FORM{'oldimage'},$FORM{'width'},$FORM{'height'},$FORM{'retain'})">
+
+<cpanel langprint="IMYourImg">:&nbsp;
+<a href="../files/showfile.html?dir=<cpanel print="$FORM{'dir'}">&file=<cpanel print="$FORM{'file'}">" target="_blank">
+<cpanel print="$FORM{'dir'}">/<cpanel print="$FORM{'file'}"></a>&nbsp;
+<cpanel langprint="IMScalerConfirm"> <cpanel print="$FORM{'width'}">x<cpanel print="$FORM{'height'}">.
+</p>
+
+<div class="return-link"><a href="images.html">&larr; <cptext "Go Back"></a></div>
+
+</div>
+<cpanel Branding="include(stdfooter.html)">
+
+

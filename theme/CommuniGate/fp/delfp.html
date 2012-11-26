@@ -1,0 +1,20 @@
+<cpanel setvar="headerimg=../images/tools.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+<div class="body-content">
+	<h1><cpanel langprint="FERemTxt1">...</h1>
+	<textarea class="output" name="delfpoutput" cols="80" rows="15" readonly >
+		<cpanel Frontpage="delfp($FORM{'domain'},$FORM{'pdomain'})">
+	</textarea>
+<br /><br />
+
+	<b><cpanel langprint="FEInstRemTxt2">: <font color="#FF0000"><cpanel Frontpage="fpstatus($FORM{'domain'})"></font></b>
+	<br /><br /><br />
+
+<div class="return-link"><a href="index.html">&larr; <cptext "Go Back"></a></div>
+</div>
+<cpanel setvar="headerimg=../images/tools.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdfooter.html)">
+
+

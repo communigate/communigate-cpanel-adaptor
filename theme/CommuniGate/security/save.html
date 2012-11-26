@@ -1,0 +1,29 @@
+<cpanel setvar="headerimg=../images/topnetworktools.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+<style type="text/css">
+ol#sec-ques {padding:0 0 0 20px;}
+#sec-ques li {margin:5px 0 15px 0;padding:10px;border-bottom:dotted 1px #ccc;background:#eee;}
+#sec-ques label {padding:0 0 15px 0;}
+</style>
+<style type="text/css">
+<?cp Branding::spritelist(.spriteicon_img_mini {float:left;margin-right:5px;background: url\{leftparenthesis}"%"\{rightparenthesis};} %,@spriteurl,images::#icon-${img}_mini {background-position\{colon}0 -${cssposition}px;width\{colon}${width}px;height\{colon}${height}px; }:) imgtype=icon,subtype=img,method=scale_60percent,format=png,img=nettools ?>
+</style>
+
+<div class="body-content">
+<div class="h1Title"><cpanel langprint="security-questions-conf-title"> for <span class="status"><?cp SourceIPCheck::getaccount(%,account) account=$FORM{'account'} ?></span></div>
+
+<!--
+<?cp SourceIPCheck::savesecquestions(%,status) q1ques=$FORM{'q1ques'},q2ques=$FORM{'q2ques'},q3ques=$FORM{'q3ques'},q4ques=$FORM{'q4ques'},q1answer=$FORM{'q1answer'},q2answer=$FORM{'q2answer'},q3answer=$FORM{'q3answer'},q4answer=$FORM{'q4answer'},account=$FORM{'account'} ?> 
+-->
+
+<cpanelif $CPVAR{'questions'}>
+	<cpanel Locale="maketext('Error:')"> <cpanel langprint="$CPVAR{'questions'}">
+</cpanelif>
+<cpanelif !$CPVAR{'questions'}>
+	<cpanel langprint="SecAnsSaved">
+</cpanelif>
+
+<div class="return-link"><a href="index.html?account=<?cp SourceIPCheck::getaccount(%,account) account=$FORM{'account'} ?>">&larr; <cptext "Go Back"></a></div>
+</div>
+<cpanel Branding="include(stdfooter.html)">

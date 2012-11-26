@@ -1,0 +1,229 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<cpanel relinclude="charset.html">
+<title><cpanel Locale="maketext('cPanel File Manager v3')"></title>
+<cpanel setvar="dprefix=../">
+<cpanel setvar="debug=0">
+<link type="text/css" rel="stylesheet" href="<cpanel MagicRevision="uri("/yui/container/assets/container.css")">" />
+<link type="text/css" rel="stylesheet" href="<cpanel MagicRevision="uri("/yui/menu/assets/menu.css")">" />
+<link type="text/css" rel="stylesheet" href="<cpanel MagicRevision="uri("/yui/datatable/assets/skins/sam/datatable.css")">" />
+<link type="text/css" rel="stylesheet" href="<cpanel MagicRevision="uri("/yui/treeview/assets/treeview.css")">" />
+<link type="text/css" rel="stylesheet" href="<cpanel MagicRevision="uri("filemanager/css/tree_styles2_optimized.css")">" />
+<style type="text/css">
+/* body { overflow: hidden; } */
+<cpanel Branding="include(sprites_ui.html)">
+
+#treeContainer a { text-decoration: none; }
+.ygtvlabel, .ygtvlabel:link, .ygtvlabel:visited, .ygtvlabel:hover {
+    background-color: transparent;
+
+}
+.diricon { width: 32px; }
+.filelist { font-weight: 900; }
+
+.icon-mail { display:block; height: 20px; padding-left: 20px; background: transparent url(../mimeicons/mail.png) no-repeat; text-decoration:none;}
+.icon-publicftp { display:block; height: 20px; padding-left: 20px; background: transparent url(../mimeicons/publicftp.png) no-repeat; text-decoration:none;}
+.icon-publichtml { display:block; height: 20px; padding-left: 20px; background: transparent url(../mimeicons/publichtml.png) no-repeat; text-decoration:none;}
+
+.create-button {
+font-size:11px;
+background-image:none;
+background-color:#F0F0F0;
+height:26px;
+color:#014D5F;
+padding:4px 4px;
+border:1px outset #F0F0F0;
+text-align:center;
+}
+.create-button:hover {
+height:26px;
+color:#014D5F;
+padding:4px 4px;
+background-image:none;
+text-decoration:none;
+border:1px inset #F0F0F0;
+}
+.input-button {
+height:22px;
+color:#014D5F;
+background-image:none;
+vertical-align:middle;
+/*margin:0 0 0 4px;
+padding:0 0 4px 0;*/
+font:11px Verdana, sans-serif;
+border:1px outset #F0F0F0;
+}
+.input-button:hover {
+height:22px;
+color:#014D5F;
+vertical-align:middle;
+background-image:none;
+/*margin:0 0 0 4px;*/
+text-decoration:none;
+font:11px Verdana, sans-serif;
+border:1px inset #F0F0F0;
+}
+</style>
+<!--[if gt IE 6]>
+<link rel="stylesheet" type="text/css" href="css/ie7.css" />
+<![endif]-->
+<!--[if lt IE 7]>
+<link rel="stylesheet" type="text/css" href="css/ie6.css" />
+<script src="js/cssQuery-p.js" type="text/javascript" charset="utf-8"></script>
+<script src="js/ie7-standard-p.js" type="text/javascript" charset="utf-8"></script>
+<![endif]-->
+
+<script type="text/javascript" src="<cpanel MagicRevision="uri("/yui/utilities_container/utilities_container.js")">"></script>
+<script type="text/javascript" src="<cpanel MagicRevision="uri("/cjt/cpanel-all-min.js")">"></script>
+<?cptt _calendar.tmpl ?>
+<script type="text/javascript">
+if (!self['NVData']) { NVData={}; }
+<?cp NVData::get(NVData.%=unescape\{leftparenthesis}'%'\{rightparenthesis};,name,^value) html_encoded=1,names=ignorecharencoding ?>
+var LANG = {
+    today: "<cptext "Today">",
+    yesterday: "<cptext "Yesterday">",
+    dir_empty : "<cptext "This directory is empty.">",
+    confirm_download: "<cptext 'You are about to download multiple items at once. Are you sure you want to do this?'>",
+    auto_detect : "<cptext '[boolean,_1,(]auto-detect[boolean,_1,)]',1>",
+    detecting_encoding: "<cptext 'Detecting character encoding for [_1]…',{file_html}>",
+    loading   : "<cptext "Fetching directory contents...">"
+};
+var cpversion = '<cpanel version="">';
+var homedir = <cpanel jsprint="$abshomedir">;
+var workingdir = <cpanel jsprint="$FORM{'dir'}">;
+var showhidden = <cpanel jsprint="$FORM{'showhidden'}">;
+var thisTheme = <cpanel jsprint="$CPDATA{'RS'}">;
+var maindomain = <cpanel jsprint="$CPDATA{'DNS'}">;
+var current_charset = '<cpanel getcharset="">';
+var charmaps = [
+<?cp Email::fetchcharmaps(
+    '%'\{comma},map) ?>
+    ''
+];
+charmaps.pop();
+<cpanelfeature version-11.24.1>
+    globalhtmledit=1;
+</cpanelfeature>
+
+</script>
+
+</head>
+<body class=" yui-skin-sam" id="index">
+		    <div id="logger" style="z-index: 9999; position: absolute;"></div>
+<div id="top" class="clear">
+	<div id="topbar" class="clear">
+		<div id="branding">
+			<h1><cpanel langprint="FMHead"></h1>
+        </div>
+        <!-- HIDDEN UNTIL FINISHED ON THE BACK END --><div id="settings" style="display:block;"><a onclick="showPrefs(); return false;" href="javascript:void(0)"><cpanel langprint="Settings"></a></div>
+		<div class="search"><form style="margin:0;padding:0" onsubmit="return false;"><cpanel langprint="FMSearch">
+		<select name="searchdir" id="searchdir">
+		<option value=""><cpanel langprint="FMSearchAll"></option>
+		<option value="public_html"><cpanel langprint="FMSearchPub"></option>
+		<option value="$cwd"><cpanel langprint="FMSearchCurDir"></option>
+		</select>
+        <cpanel langprint="for">
+        <input type="text" size="20" id="searchbox" class="searchbox" />
+        <input type="image" value="go" src="img/go.gif" onclick="dosearch('searchdir','searchbox')" width="22" heigh="22" align="absmiddle" /></form></div>
+	</div>
+	<div id="topnav" class="clear">
+		<ul>
+			<li id="action-newfile" onclick="return actionHandler('newfile');"><a href="javascript:void(0)"><img src="img/icons/Document 2 Add.gif" alt="" /><br /><cpanel langprint="FMNewFile"></a></li>
+			<li id="action-newfolder" onclick="return actionHandler('newfolder');"><a href="javascript:void(0)"><img src="img/icons/Folder 1 Add.gif" alt="" /><br /><cpanel langprint="NFolder"></a></li>
+			<li id="action-copy" onclick="return actionHandler('copy');"><a href="copymove.html" target="_blank"><img src="img/icons/copyB.gif" alt="" /><br /><cpanel langprint="FMCopyFolder"></a></li>
+			<li id="action-move" onclick="return actionHandler('move');"><a href="copymove.html" target="_blank"><img src="img/icons/moveB.gif" alt="" /><br /><cpanel langprint="FMMoveFile"></a></li>
+			<li id="action-upload" onclick="return actionHandler('upload');"><a href="javascript:void(0)"><img src="img/icons/Folder 1 Down.gif" alt="" /><br /><cpanel langprint="FMUploadButton"></a></li>
+			<li id="action-download" onclick="return actionHandler('download');"><a href="javascript:void(0)"><img src="img/icons/download.gif" alt="" /><br /><cpanel langprint="FMDL"></a></li>
+			<li id="action-delete" onclick="return actionHandler('delete');" class="divider"><a href="javascript:void(0)"><img src="img/icons/delete.gif" alt="" /><br /><cpanel langprint="Delete"></a></li>
+			<li id="action-rename" onclick="return actionHandler('rename');"><a href="javascript:void(0)"><img src="img/icons/Rename.gif" alt="" align="absmiddle" /><br /><cpanel langprint="FMRenameFilePre"></a></li>
+			<li id="action-edit" onclick="return actionHandler('edit');"><a href="javascript:void(0)"><img src="img/icons/Document 2 Edit 2.gif" alt="" align="absmiddle"/><br /><cpanel langprint="FMEdit"></a></li>
+			<li id="action-codeedit" onclick="return actionHandler('codeedit');"><a href="javascript:void(0)"><img src="img/icons/codeEditorB.gif" alt="" /><br /><cpanel langprint="FMCodeEdit"></a></li>
+			<li id="action-htmledit" onclick="return actionHandler('htmledit');"><a href="javascript:void(0)"><img src="img/icons/html-edit.gif" alt="" /><br /><cpanel langprint="FMHTMLEdit"></a></li>
+			<li id="action-chmod" onclick="return actionHandler('chmod');"><a href="javascript:void(0)"><img src="img/icons/change-permissions.gif" alt="" /><br /><cpanel langprint="ChangePerm"></a></li>
+			<li class="divider" id="action-view" onclick="return actionHandler('view');"><a href="javascript:void(0)"><img src="img/icons/Search.gif" alt="" /><br /><cpanel langprint="FMView"></a></li>
+			<li id="action-extract" onclick="return actionHandler('extract');"><a href="javascript:void(0)"><img src="img/icons/extract.gif" alt="" /><br /><cpanel langprint="FMExtract"></a></li>
+			<li id="action-compress" onclick="return actionHandler('compress');"><a href="javascript:void(0)"><img src="img/icons/compress.gif" alt="" /><br /><cpanel langprint="FMComp"></a></li>
+		</ul>
+	</div>
+	<div id="midtoolbar" class="clear">
+		<div class="path">
+			<img alt="" src="../images/homeb.gif" style="vertical-align:text-bottom" />/<input id="location" type="text" value="" />
+			<input type="button" value="<cpanel langprint="go">" onclick="dirnav();" />
+		</div>
+		<div id="srtoolbar">
+			<ul>
+				<li id="action-home" onclick="return actionHandler('home');"><a href="javascript:void(0)"><img src="img/icons/Home 2.gif" alt="home" /><br /><cpanel langprint="NavHome"></a></li>
+				<li id="action-navup" onclick="return actionHandler('navup');"><a href="javascript:void(0)"><img src="img/icons/upone.gif" alt="Up One" /><br /><cpanel langprint="FMUpOneLev"></a></li>
+				<li id="action-navback" onclick="return actionHandler('navback');"><a href="javascript:void(0)"><img src="img/icons/Navigation Arrow Back.gif" alt="back" /><br /><cpanel langprint="FMBack"></a></li>
+				<li id="action-navnext" onclick="return actionHandler('navnext');"><a href="javascript:void(0)"><img src="img/icons/Forward.gif" alt="back" /><br /><cpanel langprint="FMFwd"></a></li>
+				<li id="action-refresh" onclick="return actionHandler('refresh');"><a href="javascript:void(0)"><img src="img/icons/reload_256x256.gif" alt="reload" /><br /><cpanel langprint="FMReload"></a></li>
+				<li id="action-selectall" onclick="return actionHandler('selectall');"><a href="javascript:void(0)"><img src="img/icons/selectall.gif" alt="" /><br /><cpanel langprint="FMSelAll"></a></li>
+				<li id="action-unselectall" onclick="return actionHandler('unselectall');"><a href="javascript:void(0)"><img src="img/icons/unselect.gif" alt="" /><br /><cpanel langprint="FMUnSelAll"></a></li>
+			</ul>
+		</div>
+	</div>
+</div>
+	
+<div id="subleft">
+	<div id="main">
+ 		<div id="content">
+    	<form name="mainForm" action="javscript:;">
+			<div class="newsItem">
+				<div id="expandcontractdiv" class="clear">
+					<ul>
+						<li><a href="javascript:RootFileTree.collapseAll()"><img src="img/icons/collapse.gif" alt="" /> <cpanel langprint="FMCollapse"></a></li>
+					</ul>
+				</div>
+	  			<div id="treeScroller">
+                    <div style="text-decoration: none; " id="treeContainer"></div>
+                </div>			
+</div>
+		</form>
+  		</div>
+      <div id="footerContainer">
+        <div id="footer">
+          <p>&nbsp;</p>
+        </div>
+      </div>
+    </div>	
+</div>
+
+<div id="subright">
+	<div id="filesarea">
+	</div>
+</div>
+<cpanel dynamicinclude="popups/*.html">
+<div id="copyi" class="zOverlay"><img src="../images/symbol-add.gif"></div>
+<div id="filesi" class="zOverlay"><cpanel Locale="maketext('[quant,_1,file,files,No files]',1)"></div>	
+<iframe id="downloadbox" name="downloadbox" src="" style="width:0px;height:0px;border:0"></iframe>
+<div class="zOverlay">
+    <form id="actionform" action="" target="_blank" method="get">
+    <input type="hidden" name="file" id="actionform_file" />
+    <input type="hidden" name="fileop" id="actionform_fileop" />
+    <input type="hidden" name="dir" id="actionform_dir" />
+    <input type="hidden" name="dirop" id="actionform_dirop" />
+    <input type="hidden" name="charset" id="actionform_charset" />
+    <input type="hidden" name="file_charset" id="actionform_temp_charset" />
+    <input type="hidden" name="baseurl" id="actionform_baseurl" />
+    <input type="hidden" name="basedir" id="actionform_basedir" />
+    </form>
+</div>
+<div id="select" style="padding:0px;margin:0px;opacity:0.4;filter:progid:DXImageTransform.Microsoft.Alpha(opacity=40);filter=alpha(opacity=40);position:absolute;float:left;z-index:3000;left:1px;top:1px;background-color:#aaf;border: solid 2px #33c;display:none;">&nbsp;</div>
+
+<script type="text/javascript">
+   if (typeof LANG === "undefined") {LANG = {};}
+   LANG.tooMany = "<cptext "You may only edit one file at a time.">";
+   LANG.tooFew  = "<cptext "You must first select a file to edit.">";
+   LANG.notValid= "<cptext "No valid file selected. You cannot edit directories or files larger than one megabyte. To edit large files, please download the file and use a local editor.">";
+   LANG.notValidHTML = "<cptext "No valid file selected.  The file must be HTML and end in .htm or .html.   The file must also not be larger than one megabyte.  You also can not edit directories.">";
+   LANG.notValidType= "<cptext "This file does not appear to be a valid file type.  Do you wish to try editing this file anyway?">";
+
+   LANG.rename_conflict = "<cptext "[_1] already exists. Please delete or rename the existing file before renaming this file.", "{file}">";
+   LANG.chmod_error= "<cptext "Invalid permission mask.  Must be 4 digits with each digit a value from zero to seven.">";
+</script>
+<script type="text/javascript" src="<cpanel MagicRevision="uri("/yui/data/data.js")">"></script>
+<script type="text/javascript" src="<cpanel MagicRevision="uri("js/filemanager_optimized.js")">"></script> 
+
+</body>
+</html>

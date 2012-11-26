@@ -1,0 +1,304 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<cpanel setvar="indexpage=1">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<cpanel relinclude="charset.html">
+<!-- Start index.html -->
+<title><cpanel langprint="cPanelX"></title>
+<link rel="shortcut icon" href="<cpanel Branding="file(favicon.ico)">" type="image/x-icon">
+<link rel="stylesheet" type="text/css" href="<cpanel MagicRevision="uri("css/combined_optimized.css")">">
+<style type="text/css">
+<?cp Branding::spritelist(.spriteicon_img{text-decoration:none;margin:0 auto;background:url\{leftparenthesis}"%"\{rightparenthesis};} %,@spriteurl,images::#icon-${img}{background-position\{colon}0 -${cssposition}px;width\{colon}${width}px;height\{colon}${height}px;}:) imgtype=icon,subtype=img,skipgroups=1 ?>
+<cpanel Branding="include(sprites_ui.html)">
+<cpanel Branding="include(sprites_yui.html)">
+/* css2 */
+<cpanel relrawinclude="css2-min/$basefile.css">
+/* end css2 */
+</style>
+<cpanel Branding="include(cpanel_parsed_css.html)">
+<cpanel Branding="include(cpanel_parsed_css_local.html)">
+<!-- Start local.css include -->
+<style type="text/css">
+<cpanel Branding="include(local.css,1,1)">
+</style>
+<!-- End local.css include -->
+<!--[if gt IE 6]>
+<style type="text/css"><cpanel relrawinclude="css/ie7.css"></style>
+<![endif]-->
+<!--[if lt IE 7]>
+<style type="text/css"><cpanel relrawinclude="css/ie6.css"></style>
+<style type="text/css">
+.input-button{
+    background:url(<cpanel Branding="image(button-bg)">) repeat-x center;
+}
+</style>
+<![endif]-->
+<cpanelif $NVDATA{'x3_hideicons'}>
+<style type="text/css">
+
+#main .item .itemlink {
+    display:none;
+}
+.spriteicon_img {
+    display: none;
+    background: none;
+}
+</style>
+</cpanelif>
+
+<style type="text/css">
+<cpanel relinclude="langcss/$lang.css">
+</style>
+<!--[if lt IE 7]>
+<style type="text/css">
+	#x {
+	padding:0;
+	width:475px;
+	margin:30px 13px 0 0;
+	}
+</style>
+<![endif]-->
+<cpanel Branding="include(stdmheader.html)">
+
+			<div id="switch">
+					
+				<cpanelif $isresller || $isresellerlogin>
+					<table width="100%">
+						<tr>
+				</cpanelif>
+
+				<cpanelif $isreseller>
+        					<td id="reseller-drop" align="center">
+            					<strong> <cpanel langprint="SwitchTheme"></strong><br />
+            					<form class="cellform" action="switchtheme.html" method="post" name="tform">
+                    			<select name="theme" onchange="document.tform.submit();">
+                        			<cpanel Resellers="themelistopt()">
+                        		</select>
+                         		<input id="themego" type="submit" class="input-button" value="<cpanel langprint="go-BoxTrapper">" />
+            					</form>
+        					</td>
+				</cpanelif>
+
+				<cpanelif $isresellerlogin>
+							<td id="reseller-drop" align="center">
+             					<strong><cpanel langprint="SwitchAcct"></strong> <br />
+              					<form class="cellform" action="switchaccount.html" method="post" name="mform">
+              					<select name="user" onchange="document.mform.submit();">
+                					<cpanel Resellers="accountlistopt()">
+              					</select>
+              					<input id="acctgo" type="submit" class="input-button" value="<cpanel langprint="go-BoxTrapper">" />
+      							</form>  
+							</td>
+				</cpanelif>
+
+				<cpanelif $isresller || $isresellerlogin>
+					    </tr>	
+					</table>
+
+				</cpanelif>
+				
+			</div>
+		
+			<div class="clearitmed">&nbsp;</div>
+			
+			<div id="sub">
+				<!--whats new-->
+				<div id="notices" style="font">
+					<h4><cpanel langprint="Notices">:</h4>
+					<div id="noticeboard" style="padding:0 5px;width:auto;">
+						<cpanelif $ENV{'CPRESELLER'}>
+						<span class="warning"><strong><cpanel langprint="Warning"></strong> <cpanel langprint="TabsLoggedRootPsw"></span>
+						<br />
+						</cpanelif> 
+						<ul>
+						<?cp Email::listpopswithdisk(
+							[li class="warning"][strong]$LANG{'QuotaWarn'}[/strong] [a href="mail/editquota.html?email=%&domain=%"]%[/a][/li],user,domain,email) nearquotaonly=1,maxaccts=100,no_validate=1 ?>				
+						</ul>
+						<p><cpanel News="displaynews()"></p>
+					</div>
+				    <div class="clearit">&nbsp;</div>
+				</div>
+				<div id="jump-search">
+									<h4 style="margin:0"><cpanel langprint="Jump">:</h4>
+										<table style="padding-right:4px;" width="100%" cellpadding="0" cellspacing="0">
+				                        <colgroup width="99%">
+										</colgroup width="1%">
+										 <tr>
+						                <td colspan="2">
+					                        <div id="finder" class="smalltext" style="" align="center"><cpanel langprint="Finderdesc"></div>
+					                    </td>
+						                    </tr>
+										<tr>
+				                        <td align="center">
+				                            <input type="text" name="find" autofill="off" autocomplete="off" id="quickjump"  onkeyup="searchpage(this);" style="width:90%;margin:5px 0;" />
+				                        </td>
+				                        <td >
+										<b style="display:none;" id="clearlnk" class="smalltext"><a onclick="clearsearch();return false;" href="#">x</a></b>
+				                        </td>
+				                        </tr>
+				                    <tr>
+				                <td colspan="2">
+				                    <div id="gosearch" class="smalltext" style="display:none; margin: 0 auto" align="center"><span class="caution"><cpanel langprint="JumpNoMatches"></span></div>
+				                </td>
+				                    </tr>
+									
+				                        </table>
+								</div>
+
+                <div id="faa" style="display:none;">
+					<h4><cpanel langprint="FAA">:</h4>
+					<div id="faaboard" style="padding:0 10px;width:auto;">
+					
+                    </div>
+				    <div class="clearit">&nbsp;</div>
+				</div>
+
+
+
+				<div id="content-stats" class="newContent">
+					<div id="stats-header"><h3><div class="spriteui_img_trans" style="float:right;"  id="ui-collapse" />&nbsp;</div><cpanel langprint="SLStats">:</h3></div>		
+					<!--align="left" --><table width="100%" id="stats" class="truncate-table" cellpadding="4" cellspacing="3">
+					    <Tr>
+							<Th colspan="2"><strong><cpanel Locale="maketext('General account info:')"></strong></th>
+						</tr>    
+					<COLGROUP>
+                            <COL WIDTH="45%">
+                            <COL WIDTH="115">
+                        </COLGROUP>
+                    	<tbody>    
+							<tr >
+								<td width="45%" class="index1" align="center"><span class="stat-head"><cpanel langprint="frontend-maindomain"></span></td>
+								<td align="left" class="truncate index2" ><b><cpanel print="$CPDATA{'DNS'}"></b></td>
+							</tr> 
+							<tr class="">
+								<td width="45%" class="index1" align="center"><span class="stat-head"><cpanel langprint="HomeDir"></span></td>
+								<td align="left" class="truncate index2" ><cpanel print="$homedir"></td>
+							</tr>
+                            <cpanelif !$CPDATA{'DEMO'}>
+							<tr class="">
+								<td width="45%" class="index1" align="center"><span class="stat-head"><cpanel langprint="frontend-lastlogin"></span></td><td class="index2" align="left"><cpanel LastLogin="lastlogin(1)"></td></tr>   
+									</cpanelif>
+								<?cp StatsBar::stat([tr id="statsbar" class="row"][td align="center" class="index1" width="45\{percent}"][span class="stat-head"]%[/span][br /][div class="progressbarbig"][div class="progress_bar_% progress_barbig_base"][/div][/div][/td][td  align="left" class="truncate index2" ]%/%[/td][/tr],item,percent10,count,max) display=diskusage|bandwidthusage,infinitylang=true,rowcounter=mainstats ?>
+<cpanelif $CONF{'disk_usage_include_sqldbs'}>
+<?cp StatsBar::stat(
+[tr]
+    [td align="center" width="45\{percent}" class="index1"]%[/td]
+    [td align="left" class="index2 truncate"]% MB[/td]
+[/tr]
+,item,count) display=cachedmysqldiskusage|cachedpostgresdiskusage,rowcounter=$FORM{'rowcounter'} ?>
+</cpanelif>
+ <cpanelif $CONF{'disk_usage_include_mailman'}>
+<?cp StatsBar::stat(
+[tr]
+    [td align="center" width="45\{percent}" class="index1"]%[/td]
+    [td align="left" class="index2 truncate"]% MB[/td]
+[/tr]
+,item,count) display=cachedlistdiskusage,rowcounter=$FORM{'rowcounter'} ?>
+</cpanelif>
+								<?cp StatsBar::stat([tr ][td class="index1" align="center"  width="45\{percent}"][span class="stat-head"]%[/span][br /][div class="progressbar"][div class="progress_bar_% progress_bar_base"][/div][/div][/td][td  align="left" class="truncate index2" ]%/%[/td][/tr],item,percent10,count,max) display=emailac_counts|subdomains|parkeddomains|addondomains|ftpaccounts|sqldatabases|mailinglists,infinitylang=true,rowcounter=mainstats ?>
+						</tbody>
+					</table>
+					<br />
+					<table width="100%" id="stats" class="truncate-table" cellpadding="4" cellspacing="3">
+					    <Tr>
+							<Th colspan="2"><strong><cpanel Locale="maketext('General server info:')"></strong></th>
+						</tr>
+						<COLGROUP>
+                            <COL WIDTH="45%">
+                            <COL WIDTH="115">
+                        </COLGROUP>
+                    	<tbody>
+					<?cp StatsBar::stat([tr class="index1"][td  width="45\{percent}" align="right"][span class="stat-head"]%[/span][/td][td align="left"  class="truncate index2"  ]%[/td][/tr],item,value) display=hostingpackage|shorthostname|cpanelversion|theme|apacheversion|phpversion|mysqlversion|machinetype|operatingsystem|sharedip|dedicatedip|sendmailpath|perlpath|kernelversion,rowcounter=mainstats ?>             				  
+                         
+                         <cpanelif $CPFLAGS{'pro'}>
+						<tr class=""><td width="45%" class="index1" align="right"  align="left"><span class="stat-head"><cpanel langprint="cPanelPro"></span></td><td class="truncate index2"   align="left"><cpanel include="cpanelpro/version"></td></tr>
+						</cpanelif>
+						<cpanelfeature serverstatus>			
+						<tr  class=""><td width="45%" class="index1" align="right"><span class="stat-head"><cpanel langprint="TServiceStatus"></span></td><td class="truncate index2"   align="left"><a href="status.html"><cpanel langprint="INDXPerlView"></a></td></tr>
+						
+						</cpanelfeature>
+					</tbody>
+				</table>
+					
+			        <div id="content-stats-end"></div>
+            	</div>
+		</div>
+			
+	
+<script type="text/javascript" src="<cpanel MagicRevision="uri("/yui-gen/utilities_container/utilities_container.js")">"></script>
+<script type="text/javascript">
+var thisTheme = '<cpanel print="$CPDATA{'RS'}">';
+//Begin DEFAULT_BOX_ORDER fix from migrate_branding
+var DEFAULT_BOX_ORDER = "<cpanel Branding="getapplistorder()">".split("|");
+//End DEFAULT_BOX_ORDER fix from migrate_branding
+var NVData={};
+<?cp NVData::get(NVData.%=unescape\{leftparenthesis}'%'\{rightparenthesis};,name,^value) html_encoded=1,names=xmainrollstatus|x3_gettingstarted|xstatscollapsed|x3finder|icFAA ?>
+</script>
+<cpanel Branding="include(optionselect-script.html)">
+<script type="text/javascript" src="<cpanel MagicRevision="uri("/cjt/cpanel-all-min.js")">"></script>
+<script type="text/javascript" src="<cpanel MagicRevision="uri("js/x3main_optimized.js")">"></script>
+<script type="text/javascript">
+	  truncate_on = 1;
+      truncate_start_row = 0;
+	  truncate_wrap = 1;
+      truncate_tooltips = 0;
+      truncate_fontsize = 10;	  
+      register_truncate_table('stats');
+      maxwidth = 220;
+</script>
+<!--[if lt IE 7]>
+<script type="text/javascript">
+sfHover = function() {
+	var sfEls = document.getElementsByTagName("h6");
+	for (var i=0; i<sfEls.length; i++) {
+		sfEls[i].onmouseover=function() {
+			this.className+=" sfhover";
+		}
+		sfEls[i].onmouseout=function() {
+			this.className=this.className.replace(new RegExp(" sfhover\\b"), "");
+		}
+	}
+}
+if (window.attachEvent) window.attachEvent("onload", sfHover);
+</script>
+<![endif]-->
+	<div id="x">
+        
+<?cp Branding::applist(
+
+		
+      
+            % 
+
+
+
+
+,items::
+            [div class="item"][span class="additional_search_text" style="display\{colon}none"]${searchtext}[/span]
+            [a onclick="icFAA[['${file}']];${onclick};return true;" ${acontent} class="itemlink" href="${url}"][div border="0" class="spriteicon_img" id="icon-${file}" ][/div][/a]
+            [a id="item_${file}" onclick="icFAA[['${file}']];${onclick};return true;" ${acontent} href="${url}"]${itemdesc}[/a]
+            [/div]
+:,group,group) nvarglist=$NVDATA{'xmaingroupsorder'} ?>
+
+            </div>
+<div class="clearit">&nbsp;</div>
+<div id="togglebox">
+<cpanelif !$NVDATA{'x3_litegraphics'}><a href="hidegraphics.html" onclick="hidegraphics(); return false;"><cpanel langprint="liteGraphics"></a>&nbsp;|</cpanelif><cpanelif $NVDATA{'x3_litegraphics'}><a href="showgraphics.html" onclick="showgraphics(); return false;"><cpanel langprint="fullGraphics"></a>&nbsp;|</cpanelif><cpanelif !$NVDATA{'x3_hideicons'}>&nbsp;<a href="hideicons.html" onclick="hideicons(); return false;"><cpanel langprint="hideIcons"></a>&nbsp;|</cpanelif><cpanelif $NVDATA{'x3_hideicons'}>&nbsp;<a href="showicons.html" onclick="showicons(); return false;"><cpanel langprint="showIcons"></a>&nbsp;|</cpanelif>&nbsp;<a href="#" onclick="resetallinterfacecfg(); return false;"><cpanel langprint="resetinterfacecfg"></a>
+  </div>
+	<div class="clearit">&nbsp;</div>
+</div>
+		<div class="clearit">&nbsp;</div>
+<div id="divgen"></div>
+		<!--- Start Getting Started --->		
+<cpanel Branding="include(getstarted-pop.html)">
+<!--- End Getting Started --->		
+<cpanel Branding="include(optionselect-pop.html)">
+
+<!-- start auto edit by migrate_branding (init_extended_stats) -->
+<script type="text/javascript">
+YAHOO.util.Event.onDOMReady(init_extended_stats);
+</script>
+<!-- end auto edit by migrate_branding (init_extended_stats) -->
+<cpanel Branding="include(stdfooter.html)">	
+
+<!-- END index.html -->

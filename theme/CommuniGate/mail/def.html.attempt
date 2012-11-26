@@ -1,0 +1,54 @@
+<cpanel setvar="headerimg=../images/mailmenu.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+<style type="text/css">
+<?cp Branding::spritelist(.spriteicon_img_mini {float:left;margin-right:5px;background: url\{leftparenthesis}"%"\{rightparenthesis};} %,@spriteurl,images::#icon-${img}_mini {background-position\{colon}0 -${cssposition}px;width\{colon}${width}px;height\{colon}${height}px; }:) imgtype=icon,subtype=img,method=scale_60percent,format=png,img=defaultemailacct ?>
+</style>
+<div class="body-content">
+
+
+<div class="h1Title"><div class="spriteicon_img_mini" id="icon-defaultemailacct_mini"></div><cpanel langprint="EMSetDefaultAddr"></div>
+<p class="description"><cpanel langprint="EMDefaultDesc"></p>
+<br />
+<h2><cpanel langprint="EADefaultmaint"></h2>
+
+<form method="post" name="fwdf" id="fwdf" action="dosetdef.html" onsubmit="return do_validate(this.id);">
+<div class="highlight">
+	<h2><cpanel langprint="EADefaultsendall"></h2>
+
+	<select id="defsel" name="domain" onchange="loaddest();">
+	<cpanel Email="printdomainoptions()">
+	</select>
+<script type="text/javascript">
+//<![CDATA[
+var domain = defsel.options[defsel.selectedIndex].value;
+alert(domain);
+//]]>
+</script>
+
+
+	<span id="showdest" style="display:none;">
+		<b><cpanel langprint="contact_index_current"></b>: <span id="currentdest"></span>
+	</span>
+	<div class="formbox">
+        	<p><input name="discard" type="radio" id="discard" value="discard" checked="checked" /><label for="fwdopt_fail"><cpanel langprint="CGPSDA-ErrorDiscard"></label></p>
+        	<p><input name="reject" type="radio" id="reject" value="reject" checked="checked" /><label for="fwdopt_fail"><cpanel langprint="CGPSDA-ErrorReject"></label></p>
+        	<p><input name="forward" id="forward" type="radio" value="forward" checked="checked" /><label for="fwd_radio"><cpanel langprint="SDA-Forward"></label></p>
+        <blockquote>
+                <p><cpanel langprint="SDA-Forward">: <input onchange="choosefwd('fwd');" onkeyup="setmodded();" id="fwdemail" name="fwdemail" type="text" size="40" /> <span id="fwdemail_error"></span></p>
+        </blockquote>
+</div>
+<script type="text/javascript">
+//<![CDATA[
+discard.checked = false;
+//]]>
+</script>
+
+<br />
+<input style="margin-left: 10px" class="input-button" id="submit_forwarder" type="submit" value="<cpanel langprint="EAChange">" />
+
+</div>
+</form>
+
+</div>
+<cpanel Branding="include(stdfooter.html)">

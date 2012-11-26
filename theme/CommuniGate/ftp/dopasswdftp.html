@@ -1,0 +1,19 @@
+<cpanel setvar="headerimg=../images/topftp.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+<div class="body-content">
+<h1><cpanel langprint="MENUFTPAccountsTitle"></h1>
+
+<!-- <cpanel Ftp="passwdftp($FORM{'acct'},$FORM{'password'})"> -->
+
+<cpanelif !$CPERROR{'ftp'}>
+	<cpanel langprint="FTPAccountPasswordChanged">
+	<div class="return-link"><a href="accounts.html">&larr; <cptext "Go Back"></a></div>
+</cpanelif>
+
+<cpanelif $CPERROR{'ftp'}>
+    <div class="error_details"><cpanel print="$CPERROR{'ftp'}"></div>
+	<div class="return-link"><a href="passwdftp.html">&larr; <cptext "Go Back"></a></div>
+</cpanelif>
+
+<cpanel Branding="include(stdfooter.html)">

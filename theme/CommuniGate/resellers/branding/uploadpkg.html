@@ -1,0 +1,36 @@
+
+<cpanel setvar="headerimg=../../images/tools.gif">
+<cpanel setvar="dprefix=../../">
+<cpanel include="../../stdbheader.html">
+<cpanel include="../../ajaxhelp.html">
+
+<div class="body-content">
+<cpanel Branding="setupdirs()">
+<cpanel Fileman="uploadfiles()">
+
+<cpanelif !$CPERROR{'branding'}>
+<?cp Branding::installbrandingpkgs([b]Package:[/b] %[br /][b]Target Path:[/b] %[br /][b]Files: [/b]%[br /][br /],pkg,targetdir,files:[table]:[tr][td]${file}[/td][/tr]:[/table]) ?>
+</cpanelif>
+<cpanelif $CPERROR{'branding'}>
+<cpanel langprint="BrandingPkg">
+<b> 
+<cpanel print="$FORM{'pkg'}">
+</b>
+
+<cpanel langprint="BrandingPkgError">
+
+
+
+
+</cpanelif>
+<cpanelif !$CPERROR{'branding'}>
+<br />
+<p><cpanel langprint="BrandingInstall"></p>
+</cpanelif>
+
+<cpanel include="gobackwhere.html">
+
+
+</div>
+
+<cpanel Branding="include(stdfooter.html)">

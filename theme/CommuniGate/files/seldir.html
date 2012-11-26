@@ -1,0 +1,22 @@
+<html>
+<head>
+<title>cPanel X</title>
+<cpanel relinclude="files/files_head.html">
+</head>
+<body class="topright">
+<?cp Fileman::getdiractions(
+    [img src="../mimeicons/%.png" align="absmiddle" alt="%"] % [br /]
+    %
+,mimename,mimetype,&file,actions:[table]:
+[tr class="row-${*num}"]
+        [td][img src="img/diractions/${action}.png" align="absmiddle" alt="${action}"][/td]
+        [td][a href="${actionurl}" target="${target}window"]${actionname}[/a][/td]
+    [/tr]:[/table]
+) dir=$FORM{'dir'},file=$FORM{'file'} ?>
+<br />
+&nbsp;<br />
+&nbsp;<br />
+
+
+</body>
+</html>

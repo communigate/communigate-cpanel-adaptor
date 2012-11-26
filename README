@@ -1,0 +1,32 @@
+(c) CommuniGate System
+
+
+IMPORTANT : PREREQUSITES :
+
+This packages and install script should be run on a machine pre-installed with cPanel.
+This installation script will overrive any existing accounts.
+It should be install prior to configuring any account on cPanel as well.
+
+
+This adaptor contains a version of CommuniGate
+
+In order to install the pack just run the following script : 
+
+./install.sh 
+
+This installation script will perform automatically all the steps described in the installation PDF Guide.
+The only manual part that remains to be done is : 
+
+- Run  as root : ./disable-services.pl <root password> 
+	This will  disable automatically exim mailman spamd imap pop
+- Restart CommuniGate : 
+		/etc/init.d/CommuniGate stop 
+		/etc/init.d/CommuniGate start 
+		this will restart spamd from CommuniGate
+- Configure the bulksms details in the /usr/local/cpanel/Cpanel/CommuniGate.pm module for iOS provisioning if necessary
+- that's it !
+
+
+Default password for CommuniGate is : 
+postmaster / cp@nel that can be accessed from WHM / COmmuniGate plugin
+

@@ -1,0 +1,66 @@
+<div style="display:none;" id="textedit">
+    <div class="hd">
+        <div class="lt"></div>
+        <span><cpanel langprint="html_text_edit_title"></span>
+        <div class="rt"> </div>
+   </div>
+<div class="bd">
+
+    <div class="filecontent" id="textedit-filecontent">
+<form method="post" action="dotextedit.html">
+<h4><cpanel langprint="html_text_edit_title"></h4>
+<div style="border: 1px solid black; margin 3px; padding: 5px; background-color: #fff6cf; color: #7A6A38; border-color: #E6E08C">
+<cptext "[output,strong,Back up the original file] before converting character sets, since this action can produce unexpected results.">
+</div>
+<br/>
+<div>
+
+    <label for="textedit-file">
+       <cpanel langprint="htmledit_file_edit">
+            <div id="textedit-filelist"></div>
+    </label> 
+
+</div>
+<br />
+<br />
+<p>
+<b><cptext 'If encodings are not important to you because you will only be working with English or other Western languages, you can disable this dialog by clicking here:'>
+</b>
+    <span class="button-group">
+        <button style="margin-top: 15px" type="button" onclick="disableEncodings('textedit');"><cpanel Locale="maketext('Disable Encoding Check')"></button>
+
+    </span>
+<br />
+<br />
+<cptext 'Please select the character encoding to use when opening this file:'>
+<select id="textedit-charset" name="charset"></select><br /><br/>
+      <a href="#" onclick="
+         document.getElementById('textslider').style.display = (document.getElementById('textslider').style.display=='block') ? 'none' : 'block';
+         return false;
+      "><cptext "Toggle Help…"></a>
+      <div style="text-align:justify; padding-left: 10px;display:none" id="textslider" align="justify" >
+                    <br />
+                    <cptext "From the drop-down menu, select the encoding with which you created the file.">
+                    <cptext "[output,strong,Important]: Selecting the wrong initial encoding may corrupt the file."><br/>
+                    <br />                    
+                    <cptext "If you’re not sure of the correct encoding, here are some tips:">
+                    <ul>
+                       <li><cptext 'If you are using a Western European language like English, Spanish or French without any special characters, select “ISO-8859-1.”'>
+                       <li><cptext 'If you are using a non-Western language, or you have special characters that are not HTML-encoded in your file, select “utf-8”.'>
+                       <li><cptext 'You may have selected the wrong encoding if your file appears with text like this:'>
+                           <img src="../images/encoding_lang_broken.png" align="absmiddle">
+                           <strong><cptext 'If this happens, immediately abort the edit and select the correct encoding.'>
+                           </strong> <cptext "Do not save the file; this may corrupt the text permanently.">
+                    <ul>
+      </div>
+<input type="hidden" name="dir" id="textedit-dir" />
+<input type="hidden" name="file" id="textedit-file" />
+</p>
+</div>
+</form>
+
+</div>
+    <div class="ft"></div>
+
+</div>
+

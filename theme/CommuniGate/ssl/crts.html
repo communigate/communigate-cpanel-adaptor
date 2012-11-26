@@ -1,0 +1,94 @@
+<cpanel setvar="headerimg=../images/toperrorpages.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+
+<style type="text/css">
+<?cp Branding::spritelist(.spriteicon_img_mini {float:left;margin-right:5px;background: url\{leftparenthesis}"%"\{rightparenthesis};} %,@spriteurl,images::#icon-${img}_mini {background-position\{colon}0 -${cssposition}px;width\{colon}${width}px;height\{colon}${height}px; }:) imgtype=icon,subtype=img,method=scale_60percent,format=png,img=ssl-manager ?>
+</style>
+
+<div class="body-content">
+	  <div class="h1Title"><div class="spriteicon_img_mini" id="icon-ssl-manager_mini"></div> <cpanel langprint="SSLCertificates"></div>
+	  <p class="description"><cpanel langprint="CRTDesc"></p>
+    
+<script type="text/javascript">	
+//<![CDATA[
+
+	var init = function() {
+	var validation = new CPANEL.validate.validator("<cptext "SSL Certificates">");
+	validation.add('country', 'min_length(%input%, 2)', '<cpanel langprint="ValidatorCountryChars">');
+        validation.add('country', 'alpha(%input%)', '<cptext "Field can contain only alpha characters">');
+        validation.add('state', 'min_length(%input%, 1)', '<cpanel langprint="ValidatorState">');
+        validation.add('state', 'alpha(%input%)', '<cptext "Field can contain only alpha characters">');
+        validation.add('state', 'max_length(%input%, 2)', '<cptext "The state field can only contain two characters">');
+        validation.add('city', 'min_length(%input%, 1)', '<cpanel langprint="ValidatorCity">');
+        validation.add('company', 'min_length(%input%, 1)', '<cpanel langprint="ValidatorCompany">');
+        validation.add('companydivision', 'min_length(%input%, 1)', '<cpanel langprint="ValidatorCompanyDiv">');
+        validation.add('email', 'min_length(%input%, 1)', '<cpanel langprint="ValidatorEmailEmpty">');
+        validation.add('email', 'email(%input%)', '<cpanel langprint="ValidatorEmailFormat">');
+
+
+		validation.attach();
+
+		CPANEL.validate.attach_to_form("submit-button", validation);
+
+	};
+
+	YAHOO.util.Event.onDOMReady(init);
+
+//]]>
+</script>
+
+<h2><cpanel langprint="SSLCertServer"></h2>
+<table border="0" cellpadding="5" cellspacing="0"  class="sortable" id="ssltable" width="650">
+	  <thead>
+	  <tr>
+			<th scope="col"><cpanel langprint="SSLHost"></th>
+			<th scope="col"><cpanel langprint="SSLIssuer"></th>
+			<th scope="col"><cpanel langprint="SSLExpDate"></th>
+			<th class="sorttable_nosort" scope="col"><cpanel langprint="SSLFunc"></th>
+	  </tr>
+	  </thead>
+	  <tbody>
+			<?cp SSL::listcrts(
+			[tr class="info-%"]
+				  [td ][div align="center"]%[/div][/td]
+				  [td ][div align="center"]%[/div][/td] 
+				  [td ][div align="center"]%[/div][/td]
+				  [td ][div align="center"][a href="viewcrt.html?host=%&amp;item=crt&amp;itemname=Certificate"]$LANG{'AODShowDetails'}[/a]&nbsp;| [a href="deletecrtconfirm.html?host=%&amp;item=crt&amp;itemname=Certificate"] $LANG{'Remove'}[/a][/div][/td]
+			[/tr]
+			,*num,host,issuer,expiredate,host,host,host) || '[tr][td colspan=4 class="errors"]$LANG{'SSLNonServer'}[/td][/tr]' ?>
+	  </tbody>
+</table>
+<br /><br />
+<h2><cpanel langprint="SSLUploadCert"></h2>
+<form action="uploadcrt.html" name="" method="post" enctype="multipart/form-data">
+	  <cpanel langprint="SSLCertPaste">:<br />
+      <textarea name="crt" rows="20" cols="60"></textarea><br />
+      <cpanel langprint="SSLCertChoose"> <input type="file" name="crtfile" /><br />
+      <input type="submit" class="input-button" value="<cpanel langprint="BUUploadButton">" />
+</form>
+
+<h2><cpanel langprint="SSLCertGenerateNew"></h2>
+<form action="gencrt.html" method="post" name="mainform" id="mainform">
+<table>
+	  <tr><td align="right"><cpanel langprint="SSLHost"></td><td><select name="host"><cpanel SSL="listkeysopt()"></select></td></tr>
+	  <tr><td align="right"><cpanel langprint="SSLCountry"></td><td><input id="country" type="text" name="country" size="2" maxlength="2" class="validator_position_right" /> <span id="country_error"></span></td></tr>
+	  <tr><td align="right"><cpanel langprint="SSLState"></td><td><input id="state" type="text" size="2" maxlength="2" name="state" class="validator_position_right" /> <span id="state_error"></span></td></tr>
+	  <tr><td align="right"><cpanel langprint="SSLCity"></td><td><input id="city" type="text" name="city" class="validator_position_right" /> <span id="city_error"></span></td></tr>
+	  <tr><td align="right"><cpanel langprint="SSLCompany"></td><td><input id="company" type="text" name="company" class="validator_position_right" /> <span id="company_error"></span></td></tr>
+	  <tr><td align="right"><cpanel langprint="SSLCoDivision"></td><td><input id="companydivision" type="text" name="companydivision" class="validator_position_right" /> <span id="companydivision_error"></span></td></tr>
+	  <tr><td align="right"><cpanel langprint="SSLEmail"></td><td><input id="email" type="text" name="email" class="validator_position_right" /> <span id="email_error"></span></td></tr>
+	  <tr>
+			<td>&nbsp;</td>
+			<td>
+				  <input type="hidden" name="item" value="crt" />
+				  <input type="hidden" name="itemname" value="Certificate" />
+				  <input id="submit-button" type="submit" class="input-button" value="<cpanel langprint="SSLGen">" />
+			</td>
+	  </tr>
+</table>
+</form>
+<br /><p>* <cpanel langprint="SSLCertGenerateNewText"></p>
+<div class="return-link"><a href="index.html">&larr; <cptext "Go Back"></a></div>
+</div><!-- end body-content -->
+<cpanel Branding="include(stdfooter.html)">

@@ -1,0 +1,90 @@
+<cpanel setvar="userdefined_quota_default_value=250">
+<cpanelif $CONF{'email_account_quota_userdefined_default_value'}>
+    <cpanel setvar="userdefined_quota_default_value=$CONF{'email_account_quota_userdefined_default_value'}">
+</cpanelif>
+
+<script type="text/javascript">
+//<![CDATA[
+var REQUIRED_PASSWORD_STRENGTH = parseInt('<?cp PasswdStrength::get_required_strength(%,strength) app=pop ?>') || 0;
+var LANG = {};
+LANG.unlimited = "<cpanel langprint="email_unlimited">";
+
+LANG.new_email_input = "<cpanel langprint="email_email_input">";
+LANG.password_input = "<cpanel langprint="email_password_input">";
+LANG.quota_input = "<cpanel langprint="email_quota_input">";
+
+LANG.not_valid_email = "<cpanel langprint="email_not_valid_email">";
+LANG.email_max_128_char = "<cpanel langprint="email_email_max_128_char">";
+LANG.quota_number_or_unlimited = "<cpanel langprint="email_quota_number_or_unlimited">" + ' "' + LANG.unlimited + '".';
+LANG.quota_max_16_char = "<cpanel langprint="email_quota_max_16_char">";
+LANG.password_strength_error = "<cpanel langprint="email_password_strength_error">";
+LANG.passwords_not_match = "<cpanel langprint="email_passwords_not_match">";
+LANG.quota_2gig = "<cpanel langprint="email_quota_2gig">";
+LANG.password_spaces = "<cpanel langprint="email_password_spaces">";
+LANG.password_strength_must_be = "<cptext 'Password strength must be at least “[_1]”.','{min_passwd_strength}'>";
+
+if (self['CPANEL']) {
+<cpanel relinclude="js2-min/mail/popsinclude.js">
+}
+//]]>
+</script>
+
+<!-- <?cp Email::listmaildomains(,) ?> -->
+
+<div class="highlight">
+<table border="0" style="margin-left: 20px">
+	<tr>
+		<td align="right"><cpanel langprint="GBEmail"></td>
+		<td><input name="email" id="email_input" type="text" style="width: 150px" tabindex="1" /></td>
+		<td>@ 
+
+<cpanelif $CPVAR{'maildomainscount'}==1>
+ <?cp Email::listmaildomains(%[input type="hidden" name="domain" value="%"],domain,domain) ?>
+</cpanelif>
+
+<cpanelif $CPVAR{'maildomainscount'}=gt=1>
+<select name="domain">
+ <?cp Email::listmaildomains([option value="%"]%[/option],domain,domain) ?>
+</select>
+</cpanelif>
+
+	</td>
+		<td><div id="email_input_error"></div></td>
+	</tr>
+	<tr>
+		<td align="right"><cpanel langprint="MLAddPass"></td>
+		<td><input type="password" name="password" id="password" style="width: 150px" tabindex="2" /></td>
+		<td colspan="2"><div id="password_error"></div></td>
+	</tr>
+	<tr>
+		<td align="right"><cpanel langprint="email_password_again">:</td>
+		<td><input type="password" name="password2" id="password2" style="width: 150px" tabindex="3" /></td>
+		<td colspan="2"><div id="password2_error"></div></td>
+	</tr>
+	<tr>
+		<td align="right"><cpanel langprint="email_strength"> (<a id="why_strong_passwords_panel" href="javascript:void(0);"><cpanel langprint="email_why"></a>):</td>
+		<td><div id="password_strength" style="width: 150px; height: 20px; border: 1px solid black; margin: 5px 0px 3px 0px"></div></td>
+		<td colspan="2"><input type="button" class="input-button" id="create_strong_password" value="<cpanel langprint="cjt_password_generator">" tabindex="-1" /></td>
+	</tr>
+	<tr>
+		<td align="right"><cpanel langprint="email_mailbox_quota">:</td>
+		<td><input type="text" name="quota" value="<cpanel print="$CPVAR{'userdefined_quota_default_value'}">" id="quota" style="width: 150px" tabindex="4" /></td>
+		<td colspan="2"><div id="quota_error"></div></td>
+	</tr>
+	<tr>
+		<td></td>
+		<td colspan="3"><em><cptext 'value in MB or 0 for'> <span class="action_link" onclick="fill_unlimited()"><cptext 'unlimited'></span></em></td>
+	</tr>
+	<tr><td colspan="4"><div style="height: 10px"></div></td></tr>
+	<tr>
+		<td></td>
+		<td><input id="new_email_submit" class="input-button" type="submit" value="<cpanel langprint="ARCreate">" tabindex="5" /></td>
+		<td></td>
+		<td></td>
+	</tr>
+</table>
+</div>
+<div id="why_strong_passwords" style="display: none">
+	<cpanel langprint="email_password_why"><br /><br />
+	<cpanel langprint="email_password_tip">
+</div>

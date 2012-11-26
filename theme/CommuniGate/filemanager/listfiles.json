@@ -1,0 +1,23 @@
+{
+        "files":
+               [
+
+<?cp Fileman::listfiles(
+{
+"id":"%\{percent}2f%"\{comma}
+"name":"%"\{comma}
+"path":"%"\{comma}
+"type":"%"\{comma}
+"size":"%"\{comma}
+"mtime":"%"\{comma}
+"humansize":"%"\{comma}
+"nicemode":"%"\{comma}
+"isleaf":"%"
+}\{comma}
+,^path,*file,*file,^path,^type,^size,^mtime,^humansize,^nicemode,isleaf) checkleaf=1,dir=$FORM{'dir'},types=$FORM{'types'}?>
+   {}
+    ],
+
+    "absdir":"<?cp Fileman::getabsdir(%,^absdir) dir=$FORM{'dir'} ?>"
+}
+

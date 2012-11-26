@@ -1,0 +1,33 @@
+<cpanel setvar="headerimg=../images/topmysql.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+<style type="text/css">
+<?cp Branding::spritelist(.spriteicon_img_mini {float:left;margin-right:5px;background: url\{leftparenthesis}"%"\{rightparenthesis};} %,@spriteurl,images::#icon-${img}_mini {background-position\{colon}0 -${cssposition}px;width\{colon}${width}px;height\{colon}${height}px; }:) imgtype=icon,subtype=img,method=scale_60percent,format=png,img=postgresql ?>
+</style>
+<div class="body-content">
+<div class="h1Title"><div class="spriteicon_img_mini" id="icon-postgresql_mini"></div> <cpanel langprint="TPostgre"></div>
+
+<cpanelif !$CPERROR{'postgres'}>
+	<h2><cpanel langprint="PSQLAddeduserConfMsg"></h2>
+	<p><cpanel langprint="FTPUser"> <span class="status"><cpanel print="$FORM{'user'}"></span> <cpanel langprint="AddedtoDB"> <span class="status"><cpanel print="$FORM{'db'}"></span>.
+</cpanelif>
+
+<cpanelif $CPERROR{'postgres'}>
+	 <p class="errors"><cpanel langprint="PostgreUsertoDBError">&nbsp;<a href="#" onclick="document.getElementById('details').style.display='block'; return false;"><cpanel langprint="AODShowDetails"></a> </p>
+	    <div class="details" id="details">
+			<cpanel print="$CPERROR{'postgres'}">    
+	    </div>
+		<noscript>
+		<div class="details-noscript" id="details">
+			<cpanel print="$CPERROR{'postgres'}">    
+	    </div>
+		</noscript>
+</cpanelif>
+
+<!--<p><cpanel langprint="PSQLAddedUserConfTxt1"> <span class="status"><cpanel print="$FORM{'user'}"> </span>
+<cpanel langprint="PSQLAddedUserConfTxt2"> <span class="status"><cpanel print="$FORM{'db'}"></span>.
+<cpanel Postgres="adduserdb($FORM{'db'},$FORM{'user'})"></p>-->
+
+<div class="return-link"><a href="index.html">&larr; <cptext "Go Back"></a></div>
+</div>
+<cpanel Branding="include(stdfooter.html)">

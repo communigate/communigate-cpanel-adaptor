@@ -1,0 +1,18 @@
+<cpanel setvar="headerimg=../images/topmysql.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+<style type="text/css">
+<?cp Branding::spritelist(.spriteicon_img_mini {float:left;margin-right:5px;background: url\{leftparenthesis}"%"\{rightparenthesis};} %,@spriteurl,images::#icon-${img}_mini {background-position\{colon}0 -${cssposition}px;width\{colon}${width}px;height\{colon}${height}px; }:) imgtype=icon,subtype=img,method=scale_60percent,format=png,img=mime-types ?>
+</style>
+<div class="body-content">
+<div class="h1Title"><div class="spriteicon_img_mini" id="icon-mime-types_mini"></div> <cpanel langprint="MTMaint"></div>
+<h2><cpanel langprint="MTRem"></h2>
+
+<p><cpanel langprint="MTRevMsg">&nbsp;<strong><cpanel print="$FORM{'usermime'}"></strong>?</p>
+<p>
+	<a class="create-button" href="delmime.html?usermime=<cpanel formprint="$FORM{'usermime'}">"><cpanel Locale="maketext('Delete MIME Type')"></a>
+	<a class="cancel_link" href="mime.html"><cpanel Locale="maketext('cancel')"></a> 
+</p>
+
+<div class="return-link"><a href="mime.html">&larr; <cptext "Go Back"></a></div>
+<cpanel Branding="include(stdfooter.html)">

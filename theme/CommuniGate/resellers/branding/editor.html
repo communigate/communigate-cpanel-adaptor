@@ -1,0 +1,45 @@
+<cpanel setvar="headerimg=../../images/tools.gif">
+<cpanel setvar="dprefix=../../">
+<cpanel include="../../stdbheader.html">
+<cpanel include="../../ajaxhelp.html">
+<script type="text/javascript">
+    ajaxloader_on = 1;
+</script>
+<style type="text/css">
+<?cp Branding::spritelist(.spriteicon_img_mini {float:left;margin-right:5px;background: url\{leftparenthesis}"%"\{rightparenthesis};} %,@spriteurl,images::#icon-${img}_mini {background-position\{colon}0 -${cssposition}px;width\{colon}${width}px;height\{colon}${height}px; }:) imgtype=icon,subtype=img,method=scale_60percent,format=png,img=branding ?>
+</style>
+<div class="body-content">
+
+<div class="h1Title"><div class="spriteicon_img_mini" id="icon-branding_mini"></div> <cpanel langprint="BrandingEdit"></div>
+
+<p class="description"><cpanel langprint="BrandingEditDesc"></p>
+<p><cpanel Locale="maketext('Select the theme you wish to edit')"></p>
+<form class="cellform" action="<cpanel printvar="dprefix">switchtheme.html" method="post" name="tform">
+    <select style="margin-bottom:2px;" name="theme" onchange="document.tform.submit();">
+    <cpanel Resellers="themelistopt()">
+    </select>
+</form>
+<p><a href="headeredit.html"><cpanel Locale="maketext('Edit Header and Footer Images')"></p>
+<p><a href="iconedit.html"><cpanel Locale="maketext('Edit Main Page Icons')"></a></p>
+
+
+<p> Select the theme you wish to edit</p>
+<form class="cellform" action="<cpanel printvar="dprefix">switchtheme.html" method="POST" name="tform">
+             &nbsp;&nbsp;<select style="margin-bottom:2px;" name="theme" onChange="document.tform.submit();">
+             <cpanel Resellers="themelistopt()">
+             </select>
+
+<br /><a href="headeredit.html"><cpanel Locale="maketext('Edit Header and Footer Images')"></a><br /><br />
+
+<a href="iconedit.html"><cpanel Locale="maketext('Edit Main Page Icons')"></a>
+
+            </form>
+
+
+
+
+
+
+
+</div>
+<cpanel Branding="include(stdfooter.html)">

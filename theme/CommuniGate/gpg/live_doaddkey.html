@@ -1,0 +1,35 @@
+<cpanel setvar="headerimg=../images/tools.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+<style type="text/css">
+<?cp Branding::spritelist(.spriteicon_img_mini {float:left;margin-right:5px;background: url\{leftparenthesis}"%"\{rightparenthesis};} %,@spriteurl,images::#icon-${img}_mini {background-position\{colon}0 -${cssposition}px;width\{colon}${width}px;height\{colon}${height}px; }:) imgtype=icon,subtype=img,method=scale_60percent,format=png,img=keys ?>
+</style>
+
+<div class="body-content">
+<div class="h1Title"><div class="spriteicon_img_mini" id="icon-keys_mini"></div><cpanel langprint="PGPKeyGen"></div>
+<cpanel langprint="PGPPatient">
+<!--
+<cpanel Gpg="genkey($FORM{'name'},$FORM{'comment'},$FORM{'email'},$FORM{'expire'},$FORM{'keysize'},$FORM{'password'})">
+-->
+
+<cpanelif !$CPERROR{'gpg'}>
+		<p><cpanel Locale="maketext('The Key has been successfully created.')"></p>
+</cpanelif>
+
+<cpanelif $CPERROR{'gpg'}>
+   <p class="errors"><cpanel langprint="CPErrorCreateProb"> <cpanel langprint="PGPKeyKey">.
+    <a href="#" onclick="document.getElementById('details').style.display='block'; return false;"><cpanel langprint="AODShowDetails"></a> </p>
+    
+	<div class="details" id="details">
+		<cpanel print="$CPERROR{'gpg'}">
+    </div>
+	<noscript>
+	<div class="details-noscript" id="details">
+		<cpanel print="$CPERROR{'gpg'}">
+    </div>
+	</noscript>	
+</cpanelif>
+
+<div class="return-link"><a href="index.html">&larr; <cptext "Go Back"></a></div>
+</div><!-- body-content -->
+<cpanel Branding="include(stdfooter.html)">

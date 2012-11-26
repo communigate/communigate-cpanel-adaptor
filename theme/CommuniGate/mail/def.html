@@ -1,0 +1,81 @@
+<cpanel setvar="headerimg=../images/mailmenu.gif">
+<cpanel setvar="dprefix=../">
+<cpanel setvar="headerinclude=mail/pops_head.html">
+<cpanel Branding="include(stdheader.html)">
+    
+<cpanelfeature popaccts>
+
+  	<cpanelif $FORM{'setdefault'}>
+		<?cp CommuniGate::SetDefAddress() domain=$FORM{'domain'},action=$FORM{'actionoption'},fwdmail=$FORM{'CGPForwardAddress'} ?>
+        </cpanelif>
+
+</cpanelfeature>
+
+<div class="body-content">
+
+<style type="text/css">
+<?cp Branding::spritelist(.spriteicon_img_mini {float:left;margin-right:5px;background: url\{leftparenthesis}"%"\{rightparenthesis};} %,@spriteurl,images::#icon-${img}_mini {background-position\{colon}0 -${cssposition}px;width\{colon}${width}px;height\{colon}${height}px; }:) imgtype=icon,subtype=img,method=scale_60percent,format=png,img=defaultemailacct ?>
+</style>
+
+<div class="h1Title"><div class="spriteicon_img_mini" id="icon-defaultemailacct_mini"></div><cpanel langprint="EMSetDefaultAddr"></div>
+<p class="description"><cpanel langprint="CGPEMDefaultDesc"></p>
+<br />
+    
+
+<cpanelfeature !popaccts> 
+    <style text="text/css">
+    .disable,.input-button,.popselect,.expbox { display:none }
+    </style>
+</cpanelfeature>
+
+
+
+
+
+<cpanelfeature popaccts>
+ <table border="0" cellpadding="0" width="98%" cellspacing="0" class="sortable truncate-table" id="mailtbl">
+        <thead>
+    <tr>
+            <th><cpanel langprint="Domain"></th>
+            <th class="sorttable_nosort" colspan="4"><cpanel langprint="$LANG{'CGPSetDefault'}"></th>
+        </tr>
+    </thead>
+        <tbody>
+
+		<?cp CommuniGate::ListDefAddress( 
+[tr class="info-even"]
+                [td class="cell truncate" truncate="80"]%[/td]
+                [td class="maindisp" colspan="4" nowrap="nowrap"]
+                [form action="def.html"]
+		[select name="actionoption"]
+			[option % value="CGPDefDiscard"]
+				$LANG{'CGPDefDiscard'}	
+			[/option]	
+			[option % value="CGPDefReject"]
+                                $LANG{'CGPDefReject'} 
+                        [/option]
+                        [option % value="CGPDefForward"]
+                                $LANG{'CGPDefForward'} 
+                        [/option]
+	                    [option % value="CGPDefAcceptedAndBounced"]
+                                $LANG{'CGPDefAcceptedAndBounced'}
+                        [/option]
+		[/select]
+		[input type="text" name="CGPForwardAddress" value="%"]	
+				[input type="hidden" name="setdefault" value="toto"]
+				[input type="hidden" name="domain" value="%"]
+                                [div align="center"]
+                                        [input class="input-button" type="submit" value="$LANG{'CGPSetDefault'}" /]                                [/div]
+                [/form]
+                [/td]
+        [/tr]   
+,domain,discard,reject,forward,acceptedandbounced,MailRerouteAddress,domain)  ?> 
+       </tbody>
+    </table>
+</cpanelfeature>
+
+
+
+</div><!-- end body-content div -->
+
+<cpanel Branding="include(stdfooter.html)">

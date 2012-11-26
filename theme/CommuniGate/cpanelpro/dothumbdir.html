@@ -1,0 +1,23 @@
+<cpanel setvar="headerimg=../images/topcrontab.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+<div class="body-content">
+<h1><cpanel langprint="TImageMan"></h1>
+<br /><br />
+<cpanel langprint="IMScaler"><br /><blockquote>
+<textarea wrap="off" nowrap name="thumbnail" id="errtext" class="output" cols="80" rows="15" readonly>
+<cpanel ImageManager="thumbnail($FORM{'dir'},$FORM{'widthpercent'},$FORM{'heightpercent'})">
+</textarea>
+<br /><br />
+
+<cpanel langprint="IMThumbsConfirmText">
+<a target=_blank href="../filemanager/index.html?dir=<cpanel print="$FORM{'dir'}/thumbnails">">
+<cpanel print="$FORM{'dir'}">/thumbnails/tn_*</a>
+
+</blockquote>
+<br />
+<div class="return-link"><a href="images.html">&larr; <cptext "Go Back"></a></div>
+</div>
+<cpanel Branding="include(stdfooter.html)">
+
+

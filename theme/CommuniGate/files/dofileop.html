@@ -1,0 +1,46 @@
+<html>
+<head>
+<title>cPanel X</title>
+<cpanel relinclude="files/files_head.html">
+
+</head>
+<script type="text/javascript">
+parent.trashframe.window.location.href="trash.html?refresh=<cpanel print="$random">";
+</script>
+<script type="text/javascript">
+if (parent.dirwindow.window.location.href.indexOf("?") > 0) {
+	parent.dirwindow.window.location.href="dir.html?dir=<cpanel print="$FORM{'opdir'}">" + "&refresh=<cpanel print="$random">";
+}
+</script>
+<script type="text/javascript">
+if (parent.dirwindow.window.location.href.indexOf("?") == -1) {
+	parent.dirwindow.window.location.href="dir.html?dir=<cpanel print="$FORM{'opdir'}">" + "?refresh=<cpanel print="$random">";
+}
+</script>
+<body class="topright">
+<table class="sortable" border=0 width=100% valign=middle align=center>
+<tr>
+<td>
+<cpanel Fileman="fileimg($FORM{'opdir'},$FORM{'opfile'},1)">
+</td>
+<td>
+<img src="images/forward.gif">
+</td>
+<td>
+<cpanel Fileman="fileimg($FORM{'dir'},,1)">
+</td>
+</tr>
+<tr>
+<td>
+<cpanel print="$FORM{'opfile'}">
+</td>
+<td><cpanel print="$FORM{'fileop'}"></td>
+<td >
+<cpanel print="$FORM{'dir'}">
+</td>
+</tr>
+</table>
+<cpanel Fileman="dofileop($FORM{'opdir'},$FORM{'opfile'},$FORM{'dir'},$FORM{'fileop'})">
+</body>
+</html>
+

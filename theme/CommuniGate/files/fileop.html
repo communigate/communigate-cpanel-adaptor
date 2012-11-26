@@ -1,0 +1,68 @@
+<cpanel setvar="dprefix=../">
+<html>
+<head>
+<title>cPanel X</title>
+<cpanel relinclude="files/files_head.html">
+<script type="text/javascript" src="<cpanel MagicRevision="uri("/yui/utilities_container/utilities_container.js")">"></script>
+<script type="text/javascript" src="<cpanel MagicRevision="uri("js/x3_optimized.js")">"></script>
+<script type="text/javascript" src="<cpanel MagicRevision="uri("js/sorttable_optimized.js")">"></script>
+
+<style type="text/css">
+<cpanel Branding="include(sprites.html)">
+</style>
+</head>
+<body id="leftmain">
+<h1><img src="img/diractions/copy.png" align="middle" alt="copy" />&nbsp;<img src="img/diractions/move.png" align="middle" alt="move" /> 
+<cpanelif $FORM{'fileop'}==copy>
+<cpanel langprint="FMCopyFolder">
+</cpanelif>
+
+<cpanelif $FORM{'fileop'}==move>
+<cpanel langprint="FMMoveFolder">
+</cpanelif>
+</h1><br /><br /><br />
+<cpanel langprint="FMFileOpMsg1"> 
+
+<cpanelif $FORM{'fileop'}==copy>
+<cpanel langprint="FMCopyFolder">
+</cpanelif>
+
+<cpanelif $FORM{'fileop'}==move>
+<cpanel langprint="FMMoveFolder">
+</cpanelif>
+
+<cpanel print="$FORM{'opfile'}"> <cpanel langprint="FMFileOpMsg2">? 
+<div style="float:left;"><cpanel langprint="FMCurrDir"> :</div>
+<div style="float:left;"><a href="fileop.html?<cpanel print="fileop=$FORM{'fileop'}&opdir=$FORM{'opdir'}&opfile=$FORM{'opfile'}">&dir=/" style="text-decoration:none;"><div class="spriteui_img_trans" id="ui-homeb" />&nbsp;</div>/</a></div>
+<?cp Fileman::getpath(%,dirparts::[div style="float\{colon}left;" class="row-${*num}"][a href="fileop.html?fileop=$FORM{'fileop'}&opdir=$FORM{'opdir'}&opfile=$FORM{'opfile'}&dir=${dirurl}"]${dirpart}/[/a][/div]:) dir=$FORM{'dir'}/$FORM{'file'} ?>
+<div style="float:left; margin-left: 30px;"><a href="dofileop.html?<cpanel print="fileop=$FORM{'fileop'}&opdir=$FORM{'opdir'}&opfile=$FORM{'opfile'}">&dir=<cpanel print="$FORM{'dir'}">" target="filewindow">
+<cpanelif $FORM{'fileop'}==copy>
+<cpanel langprint="FMCopyFolder">
+</cpanelif>
+
+<cpanelif $FORM{'fileop'}==move>
+<cpanel langprint="FMMoveFolder">
+</cpanelif><cpanel langprint="FMInThisDirectory"></a></div>
+
+<div style="clear:left;"></div>
+
+<br />
+
+
+<table width="98%" id="fileopfiles" class="sortable" cellpadding="0" cellspacing="0">
+<tr>
+    <th><cpanel langprint="FMType"></th>
+    <th><cpanel langprint="FMFile"></th>
+    <th><cpanel langprint="FMMode"></th>
+</tr>
+<?cp Fileman::listfiles(
+    [tr class="row-%"]
+        [td  width="1\{percent}"][a href="fileop.html?fileop=$URI_ENCODED_FORM{'fileop'}&opdir=$URI_ENCODED_FORM{'opdir'}&opfile=$URI_ENCODED_FORM{'opfile'}&dir=%&file=%"][img src="../mimeicons/%.png" border="0" alt="%"][/a][/td]
+        [td  width="89\{percent}"][a href="dofileop.html?fileop=$URI_ENCODED_FORM{'fileop'}&opdir=$URI_ENCODED_FORM{'opdir'}&opfile=$URI_ENCODED_FORM{'opfile'}&dir=%" target="filewindow"]%[/a][/td]
+         [td  width="10\{percent}"]%[/td]
+ 
+    [/tr],*num,path,file,mimetype,mimetype,^fullpath,file,nicemode) needmime=1,dir=$FORM{'dir'}/$FORM{'file'},types=dir
+?>
+</table>
+</body>
+</html>

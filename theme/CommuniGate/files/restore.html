@@ -1,0 +1,24 @@
+<html>
+<head>
+<title>cPanel X</title>
+<cpanel relinclude="files/files_head.html">
+</head>
+<body class="topright">
+<font class=med><img src="../files/images/TrashFull.png" border=0 width="40"> 
+<cpanel Fileman="restorefile($FORM{'file'})">..... 
+<script type="text/javascript">
+parent.trashframe.window.location.href="trash.html?refresh=<cpanel print="$random">";
+</script>
+<script type="text/javascript">
+if (parent.dirwindow.window.location.href.indexOf("?") > 0) {
+        parent.dirwindow.window.location.href = parent.dirwindow.window.location.href + "&refresh=<cpanel print="$random">";
+}
+</script>
+<script type="text/javascript">
+if (parent.dirwindow.window.location.href.indexOf("?") == -1) {
+        parent.dirwindow.window.location.href = parent.dirwindow.window.location.href + "?refresh=<cpanel print="$random">";
+}
+</script>
+</font> 
+</body>
+</html>

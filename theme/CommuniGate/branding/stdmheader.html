@@ -1,0 +1,59 @@
+<!-- START stdmheader.html -->
+<cpanelif $NVDATA{'x3_litegraphics'}>
+    <style type="text/css">
+    #heading-top-header-bg, #cpanel #border-efx #heading-top-header-bg { 
+	height: 41px;
+    }
+    #heading-top-billboard, #cpanel #border-efx #heading-top-header-bg #heading-top-billboard {
+	height: 0;
+	background: none;
+    }
+    .toplogo, #logo-top-logo {
+	display: none;
+    }
+    </style>
+</cpanelif>
+</head>
+<body id="cpanel_body" class="yui-skin-sam">
+<div id="cpanel">
+
+    <div id="border-efx">
+    <!--Handheld heading-->
+    
+    <!--Start Header-->
+    <div id="heading-top-header-bg" class="spriteheading_bg">
+	<div id="heading-top-billboard" class="spriteheading_compleximg">  
+	    <div id="leftheader">
+        <cpanelif !$FORM{'msg'}>
+		<div class="spriteheading_img" id="heading-home_off" onmouseover="this.id='heading-home_on';" onmouseout="this.id='heading-home_off';" style="cursor:pointer;cursor:hand;height:35px;display:inline">
+		    <a style="display:block; width: 100%; height: 100%; text-decoration:none" target="_top" href="<cpanel printvar="dprefix">index.html">&nbsp;</a>
+		</div>
+        </cpanelif>
+	    </div>
+	
+	    <div id="rightheader" style="float:right;">
+        <cpanelif !$FORM{'msg'} && !$CPVAR{'hidehelp'}>
+		    <div class="spriteheading_img" id="heading-help_off" onmouseover="this.id='heading-help_on';" onmouseout="this.id='heading-help_off';" style="cursor:pointer;cursor:hand;height:35px;display:inline">
+			<a onclick="show_help(); return false;" style="display: block; height: 100%; width: 100%; text-decoration:none" target="_blank" href="<cpanel printvar="dprefix">help.html?url=<cpanel Parser="firstfile_relative_uri()">">&nbsp;</a>
+		    </div>
+		</cpanelif>
+		<div class="spriteheading_img" id="heading-logout_off" onmouseover="this.id='heading-logout_on';" onmouseout="this.id='heading-logout_off';" style="cursor:pointer;cursor:hand;height:35px;display:inline">
+		    <a style="display: block; width: 100%; height: 100%; text-decoration:none" target="_top" href="/logout/">&nbsp;</a>
+		</div>
+	    </div>
+	
+	    <!--This div will display logo when media-type=handheld-->
+	    <div id="handheld-head">cPanel 11</div>
+	    
+	    <div id="logo">
+		<cpanelif !$NVDATA{'x3_litegraphics'}>
+		<img id="logo-top-logo" alt="" src="<cpanel Branding="image(top-logo,,,,,,,,1)">" class="toplogo"  />
+		</cpanelif>
+	    </div>
+	</div>
+    </div>
+    <!--End Header-->
+    <div class="clearitsm">&nbsp;</div>
+    <!--Start Content-->
+    <div id="content">
+    <!-- END stdmheader.html -->

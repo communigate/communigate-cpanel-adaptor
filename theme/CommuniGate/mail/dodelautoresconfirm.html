@@ -1,0 +1,24 @@
+<cpanel setvar="headerimg=../images/mailmenu.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+
+<style type="text/css">
+<?cp Branding::spritelist(.spriteicon_img_mini {float:left;margin-right:5px;background: url\{leftparenthesis}"%"\{rightparenthesis};} %,@spriteurl,images::#icon-${img}_mini {background-position\{colon}0 -${cssposition}px;width\{colon}${width}px;height\{colon}${height}px; }:) imgtype=icon,subtype=img,method=scale_60percent,format=png,img=responder ?>
+</style>
+
+<div class="body-content">
+
+<div class="h1Title"><div class="spriteicon_img_mini" id="icon-responder_mini"></div> <cpanel langprint="EmailAuto"></div>
+
+<p><cpanel Locale="maketext('Are you sure you want to delete the autoresponder for “[output,class,_1,status]”?',$FORM{'email'})"></p>
+
+<p></a> <a class="create-button" href="dodelautores.html?email=<cpanel uriprint="$FORM{'email'}">&redirectdomain=<cpanel print="$FORM{'domain'}">"><cpanel Locale="maketext('Delete Autoresponder')"></a> <a class="cancel_link" href="autores.html"><cpanel Locale="maketext('cancel')"></a></p>
+
+<cpanelif !$appname==webmail>
+		<div class="return-link"><a href="autores.html">&larr; <cptext "Go Back"></a></div>		
+</cpanelif>
+<cpanelif $appname==webmail>
+		<div class="return-link"><a href="../index.html">&larr; <cptext "Go Back"></a></div>		
+</cpanelif>
+</div>
+<cpanel Branding="include(stdfooter.html)">

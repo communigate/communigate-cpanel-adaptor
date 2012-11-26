@@ -1,0 +1,60 @@
+<!-- START optionselect-script.html -->
+<script type="text/javascript">
+//<![CDATA[
+var optionselect_autogo=0;
+<cpanelfeature !dirselector>
+    optionselect_autogo=1;
+</cpanelfeature>
+
+<?cp NVData::get(NVData\{leftbracket}'%'\{rightbracket}=unescape\{leftparenthesis}'%'\{rightparenthesis};,name,^value) encoded=1,names=optionselect_files|optionselect_filemanager|optionselect_diskusage|optionselect_password-protect|optionselect_index|optionselect_leechprotect ?>
+var homedir = '<cpanel print="$homedir">';
+var optionselect_images = {
+    'DirSelect': 'images/DirSelect.png',
+    'homeb': 'images/homeb.gif',
+    'publichtml': 'mimeicons/publichtml.png',
+    'publicftp': 'mimeicons/publicftp.png',
+    'dirselection': 'mimeicons/dirselection.png'
+};
+
+var optionselect_list = {
+    'index': {
+        'show': ['webroot','domainrootselect'],
+        'name': '<cpanel langprint="TImageMan,1">',
+        'url': 'indexmanager/index.html',
+        'target': ''
+    },
+    'leechprotect': {
+        'show': ['webroot','domainrootselect'],
+        'name': '<cpanel langprint="LP,1">',
+        'name': 'Leech Protect',
+        'url': 'htaccess/leechprotect/leechprotect.html',
+        'target': ''
+    },
+    'password-protect': {
+        'show': ['webroot','domainrootselect'],
+        'name': '<cpanel langprint="NavProtectDir,1">',
+        'url': 'htaccess/index.html',
+        'target': ''
+    },
+    'files': {
+        'show': ['homedir','webroot','domainrootselect'],
+        'name': '<cpanel langprint="TFileManagerLegacy,1">',
+        'url': 'files/index.html',
+        'target': '_blank'
+    },
+    'filemanager': {
+        'show': ['homedir','webroot','ftproot','domainrootselect'],
+        'name': '<cpanel langprint="TFileManager,1">',
+        'url': 'filemanager/index.html',
+        'target': '_blank'
+    },
+    'diskusage': {
+        'show': ['homedir','webroot','ftproot','domainrootselect'],
+        'name': '<cpanel langprint="INDXDiskUsage,1">',
+        'url': 'diskusage/index.html',
+        'target': ''
+    }
+};
+//]]>
+</script>
+<!-- END optionselect-script.html -->

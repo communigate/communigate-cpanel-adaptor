@@ -1,0 +1,9 @@
+<cpanel Branding="include(stdheader.html)">
+<div class="body-content">
+<?php
+$string = "This is an example of a PHPCP file.  In PHPCP the execution of PHP tags occurs before the execution of cPanel tags.";
+// If you wish to execute cpanel tags first, you can use cpphp.
+?>
+<cpanel print="<?php echo $string; ?>">
+</div>
+<cpanel Branding="include(stdfooter.html)">

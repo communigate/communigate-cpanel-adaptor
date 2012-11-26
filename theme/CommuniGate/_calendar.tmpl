@@ -1,0 +1,203 @@
+[%
+#This template gives localization for YUI 2's Calendar widget
+#as well as a Date.prototype.toCpLocaleString() method
+USE JSON;
+
+SET calendar_localization = {
+    MONTHS_LONG  => 'month_format_wide',
+    MONTHS_SHORT => 'month_format_abbreviated',
+    START_WEEKDAY => 'first_day_of_week',
+    WEEKDAYS_1CHAR => 'day_stand_alone_narrow',
+    #CLDR has no equivalent of YUI's WEEKDAYS_SHORT (2-character abbreviations)
+    WEEKDAYS_MEDIUM => 'day_format_abbreviated',
+    WEEKDAYS_LONG => 'day_format_wide',
+    STRINGS => {
+        previousMonth => locale.maketext('Previous Month'),
+        nextMonth     => locale.maketext('Next Month'),
+        close         => locale.maketext('Close'),
+    },
+};
+
+SET navigator_strings = {
+    month       => locale.maketext('Month'),
+    year        => locale.maketext('Year'),
+    submit      => locale.maketext('OK'),
+    cancel      => locale.maketext('Cancel'),
+    invalidYear => locale.maketext('Invalid year'),
+};
+
+-%]
+<script>
+(function() {
+[% TRY %]
+    [% SET json_file = 'locale/cldr/' _ locale.get_language_tag() _ '.json'; -%]
+    var _cldr = [% INSERT "$json_file" %];
+[% CATCH %]
+    [% CLEAR %]
+    [% SET json_file = 'locale/cldr/en.json'; -%]
+    // Using 'en' CLDR data since '[% locale.get_language_tag() %]' did not have a specific CLDR entry
+    var _cldr = [% INSERT "$json_file" %];
+[% END %]
+CPANEL.cldr = _cldr;
+
+if ( "CalendarNavigator" in YAHOO.widget ) {
+    YAHOO.widget.CalendarNavigator.DEFAULT_CONFIG.strings = [% navigator_strings.json() %];
+}
+
+if ( "Calendar" in YAHOO.widget ) {
+    //Workaround for YUI 2 issue #2529320 and FB cases 48108 and 48119
+    //so that table cell background gradients don't clobber the cell borders
+    //in IE<9. This slows down the calendar rendering, so only apply it when
+    //necessary.
+    if ( YAHOO.env.ua.ie && YAHOO.env.ua.ie < 9 ) {
+        [   'renderCellDefault',
+            'renderCellNotThisMonth',
+            'renderBodyCellRestricted',
+            'renderOutOfBoundsDate'
+        ].forEach( function(type) {
+            var original = YAHOO.widget.Calendar.prototype[type];
+            YAHOO.widget.Calendar.prototype[type] = function(working_date,cell) {
+                var val = original.apply(this,arguments);
+                cell.innerHTML = "<div class=\"calcell-liner\">"+cell.innerHTML+"</div>";
+            };
+        } );
+    }
+
+    var yui_localization = [% calendar_localization.json() %];
+    var DC = YAHOO.widget.Calendar.DEFAULT_CONFIG;
+    for (var key in yui_localization) {
+        var value = yui_localization[key];
+        if (typeof value === "string") value = _cldr[value];
+        DC[key].value = value;
+    }
+
+    [%#CLDR has no 2-character abbreviation,
+    and the 3-letter ones are too wide for the default CSS. -%]
+    DC.LOCALE_WEEKDAYS.value = "1char";
+    [%# CLDR gives weekdays with Monday first, but YUI expects Sunday first -%]
+    ["WEEKDAYS_1CHAR","WEEKDAYS_MEDIUM","WEEKDAYS_LONG"].forEach( function(k) {
+        var copy = DC[k].value.slice();  //copy the array
+        copy.unshift( copy.pop() );
+        DC[k].value = copy;
+    } );
+    [%# CLDR is 1..7, but YUI is 0..6. That's ok given the Monday/Sunday thing,
+        but that just means "7" is "0" for YUI. -%]
+    //fuzzy equality
+    if ( DC.START_WEEKDAY.value == 7 ) DC.START_WEEKDAY.value = 0;
+
+    if ( "Calendar_With_Time" in CPANEL.widgets ) {
+        CPANEL.widgets.Calendar_With_Time.localization = {
+            cldr_time_format_short : _cldr.time_format_short,
+            ampm                   : _cldr.am_pm_abbreviated
+        };
+    }
+}
+
+//enclose consecutive occurrences of the same letter with curly braces
+//so we can use YAHOO.lang.substitute on it
+CPANEL.DateTime = {
+    time_format_short: _cldr.time_format_short.replace(/(([hkmsaz])\2*)/gi,"{$1}"),
+    date_format_medium: _cldr.date_format_medium.replace(/(([ymdez])\2*)/gi,"{$1}")
+};
+var _datetime_format = _cldr.datetime_format
+    .replace( '{0}', CPANEL.DateTime.time_format_short )
+    .replace( '{1}', CPANEL.DateTime.date_format_medium )
+;
+var lpad = function(obj,length,padder) {
+    if (!padder) padder = "0";
+    obj = obj.toString();
+    var deficit = length - obj.length;
+    var pad = "";
+    while (deficit > 0) {
+        pad += padder;
+        deficit -= padder.length;
+    }
+    return pad + obj;
+};
+Date.prototype.toCpLocaleString = function(format_string) {
+    var my_date = this;
+    var substituter = function(key, value) {
+        switch(key) {
+            case "yy":
+                return my_date.getFullYear().toString().slice(-2);
+            case "yyyyy":
+                return lpad(my_date.getFullYear(), 5);
+            case "y":
+            case "yyy":
+            case "yyyy":
+                return my_date.getFullYear();
+            case "MMMM":
+                return _cldr.month_format_wide[my_date.getMonth()];
+            case "MMM":
+                return _cldr.month_format_abbreviated[my_date.getMonth()];
+            case "MM":
+                return lpad(my_date.getMonth() + 1, 2);
+            case "M":
+                return String(my_date.getMonth() + 1);
+            case "MMMMM":
+                return _cldr.month_stand_alone_narrow[my_date.getMonth()];
+            case "dd":
+                return lpad(my_date.getDate(),2);
+            case "d":
+                return my_date.getDate();
+            case "a":
+            case "U":
+                var hours = my_date.getHours();
+                return _cldr.am_pm_abbreviated[ (hours<12) ? 0 : 1 ];
+            case "h":
+            case "hh":
+                var twelve_hours = my_date.getHours();
+                if ( twelve_hours > 12 ) twelve_hours -= 12;
+                if ( twelve_hours === 0 ) twelve_hours = 12;
+                return ( key === "hh" ) ? lpad(twelve_hours,2) : twelve_hours;
+            case "K":
+            case "KK":
+                var eleven_hours = my_date.getHours();
+                if ( eleven_hours > 11 ) eleven_hours -= 12;
+                return ( key === "KK" ) ? lpad(eleven_hours,2) : eleven_hours;
+            case "H":
+                return my_date.getHours();
+            case "HH":
+                return lpad( my_date.getHours(), 2 );
+            case "m":
+                return my_date.getMinutes();
+            case "mm":
+                return lpad( my_date.getMinutes(), 2 );
+            case "s":
+                return my_date.getSeconds();
+            case "ss":
+                return lpad( my_date.getHours(), 2 );
+            case "EEEE":
+                return weekdays_wide[ my_date.getDay() ];
+            case "EEE":
+            case "EE":
+            case "E":
+                return weekdays_abbreviated[ my_date.getDay() ];
+            case "EEEEE":
+                return weekdays_narrow[ my_date.getDay() ];
+            default:  //timezone, which we can only represent with GMT+offset
+                var seconds = my_date.getTimezoneOffset();
+                var hours = (seconds > 0) ? "-" : "+";
+                hours += lpad( Math.floor(Math.abs(seconds)/60), 2 );
+                var minutes = lpad( seconds%60, 2 );
+                return "GMT"+hours+minutes;
+        }
+    };
+
+    if ( !format_string ) format_string = _datetime_format;
+
+    return YAHOO.lang.substitute( format_string, null, substituter );
+};
+})();
+</script>
+<style type="text/css">
+.cjt_calendarwithtime {
+    text-align: center;
+    margin-top: 5px;
+}
+.cjt_calendarwithtime_hours,
+.cjt_calendarwithtime_minutes {
+    width: 1.5em;
+    text-align: right;
+}
+</style>

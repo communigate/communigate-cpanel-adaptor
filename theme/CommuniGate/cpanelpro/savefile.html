@@ -1,0 +1,10 @@
+<cpanel setvar="headerimg=../images/toperrorpages.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+<div class="body-content">
+<font class="big"><cpanel Locale="maketext('Saved!')"></font><br />
+<cpanel Fileman="fmsavefile($FORM{'dir'},$FORM{'file'},$FORM{'page'})">
+<br /><br />
+<div class="return-link"><a href="manage.html?account=<cpanel print="$FORM{'account'}">">&larr; <cptext "Go Back"></a></div>
+</div>
+<cpanel Branding="include(stdfooter.html)">

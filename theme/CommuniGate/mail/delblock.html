@@ -1,0 +1,13 @@
+<cpanel setvar="headerimg=../images/mailmenu.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+
+            <form method=post action="dodelblock.html">
+              <b><font size="+1"><cpanel langprint="RedirectRemove"></font></b> 
+              <select name="email">
+                <cpanel email="listfiltersselect()"> 
+              </select>
+              <input type="submit" value="<cpanel langprint="RedirectRemove">" name="submit">
+            </form>
+
+<cpanel Branding="include(stdfooter.html)">

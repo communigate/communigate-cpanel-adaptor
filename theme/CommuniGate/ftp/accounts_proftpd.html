@@ -1,0 +1,140 @@
+<cpanel setvar="headerimg=../images/topftp.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+<cpanelfeature ftpaccts>
+<cpanelif $FORM{'itemsperpage'}>
+    <cpanel setvar="itemsperpage=$FORM{'itemsperpage'}">
+</cpanelif>
+<cpanelif !$FORM{'itemsperpage'} || !$CPVAR{'itemsperpage'}>
+    <cpanel setvar="itemsperpage=10">
+</cpanelif>
+<script type="text/javascript">
+//<![CDATA[
+<cpanel relinclude="js/expander_optimized.js">
+truncate_on = 1;
+truncate_wrap = 1;
+truncate_tooltips = 0;
+ajaxloader_on = 1;
+register_truncate_table('ftptbl');
+
+var modeddir = 0;
+
+function MM_jumpMenu(targ,selObj,restore){ //v3.0
+  eval(targ+".location='"+selObj.options[selObj.selectedIndex].value+"'");
+  if (restore) selObj.selectedIndex=0;
+}
+//]]>
+</script>
+
+</cpanelfeature>	
+		
+<div class="body-content">		
+<style type="text/css">
+<?cp Branding::spritelist(.spriteicon_img_mini {float:left;margin-right:5px;background: url\{leftparenthesis}"%"\{rightparenthesis};} %,@spriteurl,images::#icon-${img}_mini {background-position\{colon}0 -${cssposition}px;width\{colon}${width}px;height\{colon}${height}px; }:) imgtype=icon,subtype=img,method=scale_60percent,format=png,img=ftpaccounts ?>
+</style>
+<cpanelfeature ftpaccts>
+<div class="h1Title"><div class="spriteicon_img_mini" id="icon-ftpaccounts_mini"></div><cpanel langprint="MENUFTPAccounts"></div>
+<p class="description"><cpanel langprint="FTPDescription"> <cpanel print="$CPDATA{'DNS'}"> <cpanel langprint="FTPPostDescript"></p>
+
+<cpanel setvar="vidtut_name=ftpacct">
+<cpanel setvar="vidtut_header=INDXFtpAccounts">
+<cpanel setvar="vidtut_description=VidFtpDesc">
+<cpanel setvar="vidtut_video_name=ftpacct_lo">
+<cpanel setvar="vidtut_width=450">
+<cpanel setvar="vidtut_height=353">
+<cpanel include="../video_tutorial_include.html">
+
+</cpanelfeature>
+           <cpanelfeature !ftpaccts> 
+			<style text="text/css">
+				.expbox{
+					display:none;
+				}
+			</style>
+			</cpanelfeature>
+			<cpanelfeature ftpaccts> 
+					<h2><cpanel langprint="FTPAddedHead"></h2>
+					<?cp StatsBar::stat( [p class="caution"]$LANG{'statsattention'}&nbsp;%&nbsp;$LANG{'statsoutof'}&nbsp;%$LANG{'available'}&nbsp;$LANG{'MENUFTPAccounts'}[/p],count,max) display=ftpaccounts,warnings=1,warninglevel=80,infinitylang=true ?>
+					<cpanelif $CPVAR{'statsbar_ftpaccounts_maxed'}>
+					 	<style type="text/css">
+							.highlight{
+									display:none;
+									}			
+						</style>
+						<p class="alert_box"><cpanel langprint="QuotaWarning1"> <cpanel langprint="MENUFTPAccounts">. <cpanel langprint="QuotaWarning2">  </p> 
+					</cpanelif>
+				
+				
+				<cpanel include="add_ftp_form.html">
+			</cpanelfeature>
+
+<br /><br />
+<cpanelfeature ftpaccts>
+<h2><cpanel langprint="FTPAcctManagement"></h2>
+<cpanel relinclude="expander/css_include.html">
+<script type="text/javascript">
+register_expander_container('ftptbl');
+register_expander_obj('passwd');
+register_expander_obj('delete');
+register_expander_obj('clientconf');
+</script>
+<div class="search-panel">		
+<form method="get"><span class="boldit"><cpanel langprint="SESearchButton"></span><input type="text" size="15" name="searchregex" value="<cpanel print="$FORM{'searchregex'}">" /><input type="submit" class="input-button" value="<cpanel langprint="go">" /></form>
+</div>
+
+<table width="690" border="0" cellpadding="0" cellspacing="0" id="ftptbl" class="sortable truncate-table">
+	<tr>
+		<th class="cell" scope="col"><cpanel langprint="FTPUser"></th>
+		<th class="cell" scope="col" nonsortable="true"><cpanel langprint="FTPType"></th>
+		<th class="cell" scope="col"><cpanel langprint="FTPDirectory"></th>
+		<th class="cell" scope="col" nonsortable="true" colspan="3"><cpanel langprint="FTPFunctions"></th>
+	</tr>
+<?cp Ftp::listftpwithdisk(
+[tr  class="row-%"]
+	[td class="cell truncate"]%[/td]
+	[td class="cell" align="center"][img alt="%" src="$MAGICREVISION{'images/%.gif'}" /][/td]
+	[td class="cell" align="left" width="1\{percent}" nowrap="nowrap"][div class="exptxtboxpre" id="homedir-%"][span id="homedir-txt-%"]%[/span][/div][/td]
+	[td class="maindisp" nowrap="nowrap" colspan="3" style="padding-bottom: 5px;"]
+		[form action="redirect.html"]
+			[div align="center"]
+				[select name="url" onchange="MM_jumpMenu\{leftparenthesis}'parent'\{comma}this\{comma}0\{rightparenthesis}"] 
+					[option selected="selected"]$LANG{'Choose'}[/option]
+					[option id="delete" value="dodelftp.html?login=%&amp;type=%&amp;homedir=%" on="on" onchange="return confirmSubmit\{leftparenthesis}\{rightparenthesis}" ]$LANG{'Delete'}[/option]
+					[option value="passwdftp.html?acct=%&amp;type=%"]$LANG{'TChangePass'}[/option]
+					[option value="configure.html?acct=%&amp;type=%"]$LANG{'ConfigFtp'}[/option]
+				[/select]
+				[input class="input-button" type="submit" value="$BRLANG{'go'}" /]
+			[/div]
+		[/form]
+	[/td]
+	[td class="mainhide" colspan="3" nowrap="nowrap" style="padding-left: 6px;" width="150"]
+		[div style="width: 150px;"]
+			[div class="expbox" id="delete-%" onmouseover="runAnimOver[[this]];"][a href="dodelftp.html?login=%&amp;type=%&amp;homedir=%"][img id="delete-img-%" src="$BRANDINGIMG{'email-del}" width="16" height="16" border="0" align="middle" /][br /][span id="delete-txt-%"]$BRLANG{'Delete'}[/span][/a][/div]
+			[div class="expbox" id="passwd-%" onmouseover="runAnimOver[[this]];"][a href="passwdftp.html?acct=%&amp;type=%"][img id="passwd-img-%" src="$BRANDINGIMG{'email-pass'}" width="16" height="16" border="0" align="middle" /][br /][span id="passwd-txt-%"]$BRLANG{'TChangePass'}[/span][/a][/div]
+			[div class="expbox" id="clientconf-%" onmouseover="runAnimOver[[this]];"][a href="configure.html?acct=%&amp;type=%"][img id="clientconf-img-%" src="$BRANDINGIMG{'ftpclient-config'}" width="16" height="16" border="0" align="middle" /][br /][span id="clientconf-txt-%"]$BRLANG{'ConfigFtp'}[/span][/a][/div]
+		[/div]
+	[/td]
+[/tr]
+,*num,serverlogin,accttype,accttype,serverlogin,serverlogin,htmldir,login,accttype,dir,login,accttype,login,accttype,serverlogin,login,accttype,dir,serverlogin,serverlogin,serverlogin,login,accttype,serverlogin,serverlogin,serverlogin,login,accttype,serverlogin,serverlogin) api2_paginate=1,api2_paginate_start=$FORM{'api2_paginate_start'},api2_paginate_size=$CPVAR{'itemsperpage'},regex=$FORM{'searchregex'},infinitylang=true,dirhtml=[img border="0" src="$BRANDINGIMG{'homeb'}" alt="" align="middle" /] ?>
+</table>
+	<?cp UI::paginate(%,paginator) currentpage=$CPVAR{'currentpage'},pages=$CPVAR{'pages'},itemsperpage=$CPVAR{'itemsperpage'} ?>
+	<cpanelif $CPVAR{'pages'} && !$CPVAR{'pages'}==1>
+	<div style="float:right"><form>
+	<cpanel langprint="PaginatorShowing"> <select name="itemsperpage" onchange="this.form.submit();">
+	<?cp UI::paginate_list([option value="%" %]%[/option],item,selected=1?selected:,item) itemsperpage=$CPVAR{'itemsperpage'},itemlist=10:25:50:100:250:500 ?>
+	</select><noscript><button id="my_button" onclick="" type="submit" Value=""><cpanel Locale="maketext('Change')"></button></noscript>  <cpanel langprint="PaginatorResults"> 
+	</form></div>
+	</cpanelif>	<br /><br />
+
+
+<cpanel include="accountslegendinclude.html">
+</cpanelfeature>
+<cpanelfeature !ftpaccts>
+	<cpanel include="../refresh.html">
+</cpanelfeature>
+
+</div>
+<div id="divgen_expand"></div>
+
+<cpanel Branding="include(stdfooter.html)">
+

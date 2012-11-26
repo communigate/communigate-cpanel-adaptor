@@ -1,0 +1,51 @@
+<H2>¿Qué es un filtro?</H2>
+<P>Un filtro es una herramienta que procesa el correo de acuerdo a sus 
+preferencias. Por ejemplo, un filtro puede automáticamente descartar 
+correo&nbsp;basura, o guardar el correo de un remitente específico en su propia 
+carpeta.</P>
+<P>En cPanel, los filtros pueden ser aplicados a todos los correos del dominio 
+(filtros de nivel de cuenta), o a cada cuenta individual (filtros de nivel del 
+usuario).</P>
+<H2>Crear o editar un filtro</H2>
+<P>1. Ingrese un nombre para su nuevo filtro en la casilla <EM>Nombre de 
+filtro</EM>.</P>
+<UL>
+  <LI>Recuerde utilizar un nombre diferente para cada filtro. Utilizar el mismo 
+  nombre causará que los filtros se sobrescriban </LI></UL>
+<P>2. Seleccione la característica de correo electrónico que desea utilizar para 
+filtrarlo.</P>
+<P>3. Seleccione los criterios (u <EM>operador</EM>) que desea utilizar para 
+filtrar el correo electrónico.</P>
+<P>4. En la casilla de texto, ingrese los caracteres o palabras clave que desea 
+utilizar para filtrar el correo.</P>
+<P>5. Haga clic en el botón <EM>+</EM> para agregar la regla. Se puede agregar 
+más de una regla.</P>
+<UL>
+  <LI>Haga clic en el botón <EM>-</EM> para para eliminar una regla. </LI></UL>
+<P>6. Seleccione la acción que desea tomar con el correo "capturado" por el 
+filtro.</P>
+<P>7. Haga clic en el botón <EM>+</EM> para agregar la acción. Se puede agregar 
+más de una acción.</P>
+<UL>
+  <LI>Haga clic en el botón <EM>-</EM> para para eliminar una acción. </LI></UL>
+<P>8. Haga clic en <EM>Activar</EM>.</P>
+<H2>Reglas y acciones de filtro</H2>
+<P>Se pueden elegir reglas y acciones entre diversas opciones. Nuestra 
+documentación incluye una <A 
+href="http://etwiki.cpanel.net/twiki/bin/view/AllDocumentation/CpanelDocs/FilterOptions">lista 
+completa de opciones de configuración de filtro</A>.</P>
+<H2>Acerca de los operadores</H2>
+<P>Cuando se crea un filtro utilizando diversos operadores, es útil tener en 
+cuenta que cPanel siempre procesará el operador "and" antes del operador "or". 
+Como resultado, los filtros de correo electrónico serán procesados de la 
+siguiente forma:</P>
+<UL>
+  <LI><EM>A "or" B "and" C</EM> será procesado como <EM>A "or" (B "and" C)</EM>. 
+
+  <LI><EM>A "and" B "or" C</EM> será procesado como <EM>(A "and" B) "or" C</EM>. 
+  </LI></UL>
+<P>Si desea crear un filtro como por ejemplo <EM>(A "or" B) "and" (C "or" 
+D)</EM> deberá hacerlo de la siguiente forma:</P>
+<UL>
+  <LI><EM>(A "and" C) "or" (A "and" D) "or" (B "and" C) "or" (B "and" D)</EM>. 
+  </LI></UL>

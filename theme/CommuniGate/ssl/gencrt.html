@@ -1,0 +1,39 @@
+<cpanel setvar="headerimg=../images/toperrorpages.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+<style type="text/css">
+<?cp Branding::spritelist(.spriteicon_img_mini {float:left;margin-right:5px;background: url\{leftparenthesis}"%"\{rightparenthesis};} %,@spriteurl,images::#icon-${img}_mini {background-position\{colon}0 -${cssposition}px;width\{colon}${width}px;height\{colon}${height}px; }:) imgtype=icon,subtype=img,method=scale_60percent,format=png,img=ssl-manager ?>
+</style>		
+<div class="body-content">
+
+<div class="h1Title"><div class="spriteicon_img_mini" id="icon-ssl-manager_mini"></div> <cpanel langprint="TSSLManager"></div>
+<!--<cpanel SSL="gencrt($FORM{'host'},$FORM{'country'},$FORM{'state'},$FORM{'city'},$FORM{'company'},$FORM{'companydivision'},$FORM{'email'})">-->	
+<cpanelif !$CPERROR{'sslmanger'}>
+		<p class="description"><cpanel Locale=maketext("The certificate has been saved. Please note that the certificate will display as “untrusted” in web browsers after it is installed.")></p>
+		<h2><cpanel langprint="SSLCertGen"></h2>
+			<p class="description"><cpanel langprint="GenCertDesc2"></p>
+			<div align="center">
+				<textarea class="output" cols="66" rows="23" name="GenerateCRT"><cpanel SSL="showcrt($FORM{'host'})"></textarea>
+			</div>
+		<br /><br />
+		<h2><cpanel langprint="CertInfo"></h2>
+			<div align="center">
+				<textarea class="output" cols="66" rows="23" name="Info"><cpanel SSL="showcrt($FORM{'host'},1)"></textarea>
+			</div>
+	</cpanelif>
+	<cpanelif $CPERROR{'sslmanager'}>
+    	<p class="errors"><cpanel langprint="GenCertProblem">&nbsp;<a href="#"
+onclick="document.getElementById('details').style.display='block'; returnfalse;"><cpanel langprint="AODShowDetails"></a></p>
+    	<div class="details" id="details">
+			<cpanel print="$CPERROR{'host'}">
+		</div>
+		<noscript>
+			<div class="details-noscript" id="details">
+				<cpanel print="$CPERROR{'host'}">
+    		</div>
+		</noscript>
+	</cpanelif>
+	
+<div class="return-link"><a href="crts.html"><cpanel Locale="maketext('Return to Certificates')"></a> | <a href="index.html"><cpanel langprint="SSLReturn"></a></div>
+</div>
+<cpanel Branding="include(stdfooter.html)">

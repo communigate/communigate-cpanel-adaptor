@@ -1,0 +1,43 @@
+<cpanel setvar="headerimg=../images/tools.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+<div class="body-content">
+<h1><cpanel langprint="BUWizard"></h1>
+
+<div id="backup-nav">
+	<h2><cpanel langprint="Steps"></h2>
+	<ol class="clear">
+		<li class="one"><a href="wizard.html"><span><cpanel langprint="BURes"></span></a></li>
+		<li class="two"><span class="current"><cpanel langprint="FullorPart"></span></li>
+		<li class="three"><span><cpanel langprint="FMDL"></span></li>
+	</ol>
+</div>
+<!-- END #backup-nav -->
+
+<div class="clear" id="br-wrap">
+	
+	<div id="br-content-main">
+		<h2><cpanel langprint="FullBU"></h2>
+		<p><cpanel langprint="FullBUdesc"></p>
+		<p><a href="wizard-fullbackup.html" id="wizard-backup-full"><span><cpanel langprint="FullBU"> &rarr;</span></a></p>
+		<p><cpanel langprint="FullBUNote"></p>
+	</div>
+	
+	<div id="br-content-sec">
+		<h2><cpanel langprint="SelPartBU"></h2>
+		<p><cpanel langprint="SelPartBUdesc"></p>
+		<ul id="wizard-backup-type">
+			<li><a href="wizard-backup-type.html?type=homedir"><cpanel langprint="BUFullOptHome"> &rarr;</a></li>
+			<cpanelfeature mysql><li><a href="wizard-backup-type.html?type=mysql"><cpanel langprint="BUMySQL"> &rarr;</a></li></cpanelfeature>
+			<cpanelfeature forwarders><li><a href="wizard-backup-type.html?type=email"><cpanel langprint="BUEmailFwds"> </cpanelfeature> <cpanelfeature blockers>&amp; <cpanel langprint="BUFilterList"></cpanelfeature> <cpanelfeature forwarders>&rarr;</a></li></cpanelfeature>
+		</ul>
+	</div>
+	
+</div>
+<!-- END #br-wrap -->
+
+<div class="return-link"><a href="wizard.html">&larr; <cptext "Go Back"></a></div>
+
+</div><!-- end body-content -->
+
+<cpanel Branding="include(stdfooter.html)">

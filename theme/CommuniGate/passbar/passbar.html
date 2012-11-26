@@ -1,0 +1,25 @@
+<style type="text/css">
+    <cpanel relinclude="passbar/passbar.css">
+</style>
+<script type="text/javascript">
+var pass_strength_phrases = {
+    0: '<cpanel langprint="DPVWeak">',
+    10: '<cpanel langprint="DPVWeak">',
+    20: '<cpanel langprint="DPWeak">',
+    30: '<cpanel langprint="DPWeak">',
+    40: '<cpanel langprint="DPWeak">',
+    50: '<cpanel langprint="DPOK">',
+    60: '<cpanel langprint="DPOK">',
+    70: '<cpanel langprint="DPStrong">',
+    80: '<cpanel langprint="DPStrong">',
+    90: '<cpanel langprint="DPVStrong">',
+    100: '<cpanel langprint="DPVStrong">'
+};
+<cpanel relinclude="js/password_strength_optimized.js">
+</script>
+
+
+<input type="password" name="password" onkeyup="updatePasswordStrength_new(this,'passwdRating',{ 'text':2 });" /></td>
+        <td><div id="passwdRating"><cpanel langprint="DPStrength">:
+<div id="pass_bar" class="pass_bar"><div class="progress_bar_base"></div></div>
+<div style="display:inline;" id="ps-rating"><cpanel langprint="DPVWeak"> (0/100)</div></div>

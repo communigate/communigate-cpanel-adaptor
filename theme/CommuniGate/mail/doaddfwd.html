@@ -1,0 +1,60 @@
+<cpanel setvar="headerimg=../images/mailmenu.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+<div class="body-content">
+<h1><cpanel langprint="FWAddanew"></h1>
+
+<p><?cp CommuniGate::addforward($LANG{'FWAddedTextPreSource'} [b]%[/b] $LANG{'FWAddedTextPreTarget'} [b]%[/b].[br /],email,forward) email=$FORM{'email'},domain=$FORM{'domain'},fwdopt=$FORM{'fwdopt'},failmsgs=$FORM{'failmsgs'},pipefwd=$FORM{'pipefwd'},fwdemail=$FORM{'fwdemail'},fwdsystem=$FORM{'fwdsystem'} || 'maketext('The forwarder could not be added.')' ?></p>
+<cpanelif $CPERROR{'CommuniGate'}>
+<p><cpanel print="$CPERROR{'CommuniGate'}"></p>
+</cpanelif>
+<cpanel Email="checkpipefwd($FORM{'pipefwd'})">
+
+
+
+<!-- <cpanelif $CPERROR{'CommuniGate'}>
+		 <a href="#" onclick="document.getElementById('details').style.display='block'; return false;">
+	<cpanel langprint="AODShowDetails"></a> </p>
+
+	  <div class="details" id="details">
+	        <cpanel print="$CPERROR{'CommuniGate'}">
+	    </div>
+		<noscript>
+		<div class="details-noscript" id="details">
+	      <cpanel print="$CPERROR{'CommuniGate'}">
+	    </div>
+		</noscript>
+</cpanelif> -->
+
+
+<cpanelif $CPVAR{'pipefwd_needs_fixup'}>
+<cpanel langprint="FWPipeCheckPipeTo">
+<i>"<img src="../images/homeb.gif" alt="home" align="absmiddle" />/<cpanel print="$FORM{'pipefwd'}">"</i>
+<cpanel langprint="FWPipeCheckProblems">
+</cpanelif>
+<cpanelif $CPVAR{'pipefwd_needs_hashbang'}>
+<blockquote>
+<cpanel langprint="FWPipeCheckHashbang">
+</blockquote>
+</cpanelif>
+<cpanelif $CPVAR{'pipefwd_needs_plusx'}>
+<blockquote>
+<cpanel langprint="FWPipeCheckPlusX">
+</blockquote>
+</cpanelif>
+<cpanelif $CPVAR{'pipefwd_needs_fixup'}>
+<cpanel langprint="FWPipeNeedsFixUp">
+<a href="fixpipeprog.html?return=fwd&prog=<cpanel formprint="$FORM{'pipefwd'}">"  class="create-button"><cpanel langprint="FWPipeAction"></a>
+</cpanelif>
+
+ 
+<cpanelif $appname==webmail>
+		 <div class="return-link"><a href="../index.html">&larr; <cptext "Go Back"></a></div>
+</cpanelif>
+
+<cpanelif !$appname==webmail>
+		 <div class="return-link"><a href="fwds.html">&larr; <cptext "Go Back"></a></div>
+</cpanelif>
+
+</div>
+<cpanel Branding="include(stdfooter.html)">

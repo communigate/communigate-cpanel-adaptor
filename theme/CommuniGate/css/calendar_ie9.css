@@ -1,0 +1,9 @@
+.yui-skin-sam .yui-calendar td.calcell {
+    background-color: none;
+    -cp-background-image: linear-gradient(#ffffff, #f4f4f4);
+    behavior: url(/cjt/ie9gradients.htc);
+}
+
+.yui-skin-sam .yui-calendar td.calcell.oom {
+    -cp-background-image: linear-gradient(#ececec, #cccccc);
+}

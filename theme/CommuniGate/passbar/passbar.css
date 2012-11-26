@@ -1,0 +1,63 @@
+.pass_bar_0 {
+    width: 0px;
+    background-color: #EA0000;
+}
+.pass_bar_10 {
+    width: 10px;
+    background-color: #EA0000;
+}
+.pass_bar_20 {
+    width: 20px;
+    background-color: #EA0000;
+}
+.pass_bar_30 {
+    width: 30px;
+    background-color: #FFCC00;
+}
+.pass_bar_40 {
+    width: 40px;
+    background-color: #FFCC00;
+}
+.pass_bar_50 {
+    width: 50px;
+    background-color: #FFCC00;
+}
+.pass_bar_60 {
+    width: 60px;
+    background-color: #00CC33;
+}
+.pass_bar_70 {
+    width: 70px;
+    background-color: #00CC33;
+}
+.pass_bar_80 {
+    width: 80px;
+    background-color: #00CC33;
+}
+.pass_bar_90 {
+    width: 90px;
+    background-color: #00CC33;
+}
+.pass_bar_100 {
+    width: 100px;
+    background-color: #00CC33;
+
+}
+.progress_bar_base, .progress_barbig_base,.pass_bar_base {
+    float:left;
+    height: 10px;
+    text-align:left;
+}
+
+.progressbar, .progressbarbig, .pass_bar {
+    background-color: #fff;
+    width:100px;
+    height:10px;
+    padding:0;
+    margin:0;
+    border: 1px solid #999;
+}
+.progressbarbig, .progress_barbig_base{
+    height: 16px;
+}
+

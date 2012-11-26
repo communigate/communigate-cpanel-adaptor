@@ -1,0 +1,49 @@
+<script type="text/javascript">
+var webmail_disable_link = '[ Disable AutoLoad ]';
+var webmail_enable_link = '[ Enable AutoLoad ]';
+<cpanel relinclude="js/webmaillogin_optimized.js">
+</script>
+<!-- START webmailtimer-pop.html -->
+<div id="webmailtimer_win" style="display: none;">
+<div class="hd"><div class="lt"></div>
+<span><cpanel langprint="WebmailAutoLoadTitle"></span><div class="rt"></div></div>
+<div class="bd">
+<div class="content" id="webmailtimer-content" style="padding: 15px; height: 75px;">
+<form method="post" action="nvset.xml">
+<p style="margin: 10px 0;">
+    <span id="mailclientname">
+
+    </span>
+<span>&nbsp;</span>
+    <cpanel langprint="WebmailAutoLoad1">
+<input type="hidden" name="names" value="webmail_autoload_numseconds">
+<input type="text" name="webmail_autoload_numseconds" value="5" size="2">
+ <cpanel langprint="WebmailAutoLoad2">
+</p>
+</form>
+<br />
+</div>
+</div>
+</div>
+<!-- END webmailtimer-pop.html -->
+<!-- START webmailselect-pop.html -->
+<div id="webmailselect_win" style="display: none;">
+<div class="hd"><div class="lt"></div>
+<span><cpanel langprint="WebmailAutoLoad"></span><div class="rt"></div></div>
+<div class="bd">
+<div class="content" id="webmailselect-content" style="padding: 15px; height: 105px;">
+<p style="font: 14px Verdana, Arial, Helvetica, sans-serif bold; margin: 0; padding-bottom:0; color: #014251;">
+<cpanel langprint="WebmailAutoLoadDescription">
+</p>
+<p style="margin: 10px 0;">
+
+    <div id="mailclients">
+
+    </div>
+<br />
+<p align="center" style="margin: 0 auto;"><input type="button" onclick="disable_webmailselect();" value="<cpanel langprint="RubyAppsStop">" /></p>
+
+</div>
+</div>
+</div>
+<!-- END webmailselect-pop.html -->

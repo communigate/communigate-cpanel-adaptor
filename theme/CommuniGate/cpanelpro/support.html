@@ -1,0 +1,23 @@
+<cpanel setvar="headerimg=../images/toppassword.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+<style type="text/css">
+<?cp Branding::spritelist(.spriteicon_img_mini {float:left;margin-right:5px;background: url\{leftparenthesis}"%"\{rightparenthesis};} %,@spriteurl,images::#icon-${img}_mini {background-position\{colon}0 -${cssposition}px;width\{colon}${width}px;height\{colon}${height}px; }:) imgtype=icon,subtype=img,method=scale_60percent,format=png,img=submit-support ?>
+</style>
+<div class="body-content">
+	
+<cpanelfeature cpanelpro_support>
+<div class="h1Title"><div class="spriteicon_img_mini" id="icon-submit-support_mini"></div><cpanel langprint="SRSHeader"></div>
+<br /><br /><br />
+<cpanel Branding="contactinclude(supportinfo_include.html)">
+
+<cpanelif !$CPVAR{'has_supportinfo_include'}>
+	<cpanel SupportRequest="form()"></cpanelfeature>
+</cpanelif>
+
+<cpanelfeature !cpanelpro_support>
+	<cpanel include="../refresh.html">
+</cpanelfeature>
+
+</div><!-- end body-content -->
+<cpanel Branding="include(stdfooter.html)">

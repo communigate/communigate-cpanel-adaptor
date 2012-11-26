@@ -1,0 +1,496 @@
+
+/********************************************X3 STYLES*************************************/
+/*******************************************************************************************/
+body {
+font-family:verdana, arial, helvetica, sans-serif;
+font-size:11px;
+background:none;
+background-color:#fff;
+max-width:  200px;
+margin-left:5px;
+}
+#body-content{
+	clear:both;
+	margin-top:10px;
+}
+html body img{
+	display:none;
+	background:none;
+}
+#cpanel{
+	
+	border-bottom:none;
+	background-color:#FFFFFF;
+}
+#cpanel #border-efx{
+	margin:0;
+	padding:0;
+}
+h6 {
+	background:none;
+}
+#logo{
+	display:block;
+}
+#logo img{
+	display:inline;
+}
+#handheld-head{
+	
+}
+a:link,a:visited,a:active {
+color:#014D5F;
+text-decoration:none;
+}
+
+a:hover {
+color:#F3960B;
+text-decoration:underline;
+}
+
+#reseller-drop {
+text-align:center;
+font-size:11px;
+}
+
+#manage-list {
+    float:right:
+    text-align:right;
+}
+
+#togglebox {
+float:right;
+font-size:10px;
+margin:0;
+padding:0;
+}
+
+.sortarrow {
+padding:0;
+margin:0 0 0 -5px;
+font-size:14px;
+}
+h1 {
+font-size:12px;
+}
+
+h2 {
+font-size:11px;
+}
+
+.body-content h1 {
+font-family:verdana, arial, helvetica, sans-serif;
+font-size:12px;
+font-weight:700;
+color:#000;
+}
+.body-content h2 {
+
+}
+
+.body-content p,p {
+font-size:11px;
+}
+
+.spaced {
+line-height:24px;
+}
+
+.body-content h2 {
+font-size:11px;
+}
+
+.select-drop {
+padding:0;
+}
+.create-button {
+font-size:11px;
+height:22px;
+padding:2px 4px;
+border:1px outset #F0F0F0;
+text-align:center;
+}
+.sortable td a:hover.create-button {
+	
+}
+.create-button:hover {
+
+}
+.input-button {
+
+}
+
+.input-button:hover {
+
+}
+
+#stats-but {
+text-align:center;
+}
+
+#stats-but a {
+text-align:center;
+display:inline;
+}
+.boldit {
+font-weight:700;
+}
+
+.nomargins {
+margin:0;
+padding:0;
+}
+
+.clearit {
+clear:both;
+margin:0;
+padding:0;
+}
+
+.section-indent {
+margin-left:24px;
+margin-top:-6px;
+}
+
+caption {
+font-weight:700;
+}
+
+.status {
+color:#00566a;
+font-weight:700;
+}
+
+.caution {
+color:#fAA523;
+font-weight:700;
+}
+
+.return-link {
+padding-top:20px;
+text-align:center;
+}
+.return-link-top {
+padding-top:20px;
+padding-bottom:8px;
+text-align:center;
+}
+
+.output b {
+font-weight:900;
+}
+
+
+.output {
+overflow:auto;
+background-color:#f3f3f3;
+font-family:"Andale Mono", "Courier New", Courier, monospace;
+color:#000;
+font-size:12px;
+border:1px solid #555;
+}
+
+.error {
+color:#900;
+font-family:Arial, sans-serif;
+font-size:13px;
+}
+
+.errortext {
+background-color:red;
+color:#FFF;
+font-family:Arial, sans-serif;
+font-size:13px;
+padding:5px;
+}
+
+.details,
+.details-noscript{
+background-color:#ccc;
+padding:8px;
+border:1px #aaa solid;
+overflow:auto;
+display:none;
+font-weight:normal;
+font-family:Verdana, Arial, helvetica, sans-serif;
+font-size:12px;
+width:500px;
+margin:0 auto;
+}
+.details-noscript{
+	display:block;
+}
+
+.hidden-img {
+display:none;
+}
+
+#latest-visit fieldset {
+width:100%;
+display:inline-table;
+}
+
+#latest-visit li {
+list-style-image:url(../images/display.jpg);
+}
+
+#latest-visit {
+font-size:11px;
+}
+
+h6.sfhover {
+background:url(../branding/tbl-bg-over.jpg) repeat-x bottom;
+cursor:pointer;
+}
+
+/*****************CPADDONS STYLES******************************/
+ul {
+list-style:none;
+}
+
+#center {
+text-align:center;
+}
+
+#cpaddonname {
+font-size:12px;
+}
+
+#cpaddoncategory {
+font-size:11px;
+}
+
+/********************************************TABLE STYLES*************************************/
+/*******************************************************************************************/
+.formtbl {
+font-size:12px;
+font-family:Verdana, Arial, sans-serif;
+border:none;
+border-collapse:collapse;
+}
+
+.formtbl .nobrds {
+border:none;
+}
+
+.formtbl .info-odd {
+background-color:#F3F3F3;
+border-bottom:1px solid #ccc;
+padding:5px;
+}
+
+.formtbl .info-even 
+
+/* Sortable tables */
+table.sortable, 
+table.sortable caption, 
+table.sortable th, 
+table.sortable th a,
+table.sortable th a:active, 
+table.sortable th a:visited, 
+table.sortable a:hover, 
+table.sortable, 
+table.sortable td, 
+.sortable .nobrd ,
+.sortable .nobrd-left, 
+.sortable .nobrd-right, 
+.sortable .nobrd-center, 
+.sortable .sql, 
+.sortable .row-odd,
+.sortable .info-odd, 
+.sortable .row-even,
+.sortable .info-even{
+	margin:0;
+	padding:0;
+	display:block;
+	background:none;
+}
+
+.be-screenshot {
+padding:10px 25px;
+text-align:center;
+float:left;
+}
+
+#screenshotcontainer {
+text-align:center;
+margin-left:90px;
+/**/}
+
+/********************************************Boxes************************************
+These styles are applied to index.html to manage the boxes
+**************************************************************************************/
+#boxes ,
+#files,#logs,#mail,#domains,#db,#sec,#software,#pref,#advanced, 
+.celldrop_active, 
+.celldrop, 
+.topcell, 
+.cellform,
+.cellbox,
+#main .item,
+.itemlink, 
+.clearit, 
+.clearith, 
+.clearitmed, 
+.clearitsm, 
+.cellheading, 
+h6, 
+h3, 
+h6:hover, 
+#switcher .switcher-head, 
+#content-stats,
+.domaintxt, 
+#stats table, 
+#stats table,#stats td,#stats tr, 
+#stats td,
+#stats .nopad-nobrd
+#stats .row-odd,
+#stats .row-even, 
+#stats .stat-head, 
+#stats .txt, 
+#expand,
+#notices,#quota-warnings, 
+#content-stats h3,#content-stats h3:hover, 
+#notices h6,#quota-warnings h6,#content-stats h6,
+#notices p,#quota-warnings p,
+#notices ul, 
+#notices li ,
+.warning,
+#fileman td{
+	display:block;
+	width:200px;
+}
+/********************************************CSS Layout Styles************************************
+These styles position elements on screen.
+Their are IE independent style sheets for IE6 & IE7 (ie6.css & ie7.css).
+**************************************************************************************/
+
+.body-content {
+	font-size:11px;
+}	
+
+#cpanel,
+#cpanel #border-efx,
+#cpanel #border-efx #heading-top-header-bg,
+#cpanel #border-efx #heading-top-header-bg #heading-top-billboard ,
+#cpanel #border-efx #heading-top-header-bg #heading-top-billboard #logo,
+#cpanel #border-efx #content,
+#content .body-content,
+.body-content,
+#cpanel #border-efx #content #switch,
+#cpanel #border-efx #content #sub,
+#cpanel #border-efx #content #main,
+#cpanel #border-efx .footer,
+#cpanel #border-efx #content #main-content,
+.footer ul{
+	display:block;
+}
+#switch{
+	display:none;
+}
+
+
+.
+.clearit{
+	clear:both;
+}
+.nowrap-td{
+	word-wrap:break-word;
+	overflow:hidden;
+	width:109px;
+}
+
+/*CSS Three column layout*/
+.threecontainer{
+	width: 100%;
+	text-align: center;
+}
+.threebox{
+	float: left;
+	text-align: center;
+	width: 205px;
+}
+.ftplogo{
+	width: 205px;
+	height: 82px;
+	text-align: center;
+}
+.cap{
+	margin-bottom:10px;
+	font-weight:bold;
+}
+/* generated from branding editor */
+#cpanel #border-efx #heading-top-header-bg #heading-top-billboard #logo { top: 48px; left: 584px; }
+/*#cpanel #border-efx #heading-top-header-bg #heading-top-billboard #logo img {  }*/
+.jump {
+	margin-left:-11px;
+	font-size:10px;
+	float:right;
+	}
+
+
+.yui-tt {
+    visibility:hidden;
+    position:absolute;
+    color:#333;
+    background-color:#FDFFB4;
+    font-family:arial,helvetica,verdana,sans-serif;
+    padding:2px;
+    border:1px solid #FCC90D;
+    font:100% sans-serif;
+    width:auto;
+}
+/*Module Installer Styles*/
+.module-path {
+	background-color: #eee;
+	border: 1px solid #ccc;
+	padding: 3px;
+}
+
+.highlight {
+	background: #D7FFE9;
+	border: 1px solid #ACCCB8;
+	padding: 0 10px 5px;
+}
+
+.highlight h2 {
+	margin: 10px 0 7px 0;
+}
+
+#module-output {
+	background: #D7FFE9;
+	border: 1px solid #ACCCB8;
+	overflow: auto;
+	padding: 0 10px;
+	width: 680px;
+}
+
+.module-table {
+	width: 100%;
+}
+
+.module-table th, .module-table td {
+	padding: 5px;
+}
+
+.module-table th {
+	background: #eee;
+	border: 1px solid #ccc;
+	border-width: 1px 0;
+	font-weight: normal;
+	text-align: left;
+	text-transform: uppercase;
+}
+
+.module-table tr:hover {
+	background: #f5f5f5;
+}
+
+.module-table td {
+	border-bottom: 1px solid #ccc;
+	color: #333;
+}
+
+.module-table td:hover {
+	color: #000;
+}

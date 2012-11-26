@@ -1,0 +1,35 @@
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+
+
+ <style type="text/css">
+<?cp Branding::spritelist(.spriteicon_img_mini {float:left;margin-right:5px;background: url\{leftparenthesis}"%"\{rightparenthesis};} %,@spriteurl,images::#icon-${img}_mini {background-position\{colon}0 -${cssposition}px;width\{colon}${width}px;height\{colon}${height}px; }:) imgtype=icon,subtype=img,method=scale_60percent ?>
+</style>
+<div class="body-content">
+
+<h1><div class="spriteicon_img_mini" id="icon-getstart_mini"></div><cpanel langprint="gswtitle"></h1>
+
+<cpanel include="jumpmenu.html">
+
+<div class="h1Title"><cpanel langprint="gswintrotohosting"></div>
+
+<h2><cpanel langprint="GSWGetFiles"></h2>
+<p><cpanel langprint="GSWFileChoice1"> <cpanelfeature webdisk> <cpanel langprint="GSWFileChoice2"></cpanelfeature><cpanelfeature ftpaccounts>.</p>
+
+<h2><cpanel langprint="GSWFileMan"></h2>
+<p><cpanel langprint="GSWFileManDesc1"> <img src="../images/filemanager_small.jpg" alt="<cpanel Locale="maketext('File Manager')">" /> <cpanel langprint="GSWFileManDesc2"></p>
+
+<cpanelfeature webdisk><h2><cpanel langprint="MENUWebDisk"></h2> 
+<p><cpanel langprint="GSWWebDiskDesc"></p></cpanelfeature>
+
+<cpanelfeature ftpaccounts><h2><!-- <div class="spriteicon_img_mini" id="icon-ftpaccounts_mini"></div> --><cpanel langprint="MENUFTPAccounts"></h2>
+<p><cpanel langprint="GSWFTPDesc1">  <cpanel langprint="GSWFTPDesc2"></p></cpanelfeature>
+
+
+<br /><br />
+<div align="right"><form method="link" action="webdisk.html"><input type="submit" class="input-button" value="<cpanel langprint="NextStep">"></form>
+</div>
+
+</div>
+
+<cpanel Branding="include(stdfooter.html)">

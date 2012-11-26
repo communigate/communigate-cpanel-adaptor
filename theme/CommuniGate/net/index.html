@@ -1,0 +1,57 @@
+<cpanel setvar="headerimg=../images/topnetworktools.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+<cpanelfeature nettools>
+
+	<script type="text/javascript">
+	//<![CDATA[
+
+
+	var init = function() {
+
+		var validation = new CPANEL.validate.validator("<cptext "Network Tools">");
+		validation.add('dns', 'fqdn', '<cptext "Your entry must be a domain name (example.com)">');
+
+		validation.attach();
+
+		CPANEL.validate.attach_to_form("submit-button", validation);
+	};
+
+	YAHOO.util.Event.onDOMReady(init);
+
+	//]]>
+	</script>	
+
+
+<style type="text/css">
+<?cp Branding::spritelist(.spriteicon_img_mini {float:left;margin-right:5px;background: url\{leftparenthesis}"%"\{rightparenthesis};} %,@spriteurl,images::#icon-${img}_mini {background-position\{colon}0 -${cssposition}px;width\{colon}${width}px;height\{colon}${height}px; }:) imgtype=icon,subtype=img,method=scale_60percent,format=png,img=nettools ?>
+</style></cpanelfeature>
+
+<div class="body-content">
+	
+<cpanelfeature nettools><div class="h1Title"><div class="spriteicon_img_mini" id="icon-nettools_mini"></div> <cpanel langprint="nettoolstitle"></div>
+<p class="description"><cpanel langprint="nettoolsdesc"></p>
+<h2><cpanel langprint="nettoolsdl"></h2>
+<p class="description"><cpanel langprint="nettoolsdldesc"></p>
+<div class="highlight"><form action="dnslook.html" id="dnslook" name="dnslook">
+<cpanel langprint="DNSText"> <input type="text" name="dns" id="dns"> <input id = "submit-button" type="submit" class="input-button" value="<cpanel langprint="DNSButton">">
+<span id="dns_error"></span>
+</form></div>
+
+<cpanel Net="sethastraceroute()">
+
+<cpanelif !$CPVAR{'Net_traceroute_disabled'}>
+<h2><a href="traceroute.html"><cpanel langprint="nettoolstrace"></a></h2>
+<p class="description"><cpanel langprint="nettoolstracedesc"></p> 
+<form action="traceroute.html">
+<input type="submit" class="input-button" value="<cpanel langprint="EMDTrace">" />
+</form>
+</cpanelif>
+
+
+</cpanelfeature>
+<cpanelfeature !nettools>
+	<cpanel include="../refresh.html">
+</cpanelfeature>
+</div>
+<cpanel Branding="include(stdfooter.html)">

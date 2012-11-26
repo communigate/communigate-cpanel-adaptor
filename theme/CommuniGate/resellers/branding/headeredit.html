@@ -1,0 +1,302 @@
+<cpanel Branding="tempsetbrandingpkg($RAW_FORM{'brandingpkg'})">
+
+<cpanel setvar="headerimg=../../images/tools.gif">
+<cpanel setvar="dprefix=../../">
+<cpanel include="../../stdbheader.html">
+<cpanel include="../../ajaxhelp.html">
+
+<!--[if IE]>
+<style type="text/css">
+.input-button{
+    background:url(../images/button-bg.jpg) repeat-x top;
+    height:19px;
+    color: #014D5F;
+    vertical-align:middle;
+    margin-top:0px;
+    margin-left:2px;
+}
+</style>
+<![ endif] -->
+
+
+<script type="text/javascript">
+var Brand = new Object();
+var EU = YAHOO.util.Event;
+
+function number_brand(num,file,subtype) {
+    Brand[num]={file:file, subtype:subtype, number:num};
+}
+
+
+function load_branding() {
+
+    for(var i in Brand) {
+        var subtype=Brand[i].subtype;
+        var file=Brand[i].file; 
+        var num = Brand[i].number;
+        var bid =  new String('branding-' + subtype + '-' + file);
+        var el = document.getElementById(bid);
+        if (!el) {
+            bid = bid.replace('_on','_off');
+            el = document.getElementById(bid);
+        }
+        if (!el) {
+            bid = new String('heading-' + file);
+            el = document.getElementById(bid);
+        }
+        if (!el) {
+            bid = bid.replace('_on','_off');
+            el = document.getElementById(bid);
+        } 
+        if (!el) { continue; }
+        var nDiv = document.createElement("div");
+        nDiv.className='snumber';
+        var dTxt = document.createTextNode(num);
+        nDiv.appendChild(dTxt);
+        if (el.nodeName == "DIV") {
+            el.appendChild(nDiv);
+        } else {
+             el.parentNode.insertBefore(nDiv,el);
+        }
+        EU.addListener(nDiv, "click" , clickImage);
+        nDiv.setAttribute('imageid',num);
+    	var elblock = document.getElementById('imgedit-'+num);
+        elblock.setAttribute('bid',bid);
+    	EU.addListener(elblock, "click", clickEl);
+  }
+}
+
+function clickEl(e) {
+	var bid = this.getAttribute('bid');
+	
+
+    var el = document.getElementById(bid);
+    if (!el) { alert("Could not find the bid: " + bid); }
+    relocatebox(el);
+	var boxel = document.getElementById('overflash');
+	boxel.style.display='block';
+    cssoverflash(boxel.id,'over-block',0);
+}
+
+function relocatebox(rel) {
+	var boxel = document.getElementById('overflash');
+    
+    var pt = YAHOO.util.Dom.getXY(rel);
+    if (window.scrollTop != null) {
+		window.scrollTop=pt[1];
+	}
+    if (document.body.scrollTop != null) {
+		document.body.scrollTop=pt[1];
+	}
+	if (document.documentElement.scrollTop != null) {
+		document.documentElement.scrollTop=pt[1];
+	}
+	if (rel.offsetTop > pt[1]) {
+        pt[1]=rel.offsetTop;
+    }
+
+    boxel.style.left = pt[0] + 'px';
+	boxel.style.top  = pt[1] + 'px';
+	boxel.style.width = rel.offsetWidth + 'px';
+	boxel.style.height = rel.offsetHeight + 'px';
+}
+
+function clickImage(e) {
+   YAHOO.util.Event.preventDefault(e);
+
+    var imgnum = this.getAttribute('imageid');
+    window.location.href="#imgeditor"+imgnum;
+    var elblock = document.getElementById('imgedit-'+imgnum);
+    cssflash(elblock.id,elblock.className,0);
+}
+
+
+
+function cssflash(eleid,eleStyle,cc) {
+    var ele = document.getElementById(eleid);
+
+    if (ele.className==eleStyle) {
+        ele.className='flashs';
+    } else {
+        ele.className=eleStyle;
+    }
+
+    cc++;
+
+    if (cc < 10 || ele.className=='flashs') {
+        setTimeout('cssflash("'+ele.id+'","'+eleStyle+'","'+cc+'")',200);
+    }
+}
+
+
+function cssoverflash(eleid,eleStyle,cc) {
+    var ele = document.getElementById(eleid);
+
+    if (ele.className==eleStyle) {
+        ele.className='flashs';
+    } else {
+        ele.className=eleStyle;
+    }
+
+    cc++;
+
+    if (cc < 10 || ele.className=='flashs') {
+        setTimeout('cssoverflash("'+ele.id+'","'+eleStyle+'","'+cc+'")',200);
+    }
+}
+
+
+YAHOO.util.Event.addListener(window, "load", load_branding);
+</script>
+
+<script type="text/javascript">
+//<![CDATA[
+
+	// validate filename extensions
+	// note: extending the CPANEL.validate namespace here to make it easier to add validation in a loop below
+	CPANEL.validate.external_check_extension = function (str, fname) {
+        // empty string is ok
+        if ( str == '' ) return true;
+
+        //make sure there is an extension
+        if ( !(/[^.]\.[^.]+$/.test(str)) ) return false;
+        var given_extension = str.split('.').pop();
+
+        var allowed_extensions = [ 'gif', 'jpg', 'jpeg', 'png' ];
+
+        return (allowed_extensions.indexOf(given_extension) !== -1);
+    }
+
+	// Event processing for the "reset to default" button
+	var confirm_wrapper = function( e ) {
+
+		var confirm = window.confirm('<cptext "Are you sure you want to revert this file?">');
+
+		// If the user choses to abort we need to tell the browser not to follow the anchor
+		if ( ! confirm ) {
+			YAHOO.util.Event.preventDefault(e);
+
+		}
+	}
+
+	var init = function() {
+		var validation = new CPANEL.validate.validator("<cptext "Edit Header Images">");
+
+
+		// Get all the revert buttons and attach a confirmation box to them
+		var els = YAHOO.util.Dom.getElementsByClassName("revert-button");
+		for (var i = 0; i < els.length; i++ ) {
+			YAHOO.util.Event.on(els[i].id, "click", confirm_wrapper);
+		}
+
+		// grab all the input elements
+		var els = YAHOO.util.Dom.getElementsByClassName("file_input_element", "input");
+
+		for (var i = 0; i < els.length; i++) {
+
+			var classNames = els[i].className.split(' ');
+			var file_input_name = '';
+
+			   // for each className see if the name begins with file_input_name_
+			for ( var ii = 0; ii < classNames.length; ii++ ) {
+				if ( /^file_input_name_/.test(classNames[ii]) ) {
+					// if so strip out the leading idenfifer and pass the file name to the validation function
+					var file_input_name = classNames[ii].replace('file_input_name_','');
+				}
+			}
+
+			validation.add(els[i].id, 'external_check_extension(%input%,"'+file_input_name+'")', '<cptext 'Filename must end in [list,or,_*].', '.gif', '.jpg', '.png', '.jpeg'>');
+		}
+
+		validation.attach();
+
+		CPANEL.validate.attach_to_form("submit-button", validation);
+	};
+
+	YAHOO.util.Event.onDOMReady(init);
+
+//]]>
+</script>
+
+<div class="body-content">
+<div style="padding:0 0 15px 20px;">
+<div class="breadcrumbs"><a class="crumb_highlight" href="index.html"><cpanel langprint="BrandingEdit"></a> > <a class="crumb_highlight" href="edit_bpkg.html?brandingpkg=<?cp Branding::getbrandingpkg(%,brandingpkg)?>"><cpanel langprint="Branding_edit_title"></a> > <cpanel langprint="BrandingHeadFoot"> </div>
+
+
+<style type="text/css">
+<?cp Branding::spritelist(.spriteicon_img_mini {float:left;margin-right:5px;background: url\{leftparenthesis}"%"\{rightparenthesis};} %,@spriteurl,images::#icon-${img}_mini {background-position\{colon}0 -${cssposition}px;width\{colon}${width}px;height\{colon}${height}px; }:) imgtype=icon,subtype=img,method=scale_60percent,format=png,img=branding ?>
+</style>
+<div class="h1Title"><div class="spriteicon_img_mini" id="icon-branding_mini"></div> <cpanel langprint="BrandingHeadFoot"></div>                
+
+<p class="description"><cpanel langprint="BrandingDesc"></p>
+
+<cpanel setvar="vidtut_name=editheadfoot">
+<cpanel setvar="vidtut_header=VidEditHF">
+<cpanel setvar="vidtut_description=VidEditHFDesc">
+<cpanel setvar="vidtut_video_name=editheadfoot_lo">	
+<cpanel setvar="vidtut_width=450">
+<cpanel setvar="vidtut_height=355">
+<cpanel include="../../video_tutorial_include.html">
+
+<div style="position:absolute; width:0px; height:0px; display:none; z-index: 10000;" id="overflash" class="over-block">&nbsp;</div>
+
+<br /><br />
+<cpanel langprint="BrandingStyle">:
+<strong><?cp Branding::getbrandingpkg(%,brandingpkgname) ?></strong></div>
+
+<form id="mainform" name="mainform"  enctype="multipart/form-data" action="doupload.html" method="post" name="bform">
+	<input type="hidden" name="page" value="header" />
+	<input type="hidden" name="brandingpkg" value="<?cp Branding::getbrandingpkg(%,brandingpkg) ?>" />
+	<input type="hidden" name="imgtype" value="heading" />
+	<input type="hidden" name="dir" value="<cpanel print="$homedir">/cpanelbranding/<cpanel print="$CPDATA{'RS'}">/<?cp Branding::getbrandingpkg(%,brandingpkg) ?>" />  
+	<div class="branding_tbl_wrap">
+	<table style=" id="headingstbl" class="nonsortable" cellpadding="0" cellspacing="0">    
+    <tr>
+        <th class="cell" scope="col"><cpanel langprint="FTPImage"></th>
+        <th class="cell" scope="col"><cpanel langprint="description-abbr"></th>
+		<th class="cell" scope="col"><cpanel langprint="filename"></th>
+        <th class="cell" scope="col"><cpanel langprint="BrandingWidth"></th>
+        <th class="cell" scope="col"><cpanel langprint="BrandingHeight"></th>
+        <th class="cell" scope="col"><cpanel langprint="resetdefault-BoxTrapper"></th>
+        <th class="cell" scope="col"><cpanel langprint="BUUploadButton"></th>
+    </tr>
+	
+	<?cp Branding::brandingeditor(
+		[script]number_brand\{leftparenthesis}%\{comma}'%'\{comma}'%'\{rightparenthesis};[/script]
+	[tr id="imgedit-%"]
+			[td align="center"][a name="imgeditor%" class="jumplink"]%[/a][/td]
+			[td align="center"]%[/td]
+			[td align="center"]%[/td]
+			[td align="right"]%[/td]
+			[td align="right"]%[/td]
+			[td align="center"][a class="create-button revert-button" id="revert%" href="resetimg.html?brandingpkg=$URI_ENCODED_FORM{'brandingpkg'}&amp;imgname=%&amp;imgtype=heading"]$LANG{'reset_text'}[/a][/td]
+			[td align="left" width="250px"][input type="file" id="headerfile%" name="file%" class="file_input_element file_input_name_%" /]&nbsp;[span class="no_panel" id="headerfile%_error"][/span][input type="hidden" name="filename-%" value="%" /][/td]
+		[/tr]
+		[tr]
+			[td colspan="7" align="left"][img class="logo_edit" title="%" alt="%" border="0" src="%" /][/td]
+		[/tr]
+	,number,file,subtype,number,number,number,htmldescription,file,width,height,number,file,number,number,file,number,number,file,&description,&description,&url) imgtype=heading ?>
+
+	</table>
+</div>	
+	<br /> 
+	<div style="padding:0 0 15px 20px;"><input type="submit" id="submit-button" class="input-button" value="<cpanel langprint="BrandingUpload">" />
+	
+	<br />
+	<br />
+	
+	<h2><cpanel langprint="HeaderEditReset"></h2>
+	<p><cpanel langprint="BrandingHeadFootRevert"></p>
+	<p><a class="create-button revert-button" id="resetall" href="resetall.html?brandingpkg=<cpanel print="$URI_ENCODED_FORM{'brandingpkg'}">&amp;imgtype=heading"><cpanel langprint="BrandingReset"></a></p>
+	
+	<h2><cpanel langprint="HeaderEditSprites"></h2>
+	<p><cpanel langprint="BrandingSprite"></p>
+	<p><a class="create-button" href="gensprites.html?brandingpkg=<cpanel print="$URI_ENCODED_FORM{'brandingpkg'}">&amp;imgtype=heading"><cpanel langprint="BrandingSpritesGen"></a></p><p><cpanel langprint="BRSpriteLink"></p>
+
+</form>
+
+<cpanel include="gobackwhere.html">
+</div>
+</div><!-- end body-content -->
+
+<cpanel Branding="include(stdfooter.html)">

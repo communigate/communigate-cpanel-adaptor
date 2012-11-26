@@ -1,0 +1,28 @@
+﻿  <h2>What is email authentication?</h2>
+<p>Email authentication lets you verify the origin of an email message sent to or from your domain. This feature assists in combating spam, or unwanted email.</p>
+<h2>What is DomainKeys?</h2>
+<p>DomainKeys provides a way to verify the sender and integrity of a message.  It allows an email system to prove that a message was not altered during transit (meaning it is not forged) and that the message came from the specified domain.</p>
+<h2>Enable or disable DomainKeys</h2>
+<ul>
+	<li>Click <em>Enable</em> to enable DomainKeys or click <em>Disable</em> to disable DomainKeys.</li>
+</ul>
+<p><strong>Note:</strong> DomainKeys is only effective if enabled on the authoritative <span class="caps">DNS</span> server for the zone.</p>
+<h2>What is <span class="caps">SPF</span>?</h2>
+<p>Sender Policy Framework (<span class="caps">SPF</span>) allows a recipient server to verify that an email message was truly sent from the domain specified in the <em>From:</em> field. Enabling <span class="caps">SPF</span> can prevent your server from receiving replies to spam that forged your domain name as part of the sender’s address (also known as &#8220;backscatter&#8221;).</p>
+<p><span class="caps">SPF</span> works by specifying which servers are authorized to send email from your domain. Only mail sent through an authorized server will appear as valid when a recipient checks a message&#8217;s <span class="caps">SPF</span> records.</p>
+<h2>Enable or disable <span class="caps">SPF</span></h2>
+<ul>
+	<li>Click <em>Enable</em> to enable <span class="caps">SPF</span> or click <em>Disable</em> to disable <span class="caps">SPF</span>.</li>
+</ul>
+<p><strong>Note:</strong> <span class="caps">SPF</span> is only effective if enabled on the authoritative <span class="caps">DNS</span> server for the zone and if both the sending and receiving mail servers have <span class="caps">SPF</span> enabled.</p>
+<h2>Change advanced <span class="caps">SPF</span> settings</h2>
+<ul>
+	<li>Click <em>Add</em> or <em>Remove</em> to add or remove additional hosts, servers, and IP blocks in the corresponding lists.</li>
+</ul>
+<ul>
+	<li>Click the <em>All Entry (<span class="caps">ALL</span>)</em> box if you have entered all hosts that will send to your domain and wish to exclude all other domains.</li>
+</ul>
+<ul>
+	<li>Click the <em>Overwrite Existing Entries</em> box if you wish to overwrite all existing <span class="caps">SPF</span> records for all your domains with these settings.</li>
+</ul>
+

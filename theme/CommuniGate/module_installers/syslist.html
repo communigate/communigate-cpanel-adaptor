@@ -1,0 +1,33 @@
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+<link rel="stylesheet" href="css/style.css" type="text/css" media="screen" title="<cpanel Locale="maketext('Default')">" charset="utf-8" />
+<div class="body-content">
+
+<h1><cpanel include="mini_icon.html">
+<cpanel langprint="module_system"> 
+<?cp LangMods::getkey(%,key) key=names,lang=$FORM{'lang'} ?>
+</h1>
+
+<h4><cpanel langprint="module_installed"> 
+<?cp LangMods::getkey(%,key) key=names,lang=$FORM{'lang'} ?>
+</h4>
+<table id=systbllist class="sortable" border="0" cellspacing="0" cellpadding="0">
+	<tr>
+		<th><cpanel langprint="module_installed_text"></th>
+		<th><cpanel langprint="module_version_header"></th>
+		<th nonsortable="true"><cpanel langprint="Actions"></th>
+	</tr>
+    <?cp LangMods::list_installed(
+	[tr]
+		[td]%[/td]
+		[td]%[/td]
+		[td]
+            [a href="%" target="_blank" class="create-button"]$LANG{'module_show_docs'}[/a]
+	    [/td]
+    [/tr]
+,module,latest,docurl) lang=$FORM{'lang'},sys=1 ?>
+</table>
+
+<div class="return-link"><a href="main.html?lang=<cpanel print="$FORM{'lang'}">">&larr; <cptext "Go Back"></a></div>
+</div>
+<cpanel Branding="include(stdfooter.html)">

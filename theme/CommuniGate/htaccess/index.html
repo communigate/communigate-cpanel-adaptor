@@ -1,0 +1,40 @@
+<cpanel setvar="headerimg=../images/topwebprotect.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+
+<style type="text/css">
+<?cp Branding::spritelist(.spriteicon_img_mini {float:left;margin-right:5px;background: url\{leftparenthesis}"%"\{rightparenthesis};} %,@spriteurl,images::#icon-${img}_mini {background-position\{colon}0 -${cssposition}px;width\{colon}${width}px;height\{colon}${height}px; }:) imgtype=icon,subtype=img,method=scale_60percent,format=png,img=password-protect ?>
+</style>
+
+<div class="body-content">
+
+<?cp Frontpage::fpenabled(%,fpenabled) ?>
+<cpanelif $CPVAR{'fpenabled'}>
+	<p class="alert_box">
+	<strong><cpanel Locale="maketext('Warning')"></strong>:<br />
+	<cpanel langprint="FPPPDWarning">
+	</p>
+</cpanelif>
+
+<cpanelif !$CPVAR{'fpenabled'}>
+	
+	<div class="h1Title"><div class="spriteicon_img_mini" id="icon-password-protect_mini"></div><cpanel langprint="NavProtectDir"></div>
+	
+	<p class="description"><cpanel langprint="PPDescription"></p>
+	
+	<cpanel setvar="vidtut_name=passwdprotect">
+	<cpanel setvar="vidtut_header=NavProtectDir">
+	<cpanel setvar="vidtut_description=VidProtectDirDesc">
+	<cpanel setvar="vidtut_video_name=passwdprotect_lo">
+	<cpanel setvar="vidtut_width=450">
+	<cpanel setvar="vidtut_height=323">	
+	<cpanel include="../video_tutorial_include.html">
+		
+	<h2><cpanel langprint="PPDNavHelp"></h2>
+	<cpanel Htaccess="htdirls($FORM{'dir'})">
+
+</cpanelif>
+
+</div><!-- end body-content -->
+
+<cpanel Branding="include(stdfooter.html)">

@@ -1,0 +1,34 @@
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+
+<style type="text/css">
+<?cp Branding::spritelist(.spriteicon_img_mini {float:left;margin-right:5px;background: url\{leftparenthesis}"%"\{rightparenthesis};} %,@spriteurl,images::#icon-${img}_mini {background-position\{colon}0 -${cssposition}px;width\{colon}${width}px;height\{colon}${height}px; }:) imgtype=icon,subtype=img,method=scale_60percent,format=png,img=favorites ?>
+</style>
+
+<div class="body-content">
+
+<div class="h1Title"><div class="spriteicon_img_mini" id="icon-favorites_mini"></div><cpanel langprint="shortcuts_page_title"></div>
+
+<cpanel setvar="vidtut_name=shortcuts">
+<cpanel setvar="vidtut_header=Shortcuts">
+<cpanel setvar="vidtut_description=VidShortCutDesc">
+<cpanel setvar="vidtut_video_name=shortcuts_lo">
+<cpanel setvar="vidtut_width=450">
+<cpanel setvar="vidtut_height=349">	
+<cpanel include="../video_tutorial_include.html">
+
+<p class="description"><cpanel langprint="shortcuts_page_description"></p>
+<h2><cpanel langprint="shortcuts_sub_heading"></h2>
+<p><cpanel langprint="shortcuts_drag_link">: <a href="/" title="<cpanel langprint="shortcuts_access_cpanel">"><cpanel langprint="shortcuts_access_cpanel"></a> <cpanel langprint="shortcuts_desktop"></p>
+<p><cpanel langprint="shortcuts_drag_link">: 
+<cpanelif $ENV{'SERVER_PORT'}==2082>
+<a href="http://<cpanel print="$httphost">:2095" title="<cpanel langprint="shortcuts_webmail">"><cpanel langprint="shortcuts_webmail"></a> 
+</cpanelif>
+<cpanelif !$ENV{'SERVER_PORT'}==2082>
+<a href="https://<cpanel print="$httphost">:2096" title="<cpanel langprint="shortcuts_webmail">"><cpanel langprint="shortcuts_webmail"></a> 
+</cpanelif>
+<cpanel langprint="shortcuts_desktop"></p>
+
+</div><!-- end body-content -->
+
+<cpanel Branding="include(stdfooter.html)">

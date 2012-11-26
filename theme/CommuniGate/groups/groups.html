@@ -1,0 +1,121 @@
+<cpanel setvar="headerimg=../images/mailmenu.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+<cpanelif $FORM{'itemsperpage'}>
+	<cpanel setvar="itemsperpage=$FORM{'itemsperpage'}">
+</cpanelif>
+<cpanelif !$FORM{'itemsperpage'} || !$CPVAR{'itemsperpage'}>
+	<cpanel setvar="itemsperpage=10">
+</cpanelif>
+	
+<style type="text/css">
+<?cp Branding::spritelist(.spriteicon_img_mini {float:left;margin-right:5px;background: url\{leftparenthesis}"%"\{rightparenthesis};} %,@spriteurl,images::#icon-${img}_mini {background-position\{colon}0 -${cssposition}px;width\{colon}${width}px;height\{colon}${height}px; }:) imgtype=icon,subtype=img,method=scale_60percent,format=png,img=maillist ?>
+</style>	
+	
+<div class="body-content">
+
+<div class="h1Title"><div class="spriteicon_img_mini" id="icon-maillist_mini"></div> <cpanel langprint="CGPGroupsDesc"></div>
+
+<cpanel setvar="vidtut_name=mailinglists">
+<cpanel setvar="vidtut_header=VidMailingList">
+<cpanel setvar="vidtut_description=VidMailingListDesc">
+<cpanel setvar="vidtut_video_name=mailinglists-low">
+<cpanel setvar="vidtut_width=450">
+<cpanel setvar="vidtut_height=269">	
+
+<p class="description"><cpanel langprint="CGPGroupsDetDesc"></p>
+
+
+
+<h2><cpanel langprint="CGPGroupCreate"></h2>
+<?cp StatsBar::stat( [p class="caution"]$LANG{'statsattention'}&nbsp;%&nbsp;$LANG{'statsoutof'}&nbsp;%$LANG{'available'}&nbsp;$LANG{'INDXMailingLists'}[/p],count,max) display=mailinglists,warnings=1,warninglevel=80,infinitylang=true ?>
+
+
+<div class="highlight">
+<form method="post" action="doaddgroup.html" id="userform" name="userform">
+<!-- <?cp Email::listmaildomains(,) ?> -->
+<cpanelif $CPVAR{'maildomainscount'}==1>
+	<?cp Email::listmaildomains([input type="hidden" name="domain" value="%" /],domain) ?>
+</cpanelif>
+<table>
+
+   <tr>
+                <td style="width: 150px" align="right"><cpanel langprint="CGPGroupRealName">:</td>
+                <td><input type="text" name="realname" id="realname" style="width: 150px" /></td>
+                <td><div id="email_error"></div></td>
+        </tr>
+	<tr>
+		<td style="width: 150px" align="right"><cpanel langprint="CGPGroupEmailName">:</td>
+		<td><input type="text" name="email" id="email" style="width: 150px" />
+			<cpanel langprint="@">
+				<select name="domain" id="domain"><?cp Email::listmaildomains([option value="%"]%[/option],domain,domain) ?></select>
+			</td>
+		</tr>
+               <tr>
+                        <td align="right"><cpanel langprint="CGPGroupPosting"></td>
+                        <td colspan="2">
+                                <select name="spectre" id="spectre">
+					<option value="0">Private-Members of this group only</option>
+					<option value="1">Public-Anyone</option>
+				</select>
+                        </td>
+                </tr>
+
+	<tr><td colspan="3"><br /></td></tr>
+	<tr>
+		<td>&nbsp;</td>
+		<td colspan="2"><input type="submit" id="submit" value="<cpanel langprint="CGPGroupAdd">" class="input-button" style="width: 150px" /></td>
+	</tr>
+</table>
+</form>
+<div id="why_strong_passwords_text" style="display: none"><cpanel langprint="email_password_why"><br /><br /><cpanel langprint="email_password_tip"></div>
+</div><!-- end highlight -->
+
+
+<h2><cpanel langprint="CGPCurrentGroups"></h2>
+
+<table border="0" cellpadding="5" cellspacing="0" id="mailtbl" class="sortable" width="650">
+
+    <tr >
+		<th class="cell"><cpanel langprint="Group Email Address"></th>
+		<th class="cell-end sorttable_nosort" colspan="4"><cpanel langprint="AHFucn"></th>
+	</tr>
+
+
+<?cp CommuniGate::ListGroups(
+	[tr class="row-%"]
+		[td class="cell nobrd-center-t"]%[/td]
+		[td class="nobrd" align="center"]
+			[a href="dodelgroup.html?email=%&amp;domain=$FORM{'domain'}"]$LANG{'Delete'}[/a]
+		[/td]
+		[td class="nobrd" align="center"]
+                        [a href="dorenamegroup.html?email=%&amp;domain=%"]$LANG{'CGPMailListRename'}[/a]
+                [/td]
+                [td class="nobrd" align="center"]
+                        [a href="groupsettings.html?email=%&amp;domain=%"]$LANG{'CGPMailListSettings'}[/a]
+                [/td]
+
+                [td class="nobrd" align="center"]
+                        [a href="groupmembers.html?listname=%"]$LANG{'CGPGroupsMembers'} [/a]
+                [/td]
+	[/tr]
+,*num,list,list,list,domain,list,list,list) domain=$FORM{'domain'},regex=$FORM{'searchregex'},api2_paginate=1,api2_paginate_start=$FORM{'api2_paginate_start'},api2_paginate_size=$CPVAR{'itemsperpage'} || '[tr][td colspan="4" class="errors"]$LANG{'CGPNoGroups'}[/td][/tr]' ?>
+
+
+
+</table>
+
+<?cp UI::paginate(%,paginator) currentpage=$CPVAR{'currentpage'},pages=$CPVAR{'pages'},itemsperpage=$CPVAR{'itemsperpage'} ?>
+<cpanelif $CPVAR{'pages'} && !$CPVAR{'pages'}==1>
+	<div style="float:right">
+		<form method="get" action="">
+			<cpanel langprint="PaginatorShowing"> <select name="itemsperpage" onchange="this.form.submit();">
+			<?cp UI::paginate_list([option value="%" %]%[/option],item,selected=1?selected:,item) itemsperpage=$CPVAR{'itemsperpage'},itemlist=10:25:50:100:250:500 ?>
+			</select><noscript><button id="my_button" onclick="" type="submit" Value=""><cpanel Locale="maketext('Change')"></button></noscript>  <cpanel langprint="PaginatorResults"> 
+		</form>
+	</div>
+</cpanelif>
+
+</div><!-- end body-content -->
+
+<cpanel Branding="include(stdfooter.html)">

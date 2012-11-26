@@ -1,0 +1,114 @@
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+
+<script type="text/javascript" src="<cpanel MagicRevision="uri("js/statusbox_optimized.js")">"></script>
+<script type="text/javascript" src="<cpanel MagicRevision="uri("js/browsessl_optimized.js")">"></script>
+
+<script type="text/javascript">
+//<![CDATA[
+var prevent_submit = 0;
+function checksslsubmit() {
+    if (prevent_submit) {
+        prevent_submit = 0;
+        return false;
+    }
+    document.mainform.go.disabled = true;
+    document.mainform.go.className = 'input-button-disabled';
+
+    return true;
+}
+function enabledomain() {
+    if (document.mainform.domain.selectedIndex == 0) {
+        alert("<cpanel Locale="maketext('You must select a domain to setup.')">");
+        prevent_submit = 1;
+        return false;
+    }
+    prevent_submit = 0;
+
+    document.mainform.domain.disabled = false;
+    var thisdomain =  document.mainform.domain.options[document.mainform.domain.selectedIndex].value;
+    show_loading("<cpanel langprint="SSLInstallUpdate">",thisdomain); 
+    return true;
+}
+//]]>
+</script>
+
+<style type="text/css">
+<?cp Branding::spritelist(.spriteicon_img_mini {float:left;margin-right:5px;background: url\{leftparenthesis}"%"\{rightparenthesis};} %,@spriteurl,images::#icon-${img}_mini {background-position\{colon}0 -${cssposition}px;width\{colon}${width}px;height\{colon}${height}px; }:) imgtype=icon,subtype=img,method=scale_60percent,format=png,img=ssl-manager ?>
+.mask {
+background-color:#000000;
+opacity:0.25;
+}
+#waitpanel_mask{position:absolute;}
+</style>
+
+<!-- needed for javascript -->
+<div id="sdiv"></div>
+
+<div class="body-content">
+
+<div><div class="spriteicon_img_mini" id="icon-ssl-manager_mini"></div> <cpanel langprint="SSLSetUpHost"> </div>
+
+<h2><cpanel langprint="SSLCurrentActive"></h2>
+<p><cpanel SSL="installedhost()"></p>
+<a href="deleteconfirm.html" class="create-button"><cpanel langprint="SSLDelHost"></a>
+<p><b><cpanel langprint="Note"></b><br />
+<cpanel langprint="SSLCurrentActiveNote"></p>
+
+<form onsubmit="return checksslsubmit();" action="installssl.html" name="mainform" method="post" enctype="multipart/form-data">
+
+<br />
+<h2><cpanel langprint="SSLInstallUpdate"></h2>
+<table border="0" align="left" cellpadding="5" class="sql-tbl">
+	<tr>
+		<td colspan="2"><cpanel langprint="SSLDomain"></td>
+		<td colspan="3">
+			<select id="ssldomain" name="domain" onchange="lookupinfo('domain');">
+				<option value=""><cpanel langprint="SSLSelectDomain"></option>
+				<cpanel Email="printdomainoptions(0,1,1)">
+			</select>
+		</td>
+	</tr>
+	<tr>
+		<td colspan="2"><cpanel langprint="SSLIP"></td>
+		<td colspan="3"><cpanel print="$ip"></td>
+	</tr>
+	<tr>
+		<td colspan="5" valign="top">
+			<br />
+			<h2><cpanel langprint="SSLCRT2"></h2>
+			<cpanel langprint="SSLCRTNote"><br />
+			<cpanel langprint="SSLCRTText"> <input type="button" value="<cpanel langprint="SSLCRTFetch">" onclick="lookupinfo('domain','crt')" class="input-button" /> <cpanel langprint="SSLCRTText2"><br />
+			<textarea id="sslcrt" rows="10" cols="80" name="crt" class="output" onchange="lookupinfo('crtdata');"></textarea>
+		</td>
+	</tr>
+	<tr>
+		<td colspan="5" valign="top">
+			<h2><cpanel langprint="SSLKEY"></h2>
+			<cpanel langprint="SSLKEYNote"><br />
+			<cpanel langprint="SSLKEYText"> <input type="button" value="<cpanel langprint="SSLCRTFetch">" onclick="lookupinfo('domain','key')" class="input-button" /> <cpanel langprint="SSLKEYText2"><br />
+			<textarea id="sslkey" class="output" rows="10" cols="80" name="key"></textarea>
+		</td>
+	</tr>
+	<tr>
+		<td colspan="5" valign="top">
+			<h2><cpanel langprint="SSLCABUNDLE"></h2>
+			<cpanel langprint="SSLCABUNDLEPaste"><br />
+			<textarea id="sslcab" rows="10" cols="80" class="output" name="cabundle"></textarea>
+		</td>
+	</tr>
+	<tr>
+		<td colspan="3" valign="top">
+			<input type="submit" name="go" value="<cpanel langprint="SSLInstallCert">" onclick="enabledomain();" class="input-button" />&nbsp;<input type="reset" value="<cpanel langprint="reset_text">" class="input-button" />
+		</td>
+		<td valign="top"><div align="center"></div></td>
+		<td valign="top">&nbsp;</td>
+	</tr>
+</table>
+</form>
+
+<div class="clearit">&nbsp;</div>
+
+<div class="return-link"><a href="index.html" target="_top">&larr; <cpanel langprint="SSLReturn"></a></div>
+</div><!-- end body-content -->
+<cpanel Branding="include(stdfooter.html)">

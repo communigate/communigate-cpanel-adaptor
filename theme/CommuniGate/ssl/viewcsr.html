@@ -1,0 +1,20 @@
+<cpanel setvar="headerimg=../images/toperrorpages.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+<style type="text/css">
+<?cp Branding::spritelist(.spriteicon_img_mini {float:left;margin-right:5px;background: url\{leftparenthesis}"%"\{rightparenthesis};} %,@spriteurl,images::#icon-${img}_mini {background-position\{colon}0 -${cssposition}px;width\{colon}${width}px;height\{colon}${height}px; }:) imgtype=icon,subtype=img,method=scale_60percent,format=png,img=ssl-manager ?>
+</style>
+<div class="body-content">
+<div class="h1Title"><div class="spriteicon_img_mini" id="icon-ssl-manager_mini"></div> <cpanel langprint="TSSLManager"></div>
+<h2><cpanel langprint="SSLCertSignReq"></h2>
+<pre>
+<textarea class="output" rows="15" cols="80" readonly><cpanel SSL="showcsr($FORM{'host'})"></textarea>
+</pre>
+<br />
+<pre>
+<textarea class="output" rows="15" cols="80" readonly><cpanel SSL="showcsr($FORM{'host'},1)"></textarea>
+</pre>
+
+<div class="return-link"><a href="csrs.html">&larr; <cptext "Go Back"></a></div>
+</div>           
+<cpanel Branding="include(stdfooter.html)">

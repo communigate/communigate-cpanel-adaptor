@@ -1,0 +1,57 @@
+.cleantextarea {
+    color:#000000;
+	font: 11px Verdana, Arial, Helvetica, sans-serif;
+	font-weight: none;
+	text-decoration: none;
+	background: #FFFFFF;
+	border: 0 solid #999999;
+}
+
+.cleanright {
+    color: #000000;
+    font: 11px Verdana, Arial, Helvetica, sans-serif;
+	font-weight: none;
+	text-decoration: none;
+	background: #FFFFFF;
+	border: 0 solid #999999;
+	text-align: right;
+}
+
+.cleanleft {
+    color: #000000;
+    font: 11px Verdana, Arial, Helvetica, sans-serif;
+	font-weight: none;
+	text-decoration: none;
+	background: #FFFFFF;
+	border: 0 solid #999999;
+	text-align: left;
+}
+
+.buttons {
+    font-family: Verdana, Arial, Helvetica, sans-serif;
+    font-size: 10px;
+    background-color: #333333;
+    color: #FFFFFF;
+	margin-right: 6px;
+}
+
+.borderTable {	
+    padding: 2px 4px 2px 4px;
+    border: 1px solid #00586c;
+}
+
+.itemshading {
+    background-color: #EEEEEE;
+}
+
+fieldset { 
+    border: #26a solid 1px;
+	width: 98%;
+}
+
+legend { 
+    color:#000000;
+	position: relative;
+    top: -.5em;
+	font-weight: bold;
+}

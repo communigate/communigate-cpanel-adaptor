@@ -1,0 +1,20 @@
+<cpanel setvar="headerimg=../images/tools.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+<div class="body-content">
+<font class="big">BoxTrapper</font>
+<br /><br />
+
+<cpanelif $FORM{'action'}==enable>
+   <cpanel setvar="boxtrapper_enabled=1">
+</cpanelif>   
+<cpanelif !$FORM{'action'}==enable>
+   <cpanel setvar="boxtrapper_enabled=0">
+</cpanelif> 
+<!-- Until there is a better way to communicate, "assume success": -->
+<!-- <cpanel BoxTrapper="changestatus($FORM{'account'},$FORM{'action'})"> -->
+
+<cpanel Locale="maketext('BoxTrapper has been [boolean,_1,enabled,disabled] on the account “[_2]”.',$CPVAR{'boxtrapper_enabled'},$FORM{'account'})">
+<div class="return-link"><a href="manage.html?account=<cpanel print="$FORM{'account'}">">&larr; <cptext "Go Back"></a></div>
+</div>
+<cpanel Branding="include(stdfooter.html)">

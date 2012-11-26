@@ -1,0 +1,68 @@
+<cpanel setvar="headerimg=../images/mailmenu.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+
+ <div class="body-content">
+
+<cpanel include="managelist.html">
+
+
+<style type="text/css">
+<?cp Branding::spritelist(.spriteicon_img_mini {float:left;margin-right:5px;background: url\{leftparenthesis}"%"\{rightparenthesis};} %,@spriteurl,images::#icon-${img}_mini {background-position\{colon}0 -${cssposition}px;width\{colon}${width}px;height\{colon}${height}px; }:) imgtype=icon,subtype=img,method=scale_60percent,format=png,img=filtering ?>
+
+</style>
+	<div class="h1Title"><div class="spriteicon_img_mini" id="icon-filtering_mini"></div><cpanel langprint="MENUFiltering"></div>
+		<p class="description"><cpanel langprint="MFDescription"></p>
+
+	<h2><cpanel langprint="CreateFilter"></h2>
+			<?cp StatsBar::stat( [p class="caution"]$LANG{'statsattention'}&nbsp;%&nbsp;$LANG{'statsoutof'}&nbsp;&nbsp;%[/p],count,max) display=emailfilters,warnings=1,warninglevel=80,infinitylang=true ?>
+		<p><a class="create-button" href="addblock.html?domain=<cpanel print="$FORM{'domain'}">"><cpanel langprint="EFAddfilter"></a></p>	
+
+	<br />
+
+	<h2><cpanel langprint="EFCurrentFilters"></h2>
+		<table border="0" cellpadding="5" cellspacing="0" id="mailtbl" class="sortable">
+			<tr>
+				<th class="cell-end"><cpanel langprint="EFFilter"></th>
+			    <th class="cell-end" nonsortable="true">&nbsp;</th>
+			    <th class="cell"><cpanel langprint="EFDestination"></th>
+			    <th class="cell-end"><cpanel langprint="Delete"></th>
+			</tr>
+		  <?cp Email::listfilters(
+			[tr class="row-%"]
+				[td class="row1-to-begin nobrd-center"]%[/td]
+				[td class="row1-to nobrd"][img src="../images/arrowto.gif" /][/td]
+				[td class="row1"][div align="center"]%[/div][/td]
+				[td class="row1-end"][div align="center"][a href="dodelblock.html?domain=%&dest=%&email=%"] [img src="../images/delete_x.gif" border="0" alt="maketext('Delete')" /][/a][/div][/td]
+			[/tr]
+		  ,*num,filter,nicedest,domain,^dest,^filter) ?>
+		</table>
+
+<br />
+	<br />
+
+	<br />
+	<br />
+		<h2><cpanel langprint="EFFiltertest"></h2>
+			<p><cpanel langprint="EFTesthint"></p>
+
+<form action="filtertest.html" method="post">
+<input type="hidden" name="domain" value="<cpanel print="$FORM{'domain'}">">
+<textarea name="msg" rows="10" cols="55">
+<cpanel langprint="FilterTestDefaultTo">
+<cpanel langprint="FilterTestDefaultFrom">
+<cpanel langprint="FilterTestDefaultSubject">
+
+<cpanel langprint="FilterTestDefaultBody">
+</textarea>
+
+	<br /><br />
+
+					<input type=submit value="<cpanel langprint="EFTestsubmit">" class="input-button">
+				</form>
+
+	
+
+	
+</div>
+<cpanel Branding="include(stdfooter.html)">

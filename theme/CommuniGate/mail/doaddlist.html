@@ -1,0 +1,28 @@
+<cpanel setvar="headerimg=../images/mailmenu.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+
+<style type="text/css">
+<?cp Branding::spritelist(.spriteicon_img_mini {float:left;margin-right:5px;background: url\{leftparenthesis}"%"\{rightparenthesis};} %,@spriteurl,images::#icon-${img}_mini {background-position\{colon}0 -${cssposition}px;width\{colon}${width}px;height\{colon}${height}px; }:) imgtype=icon,subtype=img,method=scale_60percent,format=png,img=maillist ?>
+</style>
+
+<div class="body-content">
+<div class="h1Title"><div class="spriteicon_img_mini" id="icon-maillist_mini"></div> <cpanel langprint="MLMaint"></div>
+
+
+<h2><cpanel langprint="MLCreated"></h2>
+
+<p>
+
+<?cp CommuniGate::AddMailingList($LANG{'CGPListName'} [b]%@%[/b] $LANG{'CGPHasbeenCreated'}[b].[br /],email,domain) email=$FORM{'email'},domain=$FORM{'domain'},owner=$FORM{'owner'} ?></p>
+<cpanelif $CPERROR{'CommuniGate'}>
+<p><cpanel print="$CPERROR{'CommuniGate'}"></p>
+</cpanelif>
+
+
+
+</p>
+
+<div class="return-link"><a href="lists.html">&larr; <cptext "Go Back"></a></div>
+</div>
+<cpanel Branding="include(stdfooter.html)">

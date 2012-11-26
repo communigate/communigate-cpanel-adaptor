@@ -1,0 +1,14 @@
+<html>
+<head>
+<title>cPanel X</title>
+<cpanel relinclude="files/files_head.html">
+</head>
+<body class="topright">
+<span class="med">&nbsp;<strong>
+<cpanel langprint="FMUploadStatus"></strong></span><br /> <cpanel Fileman="uploadfiles()"> 
+<script type="text/javascript">
+parent.dirwindow.window.location.href="dir.html?dir=<cpanel cprint="$FORM{'dir'}">&refresh=<cpanel print="$random">";
+</script>
+</body>
+</html>
+

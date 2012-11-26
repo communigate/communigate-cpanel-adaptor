@@ -1,0 +1,10 @@
+<cpanel setvar="headerimg=../images/mailmenu.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+<div class="body-content">
+<h1><cpanel langprint="FWDelHead"></h1>
+<p>	<cptext 'Email for the domain “[output,class,_1,status]” will no longer be forwarded.', $FORM{"domain"}>.
+<cpanel Email="deldforward($FORM{'domain'})"></p>
+<div class="return-link"><a href="fwds.html">&larr; <cptext "Go Back"></a></div>
+</div>
+<cpanel Branding="include(stdfooter.html)">

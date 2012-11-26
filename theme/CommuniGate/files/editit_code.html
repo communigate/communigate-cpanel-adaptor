@@ -1,0 +1,255 @@
+<html>
+<head>
+<title>cPanel X</title>
+<cpanel relinclude="charset.html">
+<link rel="stylesheet" href="../css/combined_optimized.css">
+<link rel="stylesheet" href="<cpanel MagicRevision="uri("/frontend/x3/filemanager/css/tree_styles2_optimized.css")>">
+<style type="text/css">
+html, body, #mform, #maintbl {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+}
+#maintbl, #maintbl tr, #maintbl td {
+    margin:0;
+    padding:0;
+    border-collapse: collapse;
+    border: none;
+}
+#codeframe {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    border: 0;
+}
+#closebutton {
+    padding-right: 20px;
+    margin-right: 20px;
+    margin-top: 10px;
+}
+textarea.codepress .hidden {
+    visibility: hidden;
+}
+#helpDiv {
+    margin-bottom: 10px;
+}
+<cpanel Branding="include(sprites.html)">
+
+</style>
+
+<script type="text/javascript" src="<cpanel MagicRevision="uri("/yui/utilities_container/utilities_container.js")">"></script>
+<script type="text/javascript" src="<cpanel MagicRevision="uri("/editarea/edit_area/edit_area_full.js")">"></script>
+<script type="text/javascript" src="<cpanel MagicRevision="uri("/cjt/cpanel-all-min.js")">"></script>
+
+<script type="text/javascript">
+var editAreaEl='codewindow';
+var ischanged=1;
+var lastResizeTime=0;
+var lastResizeRequestTime=0;
+
+function loadEditArea() {
+-// initialisation
+    editAreaLoader.init({
+        id: editAreaEl,
+        start_highlight: true,
+        allow_resize: "both",
+        allow_toggle: false,
+        language: "en",
+        toolbar: "search, go_to_line, |, undo, redo, |, select_font, |, syntax_selection, |, change_smooth_selection, highlight, reset_highlight, |, help",
+        syntax: "<?cp Fileman::getedittype(%,type) editor=editarea,dir=$FORM{'dir'},file=$FORM{'file'} ?>",
+        EA_load_callback:"doResize"
+    });
+}
+YAHOO.util.Event.addListener(window, "load", loadEditArea);
+
+</script>
+<script type="text/javascript" src="<cpanel MagicRevision="uri("js/edit_area_resizer.js")">"></script>
+<script type="text/javascript">
+function safeencode(st) {
+    var enc = encodeURIComponent(st);
+    var ecp = -1;
+    var safeenc = '';
+
+    for(var i=0;i<enc.length;i++) {
+
+        if (ecp >= 0) { ecp++; }
+        if (ecp >= 3) { ecp = -1; }
+        if (ecp == 1 || ecp == 2) {
+            safeenc += enc.substring(i,i+1).toLowerCase();
+        } else {
+            safeenc += enc.substring(i,i+1);
+        }
+        if (enc.substring(i,i+1) == '%') {
+            ecp = 0;
+        }
+    }
+
+
+    return safeenc.replace('(','%28').replace(')','%29');
+}
+function loadfile() {
+    if (ischanged) {
+        var sure = confirm("<cpanel Locale="maketext('Are you sure you wish to open a new file? You will lose any changes you have made.')">");
+        if (!sure) { return; }
+    }
+    var filen = document.sform.path.value;
+    var fpath = filen.split('/');;
+    var filename = fpath.pop();
+    var dir = fpath.join('/');
+    var sdir = safeencode(dir);
+    var sfilename = safeencode(filename);
+    var charsetEl = document.getElementById('charset');
+    var charset = charsetEl.options[charsetEl.selectedIndex].value;
+    document.location.href="editit_code.html?dir=" + dir + "&file=" + sfilename + '&file_charset=' + charset;
+}
+
+var save_dialog = false;
+
+var set_dialog = function () {
+    // save encoding dialog callback.
+    if (document.getElementById('save_option1').checked) {
+        document.getElementById('to_charset').value = '<cpanel formprint="$FORM{'file_charset'}">';
+    } else {
+        document.getElementById('to_charset').value = document.getElementById('convert_to').value;
+    }
+    document.sform.action='savefile.html?file_charset='+document.getElementById('to_charset').value;
+    document.sform.submit();
+}
+
+function loadfdata() {
+
+    if (editAreaLoader) {
+        document.sform.page.value = editAreaLoader.getValue("codewindow");
+    } else {
+        var codeEl = document.getElementById('codewindow');
+        document.sform.page.value = codeEl.value;
+    }
+    if (!save_dialog) {
+        save_dialog = new YAHOO.widget.Dialog("get_encode_dialog", {
+            close: false,
+            visible: false,
+            fixedcenter: true,
+            draggable: false,
+            modal: true,
+            underlay: "shadow",
+            width: "450px",
+            constraintoviewport: true,
+            effect: { effect: CPANEL.animate.ContainerEffect.FADE_MODAL, duration: 0.25 },
+            buttons: [  { text: "<cptext 'Cancel'>", handler:function() {this.cancel()} },
+                        { text: "<cptext 'Save'>", handler:set_dialog, isDefault:true }
+                     ]
+        });
+        save_dialog.render();
+        save_dialog.center();
+        var convert_to = document.getElementById('convert_to');
+        for (var i=0; i<convert_to.options.length; i++) {
+            if ((/utf\-8$/i).test(convert_to.options[i].value)) {
+                convert_to.options[i].selected=true;
+            }
+        }
+
+    }
+    if (!/^<cpanel formprint="$FORM{'file_charset'}">$/i.test(document.getElementById('charset').value)) {
+       var convert_to = document.getElementById(document.getElementById('charset').value) || false;
+       if (convert_to) {
+          convert_to.selected=true;
+       }
+    }
+
+    document.getElementById("empty_file_warning").style.display =
+        ( document.sform.page.value === "" ) ? "" : "none"
+    ;
+
+    save_dialog.show();
+    return false;
+}
+EVENT.throwErrors = true;
+YAHOO.util.Event.addListener(document, "resize", doResizeSoon);
+YAHOO.util.Event.addListener(window, "resize", doResizeSoon);
+</script>
+</head>
+<body style="background:url(images/filemantopbg.jpg) repeat-x top #F0F7F8;">
+
+<form id="mform" action="savefile.html" method="post" onsubmit="return loadfdata();" name="sform">
+<input type="hidden" id="to_charset" value="<cpanel formprint="$FORM{'file_charset'}">" name="to_charset"/>
+<table border="0" id="maintbl" cellpadding="0" cellspacing="0">
+<tr style="background-color: #cccccc;">
+ <td height="26" style="height: 26px;">
+        <input type="hidden" name="stripnewline" value="1" />
+        <input type="hidden" name="doubledecode" value="1" />
+        <input type="hidden" name="ufile" value="<cpanel print="$FORM{'file'}">">
+        <input type="hidden" name="udir" value="<cpanel print="$FORM{'dir'}">">
+        <input type="hidden" name="file" value="<cpanel formprint="$FORM{'file'}">">
+        <input type="hidden" name="dir" value="<cpanel formprint="$FORM{'dir'}">">
+        <input type="hidden" id="file_charset" name="file_charset" value="<cpanel formprint="$FORM{'file_charset'}">">
+        <div style="float:left; width:70%;">
+        <span style="font-weight: 900; font-size:13px;"><cpanel langprint="FMEditText">:</span>
+        <input style="width:40%;height:24px;" id="path" name="path" value="<cpanel cprint="$FORM{'dir'}">/<cpanel cprint="$FORM{'file'}">">
+        <span style="font-weight: 900; font-size:13px;"><cpanel langprint="Encoding"> :</span>
+<select id="charset" name="charset">
+<cpanelif $FORM{'file_charset'}=et=_DETECT_>
+<?cp Encoding::guess_file_opts([option value="%" %]%[/option],map,selected,map) file=$FORM{'dir'}/$FORM{'file'} ?>
+<cpanelelse>
+<?cp Encoding::guess_file_opts([option value="%" %]%[/option],map,selected,map) file=$FORM{'dir'}/$FORM{'file'},file_charset=$FORM{'file_charset'} ?>
+</cpanelif>
+</select>
+<input  type="button" onclick="loadfile();" class="input-button" value="<cptext "Re-open">">
+        </div>
+        <div style="float:right;" align="right">
+        <input type="button" onclick="loadfdata();" class="input-button" value="<cpanel langprint="SaveChanges">">
+        <input type="button" onclick="javascript:parent.window.close();"class="input-button" value="<cpanel langprint="CloseWOSaving">" />
+        <input type="hidden" name="code" value="1" />
+
+        <input type="hidden" name="page" value="" /></div>
+
+ </td>
+</tr>
+<tr>
+ <td valign="top">
+    <textarea class="codepress <?cp Fileman::getedittype(%,type) dir=$FORM{'dir'},file=$FORM{'file'} ?>" id="codewindow" wrap="virtual" onchange="ischanged=1;" style="padding: 0 0 0 0; margin:0; width:800px; border:0; height:600px;"><cpanel Fileman="fmpushfile($FORM{'dir'},$FORM{'file'},$FORM{'file_charset'})"></textarea>
+</td>
+</tr>
+</table>
+</form>
+
+    <div id="get_encode_dialog" class="yui-pe-content">
+      <form>
+        <div class="hd"><strong><div style="padding-top: 4px"><cptext "Select Character Encoding"></div></strong></div>
+        <div class="bd" style="padding: 10px; padding-top:20px">
+            <input type="radio" checked id="save_option1" name="save_option" value="<cpanel formprint="$FORM{'file_charset'}">" />
+            <label for="save_option1"><cptext "Keep the current “[_1]” encoding.", $FORM{'file_charset'}></label>
+            <br>
+            <input type="radio" id="save_option2" name="save_option" value="convert" />
+            <label for="save_option2"> <cptext "Convert to:"> </label><select id="convert_to" onchange="document.getElementById('save_option2').checked='true';">
+                <?cp Encoding::guess_file_opts([option id="%" value="%" %]%[/option],map,map,selected,map) file=$FORM{'dir'}/$FORM{'file'},file_charset=$FORM{'file_charset'} ?>
+            </select>
+            <br/><br/>
+            <div id="save_help">
+                <cptext 'This file is currently encoded as “[_1]”.', $FORM{'file_charset'}><cptext 'You can:'> <br/>
+                <ul style="list-style-type: square">
+                    <li> <cptext "Keep this character encoding.">
+                    <li> <cptext "Convert the file to a new character encoding, such as web-friendly UTF-8.">
+                </ul>
+                <strong><cptext "Back up this file!"></strong> <cptext "Making a backup of this file before saving is highly recommended.">
+                <a href="#" onclick="z=document.getElementById('helpDiv');z.style.display=(z.style.display=='block') ? 'none' : 'block'; return false"><cptext "(How to make a backup)"></a>
+                <br/><br/>
+                <div id="helpDiv" style="display:none">
+                   <cptext "Go to your file manager tab or window.">
+                   <cptext "Ensure this file is highlighted.">
+                   <cptext "Click “Copy” in the toolbar, or right click on the file and click “copy” in the context menu.">
+                   <cptext "In the dialog box that pops up, enter a new file name for the backup.">
+                   <cptext "Click the “copy file” button in the bottom right corner of the dialog box.">
+                   <cptext "You now have a backup copy.">
+                   <cptext "You can switch back to the editor tab or window and continue the save operation.">
+                </div>
+
+                <div id="empty_file_warning" style="display:none"><strong><cptext "Note: You are about to save an empty file."></strong></div>
+            </div>
+        </div>
+      </form>
+    </div>
+
+
+
+</body>
+</html>

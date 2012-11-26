@@ -1,0 +1,40 @@
+<h2><cpanel langprint="FTPLegend"></h2>
+<table width="690" cellpadding="2" cellspacing="0" id="ftptbllg" class="sortable">
+    <tr>
+        <th class="cell" nonsortable="true"><cpanel langprint="FTPImage"></th>
+        <th class="cell" nonsortable="true"><cpanel langprint="FTPMeaning"></th>
+        <th class="cell-end" nonsortable="true"><cpanel langprint="description-abbr"></th>
+    </tr>
+    <tr class="row-odd">
+        <td class="cell" align="center"><img src="<cpanel MagicRevision="uri("images/homeb.gif")">" alt="home" /></td>
+        <td class="cell"><div align="center"><cpanel print="$homedir">&nbsp;</div></td>
+        <td class="cell-end"><div align="left"><cpanel langprint="HomeDirectoryDesc"> <cpanel print="$homedir"></div></td>
+    </tr>
+    <tr class="row-even">
+        <td class="cell"><div align="center"><img src="<cpanel MagicRevision="uri("images/logaccess.gif")">" width="16" height="16" alt="" /></div></td>
+        <td class="cell"><div align="center"><cpanel langprint="FTPLogAccess"></div></td>
+        <td class="cell-end"><div align="left"><cpanel langprint="LogAccessDesc"></div></td>
+    </tr>
+    <tr class="row-odd">
+        <td class="cell"><div align="center"><img src="<cpanel MagicRevision="uri("images/main.gif")">" width="16" height="16" alt="" /></div></td>
+        <td class="cell"><div align="center"><cpanel langprint="FTPMainAcct"> </div></td>
+        <td class="cell-end"><div align="left"><cpanel langprint="MainAccountDesc"></div></td>
+    </tr>
+    <tr class="row-even">
+        <td class="cell"><div align="center"><img src="<cpanel MagicRevision="uri("images/sub.gif")">" width="16" height="16" alt="" /></div></td>
+        <td class="cell"><div align="center"><cpanel langprint="FTPSubAcct"> </div></td>
+        <td class="cell-end"><div align="left"><cpanel langprint="SubAccountDesc"></div></td>
+    </tr>
+<cpanelif $hasanonftp>
+    <tr class="row-odd">
+        <td class="cell"><div align="center"><img src="<cpanel MagicRevision="uri("images/anonymous.gif")">" width="16" height="16" alt="" /></div></td>
+        <td class="cell"><div align="center"><cpanel langprint="FTPAnonUser"></div></td>
+        <td class="cell-end"><div align="left"><cpanel langprint="AnonymousDesc"></div></td>
+    </tr>
+</cpanelif>
+</table>
+<br />
+<br />
+<h2><cpanel langprint="FTPLogs"></h2>
+<p><cpanel langprint="FTPHint2Pre"> <span class="status"><cpanel Ftp="ftpstatslogin()"></span><cpanel langprint="FTPHint2Post"></p>
+<cpanel Ftp="listftpstatsurl()">

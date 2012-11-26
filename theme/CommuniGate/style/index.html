@@ -1,0 +1,35 @@
+<cpanel setvar="headerimg=../images/tools.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+<style type="text/css">
+<?cp Branding::spritelist(.spriteicon_img_mini {float:left;margin-right:5px;background: url\{leftparenthesis}"%"\{rightparenthesis};} %,@spriteurl,images::#icon-${img}_mini {background-position\{colon}0 -${cssposition}px;width\{colon}${width}px;height\{colon}${height}px; }:) imgtype=icon,subtype=img,method=scale_60percent,format=png,img=lookandfeel ?>
+</style>
+<div class="body-content">
+
+
+<cpanelfeature style>
+<div class="h1Title"><div class="spriteicon_img_mini" id="icon-lookandfeel_mini"></div> <cpanel langprint="ChangeLook"></div>
+	<p class="description"><cpanel langprint="ChangeLookDesc"></p>
+
+
+<cpanel setvar="vidtut_name=changestyle">
+<cpanel setvar="vidtut_header=ChangeLook">
+<cpanel setvar="vidtut_description=VidChStyle">
+<cpanel setvar="vidtut_video_name=changestyle-low">
+<cpanel setvar="vidtut_width=450">
+<cpanel setvar="vidtut_height=345">	
+<cpanel include="../video_tutorial_include.html">
+
+<cpanelfeature style>
+<form action="switchstyle.html">
+	<cpanel include="indexform.html">
+</form>
+</cpanelfeature>
+
+
+<cpanelfeature !style>
+	<cpanel include="../refresh.html">
+</cpanelfeature>
+
+</div>
+<cpanel Branding="include(stdfooter.html)">

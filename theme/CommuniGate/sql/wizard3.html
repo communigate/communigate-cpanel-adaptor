@@ -1,0 +1,91 @@
+<cpanel setvar="headerimg=../images/topmysql.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+
+
+<script type="text/javascript">
+//<![CDATA[
+var checkallprivs = function() {
+    var privall = YAHOO.util.Dom.get("ALL");
+    var user_rights = YAHOO.util.Dom.getElementsByClassName("user_right", "input", "add_user_table");
+
+    for (var i in user_rights) {
+        if (privall.checked == true) {
+            user_rights[i].checked = true;
+        }
+        else {
+            user_rights[i].checked = false;
+        }
+    }
+};
+
+var checkprivs = function() {
+    var all_checked = true;
+    var user_rights = YAHOO.util.Dom.getElementsByClassName("user_right", "input", "add_user_table");
+    for (var i in user_rights) {
+        if (user_rights[i].checked == false) all_checked = false;
+    }
+    YAHOO.util.Dom.get("ALL").checked = all_checked;
+};
+
+var init_user_rights = function() {
+    YAHOO.util.Event.on("ALL", "click", checkallprivs);
+    YAHOO.util.Event.on(YAHOO.util.Dom.getElementsByClassName("user_right", "input", "add_user_table"), "click", checkprivs);
+
+};
+YAHOO.util.Event.onDOMReady(init_user_rights);
+//]]>
+</script>
+
+<div class="body-content">
+
+<div class="h1Title"><div class="spriteicon_img_mini" id="icon-mysql_mini"></div> <cpanel langprint="SQLWizard"></div>
+
+<!--<cpanel Mysql="adduser($FORM{'user'},$FORM{'pass'})">-->
+
+<cpanelif !$CPERROR{'mysql'}>
+    <p><cptext 'Added user “[output,class,_1,status][output,class,_2,status]” with password “[output,class,_3,status]”.',$dbownerprefix,$FORM{"user"},$FORM{"pass"}></p>
+</cpanelif>
+
+<cpanelif $CPERROR{'mysql'}>
+	<style type="text/css">
+		#wizardform, #step3{
+			display:none;
+		}
+	</style>
+	<p class="errors"><cpanel langprint="PostgreUserError">	<a href="#" onclick="document.getElementById('details').style.display='block'; return false;"><cpanel langprint="AODShowDetails"></a></p>
+	<div class="details" id="details">
+		 <cpanel print="$CPERROR{'mysql'}">
+	</div>
+	<noscript>
+		<div class="details-noscript" id="details">
+			<cpanel print="$CPERROR{'mysql'}">
+		</div>
+	</noscript>
+</cpanelif>
+
+<div id="step3">
+    <h2><cpanel langprint="MySQLStep3"></h2>
+    <p><cpanel langprint="FTPUser">: <b><cpanel print="$dbownerprefix"><cpanel print="$FORM{'user'}"></b>
+    <br />
+    <cpanel langprint="BUDatabase">: <b><cpanel print="$FORM{'db'}"> </b></p>
+</div>
+
+<form action="wizard4.html" name="adduserdb" id="wizardform" method="post">
+    <input type="hidden" name="db" value="<cpanel print="$FORM{'db'}">" />
+    <input type="hidden" name="user" value="<cpanel print="$dbownerprefix"><cpanel print="$FORM{'user'}">" />
+    <br />
+
+    <?cptt sql/userrights.tmpl ?>
+
+  <br />
+  <input type="submit" value="<cpanel langprint="NextStep">" class="input-button" />
+</form>
+
+<br />
+
+<div class="return-link"><a href="wizard1.html">&larr; <cptext "Go Back"></a> | <a href="index.html"><cptext "Go Back"> <cpanel langprint="ToMainSQL"></a></div>
+
+</div><!-- end body-content -->
+
+<cpanel Branding="include(stdfooter.html)">

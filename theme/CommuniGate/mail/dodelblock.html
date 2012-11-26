@@ -1,0 +1,19 @@
+<cpanel setvar="headerimg=../images/mailmenu.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+<style type="text/css">
+<?cp Branding::spritelist(.spriteicon_img_mini {float:left;margin-right:5px;background: url\{leftparenthesis}"%"\{rightparenthesis};} %,@spriteurl,images::#icon-${img}_mini {background-position\{colon}0 -${cssposition}px;width\{colon}${width}px;height\{colon}${height}px; }:) imgtype=icon,subtype=img,method=scale_60percent,format=png,img=filtering ?>
+</style>
+<div class="body-content">
+<div class="h1Title"><div class="spriteicon_img_mini" id="icon-filtering_mini"></div> <cpanel langprint="EFRemove"></div>
+
+<p><cpanel Locale="maketext('Are you sure you want to remove “[output,class,_1,status]”?', $FORM{'email'})"></p>
+
+<p>
+	<a class="create-button" href="doddelblock.html?email=<cpanel formprint="$FORM{'email'}">&dest=<cpanel unsafeprint="$FORM{'dest'}">"><cpanel Locale="maketext('Remove Filter')"></a>
+	<a class="cancel_link" href="blocks.html"><cpanel Locale="maketext('cancel')"></a>
+</p>
+
+<div class="return-link"><a href="blocks.html">&larr; <cptext "Go Back"></a></div>
+</div>
+<cpanel Branding="include(stdfooter.html)">

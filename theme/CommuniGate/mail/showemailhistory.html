@@ -1,0 +1,107 @@
+<cpanel setvar="headerinclude=mail/showemailhistory_head.html">
+<cpanel setvar="headerimg=../images/mailmenu.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+
+<style type="text/css">
+<?cp Branding::spritelist(.spriteicon_img_mini {float:left;margin-right:5px;background: url\{leftparenthesis}"%"\{rightparenthesis};} %,@spriteurl,images::#icon-${img}_mini {background-position\{colon}0 -${cssposition}px;width\{colon}${width}px;height\{colon}${height}px; }:) imgtype=icon,subtype=img,method=scale_60percent,format=png,img=emailroute ?>
+</style>
+
+<div class="body-content">
+    
+<div class="h1Title"><div class="spriteicon_img_mini" id="icon-emailroute_mini"></div> <cpanel langprint="EATHead"></div>
+
+This tool will show all email deliveries for a specific email address.
+
+<br />
+<cpanelfeature deliveryreport>
+<form>
+<table cellpadding="5" class="emailctls">
+<tr>
+    <td>
+        <table cellpadding="5">
+            <tr>
+                <th colspan="2">Filter</th>
+            </tr>
+            <tr>
+                <th>Email:</th>
+                <td>
+                    <input id="mainkey_email" type="radio" name="mainkey" value="email" <cpanelif $FORM{'email'} != "">checked</cpanelif>>
+                    <input onchange="document.getElementById('mainkey_email').checked = true;" id="email" type="text" name="email" value="<cpanel print="$FORM{'email'}">">
+                </td>
+            </tr>
+            <tr>
+                <th>Msg ID:</th>
+                <td>
+                    <input id="mainkey_msgid" type="radio" name="mainkey" value="msgid" <cpanelif $FORM{'msgid'} != "">checked</cpanelif>>
+                    <input onchange="document.getElementById('mainkey_msgid').checked = true;" id="msgid" type="text" name="msgid" value="<cpanel print="$FORM{'msgid'}">">
+                </td>
+            </tr>
+
+            <tr>
+                <th>Events:</th>
+                <td colspan="2">
+                        <input type="checkbox" name="success" id="success" checked> Success       
+                        <br /> 
+                        <input type="checkbox" name="defer" id="defer" checked> Defer
+                        <br /> 
+                        <input type="checkbox" name="failure" id="failure" checked> Failure
+                </td>
+            </tr>
+        </table>
+    </td>
+    <td>
+        <div id="dateSelect"></div>
+        <div id="dates">
+            <p><label for="startdate">Start Date:</label><input type="text" name="startdate" id="startdate"></p>
+            <p><label for="starttime">Start Time:</label><input type="text" name="starttime" id="starttime" value="00:00:00"></p>
+            <p><label for="enddate">End Date:</label><input type="text" name="enddate" id="enddate"></p>
+            <p><label for="endtime">End Time:</label><input type="text" name="endtime" id="endtime" value="23:59:59"></p>
+        </div>
+    </td>
+    <td colspan="2">
+        <input type="button" onClick="if ( document.getElementById('mainkey_msgid').checked ) { document.getElementById('email').value='';  }; if ( document.getElementById('mainkey_email').checked ) { document.getElementById('msgid').value='';  }; eximstatstbl.updatedata();" value="Search" class="input-button">
+    </td>
+</tr>
+</table>
+</form>
+<br />
+<div id="currentemail_sec">
+    <h2>Report For <span id="currentmsgid"><cpanel print="$FORM{'msgid'}"></span><span id="currentemail"><cpanel print="$FORM{'email'}"></span></h2>
+</div>
+<br />
+<div id="deliveryreport"></div>
+* Failures and deferals are only tracked for 72 hours.  Successes are tracked for 30 days.
+
+</cpanelfeature>
+
+
+
+<div class="return-link"><a href="javascript:window.history.back()">&larr; <cptext "Go Back"></a></div>
+
+</div><!-- end body-content -->
+
+<cpanelfeature deliveryreport>
+<br />
+<script type="text/javascript" src="<cpanel MagicRevision="uri("/yui/data/data.js")">"></script>
+<script type="text/javascript" src="<cpanel MagicRevision="uri("/yui/calendar_interval/calendar_interval.js")">"></script>
+<script type="text/javascript" src="<cpanel MagicRevision="uri("/sharedjs/emailstats_datatable.js")">"></script>
+<script type="text/javascript">
+
+var eximstatstbl = new CPANEL.EximStatsDataTable(
+        {
+
+        starttime: "month",            
+        columns: ['type','sender','sendunixtime','transport','actionunixtime','msgid','host','size','message']
+
+        }
+);
+
+
+</script>
+</cpanelfeature>
+
+<div id="emailreport"></div>
+<div style="width: 1px; height: 1px; position:absolute; top:-999999px; left:-999999px;" id="printpanel"></div>
+
+<cpanel Branding="include(stdfooter.html)">

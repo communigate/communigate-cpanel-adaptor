@@ -1,0 +1,257 @@
+<cpanel setvar="headerimg=../images/topmysql.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+<cpanel Postgres="initcache()">
+<cpanel Postgres="updateprivs()">
+  
+<cpanelif $FORM{'itemsperpage'}>
+	<cpanel setvar="itemsperpage=$FORM{'itemsperpage'}">
+</cpanelif>
+<cpanelif !$FORM{'itemsperpage'} || !$CPVAR{'itemsperpage'}>
+	<cpanel setvar="itemsperpage=10">
+</cpanelif>
+
+<style type="text/css">
+<?cp Branding::spritelist(.spriteicon_img_mini {float:left;margin-right:5px;background: url\{leftparenthesis}"%"\{rightparenthesis};} %,@spriteurl,images::#icon-${img}_mini {background-position\{colon}0 -${cssposition}px;width\{colon}${width}px;height\{colon}${height}px; }:) imgtype=icon,subtype=img,method=scale_60percent,format=png,img=postgresql ?>
+</style>
+
+<div class="body-content">
+  
+<div class="h1Title"><div class="spriteicon_img_mini" id="icon-postgresql_mini"></div><cpanel langprint="PSDHead"></div>
+	
+<p class="description"><cpanel langprint="PostgreSQLDesc"></p><br />
+
+<a name="psqldbs" id="psqldbs"></a>
+
+<cpanelif !$pgrunning>
+  <p class="alert_box"><cpanel Locale="maketext('The PostgreSQL server is currently [boolean,_1,online,offline].',$pgrunning)"></p>
+  <script>
+        YAHOO.util.Event.onDOMReady(function() { CPANEL.animate.slide_up("postgres_main"); });
+  </script>
+</cpanelif>
+
+<div id="postgres_main">
+    <p class="jump"><img src="../images/arrow-down.gif" alt="jump-down" align="middle" /><a href="#psqlusers"><cpanel langprint="jump_postgre_users"></a></p>
+    <br />
+    <h2><cpanel langprint="PSDHead"></h2>
+
+<!-- 
+<?cp StatsBar::stat(Using % out of % PostgreSQL databases,count,max) display=postgresqldatabases ?> # Needed to setup CPVAR statsbar variables used below
+-->
+<cpanelif $CPVAR{'statsbar_postgresqldatabases_maxed'}>
+<p class="alert_box"><cpanel langprint="QuotaWarning1"> <cpanel langprint="SQLdatabase">. <cpanel langprint="QuotaWarning2"></p>
+<br />
+</cpanelif>
+<cpanelif !$CPVAR{'statsbar_postgresqldatabases_maxed'}>
+<br />
+<div class="formbox">
+    <form method="post" action="addbs.html" name="mainform" id="mainform">
+    <h2><cpanel langprint="mysql_create_db"></h2>
+    <div class="highlight">
+        <table cellpadding="3" cellspacing="0">
+            <tr>
+                <td><label for="dbname"><cpanel langprint="Dbname"></label></td>
+                <td><cpanel print="$dbownerprefix"><input type="text" name="db" id="dbname" style="width: 150px" /></td>
+                <td><div id="dbname_error"></div></td>
+            </tr>
+            <tr>
+                <td>&nbsp;</td>
+                <td><center><input type="submit" id="submit_dbname" value="<cpanel langprint="PSDDBCreateButton">" class="input-button" /></center></td>
+                <td>&nbsp;</td>
+            </tr>
+        </table>			
+    </div>
+    </form>
+</div>
+    <script type="text/javascript">
+    //<![CDATA[
+    var user = "<cpanel print="$user">";
+    var user_length = parseInt('<cpanel print="$dbprefix">');
+    var dbprefix = '<cpanel print="$dbowner">';
+    var db_max_length = user_length ? ( 62-(dbprefix.length) ) : ( 63 );
+
+    var max_length = 50;    // mysql database names have a max length of 16 characters
+    var init_newdb_validation = function() {
+            var dbname_validator = new CPANEL.validate.validator("<cpanel Locale="maketext('New Database')">");
+            dbname_validator.add("dbname", "sql_alphanumeric", "<cpanel langprint="mysql_dbname_alpha">");
+            dbname_validator.add("dbname", function () {
+               var dbname = document.getElementById('dbname').value;
+               return ((!/^\_/.test(dbname)) && (!/\_$/.test(dbname)) && (!/^\d/.test(dbname)));
+            }, "<cptext "Entry cannot begin or end with an underscore or number">");
+            dbname_validator.add("dbname", "max_length(%input%, " + db_max_length + ")", "<cptext "The maximum input length for this field is ">"+db_max_length+"<cptext " characters">");
+            dbname_validator.attach();
+            
+            CPANEL.validate.attach_to_form("submit_dbname", dbname_validator);
+        };
+        YAHOO.util.Event.onDOMReady(init_newdb_validation);
+    //]]>
+    </script>
+</cpanelif>
+    <h2><cpanel langprint="current_databases"></h2>
+
+    <div class="formbox">	
+        <table style="width: 650px">
+            <tr>
+                <td width="50%"></td>
+                <td width="50%" style="text-align: right">
+                    <form method="get" action="">
+                        <span class="boldit"><cpanel langprint="SESearchButton"></span><input type="text" size="15" name="searchregex" value="<cpanel print="$FORM{'searchregex'}">" /><input type="submit" class="input-button" value="<cpanel langprint="go">" />
+                    </form>
+                </td>		
+            </tr>
+        </table>
+        <table align="center" border="0" cellpadding="5" width="650" cellspacing="0" id="sqltbl" class="sortable">
+            <tr>
+                <th width="25%"><cpanel langprint="PSDMDData"></th>
+                <th width="25%"><cpanel langprint="PSDMDSize"></th>
+                <th width="25%"><cpanel langprint="PSDMDUsers"></th>
+                <th width="25%" class="sorttable_nosort" scope="col" colspan="2"><cpanel langprint="PSDMDAct"></th>
+            </tr>
+
+    <?cp Postgres::listdbs(
+        [tr class="row-%"]
+            [td  align="center"]%[/td]
+            [td  align="center"]% MB[/td]
+            [td  align="center"]&nbsp; %[/td]
+            [td  align="center"][a href="deldbconfirm.html?db=%"]$LANG{'Delete'} $LANG{'BUDatabase'}[/a][/td]
+        [/tr]
+        
+    ,*num,db,sizemeg,userlist:
+            [table width="100\{percent}" border="0" cellpadding="0" cellspacing="0" class="sql"]:
+                [tr]
+                    [td width="80\{percent}" class="nobrd"]${user}[/td]
+                    [td width="20\{percent}" align="left" class="nobrd"][a href="deluserfromdbconfirm.html?user=${user}&amp;db=${db}"][img src="../images/delete_x.gif" border="none" alt="" /][/a][/td]
+                [/tr]:
+            [/table]
+    ,db) regex=$FORM{'searchregex'},api2_paginate=1,api2_paginate_start=$FORM{'api2_paginate_start'},api2_paginate_size=$CPVAR{'itemsperpage'} || '[tr][td colspan="5" class="errors"][br /]$LANG{'NoMySQLDbs'}[br /][br /][/td][/tr]' ?>
+
+        </table>
+        <?cp UI::paginate(%,paginator) currentpage=$CPVAR{'currentpage'},pages=$CPVAR{'pages'},itemsperpage=$CPVAR{'itemsperpage'} ?>
+        <cpanelif $CPVAR{'pages'} && !$CPVAR{'pages'}==1>
+        <div style="float:right"><form>
+        <cpanel langprint="PaginatorShowing"> <select name="itemsperpage" onchange="this.form.submit();">
+        <?cp UI::paginate_list([option value="%" %]%[/option],item,selected=1?selected:,item) itemsperpage=$CPVAR{'itemsperpage'},itemlist=10:25:50:100:250:500 ?>
+        </select><noscript><button id="my_button" onclick="" type="submit" Value=""><cpanel Locale="maketext('Change')"></button></noscript>  <cpanel langprint="PaginatorResults"> 
+        </form></div>
+        </cpanelif>
+    </div><!-- end formbox -->
+
+    <a name="psqlusers" id="psqlusers"></a>
+    <p class="jump"><img src="../images/arrow-up.gif" alt="jump-up" align="middle" /><a href="#psqldbs"><cpanel langprint="jump_postgre_databases"></a></p>
+    <h2><cpanel langprint="PSQLUsers"></h2>
+    <form method="post" action="addusers.html" name="userform" id="userform">
+    <input type="hidden" name="db" value="<cpanel print="$FORM{'db'}">" />
+    <div class="formbox">
+        <h2><cpanel langprint="NewUser"></h2>
+        <table cellpadding="3" cellspacing="0" class="tbl">
+            <tr>
+                <td align="right"><cpanel langprint="SQLGrantPermUser"></td>
+                <td><cpanel print="$dbownerprefix"><input type="text" size="15" name="user" id="user" style="width: 150px" /></td>
+                <td><div id="user_error"></div></td>
+            </tr>
+            <tr>
+                <td align="right"><cpanel langprint="ASIReadOtherPassword"></td>
+                <td><input size="15" type="password" name="pass" id="password" style="width: 150px" /></td>
+                <td><div id="password_error"></div></td>
+            </tr>
+            <tr>
+                <td align="right"><cpanel langprint="ASIReadOtherPasswordAgain"></td>
+                <td><input type="password" size="15" name="pass2" id="password2" style="width: 150px" /></td>
+                <td><div id="password2_error"></div></td>
+            </tr>
+            <tr>
+                <td align="right">
+                    <cpanel langprint="email_strength"> (<div style="display: inline" id="why_strong_passwords_link" class="action_link"><cpanel langprint="email_why"></div>):
+                    <div id="why_strong_passwords_text" style="display: none"><cpanel langprint="email_password_why"><br /><br /><cpanel langprint="email_password_tip"></div>
+                </td>
+                <td><div id="password_strength" style="width: 150px; height: 20px; border: 1px solid black; margin: 5px 0px 3px 0px"></div></td>
+                <td><input type="button" id="create_strong_password" class="input-button" value="<cpanel langprint="cjt_password_generator">" tabindex="-1" /></td>
+            </tr>
+            <tr><td colspan="3"><br /></td></tr>
+            <tr>
+                <td>&nbsp;</td>
+                <td><center><input type="submit" value="<cpanel langprint="PSDCreateButton">" class="input-button" id="submit_new_user" style="width: 150px" /></center></td>
+                <td>&nbsp;</td>
+            </tr>
+        </table>
+    </div><!-- end formbox -->
+    </form>
+    <script type="text/javascript">
+    //<![CDATA[
+    var REQUIRED_PASSWORD_STRENGTH = parseInt('<?cp PasswdStrength::get_required_strength(%,strength) app=postgres ?>') || 5;
+    var user_length = parseInt('<cpanel print="$dbprefix">');
+    var dbprefix = '<cpanel print="$dbowner">';
+
+    var max_length = user_length ? ( 62-(dbprefix.length) ) : ( 63 );
+
+    var init_user_validation = function() {
+        var user_validator = new CPANEL.validate.validator("<cpanel Locale="maketext('Username')">");
+        user_validator.add("user", "sql_alphanumeric", "<cpanel langprint="mysql_username_alpha">");
+        user_validator.add("user", function () {
+               var user = document.getElementById('user').value;
+               return (!(/^\d/.test(user)));
+            }, "<cptext "Entry cannot begin with a number">");
+        user_validator.add("user", function () {
+               var user = document.getElementById('user').value;
+               return (!(/\_$/.test(user)));
+            }, "<cptext "Entry cannot end with a trailing underscore.">");
+
+        user_validator.add("user", "max_length(%input%, "+max_length+")", "<cptext "Username cannot be longer than ">"+max_length+"<cptext " characters.">");
+        user_validator.attach();
+        
+        var password_validators = CPANEL.password.setup("password", "password2", "password_strength", REQUIRED_PASSWORD_STRENGTH, "create_strong_password", "why_strong_passwords_link", "why_strong_passwords_text");
+        password_validators.push(user_validator);
+        CPANEL.validate.attach_to_form("submit_new_user", password_validators);
+    };
+
+    YAHOO.util.Event.onDOMReady(init_user_validation);
+    //]]>
+    </script>
+
+    <!-- <cpanel Postgres="number_of_dbs()"> -->
+    <!-- <cpanel Postgres="number_of_users()"> -->
+    <cpanelif !$CPVAR{'postgres_number_of_users'}==0 && !$CPVAR{'postgres_number_of_dbs'}==0>
+        <form method="post" action="addusertodb.html">
+        <div class="formbox">
+            <h2><cpanel langprint="PSDBAddUser"></h2>
+            <table cellpadding="5" cellspacing="0" class="tbl">
+                <tr>
+                    <td align="right"><cpanel langprint="FTPUser">:</td>
+                    <td><select name="user"><cpanel Postgres="listusersopt()"></select></td>
+                </tr>
+                <tr>
+                    <td align="right"><cpanel langprint="PSDMDData">:</td>
+                    <td><select name="db"><cpanel Postgres="listdbsopt()"></select></td>
+                </tr>
+                <tr>
+                    <td>&nbsp;</td>
+                    <td><input type="submit" class="input-button" value="<cpanel langprint="Submit">" /></td>
+                </tr>
+            </table>
+        </div>
+        </form>
+    </cpanelif>
+
+    <div class="formbox">
+        <h2><cpanel langprint="current_users"></h2>
+        <table cellpadding="0" align="center" cellspacing="0" border="0" width="500" class="sortable">
+          <tr>
+            <th width="33%" class="cell"><cpanel langprint="PSDMDUsers"></th>
+            <th width="33%" class="cell sorttable_nosort"><cpanel langprint="DeleteUsr"></th>
+          </tr>
+          
+        <?cp Postgres::listusers(
+            [tr class="row-%"]
+                [td align="center"]%[/td]
+                [td align="center"][a href="deluserconfirm.html?user=%"] [img src="../images/delete_x.gif" border="0" alt="" /][/a][/td]
+            [/tr]
+        ,*num,user,user)  || '[tr][td colspan="3" class="errors"][br /]$LANG{'NoMySQLUsers'}[br /][br /][/td][/tr]' ?>
+
+        </table>
+    </div>
+
+</div> <!-- end postgres_main -->
+
+</div><!-- end body-content -->
+
+<cpanel Branding="include(stdfooter.html)">

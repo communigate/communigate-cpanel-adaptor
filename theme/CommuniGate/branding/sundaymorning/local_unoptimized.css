@@ -1,0 +1,167 @@
+body {
+font-family:verdana, arial, helvetica, sans-serif;
+background-image:none;
+background-color: #2C5BCD;
+}
+
+a:link,a:visited,a:active {
+color:#000;
+text-decoration:none;
+}
+
+a:hover {
+color:#666;
+text-decoration:underline;
+}
+
+.body-content h1 {
+font-family:verdana, arial, helvetica, sans-serif;
+font-size:12px;
+font-weight:700;
+color:#000;
+}
+
+h1 {
+color:#fff;
+}
+
+
+.formtbl .nobrds {
+border:none;
+}
+
+.sortable caption, .nonsortable caption {
+color:#000;
+font-size:12px;
+}
+
+.sortable th, .nonsortable th {
+border-top:1px solid #ccc;
+border-bottom:1px solid #ccc;
+color:#fff;
+font-size:12px;
+font-variant:small-caps;
+background-color:#0045A4;
+background-position:top;
+}
+
+.sortable th a, .nonsortable th a {
+color:#fff;
+font-weight:700;
+text-decoration:none;
+font-size:12px;
+}
+
+.sortable th a:active, .nonsortable th a:active {
+color:#fff;
+font-weight:700;
+text-decoration:underline;
+font-size:12px;
+}
+
+.sortable th a:visited, .nonsortable th a:visited {
+color:#fff;
+font-weight:700;
+text-decoration:none;
+font-size:12px;
+}
+
+.sortable a, .nonsortable a {
+color:#00566a;
+text-decoration:none;
+}
+
+.sortable a:hover, .nonsortable a:hover {
+color:#666;
+text-decoration:none;
+}
+
+.sortable td, .nonsortable td {
+border-bottom:1px solid #ccc;
+border-right:1px solid #ccc;
+}
+
+h6 {
+background-color:#fff;
+font:12px "Gill Sans", Verdana, sans-serif;
+color:#fff;
+font-weight:700;
+text-align:center;
+cursor:pointer;
+}
+
+h3 {
+background-color:#fff;
+font:12px "Gill Sans", Verdana, sans-serif;
+color:#fff;
+font-weight:700;
+text-align:center;
+cursor:default;
+}
+
+h6:hover {
+cursor:pointer;
+color:#003333;
+}
+
+h6.sfhover {
+cursor:pointer;
+}
+
+.cellbox {
+border:1px solid #33cccc;
+}
+
+#notices,#quota-warnings {
+border:1px solid #33cccc;
+text-align:center;
+}
+
+#notices h6,#quota-warnings h6,#content-stats h6 {
+border-bottom:2px #666 solid;
+font:12px "Gill Sans", Verdana, sans-serif;
+color:#333;
+font-weight:700;
+text-align:center;
+}
+
+#stats, #stats_extended{
+border-left:1px #33cccc solid;
+border-right:1px #33cccc solid;
+}
+
+#stats td, #stats_extended td{
+border-bottom:1px #33cccc solid;
+}
+
+#stats .row-odd {
+background-color:#EEEEFF;
+}
+
+#stats .row-even {
+background-color:#fff;
+}
+
+.warning {
+color:red;
+}
+
+.formtbl,.sortable {
+border:1px solid #ccc;
+font-family:Verdana, Arial, sans-serif;
+font-size:12px;
+}
+
+.formtbl .info-odd,.sortable .row-odd {
+background-color:#F3F3F3;
+border-bottom:1px solid #ccc;
+}
+
+.formtbl .info-even,.sortable.row-even {
+background-color:#fff;
+border-bottom:1px solid #ccc;
+}
+#cpanel #border-efx #heading-top-header-bg #heading-top-billboard #logo { top: 29px; left: 81px; }
+span.action_link{color:#FFFFFF;cursor:pointer;}
+ .fake_anchor{color:#000;cursor:pointer;}
+.fake_anchor:hover{color:#FFFFFF;text-decoration:underline;}

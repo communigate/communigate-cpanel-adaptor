@@ -1,0 +1,28 @@
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+<link rel="stylesheet" href="css/style.css" type="text/css" media="screen" title="<cpanel Locale="maketext('Default')">" charset="utf-8" />
+<div class="body-content">
+
+<h1><cpanel include="mini_icon.html">
+<?cp LangMods::getkey(%,key) key=name,lang=$FORM{'lang'} ?>
+ <cpanel langprint="moduleinstallheader"></h1>
+
+<h2><cpanel langprint="moduleinstallheader"></h2>
+
+<cpanelif $FORM{'lang'}==perl><p><cpanel langprint="module_perl"></p></cpanelif>
+<cpanelif $FORM{'lang'}==php-pear><p><cpanel langprint="module_php_pear"></p></cpanelif>
+<cpanelif $FORM{'lang'}==php-pecl><p><cpanel langprint="module_php_pecl"></p></cpanelif>
+<cpanelif $FORM{'lang'}==ruby><p><cpanel langprint="module_ruby"></p></cpanelif>
+
+<h2><cpanel langprint="module_check_setup"></h2>
+<div id="module-output">
+    <p><pre>
+<?cp LangMods::setup(%,result) lang=$FORM{'lang'} ?>
+<?cp LangMods::pre_run(%,result) lang=$FORM{'lang'} ?>
+    </pre></p>
+</div>
+<meta http-equiv="refresh" content="0;url=main.html?lang=<cpanel print="$FORM{'lang'}">">
+
+</div>
+
+<cpanel Branding="include(stdfooter.html)">

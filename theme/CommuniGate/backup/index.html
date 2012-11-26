@@ -1,0 +1,189 @@
+<cpanel setvar="headerimg=../images/tools.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+<script type="text/javascript">
+    truncate_on = 1;
+
+<cpanelfeature mysql>
+ register_truncate_table('sqlbackuptbl');
+</cpanelfeature>
+<cpanelfeature forwarders>	
+    register_truncate_table('aliastbl');
+</cpanelfeature>
+<cpanelfeature blockers>	
+    register_truncate_table('filtertbl');
+</cpanelfeature>
+</script>
+<style type="text/css">
+.sysbackup{
+	padding:5px;
+}
+</style>
+<div class="body-content">
+<style type="text/css">
+<?cp Branding::spritelist(.spriteicon_img_mini {float:left;margin-right:5px;background: url\{leftparenthesis}"%"\{rightparenthesis};} %,@spriteurl,images::#icon-${img}_mini {background-position\{colon}0 -${cssposition}px;width\{colon}${width}px;height\{colon}${height}px; }:) imgtype=icon,subtype=img,method=scale_60percent,format=png,img=hd ?>
+</style>
+
+<script type="text/javascript">
+	//<![CDATA[
+
+var inputs_buttons = { file1_id: "file1-submit-button" };
+
+	var init = function() {
+        for ( var input in inputs_buttons ) {
+            var validator = new CPANEL.validate.validator("<cptext "Backups">");
+            validator.add(input, 'min_length(%input%, 1)', '<cpanel langprint="BUBlank">');
+            validator.attach();
+            CPANEL.validate.attach_to_form(inputs_buttons[input], validator);
+        }
+	};
+
+	YAHOO.util.Event.onDOMReady(init);
+
+	//]]>
+</script>	
+
+<cpanel Mysql="updateprivs()">
+<div class="h1Title"><div class="spriteicon_img_mini" id="icon-hd_mini"></div><cpanel langprint="BUBackupHead"></div>
+
+<p class="description"><cpanel langprint="BackupsDesc"></p>
+
+<cpanel setvar="vidtut_name=backup">
+<cpanel setvar="vidtut_header=BUBackupHead">
+<cpanel setvar="vidtut_description=VidBUDesc">
+<cpanel setvar="vidtut_video_name=backup_lo">
+<cpanel setvar="vidtut_width=450">
+<cpanel setvar="vidtut_height=353">	
+<cpanel include="../video_tutorial_include.html">
+
+<div class="highlight" style="border-bottom: 1px solid #d2d2d2; margin: 20px 0 20px -15px;">
+	<h1 style="margin:0"><cpanel langprint="BUFullBackups"></h1>
+	<p class="description"><cpanel langprint="BUFullNotice"></p>
+	<p style="margin-bottom: 20px;"><a class="create-button" href="fullbackup.html"><cpanel langprint="BUGenDown"></a></p>
+<div><cpanel CpBackup="listbackups()"></div>
+</div>
+	
+	<div style=" margin:20px 0;">
+	 <h2><cpanel langprint="PartialBack"></h2>
+<table align="center" width="700" border="0" cellspacing="0" cellpadding="15">
+	<tr>
+		<td valign=top>
+			<strong><cpanel langprint="BUHomeBackupTitle"></strong><br /><br />
+			<a class="create-button" href="<cpanel Cgi="backuplink()">"><cpanel langprint="BUFullOptHome"></a>
+		</td>
+		<td valign=top>
+			<strong><cpanel langprint="BUHomeRestoreTitle"></strong>
+			<form action="doupload.html" name="homeform" id="homeform" target="_blank" method="post" enctype="multipart/form-data">
+			<input type="hidden" value="<cpanel print="$homedir">" name="dir">
+				<input type="file" id="file1_id" name="file1" />
+				<input id="file1-submit-button" class="input-button" type="submit"  value="<cpanel langprint="BUUploadButton">" />
+				<br />
+				<div id="file1_id_error"></div>
+			</form>
+		</td>
+	</tr>
+	<cpanelfeature mysql><tr>
+		<td valign=top>
+			<strong><cpanel langprint="BUSQLBackupTitle"></strong><br /><br />
+			<table fixedtruncate="1" class="sortable truncate-table" id="sqlbackuptbl" cellspacing="0" cellpadding="0">
+			<tr>
+				<th><cpanel langprint="Databases">
+				</th>
+			</tr>
+			    <tbody><?cp MysqlFE::listdbsbackup([tr][td class="cell nobrd-left truncate" truncatefixed="25"][a href="$ENV{'cp_security_token'}/getsqlbackup/%.sql.gz"]%[/a][/td][/tr],db,db) ?>
+				</tbody>
+			</tr>
+			</table>
+		</td>
+		<td valign=top>
+			<strong><cpanel langprint="BUSQLRestoreTitle"></strong>
+			<form action="dosqlupload.html" name="sqlform" id="sqlform" target="_blank" method="post" enctype="multipart/form-data"> 
+				<input type="hidden" value="<cpanel print="$homedir">" name="dir" />
+				<input type="file" name="file2" id="file2_id" />
+				<input id="file2-submit-button" class="input-button" type="submit" value="<cpanel langprint="BUUploadButton">" />
+				<br />
+				<div id="file2_id_error"></div>
+			</form>
+            <script type="text/javascript">
+                inputs_buttons['file2_id'] = 'file2-submit-button';
+            </script>
+		</td>
+	</tr>
+	</cpanelfeature>
+<cpanelfeature forwarders>	
+
+	<tr valign=top>
+		<td>
+				<strong><cpanel langprint="BUFwd"></strong><br />
+				                  <table fixedtruncate="1" class="sortable" id="aliastbl" border="0" cellspacing="0" cellpadding="0">
+							       <tr>    
+				                	<th valign=top>
+								    	<cpanel langprint="BUAliasList">
+								    </th>
+							        </tr>
+				                     <tbody>
+				                      <?cp Email::listaliasbackups([tr][td class="cell nobrd-left truncate" truncatefixed="25"][a href="$ENV{'cp_security_token'}/getaliasbackup/aliases-%.gz"]%[/a][/td][/tr],domain,domain) ?>
+				                     </tbody>
+				                    </tr>
+				                    </table>
+		</td>
+	
+		<td valign=top>
+				<strong><cpanel langprint="BUFwdRestore"></strong><br />
+				<form action="doafupload.html" name="fwdform" id="fwdform" target="_blank" method="post" enctype="multipart/form-data">
+					<input type="hidden" value="<cpanel print="$homedir">" name="dir" />
+					<input type="file" name="file4" id="file4_id" />
+					<input id="file4-submit-button" type="submit" class="input-button" value="<cpanel langprint="BUUploadButton">" />
+					<br />
+					<div id="file4_id_error"></div>
+				</form>
+                <script type="text/javascript">
+                    inputs_buttons['file4_id'] = 'file4-submit-button';
+                </script>
+		</td>
+	</tr>
+</cpanelfeature>
+
+	<cpanelfeature blockers>	
+	<tr>
+		<td valign=top>
+			<strong><cpanel langprint="BUFilter"></strong><br />
+			<table fixedtruncate="1" class="sortable" id="filtertbl" border="0" cellspacing="0" cellpadding="0">
+			   <tr>    
+			    <th valign=top>
+				    <cpanel langprint="System Filter Info">
+				</th>
+			    </tr>
+			     <tbody>
+			      <?cp Email::list_system_filter_info(
+[tr][td class="cell nobrd-left truncate" truncatefixed="25"]
+  [a href="$ENV{'cp_security_token'}/getfilterbackup/%"]%[/a]
+[/td][/tr]
+,filter_info,filter_info) ?>
+
+			     </tbody>
+			    </tr>
+			    </table>
+				
+		</td>
+		<td valign=top>
+			<strong><cpanel langprint="BUFilterRestore"></strong><br />
+			<form action="doafupload.html" name="filterform" id="filterform" target="_blank" method="post" enctype="multipart/form-data">
+				<input type="hidden" value="<cpanel print="$homedir">" name="dir" />
+				<input type="file" name="file3" id="file3_id" />
+				<input id = "file3-submit-button" type="submit" class="input-button" value="<cpanel langprint="BUUploadButton">" />
+				<br />
+				<div id="file3_id_error"></div>
+                <script type="text/javascript">
+                    inputs_buttons['file3_id'] = 'file3-submit-button';
+                </script>
+			</form>
+		</td>
+	</tr>
+	</cpanelfeature>	
+</table>
+</table>
+</div>
+	
+</div>
+<cpanel Branding="include(stdfooter.html)">

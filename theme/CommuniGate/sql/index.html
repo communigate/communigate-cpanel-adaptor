@@ -1,0 +1,34 @@
+<cpanel setvar="headerimg=../images/topmysql.gif">
+<cpanel setvar="dprefix=../">
+<cpanel setvar="headerinclude=sql/index_head.html">
+<cpanel Branding="include(stdheader.html)">
+<cpanel Mysql="initcache()">
+	<cpanelif $FORM{'itemsperpage'}>
+	    <cpanel setvar="itemsperpage=$FORM{'itemsperpage'}">
+	</cpanelif>
+	<cpanelif !$FORM{'itemsperpage'} || !$CPVAR{'itemsperpage'}>
+	    <cpanel setvar="itemsperpage=10">
+	</cpanelif>
+
+
+<div class="body-content">	 
+
+<cpanelfeature !mysql>
+        <meta http-equiv="refresh" content="0;url=../index.html" />
+</cpanelfeature>
+
+<cpanelif !$mysqlrunning>
+   <p class="alert_box"><cpanel Locale="maketext('The MySQL® server is currently [boolean,_1,online,offline].',$mysqlrunning)"></p>
+</cpanelif>
+
+
+<cpanelfeature mysql>
+<cpanelif $mysqlrunning>
+<cpanel relinclude="sql/index_include.html">
+</cpanelif>
+</cpanelfeature>
+
+
+</div><!-- end body-content -->
+	
+<cpanel Branding="include(stdfooter.html)">

@@ -1,0 +1,47 @@
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+
+<script type="text/javascript">
+//<![CDATA[
+
+	var init = function() {
+		var validation = new CPANEL.validate.validator("<cptext "Web Disk Accounts">");
+
+
+		validation.add('password', 'min_length(%input%,1)', '<cpanel langprint="ValidatorPass">');
+
+		validation.attach();
+
+		CPANEL.validate.attach_to_form("submit-button", validation);
+
+	};
+
+	YAHOO.util.Event.onDOMReady(init);
+
+//]]>
+</script>
+
+<div class="body-content">
+
+<style type="text/css">
+<?cp Branding::spritelist(.spriteicon_img_mini {float:left;margin-right:5px;background: url\{leftparenthesis}"%"\{rightparenthesis};} %,@spriteurl,images::#icon-${img}_mini {background-position\{colon}0 -${cssposition}px;width\{colon}${width}px;height\{colon}${height}px; }:) imgtype=icon,subtype=img,method=scale_60percent,format=png,img=webdav ?>
+
+</style>
+<div class="h1Title"><div class="spriteicon_img_mini" id="icon-webdav_mini"></div><cpanel langprint="MENUWebDAVAccounts"></div>
+
+<form method="post" action="dopasswd.html" name="mainform" id="mainform">
+			<p>
+				<cpanel langprint="EAChangingpass"> <cpanel print="$FORM{'login'}">
+			<table>
+				<tr>
+					<td><div align="right"><cpanel langprint="EANewpass"></div></td>
+					<td><input type="hidden" value="<cpanel print="$FORM{'login'}">" name="login"><input type="password" name="password" id="password"> <span id="password_error"></span></td>
+				</tr>
+			</table>		
+			<input id="submit-button" type="submit" class="input-button" value="<cpanel langprint="EAChange">">
+			</p>
+		</form>
+
+<div class="return-link"><a href="accounts_webdav.html">&larr; <cptext "Go Back"></a></div>
+</div>
+<cpanel Branding="include(stdfooter.html)">

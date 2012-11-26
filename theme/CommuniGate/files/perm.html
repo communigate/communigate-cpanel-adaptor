@@ -1,0 +1,97 @@
+<html>
+<head>
+<title>cPanel X</title>
+
+<cpanel relinclude="files/files_head.html">
+<style type="text/css">
+<cpanel Branding="include(sprites.html)">
+</style>
+<script type="text/javascript">
+
+function calcperm() {
+
+        document.fmode.u.value = 0;
+
+        if (document.fmode.ur.checked) {
+
+                document.fmode.u.value = document.fmode.u.value * 1 + document.fmode.ur.value * 1;
+
+        }
+
+        if (document.fmode.uw.checked) {
+
+                document.fmode.u.value = document.fmode.u.value * 1 + document.fmode.uw.value * 1;
+
+        }
+
+        if (document.fmode.ux.checked) {
+
+                document.fmode.u.value = document.fmode.u.value * 1 + document.fmode.ux.value * 1;
+
+        }
+
+        document.fmode.g.value = 0;
+
+        if (document.fmode.gr.checked) {
+
+                document.fmode.g.value = document.fmode.g.value * 1 + document.fmode.gr.value * 1;
+
+        }
+
+        if (document.fmode.gw.checked) {
+
+                document.fmode.g.value = document.fmode.g.value * 1 + document.fmode.gw.value * 1;
+
+        }
+
+        if (document.fmode.gx.checked) {
+
+                document.fmode.g.value = document.fmode.g.value * 1 + document.fmode.gx.value * 1;
+
+        }
+
+        document.fmode.w.value = 0;
+
+        if (document.fmode.wr.checked) {
+
+                document.fmode.w.value = document.fmode.w.value * 1 + document.fmode.wr.value * 1;
+
+        }
+
+        if (document.fmode.ww.checked) {
+
+                document.fmode.w.value = document.fmode.w.value * 1 + document.fmode.ww.value * 1;
+
+        }
+
+        if (document.fmode.wx.checked) {
+
+                document.fmode.w.value = document.fmode.w.value * 1 + document.fmode.wx.value * 1;
+
+        }
+
+}               
+</script>
+</head>
+<body onLoad="calcperm();" class="topright">
+<form name="fmode" action="changeperm.html">
+<table>
+<tr class="row-even">
+        <td><img src="img/diractions/chmod.png" align="absmiddle" alt="chmod"></td>
+        <td><b><cpanel Locale="maketext('Change Permissions')"></b></td>
+    </tr>
+</table>
+<p><cpanel Locale="maketext('File Name:')">&nbsp;&nbsp;&nbsp;&nbsp;<span class="status"><cpanel print="$FORM{'file'}"></span></p>
+<table border="1" bordercolor="#CCCCCC" bgcolor="#FFFFFF" cellpadding="0" cellspacing="1">
+<cpanel Fileman="showperm($FORM{'dir'},$FORM{'file'})">
+</table>
+<br />
+<center>
+<input type="submit" class="input-button" value="<cpanel langprint="FMChange">"></center>
+<input type="hidden" name="doubledecode" value="1">
+<input type="hidden" name="file" value="<cpanel formprint="$FORM{'file'}">">
+<input type="hidden" name="dir" value="<cpanel formprint="$FORM{'dir'}">">
+<input type="hidden" name="udir" value="<cpanel print="$FORM{'dir'}">">
+</form>
+</body>
+</html>

@@ -1,0 +1,14 @@
+<cpanel setvar="headerimg=../images/topmysql.gif">
+<cpanel setvar="dprefix=../">
+<cpanel setvar="headerinclude=sql/index_head.html">
+<cpanel Branding="include(stdheader.html)">
+<div class="body-content">
+<div class="h1Title"><div class="spriteicon_img_mini" id="icon-mysql_mini"></div> <cpanel langprint="SQLAMaint"></div>
+<p><cpanel langprint="DeldUser"> <span class="status"><cpanel print="$FORM{'user'}"> </span>
+<cpanel langprint="FromDB"> <span class="status"><cpanel print="$FORM{'db'}"></span>.
+
+<cpanel Mysql="deluserdb($FORM{'db'},$FORM{'user'})">
+
+<div class="return-link"><a href="index.html">&larr; <cptext "Go Back"></a></div>
+</div>
+<cpanel Branding="include(stdfooter.html)">

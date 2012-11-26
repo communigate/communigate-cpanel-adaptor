@@ -1,0 +1,37 @@
+<cpanel setvar="headerimg=../images/tools.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+
+<style type="text/css"><cpanel include="boxtrapper.css"></style>
+<div class="body-content">
+<h1>
+
+<style type="text/css">
+<?cp Branding::spritelist(.spriteicon_img_mini {float:left;margin-right:5px;background: url\{leftparenthesis}"%"\{rightparenthesis};} %,@spriteurl,images::#icon-${img}_mini {background-position\{colon}0 -${cssposition}px;width\{colon}${width}px;height\{colon}${height}px; }:) imgtype=icon,subtype=img,method=scale_60percent,format=png,img=boxtrapper ?>
+
+</style>
+<div class="spriteicon_img_mini" id="icon-boxtrapper_mini"></div> <cpanel langprint="forwardlistlegend-BoxTrapper"></h1>
+<div align="center"><p><cpanel langprint="forwardlistfor-BoxTrapper"> <font class="blacktext"><cpanel print="$FORM{'account'}"></font></p>
+<p><cpanel langprint="listforwarddesc-BoxTrapper"></p>
+<p>
+</div>
+<div align="center"><table align="center" border="1" bgcolor="#CCCCCC"><th><cpanel langprint="examples-BoxTrapper"></th>
+<tr><td align="left"><i>
+mobilephone@pdaco.com<br/>
+mobilepda@phoneco.com<br/>
+</i></td></tr></table>
+</p>
+<form action="saveforwardlist.html" method="post">
+<textarea name="page" cols="60" rows="40"><cpanel BoxTrapper="fetchcfgfile($FORM{'account'},"list","forward-list.txt")"></textarea><br/>
+<input type="hidden" name="filetype" value="list">
+<input type="hidden" name="account" value="<cpanel print="$FORM{'account'}">">
+
+<input type="hidden" name="dir" value="<cpanel print="$FORM{'emaildir'}">">
+<input type="hidden" value="forward-list.txt" name="file"><br />
+<input type="submit" value="<cpanel langprint="Save">" class="input-button">
+</form>
+</div>
+
+<div class="return-link"><a href="manage.html?account=<cpanel uriprint="$FORM{'account'}">">&larr; <cptext "Go Back"></a></div>
+</div>
+<cpanel Branding="include(stdfooter.html)">

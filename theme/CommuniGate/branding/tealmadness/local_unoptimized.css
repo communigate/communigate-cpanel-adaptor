@@ -1,0 +1,198 @@
+/*********** Teal Madness **********/
+
+/************ General Styles ***********/
+body {
+   font-family: verdana, arial, helvetica, sans-serif;
+   font-size: 11px;
+   background-color:#00566a;
+   background-image:none;
+}
+a:link,
+a:visited,
+a:active,
+.fake_anchor{
+color:#003643;text-decoration:none;
+}
+a:hover,.fake_anchor:hover{
+color:#24383d;text-decoration:underline;
+}
+.body-content h1{
+   font-family:verdana, arial, helvetica, sans-serif;
+   font-size:12px;
+   font-weight: bold;
+   color: #000000;
+}
+
+/********** Button Styles **********/   
+.input-button{
+	color: #014D5F;
+	vertical-align:middle;
+}
+.input-button:hover{
+	color: #014D5F;
+	vertical-align:middle;
+	text-decoration:none;
+}
+.create-button{
+	font-size:11px;
+	border: 1px solid #ccc;
+	text-align:center;
+}
+.create-button:hover{
+	color: #014D5F;
+	text-decoration:none;
+}
+/******************************************** TABLE STYLES *************************************/
+/********* Form Tables ********/
+.formtbl{
+	font-size:12px;
+	font-family:Verdana,  Arial, sans-serif;
+	border:1px solid #ccc;
+}
+.formtbl .nobrds{
+	border:none;
+}
+.formtbl .info-odd{
+	background-color:#F3F3F3;
+	border-bottom:1px solid #ccc;
+}
+.formtbl .info-even{
+	background-color:#fff;
+	border-bottom:1px solid #ccc;
+}
+
+/******** Sortable tables *********/
+.sortable, .nonsortable{
+	font-size:12px;
+	font-family:Verdana,  Arial, sans-serif;
+}
+.sortable caption, .nonsortable caption{
+	color:#000;
+	font-size: 12px;
+}
+.sortable th, .nonsortable th, .dynamic_table th{
+		background-color:#2a7384; 
+		border-top:1px solid #ccc;
+		border-bottom:1px solid #ccc;
+		color:#fff;
+		font-size: 12px;
+		font-variant: small-caps;
+		background-position:top;
+}
+.sortable th a, .nonsortable th a, .dynamic_table th a{
+	color:#fff;
+	font-weight:bold;
+	text-decoration:none;
+	font-size: 12px;
+}
+.sortable th a:active, .nonsortable th a:active, .dynamic_table th a:active{
+	color:#faa523;
+	font-weight:bold;
+	text-decoration:underline;
+	font-size: 12px;
+}
+ .sortable th a:visited,.nonsortable th a:visited, .dynamic_table th a:visited{
+	color:#faa523;
+	font-weight:bold;
+	text-decoration:none;
+	font-size: 12px;
+}
+.sortable a,.nonsortable a, .dynamic_table th a {
+	color:#24383d;
+	text-decoration:none;
+}
+.sortable a:hover,.nonsortable a:hover, .dynamic_table th a:hover {
+	color: #faa523;
+	text-decoration:none;
+}
+.sortable, .nonsortable, .dynamic_table{
+	border:1px solid #387785;
+}
+.sortable td,.nonsortable td{
+	border-bottom:1px solid #ccc;
+	border-right:1px solid #ccc;
+}
+.sortable .row-odd,.nonsortable .row-odd{
+	background-color:#f3f3f3;
+	border-bottom:1px solid #ccc;
+}
+.sortable.row-even,.nonsortable.row-even{
+	background-color:#fff;
+	border-bottom:1px solid #ccc;
+}
+
+/********** Boxes - To Right on Main Page *********/
+h6{
+	border-bottom:2px #ccc solid;
+	font:12px Verdana, sans-serif; 
+	color:#fff;
+	font-weight:bold;
+	text-align:center;
+}
+h3{
+	border-bottom:2px #ccc solid;
+	font:12px Verdana, sans-serif; 
+	color:#fff;
+	font-weight:bold;
+	text-align:center;
+	cursor:default;
+}
+h2{
+	cursor:pointer;
+}
+h6:hover{
+	color: #000;
+	cursor:pointer;
+}
+h6.sfhover { 
+    cursor:pointer; 
+}
+
+.cellbox {
+	border:1px solid #387785;
+	text-align:center;
+	/*cursor:default;*/
+}
+/********** Small boxes - To Left on Main Page *********/
+#notices, #quota-warnings{
+	border:1px solid #387785;
+	text-align:center;
+}
+#notices h6, #quota-warnings h6, #content-stats h6{
+	border-bottom:2px #ccbfa3 solid;
+	font:12px Verdana, sans-serif; 
+	color:#333;
+	font-weight:bold;
+	text-align:center;
+}
+#notices, #quota-warnings, #content-stats h6 {
+	/*cursor:pointer;*/
+}
+
+#stats .row-odd{
+	background-color:#f3f3f3;
+}
+#stats .row-even{
+	background-color:#fff;
+	
+	}	
+.warning{
+	color:#FF0000;
+}
+.celldrop_active {
+background-color: #faa523;
+}
+ul.links li a {
+color: #fff;
+}
+
+#cpanel #border-efx #heading-top-header-bg #heading-top-billboard #logo { top: 40px; left: 52px; }
+/*#cpanel #border-efx #heading-top-header-bg #heading-top-billboard #logo img { width: 148px; height: 78px; }*/
+span.action_link, span.fake_anchor {
+	color: #FFFFFF;
+	cursor: pointer;
+}
+span.fake_anchor:hover {
+	color: #FFFFFF;
+	text-decoration: underline;
+}

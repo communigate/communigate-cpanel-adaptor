@@ -1,0 +1,37 @@
+<html>
+<head>
+<title>cPanel X</title>
+<cpanel relinclude="files/files_head.html">
+<style type="text/css">
+.spf {
+    padding-left: 10px;
+}
+.flt {
+    float: left;
+}
+.bld {
+    font-weight: 700;
+}
+</style>
+
+
+</head>
+<body class="topright">
+<div id="saveprefs">
+    <div class="hd">
+        <div class="lt"></div>
+        <span><cpanel langprint="PrefHead"></span>
+
+    <div class="rt">
+</div></div>
+<div class="bd">
+    <div class="filecontent" id="saveprefs-content">
+            <div class="bld flt"><cpanel Locale="maketext('Your preferences have been saved:')"></div>
+          <?cp NVData::set([div class="spf flt"]%[/div],set) names=ignorecharencoding,setmissing=1 ?>
+    <div class="clearit" clear="both">&nbsp;</div>
+  </div>
+</div>
+    <div class="ft"></div>
+</div>
+</body>
+</html>

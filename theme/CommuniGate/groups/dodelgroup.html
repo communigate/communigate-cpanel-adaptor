@@ -1,0 +1,18 @@
+<cpanel setvar="headerimg=../images/mailmenu.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+<style type="text/css">
+<?cp Branding::spritelist(.spriteicon_img_mini {float:left;margin-right:5px;background: url\{leftparenthesis}"%"\{rightparenthesis};} %,@spriteurl,images::#icon-${img}_mini {background-position\{colon}0 -${cssposition}px;width\{colon}${width}px;height\{colon}${height}px; }:) imgtype=icon,subtype=img,method=scale_60percent,format=png,img=maillist ?>
+</style>
+<div class="body-content">
+<div class="h1Title"><div class="spriteicon_img_mini" id="icon-maillist_mini"></div> <cpanel langprint="CGPGroupMaintenance"></div>
+<h2><b><cpanel langprint="CGPDelGroup"></b></h2>
+<p>
+	<cpanel langprint="CGPGroupDelconfirm"> <span class="status"><cpanel print="$FORM{'email'}"></span>?</p>
+<p>
+	<a class="create-button" href="realdodelgroup.html?email=<cpanel formprint="$FORM{'email'}>"><cpanel Locale="maketext('Delete Mail Group')"></a>
+	<a class="cancel_link" href="groups.html"><cpanel Locale="maketext('cancel')"></a>
+</p>
+<div class="return-link"><a href="groups.html">&larr; <cptext "Go Back"></a></div>
+</div><!-- end body-content -->
+<cpanel Branding="include(stdfooter.html)">

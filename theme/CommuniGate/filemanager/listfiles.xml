@@ -1,0 +1,14 @@
+<xml id="listfilesv2">
+<?cp Fileman::getabsdir([dir]%[/dir],^absdir) dir=$FORM{'dir'} ?>
+<?cp Fileman::listfiles(
+        [file id="%\{percent}2f%"]
+            [name]%[/name]
+            [path]%[/path]
+            [type]%[/type]
+            [size]%[/size]
+            [mtime]%[/mtime]
+            [humansize]%[/humansize]
+            [nicemode]%[/nicemode]
+        [/file]
+    ,^path,^file,&file,^path,^type,^size,^mtime,^humansize,^nicemode) dir=$FORM{'dir'},types=$FORM{'types'} ?>
+</xml>

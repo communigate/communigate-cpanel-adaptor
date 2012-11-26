@@ -1,0 +1,183 @@
+<cpanel Branding="tempsetbrandingpkg($RAW_FORM{'brandingpkg'})">
+
+<cpanel setvar="headerimg=../../images/tools.gif">
+<cpanel setvar="dprefix=../../">
+<cpanel include="../../stdbheader.html">
+<cpanel include="../../ajaxhelp.html">
+
+<link rel="stylesheet" href="/yui/yui-ext/resources/css/resizable.css">
+<script type="text/javascript" src="<cpanel MagicRevision="uri("/yui/yui-ext/yui-ext.js")">"></script>
+
+<script type="text/javascript">
+var brandingpkg='<cpanel print="$FORM{'brandingpkg'}">';
+var LANG = {
+		  problem_saving_css : "<cpanel Locale="maketext('There was a problem saving the CSS. Please reload the page and try again.')">",
+		  saved_ : "<cpanel Locale="maketext('Saved: ')">",
+		  problem_saving_css_error_log : "<cpanel Locale="maketext('There was a problem saving the CSS. Please check “[_1]”.','/usr/local/cpanel/logs/error_log')">"
+};
+</script>
+<script type="text/javascript" src="logoedit.js"></script>
+
+<script type="text/javascript">
+	//<![CDATA[
+
+	// validate filename extensions
+	// note: extending the CPANEL.validate namespace here to make it easier to add validation in a loop below
+	CPANEL.validate.external_check_extension = function (str, fname) {
+        // empty string is ok
+        if ( str == '' ) return true;
+
+        //make sure there is an extension
+        if ( !(/[^.]\.[^.]+$/.test(str)) ) return false;
+        var given_extension = str.split('.').pop();
+
+        var allowed_extensions = [ 'gif', 'jpg', 'jpeg', 'png' ];
+
+        return (allowed_extensions.indexOf(given_extension) !== -1);
+    }
+
+	// Event processing for the "reset to default" button
+	var confirm_wrapper = function( e ) {
+		var confirm = window.confirm('<cptext "Are you sure you want to revert this file?">');
+
+		// If the user chose to abort we need to tell the browser not to follow the anchor
+		if ( ! confirm ) {
+			YAHOO.util.Event.preventDefault(e);
+
+		}
+	}
+
+	var init = function() {
+
+		var validation = new CPANEL.validate.validator("<cptext "Header and Footer">");
+
+		// Get all the revert buttons and attach a confirmation box to them
+		var els = YAHOO.util.Dom.getElementsByClassName("revert-button");
+
+		for (var i = 0; i < els.length; i++ ) {
+			YAHOO.util.Event.on(els[i].id, "click", confirm_wrapper);
+		}
+
+		// grab all the input elements with a class name of file_input_identifier
+		var els = YAHOO.util.Dom.getElementsByClassName("file_input_identifier", "input", "logotbl");
+
+	    for ( var i = 0; i < els.length; i++ ) {
+          
+          // get the classnames on the input element and split them out into an array
+	      var classNames = els[i].className.split(' ');
+	      var file_input_name = '';
+
+          // for each className see if the name begins with file_input_name_
+	      for ( var ii = 0; ii < classNames.length; ii++ ) {
+		     if ( /^file_input_name_/.test(classNames[ii]) ) {
+			    // if so strip out the leading idenfifer and pass the file name to the validation function
+			    var file_input_name = classNames[ii].replace('file_input_name_','');
+		     }
+	      }
+	      validation.add(els[i].id, 'external_check_extension(%input%,"'+file_input_name+'")', '<cptext 'Filename must end in [list,or,_*].', '.gif', '.jpg', '.png', '.jpeg'>');
+		}
+		validation.attach();
+
+		CPANEL.validate.attach_to_form("submit-button", validation);
+	};
+
+	YAHOO.util.Event.onDOMReady(init);
+
+	//]]>
+</script>	
+
+<style type="text/css">
+#logo-top-logo {
+    cursor:move;
+}
+#logo-top-logo-rzwrap{
+    z-index: 100;
+}
+#logo-top-logo-rzwrap .yresizable-handle{
+    width:11px;
+    height:11px;
+    background:transparent url('/yui/yui-ext/resources/images/sizer/square.gif') no-repeat;
+    margin:0px;
+}
+#logo-top-logo-rzwrap .yresizable-handle-east, #logo-top-logo-rzwrap .yresizable-handle-west{
+    top:45%;
+}
+#logo-top-logo-rzwrap .yresizable-handle-north, #logo-top-logo-rzwrap .yresizable-handle-south{
+    left:45%;
+}
+</style>
+
+<div class="body-content">
+
+<style type="text/css">
+<?cp Branding::spritelist(.spriteicon_img_mini {float:left;margin-right:5px;background: url\{leftparenthesis}"%"\{rightparenthesis};} %,@spriteurl,images::#icon-${img}_mini {background-position\{colon}0 -${cssposition}px;width\{colon}${width}px;height\{colon}${height}px; }:) imgtype=icon,subtype=img,method=scale_60percent,format=png,img=branding ?>
+.sortable td{
+	padding:0 1px;
+}
+</style>
+<div class="breadcrumbs"><a class="crumb_highlight" href="index.html"><cpanel Locale="maketext('Branding Editor')"></a> > <a class="crumb_highlight" href="edit_bpkg.html?brandingpkg=<?cp Branding::getbrandingpkg(%,^brandingpkg)?>"><cpanel  langprint="Branding_edit_title"></a> > Edit Logo </div>
+
+<div class="h1Title"><div class="spriteicon_img_mini" id="icon-branding_mini"></div> <cpanel langprint="BrandingEditLogos"></div>
+
+<p class="description"><cpanel langprint="BrandingEditLogosDesc"></p>
+
+<cpanel setvar="vidtut_name=editlogos">
+<cpanel setvar="vidtut_header=VidEditLogo">
+<cpanel setvar="vidtut_description=VidEditLogoDesc">
+<cpanel setvar="vidtut_video_name=editlogos_lo">
+<cpanel setvar="vidtut_width=450">
+<cpanel setvar="vidtut_height=355">
+<cpanel include="../../video_tutorial_include.html">
+
+<strong><cpanel Locale="maketext('For example: [comment, this is a label intended to introduce a non-language-related example, e.g. an image or code sample]')"></strong><br />
+<img src="../../images/logoeditor.jpg" alt="logo editor example" />
+
+<div style="width:100%;">CSS <a href="cssedit-code.html?brandingpkg=<cpanel print="$FORM{'brandingpkg'}">">[edit]</a>: <span id="cssnotes" style="color:#f00;">&nbsp;</span><div style="border: 1px solid;"><span id="css">&nbsp;</span><br /><span id="imgcss">&nbsp;</span></div><br /><br /></div>
+
+<br /><br />
+
+<h2><cpanel langprint="LogoEditUploadLogo"></h2>
+<cpanel langprint="BrandingStyle">:
+<strong><?cp Branding::getbrandingpkg(%,&brandingpkgname) ?></strong>
+
+
+<form id="mainform" name="mainform" enctype="multipart/form-data" action="logoupload.html" method="post">
+	<input type="hidden" name="brandingpkg" value="<?cp Branding::getbrandingpkg(%,&brandingpkg) ?>" />
+	<input type="hidden" name="dir" value="<cpanel print="$homedir">/cpanelbranding/<cpanel print="$CPDATA{'RS'}">/<?cp Branding::getbrandingpkg(%,&brandingpkg) ?>" />
+    <input type="hidden" name="imgtype" value="logo" />
+
+<table id="logotbl" class="nonsortable" width="690"style="padding:0;" cellpadding="0" cellspacing="0">
+    <tr>
+        <th class="cell" scope="col"><cpanel langprint="description-abbr"></th>
+		<th class="cell" scope="col"><cpanel langprint="filename"></th>
+        <th class="cell" scope="col"><cpanel langprint="BrandingWidth"></th>
+        <th class="cell" scope="col"><cpanel langprint="BrandingHeight"></th>
+        <th class="cell" scope="col"><cpanel langprint="resetdefault-BoxTrapper"></th>
+        <th class="cell" scope="col"><cpanel langprint="BUUploadButton"></th>
+    </tr>
+
+<?cp Branding::brandingeditor(
+    [script]number_brand\{leftparenthesis}%\{comma}'%'\{comma}'%'\{rightparenthesis};[/script]
+	[tr id="imgedit-%-b"]
+        [td align="center"]%[/td]
+		[td align="center"]%[/td]
+        [td align="right"]%[/td]
+        [td align="right"]%[/td]
+        [td align="center"][a class="create-button revert-button" id="revert%" href="resetimg.html?brandingpkg=$URI_ENCODED_FORM{'brandingpkg'}&amp;imgname=%&amp;imgtype=logo"]$LANG{'reset_text'}[/a][/td]
+        [td align="left" width="250px"][input type="file" id="logofile%" name="file%" class="file_input_identifier file_input_name_%"/]&nbsp;[span class="no_panel" id="logofile%_error"][/span][input type="hidden" name="filename-%" value="%" /][/td]
+    [/tr]
+	[tr id="imgedit-%"]  
+		[td colspan="6" align="left" colspan="6" class="logobg"][img class="logo_edit" title="%" alt="%" border="0" src="%" /][/td]
+    [/tr],number,file,subtype,number,htmldescription,file,width,height,number,file,number,number,file,number,number,file,number,htmldescription,htmldescription,&url) imgtype=logo ?>
+
+</table>
+	<input type="submit" id="submit-button" class="input-button" value="<cpanel langprint="BrandingUpload">" />
+
+
+</form>
+
+<cpanel include="gobackwhere.html">
+
+</div><!-- end body-content -->
+
+<cpanel Branding="include(stdfooter.html)">

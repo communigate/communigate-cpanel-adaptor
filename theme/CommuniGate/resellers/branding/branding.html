@@ -1,0 +1,17 @@
+<cpanel setvar="headerimg=../../images/tools.gif">
+<cpanel setvar="dprefix=../../">
+<cpanel relinclude="stdbheader.html">
+
+<div class="body-content">
+
+<style type="text/css">
+<?cp Branding::spritelist(.spriteicon_img_mini {float:left;margin-right:5px;background: url\{leftparenthesis}"%"\{rightparenthesis};} %,@spriteurl,images::#icon-${img}_mini {background-position\{colon}0 -${cssposition}px;width\{colon}${width}px;height\{colon}${height}px; }:) imgtype=icon,subtype=img,method=scale_60percent,format=png,img=branding ?>
+</style>
+
+<div class="h1Title"><div class="spriteicon_img_mini" id="icon-branding_mini"></div> <cpanel langprint="BrandingEdit"></div>
+
+<p><cpanel Locale="maketext('Loading, please wait …')"></p>
+<meta http-equiv="refresh" content="0;url=index.html" />
+
+</div>
+<cpanel Branding="include(stdfooter.html)">

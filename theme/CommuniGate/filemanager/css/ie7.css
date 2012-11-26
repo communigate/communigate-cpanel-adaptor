@@ -1,0 +1,17 @@
+#subright {margin-bottom: -18px;}
+
+#topnav li a {
+	color: #666;
+	display: block;
+	font-size: 72%;
+	padding: 0 3px;
+	text-align: center;
+	text-decoration: none;
+	width: 43px;
+	}
+#topnav ul {
+	background: #fff url(../img/icons/topgradient.jpg) repeat-x 0 0;
+	float: left;
+	padding: 10px 5px;
+	width: 100%;
+	}		

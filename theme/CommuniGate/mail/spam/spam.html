@@ -1,0 +1,136 @@
+<cpanel setvar="headerimg=../images/mailmenu.gif">
+<cpanel setvar="dprefix=../../">
+<cpanel setvar="headerinclude=mail/spam/spam_head.html">
+<cpanel Branding="include(stdheader.html)">
+
+<div class="body-content">
+
+<cpanelif !$CONF{'skipspamassassin'} $CPDATA{'FEATURE-SPAMASSASSIN'}>
+<cpanelfeature spamassassin>
+
+
+
+<div class="h1Title"><div class="spriteicon_img_mini" id="icon-spamassasin_mini"></div><div> <cpanel langprint="SPAHead"> </div></div>
+<div id="sa-wrap" class="clear">	
+<p class="description"><cpanel langprint="SPDesc"></p>
+<cpanelif !$CONF{'skipspambox'} $CPDATA{'FEATURE-SPAMBOX'}>
+<cpanelfeature version-7.0.0>
+</cpanelfeature>
+</cpanelif>
+</div>
+</cpanelfeature>
+<cpanelfeature spamassassin>
+<div id="hilight-box"><p><b><cpanel langprint="SPAStatusPre">&nbsp;<span class="status"><?cp CommuniGate::SpamAssassinStatus(%,status) domain=$CPDATA{'DOMAIN'}?></span></b>.</p>
+<cpanelif !$CPVAR{'spamstatusnotchangeable'}>
+<form action="delspam.html">
+	<p><input id="SAddis" type="submit" class="input-button" value="<cpanel langprint="SPADisableButton">" /></p>
+</form>
+<form action="addspam.html">
+   <p><input id="SAenable" type="submit" class="input-button" value="<cpanel langprint="SPAEnableButton">" /></p>
+</form></div>
+</cpanelif>
+
+<!--<p><form action="addspam.html"><input type="submit" value="<cpanel langprint="SPAEnableButton">" class="input-button"></form></p>
+<p><form action="delspam.html"><input type="submit" value="<cpanel langprint="SPADisableButton">" class="input-button"></form></p>-->
+<div class="sa-box clear">
+<h2><cpanel langprint="BUFilterList"></h2>
+<div id="sa-filters-main">
+<?cp CommuniGate::SpamAssassinStatusAutoDelete(%) domain=$CPDATA{'DOMAIN'}?>
+
+<cpanelif $CPVAR{'spam_auto_delete'}==1>
+<p><b><cpanel langprint="SpamADPre"> <span class="status"><cpanel langprint="SAEnabled"></span></b><br />
+<cpanel langprint="SPamADScorePre"> <b>
+<cpanel print="$CPVAR{'spam_auto_delete_score'}"> </b><cpanel langprint="SpamADScorePost"></p>
+</cpanelif>
+
+<cpanelif $CPVAR{'spam_auto_delete'}==0>
+<p><b><cpanel langprint="SpamADPre"> <span class="status"><cpanel langprint="SADisabled"></span></b></p>
+</cpanelif>
+<p><cpanel langprint="SpamADDesc"></p>
+<p><cptext "(Note: “[numf,_1]” is the default setting. The lower the number, the more conservative the setting.)",'5'></p>
+<form action="addspamfilter.html"><label for="score"><cpanel langprint="SpamADScore"></label> <select name="score" id="autodel_score">
+<option <cpanelif $CPVAR{'spam_auto_delete_score'}==1>selected="selected"</cpanelif> >1</option>	
+<option <cpanelif $CPVAR{'spam_auto_delete_score'}==2>selected="selected"</cpanelif> >2</option>	
+<option <cpanelif $CPVAR{'spam_auto_delete_score'}==3>selected="selected"</cpanelif> >3</option>	
+<option <cpanelif $CPVAR{'spam_auto_delete_score'}==4>selected="selected"</cpanelif> >4</option>	
+<option <cpanelif $CPVAR{'spam_auto_delete_score'}==5 || $CPVAR{'spam_auto_delete_score'}==>selected="selected"</cpanelif> >5</option>	
+<option <cpanelif $CPVAR{'spam_auto_delete_score'}==6>selected="selected"</cpanelif> >6</option>	
+<option <cpanelif $CPVAR{'spam_auto_delete_score'}==7>selected="selected"</cpanelif> >7</option>	
+<option <cpanelif $CPVAR{'spam_auto_delete_score'}==8>selected="selected"</cpanelif> >8</option>	
+<option <cpanelif $CPVAR{'spam_auto_delete_score'}==9>selected="selected"</cpanelif> >9</option>	
+<option <cpanelif $CPVAR{'spam_auto_delete_score'}==10>selected="selected"</cpanelif> >10</option>	
+</select>
+<p><input type="submit" class="input-button" value="<cpanel langprint="SAADButton">" /></p></form>
+</div>
+<div id="sa-filters-sec">
+<p><cpanel langprint="SpamDisableADDesc"></p>
+<form action="deletefilter.html"><input type="submit" class="input-button" value="<cpanel langprint="SADisADButton">" /></form>
+</div>	
+	</div>
+
+	<cpanelif !$CONF{'skipspambox'} $CPDATA{'FEATURE-SPAMBOX'}>
+	<cpanelfeature spambox>
+<div class="sa-box clear">
+	<h2><cpanel langprint="SPASpamBoxHead"></h2>
+	<p><cpanel langprint="SPBoxDesc"></p>
+
+	<p><b><cpanel langprint="SPBoxStatusPre">&nbsp;<span class="status"><?cp CommuniGate::SpamAssassinStatusSpamBox(%,status) domain=$CPDATA{'DOMAIN'}?></span></b>.</p>
+<form action="addspambox.html"><input id="SBenable" type="submit" value="<cpanel langprint="SPBoxEnableButton">" class="input-button enablespambox" /></form></p>
+<form action="delspambox.html"><input id="SBddis" type="submit" value="<cpanel langprint="SPBoxDisableButton">" class="input-button enablespambox" /></form>
+
+	</cpanelfeature>
+	</cpanelif>
+	</cpanelfeature>
+
+</div>
+
+<div class="sa-box">
+	<h2><cpanel langprint="SPAHeadConfig"></h2>
+<p><cpanel langprint="SAConfigDesc"></p>
+<form action="spamassassinconfig.html"><p>
+<cpanel Email="has_spam_as_acl()">
+<cpanelif $CPVAR{'spam_as_acl'}>
+<input type="submit" value="<cpanel langprint="SPACLConfigureButton">" class="input-button" />
+</cpanelif>
+<cpanelif !$CPVAR{'spam_as_acl'}>
+<input type="submit" value="<cpanel langprint="SPConfigureButton">" class="input-button" />
+</cpanelif>
+
+</p></form>
+</div>
+
+
+
+<cpanelif !$CPVAR{'rewrites_subjects'}>
+    <br />
+<cpanel langprint="SPNoRewrites">
+</cpanelif>
+
+
+</cpanelif>
+<script type="text/javascript">
+//<![CDATA[
+        var spamstatus = '<?cp CommuniGate::SpamAssassinStatus(%,status) domain=$CPDATA{'DOMAIN'} ?>';
+	if (spamstatus.match(/disabled/i)) {
+            var disabledDiv = document.getElementById('SAddis');
+            if (disabledDiv) { disabledDiv.style.display='none'; }
+	} else {
+            var enabledDiv = document.getElementById('SAenable');
+            if (enabledDiv) { enabledDiv.style.display='none'; }
+        }	
+	</script>
+	<script type="text/javascript">
+        var spamboxstatus = '<?cp CommuniGate::SpamAssassinStatusSpamBox(%,status) domain=$CPDATA{'DOMAIN'} ?>';
+		
+        if (spamboxstatus.match(/<cpanel langprint="disabled-text">/i)) {
+		    var disabledDiv = document.getElementById('SBddis');
+            if (disabledDiv) { disabledDiv.style.display='none'; }
+		} else {
+		    var enabledDiv = document.getElementById('SBenable');
+            if (enabledDiv) { enabledDiv.style.display='none'; }
+		}	
+	//]]>
+</script>
+</div>
+
+<cpanel Branding="include(stdfooter.html)">

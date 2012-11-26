@@ -1,0 +1,77 @@
+<cpanel setvar="headerimg=../images/toperrorpages.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+<style type="text/css">
+<?cp Branding::spritelist(.spriteicon_img_mini {float:left;margin-right:5px;background: url\{leftparenthesis}"%"\{rightparenthesis};} %,@spriteurl,images::#icon-${img}_mini {background-position\{colon}0 -${cssposition}px;width\{colon}${width}px;height\{colon}${height}px; }:) imgtype=icon,subtype=img,method=scale_60percent,format=png,img=ssl-manager ?>
+</style>
+<div class="body-content">
+
+<div class="h1Title" id="h1Header"><div class="spriteicon_img_mini" id="icon-ssl-manager_mini"></div> <cpanel Locale="maketext('Manage SSL Certifcate Sharing')"></div>
+
+<h2><cpanel Locale="maketext('Share Certificate')"></h2>
+<!--
+<cpanel SSL="installedhost()">
+-->
+<p class="description"><cpanel Locale="maketext('Share your main SSL certificate with other users by selecting “share”.')"></p>
+
+<table cellpadding="5" class="formtbl" style="border:0;">
+<tbody>
+<tr><td align="right"><cpanel Locale="maketext('Host:')"></td>
+<td><strong><cpanel print="$CPVAR{'sslhost'}"></strong></td>
+<td>
+    <!-- <cpanel SSL="sslsharedstatus()"> -->
+    <cpanelif !$CPVAR{'sslsharedstatus'}>
+        <a href="setsharing.html?share=1" class="create-button"><cpanel Locale="maketext('Enable Sharing')"></a></td>
+    </cpanelif>
+    <cpanelif $CPVAR{'sslsharedstatus'}>
+        <a href="setsharing.html?share=0" class="create-button"><cpanel Locale="maketext('Disable Sharing')"></a></td>
+    </cpanelif>
+</tr>
+<tr>
+<td colspan="3">
+    <cpanelif !$CPVAR{'sslsharedstatus'}>
+        <cpanel Locale="maketext('The SSL certificate is currently not shown as shared.')">
+    </cpanelif>
+
+  <cpanelif $CPVAR{'sslsharedstatus'}>
+        <cpanel Locale="maketext('The SSL certificate is currently shown as shared.')">
+    </cpanelif>
+</td>
+</tr>
+</tbody>
+</table>
+
+<script type="text/javascript">
+//<![CDATA[
+function setuser(selid) {
+    var selectbox = document.getElementById('usersel');
+    var selected = selectbox.options[selectbox.selectedIndex];
+    document.getElementById('username').innerHTML = selected.value;    
+    document.getElementById('urlusername').innerHTML = 'https://<cpanel print ="$CPVAR{'sslhost'}">/~' + selected.value;    
+    document.getElementById('domain').innerHTML = 'https://' + (selected.text.split(" "))[0];    
+}
+function startuser() {
+        setuser('usersel');
+}
+YAHOO.util.Event.onDOMReady(startuser);
+//]]>
+</script>
+
+<br />
+<h2><cpanel Locale="maketext('Certificate Linking')"></h2>
+<p><cpanel Locale="maketext('Other accounts can use your SSL certificate by linking their web pages to [output,class,_1,status].',https://$CPVAR{'sslhost'}/~&lt;username&gt;)"></p>
+<div class="highlight"><p><strong><cpanel Locale="maketext('Examples')"></strong></p>
+<p><cpanel Locale="maketext('Select a user to see an example:')">
+    <select name="user" id="usersel" onchange="setuser('usersel');">
+        <cpanel Resellers="accountlistopt()">
+    </select>
+</p>
+<p><cpanel Locale="maketext('User:')"> <strong><span id="username">&lt;username&gt;</span></strong><br />
+
+
+<cpanel Locale="maketext('Link pages to “[output,attr,_1,class,status,id,urlusername]” instead of “[output,attr,_2,class,status,id,domain]”.',"https://$CPVAR{'sslhost'}/~&lt;username&gt;","https://&lt;domain&gt;")">
+</div>
+
+<div class="return-link"><a href="index.html">&larr; <cpanel langprint="SSLReturn"></a></div>
+</div>
+<cpanel Branding="include(stdfooter.html)">

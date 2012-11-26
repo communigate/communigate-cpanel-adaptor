@@ -1,0 +1,38 @@
+<cpanel setvar="headerimg=../images/tools.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+<div class="body-content">
+<h1><cpanel langprint="prog-BoxTrapper"></h1>
+<br /><br />
+
+
+<center><cpanel langprint="queuefor-BoxTrapper"> <b><cpanel print="$FORM{'account'}"></b><br /><br /></center>
+
+<br />
+<b><cpanel langprint="chooseact-BoxTrapper"></b>
+
+<form action="msgaction.html">
+<input type="hidden" name="account" value="<cpanel print="$FORM{'account'}">">
+<input type="hidden" name="q" value="<cpanel print="$FORM{'q'}">">
+<input type="hidden" name="t" value="<cpanel print="$FORM{'t'}">">
+
+<input checked type="radio" name="action" value="deliverall,whitelist"> <cpanel langprint="whtlstdeliverall-BoxTrapper"><br/>
+<input type="radio" name="action" value="deliver,whitelist"> <cpanel langprint="whtlstdeliver-BoxTrapper"><br/>
+<input type="radio" name="action" value="deliverall"> <cpanel langprint="deliverall-BoxTrapper"><br/>
+<input type="radio" name="action" value="deliver"> <cpanel langprint="deliver-BoxTrapper"><br/>
+<input type="radio" name="action" value="delete"> <cpanel langprint="deletemsg-BoxTrapper"><br/>
+<input type="radio" name="action" value="deleteall"> <cpanel langprint="deleteallmsg-BoxTrapper"><br/>
+<input type="radio" name="action" value="delete,blacklist"> <cpanel langprint="blklstdeletemsg-BoxTrapper"><br/>
+<input type="radio" name="action" value="delete,ignorelist"> <cpanel langprint="ignorelstdeletemsg-BoxTrapper"><br/>
+<input type="submit" value="<cpanel langprint="go-BoxTrapper">">
+<br /><br />
+<br />
+<b><cpanel langprint="msgpreview-BoxTrapper"></b>
+<br />
+<textarea rows="30" cols="85" readonly="readonly">
+<cpanel BoxTrapper="showmessage($FORM{'account'},$FORM{'t'},$FORM{'q'})">
+</textarea>
+
+<div class="return-link"><a href="showq.html?account=<cpanel print="$FORM{'account'}">">&larr; <cptext "Go Back"></a></div>
+</div>
+<cpanel Branding="include(stdfooter.html)">

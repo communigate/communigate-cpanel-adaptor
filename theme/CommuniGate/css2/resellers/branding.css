@@ -1,0 +1,307 @@
+/* ------------------------------------
+   =Branding
+   ------------------------------------ */
+
+#branding-options {
+	list-style-type: none;
+	margin: 0 0 20px;
+	padding: 0;
+	}
+
+#branding-options li, #branding-options li a {
+	float: left;
+	}
+	
+#branding-options li {
+	background: #eee;
+	margin: 0 15px 0 0;
+	padding: 0;
+	}
+	
+#branding-options li a {
+	background-position: 5px 50%;
+	background-repeat: no-repeat;
+	border: 1px solid #ccc;
+	display: block;
+	padding: 5px 15px 5px 28px;
+	text-decoration: none;
+	}
+	
+#branding-options li.new-brand a {
+	background-image: url(../../images/be_icons/page_new.gif);
+	}
+	
+#branding-options li.enable-disable-brand a {
+	background-image: url(../../images/be_icons/page_lock.gif);
+	}
+	
+#branding-options li.download-delete-brand a {
+	background-image: url(../../images/be_icons/page_package.gif);
+	}
+	
+#branding-options li.new-brand a:hover, 
+#branding-options li.enable-disable-brand a:hover, 
+#branding-options li.download-delete-brand a:hover {
+	background-color: #fff;
+	text-decoration: underline;
+	}
+	
+p.selected-status {
+	border: 1px solid #eee;
+	border-width: 1px 0;
+	margin: 10px 0;
+	padding: 5px;
+	}
+
+.bpkg {
+	border: 1px solid #eee;
+	float: left;
+	margin: 0 15px 10px 0;
+	padding: 10px;
+	width: 200px;
+	}
+
+.bpkg:hover {
+	border: 1px solid #ccc;
+	}
+
+.bpkg ul, .bpkg ul li {
+	list-style-type: none;
+	margin: 0;
+	padding: 0;
+	}
+
+.bpkg ul {
+	margin: 5px 0 0;
+	}
+#avail-brandings .info-odd,#avail-brandings .rowA {
+background-color:#FFF;
+}
+.applybpkg a {
+	background: transparent url(../../images/be_icons/page_wizard.gif) no-repeat 5px 50%;
+	}
+	
+.applyallbpkg a {
+	background: transparent url(../../images/be_icons/icon_download.gif) no-repeat 5px 50%;
+	}
+
+.editbpkg a {
+	background: transparent url(../../images/be_icons/page_edit.gif) no-repeat 5px 50%;
+	}
+.setdefaultpkg a {
+		background: transparent url(../../images/be_icons/set_default.gif) no-repeat 5px 50%;
+	}
+
+.bpkg ul li a {
+	background-color: #fcfcfc;
+	border: 1px solid #ccc;
+	display: block;
+	margin: 5px 0;
+	padding: 5px 5px 5px 25px;
+	text-decoration: none;
+	}
+
+.bpkg ul li a:hover {
+	background-color: #fff;
+	text-decoration: underline;
+	}
+	
+.bpkg ul.greyedout li a {
+	background-color: #f5f5f5;
+	color: #999;
+	}
+
+.bpkg ul.greyedout li a:hover {
+	background-color: #f5f5f5;
+	cursor: default;
+	text-decoration: none;
+	}
+	
+.bpkg img {
+	border: 0;
+	height: 290px;
+	width: 200px;
+	}
+	
+.bpkg h2 {
+	margin: 0 0 10px;
+	}
+	
+.enable_checkbox {
+	padding: 0 0 7px;
+	}
+
+.checkbox {
+	margin: 0 5px 0 2px;
+	}
+	
+.module {
+	margin: 0 0 15px;
+	}
+	
+/* fix for create new branding headers */
+.module h2 {
+	margin: 5px 0 7px 0;
+	}
+	
+/* ------------------------------------
+   =edit-branding
+   ------------------------------------ */
+
+.status-success {
+	background-color: #D7FFE9;
+	border: 1px solid #acccb8;
+	font-style: italic;
+	padding: 10px;
+	}
+
+#edit-bpkg-content {
+	margin: 10px 0;
+	}
+
+/*.edit-preview {
+	float: left;
+	}*/
+
+#edit-options, #edit-options li, .edit-options, .edit-options li {
+	list-style-type: none;
+	margin: 0;
+	padding: 0;
+	}
+
+#edit-options, .edit-options {
+	width: 400px;
+	}
+
+#edit-options li, .edit-options li {
+	border-bottom: 1px solid #eee;
+	}
+
+#edit-options li a, .edit-options li a {
+	display: block;
+	font-size: 114%;
+	padding: 5px 0 5px 30px;
+	text-decoration: none;
+	}
+
+#edit-options li a:hover, .edit-options li a:hover {
+	background: transparent url(../../images/be_icons/icon_wand.gif) no-repeat 5px 50%;
+	}
+	
+/* ------------------------------------
+   =enable-disable
+   ------------------------------------ */
+
+#bpkg-list {
+	margin: 10px 0;
+	}
+
+#bpkg-list th, #bpkg-list td {
+	padding: 5px;
+	}
+
+#bpkg-list th {
+	background: #eee;
+	color: #000;
+	}
+
+#bpkg-list td {
+	border: 1px solid #eee;
+	}
+
+#selections, #selections li {
+	list-style-type: none;
+	margin: 0;
+	padding: 0;
+	}
+
+#selections {
+	margin: 15px 0;
+	}
+
+#selections li, #selections li a {
+	float: left;
+	}
+
+#selections li a {
+	background-color: #eee;
+	background-position: 5px 50%;
+	background-repeat: no-repeat;
+	border: 1px solid #ccc;
+	display: block;
+	margin: 0 10px 0 0;
+	padding: 5px 5px 5px 25px;
+	text-decoration: none;
+	}
+
+#selections li a:hover {
+	text-decoration: underline;
+	}
+
+#selections .all a {
+	background-image: url(../../images/be_icons/page_tick.gif);
+	}
+
+#selections .none a {
+	background-image: url(../../images/be_icons/page_delete.gif);
+	}
+
+/* ------------------------------------
+   =download-delete
+   ------------------------------------ */
+
+.bpkg-actions, .bpkg-actions li {
+	list-style-type: none;
+	margin: 0;
+	padding: 0;
+	}
+
+.bpkg-actions li, .bpkg-actions li a {
+	float: left;
+	}
+
+.bpkg-actions li a {
+	background-color: #eee;
+	background-position: 5px 50%;
+	background-repeat: no-repeat;
+	border: 1px solid #ccc;
+	display: block;
+	margin: 0 10px 0 0;
+	padding: 5px 5px 5px 25px;
+	text-decoration: none;
+	}
+
+.bpkg-actions li a:hover {
+	text-decoration: underline;
+	}
+
+.bpkg-actions li.download a {
+	background-image: url(../../images/be_icons/icon_package_get.gif);
+	}
+
+.bpkg-actions li.delete a {
+	background-image: url(../../images/be_icons/action_stop.gif);
+	}
+
+.bpkg-actions li.download a:hover, .bpkg-actions li.delete a:hover {
+	background-color: #fff;
+	}
+#gettingstarted-content {
+    background-color:#E4EFF2;
+}
+
+#optionselect-content {	
+    background-color:#E4EFF2;
+    padding: 0 15px 15px 15px; height: 300px; 
+}
+.breadcrumbs{
+	margin:0 0 30px -10px;
+	color:#333;
+}
+a.crumb_highlight{
+	text-decoration:underline;
+	color:#666;
+}
+h1, .h1Title, #h1Title{
+	font-size:14px;
+}

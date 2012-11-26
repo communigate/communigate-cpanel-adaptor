@@ -1,0 +1,72 @@
+<H2>¿Qué son las entradas MX?</H2>
+<P>Las entradas MX, también conocidas como entradas de agente de transporte de 
+correo, son registros de recursos en el sistema del nombres de dominio (<SPAN 
+class=caps>DNS</SPAN>). Un registro MX DE dominio, instruye la forma en que el 
+correo electrónico es direccionado mediante el protocolo simple de transferencia 
+de correo (<SPAN class=caps>SMTP</SPAN>).</P>
+<P>Si su correo es entregado al servidor en el que se encuentra su dominio, no 
+necesitará editar sus entradas de MX.</P>
+<P>Sin embargo, en caso de que desee que su correo sea entregado en un servidor 
+de correo externo u otro dominio, necesita apuntar su entrada MX para dicha 
+ubicación.</P>
+<P>Esta interfaz permite agregar nuevas entradas MX y asignar una prioridad a 
+cada una de ellas. Las prioridades indican que registro será utilizado para 
+direccionar el correo entrante y saliente. Por ejemplo, un registro MX con un 
+valor de prioridad de '0' será el primer registro que se intente. Si este 
+registro falla (debido a una incorrecta información <SPAN class=caps>DNS</SPAN> 
+o una caída del servicio), el segundo registro MX (normalmente con valor de 
+prioridad de '5'), será el que se intente. Este proceso continuará hasta que 
+todos los mensajes hayan sido entregados a la ubicación apropiada.</P>
+<P>Generalmente, los valores de prioridad de registro MX son divisibles por 5, y 
+0 es la entrada de MX de primera prioridad ('prioridad más baja').</P>
+<P><STRONG>Aviso:</STRONG> Una entrada MX es le nombre de host de un servidor, 
+con un formato del tipo mail.example.com. Las direcciones IP, como por ejemplo 
+127.0.0.1, no son válidas.</P>
+<H2>Direccionado de correo electrónico</H2>
+<P>Esta sección de la pantalla le permite especificar qué tipo de agente de 
+transporte de correo utiliza su dominio. Se pueden seleccionar entre cuatro 
+opciones:</P>
+<UL>
+  <LI><B>Detectar la configuración automáticamente</B> — Recomendamos 
+  fuertemente esta opción. Especificar esta opción le permite a cPanel detectar 
+  qué tipo de agente de transporte de correo debe utilizar su dominio. 
+  <LI><B>Agente de transporte de correo local</B> — Esta opción especifica que 
+  el servidor de correo asociado con su dominio siempre aceptará el correo. El 
+  correo será entregado localmente en el servidor ya sea enviado desde su 
+  servidor u otro servidor de correo. 
+  <LI><B>Agente de transporte de correo de respaldo</B> — Esta opción especifica 
+  que usted desea utilizar el servidor de correo asociado con su dominio como un 
+  agente de transporte de correo de respaldo. Utilizar esta opción permite que 
+  el correo sea mantenido en este agente de transporte hasta que un agente de 
+  transporte de prioridad más baja esté disponible. 
+  <LI><B>Agente de transporte de correo remoto</B> — Esta opción especifica que 
+  el servidor de correo asociado con su dominio no debe aceptar el correo 
+  localmente. En su lugar, el correo será transferido al registro MX con el 
+  número más bajo. </LI></UL>
+<UL>
+  <LI>Haga su selección, luego haga clic en <EM>Cambiar</EM>. </LI></UL>
+<H2>Agregar un nuevo registro MX</H2>
+<P>1. Ingrese la prioridad y destino en las casillas apropiadas.</P>
+<UL>
+  <LI>Los valores más bajos significan una prioridad más alta, siendo 0 la 
+  prioridad más alta posible. </LI></UL>
+<UL>
+  <LI>Los servidores de correo primarios (con la prioridad de número más bajo), 
+  recibirán el correo enviado a su dominio. </LI></UL>
+<UL>
+  <LI>Los servidores correo secundarios (aquellos con los valores de prioridad 
+  más altos), pueden ser utilizados a los fines de backup. </LI></UL>
+<UL>
+  <LI>Si se asignan múltiples servidores de correo con la misma prioridad, 
+  cuando dicho nivel de servidor de correo es necesario, el correo será 
+  distribuido para dichos servidores en forma aleatoria. </LI></UL>
+<P>2. Haga clic en <EM>Agregar nuevo registro</EM>.</P>
+<H2>Editar registro MX</H2>
+<P>1. Haga clic en <EM>Editar</EM> a la derecha del registro apropiado.</P>
+<P>2. Ingrese la prioridad y destino en las casillas apropiadas.</P>
+<P>3. Haga clic en <EM>Editar</EM> para guardar los cambios o en 
+<EM>cancelar</EM> para cancelarlos.</P>
+<H2>Eliminar un registro MX</H2>
+<P>1. Haga clic en <EM>Eliminar</EM> a la derecha del registro apropiado.</P>
+<P>2. Haga clic en <EM>Eliminar</EM> para guardar los cambios o en 
+<EM>cancelar</EM> para cancelarlos.</P>

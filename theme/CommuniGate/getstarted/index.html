@@ -1,0 +1,53 @@
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+
+<style type="text/css">
+<?cp Branding::spritelist(.spriteicon_img_mini {float:left;margin-right:5px;background: url\{leftparenthesis}"%"\{rightparenthesis};} %,@spriteurl,images::#icon-${img}_mini {background-position\{colon}0 -${cssposition}px;width\{colon}${width}px;height\{colon}${height}px; }:) imgtype=icon,subtype=img,method=scale_60percent,format=png,img=getstart ?>
+</style>
+
+<div class="body-content">
+
+<cpanelfeature !setlang>
+	<meta http-equiv="refresh" content="0;url=index-a.html" />
+</cpanelfeature>
+<cpanelfeature !getstart>
+	<meta http-equiv="refresh" content="0;url=../index.html" />
+</cpanelfeature>
+
+<cpanelfeature getstart>
+	<div class="h1Title"><div class="spriteicon_img_mini" id="icon-getstart_mini"></div><cpanel langprint="gswtitle"></div>
+	
+	<cpanel include="jumpmenu.html">
+	
+	<h1><cpanel langprint="gswbeforebegin"></h1>
+	<p class="description"><cpanel langprint="gswlangdesc"></p>
+	
+	<form action="goto.html" method="post">
+		<input type="hidden" name="page" value="index-a.html" />
+		<div class="highlight">
+			<h2><cpanel langprint="chlangcurrent"> <span class="status"><cpanel print="$CPDATA{'LANG'}"></span></h2>
+			<br />
+			<cpanel langprint="chlangsetlang"> 
+			<select name="lang">
+				<cpanel SetLang="listlangsopt()">
+			</select>
+			<input type="submit" class="input-button" value="<cpanel langprint="Change">" />
+		</div>
+	</form>
+</cpanelfeature>
+
+<cpanelfeature !getstart>
+	<cpanel include="../refresh.html">
+</cpanelfeature>
+
+<br />
+<div align="right">
+	<form method="get" action="index-a.html">
+		<input type="hidden" name="skip" value="yes" />
+		<input type="submit" class="input-button" value="<cpanel langprint="GSWContinue">">
+	</form>
+</div>
+
+</div><!-- end body-content -->
+
+<cpanel Branding="include(stdfooter.html)">

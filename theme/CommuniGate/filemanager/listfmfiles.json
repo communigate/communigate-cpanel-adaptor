@@ -1,0 +1,17 @@
+{
+    "files":
+   [     
+<?cp Fileman::listfiles(
+    {
+        "ename":"%"\{comma}
+        "name":"%"\{comma}
+        "mimetype":"%"\{comma}
+        "mimeicon":"%"\{comma}
+        "humansize":"%"\{comma}
+        "nicemode":"%"
+    }\{comma}
+,^file,*file,*mimetype,mimename,*humansize,*nicemode) dir=$FORM{'dir'},needmime=1,filelist=$FORM{'filelist'},showdotfiles=$FORM{'showhidden'} ?>
+    {}
+   ],    
+    "absdir":"<?cp Fileman::getabsdir(%,^absdir) dir=$FORM{'dir'} ?>"
+}        

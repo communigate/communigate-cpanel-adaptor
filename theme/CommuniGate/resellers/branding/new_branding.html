@@ -1,0 +1,64 @@
+<cpanel setvar="headerimg=../../images/tools.gif">
+<cpanel setvar="dprefix=../../">
+<cpanel relinclude="stdbheader.html">	
+	
+<div class="body-content">
+
+<style type="text/css">
+<?cp Branding::spritelist(.spriteicon_img_mini {float:left;margin-right:5px;background: url\{leftparenthesis}"%"\{rightparenthesis};} %,@spriteurl,images::#icon-${img}_mini {background-position\{colon}0 -${cssposition}px;width\{colon}${width}px;height\{colon}${height}px; }:) imgtype=icon,subtype=img,method=scale_60percent,format=png,img=branding ?>
+</style>
+
+<h1><cpanel langprint="Branding_create_new"></h1>
+
+<div class="module" id="createnew">
+	<h2><cpanel langprint="BrandingCreatePackage"></h2>
+	<p class="description"><cpanel langprint="BrandingCreatePackageDesc"></p>
+	<form action="mkstyle.html" name="makepack" method="post">
+		<cpanel langprint="Name">: <input type="text" id="name_input" name="pkg" />
+		<input class="input-button" type="submit" id="create_button" disabled="disabled" value="<cpanel langprint="Create">" />
+	</form>
+</div>
+	
+<div style="text-align:center;font-size:18px;font-weight:bold;margin-bottom:10px;"><cpanel langprint="ftp_or"><br /></div>
+
+<div class="module" id="uploadnew">
+	<h2><cpanel langprint="BrandingUploadPkg"></h2>
+	<p class="description"><cpanel langprint="BrandingUploadPkgDesc"></p>
+	<p><cpanel langprint="BrandingPkgFormat"></p>
+	<form enctype="multipart/form-data" name="uploadpack" action="uploadpkg.html" method="post">
+		<input type="hidden" name="dir" value="<cpanel print="$homedir">/tmp" />
+		<input type="file" name="file1" id="file_upload" />
+		<input class="input-button" type="submit" id="upload_button" disabled="disabled" value="<cpanel langprint="BUUploadButton">" />
+	</form>
+</div>
+
+<div class="return-link"><a href="index.html">&larr; <cptext "Go Back"></a></div>
+
+</div><!-- end body-content -->
+<script type="text/javascript">
+//<![CDATA[
+	// function that runs upon page load
+	function initialize() {
+		// add the event handlers on the input fields
+		YAHOO.util.Event.on("name_input", "keyup", validate_name_input);
+		YAHOO.util.Event.on("file_upload", "change", validate_file_upload);
+	}
+	
+	// function that checks the name_input field
+	function validate_name_input() {
+		var input = YAHOO.util.Dom.get("name_input").value;
+		if (input.length == 0) YAHOO.util.Dom.get("create_button").disabled = true;
+		else YAHOO.util.Dom.get("create_button").disabled = false;
+	}
+	
+	// function that checks the file upload field
+	function validate_file_upload() {
+		var file = YAHOO.util.Dom.get("file_upload").value;
+		if (file.length == 0) YAHOO.util.Dom.get("upload_button").disabled = true;
+		else YAHOO.util.Dom.get("upload_button").disabled = false;
+	}
+
+	YAHOO.util.Event.onDOMReady(initialize);
+//]]>
+</script>
+<cpanel Branding="include(stdfooter.html)">

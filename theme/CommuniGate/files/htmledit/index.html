@@ -1,0 +1,109 @@
+<html>
+<head>
+<title><cpanel Locale="maketext('Editing “[_1]”', $FORM{'file'})"></title>
+
+<cpanel relinclude="charset.html">
+
+<!-- load the main HTMLArea files -->
+
+<script type="text/javascript">
+
+</script>
+<script type="text/javascript" src="htmlarea.js"></script>
+<script type="text/javascript" src="lang/en.js"></script>
+<script type="text/javascript" src="dialog.js"></script>
+<script type="text/javascript" src="popupwin.js"></script>
+
+<!-- load the plugins -->
+<script type="text/javascript">
+      // WARNING: using this interface to load plugin
+      // will _NOT_ work if plugins do not have the language
+      // loaded by HTMLArea.
+
+      // In other words, this function generates SCRIPT tags
+      // that load the plugin and the language file, based on the
+      // global variable HTMLArea.I18N.lang (defined in the lang file,
+      // in our case "lang/en.js" loaded above).
+
+      // If this lang file is not found the plugin will fail to
+      // load correctly and nothing will work.
+
+      HTMLArea.loadPlugin("TableOperations");
+      HTMLArea.loadPlugin("SpellChecker");
+
+</script>
+
+<style type="text/css">
+@import url(htmlarea.css);
+textarea { background-color: #fff; border: 1px solid 00f; }
+<cpanel Branding="include(sprites.html)">
+</style>
+
+<script type="text/javascript">
+var editor = '';
+
+
+function LocalResizeEditor() {
+    if (navigator.appName.indexOf("Microsoft")!=-1) {
+      winW = document.body.offsetWidth;
+      winH = document.body.offsetHeight;
+    } else {
+      winW = window.innerWidth;
+      winH = window.innerHeight; 
+   }
+   var newh = Math.round((winH - 70));
+   var neww = Math.round(winW) ;
+
+   self.moveTo(0,0);
+   document.edit.ta.style.height=newh;
+   document.edit.ta.style.width=neww;
+}
+
+function initEditor() {
+  // create an editor for the "ta" textbox
+  editor = new HTMLArea("ta");
+
+  // register the SpellChecker plugin
+  editor.registerPlugin("TableOperations");
+
+  // register the SpellChecker plugin
+  editor.registerPlugin("SpellChecker");
+
+  editor.generate();
+
+  return false;
+}
+
+function insertHTML() {
+  var html = prompt("<cpanel Locale="maketext('Enter some HTML code here')">");
+  if (html) {
+    editor.insertHTML(html);
+  }
+}
+function highlight() {
+  editor.surroundHTML('<span style="background-color: yellow">', '</span>');
+}
+
+
+</script>
+
+</head>
+
+<body onLoad="initEditor()" leftmargin=0 topmargin=0 bottommargin=0 rightmargin=0>
+
+<form action="savefile.html" method="post" name="edit" id="edit">
+
+<textarea id="ta" name="ta" style="width:100%" rows="30" cols="40"><BASE CPTAG=1 HREF="http://<cpanel print="$CPDATA{'DNS'}">/">
+<cpanel Fileman="fmpushfile($FORM{'dir'},$FORM{'file'})"></textarea>
+
+<br />
+<center>
+<cpanel Fileman="printdir()">
+<cpanel langprint="FMEditSaveAs"> <cpanel Fileman="printfile()"><br />
+<input type="submit" class="input-button" value="<cpanel langprint="Save">">
+</center>
+</form>
+
+</body>
+<script type="text/javascript">//LocalResizeEditor();</script>
+</html>

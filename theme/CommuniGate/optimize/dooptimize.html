@@ -1,0 +1,31 @@
+<cpanel setvar="headerimg=../images/tools.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+<style type="text/css">
+<?cp Branding::spritelist(.spriteicon_img_mini {float:left;margin-right:5px;background: url\{leftparenthesis}"%"\{rightparenthesis};} %,@spriteurl,images::#icon-${img}_mini {background-position\{colon}0 -${cssposition}px;width\{colon}${width}px;height\{colon}${height}px; }:) imgtype=icon,subtype=img,method=scale_60percent,format=png,img=optimizews ?>
+</style>
+<div class="body-content">
+
+	<div class="h1Title"><div class="spriteicon_img_mini" id="icon-optimizews_mini"></div> <cpanel langprint="OptimizeWS"></div>
+	<!--
+    <cpanel OptimizeWS="optimizews($FORM{'deflate'},$FORM{'deflate-mime-list'})">
+	-->
+    <cpanelif $CPERROR{'optimizews'}> <!-- </cpanelif>
+        <h2><cpanel langprint="optpreferencesupdated"></h2>
+        <p>
+            <cpanel langprint="contentcompression">&nbsp;&nbsp;
+            <cpanelif $FORM{'deflate'}=='disabled'><cpanel langprint="DeflateDisable"></cpanelif>
+            <cpanelif !$FORM{'deflate'}=='disabled'><cpanel langprint="Enabledfor"></cpanelif>
+                <cpanelif $FORM{'deflate'}=='all'><cpanel langprint="allcontent"></cpanelif>
+                <cpanelif $FORM{'deflate'}=='list'><cpanel print="$FORM{'deflate-mime-list'}"></cpanelif>
+        </p>
+    <cpanelif $CPERROR{'optimizews'}> -->
+        <p><cpanel langprint="optimizewserror"></p>
+   	    <a href="#" onclick="document.getElementById('details').style.display='block'; return false;"><cpanel langprint="AODShowDetails"></a> </p>
+   	    <div class="details" id="details">
+            <p><cpanel print="$CPERROR{'optimizews'}"></p>
+        </div>
+    </cpanelif>
+	<div class="return-link"><a href="index.html">&larr; <cptext "Go Back"></a></div>
+</div>
+<cpanel Branding="include(stdfooter.html)">

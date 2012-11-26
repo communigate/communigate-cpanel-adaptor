@@ -1,0 +1,96 @@
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+
+<style type="text/css">
+<?cp Branding::spritelist(.spriteicon_img_mini {float:left;margin-right:5px;background: url\{leftparenthesis}"%"\{rightparenthesis};} %,@spriteurl,images::#icon-${img}_mini {background-position\{colon}0 -${cssposition}px;width\{colon}${width}px;height\{colon}${height}px; }:) imgtype=icon,subtype=img,method=scale_60percent,format=png,img=responder ?>
+</style>
+
+<div class="body-content">
+
+<cpanelfeature autoresponders>			
+
+<cpanelif !$appname==webmail>
+	<cpanel include="managelist.html">
+</cpanelif>
+
+<div class="h1Title"><div class="spriteicon_img_mini" id="icon-responder_mini"></div> <cpanel langprint="EmailAuto"></div>
+
+<cpanelif !$appname==webmail>
+	<?cp StatsBar::stat( [p class="caution"]$LANG{'statsattention'}&nbsp;%&nbsp;$LANG{'statsoutof'}&nbsp;&nbsp;%[/p],count,max) display=autoresponders,warnings=1,warninglevel=80,infinitylang=true ?>
+</cpanelif>
+
+<p class="description"><cpanel langprint="EMAutoResDesc"></p>
+
+<cpanel setvar="vidtut_name=autores">
+<cpanel setvar="vidtut_header=EmailAuto">
+<cpanel setvar="vidtut_description=VidAutoResDesc">
+<cpanel setvar="vidtut_video_name=autores-low">
+<cpanel setvar="vidtut_width=450">
+<cpanel setvar="vidtut_height=355">
+<cpanel include="../video_tutorial_include.html">
+
+<br />
+<a class="create-button" href="addars.html"><cpanel langprint="ARAddautores"></a>
+<br />
+<br />
+
+<cpanelif $FORM{'itemsperpage'}>
+    <cpanel setvar="itemsperpage=$FORM{'itemsperpage'}">
+</cpanelif>
+<cpanelif !$FORM{'itemsperpage'} || !$CPVAR{'itemsperpage'}>
+    <cpanel setvar="itemsperpage=10">
+</cpanelif>
+
+<h2><cpanel langprint="EAutoResCurResHead"></h2>
+
+<div class="search-panel">
+	<form method="get" action="">
+		<span class="boldit"><cpanel langprint="SESearchButton"></span><input type="text" size="15" name="searchregex" value="<cpanel print="$FORM{'searchregex'}">" /><input type="submit" class="input-button" value="<cpanel langprint="go">" />
+	</form>
+</div>
+
+<table border="0" align="center" cellpadding="5" width="90%" cellspacing="0" id="mailtbl" class="sortable">
+	<tr >
+		<th width="33%"><cpanel langprint="SSLEmail"></th>
+		<th width="33%"><cpanel langprint="subject-BoxTrapper"></th>
+		<th width="33%" colspan="2" class="sorttable_nosort"><cpanel langprint="FTPFunctions"></th>
+	</tr>
+	
+<?cp Email::listautoresponders(
+[tr class="row-%"]
+	[td class="nobrd-center-t" id="%" onmouseover="enableDragDrop\{leftparenthesis}this\{comma}'%'\{rightparenthesis}"]%[/td]
+	[td align="center"]&nbsp;%[/td]
+	[td class="nobrd" align="center"]
+		[a href="addars.html?email=%&amp;redirectdomain=$FORM{'domain'}"]$LANG{'editbtn-BoxTrapper'}[/a]
+	[/td]
+	[td align="center"]
+		[a href="dodelautoresconfirm.html?email=%&redirectdomain=$FORM{'domain'}"]$LANG{'delete-BoxTrapper'}[/a]
+	[/td]
+[/tr]
+,*num,^email,^email,email,subject,^email,encoded_email,^email,email,email) domain=$FORM{'domain'},regex=$FORM{'searchregex'},api2_paginate=1,api2_paginate_start=$FORM{'api2_paginate_start'},api2_paginate_size=$CPVAR{'itemsperpage'} || '[tr][td class="errors" colspan="4"]$LANG{'NoAutoRes'}.[/td][/tr]' ?>
+
+</table>
+
+<?cp UI::paginate(%,paginator) currentpage=$CPVAR{'currentpage'},pages=$CPVAR{'pages'},itemsperpage=$CPVAR{'itemsperpage'} ?>
+<cpanelif $CPVAR{'pages'} && !$CPVAR{'pages'}==1>
+<div style="float:right">
+	<form method="get" action="">
+	<cpanel langprint="PaginatorShowing"> <select name="itemsperpage" onchange="this.form.submit();">
+	<?cp UI::paginate_list([option value="%" %]%[/option],item,selected=1?selected:,item) itemsperpage=$CPVAR{'itemsperpage'},itemlist=10:25:50:100:250:500 ?>
+	</select>
+	<noscript><input id="my_button" type="submit" Value="<cpanel Locale="maketext('Change')">" /></noscript> <cpanel langprint="PaginatorResults"> 
+	</form>
+</div>
+</cpanelif>
+
+<br />
+
+<p><cpanel langprint="EAAutoResHint"></p>
+
+<div class="return-link"><a href="../index.html">&larr; <cptext "Go Back"></a></div>
+
+</cpanelfeature><!-- end cpanelfeature autoresponders -->
+
+</div><!-- end body-content -->
+
+<cpanel Branding="include(stdfooter.html)">

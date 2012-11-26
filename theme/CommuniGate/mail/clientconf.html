@@ -1,0 +1,17 @@
+<cpanel setvar="headerimg=../images/mailmenu.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+<div class="body-content">
+<cpanel include="clientconfinclude.html">
+
+<cpanelif $appname==webmail>
+	<div class="return-link"><a href="../index.html">&larr; <cptext "Go Back"></a></div>
+</cpanelif>
+
+<cpanelif !$appname==webmail>
+	<div class="return-link"><a href="pops.html">&larr; <cptext "Go Back"></a></div>
+</cpanelif>
+
+</div><!-- end body-content -->
+
+<cpanel Branding="include(stdfooter.html)">

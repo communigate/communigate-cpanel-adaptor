@@ -1,0 +1,39 @@
+<cpanel setvar="headerimg=../images/toppassword.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+
+<style type="text/css">
+<?cp Branding::spritelist(.spriteicon_img_mini {float:left;margin-right:5px;background: url\{leftparenthesis}"%"\{rightparenthesis};} %,@spriteurl,images::#icon-${img}_mini {background-position\{colon}0 -${cssposition}px;width\{colon}${width}px;height\{colon}${height}px; }:) imgtype=icon,subtype=img,method=scale_60percent,format=png,img=password ?>
+</style>
+
+<div class="body-content">
+
+<div class="h1Title"><div class="spriteicon_img_mini" id="icon-password_mini"></div><cpanel langprint="TChangePass"></div>
+
+<?cp Passwd::change_password(% [div style="clear:right;" id="srvs"][div style="float:left;"]$LANG{'ChangePassServ'}[/div][br /]  %[/div][div style="clear:both;"]&nbsp;[/div][div class="details" id="rawpw"][pre]%[/pre][/div]
+,statustxt,applist::[p class="status"] ${app}[/p]:[div style="clear\{colon}left;"][/div],passwdoutput)  oldpass=$FORM{'oldpass'},newpass=$FORM{'newpass'},enablemysql=$FORM{'enablemysql'} || '$LANG{'ChangePassError'}' ?>
+
+<div id="rawpwlnk" style="clear:both;"><a href="#" onclick="document.getElementById('rawpw').style.display='block';document.getElementById('rawpwlnk').style.display='none'; return false;"><cpanel Locale="maketext('Show Raw Password Change')"></a></div>
+
+<cpanelif $CPVAR{'change_password_status'}>
+<script type="text/javascript">
+    function SetCookie(name, value, expires, path)
+    {
+        document.cookie = name + "=" + escape (value) +
+            ((expires) ?    ("; expires=" + expires.toLocaleString()) : "") +        ((path) ?       ("; path=" + path) : "");
+    }        
+SetCookie('cpsession','closed',null,'/');
+</script>
+<div class="return-link"><a href="<cpanel printvar="dprefix">index.html">&larr; <cptext "Go Back"></a></div>
+</cpanelif>
+
+
+<cpanelif !$CPVAR{'change_password_status'}>
+    <script type="text/javascript">
+        document.getElementById('srvs').style.display='none';
+    </script>
+<div class="return-link"><a href="index.html">&larr; <cptext "Go Back"></a></div>
+</cpanelif>
+
+</div><!-- end body-content -->
+<cpanel Branding="include(stdfooter.html)">

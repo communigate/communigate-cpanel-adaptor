@@ -1,0 +1,88 @@
+<cpanel setvar="headerimg=../images/topsubdomains.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+<div class="body-content">
+<h1><cpanel Locale="maketext('Create Interface Element')"></h1>
+
+<div class="clear" id="ife-create-wrap">
+
+<div id="ife-create-legend">
+	<h2><cpanel Locale="maketext('Before You Start')"></h2>
+	<p><cpanel Locale="maketext('You will need the following:')"></p>
+	<ul>
+		<li><cpanel Locale="maketext('Icon image')"></li>
+		<li><cpanel Locale="maketext('Action page (page within your home directory or external link)')"></li>
+	</ul>
+	<h2><cpanel Locale="maketext('Chart Legend')"></h2>
+	<p><img src="../images/legend-small.gif" width="200" height="177" alt="" /></p>
+</div>
+
+<div id="ife-create-form">
+<form action="ife-create-do.html" method="post">
+	<fieldset>
+		<legend><cpanel Locale="maketext('Step [numf,_1]',1)"></legend>
+		<h2><cpanel Locale="maketext('Create Icon')"></h2>
+		<p>
+			<label for="icon_name"><cpanel Locale="maketext('Icon Name')"> <em class="legend">(1)</em></label>
+			<br />
+			<input type="text" name="icon_name" id="icon_name" />
+			<br />
+			<em><cpanel Locale="maketext('e.g. Billing System, My Website')"></em>
+		</p>
+	</fieldset>
+	<fieldset>
+		<legend><cpanel Locale="maketext('Step [numf,_1]',2)"></legend>
+		<h2><cpanel Locale="maketext('Upload Icon Image')"></h2>
+		<p>
+			<label for="icon_file"><cpanel Locale="maketext('Select Icon Image')"> <em class="legend">(2)</em></label>
+			<br />
+			<input type="file" name="icon_file" id="icon_file" />
+		</p>
+	</fieldset>
+	<fieldset>
+		<legend><cpanel Locale="maketext('Step [numf,_1]',3)"></legend>
+		<h2><cpanel Locale="maketext('Point to action link/URL')"></h2>
+		<p><cpanel Locale="maketext('Point to where you want the icon to link to.')"></p>
+		<p><img src="../images/homeb.gif" width="20" height="19" alt="<cpanel Locale="maketext('home directory')">" />/<input type="file" name="action_link" id="action_link" /></p>
+		<span>- <cpanel Locale="maketext('or')"> -</span>
+		<p><span>http://</span><input type="text" name="action_link_url" value="" id="action_link_url" /></p>
+	</fieldset>
+	<fieldset>
+		<legend><cpanel Locale="maketext('Step [numf,_1]',4)"></legend>
+		<h2><cpanel Locale="maketext('Interface Element Placement')"></h2>
+		<p>
+			<label><cpanel Locale="maketext('Select Existing Box')"> <em class="legend">(3)</em></label>
+			<br />
+			<select name="ife_placement" id="ife_placement">
+				<option value="">&nbsp;</option>
+				<option value="Preferences"><cpanel Locale="maketext('Preferences')"></option>
+				<option value="Mail"><cpanel Locale="maketext('Mail')"></option>
+				<option value="Files"><cpanel Locale="maketext('Files')"></option>
+				<option value="Logs"><cpanel Locale="maketext('Logs')"></option>
+				<option value="Security"><cpanel Locale="maketext('Security')"></option>
+				<option value="Domains"><cpanel Locale="maketext('Domains')"></option>
+				<option value="Databases"><cpanel Locale="maketext('Databases')"></option>
+				<option value="Software/Services"><cpanel Locale="maketext('Software/Services')"></option>
+				<option value="Advanced"><cpanel Locale="maketext('Advanced')"></option>
+			</select>
+		</p>
+		<span>- <cpanel Locale="maketext('or')"> -</span>
+		<p>
+			<label for="new_box"><cpanel Locale="maketext('Create New Box')"> <em class="legend">(3)</em></label>
+			<br />
+			<input type="text" name="new_box" id="new_box" />
+			<br />
+			<em><cpanel Locale="maketext('e.g. Billing System, My Website')"></em>
+		</p>
+	</fieldset>
+	
+	<p><input type="submit" id="submit" class="input-button" value="<cpanel Locale="maketext('Create Interface Element')">" /></p>
+</form>
+</div>
+
+</div>
+<!-- END #ife-create-wrap -->
+<div class="return-link"><a href="index.html">&larr; <cptext "Go Back"></a></div>
+
+</div><!-- end body-content -->
+<cpanel Branding="include(stdfooter.html)">

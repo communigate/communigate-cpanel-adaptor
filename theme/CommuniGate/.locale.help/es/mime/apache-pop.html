@@ -1,0 +1,51 @@
+<P><STRONG>¿Qué es Apache?"</STRONG></P>
+<P>Apache es un programa que recibe solicitudes provenientes de navegadores de 
+red. Responde "sirviendo" portales de Internet a los navegadores; por esta 
+razón, se denomina software servidor de la red.</P>
+<P><STRONG>¿Qué es un gestor de Apache?</STRONG></P>
+<P>Los gestores Apache controlan cómo el programa de servidor de Internet Apache 
+administra ciertos tipos de archivos y extensiones. Apache está preconfigurado 
+para tratar a instrucciones CGI y archivos procesados por servidor. Sus 
+extensiones de archivo incluyen: .cgi, .pl, .plx, .ppl, .perl, y .shtml.</P>
+<P>El sistema Apache se puede configurar para manejar un nuevo tipo de archivo 
+con un gestor existente, agregando manualmente el gestor y la extensión en esta 
+pantalla. Por ejemplo, para hacer que el servidor gestione un archivo con la 
+extensión .ejemplo como archivos CGI, se debe ingresar ”cgi-script” debajo de 
+<EM>Gestor</EM> y “.ejemplo” debajo de <EM>Extensión(es).</EM></P>
+<P><STRONG>Gestores disponibles</STRONG></P>
+<P>Los siguientes gestores de apache están disponibles. Ellos son seguidos de un 
+nombre de módulo entre paréntesis. Por favor advierta que el módulo entre 
+paréntesis debe estar instalado dentro de Apache en el servidor:</P>
+<P><B>default-handler:</B> Envía el archivo utilizando el gestor predeterminado 
+de apache de contenido estático. (core)<BR><B>send-as-is:</B> Envía el archivo 
+con encabezados HTTP como están (mod_asis)<BR><B>cgi-script:</B> Maneja el 
+archivo como una secuencia CGI. (mod_cgi)<BR><B>imap-file:</B> Procesa el 
+archivo como un archivo de regla imagemap; para más información vea la <A 
+href="http://httpd.apache.org/docs/">documentación de Apache</A>. 
+(mod_imap)<BR><B>server-info:</B> Recupera la información de configuración del 
+servidor. (mod_info)<BR><B>server-parsed:</B> Realiza el procesamiento de 
+archivos de archivos incluidos del lado servidor. 
+(mod_include)<BR><B>server-status:</B> Recupera la información de estado del 
+servidor. (mod_status)<BR><B>type-map:</B> Procesa el archivo como un archivo 
+tipo mapa; para más información vea la <A 
+href="http://httpd.apache.org/docs/">documentación de Apache</A>. 
+(mod_negotiation)</P>
+<P><STRONG>Aviso:</STRONG> Esta interfaz no le permite crear gestores de Apache 
+personalizados. </P>
+<P><STRONG>Crear un gestor de Apache</STRONG></P>
+<OL>
+  <LI>Ingrese la ruta de archivo de la acción/aplicación en la casilla 
+  <EM>Gestor</EM>. 
+  <LI>Ingrese las extensiones en la casilla <EM>Extensiones</EM>. Se pueden 
+  utilizar espacios para separar extensiones múltiples. 
+  <LI>Haga clic en <EM>Agregar</EM>. </LI></OL>
+<P><STRONG>Remover gestores Apache definidos por el usuario</STRONG></P>
+<P>Se pueden eliminar gestores Apaches definidos por el usuario. </P>
+<P><STRONG>Aviso:</STRONG> Las extensiones de archivo gestionadas 
+automáticamente por Apache no se pueden eliminar. </P>
+<OL>
+  <LI>Haga clic en <EM>X</EM> a la derecha del gestor apropiado en el gráfico 
+  <EM>Gestores de Apache definidos por el usuario</EM>. Será dirigido a una 
+  nueva página. 
+  <LI>Haga clic en <EM>Sí</EM> para remover el gestor o en <EM>No</EM> para 
+  cancelar la eliminación. </LI></OL>

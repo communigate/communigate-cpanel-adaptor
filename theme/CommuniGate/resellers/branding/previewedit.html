@@ -1,0 +1,142 @@
+<cpanel Branding="tempsetbrandingpkg($RAW_FORM{'brandingpkg'})">
+<cpanel setvar="headerimg=../../images/tools.gif">
+<cpanel setvar="dprefix=../../">
+<cpanel include="../../stdbheader.html">
+<cpanel include="../../ajaxhelp.html">
+
+<style type="text/css">
+<?cp Branding::spritelist(.spriteicon_img_mini {float:left;margin-right:5px;background: url\{leftparenthesis}"%"\{rightparenthesis};} %,@spriteurl,images::#icon-${img}_mini {background-position\{colon}0 -${cssposition}px;width\{colon}${width}px;height\{colon}${height}px; }:) imgtype=icon,subtype=img,method=scale_60percent,format=png,img=branding ?>
+</style>
+
+	<script type="text/javascript">
+	//<![CDATA[
+
+	// validate filename extensions
+	// note: extending the CPANEL.validate namespace here to make it easier to add validation in a loop below
+	CPANEL.validate.external_check_extension = function (str, fname) {
+        // empty string is ok
+        if ( str == '' ) return true;
+
+        //make sure there is an extension
+        if ( !(/[^.]\.[^.]+$/.test(str)) ) return false;
+        var given_extension = str.split('.').pop();
+
+        var allowed_extensions = [ 'gif', 'jpg', 'jpeg', 'png' ];
+
+        return (allowed_extensions.indexOf(given_extension) !== -1);
+    }
+
+	// Event processing for the "reset to default" button
+	var confirm_wrapper = function( e ) {
+
+		var confirm = window.confirm('<cptext "Are you sure you want to revert this file?">');
+
+		// If the user choses to abort we need to tell the browser not to follow the anchor
+		if ( ! confirm ) {
+			YAHOO.util.Event.preventDefault(e);
+
+		}
+	}
+
+	var init = function() {
+		var validation = new CPANEL.validate.validator("<cptext "Edit Preview Images">");
+
+
+		// Get all the revert buttons and attach a confirmation box to them
+		var els = YAHOO.util.Dom.getElementsByClassName("revert-button");
+		for (var i = 0; i < els.length; i++ ) {
+			YAHOO.util.Event.on(els[i].id, "click", confirm_wrapper);
+		}
+
+		// grab all the input elements
+		var els = YAHOO.util.Dom.getElementsByClassName("file_input_element", "input");
+
+		for (var i = 0; i < els.length; i++) {
+
+			var classNames = els[i].className.split(' ');
+			var file_input_name = '';
+
+			   // for each className see if the name begins with file_input_name_
+			for ( var ii = 0; ii < classNames.length; ii++ ) {
+				if ( /^file_input_name_/.test(classNames[ii]) ) {
+					// if so strip out the leading idenfifer and pass the file name to the validation function
+					var file_input_name = classNames[ii].replace('file_input_name_','');
+				}
+			}
+
+			validation.add(els[i].id, 'external_check_extension(%input%,"'+file_input_name+'")', '<cptext 'Filename must end in [list,or,_*].', '.gif', '.jpg', '.png', '.jpeg'>');
+
+		}
+
+		validation.attach();
+
+		CPANEL.validate.attach_to_form("submit-button", validation);
+	};
+
+	YAHOO.util.Event.onDOMReady(init);
+
+	//]]>
+	</script>	
+
+<div class="body-content">
+<div class="breadcrumbs"><a class="crumb_highlight" href="index.html"><cpanel Locale="maketext('Branding Editor')"></a> > <a class="crumb_highlight" href="edit_bpkg.html?brandingpkg=<?cp Branding::getbrandingpkg(%,^brandingpkg)?>"><cpanel langprint="Branding_edit_title"></a> > <cpanel langprint="EditPreviewImg"> </div>
+
+<div class="h1Title"><div class="spriteicon_img_mini" id="icon-branding_mini"></div> <cpanel langprint="EditPreviewImg"></div>
+
+<p class="description"><cpanel langprint="EditPImgDesc"></p>
+
+<cpanel setvar="vidtut_name=editpreview">
+<cpanel setvar="vidtut_header=VidEditPreview">
+<cpanel setvar="vidtut_description=VidEditPreviewDesc">
+<cpanel setvar="vidtut_video_name=editpreview_lo">	
+<cpanel setvar="vidtut_width=450">
+<cpanel setvar="vidtut_height=355">
+<cpanel include="../../video_tutorial_include.html">
+	
+<br />
+
+<cpanel langprint="BrandingStyle">
+<strong><?cp Branding::getbrandingpkg(%,&brandingpkgname) ?></strong>
+
+<form enctype="multipart/form-data" name="mainform" id="mainform" action="doupload.html" method="post">
+	<input type="hidden" name="where" value="preview" />
+	<input type="hidden" name="brandingpkg" value="<?cp Branding::getbrandingpkg(%,&brandingpkg) ?>" />
+	<input type="hidden" name="dir" value="<cpanel print="$homedir">/cpanelbranding/<cpanel print="$CPDATA{'RS'}">/<?cp Branding::getbrandingpkg(%,&brandingpkg) ?>" />
+	<table id="icontbl" class="nonsortable" width="700" cellpadding="0" cellspacing="0">
+	    <tr>
+	        <th class="cell" scope="col"><cpanel langprint="BrandingWidth"></th>
+	        <th class="cell" scope="col"><cpanel langprint="BrandingHeight"></th>
+	        <th class="cell" scope="col"><cpanel langprint="description-abbr"></th>
+			<th class="cell" scope="col"><cpanel langprint="filename"></th>
+	        <th class="cell" scope="col"><cpanel langprint="resetdefault-BoxTrapper"></th>
+	        <th class="cell" scope="col"><cpanel langprint="BUUploadButton"></th>
+	    </tr>
+
+	<?cp Branding::brandingeditor(
+	    [tr]
+	        [td align="center"]%[/td]
+			[td align="center"]%[/td]
+	        [td align="right"]%[/td]
+	        [td align="right"]%[/td]
+	        [td align="center"][a class="create-button revert-button" id="revert%" href="resetimg.html?brandingpkg=$URI_ENCODED_FORM{'brandingpkg'}&amp;imgname=%&amp;imgtype=preview"]$LANG{'reset_text'}[/a][/td]
+	        [td align="left" width="250px"][input type="file"  name="file%" id="file%" class="file_input_element file_input_name_%" /]&nbsp;[span class="no_panel" id="file%_error"][/span][input type="hidden" name="filename-%" value="%" /][/td]
+	    [/tr]
+	    [tr]
+	        [td colspan="6" align="center"][img class="logo_edit" title="%" alt="%" border="0" src="%" /][/td]
+	    [/tr]
+    ,width,height,htmldescription,&file,number,^file,number,number,&file,number,number,&file,&description,&description,&url) imgtype=preview ?>
+
+	</table>
+	<br />
+	<input type="submit" id="submit-button" class="input-button" value="<cpanel langprint="BrandingUpload">" />
+	<br /><br />
+	<h2><cpanel langprint="PreviewEditReset"></h2>
+	<p><cpanel langprint="BrandingPreviewRevert"></p>
+	<p><a class="create-button revert-button" id="revert-all" href="resetall.html?brandingpkg=<cpanel print="$URI_ENCODED_FORM{'brandingpkg'}">&amp;imgtype=preview"><cpanel langprint="BrandingPreviewReset"></a></p>
+</form>
+
+<cpanel include="gobackwhere.html">
+
+</div><!-- end body-content -->
+
+<cpanel Branding="include(stdfooter.html)">

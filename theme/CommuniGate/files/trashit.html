@@ -1,0 +1,41 @@
+<html>
+<head>
+<title>cPanel X</title>
+<cpanel relinclude="files/files_head.html">
+</head>
+<script type="text/javascript">
+parent.trashframe.window.location.href="trash.html?refresh=<cpanel print="$random">";
+</script>
+<script type="text/javascript">
+if (parent.dirwindow.window.location.href.indexOf("?") > 0) {
+	parent.dirwindow.window.location.href = parent.dirwindow.window.location.href + "&refresh=<cpanel print="$random">";
+}
+</script>
+<script type="text/javascript">
+if (parent.dirwindow.window.location.href.indexOf("?") == -1) {
+	parent.dirwindow.window.location.href = parent.dirwindow.window.location.href + "?refresh=<cpanel print="$random">";
+}
+</script>
+<body class="topright">
+<h1><img src="img/diractions/delete.png" alt="delete" align="absmiddle">&nbsp;<cpanel langprint="FMDelFolder"></h1>
+<table class="sortable" border=0 width=99% valign=middle align=center>
+<tr>
+<td>
+<cpanel Fileman="fileimg($FORM{'dir'},$FORM{'file'},1)">
+</td>
+<td>
+<img src="images/forward.gif">
+</td>
+<td> <img src="../files/images/TrashFull.png" width="40"></td>
+</tr>
+<tr>
+<td>
+<cpanel print="$FORM{'file'}">
+</td>
+<td></td>
+<td><font class=med><cpanel langprint="FMTrashHead"></font></td>
+</tr>
+</table>
+<font class=med><cpanel Fileman="delfile($FORM{'dir'},$FORM{'file'})"></font>
+</body>
+</html>

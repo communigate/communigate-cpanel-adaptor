@@ -1,0 +1,36 @@
+<cpanel setvar="headerimg=../images/topsubdomains.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+
+<style type="text/css">
+<?cp Branding::spritelist(.spriteicon_img_mini {float:left;margin-right:5px;background: url\{leftparenthesis}"%"\{rightparenthesis};} %,@spriteurl,images::#icon-${img}_mini {background-position\{colon}0 -${cssposition}px;width\{colon}${width}px;height\{colon}${height}px; }:) imgtype=icon,subtype=img,method=scale_60percent,format=png,img=addondomain ?>
+</style>
+
+<div class="body-content"> 
+
+<div class="h1Title"><div class="spriteicon_img_mini" id="icon-addondomain_mini"></div><cpanel langprint="INDXAddonDomains"></div>
+
+<h2><cpanel langprint="AODAddition"></h2>
+
+<!--
+<?cp AddonDomain::addaddondomain('% %',result,reason) newdomain=$FORM{'domain'},dir=$FORM{'dir'},subdomain=$FORM{'user'},pass=$FORM{'pass'} ?>
+-->
+
+<cpanelif !$CPERROR{'addondomain'}>
+	<div class="success_details"><cpanel Locale="maketext('The addon domain “[_1]” has been created.',$FORM{'domain'})"></div>
+	<!-- <cpanel Ftp="addftp($FORM{'user'},$FORM{'pass'},$FORM{'dir'},,,$FORM{'dir'})"> -->
+	<cpanel langprint="AODGoFileMgr">: <a target="_blank" href="../filemanager/index.html?dir=<cpanel uriprint="$homedir">/<cpanel uriprint="$FORM{'dir'}">" class="ajaxfiles"><cpanel langprint="TFileManager"></a>
+</cpanelif>
+
+<cpanelif $CPERROR{'addondomain'} || $CPERROR{'ftp'}>
+	<div class="error_details">
+        <cpanel print="$CPERROR{'addondomain'}">
+        <cpanel print="$CPERROR{'ftp'}">		
+	</div>
+</cpanelif>
+
+<div class="return-link"><a href="index.html">&larr; <cptext "Go Back"></a></div>
+
+</div><!-- end body-content -->
+
+<cpanel Branding="include(stdfooter.html)">

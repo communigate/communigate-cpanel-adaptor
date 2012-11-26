@@ -1,0 +1,67 @@
+<cpanel setvar="headerimg=../images/tools.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+	<cpanelif $FORM{'itemsperpage'}>
+	    <cpanel setvar="itemsperpage=$FORM{'itemsperpage'}">
+	</cpanelif>
+	<cpanelif !$FORM{'itemsperpage'} || !$CPVAR{'itemsperpage'}>
+	    <cpanel setvar="itemsperpage=10">
+	</cpanelif>
+<style type="text/css"><cpanel include="boxtrapper.css"></style>
+
+<div class="body-content">
+
+
+<style type="text/css">
+<?cp Branding::spritelist(.spriteicon_img_mini {float:left;margin-right:5px;background: url\{leftparenthesis}"%"\{rightparenthesis};} %,@spriteurl,images::#icon-${img}_mini {background-position\{colon}0 -${cssposition}px;width\{colon}${width}px;height\{colon}${height}px; }:) imgtype=icon,subtype=img,method=scale_60percent,format=png,img=boxtrapper ?>
+
+</style>
+<div class="h1Title"><div class="spriteicon_img_mini" id="icon-boxtrapper_mini"></div><cpanel langprint="prog-BoxTrapper"></div>
+<p class="description"><cpanel langprint="boxtrapperdsc-BoxTrapper"></p>
+
+<cpanel setvar="vidtut_name=boxtrapper">
+<cpanel setvar="vidtut_header=VidBoxTrapper">
+<cpanel setvar="vidtut_description=VidBoxTrapperDesc">
+<cpanel setvar="vidtut_video_name=boxtrapper-low">
+<cpanel setvar="vidtut_width=450">
+<cpanel setvar="vidtut_height=350">	
+<cpanel include="../video_tutorial_include.html">
+
+
+<table width="90%" id="sortable-search" border="0" cellpadding="0" cellspacing="0" >
+    <tr>
+        <td align="right">
+            <form action="" method="get">
+                <span class="boldit"><cpanel langprint="SESearchButton"></span> <input type="text" size="15" name="searchregex" value="<cpanel print="$FORM{'searchregex'}">" /> <input type="submit" class="input-button" value="<cpanel langprint="go">" />
+            </form>
+        </td>
+    </tr>
+</table>
+
+<table id="mailtbl" class="sortable" cellpadding="2" cellspacing="0" width="80%" align="center">
+
+<tr>
+<th class="cell"><cpanel langprint="Account"></th>
+<th class="cell"><cpanel langprint="FTPStatus"></th>
+<th class="cell" nonsortable="true"><cpanel langprint="SLFunction"></th>
+</tr>
+ <?cp BoxTrapper::accountmanagelist(
+	[tr class="info-%"]
+		[td align="center"]%[/td]
+		[td align="center"]%[/td]
+		[td align="center"][a href="manage.html?account=%"]Manage[/td]
+	[/tr] 
+	,*num,account,status,accounturi),regex=$FORM{'searchregex'},api2_paginate=1,api2_paginate_start=$FORM{'api2_paginate_start'},api2_paginate_size=$CPVAR{'itemsperpage'}, ?>
+</table>
+<?cp UI::paginate(%,paginator) currentpage=$CPVAR{'currentpage'},pages=$CPVAR{'pages'},itemsperpage=$CPVAR{'itemsperpage'} ?>
+<cpanelif $CPVAR{'pages'} && !$CPVAR{'pages'}==1>
+<div style="float:right"><form>
+<cpanel langprint="PaginatorShowing"> <select name="itemsperpage" onchange="this.form.submit();">
+<?cp UI::paginate_list([option value="%" %]%[/option],item,selected=1?selected:,item) itemsperpage=$CPVAR{'itemsperpage'},itemlist=10:25:50:100:250:500 ?>
+</select><noscript><button id="my_button" onclick="" type="submit" Value=""><cpanel Locale="maketext('Change')"></button></noscript>  <cpanel langprint="PaginatorResults"> 
+</form></div>
+</cpanelif>
+	<br /><br />
+
+</div>
+<cpanel Branding="include(stdfooter.html)">

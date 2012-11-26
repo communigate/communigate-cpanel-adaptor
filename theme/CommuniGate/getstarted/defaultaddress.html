@@ -1,0 +1,51 @@
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+<style type="text/css">
+<?cp Branding::spritelist(.spriteicon_img_mini {float:left;margin-right:5px;background: url\{leftparenthesis}"%"\{rightparenthesis};} %,@spriteurl,images::#icon-${img}_mini {background-position\{colon}0 -${cssposition}px;width\{colon}${width}px;height\{colon}${height}px; }:) imgtype=icon,subtype=img,method=scale_60percent,format=png,img=defaultemailacct ?>
+<?cp Branding::spritelist(.spriteicon_img_mini {float:left;margin-right:5px;background: url\{leftparenthesis}"%"\{rightparenthesis};} %,@spriteurl,images::#icon-${img}_mini {background-position\{colon}0 -${cssposition}px;width\{colon}${width}px;height\{colon}${height}px; }:) imgtype=icon,subtype=img,method=scale_60percent,format=png,img=getstart ?>
+</style>
+<script type="text/javascript">
+function usenewacct() {
+    var inputEl = document.getElementById('fwdemail_input');
+    if (!inputEl) {
+        inputEl = document.getElementById('fwdemail');
+    }
+    inputEl.value='<cpanel print="$FORM{'newacct'}">' || '<cpanel print="$FORM{'acct'}">';
+   document.getElementById('fwd_radio').checked = 1;
+   document.getElementById('defform').submit(); 
+}
+</script>
+
+<div class="body-content">
+<h1><div class="spriteicon_img_mini" id="icon-getstart_mini"></div><cpanel langprint="gswtitle"></h1>
+<cpanel include="jumpmenu.html">
+<cpanelfeature !defaultaddress>
+        <meta http-equiv="refresh" content="0;url=webmail.html" />
+</cpanelfeature>
+
+<cpanelfeature defaultaddress>
+
+<div class="h1Title"><div class="spriteicon_img_mini" id="icon-defaultemailacct_mini"></div><cpanel langprint="EMSetDefaultAddr"></div>
+<p class="description"><cpanel langprint="EMDefaultDesc"></p>
+<br />
+
+
+
+
+<form method="post" name="fwdf" id="fwdf"   action="defaultaddress-a.html" onsubmit="return do_validate(this.id);">
+<div class="highlight"><h2><cpanel langprint="EADefaultsendall"></h2>
+
+<input type="hidden" value="<cpanel print="$CPDATA{'DNS'}">" /> 
+<cpanel print="$CPDATA{'DNS'}">
+
+<cpanel include="../mail/definclude.html"></div>
+	</form>
+    <br />
+      <br />
+    <div align="right"><form method="link" action="webmail.html"><input type="submit" class="input-button" value="<cpanel langprint="GSWSkip">"></form>
+</div>
+	</div>
+</cpanelfeature>
+<cpanel Branding="include(stdfooter.html)">
+
+</div>

@@ -1,0 +1,19 @@
+/* As noted in IE9 bug 652599 (FB 48119), filter directives on table cells
+   will clobber the cell border, even filter:none etc.
+   The workaround is to put the cell contents into a liner div and apply the
+   gradient to that div. Also noted in YUI 2 issue #2529320.
+*/
+.yui-skin-sam .yui-calendar td.calcell div.calcell-liner {
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorStr='#ffffff', endColorStr='#f4f4f4');
+    zoom: 1; /* force hasLayout */
+    padding: 1px;
+}
+
+.yui-skin-sam .yui-calendar td.calcell {
+    padding: 0;
+}
+
+.yui-skin-sam .yui-calendar td.oom div.calcell-liner {
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorStr='#ececec', endColorStr='#cccccc');
+    zoom: 1; /* force hasLayout */
+}

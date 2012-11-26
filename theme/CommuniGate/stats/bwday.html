@@ -1,0 +1,14 @@
+<cpanel setvar="headerimg=../images/topwebftpstats.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+<div class="body-content">
+<font class="big"><cpanel langprint="BW-Title"></font>
+<br><br>
+<div align="center">
+<cpanel Bandwidth="displayday($FORM{'domain'},$FORM{'target'},$FORM{'month'},$FORM{'year'},$FORM{'day'},$FORM{'subd'})">
+</div><br><br>
+<center>
+<b>[</b> <a href="javascript:history.go(-1)">Go Back</a><b> ]</b>
+</center>
+</div>
+<cpanel Branding="include(stdfooter.html)">

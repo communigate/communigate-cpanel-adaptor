@@ -1,0 +1,82 @@
+
+
+<cpanel langprint="BrandingStyle">:
+<strong><?cp Branding::getbrandingpkg(%,brandingpkgname) ?></strong>
+
+<div class="clearit">&nbsp;</div>
+<!--<div align="center"><input type="submit" href="#" class="input-button" value="<cpanel langprint="ChangeLook">"></div>-->
+
+<div id="screenshotcontainer">
+    
+<?cp Branding::showpkgs(
+    [div class="be-screenshot"][a href="%" target="preview" id="brandingpkg/%/%" onClick="return lightpreview[[this]];"][img border="0" src="%" alt="maketext('click for preview image')" height="290" /][/a][br /][br /] [a class="create-button" href="switchstyle.html?brandingpkg=%"] maketext('Switch Style to “[_1]”.',${pkgname})[/a] [/div],previewimg,pkg,pkgname,previewsmimg,pkg,pkgname) skiphidden=1,showroot=1
+?>
+</div>
+<div class="clearit">&nbsp;</div>
+<div id="brandingpkglightbox" style="display:none;">
+    <div class="hd">
+        <div class="lt"></div>
+        <span><cpanel Locale="maketext('Preview')"></span>
+        <div class="rt"></div>
+    </div>
+    <div class="bd">
+        <div id="imgpreview" style="height:368px; width:716px; overflow:auto; text-align:center; margin:0 auto;">
+            <center>
+                <img align="center" id="previewimg" src="/cPanel_magic_revision_0/cjt/images/1px_transparent.gif" alt="" />
+            </center>
+        </div>
+    </div>
+    <div class="ft"></div>
+</div>
+
+<script type="text/javascript">
+//<![CDATA[
+var lightboxpanel;
+var openbrandingpkg;
+function lightpreview(El) {
+    setup_lightbox();
+    var pkgid = El.id;
+    var brandingpkg = pkgid.split('/');
+    var pkgname = brandingpkg.pop();
+    var pkg = brandingpkg.pop();
+    openbrandingpkg = pkg;
+    var img = YAHOO.util.Dom.get('previewimg');
+    img.src = El.href;
+    lightboxpanel.setHeader('<span>' + pkgname + '</span>');
+    lightboxpanel.render();
+    lightboxpanel.show();
+    return false;
+}
+function closeBox(El) {
+    lightboxpanel.hide();
+}
+function apply() {
+    window.location.href='switchstyle.html?brandingpkg=' + encodeURIComponent(openbrandingpkg);
+}
+function setup_lightbox() { 
+    if (lightboxpanel) return;
+    
+    YAHOO.util.Dom.setStyle("brandingpkglightbox", "display", "");
+    
+    var options = {
+        width: '720px',
+        height: '430px',
+        constraintoviewport: true,
+        close: true,
+        fixedcenter: true,
+        draggable: false,
+        modal: true,
+        buttons: [
+            { text: "<cptext 'Close'>", handler:closeBox, isDefault:true },
+            { text:"<cptext 'Apply'>", handler:apply }
+        ],
+        visible: false
+    };
+    lightboxpanel = new YAHOO.widget.Dialog('brandingpkglightbox', options);
+}
+//]]>
+</script>
+
+
+
+<!--<div align="center"><input type="submit" href="#" class="input-button" value="<cpanel langprint="ChangeLook">"></div>-->

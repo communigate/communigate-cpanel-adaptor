@@ -1,0 +1,30 @@
+<cpanel setvar="headerimg=../images/topshoppingcart.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+<div class="body-content"> 
+<cpanelif $CONF{'interchangever'}>
+<cpanelfeature interchange>
+<cpanel Cgi="initcart()">
+	
+<h1><cpanel langprint="TInterchangeCart"></h1> 
+
+<p class="status"><cpanel langprint="ICIsNowActive"></p>
+
+<p><cpanel langprint="ICDefaultUName"><i><b><cpanel print="$user"></b></i> <cpanel langprint="ICDefaultPass"> <i><b><cpanel langprint="ICPass"></b></i>.</p> 
+
+<a class="boldit" href="http://<cpanel print="$CPDATA{'DNS'}">/~<cpanel print="$user">/cgi-bin/cart.cgi/admin/index.html" target=admin><cpanel langprint="ICGotoAdmin"></a>
+<br /><br />
+<a class="boldit" href="http://<cpanel print="$CPDATA{'DNS'}">/~<cpanel print="$user">/cgi-bin/cart.cgi/index.html"target=shop><cpanel langprint="ICGotoCustInterface"></a>
+
+<p><cpanel langprint="ICMsg2"></p>
+ 
+<p class="description"><cpanel langprint="ICMsg3"></p>
+
+<a href="http://www.icdevgroup.org" target=akopia><img src="logo.gif" border=0></a>
+
+<div class="return-link"><a href="../interchange.html">&larr; <cptext "Go Back"></a></div>
+
+</div><!-- end body-content -->
+</cpanelfeature>
+</cpanelif>
+<cpanel Branding="include(stdfooter.html)">
