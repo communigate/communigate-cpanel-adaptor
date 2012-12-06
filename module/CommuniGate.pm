@@ -16,7 +16,7 @@ use Cpanel::Validate::EmailLocalPart ();
 use Cpanel::Validate::EmailRFC       ();
 use Cpanel::Sys::Hostname		();
 use Storable                         ();
-
+use Time::Local  'timelocal_nocheck';
 
 
 require Exporter;
@@ -57,7 +57,7 @@ sub maxgw_domain {
 sub currentgw_domain {
   my $domainname = shift;
   my $count=0;
-  my $CGServerAddress = "127.0.0.1";
+  my $CGServerAddress = "91.230.195.210";
   my $PostmasterLogin = 'postmaster';
   my $PostmasterPassword = postmaster_pass();     
   my $cli = new CGP::CLI( { PeerAddr => $CGServerAddress,
@@ -93,7 +93,7 @@ sub api2_GWAccounts {
 	} else {
 		@domains[0]=$domainparam;
 	}
-	my $CGServerAddress = "127.0.0.1";
+	my $CGServerAddress = "91.230.195.210";
 	my $PostmasterLogin = 'postmaster';
 	my $PostmasterPassword = postmaster_pass();	
 	my $cli = new CGP::CLI( { PeerAddr => $CGServerAddress,
@@ -137,7 +137,7 @@ sub api2_EnableGW {
 		print "<H2><font color=red>Maximum of Groupware accounts exceeded for domain : $account_domain. (Maximum is : $max). </font></H2>\n";
 		return;
  	} 
-        my $CGServerAddress = "127.0.0.1";
+        my $CGServerAddress = "91.230.195.210";
         my $PostmasterLogin = 'postmaster';
         my $PostmasterPassword = postmaster_pass();
         my $cli = new CGP::CLI( { PeerAddr => $CGServerAddress,
@@ -157,7 +157,7 @@ sub api2_EnableGW {
 sub api2_DisableGW {
         my %OPTS = @_;
         my $account = $OPTS{'account'};
-        my $CGServerAddress = "127.0.0.1";
+        my $CGServerAddress = "91.230.195.210";
         my $PostmasterLogin = 'postmaster';
         my $PostmasterPassword = postmaster_pass();
         my $cli = new CGP::CLI( { PeerAddr => $CGServerAddress,
@@ -225,7 +225,7 @@ sub api2_provisioniPad {
 sub api2_listpopswithdisk {
         my %OPTS = @_;
 	my @domains = Cpanel::Email::listmaildomains();
-  	my $CGServerAddress = "127.0.0.1";
+  	my $CGServerAddress = "91.230.195.210";
         my $PostmasterLogin = 'postmaster';
         my $PostmasterPassword = postmaster_pass();     
         my $cli = new CGP::CLI( { PeerAddr => $CGServerAddress,
@@ -276,7 +276,7 @@ sub api2_addalias {
         my $domain = $OPTS{'domain'}; 
         my $user = $OPTS{'email'}; 
         my $fwdemail = $OPTS{'fwdemail'}; 
-        my $CGServerAddress = "127.0.0.1";
+        my $CGServerAddress = "91.230.195.210";
         my $PostmasterLogin = 'postmaster';
         my $PostmasterPassword = postmaster_pass();
         my $cli = new CGP::CLI( { PeerAddr => $CGServerAddress,
@@ -304,7 +304,7 @@ sub api2_addforward {
  	my $domain = $OPTS{'domain'};
         my $user = $OPTS{'email'}; 
         my $fwdemail = $OPTS{'fwdemail'};
-        my $CGServerAddress = "127.0.0.1";
+        my $CGServerAddress = "91.230.195.210";
         my $PostmasterLogin = 'postmaster';
         my $PostmasterPassword = postmaster_pass();
         my $cli = new CGP::CLI( { PeerAddr => $CGServerAddress,
@@ -350,7 +350,7 @@ sub api2_listaliases {
         my %OPTS = @_;
 	my $specified_domain  = $OPTS{'domain'};
         my @domains = Cpanel::Email::listmaildomains($OPTS{'domain'});
-        my $CGServerAddress = "127.0.0.1";
+        my $CGServerAddress = "91.230.195.210";
         my $PostmasterLogin = 'postmaster';
         my $PostmasterPassword = postmaster_pass();
         my $cli = new CGP::CLI( { PeerAddr => $CGServerAddress,
@@ -386,7 +386,7 @@ sub api2_listforwards {
         my %OPTS = @_;
         my $specified_domain  = $OPTS{'domain'};
         my @domains = Cpanel::Email::listmaildomains($OPTS{'domain'});
-        my $CGServerAddress = "127.0.0.1";
+        my $CGServerAddress = "91.230.195.210";
         my $PostmasterLogin = 'postmaster';
         my $PostmasterPassword = postmaster_pass();
         my $cli = new CGP::CLI( { PeerAddr => $CGServerAddress,
@@ -427,7 +427,7 @@ sub api2_listforwards {
 sub api2_delalias {
         my %OPTS = @_;
         my $forwarder = $OPTS{'forwarder'};
-        my $CGServerAddress = "127.0.0.1";
+        my $CGServerAddress = "91.230.195.210";
         my $PostmasterLogin = 'postmaster';
         my $PostmasterPassword = postmaster_pass();
         my $cli = new CGP::CLI( { PeerAddr => $CGServerAddress,
@@ -456,7 +456,7 @@ sub api2_delforward {
         my $domain = $OPTS{'domain'};
         my $account = $OPTS{'account'};
         my $fwdemail = $OPTS{'forwarder'};
-        my $CGServerAddress = "127.0.0.1";
+        my $CGServerAddress = "91.230.195.210";
         my $PostmasterLogin = 'postmaster';
         my $PostmasterPassword = postmaster_pass();
         my $cli = new CGP::CLI( { PeerAddr => $CGServerAddress,
@@ -497,7 +497,7 @@ sub api2_delforward {
 
 sub api2_ListDefAddress {
         my %OPTS = @_;
-        my $CGServerAddress = "127.0.0.1";
+        my $CGServerAddress = "91.230.195.210";
         my $PostmasterLogin = 'postmaster';
         my $PostmasterPassword = postmaster_pass();
         my $cli = new CGP::CLI( { PeerAddr => $CGServerAddress,
@@ -528,7 +528,7 @@ sub api2_SetDefAddress {
 	my $domain = $OPTS{'domain'};
 	my $action = $OPTS{'action'};
 	my $fwdmail= $OPTS{'fwdmail'};
-        my $CGServerAddress = "127.0.0.1";
+        my $CGServerAddress = "91.230.195.210";
         my $PostmasterLogin = 'postmaster';
         my $PostmasterPassword = postmaster_pass();
         my $cli = new CGP::CLI( { PeerAddr => $CGServerAddress,
@@ -552,7 +552,7 @@ sub api2_SpamAssassinStatus {
 	my %OPTS = @_;
         my $account_domain  = $OPTS{'domain'};
 	my $sa_rulname = "scanspam-".$account_domain;
-	my $CGServerAddress = "127.0.0.1";
+	my $CGServerAddress = "91.230.195.210";
         my $PostmasterLogin = 'postmaster';
         my $PostmasterPassword = postmaster_pass();
         my $cli = new CGP::CLI( { PeerAddr => $CGServerAddress,
@@ -582,7 +582,7 @@ sub api2_EnableSpamAssassin {
         my $account_domain  = $OPTS{'domain'};
         my $sa_rulname = "scanspam-".$account_domain;
 	my $account = $Cpanel::authuser;
-        my $CGServerAddress = "127.0.0.1";
+        my $CGServerAddress = "91.230.195.210";
         my $PostmasterLogin = 'postmaster';
         my $PostmasterPassword = postmaster_pass();
         my $cli = new CGP::CLI( { PeerAddr => $CGServerAddress,
@@ -625,7 +625,7 @@ sub api2_EnableSpamAssassin {
 sub api2_DisableSpamAssassin {
         my %OPTS = @_;
         my $account_domain  = $OPTS{'domain'};
-        my $CGServerAddress = "127.0.0.1";
+        my $CGServerAddress = "91.230.195.210";
         my $PostmasterLogin = 'postmaster';
         my $PostmasterPassword = postmaster_pass();
         my $cli = new CGP::CLI( { PeerAddr => $CGServerAddress,
@@ -668,7 +668,7 @@ sub api2_SpamAssassinStatusAutoDelete {
 	my %OPTS = @_;
         my $account_domain  = $OPTS{'domain'};
 	my $sa_rulname = "deletespam-".$account_domain;
-	my $CGServerAddress = "127.0.0.1";
+	my $CGServerAddress = "91.230.195.210";
         my $PostmasterLogin = 'postmaster';
         my $PostmasterPassword = postmaster_pass();
         my $cli = new CGP::CLI( { PeerAddr => $CGServerAddress,
@@ -703,7 +703,7 @@ sub api2_EnableSpamAssassinAutoDelete {
 	my $score_string = "";
 	for (my $i=0;$i<$score;$i++) {$score_string .= "x"; }
         my $sa_rulname = "deletespam-".$account_domain;
-        my $CGServerAddress = "127.0.0.1";
+        my $CGServerAddress = "91.230.195.210";
         my $PostmasterLogin = 'postmaster';
         my $PostmasterPassword = postmaster_pass();
         my $cli = new CGP::CLI( { PeerAddr => $CGServerAddress,
@@ -744,7 +744,7 @@ sub api2_EnableSpamAssassinAutoDelete {
 sub api2_DisableSpamAssassinAutoDelete {
         my %OPTS = @_;
         my $account_domain  = $OPTS{'domain'};
-        my $CGServerAddress = "127.0.0.1";
+        my $CGServerAddress = "91.230.195.210";
         my $PostmasterLogin = 'postmaster';
         my $PostmasterPassword = postmaster_pass();
         my $cli = new CGP::CLI( { PeerAddr => $CGServerAddress,
@@ -779,7 +779,7 @@ sub api2_SpamAssassinStatusSpamBox {
 	my %OPTS = @_;
         my $account_domain  = $OPTS{'domain'};
 	my $sa_rulname = "spambox";
-	my $CGServerAddress = "127.0.0.1";
+	my $CGServerAddress = "91.230.195.210";
         my $PostmasterLogin = 'postmaster';
         my $PostmasterPassword = postmaster_pass();
         my $cli = new CGP::CLI( { PeerAddr => $CGServerAddress,
@@ -811,7 +811,7 @@ sub api2_EnableSpamAssassinSpamBox {
 	my $score_string = "";
 	for (my $i=0;$i<$score;$i++) {$score_string .= "x"; }
         my $sa_rulname = "spambox";
-        my $CGServerAddress = "127.0.0.1";
+        my $CGServerAddress = "91.230.195.210";
         my $PostmasterLogin = 'postmaster';
         my $PostmasterPassword = postmaster_pass();
         my $cli = new CGP::CLI( { PeerAddr => $CGServerAddress,
@@ -853,7 +853,7 @@ sub api2_EnableSpamAssassinSpamBox {
 sub api2_DisableSpamAssassinSpamBox {
         my %OPTS = @_;
         my $account_domain  = $OPTS{'domain'};
-        my $CGServerAddress = "127.0.0.1";
+        my $CGServerAddress = "91.230.195.210";
         my $PostmasterLogin = 'postmaster';
         my $PostmasterPassword = postmaster_pass();
         my $cli = new CGP::CLI( { PeerAddr => $CGServerAddress,
@@ -889,7 +889,7 @@ sub AddCGPAccount {
 	my @values = split('@',$email);
 	my $user=@values[0];
 	my $domain=@values[1];
-        my $CGServerAddress = "127.0.0.1";
+        my $CGServerAddress = "91.230.195.210";
         my $PostmasterLogin = 'postmaster';
         my $PostmasterPassword = postmaster_pass();
         my $cli = new CGP::CLI( { PeerAddr => $CGServerAddress,
@@ -975,7 +975,7 @@ sub api2_AddMailingList {
         my $domain = $OPTS{'domain'};
         my $listname = $OPTS{'email'};
         my $owner = $OPTS{'owner'};
-        my $CGServerAddress = "127.0.0.1";
+        my $CGServerAddress = "91.230.195.210";
         my $PostmasterLogin = 'postmaster';
         my $PostmasterPassword = postmaster_pass();
         my $cli = new CGP::CLI( { PeerAddr => $CGServerAddress,
@@ -1000,7 +1000,7 @@ sub api2_AddMailingList {
 sub api2_ListMailingLists {
         my %OPTS = @_;
 	@domains = Cpanel::Email::listmaildomains();
-        my $CGServerAddress = "127.0.0.1";
+        my $CGServerAddress = "91.230.195.210";
         my $PostmasterLogin = 'postmaster';
         my $PostmasterPassword = postmaster_pass();
         my $cli = new CGP::CLI( { PeerAddr => $CGServerAddress,
@@ -1026,7 +1026,7 @@ sub api2_ListMailingLists {
 sub api2_DelMailingList {
         my %OPTS = @_;
         my $listname = $OPTS{'email'};
-        my $CGServerAddress = "127.0.0.1";
+        my $CGServerAddress = "91.230.195.210";
         my $PostmasterLogin = 'postmaster';
         my $PostmasterPassword = postmaster_pass();
         my $cli = new CGP::CLI( { PeerAddr => $CGServerAddress,
@@ -1052,7 +1052,7 @@ sub api2_RenameMailingList {
         my %OPTS = @_;
         my $email = $OPTS{'email'};
         my $newname = $OPTS{'newname'};
-        my $CGServerAddress = "127.0.0.1";
+        my $CGServerAddress = "91.230.195.210";
         my $PostmasterLogin = 'postmaster';
         my $PostmasterPassword = postmaster_pass();
         my $cli = new CGP::CLI( { PeerAddr => $CGServerAddress,
@@ -1132,7 +1132,7 @@ sub api2_GetListSettings {
 
         my %OPTS = @_;
         my $email = $OPTS{'email'};
-        my $CGServerAddress = "127.0.0.1";
+        my $CGServerAddress = "91.230.195.210";
         my $PostmasterLogin = 'postmaster';
         my $PostmasterPassword = postmaster_pass();
         my $cli = new CGP::CLI( { PeerAddr => $CGServerAddress,
@@ -1221,7 +1221,7 @@ sub api2_SetListSettings {
 
         my %OPTS = @_;
         my $email = $OPTS{'email'};
-        my $CGServerAddress = "127.0.0.1";
+        my $CGServerAddress = "91.230.195.210";
         my $PostmasterLogin = 'postmaster';
         my $PostmasterPassword = postmaster_pass();
         my $cli = new CGP::CLI( { PeerAddr => $CGServerAddress,
@@ -1309,7 +1309,7 @@ sub CommuniGate_PrintTextArea_api1 {
 sub api2_ListMailingListsSubs{
         my %OPTS = @_;
         my $listname = $OPTS{'listname'};
-        my $CGServerAddress = "127.0.0.1";
+        my $CGServerAddress = "91.230.195.210";
         my $PostmasterLogin = 'postmaster';
         my $PostmasterPassword = postmaster_pass();
         my $cli = new CGP::CLI( { PeerAddr => $CGServerAddress,
@@ -1363,7 +1363,7 @@ sub api2_SetSubSettings {
         my $subemail = $OPTS{'subemail'};
         my $CGPMLReceivingMode= $OPTS{'CGPMLReceivingMode'};
         my $CGPMLPostingMode= $OPTS{'CGPMLPostingMode'};
-        my $CGServerAddress = "127.0.0.1";
+        my $CGServerAddress = "91.230.195.210";
         my $PostmasterLogin = 'postmaster';
         my $PostmasterPassword = postmaster_pass();
         my $cli = new CGP::CLI( { PeerAddr => $CGServerAddress,
@@ -1398,7 +1398,7 @@ sub api2_UnSub {
         my %OPTS = @_;
         my $listname = $OPTS{'listname'};
         my $subemail = $OPTS{'subemail'};
-        my $CGServerAddress = "127.0.0.1";
+        my $CGServerAddress = "91.230.195.210";
         my $PostmasterLogin = 'postmaster';
         my $PostmasterPassword = postmaster_pass();
         my $cli = new CGP::CLI( { PeerAddr => $CGServerAddress,
@@ -1426,7 +1426,7 @@ sub api2_Sub {
         my $subemail = $OPTS{'subemail'};
         my $CGPMLReceivingMode= $OPTS{'CGPMLReceivingMode'};
         my $CGPMLPostingMode= $OPTS{'CGPMLPostingMode'};
-        my $CGServerAddress = "127.0.0.1";
+        my $CGServerAddress = "91.230.195.210";
         my $PostmasterLogin = 'postmaster';
         my $PostmasterPassword = postmaster_pass();
         my $cli = new CGP::CLI( { PeerAddr => $CGServerAddress,
@@ -1460,7 +1460,7 @@ sub api2_Sub {
 sub api2_ListGroups{
         my %OPTS = @_;
         @domains = Cpanel::Email::listmaildomains();
-        my $CGServerAddress = "127.0.0.1";
+        my $CGServerAddress = "91.230.195.210";
         my $PostmasterLogin = 'postmaster';
         my $PostmasterPassword = postmaster_pass();
         my $cli = new CGP::CLI( { PeerAddr => $CGServerAddress,
@@ -1484,7 +1484,7 @@ sub api2_ListGroups{
 sub api2_DelGroup{
         my %OPTS = @_;
         my $listname = $OPTS{'email'};
-        my $CGServerAddress = "127.0.0.1";
+        my $CGServerAddress = "91.230.195.210";
         my $PostmasterLogin = 'postmaster';
         my $PostmasterPassword = postmaster_pass();
         my $cli = new CGP::CLI( { PeerAddr => $CGServerAddress,
@@ -1510,7 +1510,7 @@ sub api2_RenameGroup {
         my %OPTS = @_;
         my $email = $OPTS{'email'};
         my $newname = $OPTS{'newname'};
-        my $CGServerAddress = "127.0.0.1";
+        my $CGServerAddress = "91.230.195.210";
         my $PostmasterLogin = 'postmaster';
         my $PostmasterPassword = postmaster_pass();
         my $cli = new CGP::CLI( { PeerAddr => $CGServerAddress,
@@ -1540,7 +1540,7 @@ sub api2_AddGroup{
         my $listname = $OPTS{'email'};
         my $spectre = $OPTS{'spectre'};
         my $realname = $OPTS{'realname'};
-        my $CGServerAddress = "127.0.0.1";
+        my $CGServerAddress = "91.230.195.210";
         my $PostmasterLogin = 'postmaster';
         my $PostmasterPassword = postmaster_pass();
         my $cli = new CGP::CLI( { PeerAddr => $CGServerAddress,
@@ -1579,7 +1579,7 @@ sub api2_AddGroup{
 sub api2_ListGroupMembers {
         my %OPTS = @_;
         my $listname = $OPTS{'listname'};
-        my $CGServerAddress = "127.0.0.1";
+        my $CGServerAddress = "91.230.195.210";
         my $PostmasterLogin = 'postmaster';
         my $PostmasterPassword = postmaster_pass();
         my $cli = new CGP::CLI( { PeerAddr => $CGServerAddress,
@@ -1614,7 +1614,7 @@ sub api2_AddGroupMember {
 	 return;
 	}
         my $domain = $OPTS{'domain'};
-        my $CGServerAddress = "127.0.0.1";
+        my $CGServerAddress = "91.230.195.210";
         my $PostmasterLogin = 'postmaster';
         my $PostmasterPassword = postmaster_pass();
         my $cli = new CGP::CLI( { PeerAddr => $CGServerAddress,
@@ -1648,7 +1648,7 @@ sub api2_RemoveGroupMember {
         my %OPTS = @_;
         my $listname = $OPTS{'listname'};
         my $subemail = $OPTS{'subemail'};
-        my $CGServerAddress = "127.0.0.1";
+        my $CGServerAddress = "91.230.195.210";
         my $PostmasterLogin = 'postmaster';
         my $PostmasterPassword = postmaster_pass();
         my $cli = new CGP::CLI( { PeerAddr => $CGServerAddress,
@@ -1688,7 +1688,7 @@ sub api2_GetGroupSettings {
 
         my %OPTS = @_;
         my $email = $OPTS{'email'};
-        my $CGServerAddress = "127.0.0.1";
+        my $CGServerAddress = "91.230.195.210";
         my $PostmasterLogin = 'postmaster';
         my $PostmasterPassword = postmaster_pass();
         my $cli = new CGP::CLI( { PeerAddr => $CGServerAddress,
@@ -1722,11 +1722,179 @@ sub api2_GetGroupSettings {
         return @result;
 }
 
-sub api2_SetGroupSettings {
+sub api2_SetAutoresponder {
+        my %OPTS = @_;
+	my $email = $OPTS{'email'};
+        my $CGServerAddress = "91.230.195.210";
+        my $PostmasterLogin = 'postmaster';
+        my $PostmasterPassword = postmaster_pass();
+        my $cli = new CGP::CLI( { PeerAddr => $CGServerAddress,
+				  PeerPort => 106,
+				  login => $PostmasterLogin,
+				  password => $PostmasterPassword } );
+        unless($cli) {
+	  $logger->warn("Can't login to CGPro: ".$CGP::ERR_STRING);
+	  exit(0);
+        }
 
+	my $body = '+Subject: ' . $OPTS{'subject'} . "\n";
+	$body .= "In-Reply-To: ^I\n";
+	$body .= "From: " . $OPTS{'from'} . " <" . $OPTS{'email'} . '@' . $OPTS{'domain'} . ">\n\n";
+	$body .= $OPTS{'body'};
+
+	my $conditions = [
+			  ["Human Generated", "---"],
+			  ['From', "not in", "#RepliedAddresses"]
+			 ];
+	if ($OPTS{'start'}) {
+	  my $start = scalar localtime ($OPTS{'start'});
+	  $start =~ m/^\w{3}\s+(\w{3})\s+(\d+)\s+(.*?)\s+(\d{4})$/;
+	  $start = sprintf('%02d', $2) . " $1 $4 $3";
+	  push @$conditions, ["Current Date", "greater than", $start];
+	}
+	if ($OPTS{'stop'}) {
+	  my $stop = scalar localtime ($OPTS{'stop'});
+	  $stop =~ m/^\w{3}\s+(\w{3})\s+(\d+)\s+(.*?)\s+(\d{4})$/;
+	  $stop = sprintf('%02d', $2) . " $1 $4 $3";
+	  push @$conditions, ["Current Date", "less than", $stop];
+	}
+
+	my $rule = [2,"#Vacation",$conditions,[
+				     [
+				      "Reply with",
+				      $body
+				     ],
+				     ["Remember 'From' in", 'RepliedAddresses']
+				    ]];
+
+        $cli->UpdateAutoresponder(email => $OPTS{'email'} . '@' . $OPTS{'domain'}, rule => $rule );
+        $cli->Logout();
+}
+
+sub api2_DeleteAutoresponder {
+        my %OPTS = @_;
+        my $CGServerAddress = "91.230.195.210";
+        my $PostmasterLogin = 'postmaster';
+        my $PostmasterPassword = postmaster_pass();
+        my $cli = new CGP::CLI( { PeerAddr => $CGServerAddress,
+				  PeerPort => 106,
+				  login => $PostmasterLogin,
+				  password => $PostmasterPassword } );
+        unless($cli) {
+	  $logger->warn("Can't login to CGPro: ".$CGP::ERR_STRING);
+	  exit(0);
+        }
+	my $rule = [];
+
+        $cli->UpdateAutoresponder(email => $OPTS{'email'}, rule => $rule );
+        $cli->Logout();
+}
+
+sub api2_ListAutoresponders {
+        my %OPTS = @_;
+
+	my @domains = Cpanel::Email::listmaildomains();
+  	my $CGServerAddress = "91.230.195.210";
+        my $PostmasterLogin = 'postmaster';
+        my $PostmasterPassword = postmaster_pass();     
+        my $cli = new CGP::CLI( { PeerAddr => $CGServerAddress,
+                            PeerPort => 106,
+                            login => $PostmasterLogin,
+                            password => $PostmasterPassword } );
+        unless($cli) {
+                $logger->warn("Can't login to CGPro: ".$CGP::ERR_STRING);
+                exit(0);
+        }
+	my @result;
+        foreach my $domain (@domains) {
+                my $accounts=$cli->ListAccounts($domain);
+                my $userName;
+                foreach $userName (sort keys %$accounts) {      
+		  my $account = "$userName\@$domain";
+		  if ($OPTS{regex}) {
+		    my $qstr = $OPTS{regex};
+		    next unless $account =~ /$qstr/;
+		  }
+		  my $rule = $cli->GetAutoresponder(account => $account);
+		  if ( $rule->[0] == 2 ) {
+		    my $subject = $rule->[3]->[0]->[1];
+		    $subject =~ s/^\+Subject\: (.*?)\\e.*?$/$1/;
+		    push( @result, {
+				    email => $account, 
+				    subject => $subject, 
+				    domain => $domain, 
+				   });
+		  }
+		}
+	}
+	return @result;
+}
+
+sub api2_EditAutoresponder {
+  my %OPTS = @_;
+
+  my $CGServerAddress = "91.230.195.210";
+  my $PostmasterLogin = 'postmaster';
+  my $PostmasterPassword = postmaster_pass();     
+  my $cli = new CGP::CLI( { PeerAddr => $CGServerAddress,
+                            PeerPort => 106,
+                            login => $PostmasterLogin,
+                            password => $PostmasterPassword } );
+  unless($cli) {
+    $logger->warn("Can't login to CGPro: ".$CGP::ERR_STRING);
+    exit(0);
+  }
+
+  my $account = $OPTS{email};
+  if ($OPTS{regex}) {
+    my $qstr = $OPTS{regex};
+    next unless $account =~ /$qstr/;
+  }
+  my $rule = $cli->GetAutoresponder(account => $account);
+  my $replay = $rule->[3]->[0]->[1];
+  $replay =~ m/^\+Subject\: (.*?)\\e.*?\\e\\e(.*?)$/;
+  my $subject = $1;
+  my $body = $2;
+  $body =~ s/\\r\\e/\n/g;
+  my $start = undef;
+  my $stop = undef;
+  for my $condition (@{$rule->[2]}) {
+    if ($condition->[0] eq 'Current Date') {
+      my %months = (
+		    'Jan' => 0,
+		    'Feb' => 1,
+		    'Mar' => 2,
+		    'Apr' => 3,
+		    'May' => 4,
+		    'Jun' => 5,
+		    'Jul' => 6,
+		    'Aug' => 7,
+		    'Sep' => 8,
+		    'Oct' => 9,
+		    'Nov' => 10,
+		    'Dec' => 11
+		   );
+      my @date = split " ", $condition->[2];
+      if ($condition->[1] eq 'greater than') {
+	$start = timelocal_nocheck( $date[5], $date[4], $date[3], $date[0], $months{$date[1]}, ($date[2]-1900) );
+      } elsif ($condition->[1] eq 'less than') {
+	$stop = timelocal_nocheck( $date[5], $date[4], $date[3], $date[0], $months{$date[1]}, ($date[2]-1900) );
+      }
+    }
+  }
+  
+  return {
+	  subject => $subject, 
+	  body => $body,
+	  start => $start,
+	  stop => $stop
+	 };
+}
+
+sub api2_SetGroupSettings {
         my %OPTS = @_;
         my $email = $OPTS{'email'};
-        my $CGServerAddress = "127.0.0.1";
+        my $CGServerAddress = "91.230.195.210";
         my $PostmasterLogin = 'postmaster';
         my $PostmasterPassword = postmaster_pass();
         my $cli = new CGP::CLI( { PeerAddr => $CGServerAddress,
@@ -1771,7 +1939,7 @@ sub IsGroupInternal {
 	my @values = split("@",$groupwithdomain);
   	my $domain = @values[1]; 
   	my $group = @values[0]; 
-        my $CGServerAddress = "127.0.0.1";
+        my $CGServerAddress = "91.230.195.210";
         my $PostmasterLogin = 'postmaster';
         my $PostmasterPassword = postmaster_pass();
         my $cli = new CGP::CLI( { PeerAddr => $CGServerAddress,
@@ -1795,7 +1963,7 @@ sub IsGroupInternal {
 sub GroupMembersForRule{
 	my $group = shift;
 	my $domain = shift;
-	my $CGServerAddress = "127.0.0.1";
+	my $CGServerAddress = "91.230.195.210";
         my $PostmasterLogin = 'postmaster';
         my $PostmasterPassword = postmaster_pass();
         my $cli = new CGP::CLI( { PeerAddr => $CGServerAddress,
@@ -1827,7 +1995,7 @@ sub SetGroupInternal {
         my @values = split("@",$groupwithdomain);
         my $domain = @values[1];
         my $group = @values[0];
-        my $CGServerAddress = "127.0.0.1";
+        my $CGServerAddress = "91.230.195.210";
         my $PostmasterLogin = 'postmaster';
         my $PostmasterPassword = postmaster_pass();
         my $cli = new CGP::CLI( { PeerAddr => $CGServerAddress,
@@ -1867,7 +2035,7 @@ sub SetGroupExternal{
         my @values = split("@",$groupwithdomain);
         my $domain = @values[1];
         my $group = @values[0];
-        my $CGServerAddress = "127.0.0.1";
+        my $CGServerAddress = "91.230.195.210";
         my $PostmasterLogin = 'postmaster';
         my $PostmasterPassword = postmaster_pass();
         my $cli = new CGP::CLI( { PeerAddr => $CGServerAddress,
@@ -1936,6 +2104,9 @@ sub api2 {
     $API{'RemoveGroupMember'} = {};
     $API{'GetGroupSettings'} = {};
     $API{'SetGroupSettings'} = {};
+    $API{'SetAutoresponder'} = {};
+    $API{'ListAutoresponder'} = {};
+    $API{'DeleteAutoresponder'} = {};
     return ( \%{ $API{$func} } );
 }
 

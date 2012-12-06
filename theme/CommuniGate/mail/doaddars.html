@@ -4,7 +4,7 @@
 
  <div class="body-content">
 <h1><cpanel langprint="ARAddautores"></h1>
-<!--<cpanel Email="addautoresponder($FORM{'email'},$FORM{'from'},$FORM{'subject'},$FORM{'arbody'},$FORM{'domain'},$FORM{'html'},$FORM{'charset'},$FORM{'interval'},$FORM{'start'},$FORM{'stop'})"></b> -->
+<?cp CommuniGate::SetAutoresponder() email=$FORM{'email'},domain=$FORM{'domain'},body=$FORM{'arbody'},start=$FORM{'start'},stop=$FORM{'stop'},subject=$FORM{'subject'},from=$FORM{'from'} ?>
 <cpanelif !$CPERROR{'email'} && !$appname==webmail>
 	<cpanel langprint="ARModifiedPre"> <span class="status"><cpanel print="$FORM{'email'}">@<cpanel print="$FORM{'domain'}"></span>
 </cpanelif>

@@ -6,8 +6,7 @@
 
 <cptext 'The auto responder “[output,class,_1,status]” was deleted.',$FORM{'email'}>
 	
-
-<pre><span size="1"><cpanel Email="delautoresponder($FORM{'email'})"></span></pre>
+<?cp CommuniGate::DeleteAutoresponder() email=$FORM{'email'} ?>
 
 <div class="return-link"><a href="autores.html">&larr; <cptext "Go Back"></a></div>
 

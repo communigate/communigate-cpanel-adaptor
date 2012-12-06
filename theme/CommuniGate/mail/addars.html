@@ -24,7 +24,7 @@ var init = function() {
 
     validator.add("stop_ts", stop_is_after_start, "<cptext "The stop time must be later than the start time.">");
 
-    validator.add("interval", "positive_integer", "<cptext "The Interval field must be a positive integer.">");
+//    validator.add("interval", "positive_integer", "<cptext "The Interval field must be a positive integer.">");
     if (YAHOO.util.Dom.inDocument("email") == true) {
         validator.add("email", "min_length(%input%, 1)", "<cptext "The Email field cannot be empty.">");
         validator.add("email", "no_chars(%input%,'@')", "<cptext 'Cannot use a domain in this field'>");
@@ -40,13 +40,13 @@ var init = function() {
     // TODO: add a description for interval
     //CPANEL.panels.create_help("interval_help_toggle", "interval_help_description");
 
-    YAHOO.util.Dom.get("charset").focus();
+  //    YAHOO.util.Dom.get("charset").focus();
 };
 
 YAHOO.util.Event.onDOMReady(init);
 
 var kill_utfmsg = function() {
-    if (!FORM['autoload']) { checkcharset(); }
+//    if (!FORM['autoload']) { checkcharset(); }
     if (document.getElementById('utfmsg')) {
         document.getElementById('utfmsg').style.display='none';
     }
@@ -115,7 +115,6 @@ function parseForm() {
 }
 //]]>
 </script>
-
 <div class="body-content">
 
 <h1><cpanel langprint="ARModAdd"></h1>
@@ -127,46 +126,47 @@ function parseForm() {
 <form method="post" id="mainform" name="mainform" action="doaddars.html">
 	<table style="width: 100%" cellspacing="0" cellpadding="3">
 		<tr>
-			<td align="right"><i><cpanel langprint="EASubject"></i></td>
+			<td align="right"><i>^S</i></td>
 			<td>-</td>
 			<td><cpanel langprint="EASubjectDesc"></td>
 		</tr>
 		<tr>
-			<td align="right" valign="top"><i><cpanel langprint="EAFrom"></i></td>
+			<td align="right" valign="top"><i>^F</i></td>
 			<td valign="top">-</td>			
 			<td valign="top"><cpanel langprint="EAFromDesc"></td>
 		</tr>
 		<tr>
-			<td align="right"><cpanel langprint="EAEmail"></td>
+			<td align="right">^R</td>
 			<td>-</td>			
 			<td><cpanel langprint="EAEmailDesc"></td>
 		</tr>
 	</table>
 	<br />
 	<table style="width: 100%" cellspacing="0" cellpadding="3">
-		<tr>
-			<td align="right"><cpanel langprint="ARCharacterset"></td>
-			<td>
-				<table><tr>
-					<td>
-						<select name="charset" onchange="checkcharset(this);" id="charset">
-							<cpanel Email="getarscharset($FORM{'email'},$FORM{'__cpanel__temp__charset__'})">
-						</select>
-					</td>
-					<td><em><cpanel Locale="maketext('Note: You must select this option before changing anything else or you will lose your changes.')"></td>
-				</tr></table>
-			</td>
-		</tr>
-		<tr>
-            <td align="right"><cptext 'Interval:'></td>
-            <td><input size="4" maxlength="4" type="text" autofill="off" autocomplete="off" id="interval" name="interval" value="<cpanel Email="getarsinterval($FORM{'email'})">" /> <cptext '[numerate,_1,hour,hours]'> <span id="interval_error"></span></td>
-        </tr>
+		<!-- <tr> -->
+		<!-- 	<td align="right"><cpanel langprint="ARCharacterset"></td> -->
+		<!-- 	<td> -->
+		<!-- 		<table><tr> -->
+		<!-- 			<td> -->
+		<!-- 				<select name="charset" onchange="checkcharset(this);" id="charset"> -->
+		<!-- 					<cpanel Email="getarscharset($FORM{'email'},$FORM{'__cpanel__temp__charset__'})"> -->
+		<!-- 				</select> -->
+		<!-- 			</td> -->
+		<!-- 			<td><em><cpanel Locale="maketext('Note: You must select this option before changing anything else or you will lose your changes.')"></td> -->
+		<!-- 		</tr></table> -->
+		<!-- 	</td> -->
+		<!-- </tr> -->
+	<!-- 	<tr> -->
+        <!--     <td align="right"><cptext 'Interval:'></td> -->
+        <!--     <td><input size="4" maxlength="4" type="text" autofill="off" autocomplete="off" id="interval" name="interval" value="<cpanel Email="getarsinterval($FORM{'email'})">" /> <cptext '[numerate,_1,hour,hours]'> <span id="interval_error"></span></td> -->
+        <!-- </tr> -->
         <tr>
 			<td align="right"><cpanel langprint="AREmail"></td>
+			<input type="hidden" name="charset" value="utf-8" />
 			<cpanelif !$appname==webmail>
 				<td>
 					<input style="width: 150px" type="text" autofill="off" autocomplete="off" id="email" name="email" value="<cpanel sprint="$FORM{'email'},@,0">" /> @
-					<select name="domain">
+					<select name="domain"> 
 						<cpanel Email="printdomainoptions($FORM{'email'})">
 					</select> <span id="email_error"></span>
 				</td>
@@ -180,21 +180,25 @@ function parseForm() {
 			<td><input style="width: 150px" type="text" id="from" name="from" value="<cpanel Email="getarsfrom($FORM{'email'})">" /> <span id="from_error"></span>
 			</td>
 		</tr>
-		<tr>
-			<td align="right"><cpanel langprint="ARSubject">:</td>
-			<td><input type="text" size="39" id="subject" name="subject" value="<cpanel Email="getarssubject($FORM{'email'})">" /> <span id="subject_error"></span>
-			</td>
-		</tr>
-		<tr>
-			<td align="right"><cptext 'HTML[boolean,_1,:,]'></td>
-			<td><input type="checkbox" name="html" id="html_message" value="1" <cpanel Email="getarshtml($FORM{'email'})"> /> <label for="html_message"><cptext 'This message contains HTML.'></label></td>
-		</tr>
-		<tr>
-			<td align="right" valign="top"><cpanel langprint="ARBody"></td>
-			<td>
-				<textarea id="arbody" name="arbody" cols="80" rows="8"><cpanel Email="getarsbody($FORM{'email'})"></textarea>
-			</td>
-		</tr>
+		<!-- <tr> -->
+		<!-- 	<td align="right"><cptext 'HTML[boolean,_1,:,]'></td> -->
+		<!-- 	<td><input type="checkbox" name="html" id="html_message" value="1" <cpanel Email="getarshtml($FORM{'email'})"> /> <label for="html_message"><cptext 'This message contains HTML.'></label></td> -->
+		<!-- </tr> -->
+<?cp CommuniGate::EditAutoresponder(
+		[tr]
+			[td align="right"]$LANG{'ARSubject'}:[/td]
+			[td][input type="text" size="39" id="subject" name="subject" value="%" /] [span id="subject_error"][/span]
+			[/td]
+		[/tr]
+		[tr]
+			[td align="right" valign="top"]$LANG{'ARBody'}[/td]
+			[td]
+				[textarea id="arbody" name="arbody" cols="80" rows="8"]%[/textarea]
+     [input id="start_ts" name="start" type="hidden" value="%" /]
+     [input id="stop_ts" name="stop" type="hidden" value="%" /]
+      [/td]
+		[/tr],
+subject,body,start,stop) email=$FORM{'email'} ?>
         <tr>
             <td align="right"><cptext 'Start[boolean,_1,:]',1></td>
             <td><label><input type="radio" name="start_control" value="0" checked="checked" onclick="DOM.get('start_ts').value = ''; validator.verify()" /> <cptext "Immediately"></label>
@@ -202,7 +206,6 @@ function parseForm() {
                 <label><input type="radio" name="start_control" value="1" onclick="if (!customized_dates.start) custom_start(DOM.getNextSibling(this));" /> <a id="start_link" style="visibility:hidden" href="#" onclick="custom_start(this); return false"><cptext "Custom"></a></label>
                 <span id="start_ts_error"></span>
                 <div id="start_container"></div>
-                <input id="start_ts" name="start" type="hidden" value="<cpanel Email="getarsstart($FORM{'email'})">" />
             </td>
         </tr>
         <tr>
@@ -212,7 +215,6 @@ function parseForm() {
                 <label><input type="radio" name="stop_control" value="1" onclick="if (!customized_dates.stop) custom_stop(DOM.getNextSibling(this));" /> <a id="stop_link" style="visibility:hidden" href="#" onclick="custom_stop(this); return false"><cptext "Custom"></a></label>
                 <span id="stop_ts_error"></span>
                 <div id="stop_container"></div>
-                <input id="stop_ts" name="stop" type="hidden" value="<cpanel Email="getarsstop($FORM{'email'})">" />
             </td>
         </tr>
     </table>

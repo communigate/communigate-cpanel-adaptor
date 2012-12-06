@@ -3848,6 +3848,65 @@ sub SetDirectoryAccessRights {
   $this->_parseResponse();
 }
 
+############################################
+# Autoresponders
+
+sub UpdateAutoresponder {
+  my ($this) = shift;
+  my %params = (@_);
+
+  croak 'usage CGP::CLI->UpdateAutoresponder(email => "email",rule => [rule])'
+      unless exists $params{email};
+
+  my $line = 'GetAccountMailRules';
+  $line .= ' ' . $params{email};
+  $this->send($line);
+  return undef unless $this->_parseResponse();
+  my $rules = $this->parseWords($this->getWords);
+  my $changesApplied = 0;
+  my $lc = 0;
+  foreach my $rule (@{$rules}) {
+      if  ( $rule->[1] eq "#Vacation" ) {
+	  $this->send('REMOVEACCOUNTSUBSET ' . $params{email} . ' SUBSET RepliedAddresses');
+	  if ($params{'rule'}) {
+	      $rule = $params{'rule'};
+	  } else {
+	      delete $rules->[$lc];
+	  }
+	  $changesApplied = 1;
+	  last;
+      }
+      $lc++;
+  }
+  if ((! $changesApplied) && exists $params{'rule'}) {
+      push @$rules, $params{'rule'};
+  }
+  my $newLine = "SETACCOUNTMAILRULES " . ' ' . $params{email}  . ' ' . $this->printWords($rules);
+  $this->send($newLine);
+
+  $this->_parseResponse();
+}
+
+sub GetAutoresponder {
+  my $this = shift;
+  my %params = (@_);
+
+  croak 'usage CGP::CLI->Getautoresponders(\'account\')'
+    unless exists $params{account};
+
+  my $line = 'GetAccountMailRules ' . $params{account};
+  $this->send($line);
+  return undef unless $this->_parseResponse();
+  my $rules = $this->parseWords($this->getWords);
+  my $changesApplied = 0;
+  foreach my $rule (@{$rules}) {
+      if  ( $rule->[1] eq "#Vacation" ) {
+	  return $rule;
+      }
+  }
+  return undef;
+}
+
 #############################################
 #  Miscellaneous commands
 

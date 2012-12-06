@@ -56,7 +56,7 @@
 		<th width="33%" colspan="2" class="sorttable_nosort"><cpanel langprint="FTPFunctions"></th>
 	</tr>
 	
-<?cp Email::listautoresponders(
+<?cp CommuniGate::ListAutoresponders(
 [tr class="row-%"]
 	[td class="nobrd-center-t" id="%" onmouseover="enableDragDrop\{leftparenthesis}this\{comma}'%'\{rightparenthesis}"]%[/td]
 	[td align="center"]&nbsp;%[/td]
@@ -67,7 +67,7 @@
 		[a href="dodelautoresconfirm.html?email=%&redirectdomain=$FORM{'domain'}"]$LANG{'delete-BoxTrapper'}[/a]
 	[/td]
 [/tr]
-,*num,^email,^email,email,subject,^email,encoded_email,^email,email,email) domain=$FORM{'domain'},regex=$FORM{'searchregex'},api2_paginate=1,api2_paginate_start=$FORM{'api2_paginate_start'},api2_paginate_size=$CPVAR{'itemsperpage'} || '[tr][td class="errors" colspan="4"]$LANG{'NoAutoRes'}.[/td][/tr]' ?>
+,*num,^email,^email,email,subject,^email,email,^email,email,email) domain=$FORM{'domain'},regex=$FORM{'searchregex'},api2_paginate=1,api2_paginate_start=$FORM{'api2_paginate_start'},api2_paginate_size=$CPVAR{'itemsperpage'} || '[tr][td class="errors" colspan="4"]$LANG{'NoAutoRes'}.[/td][/tr]' ?>
 
 </table>
 
