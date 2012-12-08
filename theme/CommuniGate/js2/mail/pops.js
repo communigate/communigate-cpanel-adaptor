@@ -255,7 +255,7 @@ var build_email_table_markup = function() {
             html += '<span onclick="change_page(' + (PAGE_DATA.current_page - 1) + ')" class="email_table_prev_page">&larr; ' + LANG.prev + '</span> ';
         }
         if (PAGE_DATA.current_page != PAGE_DATA.total_pages) {
-            html += ' <span onclick="change_page(' + (PAGE_DATA.current_page + 1) + ')" class="email_table_next_page">' + LANG.next + ' &rarr;</span>';
+            html += ' <span onclick="change_page(' + (parseInt(PAGE_DATA.current_page) + 1) + ')" class="email_table_next_page">' + LANG.next + ' &rarr;</span>';
         }       
         html += '</div>';
     }
