@@ -28,10 +28,66 @@
 	</cpanelif>	
 </div>
 
+<br />
 <div id="mx_input_and_table" <cpanelif $CPVAR{'maildomainscount'}=gt=1>style="display: none"</cpanelif> >
+<div style="display: none">
+<h2><cpanel langprint="MX_email_routing"></h2>
+<div class="highlight2" id="mxcheck_options_div">
 
+<div class="label_wraps">
+<input type="radio" name="mxcheck" id="mxcheck_auto" value="auto" /> <label for="mxcheck_auto" class="label_txt" id="mxcheck_auto_label"><cpanel langprint="MX_auto_detect_config"></label><span class="status" id="mxcheck_auto_current_setting" style="font-weight: bold"></span> (<cpanel langprint="recommended">) <span class="action_link" id="mxcheck_auto_toggle" onclick="CPANEL.util.toggle_more_less(this, 'mxcheck_auto_desc');"><cpanel langprint="cjt_toggle_more"></span>
 
+<br />
+<div id="mxcheck_auto_desc" style="display: none">
+    <ul class="mxcheck_autolist">
+        <li>
+			<cpanel langprint="MX_local_exchanger"> <span id="mxcheck_detected_state_local"></span><br />
+			<em><cpanel langprint="MX_local_exchanger_auto_desc"></em>
+        </li>
+        <li>
+			<cpanel langprint="MX_backup_exchanger"> <span id="mxcheck_detected_state_secondary"></span><br />
+            <em><cpanel langprint="MX_backup_exchanger_auto_desc"></em>
+        </li>
+        <li>
+            <cpanel langprint="MX_remote_exchanger"> <span id="mxcheck_detected_state_remote"></span><br />
+			<em><cpanel langprint="MX_remote_exchanger_auto_desc"></em>
+        </li>
+    </ul>
+	<p><cpanel langprint="MX_auto_detect_note"></p>
 
+	<!--<div id="mxcheck_auto_warnings" style="background-color: #F6E082;"></div>-->
+</div>
+</div>
+<div class="label_wraps">
+<input type="radio" name="mxcheck" id="mxcheck_local" value="local" /> <label for="mxcheck_local" class="label_txt" id="mxcheck_local_label"><cpanel langprint="MX_local_exchanger"></label> <span class="action_link" onclick="CPANEL.util.toggle_more_less(this, 'mxcheck_local_desc');"><cpanel langprint="cjt_toggle_more"></span><br />
+<div id="mxcheck_local_desc" style="display: none">
+	<p class="highlight-accordian-desc"><em><cpanel langprint="MX_local_exchanger_desc"></em></p>
+</div>
+</div>
+
+<div class="label_wraps">
+<input type="radio" name="mxcheck" id="mxcheck_secondary" value="secondary" /> <label for="mxcheck_secondary" class="label_txt" id="mxcheck_secondary_label"><cpanel langprint="MX_backup_exchanger"></label> <span class="action_link" onclick="CPANEL.util.toggle_more_less(this, 'mxcheck_secondary_desc');"><cpanel langprint="cjt_toggle_more"></span><br />
+<div id="mxcheck_secondary_desc" style="display: none">
+	<p class="highlight-accordian-desc"><em><cpanel langprint="MX_backup_exchanger_desc"></em></p>
+</div>
+</div>
+<div class="label_wraps">
+<input type="radio" name="mxcheck" id="mxcheck_remote" value="remote" /> <label class="label_txt" for="mxcheck_remote" id="mxcheck_remote_label"><cpanel langprint="MX_remote_exchanger"></label> <span class="action_link" onclick="CPANEL.util.toggle_more_less(this, 'mxcheck_remote_desc');"><cpanel langprint="cjt_toggle_more"></span><br />
+<div id="mxcheck_remote_desc" style="display: none">
+	<p class="highlight-accordian-desc"><em><cpanel langprint="MX_remote_exchanger_desc"></em></p>
+</div>
+</div>
+
+		<div style="padding: 5px 0px">
+			<input class="input-button" type="button" value="<cpanel langprint="Change">" id="change_mxcheck_button" onclick="change_mxcheck();" /> <span id="mxcheck_status"></span>
+		</div>
+		
+	<em><cpanel langprint="current_setting_bold"></em><br /><br />
+	<img src="/cjt/images/icons/warning.gif" alt="Warning" /> <cpanel langprint="MX_routing_warning">
+
+</div><!-- end highlight -->
+<br />
+</div>
 <h2><cpanel langprint="MXAddNewRec"></h2>
 <div class="highlight">
 	<table cellpadding="3" cellspacing="0" style="margin-left: 50px">
