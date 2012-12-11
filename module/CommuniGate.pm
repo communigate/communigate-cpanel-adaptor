@@ -326,8 +326,13 @@ sub api2_addforward {
 	my @NewRules;
         foreach my $Rule (@$Rules) {
                   if ($Rule->[1] eq "#Redirect") {
-                        $Rule->[3]->[0]->[1] .= ",$fwdemail";
-			$found=1;	
+		      my %rules;
+		      for my $mail (split(',', $Rule->[3]->[0]->[1])) {
+			  $rules{$mail} = 1;
+		      }
+		      $rules{$fwdemail} = 1;
+		      $Rule->[3]->[0]->[1] = join(',', keys(%rules));
+		      $found=1;
                   }       
 		  push(@NewRules,$Rule);
         }
