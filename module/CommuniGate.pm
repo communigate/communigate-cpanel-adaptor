@@ -1784,7 +1784,7 @@ sub api2_DeleteAutoresponder {
 	  $logger->warn("Can't login to CGPro: ".$CGP::ERR_STRING);
 	  exit(0);
         }
-	my $rule = [];
+	my $rule = undef;
 
         $cli->UpdateAutoresponder(email => $OPTS{'email'}, rule => $rule );
         $cli->Logout();
