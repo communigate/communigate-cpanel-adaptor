@@ -1984,6 +1984,7 @@ sub api2_RestoreForwarders {
     open(IN, "gunzip -c $gzfile |") || die "can't open pipe to $file";
     my @input = <IN>;
     close IN;
+    unlink $gzfilea;
     foreach my $domain (@domains) {
 	my $accounts=$cli->ListAccounts($domain);
 	foreach my $userName (sort keys %$accounts) {
