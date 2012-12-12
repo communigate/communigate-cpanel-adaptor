@@ -16,7 +16,7 @@ my $cpanel = Cpanel::LiveAPI->new();
 # print "Content-type: text/plain\r\n\r\n";
 
 my $domain = $q->param('domain');
-my $domains = $cpanel->api2( 'CommuniGate', 'ListAliasBackups', {} )->{cpanelresult}->{data};
+my $domains = $cpanel->api2( 'CommuniGate', 'ListForwardersBackups', {} )->{cpanelresult}->{data};
 
 my $domainFound = 0;
 for my $dom (@$domains) {

@@ -1896,7 +1896,7 @@ sub api2_EditAutoresponder {
 	 };
 }
 
-sub api2_ListAliasBackups {
+sub api2_ListForwardersBackups {
     my %OPTS = @_;
     
     my @domains = Cpanel::Email::listmaildomains();
@@ -2148,7 +2148,7 @@ sub api2 {
     $API{'SetAutoresponder'} = {};
     $API{'ListAutoresponder'} = {};
     $API{'DeleteAutoresponder'} = {};
-    $API{'ListAliasBackups'} = {};
+    $API{'ListForwardersBackups'} = {};
     return ( \%{ $API{$func} } );
 }
 
