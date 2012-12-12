@@ -1896,6 +1896,43 @@ sub api2_EditAutoresponder {
 	 };
 }
 
+sub api2_ListAliasBackups {
+    my %OPTS = @_;
+    
+    my @domains = Cpanel::Email::listmaildomains();
+    my $CGServerAddress = "91.230.195.210";
+    my $PostmasterLogin = 'postmaster';
+    my $PostmasterPassword = postmaster_pass();     
+    my $cli = new CGP::CLI( { PeerAddr => $CGServerAddress,
+			      PeerPort => 106,
+			      login => $PostmasterLogin,
+			      password => $PostmasterPassword } );
+    unless($cli) {
+	$logger->warn("Can't login to CGPro: ".$CGP::ERR_STRING);
+	exit(0);
+    }
+    my @result;
+    foreach my $domain (@domains) {
+	my $accounts=$cli->ListAccounts($domain);
+	my $domainFound = 0;
+	foreach my $userName (sort keys %$accounts) {
+	    my $Rules=$cli->GetAccountMailRules("$userName\@$domain") || die "Error: ".$cli->getErrMessage.", quitting";
+	    foreach my $Rule (@$Rules) {
+		if ($Rule->[1] eq "#Redirect" && $Rule->[3]->[0]->[1] ne '' ) {
+		    push( @result, {
+			domain => $domain
+			  } );
+		    $domainFound = 1;
+		}
+		last if $domainFound;
+	    }
+	    last if $domainFound;
+	}
+        next if $domainFound;
+    }
+    return @result;
+}
+
 sub api2_SetGroupSettings {
         my %OPTS = @_;
         my $email = $OPTS{'email'};
@@ -1937,7 +1974,6 @@ sub api2_SetGroupSettings {
 
         return @result;
 }
-
 
 sub IsGroupInternal {
   	my $groupwithdomain = shift;
@@ -2112,6 +2148,7 @@ sub api2 {
     $API{'SetAutoresponder'} = {};
     $API{'ListAutoresponder'} = {};
     $API{'DeleteAutoresponder'} = {};
+    $API{'ListAliasBackups'} = {};
     return ( \%{ $API{$func} } );
 }
 
