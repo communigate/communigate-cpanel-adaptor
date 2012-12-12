@@ -5,7 +5,8 @@
 &nbsp;&nbsp;&nbsp;<img src="../files/images/up.gif" border=0>&nbsp;&nbsp;&nbsp;&nbsp;<b><cpanel langprint="BUAFRestoring"></b>
 <br />
 <pre>
-<cpanel Fileman="restoreaf()">
+<!-- <?cp CommuniGate::UploadForwarders (%, id) ?> -->
+<?cp CommuniGate::RestoreForwarders(% ,row) || 'maketext('The forwarders could not be restored.')' ?>
 </pre>
 </script>
 </body>

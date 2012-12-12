@@ -18,7 +18,6 @@ use Cpanel::Sys::Hostname		();
 use Storable                         ();
 use Time::Local  'timelocal_nocheck';
 
-
 require Exporter;
 @ISA    = qw(Exporter);
 @EXPORT = qw(CommuniGate_init );
@@ -315,15 +314,29 @@ sub api2_addforward {
                 $logger->warn("Can't login to CGPro: ".$CGP::ERR_STRING);
                 exit(0);
         }
+	return addforward (
+	    domain => $domain,
+	    email => $user,
+	    fwdemail => $fwdemail,
+	    cli => $cli
+	    );
+}       
+
+sub addforward {
+        my %OPTS = @_;
+ 	my $domain = $OPTS{'domain'};
+        my $user = $OPTS{'email'}; 
+        my $fwdemail = $OPTS{'fwdemail'};
+        my $cli = $OPTS{'cli'};
         my $Rules=$cli->GetAccountMailRules("$user\@$domain");
 	my $error_msg = $cli->getErrMessage();
-        my @result;
         if (!($error_msg eq "OK")) {
                 $Cpanel::CPERROR{'CommuniGate'} = $error_msg;
-		return @result;
+		return undef;
         }
 	my $found=0;
 	my @NewRules;
+        my @result;
         foreach my $Rule (@$Rules) {
                   if ($Rule->[1] eq "#Redirect") {
 		      my %rules;
@@ -345,11 +358,11 @@ sub api2_addforward {
         if ($error_msg eq "OK") {
                 push( @result, { email => "$user\@$domain", forward => "$fwdemail", domain => "$domain" } );
         } else {
-                $Cpanel::CPERROR{'CommuniGate'} = $error_msg;
+	    $Cpanel::CPERROR{'CommuniGate'} = $error_msg;
         }
         return @result;
-}       
 
+}
 
 sub api2_listaliases {
         my %OPTS = @_;
@@ -1896,6 +1909,7 @@ sub api2_EditAutoresponder {
 	 };
 }
 
+
 sub api2_ListForwardersBackups {
     my %OPTS = @_;
     
@@ -1932,6 +1946,66 @@ sub api2_ListForwardersBackups {
     }
     return @result;
 }
+sub api2_UploadForwarders {
+    my $randdata = Cpanel::Rand::getranddata(32);
+    $Cpanel::CPVAR{'forwardersimportid'} = $randdata;
+    Cpanel::SafeDir::safemkdir( $Cpanel::homedir . '/tmp/forwardersimport', '0700' );
+    my @RSD;
+    local $Cpanel::IxHash::Modify = 'none';
+  FILE:
+    foreach my $file ( keys %Cpanel::FORM ) {
+        next FILE if $file =~ m/^file-(.*)-key$/;
+        next FILE if $file !~ m/^file-(.*)/;
+        my $tmpfilepath = $Cpanel::FORM{$file};
+        rename( $tmpfilepath, $Cpanel::homedir . '/tmp/forwardersimport/' . $randdata );
+        push @RSD, { 'id' => $randdata };
+        last;
+    }
+    return \@RSD;
+}
+
+sub api2_RestoreForwarders {
+    my %OPTS = @_;
+    
+    my @domains = Cpanel::Email::listmaildomains();
+    my $CGServerAddress = "91.230.195.210";
+    my $PostmasterLogin = 'postmaster';
+    my $PostmasterPassword = postmaster_pass();     
+    my $cli = new CGP::CLI( { PeerAddr => $CGServerAddress,
+			      PeerPort => 106,
+			      login => $PostmasterLogin,
+			      password => $PostmasterPassword } );
+    unless($cli) {
+	$logger->warn("Can't login to CGPro: ".$CGP::ERR_STRING);
+	exit(0);
+    }
+    my @result;
+    my $gzfile = $Cpanel::homedir . '/tmp/forwardersimport/' . $Cpanel::CPVAR{'forwardersimportid'};
+    open(IN, "gunzip -c $gzfile |") || die "can't open pipe to $file";
+    my @input = <IN>;
+    close IN;
+    foreach my $domain (@domains) {
+	my $accounts=$cli->ListAccounts($domain);
+	foreach my $userName (sort keys %$accounts) {
+	    my $email = "$userName\@$domain";
+	    for my $row (@input) {
+		if ( $row =~ m/^\Q$email\:/i ) {
+		    my (undef, $fwdemail) = split '[\:\s]+', $row, 2;
+		    chomp $fwdemail;
+		    addforward(
+			domain => $domain,
+			email => $userName,
+			fwdemail => $fwdemail,
+			cli => $cli
+			);
+		    push @result, {row => $row};
+		}
+	    }
+	}
+    }
+    return @result;
+}
+
 
 sub api2_SetGroupSettings {
         my %OPTS = @_;
@@ -2149,6 +2223,8 @@ sub api2 {
     $API{'ListAutoresponder'} = {};
     $API{'DeleteAutoresponder'} = {};
     $API{'ListForwardersBackups'} = {};
+    $API{'UploadForwarders'} = {};
+    $API{'RestoreForwarders'} = {};
     return ( \%{ $API{$func} } );
 }
 
