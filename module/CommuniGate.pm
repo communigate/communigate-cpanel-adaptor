@@ -1984,7 +1984,7 @@ sub api2_RestoreForwarders {
     open(IN, "gunzip -c $gzfile |") || die "can't open pipe to $file";
     my @input = <IN>;
     close IN;
-    unlink $gzfilea;
+    unlink $gzfile;
     foreach my $domain (@domains) {
 	my $accounts=$cli->ListAccounts($domain);
 	foreach my $userName (sort keys %$accounts) {
@@ -2006,6 +2006,65 @@ sub api2_RestoreForwarders {
     }
     return @result;
 }
+
+sub api2_ListAccountsBackups {
+    my %OPTS = @_;
+    
+    my @domains = Cpanel::Email::listmaildomains();
+    my $CGServerAddress = "91.230.195.210";
+    my $PostmasterLogin = 'postmaster';
+    my $PostmasterPassword = postmaster_pass();     
+    my $cli = new CGP::CLI( { PeerAddr => $CGServerAddress,
+			      PeerPort => 106,
+			      login => $PostmasterLogin,
+			      password => $PostmasterPassword } );
+    unless($cli) {
+	$logger->warn("Can't login to CGPro: ".$CGP::ERR_STRING);
+	exit(0);
+    }
+    my @result;
+    foreach my $domain (@domains) {
+	my $accounts=$cli->ListAccounts($domain);
+	foreach my $userName (sort keys %$accounts) {
+	    push( @result, {
+		domain => $domain
+		  } );
+	    last;
+	}
+    }
+    return @result;
+}
+
+sub api2_GetAccountsBackups {
+    my %OPTS = @_;
+    my $CGServerAddress = "91.230.195.210";
+    my $PostmasterLogin = 'postmaster';
+    my $PostmasterPassword = postmaster_pass();     
+    my $cli = new CGP::CLI( { PeerAddr => $CGServerAddress,
+			      PeerPort => 106,
+			      login => $PostmasterLogin,
+			      password => $PostmasterPassword } );
+    unless($cli) {
+	$logger->warn("Can't login to CGPro: ".$CGP::ERR_STRING);
+	exit(0);
+    }
+    my $domain = $OPTS{'domain'};
+    my $accounts=$cli->ListAccounts($domain);
+    my @result;
+    foreach my $userName (sort keys %$accounts) {      
+	my $accountData = $cli->GetAccountEffectiveSettings("$userName\@$domain");
+	my $pass = $cli->GetAccountPlainPassword("$userName\@$domain");
+	my $diskquota = @$accountData{'MaxAccountSize'} || '';
+	$diskquota =~ s/M//g;
+	push( @result, {
+	    email => "$userName\@$domain", 
+	    diskquota => "$diskquota", 
+	    pass => "$pass"
+ 	      } );
+    }
+    return @result;
+}
+
 
 
 sub api2_SetGroupSettings {
@@ -2226,6 +2285,8 @@ sub api2 {
     $API{'ListForwardersBackups'} = {};
     $API{'UploadForwarders'} = {};
     $API{'RestoreForwarders'} = {};
+    $API{'ListAccountsBackups'} = {};
+    $API{'GetAccountsBackups'} = {};
     return ( \%{ $API{$func} } );
 }
 

@@ -897,6 +897,17 @@ sub GetAccountPresence {
   return undef unless $this->_parseResponse();
   $this->parseWords($this->getWords);
 }
+
+sub GetAccountPlainPassword {
+  my ($this, $account) = @_;
+  my $line = 'GetAccountPlainPassword';
+  $line .= ' '.$account if $account;
+  $this->send($line);
+  return undef unless $this->_parseResponse();
+  $this->parseWords($this->getWords);
+}
+
+
 #################################################################
 #  Group managent commands
 
