@@ -1,0 +1,210 @@
+#!/usr/bin/perl
+
+# Sanatize @INC
+BEGIN {
+  unshift @INC, '/usr/local/cpanel';
+  @INC = grep( !/(^\.|\.\.|\/\.+)/, @INC );
+  @INC = grep( /^(\/usr\/lib\d*\/perl|\/usr\/local\/lib\d*\/perl|\/usr\/local\/cpanel)/, @INC );
+}
+
+my $theargs = <STDIN>;
+unless ( $theargs =~ /^(\d+) ([A-Z]+) (\S+)/ ) {
+  print STDERR "$0 : Syntax Mismatch\n";
+  exit 1;
+}
+chomp($theargs);
+
+my ( $uid, $action, @args ) = split( / /, $theargs );
+
+my %commands = (
+    'UNINSTALLSRVXMPP' => sub {
+	my ($domain) = @_;
+	if (-f "/var/named/$domain.db") {
+	    open(IN, "<", "/var/named/$domain.db") or die "Cannot open zone file ($!)";
+	    my $out = "";
+	    for my $row (<IN>) {
+		$out .= $row unless $row =~ m/^_(xmpp|jabber)/;
+	    }
+	    close(IN);
+	    open(OUT, ">", "/var/named/$domain.db") or die "Cannot open zone file ($!)";
+	    print OUT $out;
+	    close(OUT);
+	} else {
+	    print "No zone file for domain $domain";
+	    exit;
+	}
+    },
+    'INSTALLSRVXMPP' => sub {
+	my ($domain) = @_;
+	if (-f "/var/named/$domain.db") {
+	    open(IN, "<", "/var/named/$domain.db") or die "Cannot open zone file ($!)";
+	    my $xmpp_client = 0;
+	    my $xmpp_server = 0;
+	    my $jabber = 0;
+	    for my $row (<IN>) {
+		$xmpp_server = 1 if $row =~ m/^_xmpp\-server/;
+		$xmpp_client = 1 if $row =~ m/^_xmpp\-client/;
+		$xmpp_client = 1 if $row =~ m/^_jabber/;
+	    }
+	    close(IN);
+	    open(OUT, ">>", "/var/named/$domain.db") or die "Cannot open zone file ($!)";
+	    print OUT "_xmpp-server._tcp\t14400\tIN\tSRV\t1\t5\t5269\texchange.$domain.\n" unless $xmpp_server;
+	    print OUT "_xmpp-client._tcp\t14400\tIN\tSRV\t1\t5\t5222\texchange.$domain.\n" unless $xmpp_client;
+	    print OUT "_jabber._tcp\t14400\tIN\tSRV\t1\t5\t5269\texchange.$domain.\n" unless $jabber;
+	    print OUT $out;
+	    close(OUT);
+	} else {
+	    print "No zone file for domain $domain";
+	    exit;
+	}
+    },
+    'UNINSTALLSRVSIP' => sub {
+	my ($domain) = @_;
+	if (-f "/var/named/$domain.db") {
+	    open(IN, "<", "/var/named/$domain.db") or die "Cannot open zone file ($!)";
+	    my $out = "";
+	    for my $row (<IN>) {
+		$out .= $row unless $row =~ m/^_sip/;
+	    }
+	    close(IN);
+	    open(OUT, ">", "/var/named/$domain.db") or die "Cannot open zone file ($!)";
+	    print OUT $out;
+	    close(OUT);
+	} else {
+	    print "No zone file for domain $domain";
+	    exit;
+	}
+    },
+    'INSTALLSRVSIP' => sub {
+	my ($domain) = @_;
+	if (-f "/var/named/$domain.db") {
+	    open(IN, "<", "/var/named/$domain.db") or die "Cannot open zone file ($!)";
+	    my $sip = 0;
+	    for my $row (<IN>) {
+		$sip = 1 if $row =~ m/^_sip/;
+	    }
+	    close(IN);
+	    open(OUT, ">>", "/var/named/$domain.db") or die "Cannot open zone file ($!)";
+	    print OUT "_sip._udp\t14400\tIN\tSRV\t1\t5\t5060\texchange.$domain.\n" unless $sip;
+	    print OUT $out;
+	    close(OUT);
+	} else {
+	    print "No zone file for domain $domain";
+	    exit;
+	}
+    },
+    'UNINSTALLSRVCALDAV' => sub {
+	my ($domain) = @_;
+	if (-f "/var/named/$domain.db") {
+	    open(IN, "<", "/var/named/$domain.db") or die "Cannot open zone file ($!)";
+	    my $out = "";
+	    for my $row (<IN>) {
+		$out .= $row unless $row =~ m/^_caldav/;
+	    }
+	    close(IN);
+	    open(OUT, ">", "/var/named/$domain.db") or die "Cannot open zone file ($!)";
+	    print OUT $out;
+	    close(OUT);
+	} else {
+	    print "No zone file for domain $domain";
+	    exit;
+	}
+    },
+    'INSTALLSRVCALDAV' => sub {
+	my ($domain) = @_;
+	if (-f "/var/named/$domain.db") {
+	    open(IN, "<", "/var/named/$domain.db") or die "Cannot open zone file ($!)";
+	    my $caldav = 0;
+	    my $caldavs = 0;
+	    for my $row (<IN>) {
+		$caldav = 1 if $row =~ m/^_caldav/;
+		$caldavs = 1 if $row =~ m/^_caldavs/;
+	    }
+	    close(IN);
+	    open(OUT, ">>", "/var/named/$domain.db") or die "Cannot open zone file ($!)";
+	    print OUT "_caldav._tcp\t14400\tIN\tSRV\t1\t5\t80\texchange.$domain.\n" unless $caldav;
+	    print OUT "_caldavs._tcp\t14400\tIN\tSRV\t1\t5\t443\texchange.$domain.\n" unless $caldavs;
+	    print OUT $out;
+	    close(OUT);
+	} else {
+	    print "No zone file for domain $domain";
+	    exit;
+	}
+    },
+    'UNINSTALLSRVCARDDAV' => sub {
+	my ($domain) = @_;
+	if (-f "/var/named/$domain.db") {
+	    open(IN, "<", "/var/named/$domain.db") or die "Cannot open zone file ($!)";
+	    my $out = "";
+	    for my $row (<IN>) {
+		$out .= $row unless $row =~ m/^_carddav/;
+	    }
+	    close(IN);
+	    open(OUT, ">", "/var/named/$domain.db") or die "Cannot open zone file ($!)";
+	    print OUT $out;
+	    close(OUT);
+	} else {
+	    print "No zone file for domain $domain";
+	    exit;
+	}
+    },
+    'INSTALLSRVCARDDAV' => sub {
+	my ($domain) = @_;
+	if (-f "/var/named/$domain.db") {
+	    open(IN, "<", "/var/named/$domain.db") or die "Cannot open zone file ($!)";
+	    my $carddav = 0;
+	    my $carddavs = 0;
+	    for my $row (<IN>) {
+		$carddav = 1 if $row =~ m/^_carddav/;
+		$carddavs = 1 if $row =~ m/^_carddavs/;
+	    }
+	    close(IN);
+	    open(OUT, ">>", "/var/named/$domain.db") or die "Cannot open zone file ($!)";
+	    print OUT "_carddav._tcp\t14400\tIN\tSRV\t1\t5\t80\texchange.$domain.\n" unless $carddav;
+	    print OUT "_carddavs._tcp\t14400\tIN\tSRV\t1\t5\t443\texchange.$domain.\n" unless $carddavs;
+	    print OUT $out;
+	    close(OUT);
+	} else {
+	    print "No zone file for domain $domain";
+	    exit;
+	}
+    },
+    'GETSRV' => sub {
+	my ($domain) = @_;
+	if (-f "/var/named/$domain.db") {
+	    open(IN, "<", "/var/named/$domain.db") or die "Cannot open zone file ($!)";
+	    for my $row (<IN>) {
+		print $row if $row =~ m/SRV/;
+	    }
+	    close(IN);
+	} else {
+	    print "No zone file for domain $domain";
+	    exit;
+	}
+    },
+    );
+
+# Verify that the command exists
+if ( !exists $commands{$action} ) {
+  print "not a valid action\n";
+  exit 1;
+}
+
+# Code used to ensure that the correct user is being run.
+my ( $user, $gid, $home ) = ( getpwuid( int($uid) ) )[ 0, 3, 7 ];
+
+if ( $user eq 'root' || $user eq '' ) {
+  print "Admin Binary called with invalid user\n";
+  exit;
+}
+
+if ( !-e "/var/cpanel/users/$user" && $user ne 'cpanel' ) {
+  print "Admin binary called with invalid user\n";
+  exit;
+}
+
+# This is needed by the Cpanel::AdminBin module
+print ".\n";
+
+# Execute the action in question
+$commands{$action}->(  @args );

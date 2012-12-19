@@ -2065,7 +2065,166 @@ sub api2_GetAccountsBackups {
     return @result;
 }
 
+sub api2_UninstallSRVXMPP {
+    my %OPTS = @_;
+    my @domains = Cpanel::Email::listmaildomains();
+    my $locale = Cpanel::Locale->get_handle();
+    my @results;
+     for my $domain (@domains) {
+	my $result = Cpanel::AdminBin::adminrun( 'cca', "UNINSTALLSRVXMPP", $domain);
+	chomp $result;
+	if ( $result eq '.' ) {
+	    push @results, { 'uninstalled' => $locale->maketext('XMPP records disabled.') };
+	} else {
+	    push @results, { 'uninstalled' => $locale->maketext( 'XMPP records not disabled ([_1]).', $result ) };
+	}
+    }
+    return @results;
+}
 
+sub api2_InstallSRVXMPP {
+    my %OPTS = @_;
+    my @domains = Cpanel::Email::listmaildomains();
+    my $locale = Cpanel::Locale->get_handle();
+    my @results;
+     for my $domain (@domains) {
+	my $result = Cpanel::AdminBin::adminrun( 'cca', "INSTALLSRVXMPP", $domain);
+	chomp $result;
+	if ( $result eq '.' ) {
+	    push @results, { 'installed' => $locale->maketext('XMPP records enabled.') };
+	} else {
+	    push @results, { 'installed' => $locale->maketext( 'XMPP records not enabled ([_1]).', $result ) };
+	}
+    }
+    return @results;
+}
+
+sub api2_UninstallSRVSIP {
+    my %OPTS = @_;
+    my @domains = Cpanel::Email::listmaildomains();
+    my $locale = Cpanel::Locale->get_handle();
+    my @results;
+     for my $domain (@domains) {
+	my $result = Cpanel::AdminBin::adminrun( 'cca', "UNINSTALLSRVSIP", $domain);
+	chomp $result;
+	if ( $result eq '.' ) {
+	    push @results, { 'uninstalled' => $locale->maketext('SIP records disabled.') };
+	} else {
+	    push @results, { 'uninstalled' => $locale->maketext( 'SIP records not disabled ([_1]).', $result ) };
+	}
+    }
+    return @results;
+}
+
+sub api2_InstallSRVSIP {
+    my %OPTS = @_;
+    my @domains = Cpanel::Email::listmaildomains();
+    my $locale = Cpanel::Locale->get_handle();
+    my @results;
+     for my $domain (@domains) {
+	my $result = Cpanel::AdminBin::adminrun( 'cca', "INSTALLSRVSIP", $domain);
+	chomp $result;
+	if ( $result eq '.' ) {
+	    push @results, { 'installed' => $locale->maketext('SIP records enabled.') };
+	} else {
+	    push @results, { 'installed' => $locale->maketext( 'SIP records not enabled ([_1]).', $result ) };
+	}
+    }
+    return @results;
+}
+
+sub api2_UninstallSRVCALDAV {
+    my %OPTS = @_;
+    my @domains = Cpanel::Email::listmaildomains();
+    my $locale = Cpanel::Locale->get_handle();
+    my @results;
+     for my $domain (@domains) {
+	my $result = Cpanel::AdminBin::adminrun( 'cca', "UNINSTALLSRVCALDAV", $domain);
+	chomp $result;
+	if ( $result eq '.' ) {
+	    push @results, { 'uninstalled' => $locale->maketext('CALDAV records disabled.') };
+	} else {
+	    push @results, { 'uninstalled' => $locale->maketext( 'CALDAV records not disabled ([_1]).', $result ) };
+	}
+    }
+    return @results;
+}
+
+sub api2_InstallSRVCALDAV {
+    my %OPTS = @_;
+    my @domains = Cpanel::Email::listmaildomains();
+    my $locale = Cpanel::Locale->get_handle();
+    my @results;
+     for my $domain (@domains) {
+	my $result = Cpanel::AdminBin::adminrun( 'cca', "INSTALLSRVCALDAV", $domain);
+	chomp $result;
+	if ( $result eq '.' ) {
+	    push @results, { 'installed' => $locale->maketext('CALDAV records enabled.') };
+	} else {
+	    push @results, { 'installed' => $locale->maketext( 'CALDAV records not enabled ([_1]).', $result ) };
+	}
+    }
+    return @results;
+}
+
+sub api2_UninstallSRVCARDDAV {
+    my %OPTS = @_;
+    my @domains = Cpanel::Email::listmaildomains();
+    my $locale = Cpanel::Locale->get_handle();
+    my @results;
+     for my $domain (@domains) {
+	my $result = Cpanel::AdminBin::adminrun( 'cca', "UNINSTALLSRVCARDDAV", $domain);
+	chomp $result;
+	if ( $result eq '.' ) {
+	    push @results, { 'uninstalled' => $locale->maketext('CARDDAV records disabled.') };
+	} else {
+	    push @results, { 'uninstalled' => $locale->maketext( 'CARDDAV records not disabled ([_1]).', $result ) };
+	}
+    }
+    return @results;
+}
+
+sub api2_InstallSRVCARDDAV {
+    my %OPTS = @_;
+    my @domains = Cpanel::Email::listmaildomains();
+    my $locale = Cpanel::Locale->get_handle();
+    my @results;
+     for my $domain (@domains) {
+	my $result = Cpanel::AdminBin::adminrun( 'cca', "INSTALLSRVCARDDAV", $domain);
+	chomp $result;
+	if ( $result eq '.' ) {
+	    push @results, { 'installed' => $locale->maketext('CARDDAV records enabled.') };
+	} else {
+	    push @results, { 'installed' => $locale->maketext( 'CARDDAV records not enabled ([_1]).', $result ) };
+	}
+    }
+    return @results;
+}
+
+sub api2_GetSRV {
+    my %OPTS = @_;
+    my @domains = Cpanel::Email::listmaildomains();
+    my $locale = Cpanel::Locale->get_handle();
+    my @results;
+     for my $domain (@domains) {
+	my $result = Cpanel::AdminBin::adminrun( 'cca', "GETSRV", $domain);
+	chomp $result;
+	if ( $result =~ /^\./ ) {
+	    push @results, { 'data' => 'OK' };
+	    $Cpanel::CPVAR{"xmpp_enabled"} = 0;
+	    $Cpanel::CPVAR{"xmpp_enabled"} = 1 if $result =~ m/_xmpp\-/;
+	    $Cpanel::CPVAR{"sip_enabled"} = 0;
+	    $Cpanel::CPVAR{"sip_enabled"} = 1 if $result =~ m/_sip/;
+	    $Cpanel::CPVAR{"caldav_enabled"} = 0;
+	    $Cpanel::CPVAR{"caldav_enabled"} = 1 if $result =~ m/_caldav/;
+	    $Cpanel::CPVAR{"carddav_enabled"} = 0;
+	    $Cpanel::CPVAR{"carddav_enabled"} = 1 if $result =~ m/_carddav/;
+	} else {
+	    push @results, { 'data' =>  $result };
+	}
+    }
+    return @results;
+}
 
 sub api2_SetGroupSettings {
         my %OPTS = @_;
@@ -2287,6 +2446,15 @@ sub api2 {
     $API{'RestoreForwarders'} = {};
     $API{'ListAccountsBackups'} = {};
     $API{'GetAccountsBackups'} = {};
+    $API{'UninstallSRVXMPP'} = {};
+    $API{'InstallSRVXMPP'} = {};
+    $API{'UninstallSRVSIP'} = {};
+    $API{'InstallSRVSIP'} = {};
+    $API{'UninstallSRVCALDAV'} = {};
+    $API{'InstallSRVCALDAV'} = {};
+    $API{'UninstallSRVCARDDAV'} = {};
+    $API{'InstallSRVCARDDAV'} = {};
+    $API{'GetSRV'} = {};
     return ( \%{ $API{$func} } );
 }
 
