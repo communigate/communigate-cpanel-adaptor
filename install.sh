@@ -90,6 +90,8 @@ cp ${PACKSRC}/module/CommuniGate.pm /usr/local/cpanel/Cpanel/
 # CGPro cPanel Wrapper
 cp ${PACKSRC}/cpwrap/cgppassadmin /usr/local/cpanel/bin/
 cp ${PACKSRC}/cpwrap/cgppasswrap /usr/local/cpanel/bin/
+cp ${PACKSRC}/cpwrap/ccaadmin /usr/local/cpanel/bin/
+cp ${PACKSRC}/cpwrap/ccawrap /usr/local/cpanel/bin/
 
 # Install cPanel Function hooks
 cp ${PACKSRC}/hooks/addpop /usr/local/cpanel/hooks/email/
