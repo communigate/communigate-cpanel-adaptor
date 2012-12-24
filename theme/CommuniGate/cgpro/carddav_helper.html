@@ -1,0 +1,98 @@
+<cpanel setvar="headerimg=../images/mailmenu.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+<div class="body-content">
+<style type="text/css">
+table.settings {
+width: 45%;
+float: left;
+margin: 0 2%;
+}
+table.settings_ssl {
+background: #dddddd;
+border: 1px solid #cccccc;
+}
+</style>
+<h1>CalDav/CardDav settings helper</h1>
+<form action="" method="get">
+<p>
+  <label><cptext 'Please select account:'></label>
+  <select name="account">
+    <?cp CommuniGate::listpopswithdisk(
+	 [option value="%"]%[/option]
+	 ,email,email) ?>
+  </select>
+</p>
+<p>
+  <input type="submit" value="<cpanel langprint="Show">" />
+</p>
+</form>
+<cpanelif !$FORM{'account'}>
+
+<h2>Setup</h2>
+<table class="settings settings_ssl">
+  <tbody>
+    <tr>
+      <th colspan="2">Secure SSL/TLS Settings <br />
+	(Recommended)
+      </th>
+    </tr>
+    <tr>
+      <td>Username:</td>
+      <td class="data"><strong>&lt;your.email@address&gt;</strong></td>
+    </tr>
+    <tr>
+      <td>Password:</td>
+      <td class="escape-note"><em>( Use the email account’s password. )</em></td>
+    </tr>
+    <tr>
+      <td>Server:</td>
+      <td class="data">
+	<strong>exchange.&lt;your.domain.name&gt;:443</strong>
+      </td>
+    </tr>
+    <tr>
+      <td>use SSL:</td>
+      <td><strong>leave ticked</strong></td>
+    </tr>
+  </tbody>
+</table>
+
+<table class="settings">
+  <tbody>
+    <tr>
+      <th colspan="2">Non-Secure Settings <br />
+	(NOT Recommended)
+      </th>
+    </tr>
+    <tr>
+      <td>Username:</td>
+      <td class="data"><strong>&lt;your.email@address&gt;</strong></td>
+    </tr>
+    <tr>
+      <td>Password:</td>
+      <td class="escape-note"><em>( Use the email account’s password. )</em></td>
+    </tr>
+    <tr>
+      <td>Server:</td>
+      <td class="data">
+	<strong>exchange.&lt;your.domain.name&gt;:80</strong>
+      </td>
+    </tr>
+    <tr>
+      <td>use SSL:</td>
+      <td><strong>untick</strong></td>
+    </tr>
+  </tbody>
+</table>
+
+</cpanelif>
+
+<cpanelif $FORM{'account'}>
+<?cptt cgpro/carddav_helper.tmpl ?>
+</cpanelif>
+
+
+</div><!-- end body-content -->
+
+<cpanel Branding="include(stdfooter.html)">

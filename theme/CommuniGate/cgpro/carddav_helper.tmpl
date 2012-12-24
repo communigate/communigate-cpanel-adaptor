@@ -1,0 +1,60 @@
+[%
+ SET account = CPANEL.get_raw_form('account');
+%]
+
+<h2>Setup</h2>
+<table class="settings settings_ssl">
+  <tbody>
+    <tr>
+      <th colspan="2">Secure SSL/TLS Settings <br />
+	(Recommended)
+      </th>
+    </tr>
+    <tr>
+      <td>Username:</td>
+      <td class="data"><strong>[% account %]</strong></td>
+    </tr>
+    <tr>
+      <td>Password:</td>
+      <td class="escape-note"><em>( Use the email account’s password. )</em></td>
+    </tr>
+    <tr>
+      <td>Server:</td>
+      <td class="data">
+	<strong>exchange.[% account.split('@').1 %]:443</strong>
+      </td>
+    </tr>
+    <tr>
+      <td>use SSL:</td>
+      <td><strong>leave ticked</strong></td>
+    </tr>
+  </tbody>
+</table>
+
+<table class="settings">
+  <tbody>
+    <tr>
+      <th colspan="2">Non-Secure Settings <br />
+	(NOT Recommended)
+      </th>
+    </tr>
+    <tr>
+      <td>Username:</td>
+      <td class="data"><strong>[% account %]</strong></td>
+    </tr>
+    <tr>
+      <td>Password:</td>
+      <td class="escape-note"><em>( Use the email account’s password. )</em></td>
+    </tr>
+    <tr>
+      <td>Server:</td>
+      <td class="data">
+	<strong>exchange.[% account.split('@').1 %]:80</strong>
+      </td>
+    </tr>
+    <tr>
+      <td>use SSL:</td>
+      <td><strong>untick</strong></td>
+    </tr>
+  </tbody>
+</table>

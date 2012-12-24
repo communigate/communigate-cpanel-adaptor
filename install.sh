@@ -129,6 +129,7 @@ chmod u+s /opt/CommuniGate/mail
 
 # Change default theme to CommuniGate
 cp -r ${PACKSRC}/theme/CommuniGate /usr/local/cpanel/base/frontend/
+/usr/local/cpanel/bin/rebuild_sprites
 replace "DEFMOD x3" "DEFMOD CommuniGate" -- /etc/wwwacct.conf
 replace "cpanel.communigate.com" "${HOSTNAME}" -- /var/CommuniGate/Settings/Main.settings
 

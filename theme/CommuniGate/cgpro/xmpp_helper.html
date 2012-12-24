@@ -1,0 +1,65 @@
+<cpanel setvar="headerimg=../images/mailmenu.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+<div class="body-content">
+<style type="text/css">
+table.settings {
+width: 50%;
+}
+table.settings_ssl {
+background: #dddddd;
+border: 1px solid #cccccc;
+}
+</style>
+<h1>Jabber/XMPP Settings</h1>
+<form action="" method="get">
+<p>
+  <label><cptext 'Please select account:'></label>
+  <select name="account">
+    <?cp CommuniGate::listpopswithdisk(
+	 [option value="%"]%[/option]
+	 ,email,email) ?>
+  </select>
+</p>
+<p>
+  <input type="submit" value="<cpanel langprint="Show">" />
+</p>
+</form>
+<cpanelif !$FORM{'account'}>
+
+<h2>Setup</h2>
+<table class="settings settings_ssl">
+  <tbody>
+    <tr>
+      <td>Username/JabberID:</td>
+      <td class="data"><strong>&lt;your.email@address&gt;</strong></td>
+    </tr>
+    <tr>
+      <td>Password:</td>
+      <td class="escape-note"><em>( Use the email account’s password. )</em></td>
+    </tr>
+    <tr>
+      <td>Server:</td>
+      <td class="data">
+	<strong>exchange.&lt;your.domain.name&gt;</strong>
+      </td>
+    </tr>
+    <tr>
+      <td>Port:</td>
+      <td class="data">
+	<strong>5222</strong>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+</cpanelif>
+
+<cpanelif $FORM{'account'}>
+<?cptt cgpro/xmpp_helper.tmpl ?>
+</cpanelif>
+
+
+</div><!-- end body-content -->
+
+<cpanel Branding="include(stdfooter.html)">
