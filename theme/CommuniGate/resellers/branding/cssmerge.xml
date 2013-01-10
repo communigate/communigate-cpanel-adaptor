@@ -1,3 +1,0 @@
-<xml>
-    <?cp Branding::cssmerge([merge]%[/merge][file]%[/file],merge,file) css=$FORM{'css'},brandingpkg=$FORM{'brandingpkg'} ?>
-</xml>

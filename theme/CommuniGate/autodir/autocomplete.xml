@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<files>
-<?cp Fileman::autocompletedir(
-    [file]
-        [name]%[/name]
-   [/file]
-,file) path=$FORM{'path'},dirsonly=$FORM{'dirsonly'} ?>
-</files>

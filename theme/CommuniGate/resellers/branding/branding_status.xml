@@ -1,5 +1,0 @@
-<xml>
-    <cpanel Branding="tempsetbrandingpkg($RAW_FORM{'brandingpkg'})">
-    <cpanel Branding="setupdirs()">
-    <?cp Branding::setbrandingpkgstatus([status]%[/status],status) action=$RAW_FORM{'status'} ?>
-</xml>

@@ -1,3 +1,0 @@
-<xml>
-<?cp Fileman::listfiles([file][name]%[/name][path]%[/path][type]%[/type][size]%[/size][mtime]%[/mtime][humansize]%[/humansize][nicemode]%[/nicemode][mimetype]%[/mimetype][fullpath]%[/fullpath][/file],^file,^path,^type,^size,^mtime,^humansize,^nicemode,^mimetype,^fullpath) dir=$FORM{'dir'},needmime=1,filelist=$FORM{'filelist'} ?>
-</xml>

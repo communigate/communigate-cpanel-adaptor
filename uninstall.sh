@@ -64,10 +64,30 @@ rm -f /usr/local/cpanel/hooks/email/passwdpop
 
 /usr/local/cpanel/bin/register_hooks
 
-# Remove CommuniGate Theme
+# Remove CommuniGate Plugin
 
-rm -rf /usr/local/cpanel/base/frontend/CommuniGate
+BASEDIR='/usr/local/cpanel/base/frontend';
+SAVEIFS=$IFS
+IFS=$(echo -en "\n\b")
+THEMES=($(find ${BASEDIR} -maxdepth 1 -mindepth 1 -type d))
+IFS=$OLDIFS
 
+tLen=${#THEMES[@]}
+
+for (( i=0; i<${tLen}; i++ ));
+do
+    if [ "${THEMES[$i]}" == "${BASEDIR}/CommuniGate" ]
+    then
+        continue
+    fi
+    echo Deleting "${THEMES[$i]}/cgpro"
+    rm -rf "${THEMES[$i]}/cgpro"
+    echo Deleting "${THEMES[$i]}/branding/cgpro_*"
+    rm -f "${THEMES[$i]}/branding/cgpro_"*
+    rm -f "${THEMES[$i]}/dynamicui/dynamicui_cgpro.conf"
+done
+
+/usr/local/cpanel/bin/rebuild_sprites
 /etc/init.d/cpanel restart
 
 # Add the following lines to /usr/local/apache/etc/httpd.conf

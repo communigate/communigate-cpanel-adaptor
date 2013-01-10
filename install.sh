@@ -127,10 +127,28 @@ chmod +x /usr/local/cpanel/bin/cgppassadmin
 chmod u+s+x /usr/local/cpanel/bin/cgppasswrap
 chmod u+s /opt/CommuniGate/mail
 
-# Change default theme to CommuniGate
-cp -r ${PACKSRC}/theme/CommuniGate /usr/local/cpanel/base/frontend/
+# Install CommuniGate Plugin
+BASEDIR='/usr/local/cpanel/base/frontend';
+SAVEIFS=$IFS
+IFS=$(echo -en "\n\b")
+THEMES=($(find ${BASEDIR} -maxdepth 1 -mindepth 1 -type d))
+IFS=$OLDIFS
+
+tLen=${#THEMES[@]}
+
+for (( i=0; i<${tLen}; i++ ));
+do
+    if [ "${THEMES[$i]}" == "${BASEDIR}/CommuniGate" ]
+    then
+        continue
+    fi
+    cp -r "${PACKSRC}/theme/cgpro" "${THEMES[$i]}/"
+    cp "${PACKSRC}/icons/"* "${THEMES[$i]}/branding"
+    cp "${PACKSRC}/plugin/dynamicui_cgpro.conf" "${THEMES[$i]}/dynamicui/"
+done
+
 /usr/local/cpanel/bin/rebuild_sprites
-replace "DEFMOD x3" "DEFMOD CommuniGate" -- /etc/wwwacct.conf
+
 replace "cpanel.communigate.com" "${HOSTNAME}" -- /var/CommuniGate/Settings/Main.settings
 
 #################################################       

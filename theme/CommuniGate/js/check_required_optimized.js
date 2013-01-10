@@ -1,1 +1,0 @@
-function check_required(a){for(var b in a){if(a.hasOwnProperty(b)){if(document.getElementById(b).value==""){alert(a[b]+" must be filled in.");return false}}}return true};

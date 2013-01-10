@@ -1,1 +1,0 @@
-../../../../whostmgr/docroot/js/statusbox.js

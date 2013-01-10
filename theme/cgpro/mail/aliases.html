@@ -1,0 +1,96 @@
+<cpanel setvar="headerimg=../images/mailmenu.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+	<cpanelif $FORM{'itemsperpage'}>
+	    <cpanel setvar="itemsperpage=$FORM{'itemsperpage'}">
+	</cpanelif>
+	<cpanelif !$FORM{'itemsperpage'} || !$CPVAR{'itemsperpage'}>
+	    <cpanel setvar="itemsperpage=10">
+	</cpanelif>
+
+<style type="text/css">
+<?cp Branding::spritelist(.spriteicon_img_mini {float:left;margin-right:5px;background: url\{leftparenthesis}"%"\{rightparenthesis};} %,@spriteurl,images::#icon-${img}_mini {background-position\{colon}0 -${cssposition}px;width\{colon}${width}px;height\{colon}${height}px; }:) imgtype=icon,subtype=img,method=scale_60percent,format=png,img=forwardersemail ?>
+</style>
+
+<div class="body-content">
+	
+<cpanelif !$appname==webmail> 
+	<cpanel include="managelist.html">
+</cpanelif>
+
+<div class="h1Title"><div class="spriteicon_img_mini" id="icon-forwardersemail_mini"></div> <cpanel langprint="CGPNavAliases"></div>
+
+
+<cpanelfeature forwarders>
+	<h2><cpanel langprint="CGPAliasesCurrent"></h2>
+
+	<?cp StatsBar::stat( [p class="caution"]$LANG{'statsattention'}&nbsp;%&nbsp;$LANG{'statsoutof'}&nbsp;&nbsp;%[/p],count,max) display=forwarders,warnings=1,warninglevel=80,infinitylang=true ?>
+
+	<p class="description"><cpanel langprint="CGPAliasesDescription"></p>
+	
+<table border="0" cellpadding="5" width="550" cellspacing="0" id="mailtbl" class="sortable truncate-table">
+	<colgroup>
+		<col width="30%" align="left" />
+		<col width="10%" align="center" />
+		<col width="30%" align="left" />
+		<col width="15%" align="center" />
+		<col width="15%" align="center" />
+	</colgroup>
+	<tr>
+		<th><cpanel langprint="CGPAliasName"></th>
+		<th class="sorttable_nosort">&nbsp;</th>
+		<th><cpanel langprint="CGPSendTo"></th>
+		<th colspan="2" class="sorttable_nosort"><cpanel langprint="FTPFunctions"></th>
+	</tr>
+	
+	<?cp CommuniGate::listaliases(
+	[tr class="row-%"]
+		[td class="truncate nobrd-left"]%[/td]
+		[td class="nobrd-left"]$LANG{'EFaddedto'}[/td]
+		[td class="truncate"]%[/td]
+		[td align="center" class="nobrd"][a href="../../showroute.html?fwd=1&amp;domain=$FORM{'domain'}&amp;email=%"]$LANG{'EMDTrace'}[/a][/td]
+		[td][a href="dodelaliasconfirm.html?domain=$FORM{'domain'}&amp;email=%&amp;emaildest=%"]$LANG{'BrandingDPackage'}[/a][/td]
+	[/tr]
+	,*num,html_dest,html_forward,uri_dest,uri_dest,^forward,^forward) domain=$FORM{'domain'},regex=$FORM{'searchregex'},api2_paginate=1,api2_paginate_start=$FORM{'api2_paginate_start'},api2_paginate_size=$CPVAR{'itemsperpage'} || '[tr][td colspan="5" class="errors"]$LANG{'CGPNoAliases'}.[/td][/tr]' ?>
+
+</table>
+
+<?cp UI::paginate(%,paginator) currentpage=$CPVAR{'currentpage'},pages=$CPVAR{'pages'},itemsperpage=$CPVAR{'itemsperpage'} ?>
+<cpanelif $CPVAR{'pages'} && !$CPVAR{'pages'}==1>
+	<div style="float:right">
+		<form method="get" action="">
+		<input type="hidden" name="domain" value="<cpanel print="$FORM{'domain'}">" />
+		Showing <select name="itemsperpage" onchange="this.form.submit();">
+		<?cp UI::paginate_list([option value="%" %]%[/option],item,selected=1?selected:,item) itemsperpage=$CPVAR{'itemsperpage'},itemlist=10:25:50:100:250:500 ?>
+	</select><noscript><button id="my_button" onClick="" type="submit" Value="">Change</button></noscript>  Results per page 
+	</form></div>
+	<div style="clear:both;"></div>
+</cpanelif>
+
+<div align="center"><a class="create-button" href="addalias.html"><cpanel langprint="CGPAddAlias"></a></div>	
+<br />
+<br />
+</cpanelfeature><!-- end cpanelfeature forwarders -->
+
+
+<script type="text/javascript">
+//<![CDATA[
+truncate_on = 1;
+var init_page = function() {
+	if (YAHOO.util.Dom.inDocument("mailtbl")) register_truncate_table("mailtbl");
+	if (YAHOO.util.Dom.inDocument("dfwdmailtbl")) register_truncate_table('dfwdmailtbl');
+};
+YAHOO.util.Event.onDOMReady(init_page);
+//]]>
+</script>
+
+<cpanelif !$appname==webmail>
+	<div class="return-link"><a href = "../index.html">&larr; <cpanel langprint="Goback"></a></div>
+</cpanelif>
+<cpanelif $appname==webmail>
+    <div class="return-link"><a href = "../index.html">&larr; <cpanel langprint="Goback"></a></div>
+</cpanelif>
+
+</div><!-- end body-content -->
+
+<cpanel Branding="include(stdfooter.html)">

@@ -1,3 +1,0 @@
-<xml>
-    <?cp NVData::set([key]%[/key],set) names=$FORM{'names'} ?>
-</xml>
