@@ -8,7 +8,7 @@ BEGIN {
 }
 
 my $theargs = <STDIN>;
-unless ( $theargs =~ /^(\d+) ([A-Z]+) (\S+)/ ) {
+unless ( $theargs =~ /^(\d+) ([A-Z]+)/ ) {
   print STDERR "$0 : Syntax Mismatch\n";
   exit 1;
 }
@@ -182,6 +182,23 @@ my %commands = (
 	    exit;
 	}
     },
+    'GETPASS' => sub {
+	my $file = "/var/CommuniGate/Accounts/postmaster.macnt/account.settings";
+	my %hash;
+	open (MYFILE, "$file");
+	while (<MYFILE>) {
+	    chomp;
+	    my @line = split("=",$_);
+	    $hash{@line[0]} = @line[1];
+	}
+	my $pass;
+	if ($hash{' Password '} =~ /^ ".*";$/) {
+	    $pass = substr $hash{' Password '}, 2, length($hash{' Password '})-4;
+	} else {
+	    $pass =  substr $hash{' Password '}, 1, length($hash{' Password '})-2;
+	}
+	print $pass;
+    }
     );
 
 # Verify that the command exists

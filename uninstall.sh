@@ -50,8 +50,6 @@ rm -f /usr/local/cpanel/scripts/postwwwacct
 # Remove cPanel CommuniGate Custom Module
 
 rm -f /usr/local/cpanel/Cpanel/CommuniGate.pm
-rm -f /usr/local/cpanel/bin/cgppassadmin
-rm -f /usr/local/cpanel/bin/cgppasswrap
 rm -f /usr/local/cpanel/bin/ccaadmin
 rm -f /usr/local/cpanel/bin/ccawrap
 

@@ -89,8 +89,6 @@ cp ${PACKSRC}/whm/postwwwacct /usr/local/cpanel/scripts/
 cp ${PACKSRC}/module/CommuniGate.pm /usr/local/cpanel/Cpanel/
 
 # CGPro cPanel Wrapper
-cp ${PACKSRC}/cpwrap/cgppassadmin /usr/local/cpanel/bin/
-cp ${PACKSRC}/cpwrap/cgppasswrap /usr/local/cpanel/bin/
 cp ${PACKSRC}/cpwrap/ccaadmin /usr/local/cpanel/bin/
 cp ${PACKSRC}/cpwrap/ccawrap /usr/local/cpanel/bin/
 
@@ -123,8 +121,8 @@ chmod +x /usr/local/cpanel/whostmgr/docroot/cgi/addon_cgs.cgi
 chmod +x /usr/local/cpanel/scripts/postwwwacct
 chmod +x /var/CommuniGate/cgi/login.pl
 chmod +x /usr/local/cpanel/Cpanel/CommuniGate.pm
-chmod +x /usr/local/cpanel/bin/cgppassadmin
-chmod u+s+x /usr/local/cpanel/bin/cgppasswrap
+chmod +x /usr/local/cpanel/bin/ccaadmin
+chmod u+s+x /usr/local/cpanel/bin/ccawrap
 chmod u+s /opt/CommuniGate/mail
 
 # Install CommuniGate Plugin
