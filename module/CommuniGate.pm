@@ -25,13 +25,30 @@ require Exporter;
 $VERSION = '1.0';
 
 my $logger = Cpanel::Logger->new();
-
+my $CLI = undef;
 sub CommuniGate_init {
     return 1;
 }
 
-sub postmaster_pass {
-	return Cpanel::AdminBin::adminrun('cgppass', 'GETPASS', 'noarg','noarg');
+sub getCLI {
+    if ($CLI && $CLI->{isConnected}) {
+	return $CLI;
+    } else {
+	my $CGServerAddress = "91.230.195.210";
+	my $PostmasterLogin = 'postmaster';
+	my $PostmasterPassword =  Cpanel::AdminBin::adminrun('cca', 'GETPASS');
+	$PostmasterPassword =~ s/^\.\n//;
+ 	my $cli = new CGP::CLI( { PeerAddr => $CGServerAddress,
+				  PeerPort => 106,
+				  login => $PostmasterLogin,
+				  password => $PostmasterPassword } );
+	unless($cli) {
+	    $logger->warn("Can't login to CGPro: ".$CGP::ERR_STRING);
+	    exit(0);
+	}
+	$CLI = $cli;
+	return $cli;
+    }
 }
 
 sub maxgw_domain {
@@ -56,17 +73,7 @@ sub maxgw_domain {
 sub currentgw_domain {
   my $domainname = shift;
   my $count=0;
-  my $CGServerAddress = "91.230.195.210";
-  my $PostmasterLogin = 'postmaster';
-  my $PostmasterPassword = postmaster_pass();     
-  my $cli = new CGP::CLI( { PeerAddr => $CGServerAddress,
-                            PeerPort => 106,
-                            login => $PostmasterLogin,
-                            password => $PostmasterPassword } );
-  unless($cli) {
-                $logger->warn("Can't login to CGPro: ".$CGP::ERR_STRING);
-                exit(0);
-  }
+  my $cli = getCLI();
   my $accounts=$cli->ListAccounts($domainname);
   my $userName;
   foreach $userName (sort keys %$accounts) {      
@@ -92,17 +99,7 @@ sub api2_GWAccounts {
 	} else {
 		@domains[0]=$domainparam;
 	}
-	my $CGServerAddress = "91.230.195.210";
-	my $PostmasterLogin = 'postmaster';
-	my $PostmasterPassword = postmaster_pass();	
-	my $cli = new CGP::CLI( { PeerAddr => $CGServerAddress,
-                            PeerPort => 106,
-                            login => $PostmasterLogin,
-                            password => $PostmasterPassword } );
-  	unless($cli) {
-   		$logger->warn("Can't login to CGPro: ".$CGP::ERR_STRING);
-   		exit(0);
-	}
+	my $cli = getCLI();
 	my @result;
 	foreach my $domain (@domains) {
 		my $accounts=$cli->ListAccounts($domain);
@@ -136,17 +133,7 @@ sub api2_EnableGW {
 		print "<H2><font color=red>Maximum of Groupware accounts exceeded for domain : $account_domain. (Maximum is : $max). </font></H2>\n";
 		return;
  	} 
-        my $CGServerAddress = "91.230.195.210";
-        my $PostmasterLogin = 'postmaster';
-        my $PostmasterPassword = postmaster_pass();
-        my $cli = new CGP::CLI( { PeerAddr => $CGServerAddress,
-                            PeerPort => 106,
-                            login => $PostmasterLogin,
-                            password => $PostmasterPassword } );
-        unless($cli) {
-                $logger->warn("Can't login to CGPro: ".$CGP::ERR_STRING);
-                exit(0);
-        }
+	my $cli = getCLI();
 	my $accountData;
 	@$accountData{'ServiceClass'} = "groupware";	
 	$cli->UpdateAccountSettings("$account",$accountData);
@@ -156,17 +143,7 @@ sub api2_EnableGW {
 sub api2_DisableGW {
         my %OPTS = @_;
         my $account = $OPTS{'account'};
-        my $CGServerAddress = "91.230.195.210";
-        my $PostmasterLogin = 'postmaster';
-        my $PostmasterPassword = postmaster_pass();
-        my $cli = new CGP::CLI( { PeerAddr => $CGServerAddress,
-                            PeerPort => 106,
-                            login => $PostmasterLogin,
-                            password => $PostmasterPassword } );
-        unless($cli) {
-                $logger->warn("Can't login to CGPro: ".$CGP::ERR_STRING);
-                exit(0);
-        }
+	my $cli = getCLI();
         my $accountData;
         @$accountData{'ServiceClass'} = "mailonly";
         $cli->UpdateAccountSettings("$account",$accountData);
@@ -224,17 +201,7 @@ sub api2_provisioniPad {
 sub api2_listpopswithdisk {
         my %OPTS = @_;
 	my @domains = Cpanel::Email::listmaildomains();
-  	my $CGServerAddress = "91.230.195.210";
-        my $PostmasterLogin = 'postmaster';
-        my $PostmasterPassword = postmaster_pass();     
-        my $cli = new CGP::CLI( { PeerAddr => $CGServerAddress,
-                            PeerPort => 106,
-                            login => $PostmasterLogin,
-                            password => $PostmasterPassword } );
-        unless($cli) {
-                $logger->warn("Can't login to CGPro: ".$CGP::ERR_STRING);
-                exit(0);
-        }
+	my $cli = getCLI;
 	my @result;
         foreach my $domain (@domains) {
                 my $accounts=$cli->ListAccounts($domain);
@@ -275,17 +242,7 @@ sub api2_addalias {
         my $domain = $OPTS{'domain'}; 
         my $user = $OPTS{'email'}; 
         my $fwdemail = $OPTS{'fwdemail'}; 
-        my $CGServerAddress = "91.230.195.210";
-        my $PostmasterLogin = 'postmaster';
-        my $PostmasterPassword = postmaster_pass();
-        my $cli = new CGP::CLI( { PeerAddr => $CGServerAddress,
-                            PeerPort => 106,
-                            login => $PostmasterLogin,
-                            password => $PostmasterPassword } );
-        unless($cli) {
-                $logger->warn("Can't login to CGPro: ".$CGP::ERR_STRING);
-                exit(0);
-        }       
+	my $cli = getCLI();
 	$cli->CreateForwarder("$user\@$domain", $fwdemail);
 	my $error_msg = $cli->getErrMessage();
 	my @result;
@@ -303,17 +260,7 @@ sub api2_addforward {
  	my $domain = $OPTS{'domain'};
         my $user = $OPTS{'email'}; 
         my $fwdemail = $OPTS{'fwdemail'};
-        my $CGServerAddress = "91.230.195.210";
-        my $PostmasterLogin = 'postmaster';
-        my $PostmasterPassword = postmaster_pass();
-        my $cli = new CGP::CLI( { PeerAddr => $CGServerAddress,
-                            PeerPort => 106,
-                            login => $PostmasterLogin,
-                            password => $PostmasterPassword } );
-        unless($cli) {
-                $logger->warn("Can't login to CGPro: ".$CGP::ERR_STRING);
-                exit(0);
-        }
+	my $cli = getCLI();
 	return addforward (
 	    domain => $domain,
 	    email => $user,
@@ -368,17 +315,7 @@ sub api2_listaliases {
         my %OPTS = @_;
 	my $specified_domain  = $OPTS{'domain'};
         my @domains = Cpanel::Email::listmaildomains($OPTS{'domain'});
-        my $CGServerAddress = "91.230.195.210";
-        my $PostmasterLogin = 'postmaster';
-        my $PostmasterPassword = postmaster_pass();
-        my $cli = new CGP::CLI( { PeerAddr => $CGServerAddress,
-                            PeerPort => 106,
-                            login => $PostmasterLogin,
-                            password => $PostmasterPassword } );
-        unless($cli) {
-                $logger->warn("Can't login to CGPro: ".$CGP::ERR_STRING);
-                exit(0);
-        }
+	my $cli = getCLI();
         my @result;
         foreach my $domain (@domains) {
 	  if (($specified_domain eq "") || ($specified_domain eq $domain)){
@@ -404,17 +341,7 @@ sub api2_listforwards {
         my %OPTS = @_;
         my $specified_domain  = $OPTS{'domain'};
         my @domains = Cpanel::Email::listmaildomains($OPTS{'domain'});
-        my $CGServerAddress = "91.230.195.210";
-        my $PostmasterLogin = 'postmaster';
-        my $PostmasterPassword = postmaster_pass();
-        my $cli = new CGP::CLI( { PeerAddr => $CGServerAddress,
-                            PeerPort => 106,
-                            login => $PostmasterLogin,
-                            password => $PostmasterPassword } );
-        unless($cli) {
-                $logger->warn("Can't login to CGPro: ".$CGP::ERR_STRING);
-                exit(0);
-        }
+	my $cli = getCLI();
         my @result;
         foreach my $domain (@domains) {
           if (($specified_domain eq "") || ($specified_domain eq $domain)){
@@ -445,17 +372,7 @@ sub api2_listforwards {
 sub api2_delalias {
         my %OPTS = @_;
         my $forwarder = $OPTS{'forwarder'};
-        my $CGServerAddress = "91.230.195.210";
-        my $PostmasterLogin = 'postmaster';
-        my $PostmasterPassword = postmaster_pass();
-        my $cli = new CGP::CLI( { PeerAddr => $CGServerAddress,
-                            PeerPort => 106,
-                            login => $PostmasterLogin,
-                            password => $PostmasterPassword } );
-        unless($cli) {      
-                $logger->warn("Can't login to CGPro: ".$CGP::ERR_STRING);
-                exit(0);
-        }       
+	my $cli = getCLI();
         $cli->DeleteForwarder("$forwarder");
         my $error_msg = $cli->getErrMessage();
         my @result;
@@ -474,17 +391,7 @@ sub api2_delforward {
         my $domain = $OPTS{'domain'};
         my $account = $OPTS{'account'};
         my $fwdemail = $OPTS{'forwarder'};
-        my $CGServerAddress = "91.230.195.210";
-        my $PostmasterLogin = 'postmaster';
-        my $PostmasterPassword = postmaster_pass();
-        my $cli = new CGP::CLI( { PeerAddr => $CGServerAddress,
-                            PeerPort => 106,
-                            login => $PostmasterLogin,
-                            password => $PostmasterPassword } );
-        unless($cli) {
-                $logger->warn("Can't login to CGPro: ".$CGP::ERR_STRING);
-                exit(0);
-        }
+	my $cli = getCLI();
         my $Rules=$cli->GetAccountMailRules("$account") || die "Error: ".$cli->getErrMessage.", quitting";
         foreach my $Rule (@$Rules) {
                   if ($Rule->[1] eq "#Redirect") {
@@ -515,17 +422,7 @@ sub api2_delforward {
 
 sub api2_ListDefAddress {
         my %OPTS = @_;
-        my $CGServerAddress = "91.230.195.210";
-        my $PostmasterLogin = 'postmaster';
-        my $PostmasterPassword = postmaster_pass();
-        my $cli = new CGP::CLI( { PeerAddr => $CGServerAddress,
-                            PeerPort => 106,
-                            login => $PostmasterLogin,
-                            password => $PostmasterPassword } );
-        unless($cli) {
-                $logger->warn("Can't login to CGPro: ".$CGP::ERR_STRING);
-                exit(0);
-        }
+	my $cli = getCLI();
 	my @result;
 	my @domains = Cpanel::Email::listmaildomains();
 	foreach my $domain (@domains) {
@@ -546,17 +443,7 @@ sub api2_SetDefAddress {
 	my $domain = $OPTS{'domain'};
 	my $action = $OPTS{'action'};
 	my $fwdmail= $OPTS{'fwdmail'};
-        my $CGServerAddress = "91.230.195.210";
-        my $PostmasterLogin = 'postmaster';
-        my $PostmasterPassword = postmaster_pass();
-        my $cli = new CGP::CLI( { PeerAddr => $CGServerAddress,
-                            PeerPort => 106,
-                            login => $PostmasterLogin,
-                            password => $PostmasterPassword } );
-        unless($cli) {
-                $logger->warn("Can't login to CGPro: ".$CGP::ERR_STRING);
-                exit(0);
-        }
+	my $cli = getCLI();
 	my $domainData;
 	if ($action eq "CGPDefDiscard") { @$domainData{'MailToUnknown'} = "Discarded"; }
 	if ($action eq "CGPDefReject") { @$domainData{'MailToUnknown'} = "Rejected"; }
@@ -570,17 +457,7 @@ sub api2_SpamAssassinStatus {
 	my %OPTS = @_;
         my $account_domain  = $OPTS{'domain'};
 	my $sa_rulname = "scanspam-".$account_domain;
-	my $CGServerAddress = "91.230.195.210";
-        my $PostmasterLogin = 'postmaster';
-        my $PostmasterPassword = postmaster_pass();
-        my $cli = new CGP::CLI( { PeerAddr => $CGServerAddress,
-                            PeerPort => 106,
-                            login => $PostmasterLogin,
-                            password => $PostmasterPassword } );
-        unless($cli) {
-                $logger->warn("Can't login to CGPro: ".$CGP::ERR_STRING);
-                exit(0);
-        }
+	my $cli = getCLI();
 	my $Rules=$cli->GetServerRules() || die "Error: ".$cli->getErrMessage.", quitting";
 	my @result;
    	foreach my $Rule (@$Rules) {
@@ -600,17 +477,7 @@ sub api2_EnableSpamAssassin {
         my $account_domain  = $OPTS{'domain'};
         my $sa_rulname = "scanspam-".$account_domain;
 	my $account = $Cpanel::authuser;
-        my $CGServerAddress = "91.230.195.210";
-        my $PostmasterLogin = 'postmaster';
-        my $PostmasterPassword = postmaster_pass();
-        my $cli = new CGP::CLI( { PeerAddr => $CGServerAddress,
-                            PeerPort => 106,
-                            login => $PostmasterLogin,
-                            password => $PostmasterPassword } );
-        unless($cli) {
-                $logger->warn("Can't login to CGPro: ".$CGP::ERR_STRING);
-                exit(0);
-        }
+	my $cli = getCLI();
         my @result;
 	my $ExistingRules=$cli->GetServerRules() || die "Error: ".$cli->getErrMessage.", quitting";
 	my @domains = Cpanel::Email::listmaildomains();
@@ -643,17 +510,7 @@ sub api2_EnableSpamAssassin {
 sub api2_DisableSpamAssassin {
         my %OPTS = @_;
         my $account_domain  = $OPTS{'domain'};
-        my $CGServerAddress = "91.230.195.210";
-        my $PostmasterLogin = 'postmaster';
-        my $PostmasterPassword = postmaster_pass();
-        my $cli = new CGP::CLI( { PeerAddr => $CGServerAddress,
-                            PeerPort => 106,
-                            login => $PostmasterLogin,
-                            password => $PostmasterPassword } );
-        unless($cli) {
-                $logger->warn("Can't login to CGPro: ".$CGP::ERR_STRING);
-                exit(0); 
-        }
+	my $cli = getCLI();
         my $Rules=$cli->GetServerRules() || die "Error: ".$cli->getErrMessage.", quitting";
         my @result;
 	my @NewRules;
@@ -686,18 +543,8 @@ sub api2_SpamAssassinStatusAutoDelete {
 	my %OPTS = @_;
         my $account_domain  = $OPTS{'domain'};
 	my $sa_rulname = "deletespam-".$account_domain;
-	my $CGServerAddress = "91.230.195.210";
-        my $PostmasterLogin = 'postmaster';
-        my $PostmasterPassword = postmaster_pass();
-        my $cli = new CGP::CLI( { PeerAddr => $CGServerAddress,
-                            PeerPort => 106,
-                            login => $PostmasterLogin,
-                            password => $PostmasterPassword } );
-        unless($cli) {
-                $logger->warn("Can't login to CGPro: ".$CGP::ERR_STRING);
-                exit(0);
-        }
-	my $Rules=$cli->GetServerRules() || die "Error: ".$cli->getErrMessage.", quitting";
+	my $cli = getCLI();
+ 	my $Rules=$cli->GetServerRules() || die "Error: ".$cli->getErrMessage.", quitting";
 	my @result;
    	foreach my $Rule (@$Rules) {
 		if ($Rule->[1] eq "$sa_rulname") {
@@ -721,17 +568,7 @@ sub api2_EnableSpamAssassinAutoDelete {
 	my $score_string = "";
 	for (my $i=0;$i<$score;$i++) {$score_string .= "x"; }
         my $sa_rulname = "deletespam-".$account_domain;
-        my $CGServerAddress = "91.230.195.210";
-        my $PostmasterLogin = 'postmaster';
-        my $PostmasterPassword = postmaster_pass();
-        my $cli = new CGP::CLI( { PeerAddr => $CGServerAddress,
-                            PeerPort => 106,
-                            login => $PostmasterLogin,
-                            password => $PostmasterPassword } );
-        unless($cli) {
-                $logger->warn("Can't login to CGPro: ".$CGP::ERR_STRING);
-                exit(0);
-        }
+	my $cli = getCLI();
         my @result;
 	my $ExistingRules=$cli->GetServerRules() || die "Error: ".$cli->getErrMessage.", quitting";
 	my @domains = Cpanel::Email::listmaildomains();
@@ -762,17 +599,7 @@ sub api2_EnableSpamAssassinAutoDelete {
 sub api2_DisableSpamAssassinAutoDelete {
         my %OPTS = @_;
         my $account_domain  = $OPTS{'domain'};
-        my $CGServerAddress = "91.230.195.210";
-        my $PostmasterLogin = 'postmaster';
-        my $PostmasterPassword = postmaster_pass();
-        my $cli = new CGP::CLI( { PeerAddr => $CGServerAddress,
-                            PeerPort => 106,
-                            login => $PostmasterLogin,
-                            password => $PostmasterPassword } );
-        unless($cli) {
-                $logger->warn("Can't login to CGPro: ".$CGP::ERR_STRING);
-                exit(0); 
-        }
+	my $cli = getCLI();
         my $Rules=$cli->GetServerRules() || die "Error: ".$cli->getErrMessage.", quitting";
         my @result;
 	my @NewRules;
@@ -797,17 +624,7 @@ sub api2_SpamAssassinStatusSpamBox {
 	my %OPTS = @_;
         my $account_domain  = $OPTS{'domain'};
 	my $sa_rulname = "spambox";
-	my $CGServerAddress = "91.230.195.210";
-        my $PostmasterLogin = 'postmaster';
-        my $PostmasterPassword = postmaster_pass();
-        my $cli = new CGP::CLI( { PeerAddr => $CGServerAddress,
-                            PeerPort => 106,
-                            login => $PostmasterLogin,
-                            password => $PostmasterPassword } );
-        unless($cli) {
-                $logger->warn("Can't login to CGPro: ".$CGP::ERR_STRING);
-                exit(0);
-        }
+	my $cli = getCLI();
 	my $Rules=$cli->GetDomainMailRules($account_domain) || die "Error: ".$cli->getErrMessage.", quitting";
 	my @result;
    	foreach my $Rule (@$Rules) {
@@ -829,17 +646,7 @@ sub api2_EnableSpamAssassinSpamBox {
 	my $score_string = "";
 	for (my $i=0;$i<$score;$i++) {$score_string .= "x"; }
         my $sa_rulname = "spambox";
-        my $CGServerAddress = "91.230.195.210";
-        my $PostmasterLogin = 'postmaster';
-        my $PostmasterPassword = postmaster_pass();
-        my $cli = new CGP::CLI( { PeerAddr => $CGServerAddress,
-                            PeerPort => 106,
-                            login => $PostmasterLogin,
-                            password => $PostmasterPassword } );
-        unless($cli) {
-                $logger->warn("Can't login to CGPro: ".$CGP::ERR_STRING);
-                exit(0);
-        }
+	my $cli = getCLI();
         my @result;
 	my @domains = Cpanel::Email::listmaildomains();
 	my @NewRules;
@@ -871,17 +678,7 @@ sub api2_EnableSpamAssassinSpamBox {
 sub api2_DisableSpamAssassinSpamBox {
         my %OPTS = @_;
         my $account_domain  = $OPTS{'domain'};
-        my $CGServerAddress = "91.230.195.210";
-        my $PostmasterLogin = 'postmaster';
-        my $PostmasterPassword = postmaster_pass();
-        my $cli = new CGP::CLI( { PeerAddr => $CGServerAddress,
-                            PeerPort => 106,
-                            login => $PostmasterLogin,
-                            password => $PostmasterPassword } );
-        unless($cli) {
-                $logger->warn("Can't login to CGPro: ".$CGP::ERR_STRING);
-                exit(0); 
-        }
+	my $cli = getCLI();
         my @result;
 	my @NewRules;
  	my @domains = Cpanel::Email::listmaildomains();
@@ -907,17 +704,7 @@ sub AddCGPAccount {
 	my @values = split('@',$email);
 	my $user=@values[0];
 	my $domain=@values[1];
-        my $CGServerAddress = "91.230.195.210";
-        my $PostmasterLogin = 'postmaster';
-        my $PostmasterPassword = postmaster_pass();
-        my $cli = new CGP::CLI( { PeerAddr => $CGServerAddress,
-                            PeerPort => 106,
-                            login => $PostmasterLogin,
-                            password => $PostmasterPassword } );
-        unless($cli) {      
-                $logger->warn("Can't login to CGPro: ".$CGP::ERR_STRING);
-                exit(0); 
-        }       
+	my $cli = getCLI();
 
 	if ($quota == 0) {
         	$quota="unlimited" ;
@@ -993,17 +780,7 @@ sub api2_AddMailingList {
         my $domain = $OPTS{'domain'};
         my $listname = $OPTS{'email'};
         my $owner = $OPTS{'owner'};
-        my $CGServerAddress = "91.230.195.210";
-        my $PostmasterLogin = 'postmaster';
-        my $PostmasterPassword = postmaster_pass();
-        my $cli = new CGP::CLI( { PeerAddr => $CGServerAddress,
-                            PeerPort => 106,
-                            login => $PostmasterLogin,
-                            password => $PostmasterPassword } );
-        unless($cli) {      
-                $logger->warn("Can't login to CGPro: ".$CGP::ERR_STRING);
-                exit(0);
-        }      
+	my $cli = getCLI();
         $cli->CreateList("$listname\@$domain","$owner");
         my $error_msg = $cli->getErrMessage();
         my @result;
@@ -1018,17 +795,7 @@ sub api2_AddMailingList {
 sub api2_ListMailingLists {
         my %OPTS = @_;
 	@domains = Cpanel::Email::listmaildomains();
-        my $CGServerAddress = "91.230.195.210";
-        my $PostmasterLogin = 'postmaster';
-        my $PostmasterPassword = postmaster_pass();
-        my $cli = new CGP::CLI( { PeerAddr => $CGServerAddress,
-                            PeerPort => 106,
-                            login => $PostmasterLogin,
-                            password => $PostmasterPassword } );
-        unless($cli) {
-                $logger->warn("Can't login to CGPro: ".$CGP::ERR_STRING);
-                exit(0);
-        }
+	my $cli = getCLI();
         my @result;
 	foreach my $domain (@domains) {
 		my $lists=$cli->GetDomainLists($domain);
@@ -1044,17 +811,7 @@ sub api2_ListMailingLists {
 sub api2_DelMailingList {
         my %OPTS = @_;
         my $listname = $OPTS{'email'};
-        my $CGServerAddress = "91.230.195.210";
-        my $PostmasterLogin = 'postmaster';
-        my $PostmasterPassword = postmaster_pass();
-        my $cli = new CGP::CLI( { PeerAddr => $CGServerAddress,
-                            PeerPort => 106,
-                            login => $PostmasterLogin,
-                            password => $PostmasterPassword } );
-        unless($cli) {      
-                $logger->warn("Can't login to CGPro: ".$CGP::ERR_STRING);
-                exit(0);
-        }       
+	my $cli = getCLI();
         $cli->DeleteList("$listname");
         my $error_msg = $cli->getErrMessage();
         my @result;
@@ -1070,17 +827,7 @@ sub api2_RenameMailingList {
         my %OPTS = @_;
         my $email = $OPTS{'email'};
         my $newname = $OPTS{'newname'};
-        my $CGServerAddress = "91.230.195.210";
-        my $PostmasterLogin = 'postmaster';
-        my $PostmasterPassword = postmaster_pass();
-        my $cli = new CGP::CLI( { PeerAddr => $CGServerAddress,
-                            PeerPort => 106,
-                            login => $PostmasterLogin,
-                            password => $PostmasterPassword } );
-        unless($cli) {
-                $logger->warn("Can't login to CGPro: ".$CGP::ERR_STRING);
-                exit(0);
-        }
+	my $cli = getCLI();
         $cli->RenameList("$email","$newname");
         my $error_msg = $cli->getErrMessage();
         my @result;
@@ -1150,17 +897,7 @@ sub api2_GetListSettings {
 
         my %OPTS = @_;
         my $email = $OPTS{'email'};
-        my $CGServerAddress = "91.230.195.210";
-        my $PostmasterLogin = 'postmaster';
-        my $PostmasterPassword = postmaster_pass();
-        my $cli = new CGP::CLI( { PeerAddr => $CGServerAddress,
-                            PeerPort => 106,
-                            login => $PostmasterLogin,
-                            password => $PostmasterPassword } );
-        unless($cli) {
-                $logger->warn("Can't login to CGPro: ".$CGP::ERR_STRING);
-                exit(0);
-        }
+	my $cli = getCLI();
         my $listSettings = $cli->GetList("$email");
         my $error_msg = $cli->getErrMessage();
         my @result;
@@ -1239,17 +976,7 @@ sub api2_SetListSettings {
 
         my %OPTS = @_;
         my $email = $OPTS{'email'};
-        my $CGServerAddress = "91.230.195.210";
-        my $PostmasterLogin = 'postmaster';
-        my $PostmasterPassword = postmaster_pass();
-        my $cli = new CGP::CLI( { PeerAddr => $CGServerAddress,
-                            PeerPort => 106,
-                            login => $PostmasterLogin,
-                            password => $PostmasterPassword } );
-        unless($cli) {
-                $logger->warn("Can't login to CGPro: ".$CGP::ERR_STRING);
-                exit(0);
-        }
+	my $cli = getCLI();
         my $listSettings;
 	@$listSettings{'Charset'} = @IndexesToValues_Charset[$OPTS{'Charset'}];
 	@$listSettings{'OwnerCheck'} = @IndexesToValues_OwnerCheck[$OPTS{'OwnerCheck'}];
@@ -1327,17 +1054,7 @@ sub CommuniGate_PrintTextArea_api1 {
 sub api2_ListMailingListsSubs{
         my %OPTS = @_;
         my $listname = $OPTS{'listname'};
-        my $CGServerAddress = "91.230.195.210";
-        my $PostmasterLogin = 'postmaster';
-        my $PostmasterPassword = postmaster_pass();
-        my $cli = new CGP::CLI( { PeerAddr => $CGServerAddress,
-                            PeerPort => 106,
-                            login => $PostmasterLogin,
-                            password => $PostmasterPassword } );
-        unless($cli) {
-                $logger->warn("Can't login to CGPro: ".$CGP::ERR_STRING);
-                exit(0);
-        }
+	my $cli = getCLI();
         my @result;
         my $subs_array=$cli->ListSubscribers($listname);
 	foreach my $sub (@$subs_array) {
@@ -1381,17 +1098,7 @@ sub api2_SetSubSettings {
         my $subemail = $OPTS{'subemail'};
         my $CGPMLReceivingMode= $OPTS{'CGPMLReceivingMode'};
         my $CGPMLPostingMode= $OPTS{'CGPMLPostingMode'};
-        my $CGServerAddress = "91.230.195.210";
-        my $PostmasterLogin = 'postmaster';
-        my $PostmasterPassword = postmaster_pass();
-        my $cli = new CGP::CLI( { PeerAddr => $CGServerAddress,
-                            PeerPort => 106,
-                            login => $PostmasterLogin,
-                            password => $PostmasterPassword } );
-        unless($cli) {      
-                $logger->warn("Can't login to CGPro: ".$CGP::ERR_STRING);
-                exit(0);
-        }       
+	my $cli = getCLI();
 	if ($CGPMLPostingMode eq "mod1") {$CGPMLPostingMode=1;};
 	if ($CGPMLPostingMode eq "mod2") {$CGPMLPostingMode=2;};
 	if ($CGPMLPostingMode eq "mod3") {$CGPMLPostingMode=3;};
@@ -1416,17 +1123,7 @@ sub api2_UnSub {
         my %OPTS = @_;
         my $listname = $OPTS{'listname'};
         my $subemail = $OPTS{'subemail'};
-        my $CGServerAddress = "91.230.195.210";
-        my $PostmasterLogin = 'postmaster';
-        my $PostmasterPassword = postmaster_pass();
-        my $cli = new CGP::CLI( { PeerAddr => $CGServerAddress,
-                            PeerPort => 106,
-                            login => $PostmasterLogin,
-                            password => $PostmasterPassword } );
-        unless($cli) {
-                $logger->warn("Can't login to CGPro: ".$CGP::ERR_STRING);
-                exit(0);
-        }
+	my $cli = getCLI();
         $cli->List("$listname","unsubscribe","$subemail");
         my $error_msg = $cli->getErrMessage();
         if ($error_msg eq "OK") {
@@ -1444,17 +1141,7 @@ sub api2_Sub {
         my $subemail = $OPTS{'subemail'};
         my $CGPMLReceivingMode= $OPTS{'CGPMLReceivingMode'};
         my $CGPMLPostingMode= $OPTS{'CGPMLPostingMode'};
-        my $CGServerAddress = "91.230.195.210";
-        my $PostmasterLogin = 'postmaster';
-        my $PostmasterPassword = postmaster_pass();
-        my $cli = new CGP::CLI( { PeerAddr => $CGServerAddress,
-                            PeerPort => 106,
-                            login => $PostmasterLogin,
-                            password => $PostmasterPassword } );
-        unless($cli) {
-                $logger->warn("Can't login to CGPro: ".$CGP::ERR_STRING);
-                exit(0);
-        }
+	my $cli = getCLI();
         $cli->List("$listname","$CGPMLReceivingMode","$subemail");
  	if ($CGPMLPostingMode eq "mod1") {$CGPMLPostingMode=1;};
         if ($CGPMLPostingMode eq "mod2") {$CGPMLPostingMode=2;};
@@ -1478,17 +1165,7 @@ sub api2_Sub {
 sub api2_ListGroups{
         my %OPTS = @_;
         @domains = Cpanel::Email::listmaildomains();
-        my $CGServerAddress = "91.230.195.210";
-        my $PostmasterLogin = 'postmaster';
-        my $PostmasterPassword = postmaster_pass();
-        my $cli = new CGP::CLI( { PeerAddr => $CGServerAddress,
-                            PeerPort => 106,
-                            login => $PostmasterLogin,
-                            password => $PostmasterPassword } );
-        unless($cli) {
-                $logger->warn("Can't login to CGPro: ".$CGP::ERR_STRING);
-                exit(0);
-        }
+	my $cli = getCLI();
         my @result;
         foreach my $domain (@domains) {
                 my $groups=$cli->ListGroups($domain);
@@ -1502,17 +1179,7 @@ sub api2_ListGroups{
 sub api2_DelGroup{
         my %OPTS = @_;
         my $listname = $OPTS{'email'};
-        my $CGServerAddress = "91.230.195.210";
-        my $PostmasterLogin = 'postmaster';
-        my $PostmasterPassword = postmaster_pass();
-        my $cli = new CGP::CLI( { PeerAddr => $CGServerAddress,
-                            PeerPort => 106,
-                            login => $PostmasterLogin,
-                            password => $PostmasterPassword } );
-        unless($cli) {
-                $logger->warn("Can't login to CGPro: ".$CGP::ERR_STRING);
-                exit(0);
-        }
+	my $cli = getCLI();
         $cli->DeleteGroup("$listname");
         my $error_msg = $cli->getErrMessage();
         my @result;
@@ -1528,17 +1195,7 @@ sub api2_RenameGroup {
         my %OPTS = @_;
         my $email = $OPTS{'email'};
         my $newname = $OPTS{'newname'};
-        my $CGServerAddress = "91.230.195.210";
-        my $PostmasterLogin = 'postmaster';
-        my $PostmasterPassword = postmaster_pass();
-        my $cli = new CGP::CLI( { PeerAddr => $CGServerAddress,
-                            PeerPort => 106,
-                            login => $PostmasterLogin,
-                            password => $PostmasterPassword } );
-        unless($cli) {
-                $logger->warn("Can't login to CGPro: ".$CGP::ERR_STRING);
-                exit(0);
-        }
+	my $cli = getCLI();
         $cli->RenameGroup("$email","$newname");
         my $error_msg = $cli->getErrMessage();
         my @result;
@@ -1558,17 +1215,7 @@ sub api2_AddGroup{
         my $listname = $OPTS{'email'};
         my $spectre = $OPTS{'spectre'};
         my $realname = $OPTS{'realname'};
-        my $CGServerAddress = "91.230.195.210";
-        my $PostmasterLogin = 'postmaster';
-        my $PostmasterPassword = postmaster_pass();
-        my $cli = new CGP::CLI( { PeerAddr => $CGServerAddress,
-                            PeerPort => 106,
-                            login => $PostmasterLogin,
-                            password => $PostmasterPassword } );
-        unless($cli) {
-                $logger->warn("Can't login to CGPro: ".$CGP::ERR_STRING);
-                exit(0);
-        }
+	my $cli = getCLI();
         $cli->CreateGroup("$listname\@$domain");
         my $error_msg = $cli->getErrMessage();
         my @result;
@@ -1597,17 +1244,7 @@ sub api2_AddGroup{
 sub api2_ListGroupMembers {
         my %OPTS = @_;
         my $listname = $OPTS{'listname'};
-        my $CGServerAddress = "91.230.195.210";
-        my $PostmasterLogin = 'postmaster';
-        my $PostmasterPassword = postmaster_pass();
-        my $cli = new CGP::CLI( { PeerAddr => $CGServerAddress,
-                            PeerPort => 106,
-                            login => $PostmasterLogin,
-                            password => $PostmasterPassword } );
-        unless($cli) {
-                $logger->warn("Can't login to CGPro: ".$CGP::ERR_STRING);
-                exit(0);
-        }
+	my $cli = getCLI();
         my @result;
 	my $Settings;
 	$Settings=$cli->GetGroup($listname);
@@ -1632,17 +1269,7 @@ sub api2_AddGroupMember {
 	 return;
 	}
         my $domain = $OPTS{'domain'};
-        my $CGServerAddress = "91.230.195.210";
-        my $PostmasterLogin = 'postmaster';
-        my $PostmasterPassword = postmaster_pass();
-        my $cli = new CGP::CLI( { PeerAddr => $CGServerAddress,
-                            PeerPort => 106,
-                            login => $PostmasterLogin,
-                            password => $PostmasterPassword } );
-        unless($cli) {
-                $logger->warn("Can't login to CGPro: ".$CGP::ERR_STRING);
-                exit(0);
-        }
+	my $cli = getCLI();
 
 	my $Settings=$cli->GetGroup($listname);
   	@$Settings{'Members'}=[] unless(@$Settings{'Members'});
@@ -1666,17 +1293,7 @@ sub api2_RemoveGroupMember {
         my %OPTS = @_;
         my $listname = $OPTS{'listname'};
         my $subemail = $OPTS{'subemail'};
-        my $CGServerAddress = "91.230.195.210";
-        my $PostmasterLogin = 'postmaster';
-        my $PostmasterPassword = postmaster_pass();
-        my $cli = new CGP::CLI( { PeerAddr => $CGServerAddress,
-                            PeerPort => 106,
-                            login => $PostmasterLogin,
-                            password => $PostmasterPassword } );
-        unless($cli) {      
-                $logger->warn("Can't login to CGPro: ".$CGP::ERR_STRING);
-                exit(0);
-        }       
+	my $cli = getCLI();
         
         my $Settings=$cli->GetGroup($listname);
         @$Settings{'Members'}=[] unless(@$Settings{'Members'});
@@ -1706,17 +1323,7 @@ sub api2_GetGroupSettings {
 
         my %OPTS = @_;
         my $email = $OPTS{'email'};
-        my $CGServerAddress = "91.230.195.210";
-        my $PostmasterLogin = 'postmaster';
-        my $PostmasterPassword = postmaster_pass();
-        my $cli = new CGP::CLI( { PeerAddr => $CGServerAddress,
-                            PeerPort => 106,
-                            login => $PostmasterLogin,
-                            password => $PostmasterPassword } );
-        unless($cli) {
-                $logger->warn("Can't login to CGPro: ".$CGP::ERR_STRING);
-                exit(0);
-        }
+	my $cli = getCLI();
         my $listSettings = $cli->GetGroup("$email");
         my $error_msg = $cli->getErrMessage();
         my @result;
@@ -1743,17 +1350,7 @@ sub api2_GetGroupSettings {
 sub api2_SetAutoresponder {
         my %OPTS = @_;
 	my $email = $OPTS{'email'};
-        my $CGServerAddress = "91.230.195.210";
-        my $PostmasterLogin = 'postmaster';
-        my $PostmasterPassword = postmaster_pass();
-        my $cli = new CGP::CLI( { PeerAddr => $CGServerAddress,
-				  PeerPort => 106,
-				  login => $PostmasterLogin,
-				  password => $PostmasterPassword } );
-        unless($cli) {
-	  $logger->warn("Can't login to CGPro: ".$CGP::ERR_STRING);
-	  exit(0);
-        }
+	my $cli = getCLI();
 
 	my $body = '+Subject: ' . $OPTS{'subject'} . "\n";
 	$body .= "In-Reply-To: ^I\n";
@@ -1791,17 +1388,7 @@ sub api2_SetAutoresponder {
 
 sub api2_DeleteAutoresponder {
         my %OPTS = @_;
-        my $CGServerAddress = "91.230.195.210";
-        my $PostmasterLogin = 'postmaster';
-        my $PostmasterPassword = postmaster_pass();
-        my $cli = new CGP::CLI( { PeerAddr => $CGServerAddress,
-				  PeerPort => 106,
-				  login => $PostmasterLogin,
-				  password => $PostmasterPassword } );
-        unless($cli) {
-	  $logger->warn("Can't login to CGPro: ".$CGP::ERR_STRING);
-	  exit(0);
-        }
+	my $cli = getCLI();
 	my $rule = undef;
 
         $cli->UpdateAutoresponder(email => $OPTS{'email'}, rule => $rule );
@@ -1812,17 +1399,7 @@ sub api2_ListAutoresponders {
         my %OPTS = @_;
 
 	my @domains = Cpanel::Email::listmaildomains();
-  	my $CGServerAddress = "91.230.195.210";
-        my $PostmasterLogin = 'postmaster';
-        my $PostmasterPassword = postmaster_pass();     
-        my $cli = new CGP::CLI( { PeerAddr => $CGServerAddress,
-                            PeerPort => 106,
-                            login => $PostmasterLogin,
-                            password => $PostmasterPassword } );
-        unless($cli) {
-                $logger->warn("Can't login to CGPro: ".$CGP::ERR_STRING);
-                exit(0);
-        }
+	my $cli = getCLI();
 	my @result;
         foreach my $domain (@domains) {
                 my $accounts=$cli->ListAccounts($domain);
@@ -1851,17 +1428,7 @@ sub api2_ListAutoresponders {
 sub api2_EditAutoresponder {
   my %OPTS = @_;
 
-  my $CGServerAddress = "91.230.195.210";
-  my $PostmasterLogin = 'postmaster';
-  my $PostmasterPassword = postmaster_pass();     
-  my $cli = new CGP::CLI( { PeerAddr => $CGServerAddress,
-                            PeerPort => 106,
-                            login => $PostmasterLogin,
-                            password => $PostmasterPassword } );
-  unless($cli) {
-    $logger->warn("Can't login to CGPro: ".$CGP::ERR_STRING);
-    exit(0);
-  }
+  my $cli = getCLI();
 
   my $account = $OPTS{email};
   if ($OPTS{regex}) {
@@ -1914,17 +1481,7 @@ sub api2_ListForwardersBackups {
     my %OPTS = @_;
     
     my @domains = Cpanel::Email::listmaildomains();
-    my $CGServerAddress = "91.230.195.210";
-    my $PostmasterLogin = 'postmaster';
-    my $PostmasterPassword = postmaster_pass();     
-    my $cli = new CGP::CLI( { PeerAddr => $CGServerAddress,
-			      PeerPort => 106,
-			      login => $PostmasterLogin,
-			      password => $PostmasterPassword } );
-    unless($cli) {
-	$logger->warn("Can't login to CGPro: ".$CGP::ERR_STRING);
-	exit(0);
-    }
+	my $cli = getCLI();
     my @result;
     foreach my $domain (@domains) {
 	my $accounts=$cli->ListAccounts($domain);
@@ -1968,17 +1525,7 @@ sub api2_RestoreForwarders {
     my %OPTS = @_;
     
     my @domains = Cpanel::Email::listmaildomains();
-    my $CGServerAddress = "91.230.195.210";
-    my $PostmasterLogin = 'postmaster';
-    my $PostmasterPassword = postmaster_pass();     
-    my $cli = new CGP::CLI( { PeerAddr => $CGServerAddress,
-			      PeerPort => 106,
-			      login => $PostmasterLogin,
-			      password => $PostmasterPassword } );
-    unless($cli) {
-	$logger->warn("Can't login to CGPro: ".$CGP::ERR_STRING);
-	exit(0);
-    }
+	my $cli = getCLI();
     my @result;
     my $gzfile = $Cpanel::homedir . '/tmp/forwardersimport/' . $Cpanel::CPVAR{'forwardersimportid'};
     open(IN, "gunzip -c $gzfile |") || die "can't open pipe to $file";
@@ -2011,17 +1558,7 @@ sub api2_ListAccountsBackups {
     my %OPTS = @_;
     
     my @domains = Cpanel::Email::listmaildomains();
-    my $CGServerAddress = "91.230.195.210";
-    my $PostmasterLogin = 'postmaster';
-    my $PostmasterPassword = postmaster_pass();     
-    my $cli = new CGP::CLI( { PeerAddr => $CGServerAddress,
-			      PeerPort => 106,
-			      login => $PostmasterLogin,
-			      password => $PostmasterPassword } );
-    unless($cli) {
-	$logger->warn("Can't login to CGPro: ".$CGP::ERR_STRING);
-	exit(0);
-    }
+	my $cli = getCLI();
     my @result;
     foreach my $domain (@domains) {
 	my $accounts=$cli->ListAccounts($domain);
@@ -2037,17 +1574,7 @@ sub api2_ListAccountsBackups {
 
 sub api2_GetAccountsBackups {
     my %OPTS = @_;
-    my $CGServerAddress = "91.230.195.210";
-    my $PostmasterLogin = 'postmaster';
-    my $PostmasterPassword = postmaster_pass();     
-    my $cli = new CGP::CLI( { PeerAddr => $CGServerAddress,
-			      PeerPort => 106,
-			      login => $PostmasterLogin,
-			      password => $PostmasterPassword } );
-    unless($cli) {
-	$logger->warn("Can't login to CGPro: ".$CGP::ERR_STRING);
-	exit(0);
-    }
+	my $cli = getCLI();
     my $domain = $OPTS{'domain'};
     my $accounts=$cli->ListAccounts($domain);
     my @result;
@@ -2229,17 +1756,7 @@ sub api2_GetSRV {
 sub api2_SetGroupSettings {
         my %OPTS = @_;
         my $email = $OPTS{'email'};
-        my $CGServerAddress = "91.230.195.210";
-        my $PostmasterLogin = 'postmaster';
-        my $PostmasterPassword = postmaster_pass();
-        my $cli = new CGP::CLI( { PeerAddr => $CGServerAddress,
-                            PeerPort => 106,
-                            login => $PostmasterLogin,
-                            password => $PostmasterPassword } );
-        unless($cli) {
-                $logger->warn("Can't login to CGPro: ".$CGP::ERR_STRING);
-                exit(0);
-        }
+	my $cli = getCLI();
 
         $Settings=$cli->GetGroup($email);
         @$Settings{'RealName'}=$OPTS{'RealName'};
@@ -2273,17 +1790,7 @@ sub IsGroupInternal {
 	my @values = split("@",$groupwithdomain);
   	my $domain = @values[1]; 
   	my $group = @values[0]; 
-        my $CGServerAddress = "91.230.195.210";
-        my $PostmasterLogin = 'postmaster';
-        my $PostmasterPassword = postmaster_pass();
-        my $cli = new CGP::CLI( { PeerAddr => $CGServerAddress,
-                            PeerPort => 106,
-                            login => $PostmasterLogin,
-                            password => $PostmasterPassword } );
-        unless($cli) {      
-                $logger->warn("Can't login to CGPro: ".$CGP::ERR_STRING);
-                exit(0);
-        }
+	my $cli = getCLI();
 	my $ExistingRules=$cli->GetServerRules() || die "Error: ".$cli->getErrMessage.", quitting";
         my $sa_rulname = $group."_posting_policy";
         foreach my $Rule (@$ExistingRules) {
@@ -2297,17 +1804,7 @@ sub IsGroupInternal {
 sub GroupMembersForRule{
 	my $group = shift;
 	my $domain = shift;
-	my $CGServerAddress = "91.230.195.210";
-        my $PostmasterLogin = 'postmaster';
-        my $PostmasterPassword = postmaster_pass();
-        my $cli = new CGP::CLI( { PeerAddr => $CGServerAddress,
-                            PeerPort => 106,
-                            login => $PostmasterLogin,
-                            password => $PostmasterPassword } );
-        unless($cli) {
-                $logger->warn("Can't login to CGPro: ".$CGP::ERR_STRING);
-                exit(0);
-        }
+	my $cli = getCLI();
 
 	my $result;
         my $Settings;
@@ -2329,17 +1826,7 @@ sub SetGroupInternal {
         my @values = split("@",$groupwithdomain);
         my $domain = @values[1];
         my $group = @values[0];
-        my $CGServerAddress = "91.230.195.210";
-        my $PostmasterLogin = 'postmaster';
-        my $PostmasterPassword = postmaster_pass();
-        my $cli = new CGP::CLI( { PeerAddr => $CGServerAddress,
-                            PeerPort => 106,
-                            login => $PostmasterLogin,
-                            password => $PostmasterPassword } );
-        unless($cli) {     
-                $logger->warn("Can't login to CGPro: ".$CGP::ERR_STRING);
-                exit(0);
-        }
+	my $cli = getCLI();
  	my @NewRules;
         @NewRules=(); 
         my $ExistingRules=$cli->GetServerRules() || die "Error: ".$cli->getErrMessage.", quitting";
@@ -2369,17 +1856,7 @@ sub SetGroupExternal{
         my @values = split("@",$groupwithdomain);
         my $domain = @values[1];
         my $group = @values[0];
-        my $CGServerAddress = "91.230.195.210";
-        my $PostmasterLogin = 'postmaster';
-        my $PostmasterPassword = postmaster_pass();
-        my $cli = new CGP::CLI( { PeerAddr => $CGServerAddress,
-                            PeerPort => 106,
-                            login => $PostmasterLogin,
-                            password => $PostmasterPassword } );
-        unless($cli) {    
-                $logger->warn("Can't login to CGPro: ".$CGP::ERR_STRING);
-                exit(0);
-        }
+	my $cli = getCLI();
         my @NewRules;
         @NewRules=();
         my $ExistingRules=$cli->GetServerRules() || die "Error: ".$cli->getErrMessage.", quitting";
