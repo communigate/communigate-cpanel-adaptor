@@ -134,6 +134,9 @@ IFS=$OLDIFS
 
 tLen=${#THEMES[@]}
 
+LOCALES=($(find ${PACKSRC}/locale -maxdepth 1 -mindepth 1))
+lLen=${#LOCALES[@]}
+
 for (( i=0; i<${tLen}; i++ ));
 do
     if [ "${THEMES[$i]}" == "${BASEDIR}/CommuniGate" ]
@@ -143,9 +146,20 @@ do
     cp -r "${PACKSRC}/theme/cgpro" "${THEMES[$i]}/"
     cp "${PACKSRC}/icons/"* "${THEMES[$i]}/branding"
     cp "${PACKSRC}/plugin/dynamicui_cgpro.conf" "${THEMES[$i]}/dynamicui/"
+    for ((j=0; j<${lLen}; j++)); do
+        TARGET=${THEMES[$i]}/locale/`basename ${LOCALES[$j]} '{}'`.yaml.local
+        if [ ! -f ${TARGET} ]
+        then
+            echo "---" > ${TARGET}
+        else
+            sed -i -e '/^CGP/d' ${TARGET}
+        fi
+        cat ${LOCALES[$j]} >> ${TARGET}
+    done
 done
 
 /usr/local/cpanel/bin/rebuild_sprites
+/usr/local/cpanel/bin/build_locale_databases
 
 replace "cpanel.communigate.com" "${HOSTNAME}" -- /var/CommuniGate/Settings/Main.settings
 

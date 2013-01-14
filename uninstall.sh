@@ -72,6 +72,9 @@ IFS=$OLDIFS
 
 tLen=${#THEMES[@]}
 
+LOCALES=($(find ${PACKSRC}/locale -maxdepth 1 -mindepth 1))
+lLen=${#LOCALES[@]}
+
 for (( i=0; i<${tLen}; i++ ));
 do
     if [ "${THEMES[$i]}" == "${BASEDIR}/CommuniGate" ]
@@ -83,6 +86,13 @@ do
     echo Deleting "${THEMES[$i]}/branding/cgpro_*"
     rm -f "${THEMES[$i]}/branding/cgpro_"*
     rm -f "${THEMES[$i]}/dynamicui/dynamicui_cgpro.conf"
+    for ((j=0; j<${lLen}; j++)); do
+        TARGET=${THEMES[$i]}/locale/`basename ${LOCALES[$j]} '{}'`.yaml.local
+        if [ -f ${TARGET} ]
+        then
+            sed -i -e '/^CGP/d' ${TARGET}
+        fi
+    done
 done
 
 /usr/local/cpanel/bin/rebuild_sprites
