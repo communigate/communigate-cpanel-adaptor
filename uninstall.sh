@@ -37,7 +37,9 @@ rm -f /usr/local/lib/perl5/5.8.8/x86_64-linux/CLI.pm
 # Remove the WHM plugins (administration and groupware control)
 
 rm -f /usr/local/cpanel/whostmgr/docroot/cgi/addon_cgs*
-
+rm -f /usr/local/cpanel/whostmgr/docroot/cgi/addon_cgp*
+rm -f /usr/local/cpanel/whostmgr/docroot/templates/addon_cgp*
+rm -rf /usr/local/cpanel/whostmgr/docroot/cgi/cgpro
 
 # CGP Logo
 

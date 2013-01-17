@@ -1,0 +1,59 @@
+ 	    <table class="datatable brick" cellspacing="0" cellpadding="5" width="100%" border="0" align="center">
+	      <tbody>
+		<tr>
+		  <td nowrap="nowrap" align="RIGHT">Outgoing Mail Limit per Account (defaults):</td>
+		  <td nowrap="nowrap">
+		    <select name="limit-MailOutFlow" class="popup">
+<option [% IF mailOutFlowLimit == -1; 'selected="selected"'; END %] value="-1">unlimited</option>
+<option [% IF mailOutFlowLimit == 0; 'selected="selected"'; END %] value="0">0</option>
+<option [% IF mailOutFlowLimit == 1; 'selected="selected"'; END %] value="1">1</option>
+<option [% IF mailOutFlowLimit == 3; 'selected="selected"'; END %] value="3">3</option>
+<option [% IF mailOutFlowLimit == 5; 'selected="selected"'; END %] value="5">5</option>
+<option [% IF mailOutFlowLimit == 10; 'selected="selected"'; END %] value="10">10</option>
+<option [% IF mailOutFlowLimit == 15; 'selected="selected"'; END %] value="15">15</option>
+<option [% IF mailOutFlowLimit == 20; 'selected="selected"'; END %] value="20">20</option>
+<option [% IF mailOutFlowLimit == 30; 'selected="selected"'; END %] value="30">30</option>
+<option [% IF mailOutFlowLimit == 100; 'selected="selected"'; END %] value="100">100</option>
+<option [% IF mailOutFlowLimit == 300; 'selected="selected"'; END %] value="300">300</option>
+<option [% IF mailOutFlowLimit == 1000; 'selected="selected"'; END %] value="1000">1000</option>
+<option [% IF mailOutFlowLimit == 3000; 'selected="selected"'; END %] value="3000">3000</option>
+<option [% IF mailOutFlowLimit == 10000; 'selected="selected"'; END %] value="10000">10000</option>
+<option [% IF mailOutFlowLimit == 30000; 'selected="selected"'; END %] value="30000">30000</option>
+<option [% IF mailOutFlowLimit == 100000; 'selected="selected"'; END %] value="100000">100000</option>
+<option [% IF mailOutFlowLimit == 300000; 'selected="selected"'; END %] value="300000">300000</option>
+<option [% IF mailOutFlowLimit == 1000000; 'selected="selected"'; END %] value="1000000">1000000</option>
+		    </select>
+		    in
+		    <select name="period-MailOutFlow" class="popup">
+<option [% IF mailOutFlowPeriod == '1s'; 'selected="selected"'; END %] value="1s">1 sec</option>
+<option [% IF mailOutFlowPeriod == '3s'; 'selected="selected"'; END %] value="3s">3 sec</option>
+<option [% IF mailOutFlowPeriod == '5s'; 'selected="selected"'; END %] value="5s">5 sec</option>
+<option [% IF mailOutFlowPeriod == '10s'; 'selected="selected"'; END %] value="10s">10 sec</option>
+<option [% IF mailOutFlowPeriod == '15s'; 'selected="selected"'; END %] value="15s">15 sec</option>
+<option [% IF mailOutFlowPeriod == '20s'; 'selected="selected"'; END %] value="20s">20 sec</option>
+<option [% IF mailOutFlowPeriod == '30s'; 'selected="selected"'; END %] value="30s">30 sec</option>
+<option [% IF mailOutFlowPeriod == '60s'; 'selected="selected"'; END %] value="60s">60 sec</option>
+<option [% IF mailOutFlowPeriod == '2m'; 'selected="selected"'; END %] value="2m">2 min</option>
+<option [% IF mailOutFlowPeriod == '3m'; 'selected="selected"'; END %] value="3m">3 min</option>
+<option [% IF mailOutFlowPeriod == '5m'; 'selected="selected"'; END %] value="5m">5 min</option>
+<option [% IF mailOutFlowPeriod == '10m'; 'selected="selected"'; END %] value="10m">10 min</option>
+<option [% IF mailOutFlowPeriod == '15m'; 'selected="selected"'; END %] value="15m">15 min</option>
+<option [% IF mailOutFlowPeriod == '20m'; 'selected="selected"'; END %] value="20m">20 min</option>
+<option [% IF mailOutFlowPeriod == '30m'; 'selected="selected"'; END %] value="30m">30 min</option>
+<option [% IF mailOutFlowPeriod == '1h'; 'selected="selected"'; END %] value="1h">60 min</option>
+<option [% IF mailOutFlowPeriod == '2h'; 'selected="selected"'; END %] value="2h">2 hour(s)</option>
+<option [% IF mailOutFlowPeriod == '3h'; 'selected="selected"'; END %] value="3h">3 hour(s)</option>
+<option [% IF mailOutFlowPeriod == '6h'; 'selected="selected"'; END %] value="6h">6 hour(s)</option>
+<option [% IF mailOutFlowPeriod == '12h'; 'selected="selected"'; END %] value="12h">12 hour(s)</option>
+<option [% IF mailOutFlowPeriod == '1d'; 'selected="selected"'; END %] value="1d">24 hour(s)</option>
+<option [% IF mailOutFlowPeriod == '2d'; 'selected="selected"'; END %] value="2d">2 day(s)</option>
+<option [% IF mailOutFlowPeriod == '3d'; 'selected="selected"'; END %] value="3d">3 day(s)</option>
+<option [% IF mailOutFlowPeriod == '7d'; 'selected="selected"'; END %] value="7d">7 day(s)</option>
+<option [% IF mailOutFlowPeriod == '14d'; 'selected="selected"'; END %] value="14d">2 week(s)</option>
+<option [% IF mailOutFlowPeriod == '21d'; 'selected="selected"'; END %] value="21d">3 week(s)</option>
+<option [% IF mailOutFlowPeriod == '28d'; 'selected="selected"'; END %] value="28d">4 week(s)</option>
+		    </select>
+		  </td>
+		</tr>
+	      </tbody>
+	    </table>

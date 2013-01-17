@@ -1,0 +1,41 @@
+<table cellspacing="0" cellpadding="5" width="100%" border="0" align="center" id="group_RBLs" class="datatable brick">
+  <thead>
+    <tr id="idgen5" class="tdshade1_noborder" style="display: none;">
+      <th align="left" colspan="100">RBLs</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr class="tdshade2_noborder" id="acl_spamhaus_rbl_container">
+      <td id="labelhelp-acl_spamhaus_rbl" class="label_and_help">
+	<div id="label-acl_spamhaus_rbl">Use Blacklisting DNS Servers (RBLs)</div>
+      </td>
+      <td valign="middle" class="controls">
+	<div class="brickcontainer">
+	  <ul class="tweak_settings binary">
+	    <li>
+	      <label>
+		<input type="radio" value="YES" name="UseRBL" id="acl_spamhaus_rbl_1"[% IF UseRBL == 'YES'; ' checked="checked"'; END %]>Yes</label>
+	    </li>
+	    <li>
+	      <label>
+		<input type="radio" value="NO" name="UseRBL"[% IF UseRBL == 'NO'; ' checked="checked"'; END %]>No<br>
+	      </label>
+	    </li>
+	  </ul>
+	</div>
+      </td>
+    </tr>
+    <!--  -->
+    <tr class="tdshade1_noborder">
+      <td class="label_and_help">
+	<div id="label-manage_rbls_button">Blacklisting DNS Servers (RBLs) (Domains, not IPs; One per row)</div>
+      </td>
+      <td valign="middle" class="controls">
+	
+	<textarea name="RBLDomain" rows="5" cols="40">[% FOREACH dom IN RBLDomain -%][% dom %]
+[% END -%]</textarea>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
