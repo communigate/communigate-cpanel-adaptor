@@ -1,15 +1,7 @@
-#!/bin/sh
+#!/bin/bash
 
-# set the environment
-LC_ALL=en_US.ISO8859-1
-export LC_ALL
-
-# config vars
-HOSTNAME=`hostname`
-SERVERADDRESS="127.0.0.1"
-BASEFOLDER="/var/CommuniGate"
-SERVERFOLDER="/opt/CommuniGate"
 PACKSRC=`pwd`
+source ${PACKSRC}/config.ini
 
 #################################################       
 #               CommuniGate Specific  	 	#
@@ -20,7 +12,6 @@ service exim stop
 service dovecot stop
 chkconfig exim off
 chkconfig dovecot off
-chkconfig CommuniGate on
 service cpanel stop
 service httpd stop
 
@@ -31,18 +22,19 @@ fi
 
 # Installing CGPro 6.0
 if [ ! -d "$SERVERFOLDER" ]; then
-wget -P${PACKSRC} ftp://www.communigate.com/pub/CommuniGatePro/6.0/CGatePro-Linux-6.0c-3.x86_64.rpm
-rpm -Uvh ${PACKSRC}/CGatePro-Linux-6.0c-3.x86_64.rpm
+wget -P${PACKSRC} http://www.communigate.com/pub/CommuniGatePro/CGatePro-Linux.x86_64.rpm
+rpm -Uvh ${PACKSRC}/CGatePro-Linux.x86_64.rpm
+chkconfig CommuniGate on
 service CommuniGate start
+mkdir ${BASEFOLDER}/cPanel/
+rsync -az ${PACKSRC}/CGP/Settings/* ${BASEFOLDER}/Settings/
+rsync -az ${PACKSRC}/CGP/Accounts/postmaster.macnt/postmaster.macnt ${BASEFOLDER}/Accounts/postmaster.macnt/account.settings
 fi
 
 # Lets add CGPro perl lib
 rsync -az ${PACKSRC}/library/CLI.pm /usr/local/cpanel/perl/
-
-# Copy the postmaster's settings file with the password
-mkdir ${BASEFOLDER}/cPanel/
-rsync -az ${PACKSRC}/CGP/Settings/* ${BASEFOLDER}/Settings/
-rsync -az ${PACKSRC}/CGP/Accounts/postmaster.macnt/postmaster.settings ${BASEFOLDER}/Accounts/postmaster.macnt/account.settings
+rsync -az ${PACKSRC}/library/CLI.pm /usr/local/lib/perl5/
+rsync -az ${PACKSRC}/library/CLI.pm /usr/local/lib/perl5/5.8.8/
 
 # Configure Airsync and Spamd
 if grep -Fxq "Microsoft-Server-ActiveSync" /usr/local/apache/conf/includes/pre_main_global.conf
@@ -88,6 +80,8 @@ cp ${PACKSRC}/whm/postwwwacct /usr/local/cpanel/scripts/
 cp ${PACKSRC}/module/CommuniGate.pm /usr/local/cpanel/Cpanel/
 
 # CGPro cPanel Wrapper
+cp ${PACKSRC}/cpwrap/ccaadmin /usr/local/cpanel/bin/
+cp ${PACKSRC}/cpwrap/ccawrap /usr/local/cpanel/bin/
 cp ${PACKSRC}/cpwrap/cgppassadmin /usr/local/cpanel/bin/
 cp ${PACKSRC}/cpwrap/cgppasswrap /usr/local/cpanel/bin/
 
@@ -101,8 +95,8 @@ cp ${PACKSRC}/hooks/editquota /usr/local/cpanel/hooks/email/
 /usr/local/cpanel/bin/register_hooks
 
 # Install CommuniGate Webmail in cPanel
-cp ${PACKSRC}/webmail/webmail_communigate.yaml /var/cpanel/webmail/
-cp -r ${PACKSRC}/webmail/CommuniGate /usr/local/cpanel/base/3rdparty/
+cp ${PACKSRC}/cgpro-webmail/webmail_communigate.yaml /var/cpanel/webmail/
+cp -r ${PACKSRC}/cgpro-webmail/CommuniGate /usr/local/cpanel/base/3rdparty/
 
 # Install SSO for Webmail
 mkdir /var/CommuniGate/cgi
@@ -122,6 +116,8 @@ chmod +x /var/CommuniGate/cgi/login.pl
 chmod +x /usr/local/cpanel/Cpanel/CommuniGate.pm
 chmod +x /usr/local/cpanel/bin/cgppassadmin
 chmod u+s+x /usr/local/cpanel/bin/cgppasswrap
+chmod u+s+x /usr/local/cpanel/bin/ccaadmin 
+chmod u+s+x /usr/local/cpanel/bin/ccawrap 
 chmod u+s /opt/CommuniGate/mail
 
 # Change default theme to CommuniGate
@@ -143,3 +139,8 @@ iptables-save
 # Start needed services
 service	cpanel start
 service	httpd start
+
+# Installing iTool Labs webmail
+sh ${PACKSRC}/webmail-install.sh
+
+echo "Dont forget to run disable-services.pl script to stop cPanel`s native mail software"
