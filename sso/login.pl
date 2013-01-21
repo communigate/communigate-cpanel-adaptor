@@ -3,33 +3,11 @@
 
 # (c) 2011 CommuniGate Systems
 
-sub postmaster_pass {
-my $file = "/var/CommuniGate/Accounts/postmaster.macnt/account.settings";
-my %hash;
-open (MYFILE, "$file");
-while (<MYFILE>) {
-        chomp;
-        my @line = split("=",$_);
-        $hash{@line[0]} = @line[1];
- }
-if ($hash{' Password '} =~ /^ ".*";$/) {
-          return  substr $hash{' Password '}, 2, length($hash{' Password '})-4;
-} else {
-          return  substr $hash{' Password '}, 1, length($hash{' Password '})-2;
-}
-}
-
-
-
-
-my $CGServerAddress = "127.0.0.1";
-my $PostmasterLogin = 'postmaster';
-my $PostmasterPassword = postmaster_pass();
-
 BEGIN
 {
  use FindBin qw($Bin);
  use lib "$Bin";
+ use lib '/usr/local/cpanel';
 }#This is for web server so it could find CLI.pm from the current directory
 
 use CLI;
@@ -37,6 +15,7 @@ use CGI qw(:standard);
 use LWP::UserAgent;
 use HTTP::Request::Common;
 use URI::Escape;
+use Cpanel::CachedDataStore;
 
 use Data::Dumper;
 
@@ -49,10 +28,11 @@ if ($domain) {
 }
 
 
-my $cli = new CGP::CLI( { PeerAddr => $CGServerAddress,
-                            PeerPort => 106,
-                            login => $PostmasterLogin,
-                            password => $PostmasterPassword } );
+my $conf = Cpanel::CachedDataStore::fetch_ref( '/etc/cpanel_cgpro.conf' ) || {};
+my $cli = new CGP::CLI( { PeerAddr => $conf->{cgprohost},
+                            PeerPort => $conf->{cgproport},
+                            login => $conf->{cgprouser},
+                            password => $conf->{cgpropass} } );
   unless($cli) {
    print header;
    print "Can't login to CGPro: ".$CGP::ERR_STRING,"\n";

@@ -102,6 +102,10 @@ cp ${PACKSRC}/hooks/editquota /usr/local/cpanel/hooks/email/
 # Register installed hooks
 /usr/local/cpanel/bin/register_hooks
 
+#Install config file
+cp ${PACKSRC}/etc/cpanel_cgpro.conf /etc
+chmod 600 /etc/cpanel_cgpro.conf
+
 # Install CommuniGate Webmail in cPanel
 cp ${PACKSRC}/webmail/webmail_communigate.yaml /var/cpanel/webmail/
 cp -r ${PACKSRC}/webmail/CommuniGate /usr/local/cpanel/base/3rdparty/

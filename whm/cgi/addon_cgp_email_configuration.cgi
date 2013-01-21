@@ -7,6 +7,7 @@ use Whostmgr::HTMLInterface ();
 use Whostmgr::ACLS          ();
 use CLI;
 use Cpanel::API::Branding        ();
+use Cpanel::CachedDataStore;
 
 print "Content-type: text/html\r\n\r\n";
 
@@ -16,16 +17,11 @@ if ( !Whostmgr::ACLS::hasroot() ) {
   exit();
 }
 
-my $CGServerAddress = '91.230.195.210';
-my $PostmasterLogin = 'postmaster';
-my $PostmasterPassword = postmaster_pass();
-
-my $cli = new CGP::CLI({
-			PeerAddr => $CGServerAddress,
-			PeerPort => 106,
-			login => $PostmasterLogin,
-			password => $PostmasterPassword
-		       });
+my $conf = Cpanel::CachedDataStore::fetch_ref( '/etc/cpanel_cgpro.conf' ) || {};
+my $cli = new CGP::CLI( { PeerAddr => $conf->{cgprohost},
+                            PeerPort => $conf->{cgproport},
+                            login => $conf->{cgprouser},
+                            password => $conf->{cgpropass} } );
 unless($cli) {
   print STDERR "Can't login to CGPro: ".$CGP::ERR_STRING,"\n";
    exit(0);

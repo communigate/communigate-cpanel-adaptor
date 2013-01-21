@@ -7,24 +7,8 @@ use lib '/usr/local/cpanel/';
 use Whostmgr::ACLS ();
 use Whostmgr::HTMLInterface ();
 Whostmgr::ACLS::init_acls();
+use Cpanel::CachedDataStore;
 use CGI qw(:standard);
-
-sub postmaster_pass {
-my $file = "/var/CommuniGate/Accounts/postmaster.macnt/account.settings";
-my %hash;
-open (MYFILE, "$file");
-while (<MYFILE>) {
-        chomp;
-        my @line = split("=",$_);
-        $hash{@line[0]} = @line[1];
- }
-if ($hash{' Password '} =~ /^ ".*";$/) {
-          return  substr $hash{' Password '}, 2, length($hash{' Password '})-4;
-} else {
-          return  substr $hash{' Password '}, 1, length($hash{' Password '})-2;
-}
-}
-
 
 if (!Whostmgr::ACLS::checkacl( 'all' ) ) {
 	print "HTTP/1.0\r\nStatus: 200 OK\r\nContext-type: text/html\r\n\r\n";
@@ -89,7 +73,11 @@ return(0);
 
 read_limits(); # Fills $limits hash
 Whostmgr::HTMLInterface::defheader( '<br><br><br><H1>CommuniGate Groupware Accounts Control<H1>', '/images/communigate.gif', '/cgi/addon_cgs-gwcontrol.cgi' );
-my $cli = new CGP::CLI( { PeerAddr => $CGServerAddress, PeerPort => 106, login => $PostmasterLogin, password => $PostmasterPassword } );
+my $conf = Cpanel::CachedDataStore::fetch_ref( '/etc/cpanel_cgpro.conf' ) || {};
+my $cli = new CGP::CLI( { PeerAddr => $conf->{cgprohost},
+                            PeerPort => $conf->{cgproport},
+                            login => $conf->{cgprouser},
+                            password => $conf->{cgpropass} } );
   unless($cli) {
    print STDERR "Can't login to CGPro: ".$CGP::ERR_STRING,"\n";
    exit(0);

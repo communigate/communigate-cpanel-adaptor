@@ -34,14 +34,14 @@ sub getCLI {
     if ($CLI && $CLI->{isConnected}) {
 	return $CLI;
     } else {
-	my $CGServerAddress = "91.230.195.210";
-	my $PostmasterLogin = 'postmaster';
-	my $PostmasterPassword =  Cpanel::AdminBin::adminrun('cca', 'GETPASS');
-	$PostmasterPassword =~ s/^\.\n//;
- 	my $cli = new CGP::CLI( { PeerAddr => $CGServerAddress,
-				  PeerPort => 106,
-				  login => $PostmasterLogin,
-				  password => $PostmasterPassword } );
+	my $loginData = Cpanel::AdminBin::adminrun('cca', 'GETLOGIN');
+	$loginData =~ s/^\.\n//;
+	my @loginData = split "::", $loginData;
+ 	my $cli = new CGP::CLI( { PeerAddr => $loginData[0],
+				  PeerPort => $loginData[1],
+				  login => $loginData[2],
+				  password => $loginData[3]
+				});
 	unless($cli) {
 	    $logger->warn("Can't login to CGPro: ".$CGP::ERR_STRING);
 	    exit(0);
