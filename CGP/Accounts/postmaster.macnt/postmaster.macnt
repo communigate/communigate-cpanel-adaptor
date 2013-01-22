@@ -1,0 +1,6 @@
+{
+ Password = cp@nel;
+ PasswordEncryption = clear;
+ UseAppPassword = YES;
+ WebAdminPrefs = {ExpertLevel=10;};
+}

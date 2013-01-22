@@ -1,0 +1,145 @@
+{
+  AGradeLimit =  "-1";
+  AUTHMethods =  All;
+  AccessRerouteAddress =  error;
+  AccessToUnknown =  Rejected;
+  AccountDefaults =  {
+    AccessModes =  All;
+    AddMailTrailer =  YES;
+    AddWebBanner =  YES;
+    ArchiveMessagesAfter =  0;
+    BannerInfo =  "";
+    CallInpFlow =  ("-1", 3600);
+    CallLogs =  YES;
+    CallOutFlow =  ("-1", 3600);
+    CallsLimit =  "-1";
+    DefaultMailboxType =  TextMailbox;
+    DefaultWebPage =  default.html;
+    DeleteMessagesAfter =  0;
+    DialogInfo =  YES;
+    ExternalINBOX =  NO;
+    FailedLoginFlow =  (10, 1m);
+    HiddenProntoModules =  "";
+    HiddenSkins =  "";
+    IMAPSeesNonMail =  NO;
+    IMLogs =  YES;
+    LogLogin =  NO;
+    MailInpFlow =  (20, 15);
+    MailOutFlow =  ("-1", 30);
+    MailToAll =  YES;
+    MaxAccountSize =  unlimited;
+    MaxFileSize =  unlimited;
+    MaxMailOutSize =  unlimited;
+    MaxMailboxes =  "-1";
+    MaxMessageSize =  unlimited;
+    MaxRosterItems =  20;
+    MaxSignalContacts =  10;
+    MaxWebFiles =  1000;
+    MaxWebSize =  100M;
+    NotifyOutFlow =  (100, 15);
+    OSUserName =  "*";
+    PSTNAreaCode =  "1(415)";
+    PSTNEmergency =  "call=sip:911@telnum";
+    PSTNFromName =  "$";
+    PSTNGatewayAuthName =  "trial-*domain*";
+    PSTNGatewayDomain =  pstn.communigate.com;
+    PSTNGatewayPassword =  dummy;
+    PSTNSMSHost =  "";
+    PWDAllowed =  YES;
+    PasswordEncryption =  A-crpt;
+    PasswordRecovery =  YES;
+    QuotaAlert =  80;
+    QuotaNotice =  90;
+    QuotaSuspend =  100;
+    RPOPAllowed =  NO;
+    RSIPAllowed =  NO;
+    RequireAPOP =  NO;
+    RulesAllowed =  "Filter Only";
+    SIPIMMode =  YES;
+    ServiceClasses =  {
+      groupware =  {
+        AccessModes =  (
+          26,
+          Mail,
+          Relay,
+          Signal,
+          Mobile,
+          TLS,
+          POP,
+          IMAP,
+          MAPI,
+          AirSync,
+          XMPP,
+          WebMail,
+          XIMSS,
+          ACAP,
+          PWD,
+          LDAP,
+          "S/MIME",
+          WebCAL,
+          HTTP,
+	  WebSite,
+          FTP
+        );
+      };
+      mailonly =  {
+        AccessModes =  (
+          26,
+          Mail,
+          Relay,
+          Mobile,
+          TLS,
+          POP,
+          IMAP,
+          WebMail,
+          ACAP,
+          RADIUS,
+          "S/MIME",
+          HTTP
+        );
+      };
+    };
+    SignalRulesAllowed =  Any;
+    SyncMode =  NO;
+    SyncServer =  "";
+    SyncUserName =  "^0";
+    SyncUserPassword =  "^0";
+    UseAppPassword =  YES;
+    UseCertificateAuth =  NO;
+    UseExtPassword =  NO;
+    UseKerberosPassword =  YES;
+    UseSysPassword =  NO;
+  };
+  AccountsLimit =  "-1";
+  AccountsLogLevel =  3;
+  AllWithForwarders =  NO;
+  AutoCreateChats =  NO;
+  AutoSignup =  NO;
+  BGradeLimit =  "-1";
+  CGradeLimit =  "-1";
+  CentralDirectory =  "Keep In Sync";
+  CertificateType =  Test;
+  ClientCertCA =  "";
+  ClientCertReq =  NO;
+  DGradeLimit =  "-1";
+  DomainAccessModes =  All;
+  ExternalLockType =  FileLevel;
+  ExternalOnProvision =  NO;
+  ExternalOnUnknown =  NO;
+  FastStorageType =  0;
+  FolderIndex =  NO;
+  Foldering =  flat;
+  ForceSMTPAUTH =  nobody;
+  ListsLimit =  "-1";
+  MailRerouteAddress =  spamtrap;
+  MailToAllAction =  "Authenticated Domain Users";
+  MailToUnknown =  Rejected;
+  MailboxesLogLevel =  3;
+  RecipientStatus =  NO;
+  RelayAddress =  any;
+  RenameInPlace =  NO;
+  SignalRerouteAddress =  pbx;
+  SignalToUnknown =  Rejected;
+  WebSitePrefix =  "~";
+  XIMSSMode =  TCP;
+}

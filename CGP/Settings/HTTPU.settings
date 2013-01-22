@@ -1,0 +1,20 @@
+{
+ AIRSYNCLog = 2;
+ AdvertiseBasicAUTH = YES;
+ AdvertiseDigestAUTH = YES;
+ AdvertiseNTLMAUTH = NO;
+ AdvertiseNegotiateAUTH = NO;
+ CALDAVLog = 3;
+ CARDDAVLog = 3;
+ CGIExtensions = {pl="/usr/bin/perl";};
+ CGIHeaderFields = ();
+ FILEDAVLog = 3;
+ FileExtensions = {};
+ HTTPRequestSizeLimit = 10M;
+ Listener = {MaxInputChannels=50;Ports=({PortNumber=8100;},{InitialSecurity=on;PortNumber=9100;});};
+ LogLevel = 3;
+ PARLAYXLog = 2;
+ ScanLargeRequests = NO;
+ SupportKeepAlive = YES;
+ SystemCGIDirectory = cgi;
+}

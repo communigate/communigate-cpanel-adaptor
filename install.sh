@@ -1,9 +1,17 @@
-#!/bin/bash
+#!/bin/sh
 
+# set the environment
+LC_ALL=en_US.ISO8859-1
+export LC_ALL
+
+# config vars
+HOSTNAME=`hostname`
+SERVERADDRESS="127.0.0.1"
+BASEFOLDER="/var/CommuniGate"
+SERVERFOLDER="/opt/CommuniGate"
 PACKSRC=`pwd`
-source ${PACKSRC}/config.ini
 
-#################################################
+#################################################       
 #               CommuniGate Specific  	 	#
 #################################################
 
@@ -12,6 +20,7 @@ service exim stop
 service dovecot stop
 chkconfig exim off
 chkconfig dovecot off
+chkconfig CommuniGate on
 service cpanel stop
 service httpd stop
 
@@ -22,19 +31,18 @@ fi
 
 # Installing CGPro 6.0
 if [ ! -d "$SERVERFOLDER" ]; then
-wget -P${PACKSRC} http://www.communigate.com/pub/CommuniGatePro/CGatePro-Linux.x86_64.rpm
-rpm -Uvh ${PACKSRC}/CGatePro-Linux.x86_64.rpm
-chkconfig CommuniGate on
+wget -P${PACKSRC} ftp://www.communigate.com/pub/CommuniGatePro/6.0/CGatePro-Linux-6.0c-3.x86_64.rpm
+rpm -Uvh ${PACKSRC}/CGatePro-Linux-6.0c-3.x86_64.rpm
 service CommuniGate start
-mkdir ${BASEFOLDER}/cPanel/
-rsync -az ${PACKSRC}/CGP/Settings/* ${BASEFOLDER}/Settings/
-rsync -az ${PACKSRC}/CGP/Accounts/postmaster.macnt/postmaster.macnt ${BASEFOLDER}/Accounts/postmaster.macnt/account.settings
 fi
 
 # Lets add CGPro perl lib
 rsync -az ${PACKSRC}/library/CLI.pm /usr/local/cpanel/perl/
-rsync -az ${PACKSRC}/library/CLI.pm /usr/local/lib/perl5/
-rsync -az ${PACKSRC}/library/CLI.pm /usr/local/lib/perl5/5.8.8/
+
+# Copy the postmaster's settings file with the password
+mkdir ${BASEFOLDER}/cPanel/
+rsync -az ${PACKSRC}/CGP/Settings/* ${BASEFOLDER}/Settings/
+rsync -az ${PACKSRC}/CGP/Accounts/postmaster.macnt/postmaster.settings ${BASEFOLDER}/Accounts/postmaster.macnt/account.settings
 
 # Configure Airsync and Spamd
 if grep -Fxq "Microsoft-Server-ActiveSync" /usr/local/apache/conf/includes/pre_main_global.conf
@@ -45,7 +53,7 @@ echo ProxyPass /Microsoft-Server-ActiveSync http://${HOSTNAME}:8100/Microsoft-Se
 echo ProxyPassReverse /Microsoft-Server-ActiveSync http://${HOSTNAME}:8100/Microsoft-Server-ActiveSync >> /usr/local/apache/conf/includes/pre_main_global.conf
 fi
 
-if grep -Fxq "CommuniGate Integration Settings" /etc/mail/spamassassin/local.cf
+if grep -Fxq "CommuniGate Integration Settings" /etc/mail/spamassassin/local.cf                
 then
 echo "spamd already configured"
 else
@@ -84,6 +92,8 @@ cp ${PACKSRC}/module/CommuniGate.pm /usr/local/cpanel/Cpanel/
 # CGPro cPanel Wrapper
 cp ${PACKSRC}/cpwrap/ccaadmin /usr/local/cpanel/bin/
 cp ${PACKSRC}/cpwrap/ccawrap /usr/local/cpanel/bin/
+chmod +x /usr/local/cpanel/bin/ccawrap
+chmod +x /usr/local/cpanel/bin/ccaadmin
 
 # Install cPanel Function hooks
 cp ${PACKSRC}/hooks/addpop /usr/local/cpanel/hooks/email/
@@ -99,8 +109,8 @@ cp ${PACKSRC}/etc/cpanel_cgpro.conf /etc
 chmod 600 /etc/cpanel_cgpro.conf
 
 # Install CommuniGate Webmail in cPanel
-cp ${PACKSRC}/cgpro-webmail/webmail_communigate.yaml /var/cpanel/webmail/
-cp -r ${PACKSRC}/cgpro-webmail/CommuniGate /usr/local/cpanel/base/3rdparty/
+cp ${PACKSRC}/webmail/webmail_communigate.yaml /var/cpanel/webmail/
+cp -r ${PACKSRC}/webmail/CommuniGate /usr/local/cpanel/base/3rdparty/
 
 # Install SSO for Webmail
 mkdir /var/CommuniGate/cgi
@@ -160,7 +170,7 @@ done
 
 replace "cpanel.communigate.com" "${HOSTNAME}" -- /var/CommuniGate/Settings/Main.settings
 
-#################################################
+#################################################       
 #             	  OS Specific	  	 	#
 #################################################
 
@@ -174,8 +184,3 @@ iptables-save
 # Start needed services
 service	cpanel start
 service	httpd start
-
-# Installing iTool Labs webmail
-sh ${PACKSRC}/webmail-install.sh
-
-echo "Dont forget to run disable-services.pl script to stop cPanel`s native mail software"
