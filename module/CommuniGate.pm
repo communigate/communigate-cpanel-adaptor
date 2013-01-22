@@ -241,9 +241,15 @@ sub api2_addalias {
         my %OPTS = @_;
         my $domain = $OPTS{'domain'}; 
         my $user = $OPTS{'email'}; 
-        my $fwdemail = $OPTS{'fwdemail'}; 
+        my $fwdemail = $OPTS{'fwdemail'} . '@' . $OPTS{'domain'}; 
 	my $cli = getCLI();
-	$cli->CreateForwarder("$user\@$domain", $fwdemail);
+	my $aliases = $cli->GetAccountAliases("$fwdemail");
+	my $found = 0;
+	for my $alias (@$aliases) {
+	    $found = 1 if "$alias" eq "$user";
+	}
+	push @$aliases, "$user" unless $found;
+	my $aliases = $cli->SetAccountAliases("$fwdemail", $aliases);
 	my $error_msg = $cli->getErrMessage();
 	my @result;
 	if ($error_msg eq "OK") {
@@ -312,26 +318,29 @@ sub addforward {
 }
 
 sub api2_listaliases {
-        my %OPTS = @_;
-	my $specified_domain  = $OPTS{'domain'};
-        my @domains = Cpanel::Email::listmaildomains($OPTS{'domain'});
-	my $cli = getCLI();
-        my @result;
-        foreach my $domain (@domains) {
-	  if (($specified_domain eq "") || ($specified_domain eq $domain)){
-                my $accounts=$cli->ListForwarders($domain);
-                foreach my $userName (@$accounts) {
-                        my $fwddata = $cli->GetForwarder("$userName\@$domain");
-                        push( @result, {        uri_dest => "$userName%40$domain",
-                                                html_dest => "$userName\@$domain",
-                                                dest => "$userName\@$domain",
-                                                uri_forward => "$fwddata",
-                                                html_forward => "$fwddata" ,
-                                                forward => "$fwddata" } );
-                }
-	  }
-        }
-        return @result;
+    my %OPTS = @_;
+    my $specified_domain  = $OPTS{'domain'};
+    my @domains = Cpanel::Email::listmaildomains($OPTS{'domain'});
+    my $cli = getCLI();
+    my @result;
+    foreach my $domain (@domains) {
+	if (($specified_domain eq "") || ($specified_domain eq $domain)){
+	    my $accounts = $cli->ListAccounts($domain);
+	    foreach my $userName (sort keys %$accounts) {
+		my $aliases = $cli->GetAccountAliases("$userName\@$domain");
+		# die $aliases if $userName eq 'borislav';
+		for my $alias (@$aliases) {
+		    push( @result, { uri_dest => "$userName%40$domain",
+				     html_dest => "$userName\@$domain",
+				     dest => "$userName\@$domain",
+				     uri_forward => "$alias%40$domain",
+				     html_forward => "$alias\@$domain" ,
+				     forward => "$alias\@$domain" } );
+		}
+	    }
+	}
+    }
+    return @result;
 } 
 
 
@@ -371,19 +380,25 @@ sub api2_listforwards {
 
 sub api2_delalias {
         my %OPTS = @_;
-        my $forwarder = $OPTS{'forwarder'};
+        my $email = $OPTS{'email'};
+        my $thealias = $OPTS{'alias'};
+	$thealias =~ s/\@.*?$//;
 	my $cli = getCLI();
-        $cli->DeleteForwarder("$forwarder");
-        my $error_msg = $cli->getErrMessage();
-        my @result;
-        if ($error_msg eq "OK") {
-                push( @result, { forwarder => "$forwarder" } );
-        } else {
-		$error_msg =~ s/forwarder/alias/g;
-                $Cpanel::CPERROR{'CommuniGate'} = $error_msg;
-        }
-        $cli->Logout();
-        return @result;
+	my $aliases = $cli->GetAccountAliases("$email");
+	my $newaliases = [];
+	for my $alias (@$aliases) {
+	    push @$newaliases, $alias unless $alias eq $thealias;
+	}
+	my $aliases = $cli->SetAccountAliases("$email", $newaliases);
+	my $error_msg = $cli->getErrMessage();
+	my @result;
+	if ($error_msg eq "OK") {
+		push( @result, { forwarder => $OPTS{'alias'}} );
+	} else {
+		$Cpanel::CPERROR{'CommuniGate'} = $error_msg;
+	}
+        $cli->Logout();         
+	return @result;
 }
 
 sub api2_delforward {

@@ -3,7 +3,7 @@
 <cpanel Branding="include(stdheader.html)">
 <div class="body-content">
 <h1><cpanel langprint="CGPAliasMaint"></h1>
-<p><cpanel Locale="maketext('Are you sure you want to delete the[boolean,_3, domain, email,] alias “[output,class,_1,status] to [output,class,_2,status]”?',$FORM{'email'}, $FORM{'emaildest'},0)"></p>
+<p><cpanel Locale="maketext('Are you sure you want to delete the[boolean,_3, domain, email,] alias “[output,class,_1,status] to [output,class,_2,status]”?',$FORM{'emaildest'}, $FORM{'email'},0)"></p>
 <p> 
 	<a class="create-button" href="dodelalias.html?email=<cpanel formprint="$FORM{'email'}">&emaildest=<cpanel formprint="$FORM{'emaildest'}">"><cpanel Locale="maketext('Delete Alias')"></a> 
 	<a class="cancel_link" href="aliases.html"><cpanel Locale="maketext('cancel')"></a>

@@ -90,7 +90,7 @@ function init_page() {
 	forward_validator.add("email", "local_part_email(%input%, 'cpanel')", "<cpanel langprint="email_not_valid_email">");
 	forward_validator.attach();
 	
-	fwd_validator.add("fwdemail", validate_destination, "<cpanel langprint="email_not_valid_email">");
+	fwd_validator.add("fwdemail", "local_part_email(%input%, 'cpanel')", "<cpanel langprint="email_not_valid_email">");
 	fwd_validator.attach();
 	
 	discard_validator.add("failmsgs", validate_discard, "<cpanel langprint="email_fwd_discard_not_empty">");
@@ -138,7 +138,7 @@ YAHOO.util.Event.onDOMReady(init_page);
 	    </cpanelif>
 	    <cpanelif !$appname==webmail>
 			<tr>
-				<td><cpanel langprint="CGPNameOfAlias"> <input id="email" type="text" name="email" size="25" />@<select name="domain"><cpanel Email="printdomainoptions()"></select></td>
+				<td><cpanel langprint="CGPNameOfAlias"> <input id="email" type="text" name="email" size="25" />@<select id="domain" name="domain"><cpanel Email="printdomainoptions()"></select></td>
 				<td><span id="email_error"></span></td>
 			</tr>
 	    </cpanelif>
@@ -157,7 +157,7 @@ YAHOO.util.Event.onDOMReady(init_page);
 	</cpanelif>
     
 	<cpanelif !$appname==webmail>
-		<input name="fwdopt" id="fwd_radio" type="hidden" value="fwd" checked="checked" /> <label for="fwd_radio"><cpanel langprint="CGPAliasDeliverTo"></label>: <input name="fwdemail" id="fwdemail"  type="text" size="40" /> <span id="fwdemail_error"></span>
+		<input name="fwdopt" id="fwd_radio" type="hidden" value="fwd" checked="checked" /> <label for="fwd_radio"><cpanel langprint="CGPAliasDeliverTo"></label> <input name="fwdemail" id="fwdemail"  type="text" size="25" />@<span id="thedomain">?</span> <span id="fwdemail_error"></span>
 		<br /><br />
 
 		
@@ -197,5 +197,15 @@ YAHOO.util.Event.onDOMReady(init_page);
 <div class="return-link"><a href="aliases.html">&larr; <cptext "Go Back"></a></div>
 
 </div><!-- end body-content -->
+
+<script>
+
+
+var updateDomain = function () {
+    document.getElementById('thedomain').textContent = document.getElementById('domain').value;
+};
+updateDomain();
+document.getElementById('domain').onchange=function(){ updateDomain() };
+</script>
 
 <cpanel Branding="include(stdfooter.html)">

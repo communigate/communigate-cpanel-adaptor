@@ -4,12 +4,12 @@
 <div class="body-content">
 <h1><cpanel langprint="CGPAliasMaint"></h1>
 
-<p><?cp CommuniGate::delalias() forwarder=$FORM{'email'} || 'maketext('The alias could not be removed.')' ?></p>
+<p><?cp CommuniGate::delalias() email=$FORM{'email'}, alias=$FORM{'emaildest'} || 'maketext('The alias could not be removed.')' ?></p>
 <cpanelif $CPERROR{'CommuniGate'}>
 <p><cpanel print="$CPERROR{'CommuniGate'}"></p>
 </cpanelif>
 <cpanelif !$CPERROR{'CommuniGate'}>
-    <p><b><cpanel print="$FORM{'email'}">'s</b> <cpanel langprint="FWDelfwd"> <b><cpanel print="$FORM{'emaildest'}"></b>.
+    <p><b><cpanel print="$FORM{'emaildest'}"></b> <cpanel langprint="FWDelfwd"> <b><cpanel print="$FORM{'email'}"></b>.
 </cpanelif>
  
 <cpanelif $appname==webmail>
