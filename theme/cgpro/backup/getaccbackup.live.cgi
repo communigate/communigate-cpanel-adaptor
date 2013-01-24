@@ -13,7 +13,7 @@ my $cpanel = Cpanel::LiveAPI->new();
 
 
 my $domain = $q->param('domain');
-my $domains = $cpanel->api2( 'CommuniGate', 'ListForwardersBackups', {} )->{cpanelresult}->{data};
+my $domains = $cpanel->api2( 'CommuniGate', 'ListAccountsBackups', {} )->{cpanelresult}->{data};
 
 my $domainFound = 0;
 for my $dom (@$domains) {

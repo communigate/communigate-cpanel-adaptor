@@ -3,7 +3,7 @@
 PACKSRC=`pwd`
 source ${PACKSRC}/config.ini
 
-#################################################       
+#################################################
 #               CommuniGate Specific  	 	#
 #################################################
 
@@ -45,7 +45,7 @@ echo ProxyPass /Microsoft-Server-ActiveSync http://${HOSTNAME}:8100/Microsoft-Se
 echo ProxyPassReverse /Microsoft-Server-ActiveSync http://${HOSTNAME}:8100/Microsoft-Server-ActiveSync >> /usr/local/apache/conf/includes/pre_main_global.conf
 fi
 
-if grep -Fxq "CommuniGate Integration Settings" /etc/mail/spamassassin/local.cf                
+if grep -Fxq "CommuniGate Integration Settings" /etc/mail/spamassassin/local.cf
 then
 echo "spamd already configured"
 else
@@ -69,7 +69,7 @@ cp ${PACKSRC}/iphone/iphonetemplate.mobileconfig /var/CommuniGate/apple/
 # Install the WHM plugins (administration and groupware control)
 cp ${PACKSRC}/whm/addon_cgs-gwcontrol.cgi /usr/local/cpanel/whostmgr/docroot/cgi/
 cp ${PACKSRC}/whm/addon_cgs.cgi /usr/local/cpanel/whostmgr/docroot/cgi/
-cp ${PACKSRC}/whm/cgi/* /usr/local/cpanel/whostmgr/docroot/cgi/
+cp -rf ${PACKSRC}/whm/cgi/* /usr/local/cpanel/whostmgr/docroot/cgi/
 cp ${PACKSRC}/whm/templates/* /usr/local/cpanel/whostmgr/docroot/templates/
 
 # Install CGP Logo
@@ -84,14 +84,16 @@ cp ${PACKSRC}/module/CommuniGate.pm /usr/local/cpanel/Cpanel/
 # CGPro cPanel Wrapper
 cp ${PACKSRC}/cpwrap/ccaadmin /usr/local/cpanel/bin/
 cp ${PACKSRC}/cpwrap/ccawrap /usr/local/cpanel/bin/
-chmod +x /usr/local/cpanel/bin/ccawrap
-chmod +x /usr/local/cpanel/bin/ccaadmin
 
 # Install cPanel Function hooks
 cp ${PACKSRC}/hooks/addpop /usr/local/cpanel/hooks/email/
 cp ${PACKSRC}/hooks/delpop /usr/local/cpanel/hooks/email/
 cp ${PACKSRC}/hooks/passwdpop /usr/local/cpanel/hooks/email/
 cp ${PACKSRC}/hooks/editquota /usr/local/cpanel/hooks/email/
+chmod +x  /usr/local/cpanel/hooks/email/addpop
+chmod +x  /usr/local/cpanel/hooks/email/delpop
+chmod +x  /usr/local/cpanel/hooks/email/passwdpop
+chmod +x  /usr/local/cpanel/hooks/email/editquota
 
 # Register installed hooks
 /usr/local/cpanel/bin/register_hooks
@@ -117,11 +119,12 @@ echo "CommuniGate_spamd:1" >> /etc/chkserv.d/chkservd.conf
 # Check the scripts have executable flag
 chmod +x /usr/local/cpanel/whostmgr/docroot/cgi/addon_cgs-gwcontrol.cgi
 chmod +x /usr/local/cpanel/whostmgr/docroot/cgi/addon_cgs.cgi
+chmod +x /usr/local/cpanel/whostmgr/docroot/cgi/addon_cgp_email_configuration.cgi
 chmod +x /usr/local/cpanel/scripts/postwwwacct
 chmod +x /var/CommuniGate/cgi/login.pl
 chmod +x /usr/local/cpanel/Cpanel/CommuniGate.pm
 chmod +x /usr/local/cpanel/bin/ccaadmin
-chmod u+s+x /usr/local/cpanel/bin/ccawrap
+chmod +s+x /usr/local/cpanel/bin/ccawrap
 chmod u+s /opt/CommuniGate/mail
 
 # Install CommuniGate Plugin
@@ -145,6 +148,8 @@ do
     cp -r "${PACKSRC}/theme/cgpro" "${THEMES[$i]}/"
     cp "${PACKSRC}/icons/"* "${THEMES[$i]}/branding"
     cp "${PACKSRC}/plugin/dynamicui_cgpro.conf" "${THEMES[$i]}/dynamicui/"
+    chmod +x ${THEMES[$i]}/cgpro/backup/getaccbackup.live.cgi
+    chmod +x ${THEMES[$i]}/cgpro/backup/getaliasesbackup.live.cgi
     for ((j=0; j<${lLen}; j++)); do
         TARGET=${THEMES[$i]}/locale/`basename ${LOCALES[$j]} '{}'`.yaml.local
         if [ ! -f ${TARGET} ]
@@ -162,7 +167,7 @@ done
 
 replace "cpanel.communigate.com" "${HOSTNAME}" -- /var/CommuniGate/Settings/Main.settings
 
-#################################################       
+#################################################
 #             	  OS Specific	  	 	#
 #################################################
 
@@ -180,4 +185,4 @@ service	httpd start
 # Installing iTool Labs webmail
 sh ${PACKSRC}/webmail-install.sh
 
-echo "Dont forget to run disable-services.pl script to stop cPanel`s native mail software"
+echo "Dont forget to run disable-services.pl script to stop cPanel's native mail software"

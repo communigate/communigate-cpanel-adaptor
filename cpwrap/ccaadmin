@@ -7,6 +7,8 @@ BEGIN {
   @INC = grep( /^(\/usr\/lib\d*\/perl|\/usr\/local\/lib\d*\/perl|\/usr\/local\/cpanel)/, @INC );
 }
 
+use Cpanel::CachedDataStore ();
+
 my $theargs = <STDIN>;
 unless ( $theargs =~ /^(\d+) ([A-Z]+)/ ) {
   print STDERR "$0 : Syntax Mismatch\n";
@@ -198,6 +200,10 @@ my %commands = (
 	    $pass =  substr $hash{' Password '}, 1, length($hash{' Password '})-2;
 	}
 	print $pass;
+    },
+    'GETLOGIN' => sub {
+	my $conf = Cpanel::CachedDataStore::fetch_ref( '/etc/cpanel_cgpro.conf' ) || {};
+	print $conf->{cgprohost} , "::" , $conf->{cgproport} , "::" , $conf->{cgprouser} , "::" , $conf->{cgpropass};
     }
     );
 
