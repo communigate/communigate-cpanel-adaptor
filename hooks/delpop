@@ -41,7 +41,7 @@ my $user           = ( getpwuid($uid) )[0];
 my $domain 	   = $$dref{'cpanelevent'}{'params'}{'domain'};
 my $user= $$dref{'cpanelevent'}{'params'}{'email'};
 
-my $conf = Cpanel::CachedDataStore::fetch_ref( '/etc/cpanel_cgpro.conf' ) || {};
+my $conf = Cpanel::CachedDataStore::fetch_ref( '/var/cpanel/communigate.yaml' ) || {};
 my $cli = new CGP::CLI( { PeerAddr => $conf->{cgprohost},
                             PeerPort => $conf->{cgproport},
                             login => $conf->{cgprouser},

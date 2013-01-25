@@ -24,6 +24,7 @@ fi
 if [ ! -d "$SERVERFOLDER" ]; then
 wget -P${PACKSRC} http://www.communigate.com/pub/CommuniGatePro/CGatePro-Linux.x86_64.rpm
 rpm -Uvh ${PACKSRC}/CGatePro-Linux.x86_64.rpm
+rm -rf ${PACKSRC}/CGatePro-Linux.x86_64.rpm
 chkconfig CommuniGate on
 service CommuniGate start
 mkdir ${BASEFOLDER}/cPanel/
@@ -99,8 +100,8 @@ chmod +x  /usr/local/cpanel/hooks/email/editquota
 /usr/local/cpanel/bin/register_hooks
 
 #Install config file
-cp ${PACKSRC}/etc/cpanel_cgpro.conf /etc
-chmod 600 /etc/cpanel_cgpro.conf
+cp ${PACKSRC}/etc/cpanel_cgpro.conf /var/cpanel/communigate.yaml
+chmod 600 /var/cpanel/communigate.yaml
 
 # Install CommuniGate Webmail in cPanel
 cp ${PACKSRC}/cgpro-webmail/webmail_communigate.yaml /var/cpanel/webmail/

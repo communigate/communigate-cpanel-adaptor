@@ -202,7 +202,7 @@ my %commands = (
 	print $pass;
     },
     'GETLOGIN' => sub {
-	my $conf = Cpanel::CachedDataStore::fetch_ref( '/etc/cpanel_cgpro.conf' ) || {};
+	my $conf = Cpanel::CachedDataStore::fetch_ref( '/var/cpanel/communigate.yaml' ) || {};
 	print $conf->{cgprohost} , "::" , $conf->{cgproport} , "::" , $conf->{cgprouser} , "::" , $conf->{cgpropass};
     }
     );
