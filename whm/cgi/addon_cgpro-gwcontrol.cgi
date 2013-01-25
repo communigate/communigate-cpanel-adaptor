@@ -8,24 +8,21 @@ use Whostmgr::ACLS ();
 use Whostmgr::HTMLInterface ();
 Whostmgr::ACLS::init_acls();
 use Cpanel::CachedDataStore;
-use CGI qw(:standard);
+use CGI;
 
 if (!Whostmgr::ACLS::checkacl( 'all' ) ) {
 	print "HTTP/1.0\r\nStatus: 200 OK\r\nContext-type: text/html\r\n\r\n";
 	print "This plugin is available only at the platform owner level.";
 	exit(0);
 } 
-
-my $CGServerAddress = $ENV{'HTTP_HOST'};
-my $PostmasterLogin = 'postmaster';
-my $PostmasterPassword = postmaster_pass();
+my $q = CGI->new;
 my $limits_file = "/var/CommuniGate/cPanel/limits";
 my $global_limits_file = "/var/CommuniGate/cPanel/boxlimit";
 my %limits;
 my $default_max_gw = 5;
 my $requri=$ENV{'REQUEST_URI'};
-my $form_domain=param("domain");
-my $form_max=param("max");
+my $form_domain=$q->param("domain");
+my $form_max=$q->param("max");
 
 sub read_limits {
 open (MYFILE, "$limits_file"); # retrieve the tokens stored on file
@@ -73,11 +70,12 @@ return(0);
 
 read_limits(); # Fills $limits hash
 Whostmgr::HTMLInterface::defheader( '<br><br><br><H1>CommuniGate Groupware Accounts Control<H1>', '/images/communigate.gif', '/cgi/addon_cgs-gwcontrol.cgi' );
-my $conf = Cpanel::CachedDataStore::fetch_ref( '/var/cpanel/communigate.yaml' ) || {};
+my $conf = Cpanel::CachedDataStore::fetch_ref( '/etc/cpanel_cgpro.conf' ) || {};
 my $cli = new CGP::CLI( { PeerAddr => $conf->{cgprohost},
                             PeerPort => $conf->{cgproport},
                             login => $conf->{cgprouser},
                             password => $conf->{cgpropass} } );
+
   unless($cli) {
    print STDERR "Can't login to CGPro: ".$CGP::ERR_STRING,"\n";
    exit(0);

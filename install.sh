@@ -68,8 +68,6 @@ mkdir /var/CommuniGate/apple
 cp ${PACKSRC}/iphone/iphonetemplate.mobileconfig /var/CommuniGate/apple/
 
 # Install the WHM plugins (administration and groupware control)
-cp ${PACKSRC}/whm/addon_cgs-gwcontrol.cgi /usr/local/cpanel/whostmgr/docroot/cgi/
-cp ${PACKSRC}/whm/addon_cgs.cgi /usr/local/cpanel/whostmgr/docroot/cgi/
 cp -rf ${PACKSRC}/whm/cgi/* /usr/local/cpanel/whostmgr/docroot/cgi/
 cp ${PACKSRC}/whm/templates/* /usr/local/cpanel/whostmgr/docroot/templates/
 
