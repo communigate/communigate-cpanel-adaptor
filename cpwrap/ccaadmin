@@ -50,9 +50,9 @@ my %commands = (
 	    }
 	    close(IN);
 	    open(OUT, ">>", "/var/named/$domain.db") or die "Cannot open zone file ($!)";
-	    print OUT "_xmpp-server._tcp\t14400\tIN\tSRV\t1\t5\t5269\texchange.$domain.\n" unless $xmpp_server;
-	    print OUT "_xmpp-client._tcp\t14400\tIN\tSRV\t1\t5\t5222\texchange.$domain.\n" unless $xmpp_client;
-	    print OUT "_jabber._tcp\t14400\tIN\tSRV\t1\t5\t5269\texchange.$domain.\n" unless $jabber;
+	    print OUT "_xmpp-server._tcp\t14400\tIN\tSRV\t1\t5\t5269\tmail.$domain.\n" unless $xmpp_server;
+	    print OUT "_xmpp-client._tcp\t14400\tIN\tSRV\t1\t5\t5222\tmail.$domain.\n" unless $xmpp_client;
+	    print OUT "_jabber._tcp\t14400\tIN\tSRV\t1\t5\t5269\tmail.$domain.\n" unless $jabber;
 	    print OUT $out;
 	    close(OUT);
 	} else {
@@ -87,7 +87,7 @@ my %commands = (
 	    }
 	    close(IN);
 	    open(OUT, ">>", "/var/named/$domain.db") or die "Cannot open zone file ($!)";
-	    print OUT "_sip._udp\t14400\tIN\tSRV\t1\t5\t5060\texchange.$domain.\n" unless $sip;
+	    print OUT "_sip._udp\t14400\tIN\tSRV\t1\t5\t5060\tmail.$domain.\n" unless $sip;
 	    print OUT $out;
 	    close(OUT);
 	} else {
@@ -124,8 +124,8 @@ my %commands = (
 	    }
 	    close(IN);
 	    open(OUT, ">>", "/var/named/$domain.db") or die "Cannot open zone file ($!)";
-	    print OUT "_caldav._tcp\t14400\tIN\tSRV\t1\t5\t80\texchange.$domain.\n" unless $caldav;
-	    print OUT "_caldavs._tcp\t14400\tIN\tSRV\t1\t5\t443\texchange.$domain.\n" unless $caldavs;
+	    print OUT "_caldav._tcp\t14400\tIN\tSRV\t1\t5\t80\tmail.$domain.\n" unless $caldav;
+	    print OUT "_caldavs._tcp\t14400\tIN\tSRV\t1\t5\t443\tmail.$domain.\n" unless $caldavs;
 	    print OUT $out;
 	    close(OUT);
 	} else {
@@ -162,8 +162,8 @@ my %commands = (
 	    }
 	    close(IN);
 	    open(OUT, ">>", "/var/named/$domain.db") or die "Cannot open zone file ($!)";
-	    print OUT "_carddav._tcp\t14400\tIN\tSRV\t1\t5\t80\texchange.$domain.\n" unless $carddav;
-	    print OUT "_carddavs._tcp\t14400\tIN\tSRV\t1\t5\t443\texchange.$domain.\n" unless $carddavs;
+	    print OUT "_carddav._tcp\t14400\tIN\tSRV\t1\t5\t80\tmail.$domain.\n" unless $carddav;
+	    print OUT "_carddavs._tcp\t14400\tIN\tSRV\t1\t5\t443\tmail.$domain.\n" unless $carddavs;
 	    print OUT $out;
 	    close(OUT);
 	} else {
@@ -202,7 +202,7 @@ my %commands = (
 	print $pass;
     },
     'GETLOGIN' => sub {
-	my $conf = Cpanel::CachedDataStore::fetch_ref( '/var/cpanel/communigate.yaml' ) || {};
+	my $conf = Cpanel::CachedDataStore::fetch_ref( '/etc/cpanel_cgpro.conf' ) || {};
 	print $conf->{cgprohost} , "::" , $conf->{cgproport} , "::" , $conf->{cgprouser} , "::" , $conf->{cgpropass};
     }
     );
