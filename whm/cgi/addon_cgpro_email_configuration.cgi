@@ -17,7 +17,7 @@ if ( !Whostmgr::ACLS::hasroot() ) {
   exit();
 }
 
-my $conf = Cpanel::CachedDataStore::fetch_ref( '/var/cpanel/communigate.yaml' ) || {};
+my $conf = Cpanel::CachedDataStore::fetch_ref( '/etc/cpanel_cgpro.conf' ) || {};
 my $cli = new CGP::CLI( { PeerAddr => $conf->{cgprohost},
                             PeerPort => $conf->{cgproport},
                             login => $conf->{cgprouser},
@@ -75,7 +75,7 @@ sub postmaster_pass {
 Cpanel::Template::process_template(
 				   'whostmgr',
 				   {
-				    'template_file' => 'addon_cgp_email_configuration.tmpl',
+				    'template_file' => 'addon_cgpro_email_configuration.tmpl',
 				    mailOutFlowLimit => $mailOutFlowLimit,
 				    mailOutFlowPeriod => $mailOutFlowPeriod,
 				    UseRBL => $defaultsNetwork->{UseRBL},
