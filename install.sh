@@ -116,9 +116,7 @@ echo "CommuniGate:1" >> /etc/chkserv.d/chkservd.conf
 echo "CommuniGate_spamd:1" >> /etc/chkserv.d/chkservd.conf
 
 # Check the scripts have executable flag
-chmod +x /usr/local/cpanel/whostmgr/docroot/cgi/addon_cgs-gwcontrol.cgi
-chmod +x /usr/local/cpanel/whostmgr/docroot/cgi/addon_cgs.cgi
-chmod +x /usr/local/cpanel/whostmgr/docroot/cgi/addon_cgp_email_configuration.cgi
+chmod +x /usr/local/cpanel/whostmgr/docroot/cgi/addon_cgpro*
 chmod +x /usr/local/cpanel/scripts/postwwwacct
 chmod +x /var/CommuniGate/cgi/login.pl
 chmod +x /usr/local/cpanel/Cpanel/CommuniGate.pm

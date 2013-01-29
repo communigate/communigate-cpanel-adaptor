@@ -17,7 +17,7 @@ if ( !Whostmgr::ACLS::hasroot() ) {
   exit();
 }
 
-my $conf = Cpanel::CachedDataStore::fetch_ref( '/etc/cpanel_cgpro.conf' ) || {};
+my $conf = Cpanel::CachedDataStore::fetch_ref( '/var/cpanel/communigate.yaml' ) || {};
 my $cli = new CGP::CLI( { PeerAddr => $conf->{cgprohost},
                             PeerPort => $conf->{cgproport},
                             login => $conf->{cgprouser},
@@ -34,11 +34,20 @@ Whostmgr::HTMLInterface::defheader( "CGPro Mail Configuration Manager",'', '/cgi
 
 # Mail delimiter
 if ($FORM{'limit-MailOutFlow'} && $FORM{'period-MailOutFlow'}) {
-  $cli->UpdateServerAccountDefaults({MailOutFlow => [$FORM{'limit-MailOutFlow'}, $FORM{'period-MailOutFlow'}]});
+  $cli->UpdateServerAccountDefaults({
+      MailOutFlow => [$FORM{'limit-MailOutFlow'}, $FORM{'period-MailOutFlow'}],
+      MailInpFlow => [$FORM{'limit-MailInpFlow'}, $FORM{'period-MailInpFlow'}],
+      MaxMessageSize => $FORM{'maxMessageSize'},
+      MaxMailOutSize => $FORM{'MaxMailOutSize'},
+				    });
 }
 my $defaults = $cli->GetServerAccountDefaults();
 my $mailOutFlowLimit =  $defaults->{MailOutFlow}->[0];
 my $mailOutFlowPeriod =  $defaults->{MailOutFlow}->[1];
+my $mailInpFlowLimit =  $defaults->{MailInpFlow}->[0];
+my $mailInpFlowPeriod =  $defaults->{MailInpFlow}->[1];
+my $maxMessageSize =  $defaults->{MaxMessageSize};
+my $MaxMailOutSize =  $defaults->{MaxMailOutSize};
 
 # RBLs
 my $defaultsNetwork = $cli->GetNetwork();
@@ -56,21 +65,6 @@ if ($FORM{'UseRBL'}) {
   $cli->SetNetwork($defaultsNetwork);
 }
 
-sub postmaster_pass {
-  my $file = "/var/CommuniGate/Accounts/postmaster.macnt/account.settings";
-  my %hash;
-  open (MYFILE, "$file");
-  while (<MYFILE>) {
-    chomp;
-    my @line = split("=",$_);
-    $hash{@line[0]} = @line[1];
-  }
-  if ($hash{' Password '} =~ /^ ".*";$/) {
-    return  substr $hash{' Password '}, 2, length($hash{' Password '})-4;
-  } else {
-    return  substr $hash{' Password '}, 1, length($hash{' Password '})-2;
-  }
-}
 
 Cpanel::Template::process_template(
 				   'whostmgr',
@@ -78,6 +72,10 @@ Cpanel::Template::process_template(
 				    'template_file' => 'addon_cgpro_email_configuration.tmpl',
 				    mailOutFlowLimit => $mailOutFlowLimit,
 				    mailOutFlowPeriod => $mailOutFlowPeriod,
+				    mailInpFlowLimit => $mailInpFlowLimit,
+				    mailInpFlowPeriod => $mailInpFlowPeriod,
+				    maxMessageSize => $maxMessageSize,
+				    MaxMailOutSize => $MaxMailOutSize,
 				    UseRBL => $defaultsNetwork->{UseRBL},
 				    RBLDomain => $defaultsNetwork->{RBLDomain}
 				   },

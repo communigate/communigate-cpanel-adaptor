@@ -1,0 +1,307 @@
+<link rel="stylesheet" type="text/css" href="cgpro/tabview.css" />
+<script type='text/javascript' src='cgpro/tabview-min.js'></script>
+<script type="text/javascript">
+  var tweakTabs = new YAHOO.widget.TabView('tweaktabs');
+</script>
+<form name="exopt" method="post" action="" >
+
+  <style type="text/css">
+    #find_container {
+    float: right;
+    margin-left: 6px;
+    margin-right: 6px;
+    }
+
+    .yui-navset {
+    position: static;  /* override tabview.css */
+    }
+  </style>
+
+  <style type="text/css">
+    div.yui_tabview_scroll_tabs {
+    position: relative;  /* IE7 */
+    overflow: hidden;
+    white-space: nowrap;
+    }
+    div.yui_tabview_scroll_tabs ul.yui-nav {
+    position: relative;
+    border-bottom-width: 0 ! important;
+    }
+    .scroll_button {
+    background-color: #7697f0;
+    display: inline-block;
+    vertical-align: bottom;
+    font-size: 11px;
+    padding: 0.35em 0.5em;
+    height: auto;
+    color: #ffffff;
+    cursor: pointer;
+    }
+    .scroll_button:hover {
+    background-color: #5677d0;
+    }
+    div.scroll_button.scrolling,
+    .scroll_button.scrolling:hover {
+    background-color: #3657b0;
+    }
+    div.scroll_button.inactive {
+    background-color: buttonface;
+    color: graytext;
+    cursor: default;
+    }
+    div.scroll_button.inactive:hover {
+    background-color: buttonface;
+    }
+    div.scroll_button.hidden {
+    visibility: hidden;
+    }
+
+    #left_scroll_button {
+    float: left;
+    margin: 1px 0.16em 0 0;
+    height:18px;
+    border-top-left-radius: 6px;
+    border-bottom-left-radius: 6px;
+    -moz-border-radius-topleft: 6px;
+    -moz-border-radius-bottomleft: 6px;
+    -webkit-border-top-left-radius: 6px;
+    -webkit-border-bottom-left-radius: 6px;
+    }
+    #right_scroll_button {
+    float: right;    
+    height:18px;
+    margin: 1px 0 0 0.16em;
+    border-top-right-radius: 6px;
+    border-bottom-right-radius: 6px;
+    -moz-border-radius-topright: 6px;
+    -moz-border-radius-bottomright: 6px;
+    -webkit-border-top-right-radius: 6px;
+    -webkit-border-bottom-right-radius: 6px;
+    }
+
+    #scrolling_tabs li.last {
+    margin-right: 0 ! important;
+    }
+
+    #alltweaks {
+    clear:both;
+    padding: 0;
+    }
+
+    div.help {
+    margin: 12px 40px;
+    float: none;
+    }
+  </style>
+
+  <div class="tweaksettings">
+    <div class="" style="align:left;">
+      <div id="tweaktabs" class="yui-navset yui-navset-top">
+	<div valign="bottom" id="scrolling_tabs_container">
+	  <div class="yui_tabview_scroll_tabs" id="scrolling_tabs">
+	    <ul class="yui-nav" id="yui_tabs">
+	      <li class="selected">
+		<a href="#tab_MailDelimiter">
+		  <em>Mail Delimiter</em>
+		</a>
+	      </li>
+	    </ul>
+	  </div>
+	</div> <!-- END TABS -->
+	<div id="alltweaks" class="yui-content">
+	  <div id="tab_MailDelimiter">
+ 	    <table class="datatable brick" cellspacing="0" cellpadding="5" width="100%" border="0" align="center">
+	      [% IF defaults -%]
+	      <tbody>
+		<tr class="tdshade1_noborder">
+		  <td nowrap="nowrap" align="RIGHT">Outgoing Mail Limit per Account (defaults):</td>
+		  <td nowrap="nowrap">
+		    <input type="radio" name="MailOutFlow-default" value="1" [% IF ! mailOutFlowLimit; 'checked="checked"'; END %] /> Default <br />
+		    <input type="radio" name="MailOutFlow-default" value="0" [% IF   mailOutFlowLimit; 'checked="checked"'; END %] /> Custom:
+		    <select name="limit-MailOutFlow" class="popup">
+		      <option [% IF mailOutFlowLimit == -1; 'selected="selected"'; END %] value="-1">unlimited</option>
+		      <option [% IF mailOutFlowLimit == 0; 'selected="selected"'; END %] value="0">0</option>
+		      <option [% IF mailOutFlowLimit == 1; 'selected="selected"'; END %] value="1">1</option>
+		      <option [% IF mailOutFlowLimit == 3; 'selected="selected"'; END %] value="3">3</option>
+		      <option [% IF mailOutFlowLimit == 5; 'selected="selected"'; END %] value="5">5</option>
+		      <option [% IF mailOutFlowLimit == 10; 'selected="selected"'; END %] value="10">10</option>
+		      <option [% IF mailOutFlowLimit == 15; 'selected="selected"'; END %] value="15">15</option>
+		      <option [% IF mailOutFlowLimit == 20; 'selected="selected"'; END %] value="20">20</option>
+		      <option [% IF mailOutFlowLimit == 30; 'selected="selected"'; END %] value="30">30</option>
+		      <option [% IF mailOutFlowLimit == 100; 'selected="selected"'; END %] value="100">100</option>
+		      <option [% IF mailOutFlowLimit == 300; 'selected="selected"'; END %] value="300">300</option>
+		      <option [% IF mailOutFlowLimit == 1000; 'selected="selected"'; END %] value="1000">1000</option>
+		      <option [% IF mailOutFlowLimit == 3000; 'selected="selected"'; END %] value="3000">3000</option>
+		      <option [% IF mailOutFlowLimit == 10000; 'selected="selected"'; END %] value="10000">10000</option>
+		      <option [% IF mailOutFlowLimit == 30000; 'selected="selected"'; END %] value="30000">30000</option>
+		      <option [% IF mailOutFlowLimit == 100000; 'selected="selected"'; END %] value="100000">100000</option>
+		      <option [% IF mailOutFlowLimit == 300000; 'selected="selected"'; END %] value="300000">300000</option>
+		      <option [% IF mailOutFlowLimit == 1000000; 'selected="selected"'; END %] value="1000000">1000000</option>
+		    </select>
+		    in
+		    <select name="period-MailOutFlow" class="popup">
+		      <option [% IF mailOutFlowPeriod == '1s'; 'selected="selected"'; END %] value="1s">1 sec</option>
+		      <option [% IF mailOutFlowPeriod == '3s'; 'selected="selected"'; END %] value="3s">3 sec</option>
+		      <option [% IF mailOutFlowPeriod == '5s'; 'selected="selected"'; END %] value="5s">5 sec</option>
+		      <option [% IF mailOutFlowPeriod == '10s'; 'selected="selected"'; END %] value="10s">10 sec</option>
+		      <option [% IF mailOutFlowPeriod == '15s'; 'selected="selected"'; END %] value="15s">15 sec</option>
+		      <option [% IF mailOutFlowPeriod == '20s'; 'selected="selected"'; END %] value="20s">20 sec</option>
+		      <option [% IF mailOutFlowPeriod == '30s'; 'selected="selected"'; END %] value="30s">30 sec</option>
+		      <option [% IF mailOutFlowPeriod == '1m'; 'selected="selected"'; END %] value="60s">60 sec</option>
+		      <option [% IF mailOutFlowPeriod == '2m'; 'selected="selected"'; END %] value="2m">2 min</option>
+		      <option [% IF mailOutFlowPeriod == '3m'; 'selected="selected"'; END %] value="3m">3 min</option>
+		      <option [% IF mailOutFlowPeriod == '5m'; 'selected="selected"'; END %] value="5m">5 min</option>
+		      <option [% IF mailOutFlowPeriod == '10m'; 'selected="selected"'; END %] value="10m">10 min</option>
+		      <option [% IF mailOutFlowPeriod == '15m'; 'selected="selected"'; END %] value="15m">15 min</option>
+		      <option [% IF mailOutFlowPeriod == '20m'; 'selected="selected"'; END %] value="20m">20 min</option>
+		      <option [% IF mailOutFlowPeriod == '30m'; 'selected="selected"'; END %] value="30m">30 min</option>
+		      <option [% IF mailOutFlowPeriod == '1h'; 'selected="selected"'; END %] value="1h">60 min</option>
+		      <option [% IF mailOutFlowPeriod == '2h'; 'selected="selected"'; END %] value="2h">2 hour(s)</option>
+		      <option [% IF mailOutFlowPeriod == '3h'; 'selected="selected"'; END %] value="3h">3 hour(s)</option>
+		      <option [% IF mailOutFlowPeriod == '6h'; 'selected="selected"'; END %] value="6h">6 hour(s)</option>
+		      <option [% IF mailOutFlowPeriod == '12h'; 'selected="selected"'; END %] value="12h">12 hour(s)</option>
+		      <option [% IF mailOutFlowPeriod == '1d'; 'selected="selected"'; END %] value="1d">24 hour(s)</option>
+		      <option [% IF mailOutFlowPeriod == '2d'; 'selected="selected"'; END %] value="2d">2 day(s)</option>
+		      <option [% IF mailOutFlowPeriod == '3d'; 'selected="selected"'; END %] value="3d">3 day(s)</option>
+		      <option [% IF mailOutFlowPeriod == '7d'; 'selected="selected"'; END %] value="7d">7 day(s)</option>
+		      <option [% IF mailOutFlowPeriod == '14d'; 'selected="selected"'; END %] value="14d">2 week(s)</option>
+		      <option [% IF mailOutFlowPeriod == '21d'; 'selected="selected"'; END %] value="21d">3 week(s)</option>
+		      <option [% IF mailOutFlowPeriod == '28d'; 'selected="selected"'; END %] value="28d">4 week(s)</option>
+		    </select>
+		  </td>
+		</tr>
+		<tr class="tdshade2_noborder">
+		  <td nowrap="nowrap" align="RIGHT">Incoming Mail Limit per Account (defaults):</td>
+		  <td nowrap="nowrap">
+		    <input type="radio" name="MailInpFlow-default" value="1" [% IF ! mailInpFlowLimit; 'checked="checked"'; END %] /> Default <br />
+		    <input type="radio" name="MailInpFlow-default" value="0" [% IF   mailInpFlowLimit; 'checked="checked"'; END %] /> Custom:
+		    <select name="limit-MailInpFlow" class="popup">
+		      <option [% IF mailInpFlowLimit == -1; 'selected="selected"'; END %] value="-1">unlimited</option>
+		      <option [% IF mailInpFlowLimit == 0; 'selected="selected"'; END %] value="0">0</option>
+		      <option [% IF mailInpFlowLimit == 1; 'selected="selected"'; END %] value="1">1</option>
+		      <option [% IF mailInpFlowLimit == 3; 'selected="selected"'; END %] value="3">3</option>
+		      <option [% IF mailInpFlowLimit == 5; 'selected="selected"'; END %] value="5">5</option>
+		      <option [% IF mailInpFlowLimit == 10; 'selected="selected"'; END %] value="10">10</option>
+		      <option [% IF mailInpFlowLimit == 15; 'selected="selected"'; END %] value="15">15</option>
+		      <option [% IF mailInpFlowLimit == 20; 'selected="selected"'; END %] value="20">20</option>
+		      <option [% IF mailInpFlowLimit == 30; 'selected="selected"'; END %] value="30">30</option>
+		      <option [% IF mailInpFlowLimit == 100; 'selected="selected"'; END %] value="100">100</option>
+		      <option [% IF mailInpFlowLimit == 300; 'selected="selected"'; END %] value="300">300</option>
+		      <option [% IF mailInpFlowLimit == 1000; 'selected="selected"'; END %] value="1000">1000</option>
+		      <option [% IF mailInpFlowLimit == 3000; 'selected="selected"'; END %] value="3000">3000</option>
+		      <option [% IF mailInpFlowLimit == 10000; 'selected="selected"'; END %] value="10000">10000</option>
+		      <option [% IF mailInpFlowLimit == 30000; 'selected="selected"'; END %] value="30000">30000</option>
+		      <option [% IF mailInpFlowLimit == 100000; 'selected="selected"'; END %] value="100000">100000</option>
+		      <option [% IF mailInpFlowLimit == 300000; 'selected="selected"'; END %] value="300000">300000</option>
+		      <option [% IF mailInpFlowLimit == 1000000; 'selected="selected"'; END %] value="1000000">1000000</option>
+		    </select>
+		    in
+		    <select name="period-MailInpFlow" class="popup">
+		      <option [% IF mailInpFlowPeriod == '1s'; 'selected="selected"'; END %] value="1s">1 sec</option>
+		      <option [% IF mailInpFlowPeriod == '3s'; 'selected="selected"'; END %] value="3s">3 sec</option>
+		      <option [% IF mailInpFlowPeriod == '5s'; 'selected="selected"'; END %] value="5s">5 sec</option>
+		      <option [% IF mailInpFlowPeriod == '10s'; 'selected="selected"'; END %] value="10s">10 sec</option>
+		      <option [% IF mailInpFlowPeriod == '15s'; 'selected="selected"'; END %] value="15s">15 sec</option>
+		      <option [% IF mailInpFlowPeriod == '20s'; 'selected="selected"'; END %] value="20s">20 sec</option>
+		      <option [% IF mailInpFlowPeriod == '30s'; 'selected="selected"'; END %] value="30s">30 sec</option>
+		      <option [% IF mailInpFlowPeriod == '1m'; 'selected="selected"'; END %] value="60s">60 sec</option>
+		      <option [% IF mailInpFlowPeriod == '2m'; 'selected="selected"'; END %] value="2m">2 min</option>
+		      <option [% IF mailInpFlowPeriod == '3m'; 'selected="selected"'; END %] value="3m">3 min</option>
+		      <option [% IF mailInpFlowPeriod == '5m'; 'selected="selected"'; END %] value="5m">5 min</option>
+		      <option [% IF mailInpFlowPeriod == '10m'; 'selected="selected"'; END %] value="10m">10 min</option>
+		      <option [% IF mailInpFlowPeriod == '15m'; 'selected="selected"'; END %] value="15m">15 min</option>
+		      <option [% IF mailInpFlowPeriod == '20m'; 'selected="selected"'; END %] value="20m">20 min</option>
+		      <option [% IF mailInpFlowPeriod == '30m'; 'selected="selected"'; END %] value="30m">30 min</option>
+		      <option [% IF mailInpFlowPeriod == '1h'; 'selected="selected"'; END %] value="1h">60 min</option>
+		      <option [% IF mailInpFlowPeriod == '2h'; 'selected="selected"'; END %] value="2h">2 hour(s)</option>
+		      <option [% IF mailInpFlowPeriod == '3h'; 'selected="selected"'; END %] value="3h">3 hour(s)</option>
+		      <option [% IF mailInpFlowPeriod == '6h'; 'selected="selected"'; END %] value="6h">6 hour(s)</option>
+		      <option [% IF mailInpFlowPeriod == '12h'; 'selected="selected"'; END %] value="12h">12 hour(s)</option>
+		      <option [% IF mailInpFlowPeriod == '1d'; 'selected="selected"'; END %] value="1d">24 hour(s)</option>
+		      <option [% IF mailInpFlowPeriod == '2d'; 'selected="selected"'; END %] value="2d">2 day(s)</option>
+		      <option [% IF mailInpFlowPeriod == '3d'; 'selected="selected"'; END %] value="3d">3 day(s)</option>
+		      <option [% IF mailInpFlowPeriod == '7d'; 'selected="selected"'; END %] value="7d">7 day(s)</option>
+		      <option [% IF mailInpFlowPeriod == '14d'; 'selected="selected"'; END %] value="14d">2 week(s)</option>
+		      <option [% IF mailInpFlowPeriod == '21d'; 'selected="selected"'; END %] value="21d">3 week(s)</option>
+		      <option [% IF mailInpFlowPeriod == '28d'; 'selected="selected"'; END %] value="28d">4 week(s)</option>
+		    </select>
+		  </td>
+		</tr>
+		<tr class="tdshade1_noborder">
+		  <td nowrap="nowrap" align="RIGHT">Max Incoming Message Size Limit (defaults):</td>
+		  <td nowrap="nowrap">
+		    <input type="radio" name="maxMessageSize-default" value="1" [% IF ! maxMessageSize; 'checked="checked"'; END %] /> Default <br />
+		    <input type="radio" name="maxMessageSize-default" value="0" [% IF   maxMessageSize; 'checked="checked"'; END %] /> Custom:
+		    <select name="maxMessageSize" class="popup">
+<option [% IF maxMessageSize == -1; 'selected="selected"'; END %] value="-1">unlimited</option>
+<option [% IF maxMessageSize == 0; 'selected="selected"'; END %] value="0">0</option>
+<option [% IF maxMessageSize == '100K'; 'selected="selected"'; END %] value="100K">100K</option>
+<option [% IF maxMessageSize == '300K'; 'selected="selected"'; END %] value="300K">300K</option>
+<option [% IF maxMessageSize == '500K'; 'selected="selected"'; END %] value="500K">500K</option>
+<option [% IF maxMessageSize == '1M'; 'selected="selected"'; END %] value="1M">1M</option>
+<option [% IF maxMessageSize == '3M'; 'selected="selected"'; END %] value="3M">3M</option>
+<option [% IF maxMessageSize == '5M'; 'selected="selected"'; END %] value="5M">5M</option>
+<option [% IF maxMessageSize == '10M'; 'selected="selected"'; END %] value="10M">10M</option>
+<option [% IF maxMessageSize == '30M'; 'selected="selected"'; END %] value="30M">30M</option>
+<option [% IF maxMessageSize == '50M'; 'selected="selected"'; END %] value="50M">50M</option>
+<option [% IF maxMessageSize == '100M'; 'selected="selected"'; END %] value="100M">100M</option>
+<option [% IF maxMessageSize == '300M'; 'selected="selected"'; END %] value="300M">300M</option>
+<option [% IF maxMessageSize == '500M'; 'selected="selected"'; END %] value="500M">500M</option>
+<option [% IF maxMessageSize == '1G'; 'selected="selected"'; END %] value="1G">1G</option>
+<option [% IF maxMessageSize == '3G'; 'selected="selected"'; END %] value="3G">3G</option>
+<option [% IF maxMessageSize == '5G'; 'selected="selected"'; END %] value="5G">5G</option>
+<option [% IF maxMessageSize == '10G'; 'selected="selected"'; END %] value="10G">10G</option>
+<option [% IF maxMessageSize == '30G'; 'selected="selected"'; END %] value="30G">30G</option>
+		    </select>
+		  </td>
+		</tr>
+		<tr class="tdshade2_noborder">
+		  <td nowrap="nowrap" align="RIGHT">Max Outgoing Message Size Limit (defaults):</td>
+		  <td nowrap="nowrap">
+		    <input type="radio" name="MaxMailOutSize-default" value="1" [% IF ! MaxMailOutSize; 'checked="checked"'; END %] /> Default <br />
+		    <input type="radio" name="MaxMailOutSize-default" value="0" [% IF   MaxMailOutSize; 'checked="checked"'; END %] /> Custom:
+		    <select name="MaxMailOutSize" class="popup">
+<option [% IF MaxMailOutSize == -1; 'selected="selected"'; END %] value="-1">unlimited</option>
+<option [% IF MaxMailOutSize == 0; 'selected="selected"'; END %] value="0">0</option>
+<option [% IF MaxMailOutSize == '100K'; 'selected="selected"'; END %] value="100K">100K</option>
+<option [% IF MaxMailOutSize == '300K'; 'selected="selected"'; END %] value="300K">300K</option>
+<option [% IF MaxMailOutSize == '500K'; 'selected="selected"'; END %] value="500K">500K</option>
+<option [% IF MaxMailOutSize == '1M'; 'selected="selected"'; END %] value="1M">1M</option>
+<option [% IF MaxMailOutSize == '3M'; 'selected="selected"'; END %] value="3M">3M</option>
+<option [% IF MaxMailOutSize == '5M'; 'selected="selected"'; END %] value="5M">5M</option>
+<option [% IF MaxMailOutSize == '10M'; 'selected="selected"'; END %] value="10M">10M</option>
+<option [% IF MaxMailOutSize == '30M'; 'selected="selected"'; END %] value="30M">30M</option>
+<option [% IF MaxMailOutSize == '50M'; 'selected="selected"'; END %] value="50M">50M</option>
+<option [% IF MaxMailOutSize == '100M'; 'selected="selected"'; END %] value="100M">100M</option>
+<option [% IF MaxMailOutSize == '300M'; 'selected="selected"'; END %] value="300M">300M</option>
+<option [% IF MaxMailOutSize == '500M'; 'selected="selected"'; END %] value="500M">500M</option>
+<option [% IF MaxMailOutSize == '1G'; 'selected="selected"'; END %] value="1G">1G</option>
+<option [% IF MaxMailOutSize == '3G'; 'selected="selected"'; END %] value="3G">3G</option>
+<option [% IF MaxMailOutSize == '5G'; 'selected="selected"'; END %] value="5G">5G</option>
+<option [% IF MaxMailOutSize == '10G'; 'selected="selected"'; END %] value="10G">10G</option>
+<option [% IF MaxMailOutSize == '30G'; 'selected="selected"'; END %] value="30G">30G</option>
+		    </select>
+		  </td>
+		</tr>
+	      </tbody>
+	      [% ELSE -%]
+	      <tbody>
+		<tr>
+		  <td>
+		    No shuch domain [% domain %]
+		  </td>
+		</tr>
+	      </tbody>
+	      [% END -%]
+	    </table>
+	  </div> <!-- END MailDelimiter -->
+	</div>
+
+      </div>
+    </div>
+  </div>
+  <p>
+    <input type="submit" value="Save" class="input-button" />
+    <a href="javascript:window.history.back()">Back</a>
+  </p>
+</form>
