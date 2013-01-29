@@ -84,6 +84,9 @@ cp ${PACKSRC}/module/CommuniGate.pm /usr/local/cpanel/Cpanel/
 cp ${PACKSRC}/cpwrap/ccaadmin /usr/local/cpanel/bin/
 cp ${PACKSRC}/cpwrap/ccawrap /usr/local/cpanel/bin/
 
+# Update Feature List
+cp ${PACKSRC}/featurelists/cgpro /usr/local/cpanel/whostmgr/addonfeatures/
+
 # Install cPanel Function hooks
 cp ${PACKSRC}/hooks/addpop /usr/local/cpanel/hooks/email/
 cp ${PACKSRC}/hooks/delpop /usr/local/cpanel/hooks/email/
@@ -158,7 +161,8 @@ do
         cat ${LOCALES[$j]} >> ${TARGET}
     done
 done
-
+chmod +x ${PACKSRC}/scripts/*
+${PACKSRC}/scripts/modify_features.pl
 /usr/local/cpanel/bin/rebuild_sprites
 /usr/local/cpanel/bin/build_locale_databases
 
