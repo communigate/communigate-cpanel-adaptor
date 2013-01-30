@@ -88,17 +88,13 @@ cp ${PACKSRC}/cpwrap/ccawrap /usr/local/cpanel/bin/
 cp ${PACKSRC}/featurelists/cgpro /usr/local/cpanel/whostmgr/addonfeatures/
 
 # Install cPanel Function hooks
-cp ${PACKSRC}/hooks/addpop /usr/local/cpanel/hooks/email/
-cp ${PACKSRC}/hooks/delpop /usr/local/cpanel/hooks/email/
-cp ${PACKSRC}/hooks/passwdpop /usr/local/cpanel/hooks/email/
-cp ${PACKSRC}/hooks/editquota /usr/local/cpanel/hooks/email/
-chmod +x  /usr/local/cpanel/hooks/email/addpop
-chmod +x  /usr/local/cpanel/hooks/email/delpop
-chmod +x  /usr/local/cpanel/hooks/email/passwdpop
-chmod +x  /usr/local/cpanel/hooks/email/editquota
-
+if [ ! -d /var/cpanel/perl5/lib/ ]
+then
+    mkdir -p /var/cpanel/perl5/lib/
+fi
+cp -rf ${PACKSRC}/hooks/CGPro /var/cpanel/perl5/lib/
 # Register installed hooks
-/usr/local/cpanel/bin/register_hooks
+/usr/local/cpanel/bin/manage_hooks add module CGPro::Hooks
 
 #Install config file
 cp ${PACKSRC}/etc/cpanel_cgpro.conf /var/cpanel/communigate.yaml
