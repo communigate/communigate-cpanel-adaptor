@@ -70,7 +70,7 @@ return(0);
 
 read_limits(); # Fills $limits hash
 Whostmgr::HTMLInterface::defheader( '<br><br><br><H1>CommuniGate Groupware Accounts Control<H1>', '/images/communigate.gif', '/cgi/addon_cgs-gwcontrol.cgi' );
-my $conf = Cpanel::CachedDataStore::fetch_ref( '/etc/cpanel_cgpro.conf' ) || {};
+my $conf = Cpanel::CachedDataStore::fetch_ref( '/var/cpanel/communigate.yaml' ) || {};
 my $cli = new CGP::CLI( { PeerAddr => $conf->{cgprohost},
                             PeerPort => $conf->{cgproport},
                             login => $conf->{cgprouser},
