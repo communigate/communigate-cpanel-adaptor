@@ -2,6 +2,7 @@
 
 PACKSRC=`pwd`
 source ${PACKSRC}/config.ini
+BASEFOLDER=/var/CommuniGate/
 
 #################################################
 #               CommuniGate Specific  	 	#
