@@ -81,4 +81,5 @@ Cpanel::Template::process_template(
 				   },
 				  );
 
+$cli->Logout();
 1;

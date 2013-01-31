@@ -10,8 +10,6 @@ use Cpanel::CachedDataStore;
 
 print "Content-type: text/html\r\n\r\n";
 
-# my $q = CGI->new;
-
 Whostmgr::ACLS::init_acls();
 if ( !Whostmgr::ACLS::hasroot() ) {
   print "You need to be root to see this page.\n";
@@ -100,4 +98,5 @@ Cpanel::Template::process_template(
 				   },
 				  );
 
+$cli->Logout();
 1;

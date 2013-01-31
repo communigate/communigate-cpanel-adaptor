@@ -234,6 +234,7 @@ sub api2_listpopswithdisk {
 		}
 
 	}
+	$cli->Logout();
 	return @result;
 }
 
@@ -313,6 +314,7 @@ sub addforward {
         } else {
 	    $Cpanel::CPERROR{'CommuniGate'} = $error_msg;
         }
+	$cli->Logout();
         return @result;
 
 }
@@ -340,6 +342,7 @@ sub api2_listaliases {
 	    }
 	}
     }
+    $cli->Logout();
     return @result;
 } 
 
@@ -373,6 +376,7 @@ sub api2_listforwards {
 		}
           }
         }
+	$cli->Logout();
         return @result;
 }
 
@@ -431,6 +435,7 @@ sub api2_delforward {
         } else {
                 $Cpanel::CPERROR{'CommuniGate'} = $error_msg;
         }
+	$cli->Logout();
         return @result;
 }
 
@@ -804,6 +809,7 @@ sub api2_AddMailingList {
         } else {
                 $Cpanel::CPERROR{'CommuniGate'} = $error_msg;
         }
+	$cli->Logout();
         return @result;
 }
 
@@ -818,6 +824,7 @@ sub api2_ListMailingLists {
 		 push( @result, { list => "$listName\@$domain" , domain =>"$domain"} );
 		}
 	}
+	$cli->Logout();
         return @result;
 }
 
@@ -835,6 +842,7 @@ sub api2_DelMailingList {
         } else {
                 $Cpanel::CPERROR{'CommuniGate'} = $error_msg;
         }       
+	$cli->Logout();
         return @result;
 }
 
@@ -851,6 +859,7 @@ sub api2_RenameMailingList {
         } else {
                 $Cpanel::CPERROR{'CommuniGate'} = $error_msg;
         }
+	$cli->Logout();
         return @result;
 }
 
@@ -959,6 +968,7 @@ sub api2_GetListSettings {
         } else {
                 $Cpanel::CPERROR{'CommuniGate'} = $error_msg;
         }
+	$cli->Logout();
         return @result;
 }
 
@@ -1052,6 +1062,7 @@ sub api2_SetListSettings {
         } else {
                 $Cpanel::CPERROR{'CommuniGate'} = $error_msg;
         }
+	$cli->Logout();
         return @result;
 }
 
@@ -1104,6 +1115,7 @@ sub api2_ListMailingListsSubs{
 		push (@result, {subemail => "$sub" ,rcvmode => "@$SubInfos{'mode'}", postmode => "$postmode" , mod1sel => "$mod1sel",mod2sel=>"$mod2sel",mod3sel=>"$mod3sel",mod4sel=>"$mod4sel",mod5sel=>"$mod5sel",modallsel=>"$modallsel",unmodsel=>"$unmodsel",nopostsel=>"$nopostsel",r_feedsel=>"$r_feedsel",r_indexsel=>"$r_indexsel",r_digestsel=>"$r_digestsel",r_nullsel=>"$r_nullsel",r_bannedsel=>"$r_bannedsel", numpost=>"$numpost", r_subscribesel=>"$r_subscribesel", r_unsubscribesel=>"$r_unsubscribesel"});
 
 	}
+	$cli->Logout();
         return @result;
 }       
 
@@ -1130,6 +1142,7 @@ sub api2_SetSubSettings {
         } else {
                 $Cpanel::CPERROR{'CommuniGate'} = $error_msg; 
         }               
+	$cli->Logout();
         return @result; 
 
 }
@@ -1146,6 +1159,7 @@ sub api2_UnSub {
         } else {
                 $Cpanel::CPERROR{'CommuniGate'} = $error_msg;
         }
+	$cli->Logout();
         return @result;
 
 }
@@ -1174,6 +1188,7 @@ sub api2_Sub {
         } else {
                 $Cpanel::CPERROR{'CommuniGate'} = $error_msg;
         }
+	$cli->Logout();
         return @result;
 }
 
@@ -1188,6 +1203,7 @@ sub api2_ListGroups{
                  push( @result, { list => "$groupName\@$domain" , domain =>"$domain"} );
                 }
         }
+	$cli->Logout();
         return @result;
 }
 
@@ -1203,6 +1219,7 @@ sub api2_DelGroup{
         } else {
                 $Cpanel::CPERROR{'CommuniGate'} = $error_msg;
         }
+	$cli->Logout();
         return @result;
 }
 
@@ -1219,6 +1236,7 @@ sub api2_RenameGroup {
         } else {
                 $Cpanel::CPERROR{'CommuniGate'} = $error_msg;
         }
+	$cli->Logout();
         return @result;
 }
 
@@ -1271,6 +1289,7 @@ sub api2_ListGroupMembers {
         		}
 		}
     	}
+	$cli->Logout();
         return @result;
 }      
 
@@ -1301,6 +1320,7 @@ sub api2_AddGroupMember {
 		SetGroupExternal($listname);
 		SetGroupInternal($listname);
 	}
+	$cli->Logout();
         return @result;
 }
 
@@ -1331,6 +1351,7 @@ sub api2_RemoveGroupMember {
                 SetGroupExternal($listname);
                 SetGroupInternal($listname);
         }
+	$cli->Logout();
         return @result;
 }
 
@@ -1359,6 +1380,7 @@ sub api2_GetGroupSettings {
 		push( @result, { "spectre" => "1" } );
                 $Cpanel::CPDATA{"spectre"} = "1";
 	}
+	$cli->Logout();
         return @result;
 }
 
@@ -1437,6 +1459,7 @@ sub api2_ListAutoresponders {
 		  }
 		}
 	}
+	$cli->Logout();
 	return @result;
 }
 
@@ -1483,6 +1506,7 @@ sub api2_EditAutoresponder {
     }
   }
   
+  $cli->Logout();
   return {
 	  subject => $subject, 
 	  body => $body,
@@ -1516,8 +1540,10 @@ sub api2_ListForwardersBackups {
 	}
         next if $domainFound;
     }
+    $cli->Logout();
     return @result;
 }
+
 sub api2_UploadForwarders {
     my $randdata = Cpanel::Rand::getranddata(32);
     $Cpanel::CPVAR{'forwardersimportid'} = $randdata;
@@ -1566,6 +1592,7 @@ sub api2_RestoreForwarders {
 	    }
 	}
     }
+    $cli->Logout();
     return @result;
 }
 
@@ -1584,6 +1611,7 @@ sub api2_ListAccountsBackups {
 	    last;
 	}
     }
+    $cli->Logout();
     return @result;
 }
 
@@ -1604,6 +1632,7 @@ sub api2_GetAccountsBackups {
 	    pass => "$pass"
  	      } );
     }
+    $cli->Logout();
     return @result;
 }
 
@@ -1833,6 +1862,7 @@ sub GroupMembersForRule{
                         }
                 }
         }       
+	$cli->Logout();
         return $result;
 }
 
