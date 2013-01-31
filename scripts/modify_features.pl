@@ -6,7 +6,13 @@ use strict;
 use CLI;
 use Cpanel::Features ();
 
-my @stop_features = ("webmail", "spamassassin", "forwarders", "emaildomainfwd", "autoresponders");
+# if the file does not exist, create it.
+if (! -f '/var/cpanel/features/default' ) {
+  open(FO, ">>", '/var/cpanel/features/default');
+  close(FO);
+}
+
+my @stop_features = ("webmail", "spamassassin", "forwarders", "emaildomainfwd", "autoresponders", "boxtrapper", "lists", "blockers");
 my @feature_lists = Cpanel::Features::get_feature_lists();
 foreach my $feature_list_name (@feature_lists) {
   if ($feature_list_name ne 'disabled') {
