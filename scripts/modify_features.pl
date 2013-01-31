@@ -11,8 +11,7 @@ if (! -f '/var/cpanel/features/default' ) {
   open(FO, ">>", '/var/cpanel/features/default');
   close(FO);
 }
-
-my @stop_features = ("webmail", "spamassassin", "forwarders", "emaildomainfwd", "autoresponders", "boxtrapper", "lists", "blockers");
+my @stop_features = ("webmail", "spamassassin", "forwarders", "emaildomainfwd", "autoresponders", "boxtrapper", "lists", "blockers", "backup");
 my @feature_lists = Cpanel::Features::get_feature_lists();
 foreach my $feature_list_name (@feature_lists) {
   if ($feature_list_name ne 'disabled') {
