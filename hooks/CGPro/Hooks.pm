@@ -2,12 +2,13 @@ package CGPro::Hooks;
 
 use CLI;
 use Cpanel::AdminBin ();
+use Cpanel::Api2::Exec ();
 
 sub describe {
     my $mail_addpop = {
         'category' => 'Cpanel',
         'event'    => 'Api2::Email::addpop',
-        'stage'    => 'pre',
+        'stage'    => 'post',
         'hook'     => 'CGPro::Hooks::addpop',
         'exectype' => 'module',
     };
@@ -79,11 +80,14 @@ sub addpop {
     @$UserData{'Password'}=$password;
     @$UserData{'ServiceClass'}="mailonly";
     @$UserData{'MaxAccountSize'}=$quota;
-
-    $cli->CreateAccount(accountName => "$user\@$domain", settings => $UserData);
-    $cli->CreateMailbox("$user\@$domain", "Calendar");
-    $cli->CreateMailbox("$user\@$domain", "Spam");
-
+    my $response = $cli->CreateAccount(accountName => "$user\@$domain", settings => $UserData);
+    if ($response) {
+	$cli->CreateMailbox("$user\@$domain", "Calendar");
+	$cli->CreateMailbox("$user\@$domain", "Spam");
+    } else {
+	my $apiref = Cpanel::Api2::Exec::api2_preexec( 'Email', 'delpop' );
+	my ( $data, $status ) = Cpanel::Api2::Exec::api2_exec( 'Email', 'delpop', $apiref, {domain => 'anton.bg', email=>'testov'} );
+    }
     $cli->Logout();
 }
 
