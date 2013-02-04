@@ -35,8 +35,7 @@ fi
 
 # Lets add CGPro perl lib
 rsync -az ${PACKSRC}/library/CLI.pm /usr/local/cpanel/perl/
-rsync -az ${PACKSRC}/library/CLI.pm /usr/local/lib/perl5/
-rsync -az ${PACKSRC}/library/CLI.pm /usr/local/lib/perl5/5.8.8/
+ln -s /usr/local/cpanel/perl/CLI.pm /usr/local/lib/perl5/5.8.8/
 
 # Configure Airsync and Spamd
 if grep -Fxq "Microsoft-Server-ActiveSync" /usr/local/apache/conf/includes/pre_main_global.conf
