@@ -56,14 +56,7 @@ var inputs_buttons = { file1_id: "file1-submit-button" };
 <cpanel setvar="vidtut_height=353">	
 <cpanel include="../video_tutorial_include.html">
 
-<div class="highlight" style="border-bottom: 1px solid #d2d2d2; margin: 20px 0 20px -15px;">
-	<h1 style="margin:0"><cpanel langprint="BUFullBackups"></h1>
-	<p class="description"><cpanel langprint="BUFullNotice"></p>
-	<p style="margin-bottom: 20px;"><a class="create-button" href="fullbackup.html"><cpanel langprint="BUGenDown"></a></p>
-<div><cpanel CpBackup="listbackups()"></div>
-</div>
-	
-	<div style=" margin:20px 0;">
+		<div style=" margin:20px 0;">
 	 <h2><cpanel langprint="PartialBack"></h2>
 <table align="center" width="700" border="0" cellspacing="0" cellpadding="15">
 	<tr>
@@ -178,7 +171,7 @@ var inputs_buttons = { file1_id: "file1-submit-button" };
 		</td>
 	</tr>
 
-	<cpanelfeature blockers>	
+	<cpanelfeature cgpro_filters>	
 	<tr>
 		<td valign=top>
 			<strong><cpanel langprint="BUFilter"></strong><br />
@@ -189,12 +182,11 @@ var inputs_buttons = { file1_id: "file1-submit-button" };
 				</th>
 			    </tr>
 			     <tbody>
-			      <?cp Email::list_system_filter_info(
-[tr][td class="cell nobrd-left truncate" truncatefixed="25"]
-  [a href="$ENV{'cp_security_token'}/getfilterbackup/%"]%[/a]
-[/td][/tr]
-,filter_info,filter_info) ?>
-
+			       <tr>
+				 <td>
+				   <a href="getfiltersbackup.live.cgi">filter_info.yaml</a>
+				 </td>
+			       </tr>
 			     </tbody>
 			    </tr>
 			    </table>
@@ -202,7 +194,7 @@ var inputs_buttons = { file1_id: "file1-submit-button" };
 		</td>
 		<td valign=top>
 			<strong><cpanel langprint="BUFilterRestore"></strong><br />
-			<form action="doafupload.html" name="filterform" id="filterform" target="_blank" method="post" enctype="multipart/form-data">
+			<form action="dofilterupload.html" name="filterform" id="filterform" target="_blank" method="post" enctype="multipart/form-data">
 				<input type="hidden" value="<cpanel print="$homedir">" name="dir" />
 				<input type="file" name="file3" id="file3_id" />
 				<input id = "file3-submit-button" type="submit" class="input-button" value="<cpanel langprint="BUUploadButton">" />

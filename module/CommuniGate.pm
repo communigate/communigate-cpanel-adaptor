@@ -15,6 +15,7 @@ use Cpanel::PasswdStrength           ();
 use Cpanel::Validate::EmailLocalPart ();
 use Cpanel::Validate::EmailRFC       ();
 use Cpanel::Sys::Hostname		();
+use Cpanel::Api2::Exec ();
 use Storable                         ();
 use Time::Local  'timelocal_nocheck';
 
@@ -1596,6 +1597,55 @@ sub api2_RestoreForwarders {
     return @result;
 }
 
+sub api2_RestoreFilters {
+    my %OPTS = @_;
+    
+    my @domains = Cpanel::Email::listmaildomains();
+    my $cli = getCLI();
+    my @result;
+    my $file = $Cpanel::homedir . '/tmp/forwardersimport/' . $Cpanel::CPVAR{'forwardersimportid'};
+    open (FI, "<", $file);
+    my @yaml = <FI>;
+    my $yaml = join "", @yaml;
+    close FI;
+    unlink $file;
+    my $loaded_data = YAML::Syck::Load($yaml);
+    $loaded_data = $loaded_data->[0];
+    foreach my $domain (@domains) {
+	my $accounts = $cli->ListAccounts($domain);
+	my $apiref = Cpanel::Api2::Exec::api2_preexec( 'Email', 'storefilter' );
+	foreach my $userName (sort keys %$accounts) {
+	    if ($loaded_data->{"$userName\@$domain"}) {
+		for my $filter (@{$loaded_data->{"$userName\@$domain"}}) {
+		    # Import filters per account
+		    my $rules = $cli->GetAccountMailRules("$userName\@$domain");
+		    if ($rules) {
+			# Fake filter in cPanel
+			my ( $data, $status ) = Cpanel::Api2::Exec::api2_exec( 'Email', 'storefilter', $apiref, {account=> "$userName\@$domain",filtername=> $filter->[1], action1=> 'fail', match1=> 'is', opt1 => 'or', part1 => '$header_to:', val1 => 'noone@example.com', oldfiltername => $filter->[1]} );
+			# Real CGPro filter
+			my $newrules = [];
+			my $found = 0;
+			for my $rule (@$rules) {
+			    if ($rule->[1] eq $filter->[1]) {
+				push @$newrules, $filter;
+				$found = 1;
+			    } else {
+				push @$newrules, $rule;
+			    }
+			}
+			push @$newrules, $filter unless $found;
+			$cli->SetAccountMailRules("$userName\@$domain",$newrules);
+		    }
+		    # END import filters
+		    push @result, {row, "$userName\@$domain: " . $filter->[1] . "\n"};
+		}
+	    }
+	}
+    }
+    $cli->Logout();
+    return @result;
+}
+
 sub api2_ListAccountsBackups {
     my %OPTS = @_;
     
@@ -1882,8 +1932,6 @@ sub api2_storefilter {
 sub api2_get_filter {
     my %OPTS = @_;
     my $cli = getCLI();
-    # use Data::Dumper;
-    # print Dumper \%OPTS;;
     my $rules = $cli->GetAccountMailRules($OPTS{account});
 	for my $rule (@$rules) {
 	    if ($rule->[1] eq $OPTS{filtername}) {
@@ -1903,6 +1951,26 @@ sub api2_get_filter {
     $cli->Logout();
     return { get_filter => { data => { filtername => "Rule 1", actions => [{}], rules => [{}] } } };
 }
+
+sub api2_dumpfilters {
+    my %OPTS = @_;
+    my $cli = getCLI();
+    my @domains = Cpanel::Email::listmaildomains();
+    my $filters = {};
+    for my $domain (@domains) {
+	my $accounts = $cli->ListAccounts($domain);
+	for my $account (sort keys %$accounts) {
+	    $filters->{"$account\@$domain"} = [];
+	    my $rules = $cli->GetAccountMailRules("$account\@$domain");
+	    for my $rule (@$rules) {
+		push @{$filters->{"$account\@$domain"}}, $rule if $rule->[1] !~ m/^#/;
+	    } 
+	}
+    }
+    $cli->Logout();
+    return $filters;
+}
+
 sub IsGroupInternal {
   	my $groupwithdomain = shift;
 	my @values = split("@",$groupwithdomain);

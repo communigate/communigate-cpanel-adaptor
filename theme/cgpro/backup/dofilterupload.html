@@ -1,0 +1,13 @@
+<html>
+<head>
+<cpanel setvar="dprefix=../">
+<cpanel include="../filemanhead.html">
+<b> Restoring Email Filters</b>
+<br />
+<pre>
+<!-- <?cp CommuniGate::UploadForwarders (%, id) ?> -->
+<?cp CommuniGate::RestoreFilters(% ,row) || 'maketext('The filters could not be restored.')' ?>
+</pre>
+</script>
+</body>
+</html>
