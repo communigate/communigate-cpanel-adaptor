@@ -58,11 +58,15 @@ overflow: hidden;
 <div class="body-content">
   <div class="h1Title"><cpanel langprint="CGPSRVrecords"></div>
   <p class="description">
-    <cptext 'Description goes here.'>
+    <cptext 'DNS SRV records supplement the Domain you manage with information that will allow such services like Instant Messaging and VoIP to work better with other companies and people. You can read more technical information about DNS SRV records in the Wikipedia:'>
+      <a href="http://en.wikipedia.org/wiki/SRV_record">http://en.wikipedia.org/wiki/SRV_record</a>
   </p>
   <h2><cpanel langprint="CGPJabberXMPP"></h2>
   <p class="description">
-    <cptext 'Description goes here.'>
+    <cptext 'By enabling this setting external XMPP (Jabber) based Instant Messaging servers will be able to send you buddy requests and chat messages. This setting is particularly important for people using Gtalk. Once this is enabled, you should be able to "request a buddy" from google (user@gmail.com) in your IM client. In addition, when servers using Jabber or MS Lync are properly configured, you will be able to add these colleagues or friends to your Buddy list and they will be able to see when you are online or not.'>
+  </p>
+  <p class="description">
+    <cptext 'Note: External systems using Jabber must also have properly configured SRV records in their DNS for the two-way communication to work properly.'>
   </p>
   <cpanelif $CPVAR{'xmpp_enabled'}==1>
     <p>
@@ -80,7 +84,7 @@ overflow: hidden;
 
   <h2><cpanel langprint="CGPSIP"></h2>
   <p class="description">
-    <cptext 'Description goes here.'>
+    <cptext 'By enabling this setting you will be able to make and receive phone calls from external clients using the SIP protocol. When properly configured, a person will be able to call you simply by sending the request to "username@yourdomain.com". The same is try for you to place a call to an external system using SIP when their DNS SRV records are properly defined.'>
   </p>
   <cpanelif $CPVAR{'sip_enabled'}==1>
     <p>
@@ -97,7 +101,7 @@ overflow: hidden;
 
   <h2><cpanel langprint="CGPCALDAV"></h2>
   <p class="description">
-    <cptext 'Description goes here.'>
+    <cptext 'By enabling this setting you will be able to create and share a calendar with external systems. This could be a partner company, or colleague that wants to collaborate with you.'>
   </p>
   <cpanelif $CPVAR{'caldav_enabled'}==1>
     <p>
@@ -114,7 +118,7 @@ overflow: hidden;
 
   <h2><cpanel langprint="CGPCARDDAV"></h2>
   <p class="description">
-    <cptext 'Description goes here.'>
+    <cptext 'By enabling this setting, you will be able to share contacts in your address book with external systems that also use the CardDAV protocol. This can be of particular use for home / office situations or when you want to share address resources with a partner company or colleague that uses a different system.'>
   </p>
   <cpanelif $CPVAR{'carddav_enabled'}==1>
     <p>
