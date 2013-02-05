@@ -144,6 +144,8 @@ do
     cp -r "${PACKSRC}/theme/cgpro" "${THEMES[$i]}/"
     cp "${PACKSRC}/icons/"* "${THEMES[$i]}/branding"
     cp "${PACKSRC}/plugin/dynamicui_cgpro.conf" "${THEMES[$i]}/dynamicui/"
+    mkdir ${THEMES[$i]}/dynamicui/js2-min/cgpro
+    ln -s ${THEMES[$i]}/dynamicui/js2-min/mail ${THEMES[$i]}/dynamicui/js2-min/cgpro/
     chmod +x ${THEMES[$i]}/cgpro/backup/getaccbackup.live.cgi
     chmod +x ${THEMES[$i]}/cgpro/backup/getaliasesbackup.live.cgi
     for ((j=0; j<${lLen}; j++)); do
