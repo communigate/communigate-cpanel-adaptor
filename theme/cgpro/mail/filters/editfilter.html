@@ -1,0 +1,68 @@
+5A<cpanel setvar="headerimg=../../images/mailmenu.gif">
+<cpanel setvar="dprefix=../../">
+<cpanel Branding="include(stdheader.html)">
+<style type="text/css">
+.icon-mailbox { cursor:pointer;display:block; height: 20px; padding-left: 20px; background: transparent url(mailbox.png) no-repeat; }
+.code {
+    font-family: monospace;
+Rule 1}
+</style>
+<link rel="stylesheet" type="text/css" href="assets/css/folders/tree.css"> 
+<?cptt _ajaxapp_header.tmpl ?>
+
+<style type="text/css">
+<?cp Branding::spritelist(.spriteicon_img_mini {float:left;margin-right:5px;background: url\{leftparenthesis}"%"\{rightparenthesis};} %,@spriteurl,images::#icon-${img}_mini {background-position\{colon}0 -${cssposition}px;width\{colon}${width}px;height\{colon}${height}px; }:) imgtype=icon,subtype=img,method=scale_60percent,format=png,img=ufiltering ?>
+.frow {
+    padding-top: 3px;
+    padding-bottom: 3px;
+}
+#ruletbl tr {
+	height: 50px;
+}
+
+#actiontbl tr {
+	height: 35px;
+}
+
+#filterform {
+    padding: 8px;
+}
+</style>
+
+
+<div class="body-content">
+
+
+</b>
+
+<?cptt CommuniGate::get_filter(cgpro/mail/filters/filter.tt) account=$FORM{'account'}, filtername=$FORM{'filtername'} ?>
+
+<cpanelif $CPVAR{'spam_as_acl'} && $CPVAR{'spamstatus'}>
+<p class="description"><cpanel langprint="EFAddhint2"></p>
+<p class="description"><cpanel langprint="EFAddhint3"></p>
+</cpanelif>
+
+
+<div class="return-link"><a href="userfilters.html?account=<cpanel formprint="$FORM{'account'}">">&larr; <cptext "Go Back"></a></div>
+
+</div>
+<div id="treeviewCont" style='display:none; position:absolute; z-index: 12; border: 1px solid #000; background-color: #fff; padding: 0; margin: 0;'>
+<div id="treeview" style='overflow: auto; padding: 0; margin: 0;'></div>
+</div>
+
+<script type="text/javascript" src="/yui/treeview/treeview.js"></script>
+
+<?cptt _ajaxapp_footer.tmpl ?>
+
+<script type="text/javascript">
+var WE_ARE_EDITING = !!<cpanel jsprint="$FORM{'filtername'}">;
+
+var HAS_SPAM_AS_ACL = !!parseInt(<cpanel jsprint="$CPVAR{'spam_as_acl'}">);
+var SPAM_ASSASSIN_ENABLED = !!parseInt(<cpanel jsprint="$CPVAR{'spamstatus'}">);
+var HAS_MAILDIR = !!parseInt(<cpanel jsprint="$CONF{'maildir'}">);
+
+var ACCOUNT_NAME = '<?cp Email::accountname(%,account) display=1,account=$FORM{'account'} ?>';
+
+var GO_BACK_URL = "userfilters.html?account=" + encodeURIComponent(<cpanel jsprint="$RAW_FORM{'account'}">);
+</script>
+<cpanel Branding="include(stdfooter.html)">

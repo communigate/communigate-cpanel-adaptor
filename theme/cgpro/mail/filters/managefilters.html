@@ -1,0 +1,49 @@
+<cpanel setvar="headerimg=../../images/mailmenu.gif">
+<cpanel setvar="dprefix=../../">
+<cpanel Branding="include(stdheader.html)">
+
+<cpanelif $FORM{'itemsperpage'}>
+    <cpanel setvar="itemsperpage=$FORM{'itemsperpage'}">
+</cpanelif>
+<cpanelif !$FORM{'itemsperpage'} || !$CPVAR{'itemsperpage'}>
+    <cpanel setvar="itemsperpage=10">
+</cpanelif>
+
+<style type="text/css">
+<?cp Branding::spritelist(.spriteicon_img_mini {float:left;margin-right:5px;background: url\{leftparenthesis}"%"\{rightparenthesis};} %,@spriteurl,images::#icon-${img}_mini {background-position\{colon}0 -${cssposition}px;width\{colon}${width}px;height\{colon}${height}px; }:) imgtype=icon,subtype=img,method=scale_60percent,format=png,img=userfiltering ?>
+</style>
+<div class="body-content">
+<div class="h1Title"><div class="spriteicon_img_mini" id="icon-userfiltering_mini"></div><cpanel langprint="filter_manage"></div>
+<p class="description"><cpanel langprint="filter_manage_desc"></p>
+
+<h2><cpanel langprint="filters_by_users"></h2>
+
+<br/>
+
+<div class="search-panel">
+    <form method="get">
+        <span class="boldit"><cpanel langprint="SESearchButton"></span>
+        <input type="text" size="15" name="searchregex" value="<cpanel print="$FORM{'searchregex'}">">
+        <input type="submit" class="input-button" value="<cpanel langprint="go">">
+        <input type="hidden" name="itemsperpage" value="<cpanel print="$CPVAR{'itemsperpage'}">" />
+    </form>
+</div>
+
+<table id="actiontbl" border="0" width=100% class="sortable">
+<thead>
+<tr>
+    <th><cpanel langprint="filters_accounts"></th>
+    <th><cpanel langprint="filters_actions"></th>
+</tr>
+</thead>
+<tbody>
+<?cp Email::listpops([tr][td]%[/td][td align="center"][div][a href="userfilters.html?account=%"]maketext('Manage Filters')[/a][/div][/td][/tr],email,email)regex=$RAW_FORM{'searchregex'},api2_paginate=1,api2_paginate_start=$FORM{'api2_paginate_start'},api2_paginate_size=$CPVAR{'itemsperpage'},regex=@ ?>
+</tbody>
+</table>
+
+<?cptt /usr/local/cpanel/base/shared/templates/paginate.tmpl ?>
+
+<div class="return-link"><a href="<cpanel print="$ENV{'cp_security_token'}">/">&larr; <cptext "Go Back"></a></div>
+
+</div><!-- end body-content -->
+<cpanel Branding="include(stdfooter.html)">

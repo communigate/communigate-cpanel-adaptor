@@ -1829,6 +1829,80 @@ sub api2_SetGroupSettings {
         return @result;
 }
 
+sub api2_storefilter {
+    my %OPTS = @_;
+    my $formdump = $OPTS{'formdump'};
+    my $params = {};
+    for my $row (split "\n", $formdump) {
+	if ($row =~ m/^(\S+)\s\=\s(.*?)$/) {
+	    my $key =$1;
+	    my $value = $2;
+	    if ($key =~ m/^(\S+)(\d+)$/) {
+		$params->{$1}->[$2 - 1] = $value;
+	    } else {
+		$params->{$key} = $value;
+	    }
+	}
+    }
+    my $cli = getCLI();
+    my $rules = $cli->GetAccountMailRules($params->{account});
+    if ($rules) {
+	my $conditions = [];
+	my $actions = [];
+	for (my $i = 0; $i <= $#{$params->{part}}; $i++) {
+	    push @$conditions, [$params->{part}->[$i], $params->{match}->[$i], $params->{val}->[$i]];
+	}
+	for (my $i = 0; $i <= $#{$params->{action}}; $i++) {
+	    my $action = [$params->{action}->[$i]];
+	    push @$action, $params->{dest}->[$i] if $params->{dest}->[$i];
+	    push @$actions, $action;
+	}
+	my $therule = [
+	    5,
+	    $params->{filtername},
+	    $conditions,
+	    $actions
+	    ];
+	my $newrules = [];
+	my $found = 0;
+	for my $rule (@$rules) {
+	    if ($rule->[1] eq $params->{oldfiltername}) {
+		push @$newrules, $therule;
+		$found = 1;
+	    } else {
+		push @$newrules, $rule;
+	    }
+	}
+	push @$newrules, $therule unless $found;
+	$cli->SetAccountMailRules($params->{account},$newrules);
+    }
+    $cli->Logout();
+    return;
+}
+sub api2_get_filter {
+    my %OPTS = @_;
+    my $cli = getCLI();
+    # use Data::Dumper;
+    # print Dumper \%OPTS;;
+    my $rules = $cli->GetAccountMailRules($OPTS{account});
+	for my $rule (@$rules) {
+	    if ($rule->[1] eq $OPTS{filtername}) {
+		my $filter = {};
+		$filter->{data}->{filtername} = $rule->[1];
+		for my $condition (@{$rule->[2]}) {
+		    push @{$filter->{data}->{rules}}, {part => $condition->[0], match => $condition->[1], val => $condition->[2]};
+		}
+		for my $action (@{$rule->[3]}) {
+		    push @{$filter->{data}->{actions}}, {action => $action->[0], dest => $action->[1]};
+		}
+		
+		$cli->Logout();
+		return {get_filter => $filter};
+	    }
+	}
+    $cli->Logout();
+    return { get_filter => { data => { filtername => "Rule 1", actions => [{}], rules => [{}] } } };
+}
 sub IsGroupInternal {
   	my $groupwithdomain = shift;
 	my @values = split("@",$groupwithdomain);
