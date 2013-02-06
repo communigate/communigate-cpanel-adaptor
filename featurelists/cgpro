@@ -12,3 +12,4 @@ cgpro_maillist: Mailing Lists (CGPro)
 cgpro_groupmail: Group mail (CGPRo)
 cgpro_filters: Email Filtering (CGPro)
 cgpro_defaultemailacct: Default Address Management (CGPro)
+default_spamassassin: Default Spamassassin Icon

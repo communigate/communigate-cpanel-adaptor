@@ -84,9 +84,6 @@ cp ${PACKSRC}/module/CommuniGate.pm /usr/local/cpanel/Cpanel/
 cp ${PACKSRC}/cpwrap/ccaadmin /usr/local/cpanel/bin/
 cp ${PACKSRC}/cpwrap/ccawrap /usr/local/cpanel/bin/
 
-# Update Feature List
-cp ${PACKSRC}/featurelists/cgpro /usr/local/cpanel/whostmgr/addonfeatures/
-
 # Install cPanel Function hooks
 if [ ! -d /var/cpanel/perl5/lib/ ]
 then
@@ -161,6 +158,8 @@ do
         cat ${LOCALES[$j]} >> ${TARGET}
     done
 done
+# Update Feature List
+cp ${PACKSRC}/featurelists/cgpro /usr/local/cpanel/whostmgr/addonfeatures/
 chmod +x ${PACKSRC}/scripts/*
 ${PACKSRC}/scripts/modify_features.pl
 /usr/local/cpanel/bin/rebuild_sprites
