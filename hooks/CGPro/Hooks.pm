@@ -47,7 +47,14 @@ sub describe {
         'hook'     => 'CGPro::Hooks::reorderfilters',
         'exectype' => 'module',
     };
-    return [$mail_addpop, $mail_delpop, $mail_passwdpop, $mail_editquota, $mail_deletefilter, $mail_reorderfilters];
+    my $mail_addpop1 = {
+        'category' => 'Cpanel',
+        'event'    => 'Api1::Email::addpop',
+        'stage'    => 'post',
+        'hook'     => 'CGPro::Hooks::addpop1',
+        'exectype' => 'module',
+    };
+    return [$mail_addpop, $mail_delpop, $mail_passwdpop, $mail_editquota, $mail_deletefilter, $mail_reorderfilters, $mail_addpop1];
 }
 
 sub getCLI {
@@ -74,35 +81,7 @@ sub getCLI {
 sub addpop {
     my (undef, $params) = @_;
     my $args = $params->{args};
-    my $cli = getCLI();
-
-    my $domain = $args->{'domain'};
-    my $user= $args->{'email'};
-    my $password= $args->{'password'};
-    my $quota = $args->{'quota'};
-    if ($quota == 0) {
-        $quota="unlimited" ;
-    }else{
-        $quota .= "M";
-    }
-    my $cli = getCLI();
-    my $data = $cli->GetDomainSettings("$domain");
-    if (!$data) {
-	$cli->CreateDomain("$domain");
-    } 
-    my $UserData;
-    @$UserData{'Password'}=$password;
-    @$UserData{'ServiceClass'}="mailonly";
-    @$UserData{'MaxAccountSize'}=$quota;
-    my $response = $cli->CreateAccount(accountName => "$user\@$domain", settings => $UserData);
-    if ($response) {
-	$cli->CreateMailbox("$user\@$domain", "Calendar");
-	$cli->CreateMailbox("$user\@$domain", "Spam");
-    } else {
-	my $apiref = Cpanel::Api2::Exec::api2_preexec( 'Email', 'delpop' );
-	my ( $data, $status ) = Cpanel::Api2::Exec::api2_exec( 'Email', 'delpop', $apiref, {domain => 'anton.bg', email=>'testov'} );
-    }
-    $cli->Logout();
+    doaddpop($args->{'email'}, $args->{'password'}, $args->{'quota'}, $args->{'domain'});
 }
 
 sub delpop {
@@ -197,6 +176,40 @@ sub reorderfilters {
 	    push @$newrules, $rule;
     	}
     	$cli->SetAccountMailRules($account,$newrules);
+    }
+    $cli->Logout();
+}
+
+sub addpop1 {
+    my (undef, $params) = @_;
+    my $args = $params->{args};
+    doaddpop($args->[0], $args->[1], $args->[2], $args->[3]);
+}
+
+sub doaddpop {
+    my ($user, $password, $quota, $domain) = @_;
+    my $cli = getCLI();
+    if ($quota == 0) {
+        $quota="unlimited" ;
+    }else{
+        $quota .= "M";
+    }
+    my $cli = getCLI();
+    my $data = $cli->GetDomainSettings("$domain");
+    if (!$data) {
+    	$cli->CreateDomain("$domain");
+    } 
+    my $UserData;
+    @$UserData{'Password'}=$password;
+    @$UserData{'ServiceClass'}="mailonly";
+    @$UserData{'MaxAccountSize'}=$quota;
+    my $response = $cli->CreateAccount(accountName => "$user\@$domain", settings => $UserData);
+    if ($response) {
+    	$cli->CreateMailbox("$user\@$domain", "Calendar");
+    	$cli->CreateMailbox("$user\@$domain", "Spam");
+    } else {
+    	my $apiref = Cpanel::Api2::Exec::api2_preexec( 'Email', 'delpop' );
+    	my ( $data, $status ) = Cpanel::Api2::Exec::api2_exec( 'Email', 'delpop', $apiref, {domain => 'anton.bg', email=>'testov'} );
     }
     $cli->Logout();
 }
