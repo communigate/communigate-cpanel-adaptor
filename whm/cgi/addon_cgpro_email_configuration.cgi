@@ -27,6 +27,7 @@ unless($cli) {
    exit(0);
 }
 
+my $cgproversion = $cli->getversion();
 
 my %FORM = Cpanel::Form::parseform();
 
@@ -77,7 +78,8 @@ Cpanel::Template::process_template(
 				    maxMessageSize => $maxMessageSize,
 				    MaxMailOutSize => $MaxMailOutSize,
 				    UseRBL => $defaultsNetwork->{UseRBL},
-				    RBLDomain => $defaultsNetwork->{RBLDomain}
+				    RBLDomain => $defaultsNetwork->{RBLDomain},
+				    cgproversion => $cgproversion,
 				   },
 				  );
 

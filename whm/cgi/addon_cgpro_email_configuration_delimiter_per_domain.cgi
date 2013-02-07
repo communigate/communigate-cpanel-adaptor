@@ -26,6 +26,7 @@ unless($cli) {
    exit(0);
 }
 
+my $cgproversion = $cli->getversion();
 
 my %FORM = Cpanel::Form::parseform();
 
@@ -94,7 +95,8 @@ Cpanel::Template::process_template(
 				    mailInpFlowPeriod => $mailInpFlowPeriod,
 				    maxMessageSize => $maxMessageSize,
 				    MaxMailOutSize => $MaxMailOutSize,
-				    domain => $FORM{domain}
+				    domain => $FORM{domain},
+				    cgproversion => $cgproversion
 				   },
 				  );
 

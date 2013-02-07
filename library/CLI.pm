@@ -3979,6 +3979,12 @@ sub SetTempBlacklistedIPs  {
   $this->send ('SetTempBlacklistedIPs '.$this->printWords($addresses));
   $this->_parseResponse();
 }
+sub getversion {
+  my ($this, $level, $msg) = @_;
+  $this->send('GETVERSION');
+  return 'Unknown' unless $this->_parseResponse();
+  $this->parseWords($this->getWords);
+}
 
 
 #########################################################################
