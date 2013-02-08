@@ -1,0 +1,78 @@
+[% 
+  class = FORM.class;
+  classes = {};
+  FOR c IN ServiceClasses.$class.AccessModes;
+    classes.$c = 1;
+  END;
+ -%]
+[% MACRO filter_row(pval, val, text) BLOCK -%]
+<tr>
+  <td>
+    <label for="reseller_check">[% text %]</label>
+  </td>
+  <td>
+    <input type="checkbox" value="[% val %]" name="AccessModes"[% IF pval or classes.All; ' checked="checked"'; END %] />
+  </td>
+</tr>
+[% END -%]
+<form action="" method="post">
+  <div class="form_action">
+    <fieldset>
+      <h3>Basic Information</h3>
+      <table>
+	<tbody>
+	  <tr>
+            <td>
+	      <label for="DNS">Class Name (alphanumeral, no spaces):</label>
+	    </td>
+            <td>
+	      <input type="text" value="[% FORM.class %]" name="classname" />
+	      <input type="hidden" value="[% FORM.class %]" name="oldclassname" />
+            </td>
+          </tr>
+	</tbody>
+      </table>
+    </fieldset>
+  </div>
+  <div class="form_action">
+    <fieldset>
+      <h3>Enabled Services</h3>
+      <table>
+	<tbody>
+	  [% filter_row(classes.Mail, "Mail", "Mail") %]
+	  [% filter_row(classes.Relay, "Relay", "Relay") %]
+	  [% filter_row(classes.Signal, "Signal", "Signal") %]
+	  [% filter_row(classes.Mobile, "Mobile", "Mobile") %]
+	  [% filter_row(classes.TLS, "TLS", "TLS") %]
+	  [% filter_row(classes.POP, "POP", "POP") %]
+	  [% filter_row(classes.IMAP, "IMAP", "IMAP") %]
+	  [% filter_row(classes.MAPI, "MAPI", "MAPI") %]
+	  [% filter_row(classes.AirSync, "AirSync", "AirSync") %]
+	  [% filter_row(classes.SIP, "SIP", "SIP") %]
+	  [% filter_row(classes.XMPP, "XMPP", "XMPP") %]
+	  [% filter_row(classes.WebMail, "WebMail", "WebMail") %]
+	  [% filter_row(classes.XIMSS, "XIMSS", "XIMSS") %]
+	  [% filter_row(classes.FTP, "FTP", "FTP") %]
+	  [% filter_row(classes.ACAP, "ACAP", "ACAP") %]
+	  [% filter_row(classes.PWD, "PWD", "PWD") %]
+	  [% filter_row(classes.LDAP, "LDAP", "LDAP") %]
+	  [% filter_row(classes.RADIUS, "RADIUS", "RADIUS") %]
+	  [% smime = 'S/MIME'; filter_row(classes.$smime, "S/MIME", "S/MIME") %]
+	  [% filter_row(classes.WebCAL, "WebCAL", "WebCAL") %]
+	  [% filter_row(classes.WebSite, "WebSite", "WebSite") %]
+	  [% filter_row(classes.PBX, "PBX", "PBX") %]
+	  [% filter_row(classes.HTTP, "HTTP", "HTTP") %]
+	  [% filter_row(classes.MobilePBX, "MobilePBX", "MobilePBX") %]
+	  [% filter_row(classes.XMedia, "XMedia", "GIPS Media") %]
+	  [% filter_row(classes.YMedia, "YMedia", "YMedia") %]
+	  [% filter_row(classes.MobilePronto, "MobilePronto", "MobilePronto") %]
+	</tbody>
+      </table>
+    </fieldset>
+  </div>
+  <p>
+    <input type="submit" value="Save" class="input-button" />
+    <a href="addon_cgpro_manage_classes.cgi">Back</a>
+  </p>
+</form>
+[% PROCESS addon_cgpro_footer.tmpl %]
