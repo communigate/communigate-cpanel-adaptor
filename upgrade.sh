@@ -79,7 +79,7 @@ do
         continue
     fi
     cp -r "${PACKSRC}/theme/cgpro" "${THEMES[$i]}/"
-    rm -f "${THEMES[$i]}/branding/cgpro_*"
+    rm -f ${THEMES[$i]}/branding/cgpro_*
     cp "${PACKSRC}/icons/"* "${THEMES[$i]}/branding"
     cp "${PACKSRC}/plugin/dynamicui_cgpro.conf" "${THEMES[$i]}/dynamicui/"
     if [ ! -d /dynamicui/js2-min/cgpro ]
