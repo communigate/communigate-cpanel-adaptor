@@ -79,6 +79,7 @@ do
         continue
     fi
     cp -r "${PACKSRC}/theme/cgpro" "${THEMES[$i]}/"
+    rm -f "${THEMES[$i]}/branding/cgpro_*"
     cp "${PACKSRC}/icons/"* "${THEMES[$i]}/branding"
     cp "${PACKSRC}/plugin/dynamicui_cgpro.conf" "${THEMES[$i]}/dynamicui/"
     if [ ! -d /dynamicui/js2-min/cgpro ]
@@ -114,7 +115,9 @@ ${PACKSRC}/scripts/modify_features.pl
 replace "cpanel.communigate.com" "${HOSTNAME}" -- /var/CommuniGate/Settings/Main.settings
 
 # Install the WHM plugins (administration and groupware control)
+rm -f /usr/local/cpanel/whostmgr/docroot/templates/cgpro_*
 cp ${PACKSRC}/whm/templates/* /usr/local/cpanel/whostmgr/docroot/templates/
-cp -rf ${PACKSRC}/whm/cgi/* /usr/local/cpanel/whostmgr/docroot/cgi
+rm -rf /usr/local/cpanel/whostmgr/docroot/cgi/cgpro*
+cp -rf ${PACKSRC}/whm/cgi/* /usr/local/cpanel/whostmgr/docroot/cgi/
 
 echo "Upgrade Finished!"
