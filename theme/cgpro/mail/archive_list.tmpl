@@ -1,0 +1,83 @@
+[%-
+
+# Imports
+USE Api2;
+USE DataURI;
+USE JSON;
+USE VarCache;
+USE Encoder;
+%]
+[% MACRO filter_option(pval, val, text) BLOCK -%]
+<option value="[% val %]"[% val == pval and " selected" %]>[% cptext(text) %]</option>
+[% END -%]
+[%
+ SET api_response = Api2.exec( 'CommuniGate', 'get_archiving_configuration', {});
+-%]
+
+[% IF api_response.size -%]
+    [% FOR dom = api_response -%]
+            [% SET oddeven = loop.index % 2 ? 'odd' : 'even' -%]
+            [%-
+                SET archive_active = 0;
+                FOR archive_type IN archive_types;
+                    SET archive_key = "archive_" _ archive_type.key;
+                    IF dom.$archive_key;
+                        SET archive_active = 1;
+                        LAST;
+                    END;
+                END;
+            %]
+            <tr class="row-[% oddeven %]">
+                <td class="col1" truncate="50">
+                     [% dom.domain FILTER html FILTER replace('\.', '.&#8203;') %]
+                </td>
+                <td class="col2">
+                </td>
+                <td class="col3" nowrap="nowrap">
+		  <p>
+		    <label style="width: 150px; display: block; float: left;">Archive Messages after:</label>
+		    <select name="ArchiveMessagesAfter-[% dom.domain %]">
+		      [% filter_option(dom.ArchiveMessagesAfter, "", 'default') %]
+		      [% filter_option(dom.ArchiveMessagesAfter, "0", 'Never') %]
+		      [% filter_option(dom.ArchiveMessagesAfter, "1d", '24 hours') %]
+		      [% filter_option(dom.ArchiveMessagesAfter, "2d", '2 days') %]
+		      [% filter_option(dom.ArchiveMessagesAfter, "3d", '3 days') %]
+		      [% filter_option(dom.ArchiveMessagesAfter, "5d", '5 days') %]
+		      [% filter_option(dom.ArchiveMessagesAfter, "7d", '7 days') %]
+		      [% filter_option(dom.ArchiveMessagesAfter, "14d", '2 weeks') %]
+		      [% filter_option(dom.ArchiveMessagesAfter, "30d", '30 days') %]
+		      [% filter_option(dom.ArchiveMessagesAfter, "90d", '90 days') %]
+		      [% filter_option(dom.ArchiveMessagesAfter, "180d", '180 days') %]
+		      [% filter_option(dom.ArchiveMessagesAfter, "365d", '365 days') %]
+		      [% filter_option(dom.ArchiveMessagesAfter, "730d", '730 days') %]
+		    </select>
+		  </p>
+		  <p>
+		    <label style="width: 150px; display: block; float: left;">Delete Messages after:</label>
+		    <select name="DeleteMessagesAfter-[% dom.domain %]">
+		      [% filter_option(dom.DeleteMessagesAfter, "", 'default') %]
+		      [% filter_option(dom.DeleteMessagesAfter, "0", 'Never') %]
+		      [% filter_option(dom.DeleteMessagesAfter, "1d", '24 hours') %]
+		      [% filter_option(dom.DeleteMessagesAfter, "2d", '2 days') %]
+		      [% filter_option(dom.DeleteMessagesAfter, "3d", '3 days') %]
+		      [% filter_option(dom.DeleteMessagesAfter, "5d", '5 days') %]
+		      [% filter_option(dom.DeleteMessagesAfter, "7d", '7 days') %]
+		      [% filter_option(dom.DeleteMessagesAfter, "14d", '2 weeks') %]
+		      [% filter_option(dom.DeleteMessagesAfter, "30d", '30 days') %]
+		      [% filter_option(dom.DeleteMessagesAfter, "90d", '90 days') %]
+		      [% filter_option(dom.DeleteMessagesAfter, "180d", '180 days') %]
+		      [% filter_option(dom.DeleteMessagesAfter, "365d", '365 days') %]
+		      [% filter_option(dom.DeleteMessagesAfter, "730d", '730 days') %]
+		    </select>
+		  </p>
+                </td>
+            </tr>
+    [% END -%]
+[% ELSE -%]
+        [% SET err = form_regex
+        ? locale.maketext('No configured domains match the search term “[_1]”.', form_regex)
+        : locale.maketext('No domains configured.'); -%]
+                <tr>
+                    <td colspan="5" class="errors">[% err FILTER html %]</td>
+                </tr>
+[% END -%]

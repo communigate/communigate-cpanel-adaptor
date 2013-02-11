@@ -1,0 +1,11 @@
+ <cpanel setvar="headerimg=../images/mailmenu.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+
+  <div class="body-content">
+    <div class="h1Title"><div class="spriteicon_img_mini" id="icon-emailarch_mini"></div> <cptext 'Email Archiving'></div>
+
+    <p><?cp CommuniGate::updatearchive(%, msg) formdump=$formdump ?></p>
+    <div class="return-link"><a href="archive.html">&larr; <cptext "Go Back"></a></div>
+  </div>
+<cpanel Branding="include(stdfooter.html)">

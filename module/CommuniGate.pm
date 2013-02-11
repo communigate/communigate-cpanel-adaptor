@@ -1971,6 +1971,45 @@ sub api2_dumpfilters {
     return $filters;
 }
 
+sub api2_get_archiving_configuration {
+    my $cli = getCLI();
+    my @domains = Cpanel::Email::listmaildomains();
+    my $filters = {};
+    my @result;
+    for my $domain (@domains) {
+	my $defaults = $cli->GetAccountDefaults($domain);
+	push @result, { domain => $domain, ArchiveMessagesAfter => $defaults->{'ArchiveMessagesAfter'}, DeleteMessagesAfter => $defaults->{'DeleteMessagesAfter'}} if $defaults;
+    }
+    $cli->Logout();
+    return @result;
+}
+
+sub api2_updatearchive {
+    my %OPTS = @_;
+    my $formdump = $OPTS{'formdump'};
+    my $params = {};
+    for my $row (split "\n", $formdump) {
+	if ($row =~ m/^(\S+)\s\=\s(.*?)$/) {
+	    my $key =$1;
+	    my $value = $2;
+	    if ($key =~ m/^(\S+)(\d+)$/) {
+		$params->{$1}->[$2 - 1] = $value;
+	    } else {
+		$params->{$key} = $value;
+	    }
+	}
+    }
+    my $cli = getCLI();
+    my @domains = Cpanel::Email::listmaildomains();
+    for my $domain (@domains) {
+	$cli->UpdateAccountDefaults(domain => $domain, settings => {
+	    ArchiveMessagesAfter => ((defined $params->{'ArchiveMessagesAfter-' . $domain})?$params->{'ArchiveMessagesAfter-' . $domain}:undef),
+	    DeleteMessagesAfter => ((defined $params->{'DeleteMessagesAfter-' . $domain})?$params->{'DeleteMessagesAfter-' . $domain}:undef )
+				    });
+    }
+    $cli->Logout();
+    return {msg => "Changes saved."};
+}
 sub IsGroupInternal {
   	my $groupwithdomain = shift;
 	my @values = split("@",$groupwithdomain);
