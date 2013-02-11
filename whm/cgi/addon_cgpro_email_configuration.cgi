@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-#WHMADDON:appname:CGPro Mail Configuration Manager
+#WHMADDON:appname:CGPro <strong>Mail Configuration Manager</strong>
 
 use lib '/usr/local/cpanel';
 use Cpanel::Form            ();
