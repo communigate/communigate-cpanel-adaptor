@@ -37,7 +37,7 @@
 </tr>
 </thead>
 <tbody>
-<?cp Email::listpops([tr][td]%[/td][td align="center"][div][a href="userfilters.html?account=%"]maketext('Manage Filters')[/a][/div][/td][/tr],email,email)regex=$RAW_FORM{'searchregex'},api2_paginate=1,api2_paginate_start=$FORM{'api2_paginate_start'},api2_paginate_size=$CPVAR{'itemsperpage'},regex=@ ?>
+<?cp Email::listpops([tr][td]%[/td][td align="center"][div][a href="userfilters.html?account=%"]maketext('Manage Filters')[/a][/div][/td][/tr],email,email)regex=$RAW_FORM{'searchregex'},api2_paginate=1,api2_paginate_start=$FORM{'api2_paginate_start'},api2_paginate_size=$CPVAR{'itemsperpage'},regex=@ || '[tr][td colspan="8" class="errors"]Please add e-mail accounts first.[/td][/tr]' ?>
 </tbody>
 </table>
 
