@@ -74,9 +74,6 @@ cp ${PACKSRC}/whm/templates/* /usr/local/cpanel/whostmgr/docroot/templates/
 # Install CGP Logo
 cp ${PACKSRC}/whm/communigate.gif /usr/local/cpanel/whostmgr/docroot/images/communigate.gif
 
-# Install the WHM Script hooks (CommuniGate provisioning)
-cp ${PACKSRC}/whm/postwwwacct /usr/local/cpanel/scripts/
-
 # Install cPanel CommuniGate Custom Module
 cp ${PACKSRC}/module/CommuniGate.pm /usr/local/cpanel/Cpanel/
 

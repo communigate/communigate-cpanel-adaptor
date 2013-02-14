@@ -17,7 +17,10 @@ rm -f /usr/local/cpanel/whostmgr/docroot/templates/cgpro_*
 rm -f /usr/local/cpanel/whostmgr/docroot/images/communigate.gif
 
 # Install the WHM Script hooks (CommuniGate provisioning)
-rm -f /usr/local/cpanel/scripts/postwwwacct
+if [ -f /usr/local/cpanel/scripts/postwwwacct ]
+then
+    rm -f /usr/local/cpanel/scripts/postwwwacct
+fi
 
 # Install cPanel CommuniGate Custom Module
 rm -f /usr/local/cpanel/Cpanel/CommuniGate.pm

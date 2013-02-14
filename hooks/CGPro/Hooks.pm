@@ -3,7 +3,7 @@ package CGPro::Hooks;
 use CLI;
 use Cpanel::AdminBin ();
 use Cpanel::Api2::Exec ();
-
+use Cpanel::CachedDataStore ();
 sub describe {
     my $mail_addpop = {
         'category' => 'Cpanel',
@@ -54,14 +54,23 @@ sub describe {
         'hook'     => 'CGPro::Hooks::addpop1',
         'exectype' => 'module',
     };
-    return [$mail_addpop, $mail_delpop, $mail_passwdpop, $mail_editquota, $mail_deletefilter, $mail_reorderfilters, $mail_addpop1];
+    my $AccountsCreate = {
+        'category' => 'Whostmgr',
+        'event'    => 'Accounts::Create',
+        'stage'    => 'pre',
+        'hook'     => 'CGPro::Hooks::AccountsCreate',
+        'exectype' => 'module',
+    };
+    return [$mail_addpop, $mail_delpop, $mail_passwdpop, $mail_editquota, $mail_deletefilter, $mail_reorderfilters, $mail_addpop1, $AccountsCreate];
 }
 
 sub getCLI {
+   (my $conf) = @_;
     if ($CLI && $CLI->{isConnected}) {
 	return $CLI;
     } else {
-	my $loginData = Cpanel::AdminBin::adminrun('cca', 'GETLOGIN');
+	my $loginData = $conf;
+	$loginData = Cpanel::AdminBin::adminrun('cca', 'GETLOGIN') unless $loginData;
 	$loginData =~ s/^\.\n//;
 	my @loginData = split "::", $loginData;
  	my $cli = new CGP::CLI( { PeerAddr => $loginData[0],
@@ -77,7 +86,11 @@ sub getCLI {
 	return $cli;
     }
 }
-
+# pass it as a parramether of getCLI() if hooking WHM events
+sub getConf {
+    my $conf = Cpanel::CachedDataStore::fetch_ref( '/var/cpanel/communigate.yaml' ) || {};
+    return $conf->{cgprohost} . "::" . $conf->{cgproport} . "::" . $conf->{cgprouser} . "::" . $conf->{cgpropass};
+}
 sub addpop {
     my (undef, $params) = @_;
     my $args = $params->{args};
@@ -212,6 +225,16 @@ sub doaddpop {
     	my ( $data, $status ) = Cpanel::Api2::Exec::api2_exec( 'Email', 'delpop', $apiref, {domain => 'anton.bg', email=>'testov'} );
     }
     $cli->Logout();
+}
+
+sub AccountsCreate {
+    my (undef, $params) = @_;
+    my $domain = $params->{'domain'};
+    if ($domain) {
+	my $cli = getCLI(getConf());
+	$cli->CreateDomain("$domain");
+	$cli->Logout();
+    }
 }
 
 1;
