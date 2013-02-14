@@ -4,6 +4,8 @@ use CLI;
 use Cpanel::AdminBin ();
 use Cpanel::Api2::Exec ();
 use Cpanel::CachedDataStore ();
+use Cpanel::Config::LoadUserDomains ();
+
 sub describe {
     my $mail_addpop = {
         'category' => 'Cpanel',
@@ -57,11 +59,18 @@ sub describe {
     my $AccountsCreate = {
         'category' => 'Whostmgr',
         'event'    => 'Accounts::Create',
-        'stage'    => 'pre',
+        'stage'    => 'post',
         'hook'     => 'CGPro::Hooks::AccountsCreate',
         'exectype' => 'module',
     };
-    return [$mail_addpop, $mail_delpop, $mail_passwdpop, $mail_editquota, $mail_deletefilter, $mail_reorderfilters, $mail_addpop1, $AccountsCreate];
+    my $AccountsRemove = {
+        'category' => 'Whostmgr',
+        'event'    => 'Accounts::Remove',
+        'stage'    => 'pre',
+        'hook'     => 'CGPro::Hooks::AccountsRemove',
+        'exectype' => 'module',
+    };
+    return [$mail_addpop, $mail_delpop, $mail_passwdpop, $mail_editquota, $mail_deletefilter, $mail_reorderfilters, $mail_addpop1, $AccountsCreate, $AccountsRemove];
 }
 
 sub getCLI {
@@ -235,6 +244,21 @@ sub AccountsCreate {
 	$cli->CreateDomain("$domain");
 	$cli->Logout();
     }
+    return 1;
+}
+
+sub AccountsRemove {
+    my (undef, $params) = @_;
+    my $user = $params->{'user'};
+    if ($user) {
+	my $cli = getCLI(getConf());
+	my $users = Cpanel::Config::LoadUserDomains::loaduserdomains( undef, 0, 1 );
+	for my $domain (@{$users->{$user}}) {
+	    $cli->DeleteDomain($domain, 1);
+	}
+	$cli->Logout();
+    }
+    return 1;
 }
 
 1;
