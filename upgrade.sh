@@ -12,14 +12,15 @@ cp ${PACKSRC}/iphone/iphonetemplate.mobileconfig /var/CommuniGate/apple/
 # Install CGP Logo
 cp ${PACKSRC}/whm/communigate.gif /usr/local/cpanel/whostmgr/docroot/images/communigate.gif
 
-# Install the WHM Script hooks (CommuniGate provisioning)
-if [ -f /usr/local/cpanel/scripts/postwwwacct ]
-then
-    rm -f /usr/local/cpanel/scripts/postwwwacct
-fi
-
 # Install cPanel CommuniGate Custom Module
 cp ${PACKSRC}/module/CommuniGate.pm /usr/local/cpanel/Cpanel/
+
+# Lets add CGPro perl lib
+cp ${PACKSRC}/library/CLI.pm /usr/local/cpanel/perl/
+if [ ! -L /usr/local/lib/perl5/5.8.8/CLI.pm ]
+then
+    ln -s /usr/local/cpanel/perl/CLI.pm /usr/local/lib/perl5/5.8.8/
+fi
 
 # CGPro cPanel Wrapper
 cp ${PACKSRC}/cpwrap/ccaadmin /usr/local/cpanel/bin/
@@ -56,7 +57,6 @@ cp ${PACKSRC}/chkservd/CommuniGate_spamd /etc/chkserv.d/
 
 # Check the scripts have executable flag
 chmod +x /usr/local/cpanel/whostmgr/docroot/cgi/addon_cgpro*
-chmod +x /usr/local/cpanel/scripts/postwwwacct
 chmod +x /var/CommuniGate/cgi/login.pl
 chmod +x /usr/local/cpanel/Cpanel/CommuniGate.pm
 chmod +x /usr/local/cpanel/bin/ccaadmin
@@ -97,6 +97,11 @@ do
     fi
     chmod +x ${THEMES[$i]}/cgpro/backup/getaccbackup.live.cgi
     chmod +x ${THEMES[$i]}/cgpro/backup/getaliasesbackup.live.cgi
+    chmod +x ${THEMES[$i]}/cgpro/backup/getfiltersbackup.live.cgi
+    if [ -f ${THEMES[$i]}cgpro/mail/groupware.html ]
+    then
+	rm -f ${THEMES[$i]}cgpro/mail/groupware.html
+    fi
     for ((j=0; j<${lLen}; j++)); do
         TARGET=${THEMES[$i]}/locale/`basename ${LOCALES[$j]} '{}'`.yaml.local
         if [ ! -f ${TARGET} ]
@@ -108,14 +113,31 @@ do
         cat ${LOCALES[$j]} >> ${TARGET}
     done
 done
+
+chmod +x ${PACKSRC}/scripts/*
+
+# Migrating groupware accounts
+if [ -f /var/CommuniGate/cPanel/limits ]
+then
+    ${PACKSRC}/scripts/migrate_groupware.pl
+    echo "!!! Please delete /var/CommuniGate/cPanel/limits by hand if seetings are OK !!!"
+fi
+
+# Purge unneeded files
+if [ -f /usr/local/cpanel/whostmgr/docroot/cgi/addon_cgpro-gwcontrol.cgi ]
+then
+    rm -f /usr/local/cpanel/whostmgr/docroot/cgi/addon_cgpro-gwcontrol.cgi
+fi
+if [ -f /usr/local/cpanel/scripts/postwwwacct ]
+then
+    rm -f /usr/local/cpanel/scripts/postwwwacct
+fi
+
 # Update Feature List
 cp ${PACKSRC}/featurelists/cgpro /usr/local/cpanel/whostmgr/addonfeatures/
-chmod +x ${PACKSRC}/scripts/*
 ${PACKSRC}/scripts/modify_features.pl
 /usr/local/cpanel/bin/rebuild_sprites
 /usr/local/cpanel/bin/build_locale_databases
-
-replace "cpanel.communigate.com" "${HOSTNAME}" -- /var/CommuniGate/Settings/Main.settings
 
 # Install the WHM plugins (administration and groupware control)
 rm -f /usr/local/cpanel/whostmgr/docroot/templates/cgpro_*

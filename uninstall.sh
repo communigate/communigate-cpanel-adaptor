@@ -9,21 +9,28 @@ PACKSRC=`pwd`
 rm -rf /usr/local/apache/htdocs/iOS
 rm -rf /var/CommuniGate/apple
 
-# Install the WHM plugins (administration and groupware control)
+# Uninstall the WHM plugins (administration and groupware control)
 rm -rf /usr/local/cpanel/whostmgr/docroot/cgi/cgpro*
 rm -f /usr/local/cpanel/whostmgr/docroot/templates/cgpro_*
 
-# Install CGP Logo
+# Uninstall CGP Logo
 rm -f /usr/local/cpanel/whostmgr/docroot/images/communigate.gif
 
-# Install the WHM Script hooks (CommuniGate provisioning)
+# Uninstall the WHM Script hooks (CommuniGate provisioning)
 if [ -f /usr/local/cpanel/scripts/postwwwacct ]
 then
     rm -f /usr/local/cpanel/scripts/postwwwacct
 fi
 
-# Install cPanel CommuniGate Custom Module
+# Uninstall cPanel CommuniGate Custom Module
 rm -f /usr/local/cpanel/Cpanel/CommuniGate.pm
+
+# Lets remove CGPro perl lib
+if [ ! -L /usr/local/lib/perl5/5.8.8/CLI.pm ]
+then
+    rm -f /usr/local/lib/perl5/5.8.8/CLI.pm
+fi
+rm -f /usr/local/cpanel/perl/CLI.pm
 
 # CGPro cPanel Wrapper
 rm -f /usr/local/cpanel/bin/ccaadmin
@@ -31,17 +38,17 @@ rm -f /usr/local/cpanel/bin/ccawrap
 
 # Register installed hooks
 /usr/local/cpanel/bin/manage_hooks delete module CGPro::Hooks
-# Install cPanel Function hooks
+# Uninstall cPanel Function hooks
 rm -rf /var/cpanel/perl5/lib/CGPro/
 
-#Install config file
+#Uninstall config file
 rm -f /var/cpanel/communigate.yaml
 
-# Install CommuniGate Webmail in cPanel
+# Uninstall CommuniGate Webmail in cPanel
 rm -f /var/cpanel/webmail/webmail_communigate.yaml
 rm -rf /usr/local/cpanel/base/3rdparty/CommuniGate/
 
-# Install SSO for Webmail
+# Uninstall SSO for Webmail
 rm -f /var/CommuniGate/cgi/login.pl
 
 # chkservd for CGServer & spamd
@@ -49,7 +56,7 @@ rm -f /etc/chkserv.d/CommuniGate
 rm -f /etc/chkserv.d/CommuniGate_spamd
 sed -i -e '/^CommuniGate/d' /etc/chkserv.d/chkservd.conf
 
-# Install CommuniGate Plugin
+# Uninstall CommuniGate Plugin
 BASEDIR='/usr/local/cpanel/base/frontend';
 SAVEIFS=$IFS
 IFS=$(echo -en "\n\b")

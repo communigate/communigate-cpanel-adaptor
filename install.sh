@@ -17,44 +17,37 @@ service cpanel stop
 service httpd stop
 
 if [ -d "$BASEFOLDER" ]; then
-echo "CommuniGate cPanel plugin is already installed. Exiting..."
-exit;
-fi
+    echo "CommuniGate cPanel plugin is already installed. Exiting..."
 
 # Installing CGPro 6.0
-if [ ! -d "$SERVERFOLDER" ]; then
-wget -P${PACKSRC} http://www.communigate.com/pub/CommuniGatePro/CGatePro-Linux.x86_64.rpm
-rpm -Uvh ${PACKSRC}/CGatePro-Linux.x86_64.rpm
-rm -rf ${PACKSRC}/CGatePro-Linux.x86_64.rpm
-chkconfig CommuniGate on
-service CommuniGate start
-mkdir ${BASEFOLDER}/cPanel/
-rsync -az ${PACKSRC}/CGP/Settings/* ${BASEFOLDER}/Settings/
-rsync -az ${PACKSRC}/CGP/Accounts/postmaster.macnt/postmaster.macnt ${BASEFOLDER}/Accounts/postmaster.macnt/account.settings
-fi
-
-# Lets add CGPro perl lib
-rsync -az ${PACKSRC}/library/CLI.pm /usr/local/cpanel/perl/
-ln -s /usr/local/cpanel/perl/CLI.pm /usr/local/lib/perl5/5.8.8/
+    wget -P${PACKSRC} http://www.communigate.com/pub/CommuniGatePro/CGatePro-Linux.x86_64.rpm
+    rpm -Uvh ${PACKSRC}/CGatePro-Linux.x86_64.rpm
+    rm -rf ${PACKSRC}/CGatePro-Linux.x86_64.rpm
+    chkconfig CommuniGate on
+    service CommuniGate start
+    mkdir ${BASEFOLDER}/cPanel/
+    rsync -az ${PACKSRC}/CGP/Settings/* ${BASEFOLDER}/Settings/
+    rsync -az ${PACKSRC}/CGP/Accounts/postmaster.macnt/postmaster.macnt ${BASEFOLDER}/Accounts/postmaster.macnt/account.settings
 
 # Configure Airsync and Spamd
-if grep -Fxq "Microsoft-Server-ActiveSync" /usr/local/apache/conf/includes/pre_main_global.conf
-then
-echo "Airsync already installed"
-else
-echo ProxyPass /Microsoft-Server-ActiveSync http://${HOSTNAME}:8100/Microsoft-Server-ActiveSync >> /usr/local/apache/conf/includes/pre_main_global.conf
-echo ProxyPassReverse /Microsoft-Server-ActiveSync http://${HOSTNAME}:8100/Microsoft-Server-ActiveSync >> /usr/local/apache/conf/includes/pre_main_global.conf
-fi
+    if grep -Fxq "Microsoft-Server-ActiveSync" /usr/local/apache/conf/includes/pre_main_global.conf
+    then
+	echo "Airsync already installed"
+    else
+	echo ProxyPass /Microsoft-Server-ActiveSync http://${HOSTNAME}:8100/Microsoft-Server-ActiveSync >> /usr/local/apache/conf/includes/pre_main_global.conf
+	echo ProxyPassReverse /Microsoft-Server-ActiveSync http://${HOSTNAME}:8100/Microsoft-Server-ActiveSync >> /usr/local/apache/conf/includes/pre_main_global.conf
+    fi
 
-if grep -Fxq "CommuniGate Integration Settings" /etc/mail/spamassassin/local.cf
-then
-echo "spamd already configured"
-else
-echo "# CommuniGate Integration Settings #" >> /etc/mail/spamassassin/local.cf
-echo "rewrite_header Subject *****SPAM*****" >> /etc/mail/spamassassin/local.cf
-echo "report_safe 0" >> /etc/mail/spamassassin/local.cf
-echo "add_header all Level _STARS(x)_" >> /etc/mail/spamassassin/local.cf
-echo "# END of CommuniGate Integration Settings #" >> /etc/mail/spamassassin/local.cf
+    if grep -Fxq "CommuniGate Integration Settings" /etc/mail/spamassassin/local.cf
+    then
+	echo "spamd already configured"
+    else
+	echo "# CommuniGate Integration Settings #" >> /etc/mail/spamassassin/local.cf
+	echo "rewrite_header Subject *****SPAM*****" >> /etc/mail/spamassassin/local.cf
+	echo "report_safe 0" >> /etc/mail/spamassassin/local.cf
+	echo "add_header all Level _STARS(x)_" >> /etc/mail/spamassassin/local.cf
+	echo "# END of CommuniGate Integration Settings #" >> /etc/mail/spamassassin/local.cf
+    fi
 fi
 
 #################################################
@@ -67,7 +60,7 @@ chmod 777 /usr/local/apache/htdocs/iOS
 mkdir /var/CommuniGate/apple
 cp ${PACKSRC}/iphone/iphonetemplate.mobileconfig /var/CommuniGate/apple/
 
-# Install the WHM plugins (administration and groupware control)
+# Install the WHM plugins
 cp -rf ${PACKSRC}/whm/cgi/* /usr/local/cpanel/whostmgr/docroot/cgi/
 cp ${PACKSRC}/whm/templates/* /usr/local/cpanel/whostmgr/docroot/templates/
 
@@ -76,6 +69,10 @@ cp ${PACKSRC}/whm/communigate.gif /usr/local/cpanel/whostmgr/docroot/images/comm
 
 # Install cPanel CommuniGate Custom Module
 cp ${PACKSRC}/module/CommuniGate.pm /usr/local/cpanel/Cpanel/
+
+# Lets add CGPro perl lib
+cp ${PACKSRC}/library/CLI.pm /usr/local/cpanel/perl/
+ln -s /usr/local/cpanel/perl/CLI.pm /usr/local/lib/perl5/5.8.8/
 
 # CGPro cPanel Wrapper
 cp ${PACKSRC}/cpwrap/ccaadmin /usr/local/cpanel/bin/
@@ -144,6 +141,7 @@ do
     ln -s ${THEMES[$i]}/dynamicui/css2-min/mail ${THEMES[$i]}/dynamicui/css2-min/cgpro/
     chmod +x ${THEMES[$i]}/cgpro/backup/getaccbackup.live.cgi
     chmod +x ${THEMES[$i]}/cgpro/backup/getaliasesbackup.live.cgi
+    chmod +x ${THEMES[$i]}/cgpro/backup/getfiltersbackup.live.cgi
     for ((j=0; j<${lLen}; j++)); do
         TARGET=${THEMES[$i]}/locale/`basename ${LOCALES[$j]} '{}'`.yaml.local
         if [ ! -f ${TARGET} ]
