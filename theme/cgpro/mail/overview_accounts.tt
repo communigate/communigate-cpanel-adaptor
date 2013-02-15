@@ -1,0 +1,38 @@
+[% USE CPBranding -%]
+[% MACRO filter_option(pval, val, text) BLOCK -%]
+<option value="[% val %]"[% val == pval and " selected" %]>[% cptext(text) %]</option>
+[% END -%]
+[% FOREACH account IN accounts.keys.sort -%]
+<tr class="info-even">
+  <td class="cell truncate" truncate="80">[% account %]</td>
+  <td  class="cell">
+    <a target="_blank" href="webmailform.html?user=[% account %]&amp;domain=[% accounts.$account.domain %]">
+      <img src="[% CPBranding.image('cgpro_webmail') %]" alt="Access Webmail" title="Access Webmail" />
+    </a>
+    [% myclass = accounts.$account.class -%]
+    [% IF classes.$myclass.AccessModes.join(',').search('(XMPP)') -%]
+    <a target="_blank" href="pronto.html?user=[% account %]&amp;domain=[% accounts.$account.domain %]">
+      <img alt="Pronto! Web" title="Pronto! Web" src="[% CPBranding.image('cgpro_pronto') %]" />
+    </a>
+    [% END -%]
+  </td>
+  <td class="maindisp" colspan="4" nowrap="nowrap">
+  <form action="" method="post" id="form-[% account %]">
+    <select name="class" id="select-[% account %]" >
+      [% FOREACH class IN classes.keys.sort -%]
+      [% filter_option(myclass, class, class) %]
+      [% END -%]
+    </select>
+    <input type="hidden" name="account" value="[% account %]" />
+    <noscript>
+      <input type="submit" name="save" class="input-button" value="[% cptext("Save") %]" />
+    </noscript>
+    <script type="text/javascript">
+       document.getElementById('select-[% account %]').onchange = function () {
+       document.forms["form-[% account %]"].submit();
+       }
+    </script>
+  </form>
+  </td>
+</tr>
+[% END -%]

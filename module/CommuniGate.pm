@@ -52,103 +52,69 @@ sub getCLI {
     }
 }
 
-sub maxgw_domain {
- my $domainname = shift;
- my $limits_file = "/var/CommuniGate/cPanel/limits";
- my %limits;
- my $default_max_gw = 5;
- open (MYFILE, "$limits_file"); # retrieve the tokens stored on file
- while (<MYFILE>) {
-        chomp;
-        my @line = split(",",$_);
-        $limits{@line[0]} = @line[1];
- }
- close (MYFILE);
- if ($limits{$domainname}) {
-	return $limits{$domainname};
+sub max_class_accounts_domain {
+ my ($domain, $class) = @_;
+ my $data = Cpanel::CachedDataStore::fetch_ref( '/var/cpanel/cgpro/classes.yaml' ) || {};
+ if ($data->{$domain}) {
+     return $data->{$domain}->{$class}->{all};
  } else {
- 	return $default_max_gw;
+     return $data->{default}->{$class}->{all};
  }
 }
 
-sub currentgw_domain {
-  my $domainname = shift;
-  my $count=0;
-  my $cli = getCLI();
-  my $accounts=$cli->ListAccounts($domainname);
-  my $userName;
-  foreach $userName (sort keys %$accounts) {      
-   my $accountData = $cli->GetAccountEffectiveSettings("$userName\@$domainname");
-   my $services = @$accountData{'ServiceClass'} || '';
-   if (!($services cmp "groupware")) {
-	$count++;
-   }
-  }
-  $cli->Logout();
-  return $count;
+sub current_class_accounts_domain {
+    my ($domain, $class, $cli) = @_;
+    my $count = 0;
+     my $accounts = $cli->ListAccounts($domain);
+    foreach my $userName (sort keys %$accounts) {      
+     	my $accountData = $cli->GetAccountEffectiveSettings("$userName\@$domain");
+	my $service = $accountData->{'ServiceClass'} || '';
+	if ($service eq $class) {
+	    $count++;
+	}
+    }
+    return $count;
 }
 
-
-
-sub api2_GWAccounts {
+sub api2_AccountsOverview {
 	my %OPTS = @_;
-	my $domainparam = $OPTS{'domain'};
 	my $invert = $OPTS{'invert'};
-	my @domains;
-	if (!$domainparam) {
-		@domains = Cpanel::Email::listmaildomains(); 
-	} else {
-		@domains[0]=$domainparam;
-	}
+	my @domains = Cpanel::Email::listmaildomains(); 
 	my $cli = getCLI();
 	my @result;
+	my $return_accounts = {};
 	foreach my $domain (@domains) {
-		my $accounts=$cli->ListAccounts($domain);
-		my $userName;
-		foreach $userName (sort keys %$accounts) {	
-			my $accountData = $cli->GetAccountEffectiveSettings("$userName\@$domain");
-  			my $services = @$accountData{'ServiceClass'} || '';
-			if ((!($services cmp "groupware"))  && (!$invert)){ 
-				my $mail=$userName."@".$domain;
-				push( @result, { mail => $mail, domain => $domain } );
-			}
-                        if ((($services cmp "groupware"))  && ($invert)){ 
-                                my $mail=$userName."@".$domain;
-                                push( @result, { mail => $mail, domain => $domain } );
-                        }
+	    my $accounts=$cli->ListAccounts($domain);
+	    foreach my $userName (sort keys %$accounts) {	
+		my $accountData = $cli->GetAccountEffectiveSettings("$userName\@$domain");
+		my $service = @$accountData{'ServiceClass'} || '';
+		$return_accounts->{$userName . "@" . $domain} = {
+		    domain => $domain,
+		    class => $service
+		};
 
-		}
+	    }
 	}
+	my $defaults = $cli->GetServerAccountDefaults();
 	$cli->Logout();
-	return @result;
+	return { accounts => $return_accounts, classes => $defaults->{'ServiceClasses'} };
 }
 
-sub api2_EnableGW {
-	my %OPTS = @_;
-	my $account = $OPTS{'account'};
-	my @values=split("@",$account);
-        my $account_domain = @values[1];
-	my $current=currentgw_domain($account_domain);
-	my $max=maxgw_domain($account_domain);
-	if ($current>=$max) {
-		print "<H2><font color=red>Maximum of Groupware accounts exceeded for domain : $account_domain. (Maximum is : $max). </font></H2>\n";
-		return;
- 	} 
-	my $cli = getCLI();
-	my $accountData;
-	@$accountData{'ServiceClass'} = "groupware";	
-	$cli->UpdateAccountSettings("$account",$accountData);
+sub api2_UpdateAccountClass {
+    my %OPTS = @_;
+    my $cli = getCLI();
+    my (undef, $domain) = split "@", $OPTS{'account'};
+    my $max = max_class_accounts_domain($domain, $OPTS{'class'});
+    my $current = 0;
+    $current = current_class_accounts_domain($domain, $OPTS{'class'}, $cli) if $max > 0;
+    if ($max > $current || $max == -1) {
+	$cli->UpdateAccountSettings($OPTS{'account'}, { ServiceClass => $OPTS{'class'} });
 	$cli->Logout();
-}
-
-sub api2_DisableGW {
-        my %OPTS = @_;
-        my $account = $OPTS{'account'};
-	my $cli = getCLI();
-        my $accountData;
-        @$accountData{'ServiceClass'} = "mailonly";
-        $cli->UpdateAccountSettings("$account",$accountData);
-        $cli->Logout();
+	return { msg => "Updated Successfuly." };
+    } else {
+	$cli->Logout();
+	return { msg => "Maximum $class acounts is $max." };
+    }
 }
 
 sub api2_provisioniPhone {

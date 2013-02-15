@@ -31,7 +31,7 @@ my %FORM = Cpanel::Form::parseform();
 
 my $defaults = $cli->GetServerAccountDefaults();
 
-if ($FORM{'class'}) {
+if ($FORM{'class'} && $FORM{'class'} ne "mailonly") {
     delete $defaults->{ServiceClasses}->{$FORM{'class'}} if $FORM{'class'} && $defaults->{ServiceClasses}->{$FORM{'class'}};
     $cli->UpdateServerAccountDefaults({
 	ServiceClasses => $defaults->{ServiceClasses}

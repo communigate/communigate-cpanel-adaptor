@@ -26,7 +26,7 @@
 	      <label for="DNS">Class Name (alphanumeral, no spaces):</label>
 	    </td>
             <td>
-	      <input type="text" value="[% FORM.class %]" name="classname" />
+	      <input type="text" value="[% FORM.class %]" name="classname"[% IF FORM.class; ' style="background-color: #eeeeee;" readonly="readonly"' %][% END %] />
 	      <input type="hidden" value="[% FORM.class %]" name="oldclassname" />
             </td>
           </tr>
