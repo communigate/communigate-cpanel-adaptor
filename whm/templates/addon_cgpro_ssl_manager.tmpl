@@ -1,0 +1,51 @@
+[% IF hostname -%]
+[% IF settings -%]
+[% IF MSG -%]
+<h2>[% MSG %]</h2>
+[% END -%]
+<form action="" method="post">
+  <div class="form_action">
+    <fieldset>
+      <h3>Import SSL for host [% hostname %]</h3>
+      <table>
+	<tbody>
+	  <tr>
+            <td style="vertical-align: top;">
+	      <label>Private Key:</label>
+	      <sub>(Key must be with NO passphrase.)</sub>
+	    </td>
+            <td>
+	      <textarea name="key" rows="12" cols="65"></textarea>
+            </td>
+          </tr>
+	  <tr>
+            <td style="vertical-align: top;">
+	      <label>Certificate:</label>
+	    </td>
+            <td>
+	      <textarea name="crt" rows="12" cols="65"></textarea>
+            </td>
+          </tr>
+	  <tr>
+            <td style="vertical-align: top;">
+	      <label>Certificate Authority (Optional):</label>
+	    </td>
+            <td>
+	      <textarea name="ca" rows="12" cols="65"></textarea>
+            </td>
+          </tr>
+	</tbody>
+      </table>
+    </fieldset>
+  </div>
+  <p>
+    <input type="submit" value="Import" class="input-button" name="submit" />
+  </p>
+</form>
+[% ELSE -%]
+<h2>Domain ([% hostname %]) not defined in CommuniGate!</h2>
+[% END %]
+[% ELSE -%]
+<h2>Cannot determine hostname!</h2>
+[% END %]
+[% PROCESS addon_cgpro_footer.tmpl %]
