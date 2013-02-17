@@ -7,6 +7,9 @@ use Cpanel::CachedDataStore ();
 
 if ( -f '/var/CommuniGate/cPanel/limits' ) {
     open(INLIMITS, "<", "/var/CommuniGate/cPanel/limits");
+    if (! -d '/var/cpanel/cgpro' ) {
+      mkdir '/var/cpanel/cgpro';
+    }
     my $yamldata = Cpanel::CachedDataStore::fetch_ref( '/var/cpanel/cgpro/classes.yaml' ) || {};
     my $limits;
     while (<INLIMITS>) {
