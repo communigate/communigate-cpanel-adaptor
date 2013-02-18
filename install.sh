@@ -2,7 +2,6 @@
 
 PACKSRC=`pwd`
 source ${PACKSRC}/config.ini
-BASEFOLDER=/var/CommuniGate/
 
 #################################################
 #               CommuniGate Specific  	 	#
@@ -17,37 +16,43 @@ service cpanel stop
 service httpd stop
 
 if [ -d "$BASEFOLDER" ]; then
-    echo "CommuniGate cPanel plugin is already installed. Exiting..."
+echo "CommuniGate cPanel plugin is already installed. Exiting..."
+exit;
+fi
 
-# Installing CGPro 6.0
-    wget -P${PACKSRC} http://www.communigate.com/pub/CommuniGatePro/CGatePro-Linux.x86_64.rpm
-    rpm -Uvh ${PACKSRC}/CGatePro-Linux.x86_64.rpm
-    rm -rf ${PACKSRC}/CGatePro-Linux.x86_64.rpm
-    chkconfig CommuniGate on
-    service CommuniGate start
-    mkdir ${BASEFOLDER}/cPanel/
-    rsync -az ${PACKSRC}/CGP/Settings/* ${BASEFOLDER}/Settings/
-    rsync -az ${PACKSRC}/CGP/Accounts/postmaster.macnt/postmaster.macnt ${BASEFOLDER}/Accounts/postmaster.macnt/account.settings
+# Installing CGPro 6.0.1
+if [ ! -d "$SERVERFOLDER" ]; then
+wget -P${PACKSRC} http://www.communigate.com/pub/CommuniGatePro/CGatePro-Linux.x86_64.rpm
+rpm -Uvh ${PACKSRC}/CGatePro-Linux.x86_64.rpm
+rm -rf ${PACKSRC}/CGatePro-Linux.x86_64.rpm
+chkconfig CommuniGate on
+service CommuniGate start
+service CommuniGate stop
+mkdir ${BASEFOLDER}/cPanel/
+mkdir ${BASEFOLDER}/spamassassin/
+rsync -az ${PACKSRC}/CGP/Settings/* ${BASEFOLDER}/Settings/
+rsync -az ${PACKSRC}/CGP/Accounts/postmaster.macnt/postmaster.macnt ${BASEFOLDER}/Accounts/postmaster.macnt/account.settings
+rsync -az ${PACKSRC}/sso/scanspam.sh ${BASEFOLDER}/spamassassin/
+fi
 
 # Configure Airsync and Spamd
-    if grep -Fxq "Microsoft-Server-ActiveSync" /usr/local/apache/conf/includes/pre_main_global.conf
-    then
-	echo "Airsync already installed"
-    else
-	echo ProxyPass /Microsoft-Server-ActiveSync http://${HOSTNAME}:8100/Microsoft-Server-ActiveSync >> /usr/local/apache/conf/includes/pre_main_global.conf
-	echo ProxyPassReverse /Microsoft-Server-ActiveSync http://${HOSTNAME}:8100/Microsoft-Server-ActiveSync >> /usr/local/apache/conf/includes/pre_main_global.conf
-    fi
+if grep -Fxq "Microsoft-Server-ActiveSync" /usr/local/apache/conf/includes/pre_main_global.conf
+then
+echo "Airsync already installed"
+else
+echo ProxyPass /Microsoft-Server-ActiveSync http://${HOSTNAME}:8100/Microsoft-Server-ActiveSync >> /usr/local/apache/conf/includes/pre_main_global.conf
+echo ProxyPassReverse /Microsoft-Server-ActiveSync http://${HOSTNAME}:8100/Microsoft-Server-ActiveSync >> /usr/local/apache/conf/includes/pre_main_global.conf
+fi
 
-    if grep -Fxq "CommuniGate Integration Settings" /etc/mail/spamassassin/local.cf
-    then
-	echo "spamd already configured"
-    else
-	echo "# CommuniGate Integration Settings #" >> /etc/mail/spamassassin/local.cf
-	echo "rewrite_header Subject *****SPAM*****" >> /etc/mail/spamassassin/local.cf
-	echo "report_safe 0" >> /etc/mail/spamassassin/local.cf
-	echo "add_header all Level _STARS(x)_" >> /etc/mail/spamassassin/local.cf
-	echo "# END of CommuniGate Integration Settings #" >> /etc/mail/spamassassin/local.cf
-    fi
+if grep -Fxq "CommuniGate Integration Settings" /etc/mail/spamassassin/local.cf
+then
+echo "spamd already configured"
+else
+echo "# CommuniGate Integration Settings #" >> /etc/mail/spamassassin/local.cf
+echo "rewrite_header Subject *****SPAM*****" >> /etc/mail/spamassassin/local.cf
+echo "report_safe 0" >> /etc/mail/spamassassin/local.cf
+echo "add_header all Level _STARS(x)_" >> /etc/mail/spamassassin/local.cf
+echo "# END of CommuniGate Integration Settings #" >> /etc/mail/spamassassin/local.cf
 fi
 
 #################################################
@@ -135,10 +140,10 @@ do
     cp -r "${PACKSRC}/theme/cgpro" "${THEMES[$i]}/"
     cp "${PACKSRC}/icons/"* "${THEMES[$i]}/branding"
     cp "${PACKSRC}/plugin/dynamicui_cgpro.conf" "${THEMES[$i]}/dynamicui/"
-    mkdir ${THEMES[$i]}/dynamicui/js2-min/cgpro
-    ln -s ${THEMES[$i]}/dynamicui/js2-min/mail ${THEMES[$i]}/dynamicui/js2-min/cgpro/
-    mkdir ${THEMES[$i]}/dynamicui/css2-min/cgpro
-    ln -s ${THEMES[$i]}/dynamicui/css2-min/mail ${THEMES[$i]}/dynamicui/css2-min/cgpro/
+    mkdir ${THEMES[$i]}/js2-min/cgpro
+    ln -s ${THEMES[$i]}/js2-min/mail ${THEMES[$i]}/js2-min/cgpro/
+    mkdir ${THEMES[$i]}/css2-min/cgpro
+    ln -s ${THEMES[$i]}/css2-min/mail ${THEMES[$i]}/css2-min/cgpro/
     chmod +x ${THEMES[$i]}/cgpro/backup/getaccbackup.live.cgi
     chmod +x ${THEMES[$i]}/cgpro/backup/getaliasesbackup.live.cgi
     chmod +x ${THEMES[$i]}/cgpro/backup/getfiltersbackup.live.cgi
@@ -176,6 +181,7 @@ iptables-save
 # Start needed services
 service	cpanel start
 service	httpd start
+service CommuniGate start
 
 # Installing iTool Labs webmail
 sh ${PACKSRC}/webmail-install.sh

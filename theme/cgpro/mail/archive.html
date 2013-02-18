@@ -1,27 +1,6 @@
 <cpanel setvar="headerinclude=mail/archiver_head.html">
 <cpanel setvar="headerimg=../images/mailmenu.gif">
 <cpanel setvar="dprefix=../">
-<cpanelif $FORM{'itemsperpage'}>
-    <cpanel setvar="itemsperpage=$FORM{'itemsperpage'}">
-</cpanelif>
-<cpanelif !$FORM{'itemsperpage'} || !$CPVAR{'itemsperpage'}>
-    <cpanel setvar="itemsperpage=10">
-</cpanelif>
-
-<cpanelif $FORM{'api2_sort_column'}>
-    <cpanel setvar="api2_sort_column=$FORM{'api2_sort_column'}">
-</cpanelif>
-<cpanelif !$FORM{'api2_sort_column'} || !$CPVAR{'api2_sort_column'}>
-    <cpanel setvar="api2_sort_column=domain">
-</cpanelif>
-
-<cpanelif $FORM{'api2_sort_reverse'}>
-    <cpanel setvar="api2_sort_reverse=$FORM{'api2_sort_reverse'}">
-</cpanelif>
-<cpanelif !$FORM{'api2_sort_reverse'} || !$CPVAR{'api2_sort_reverse'}>
-    <cpanel setvar="api2_sort_reverse=0">
-</cpanelif>
-
 <cpanel Branding="include(stdheader.html)">
 <style type="text/css">
 <?cp Branding::spritelist(.spriteicon_img_mini {float:left;margin-right:5px;background: url\{leftparenthesis}"%"\{rightparenthesis};} %,@spriteurl,images::#icon-${img}_mini {background-position\{colon}0 -${cssposition}px;width\{colon}${width}px;height\{colon}${height}px; }:) imgtype=icon,subtype=img,method=scale_60percent,format=png,img=emailarch ?>
@@ -33,7 +12,6 @@
 
     <cpanelfeature cgpro_emailarchive>
 
-    <cpanelif $CONF{'emailarchive'}>
     <div class="header-text">
         <cpanel Locale="maketext('Email Archiving allows you to store a copy of each incoming and outgoing message that is sent to or from a domain on your account. The archives are stored in an uncompressed [output,strong,_1] format so they can be browsed via an IMAP connection. Be aware that archiving email can consume disk space quickly, and you should ensure you have enough disk space available for the retention period you select.','maildir')">
     </div>
@@ -57,11 +35,7 @@
     </form>
 
     <iframe style="display:none;" name="archivedown" id="archivedown"></iframe>
-    </cpanelif>
     </cpanelfeature>
 
-    <cpanelif !$CONF{'emailarchive'}>
-        <cpanel Locale="maketext('Email archiving is disabled.')">
-    </cpanelif>
 </div>
 <cpanel Branding="include(stdfooter.html)">
