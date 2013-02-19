@@ -416,10 +416,12 @@ sub api2_ListDefAddress {
 		my $domaindata = $cli->GetDomainEffectiveSettings("$domain");
                 my $action = @$domaindata{'MailToUnknown'} || '';
 		my $forwardaddress = @$domaindata{'MailRerouteAddress'} || '';
-		if ($action eq "Rejected") { push( @result, { domain => "$domain",reject => "selected",discard =>"",forward=>"",acceptedandbounced =>"" } ); }
-		if ($action eq "Discarded") { push( @result, { domain => "$domain",reject => "",discard =>"selected",forward=>"",acceptedandbounced =>"" } ); }
-		if ($action eq "Rerouted to") { push( @result, { domain => "$domain",reject => "",discard =>"",forward=>"selected",acceptedandbounced =>"",MailRerouteAddress => "$forwardaddress"} ); }
-		if ($action eq "Accepted and Bounced") { push( @result, { domain => "$domain",reject => "",discard =>"",forward=>"",acceptedandbounced =>"selected" } ); }
+		my $entry = { domain => "$domain",reject => "",discard =>"",forward=>"",acceptedandbounced =>"" };
+		if ($action eq "Rejected") { $entry->{'reject'} = "selected"; }
+		if ($action eq "Discarded") { $entry->{'discard'} = "selected"; }
+		if ($action eq "Rerouted to") { $entry->{'forward'} = "selected"; }
+		if ($action eq "Accepted and Bounced") { $entry-> {'acceptedandbounced'} = "selected"; }
+		push( @result, $entry );
 	}	
         $cli->Logout();
         return @result;
@@ -431,6 +433,8 @@ sub api2_SetDefAddress {
 	my $action = $OPTS{'action'};
 	my $fwdmail= $OPTS{'fwdmail'};
 	my $cli = getCLI();
+	my $data = $cli->GetDomainSettings("$domain");
+	$cli->CreateDomain("$domain") unless $data;
 	my $domainData;
 	if ($action eq "CGPDefDiscard") { @$domainData{'MailToUnknown'} = "Discarded"; }
 	if ($action eq "CGPDefReject") { @$domainData{'MailToUnknown'} = "Rejected"; }
