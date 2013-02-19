@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-#WHMADDON:communigatepro:CommuniGate Pro Administration 
+#WHMADDON:communigatepro:CGPro <strong>Administration</strong>
 
 
 # (c) 2011 CommuniGate Systems
