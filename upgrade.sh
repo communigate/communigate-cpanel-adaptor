@@ -87,13 +87,13 @@ do
     cp "${PACKSRC}/plugin/dynamicui_cgpro.conf" "${THEMES[$i]}/dynamicui/"
     if [ ! -d /dynamicui/js2-min/cgpro ]
     then
-	mkdir ${THEMES[$i]}/dynamicui/js2-min/cgpro
-	ln -s ${THEMES[$i]}/dynamicui/js2-min/mail ${THEMES[$i]}/dynamicui/js2-min/cgpro/
+	mkdir ${THEMES[$i]}/js2-min/cgpro
+	ln -s ${THEMES[$i]}/js2-min/mail ${THEMES[$i]}/js2-min/cgpro/
     fi
     if [ ! -d /dynamicui/css2-min/cgpro ]
     then
-	mkdir ${THEMES[$i]}/dynamicui/css2-min/cgpro
-	ln -s ${THEMES[$i]}/dynamicui/css2-min/mail ${THEMES[$i]}/dynamicui/css2-min/cgpro/
+	mkdir ${THEMES[$i]}/css2-min/cgpro
+	ln -s ${THEMES[$i]}/css2-min/mail ${THEMES[$i]}/css2-min/cgpro/
     fi
     chmod +x ${THEMES[$i]}/cgpro/backup/getaccbackup.live.cgi
     chmod +x ${THEMES[$i]}/cgpro/backup/getaliasesbackup.live.cgi

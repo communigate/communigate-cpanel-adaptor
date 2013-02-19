@@ -77,10 +77,10 @@ do
     rm -rf ${THEMES[$i]}/cgpro
     rm -f ${THEMES[$i]}/branding/cgpro_*
     rm -rf ${THEMES[$i]}/dynamicui/dynamicui_cgpro.conf
-    rm -f ${THEMES[$i]}/dynamicui/js2-min/cgpro/mail
-    rmdir  ${THEMES[$i]}/dynamicui/js2-min/cgpro
-    rm -f ${THEMES[$i]}/dynamicui/css2-min/cgpro/mail
-    rmdir ${THEMES[$i]}/dynamicui/css2-min/cgpro
+    rm -f ${THEMES[$i]}/js2-min/cgpro/mail
+    rmdir  ${THEMES[$i]}/js2-min/cgpro
+    rm -f ${THEMES[$i]}/css2-min/cgpro/mail
+    rmdir ${THEMES[$i]}/css2-min/cgpro
     for ((j=0; j<${lLen}; j++)); do
         TARGET=${THEMES[$i]}/locale/`basename ${LOCALES[$j]} '{}'`.yaml.local
         sed -i -e '/^CGP/d' ${TARGET}
