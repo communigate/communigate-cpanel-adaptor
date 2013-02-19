@@ -13,6 +13,11 @@
             <td style="vertical-align: top;">
 	      <label>Private Key:</label>
 	      <sub>(Key must be with NO passphrase.)</sub>
+	      [% IF settings.PrivateSecureKey -%]
+	      <p><strong>Key is imported.</strong></p>
+	      [% ELSE -%]
+	      <p><strong>No key imported.</strong></p>
+	      [% END -%]
 	    </td>
             <td>
 	      <textarea name="key" rows="12" cols="65"></textarea>
@@ -21,6 +26,11 @@
 	  <tr>
             <td style="vertical-align: top;">
 	      <label>Certificate:</label>
+	      [% IF settings.SecureCertificate -%]
+	      <p><strong>Certificate is imported.</strong></p>
+	      [% ELSE -%]
+	      <p><strong>No certificate imported.</strong></p>
+	      [% END -%]
 	    </td>
             <td>
 	      <textarea name="crt" rows="12" cols="65"></textarea>
@@ -29,6 +39,11 @@
 	  <tr>
             <td style="vertical-align: top;">
 	      <label>Certificate Authority (Optional):</label>
+	      [% IF settings.SecureCertificate -%]
+	      <p><strong>CA is imported.</strong></p>
+	      [% ELSE -%]
+	      <p><strong>No CA imported.</strong></p>
+	      [% END -%]
 	    </td>
             <td>
 	      <textarea name="ca" rows="12" cols="65"></textarea>
