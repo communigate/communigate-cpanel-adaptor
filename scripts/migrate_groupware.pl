@@ -31,11 +31,13 @@ if ( -f '/var/CommuniGate/cPanel/limits' ) {
     }
     Cpanel::CachedDataStore::store_ref( '/var/cpanel/cgpro/classes.yaml', $yamldata );
 } else {
+  unless (-f '/var/cpanel/cgpro/classes.yaml' ) {
     my $yamldata = {};
     $yamldata->{'default'}->{'groupware'}->{'all'} = -1;
     $yamldata->{'default'}->{'groupware'}->{'free'} = -1;
     $yamldata->{'default'}->{'mailonly'}->{'all'} = -1;
     $yamldata->{'default'}->{'mailonly'}->{'free'} = -1;
     Cpanel::CachedDataStore::store_ref( '/var/cpanel/cgpro/classes.yaml', $yamldata );
+  }
 }
 
