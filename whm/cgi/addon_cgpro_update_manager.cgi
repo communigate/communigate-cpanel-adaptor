@@ -38,7 +38,7 @@ if ($response->is_success) {
 		    system("rm -rf /usr/src/communigate-cpanel-adaptor");
 		}
 		print "Extracting files...\n";
-		system ("cd /usr/src ; tar -xzf  /usr/src/Communigate-Cpanel-adaptor-$newversion.tar.gz; cd communigate-cpanel-adaptor; /bin/bash ./upgrade.sh");
+		system ("cd /usr/src ; tar -xzf  /usr/src/Communigate-Cpanel-adaptor-$newversion.tar.gz; cd CommuniGate-cPanel-adaptor-$newversion; /bin/bash ./upgrade.sh");
 	    } else {
 		print "Error while downloading package: <em>" . $response->status_line . "</em>";
 	    }
