@@ -7,7 +7,7 @@
   <td class="cell truncate" truncate="80">[% account %]</td>
   <td  class="cell">
     <a target="_blank" href="webmailform.html?user=[% account %]&amp;domain=[% accounts.$account.domain %]">
-      <img src="[% CPBranding.image('cgpro_webmail') %]" alt="Access Webmail" title="Access Webmail" />
+      <img src="[% CPBranding.image('cgpro_webemail') %]" alt="Access Webmail" title="Access Webmail" />
     </a>
     [% myclass = accounts.$account.class -%]
     [% IF classes.$myclass.AccessModes.join(',').search('(XMPP)') -%]
