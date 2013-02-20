@@ -1,0 +1,102 @@
+#!/bin/sh
+#
+# CommuniGate  This shell script takes care of starting and stopping
+#              the CommuniGate(r) Pro Communication server
+#
+# Linux version
+#
+# (c) 1998-2012, Stalker Software, Inc.
+#
+# chkconfig: 345 80 30
+# description: CommuniGate Pro Communication Server
+### BEGIN INIT INFO
+# Default-Start:  3 4 5
+# Default-Stop: 0 1 2 6
+# Provides:       CommuniGate
+# Required-Start: $network
+# Required-Stop: $network
+# Description:    Start CommuniGate Pro Communication Server
+### END INIT INFO
+#
+# APPDIRECTORY  is the CommuniGate Pro application directory location
+# (this is a non-modifiable software directory)
+# BASEDIRECTORY is the CommuniGate Pro base directory location
+# (this directory contains accounts, settings, logs, and other data)
+#
+APPDIRECTORY="/opt"
+BASEDIRECTORY="/var/CommuniGate"
+SUPPLPARAMS=
+
+# Some Linux distributions come with the "NPTL" threads library
+# that crashes quite often. The following lines are believed to force
+# Linux to use the old working threads library.
+#
+#LD_ASSUME_KERNEL=2.4.1
+#export LD_ASSUME_KERNEL
+
+# Source function library.
+if [ -f /etc/rc.d/init.d/functions ]; then
+  . /etc/rc.d/init.d/functions
+elif [ -f /etc/init.d/functions ]; then
+  . /etc/init.d/functions
+fi
+
+ulimit -u 2000
+ulimit -c 2097151
+umask 0
+
+# Custom startup parameters
+if [ -f ${BASEDIRECTORY}/Startup.sh ]; then
+  . ${BASEDIRECTORY}/Startup.sh
+fi
+
+case "$1" in
+start)
+  if [ ! -d ${BASEDIRECTORY} ] ; then
+    if mkdir -p ${BASEDIRECTORY} && chgrp mail ${BASEDIRECTORY} && \
+       chmod 2770 ${BASEDIRECTORY} ; then
+      echo "CommuniGate Pro Base Directory ${BASEDIRECTORY} created"
+    else
+      echo "Failed to create the CommuniGate Pro Base Directory ${BASEDIRECTORY}"; exit 1
+    fi
+  fi
+
+  if [ ! -x ${APPDIRECTORY}/CommuniGate/CGServer ]; then
+    echo "CommuniGate Pro Server is not found"; exit 1
+  fi
+
+  echo "Starting Spamd"
+  nohup /usr/bin/spamd --allowed-ips=127.0.0.1 -d &
+
+  echo "Starting CommuniGate Pro Server"
+  if ${APPDIRECTORY}/CommuniGate/CGServer --Base ${BASEDIRECTORY} --Daemon ${SUPPLPARAMS} ; then
+    touch /var/lock/subsys/CommuniGate
+  fi
+  ;;
+stop)
+  if [ -f ${BASEDIRECTORY}/ProcessID ]; then
+    echo "Shutting down CommuniGate Pro Server"
+    if kill `cat ${BASEDIRECTORY}/ProcessID` ; then
+      echo -n "Waiting for CommuniGate Pro Server to stop"
+      pkill spamd
+      while [ -f ${BASEDIRECTORY}/ProcessID ]; do
+        echo -n "."; sleep 1;
+      done
+    fi
+  else
+    echo "It looks like the CommuniGate Pro Server is not running"
+  fi
+  rm -f /var/lock/subsys/CommuniGate
+  ;;
+status)
+  if [ -f ${BASEDIRECTORY}/ProcessID ]; then
+    echo "CommuniGate Pro Server is running. pid=`cat ${BASEDIRECTORY}/ProcessID`"
+  else
+    echo "CommuniGate Pro Server is not running"
+  fi
+  ;;
+*)
+  echo "Usage: $0 [ start | stop | status ]"
+  exit 1
+esac
+

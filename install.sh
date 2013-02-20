@@ -28,8 +28,9 @@ rm -rf ${PACKSRC}/CGatePro-Linux.x86_64.rpm
 chkconfig CommuniGate on
 service CommuniGate start
 service CommuniGate stop
-mkdir ${BASEFOLDER}/cPanel/
-mkdir ${BASEFOLDER}/spamassassin/
+mkdir -p ${BASEFOLDER}/cPanel/
+mkdir -p ${BASEFOLDER}/spamassassin/
+rsync -az ${PACKSRC}/CGP/initCommuniGate /etc/init.d/CommuniGate
 rsync -az ${PACKSRC}/CGP/Settings/* ${BASEFOLDER}/Settings/
 rsync -az ${PACKSRC}/CGP/Accounts/postmaster.macnt/postmaster.macnt ${BASEFOLDER}/Accounts/postmaster.macnt/account.settings
 rsync -az ${PACKSRC}/sso/scanspam.sh ${BASEFOLDER}/spamassassin/
@@ -60,9 +61,9 @@ fi
 #################################################
 
 # iPhone provisioning using default httpd
-mkdir /usr/local/apache/htdocs/iOS
+mkdir -p /usr/local/apache/htdocs/iOS
 chmod 777 /usr/local/apache/htdocs/iOS
-mkdir /var/CommuniGate/apple
+mkdir -p /var/CommuniGate/apple
 cp ${PACKSRC}/iphone/iphonetemplate.mobileconfig /var/CommuniGate/apple/
 
 # Install the WHM plugins
@@ -101,7 +102,7 @@ cp ${PACKSRC}/cgpro-webmail/webmail_communigate.yaml /var/cpanel/webmail/
 cp -r ${PACKSRC}/cgpro-webmail/CommuniGate /usr/local/cpanel/base/3rdparty/
 
 # Install SSO for Webmail
-mkdir /var/CommuniGate/cgi
+mkdir -p /var/CommuniGate/cgi
 cp ${PACKSRC}/sso/login.pl /var/CommuniGate/cgi/
 
 # chkservd for CGServer & spamd
@@ -112,7 +113,6 @@ echo "CommuniGate_spamd:1" >> /etc/chkserv.d/chkservd.conf
 
 # Check the scripts have executable flag
 chmod +x /usr/local/cpanel/whostmgr/docroot/cgi/addon_cgpro*
-chmod +x /usr/local/cpanel/scripts/postwwwacct
 chmod +x /var/CommuniGate/cgi/login.pl
 chmod +x /usr/local/cpanel/Cpanel/CommuniGate.pm
 chmod +x /usr/local/cpanel/bin/ccaadmin
@@ -140,10 +140,22 @@ do
     cp -r "${PACKSRC}/theme/cgpro" "${THEMES[$i]}/"
     cp "${PACKSRC}/icons/"* "${THEMES[$i]}/branding"
     cp "${PACKSRC}/plugin/dynamicui_cgpro.conf" "${THEMES[$i]}/dynamicui/"
-    mkdir ${THEMES[$i]}/js2-min/cgpro
-    ln -s ${THEMES[$i]}/js2-min/mail ${THEMES[$i]}/js2-min/cgpro/
-    mkdir ${THEMES[$i]}/css2-min/cgpro
-    ln -s ${THEMES[$i]}/css2-min/mail ${THEMES[$i]}/css2-min/cgpro/
+    if [ ! -d ${THEMES[$i]}/js2-min/cgpro ]
+    then
+	mkdir -p ${THEMES[$i]}/js2-min/cgpro
+    fi
+    if [ ! -L ${THEMES[$i]}/js2-min/cgpro/mail ]
+    then
+	ln -s ${THEMES[$i]}/js2-min/mail ${THEMES[$i]}/js2-min/cgpro/
+    fi
+    if [ ! -d ${THEMES[$i]}/css2-min/cgpro ]
+    then
+	mkdir -p ${THEMES[$i]}/css2-min/cgpro
+    fi
+    if [ ! -L ${THEMES[$i]}/css2-min/cgpro/mail ]
+    then
+	ln -s ${THEMES[$i]}/css2-min/mail ${THEMES[$i]}/css2-min/cgpro/
+    fi
     chmod +x ${THEMES[$i]}/cgpro/backup/getaccbackup.live.cgi
     chmod +x ${THEMES[$i]}/cgpro/backup/getaliasesbackup.live.cgi
     chmod +x ${THEMES[$i]}/cgpro/backup/getfiltersbackup.live.cgi

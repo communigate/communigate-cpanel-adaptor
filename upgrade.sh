@@ -19,6 +19,7 @@ cp ${PACKSRC}/module/CommuniGate.pm /usr/local/cpanel/Cpanel/
 cp ${PACKSRC}/library/CLI.pm /usr/local/cpanel/perl/
 if [ ! -L /usr/local/lib/perl5/5.8.8/CLI.pm ]
 then
+    rm -f /usr/local/lib/perl5/5.8.8/CLI.pm
     ln -s /usr/local/cpanel/perl/CLI.pm /usr/local/lib/perl5/5.8.8/
 fi
 
@@ -47,7 +48,7 @@ cp -r ${PACKSRC}/cgpro-webmail/CommuniGate /usr/local/cpanel/base/3rdparty/
 # Install SSO for Webmail
 if [ ! -d /var/CommuniGate/cgi ]
 then
-    mkdir /var/CommuniGate/cgi
+    mkdir -p /var/CommuniGate/cgi
 fi
 cp ${PACKSRC}/sso/login.pl /var/CommuniGate/cgi/
 
@@ -85,14 +86,20 @@ do
     rm -f ${THEMES[$i]}/branding/cgpro_*
     cp "${PACKSRC}/icons/"* "${THEMES[$i]}/branding"
     cp "${PACKSRC}/plugin/dynamicui_cgpro.conf" "${THEMES[$i]}/dynamicui/"
-    if [ ! -d /dynamicui/js2-min/cgpro ]
+    if [ ! -d ${THEMES[$i]}/js2-min/cgpro ]
     then
-	mkdir ${THEMES[$i]}/js2-min/cgpro
+	mkdir -p ${THEMES[$i]}/js2-min/cgpro
+    fi
+    if [ ! -L ${THEMES[$i]}/js2-min/cgpro/mail ]
+    then
 	ln -s ${THEMES[$i]}/js2-min/mail ${THEMES[$i]}/js2-min/cgpro/
     fi
-    if [ ! -d /dynamicui/css2-min/cgpro ]
+    if [ ! -d ${THEMES[$i]}/css2-min/cgpro ]
     then
-	mkdir ${THEMES[$i]}/css2-min/cgpro
+	mkdir -p ${THEMES[$i]}/css2-min/cgpro
+    fi
+    if [ ! -L ${THEMES[$i]}/css2-min/cgpro/mail ]
+    then
 	ln -s ${THEMES[$i]}/css2-min/mail ${THEMES[$i]}/css2-min/cgpro/
     fi
     chmod +x ${THEMES[$i]}/cgpro/backup/getaccbackup.live.cgi

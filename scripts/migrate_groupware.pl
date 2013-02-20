@@ -5,11 +5,11 @@ use warnings;
 use lib '/usr/local/cpanel/';
 use Cpanel::CachedDataStore ();
 
+if (! -d '/var/cpanel/cgpro' ) {
+    mkdir '/var/cpanel/cgpro';
+}
 if ( -f '/var/CommuniGate/cPanel/limits' ) {
     open(INLIMITS, "<", "/var/CommuniGate/cPanel/limits");
-    if (! -d '/var/cpanel/cgpro' ) {
-      mkdir '/var/cpanel/cgpro';
-    }
     my $yamldata = Cpanel::CachedDataStore::fetch_ref( '/var/cpanel/cgpro/classes.yaml' ) || {};
     my $limits;
     while (<INLIMITS>) {
@@ -29,6 +29,13 @@ if ( -f '/var/CommuniGate/cPanel/limits' ) {
 	$yamldata->{'default'}->{'mailonly'}->{'all'} = -1;
 	$yamldata->{'default'}->{'mailonly'}->{'free'} = -1;
     }
+    Cpanel::CachedDataStore::store_ref( '/var/cpanel/cgpro/classes.yaml', $yamldata );
+} else {
+    my $yamldata = {};
+    $yamldata->{'default'}->{'groupware'}->{'all'} = -1;
+    $yamldata->{'default'}->{'groupware'}->{'free'} = -1;
+    $yamldata->{'default'}->{'mailonly'}->{'all'} = -1;
+    $yamldata->{'default'}->{'mailonly'}->{'free'} = -1;
     Cpanel::CachedDataStore::store_ref( '/var/cpanel/cgpro/classes.yaml', $yamldata );
 }
 

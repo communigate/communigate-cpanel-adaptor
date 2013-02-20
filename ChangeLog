@@ -1,3 +1,104 @@
+2.0 Release notes:
+
+* Groupware accounts replaced with the more detailed Overview Accounts manager
+* Replacing postwwwacct script with a Hook
+* Showing a info message in User Filters when there are not any email accounts
+* Removed Email Routing from MX records template
+* Removing some files before upgrade
+* WHM CGI plugins are updating last now
+* Added SSL Importer in WHM
+* Added groupware to Overview accounts upgrade script
+* Added hook on WHM Terminate Account ( Deletes CGPro domains belonging to account )
+* Added Email Archiving
+* Adding uninstall.sh script (CCA only)
+* Added Email Filtering
+* Adding upgrade.sh
+* Adding Update Manager in WHM
+* Added Class Manager in WHM
+* Adding Filters and Forwarders Backup and Restore
+* Displaying CGPro and CCA versions in WHM Plugins' footer
+* Sepatate feature for default Spamassassin icon. Not disabling the default functionality.
+* Default Mail Account as new feature in feature list
+* Disabling default Email Accounts
+* Updated DNS SRV records descriptions
+* Linking standard js paths to cgpro subfolder
+* CLI.pm only in cpanel path
+* Minor fix: reseting email accounts icon
+* Minor change of a title style
+* Fixed Wizard adding new account
+* Fixed back button in mail delimiter per domain
+* Bugfix: Fixed Webmail feature listing
+* Bugfix: Autodeletes account from local cpanel accouts if CGPro account cannot be created
+* Bugfix: checking for directory in migrate script
+
+1.9 Release notes:
+
+* Moving theme to plugin.
+* Adding stable version of the Energy HTML5 Webmail & Calendar.
+* Migrating hooks from Legacy to Standardized
+* Plugin features added to WHM Feature Manager
+* Updated Mail delimiter. Added outgoing limits, mail size limit and per domain limits
+* Templates names changed from cgp to cgpro
+* Helpers and Autoloaders grouping and optimisation
+* Fixing mail.example.com in both helpoers and SRV records
+* Changed group title
+* Changed webmail client icon
+* Added localization strings to account backups
+* Added config.ini
+* Added SpamAssasin support
+* Fixed Aliases functionality. Now it creates true alias instead of forwarders
+* install.sh updated to match new plugin needs
+* CGPro login data moved into configuration file
+* Added RBLs functionality, merged with email delimiters in a singe whm plugin. Using Template Toolkit templates
+* All Pronto! services joined in one item/page
+* Enabled localization for the plugin
+* Added CLI connection management function in CommuniGate.pm
+* Merging cgppass and cca wrappers to cca only
+* Bugfix: Disabling original Backup interface by default
+* Bugfix: Added $cli->logOut in each function
+* Bugfix: Fixed dulicate Mail Route Trace icon
+* Bugfix: Fixed intial default feature list creation
+* Bugfix: Fixed cpanel feature flag in temapltes
+* Bugfix: Fixed wrong configuration file paths
+* Bugfix: Added missing BASEFOLDER to CommuniGate server
+* Some minor bugfixes, reported by internal QA or developers
+
+1.8 Release notes:
+
+* Added ENERGY HTML5 webmail interface
+* Added CalDav/CardDav helpers for Apple Calendar and Address book setup
+* Added Jabber/XMPP helpers for Instant Messaging client setup
+* DNS/SRV icon moved in separate dynamic UI file
+* Mail delimiter WHM plugin added (NOTE: hardcoded server IP address)
+* Wrapper aded to install.sh scripts
+* Added DNS srv records enabler (Opensource project Task#27)
+* Updated install.sh script for better performance
+* Updated wrap directory
+* Uninstall.sh script removed. New uninstall process will be added in version 2.0
+* Minor bugfixes and cleaned up errata
+
+1.7 Release notes:
+
+* CommuniGate is installed via RPM;
+* Added new install.sh
+* Backup and restore of Email accounts added
+* Fixed a typo bug in forwarders restore
+* generating a forwarders temp files changed to homedir's tmp
+* Deleting tempfiles while restoring forwarders backup
+* Added restoring of forwarder backups
+* Changed name of backup function
+* Downloading email forwarders backup file
+* Fixed duplicate forwarders bug
+* Fixed empty forwarders bug
+* Fixed bug on deleting autoresponders
+* Password generator header image fixed.
+* Email account pagination "next" button fixed.
+* Mail Client Configuration template updated.
+* Fixed MX template
+* Email Authentication updated. Added DKIM control.
+* Added autoresponder functionality
+* Added /COPYING file containign the GNU GPL v3 License
+
 1.6 Release notes:
 
 * iOS auto provisionning fixed (issue # 30)
