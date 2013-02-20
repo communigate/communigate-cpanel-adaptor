@@ -24,6 +24,7 @@ if ($response->is_success) {
     my $newversion = $response->decoded_content;  # or whatever
     $newversion =~ s/Version:\s+(\S+)/$1/;
     chomp $newversion;
+    $newversion =~ s/\s+//;
     if ($newversion eq $VERSION) {
 	print "<p>Communigate Cpanel Adaptor is up to date (Version: $VERSION)</p>";
     } else {
