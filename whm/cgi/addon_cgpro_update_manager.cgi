@@ -31,14 +31,14 @@ if ($response->is_success) {
 	if ($FORM{'upgrade'}) {
 	    print "<h2>Downloading files</h2>";
 	    print "<pre>\n";
-	    $response = $ua->get("http://communigate-cpanel-adaptor.googlecode.com/files/Communigate-Cpanel-adaptor-$newversion.tar.gz", ':content_file' => "/usr/src/Communigate-Cpanel-adaptor-$newversion.tar.gz");
+	    $response = $ua->get("http://communigate-cpanel-adaptor.googlecode.com/files/CommuniGate-cPanel-adaptor-$newversion.tar.gz", ':content_file' => "/usr/src/CommuniGate-cPanel-adaptor-$newversion.tar.gz");
 	    if ($response->is_success) {
-		print "Download successful. '/usr/src/Communigate-Cpanel-adaptor-$newversion.tar.gz' \n";
+		print "Download successful. '/usr/src/CommuniGate-cPanel-adaptor-$newversion.tar.gz' \n";
 		if ( -d '/usr/src/communigate-cpanel-adaptor' ) {
 		    system("rm -rf /usr/src/communigate-cpanel-adaptor");
 		}
 		print "Extracting files...\n";
-		system ("cd /usr/src ; tar -xzf  /usr/src/Communigate-Cpanel-adaptor-$newversion.tar.gz; cd CommuniGate-cPanel-adaptor-$newversion; /bin/bash ./upgrade.sh");
+		system ("cd /usr/src ; tar -xzf  /usr/src/CommuniGate-cPanel-adaptor-$newversion.tar.gz; cd CommuniGate-cPanel-adaptor-$newversion; /bin/bash ./upgrade.sh");
 	    } else {
 		print "Error while downloading package: <em>" . $response->status_line . "</em>";
 	    }
