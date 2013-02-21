@@ -6,7 +6,6 @@ use Cpanel::Form            ();
 use Whostmgr::HTMLInterface ();
 use Whostmgr::ACLS          ();
 use CLI;
-use Cpanel::API::Branding        ();
 use Cpanel::CachedDataStore;
 
 print "Content-type: text/html\r\n\r\n";

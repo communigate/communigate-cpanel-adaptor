@@ -82,6 +82,7 @@ sub api2_AccountsOverview {
 	my @domains = Cpanel::Email::listmaildomains(); 
 	my $cli = getCLI();
 	my @result;
+	my $data = Cpanel::CachedDataStore::fetch_ref( '/var/cpanel/cgpro/classes.yaml' ) || {};
 	my $return_accounts = {};
 	foreach my $domain (@domains) {
 	    my $accounts=$cli->ListAccounts($domain);
@@ -97,7 +98,7 @@ sub api2_AccountsOverview {
 	}
 	my $defaults = $cli->GetServerAccountDefaults();
 	$cli->Logout();
-	return { accounts => $return_accounts, classes => $defaults->{'ServiceClasses'} };
+	return { accounts => $return_accounts, classes => $defaults->{'ServiceClasses'}, data => $data };
 }
 
 sub api2_UpdateAccountClass {

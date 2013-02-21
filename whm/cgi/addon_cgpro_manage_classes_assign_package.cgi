@@ -8,6 +8,8 @@ use CLI;
 use Cpanel::API::Branding        ();
 use Cpanel::CachedDataStore;
 
+print "Content-type: text/html\r\n\r\n";
+
 Whostmgr::ACLS::init_acls();
 if ( !Whostmgr::ACLS::hasroot() ) {
   print "You need to be root to see this page.\n";
@@ -28,38 +30,28 @@ my $cgproversion = $cli->getversion();
 
 my %FORM = Cpanel::Form::parseform();
 
+Whostmgr::HTMLInterface::defheader( "CGPro Manage Classes for package " . $FORM{package},'', '/cgi/addon_cgp_manage_classes_assign_package.cgi' );
+
 # Mail delimiter
 my $defaults = $cli->GetServerAccountDefaults();
-# check if domain is defined in CGPro;
-my $domain = $cli->GetDomainSettings($FORM{domain});
 my $data = Cpanel::CachedDataStore::fetch_ref( '/var/cpanel/cgpro/classes.yaml' ) || {};
-if ($FORM{'delete'}) {
-    $data->{$FORM{'domain'}} = {};
-    delete $data->{$FORM{'domain'}};
-    Cpanel::CachedDataStore::store_ref( '/var/cpanel/cgpro/classes.yaml', $data );
-    print "HTTP/1.1 303 See Other\r\nLocation: addon_cgpro_manage_classes.cgi\r\n\r\n";
-}
 if ($FORM{'save'}) {
-    $data->{$FORM{'domain'}} = {};
+    $data->{$FORM{'package'}} = {};
     for my $class (keys %{$defaults->{ServiceClasses}}) {
-	$data->{$FORM{'domain'}}->{$class}->{'all'} = $FORM{$class . '-all'};
-	$data->{$FORM{'domain'}}->{$class}->{'free'} = $FORM{$class . '-free'};
+	$data->{$FORM{'package'}}->{$class}->{'all'} = $FORM{$class . '-all'};
+	$data->{$FORM{'package'}}->{$class}->{'free'} = $FORM{$class . '-free'};
     }
     Cpanel::CachedDataStore::store_ref( '/var/cpanel/cgpro/classes.yaml', $data );
 }
 
 
-print "Content-type: text/html\r\n\r\n";
-Whostmgr::HTMLInterface::defheader( "CGPro Manage Classes for " . $FORM{domain},'', '/cgi/addon_cgp_manage_classes_assign.cgi' );
-
 Cpanel::Template::process_template(
 				   'whostmgr',
 				   {
-				    'template_file' => 'addon_cgpro_manage_classes_assign.tmpl',
+				    'template_file' => 'addon_cgpro_manage_classes_assign_package.tmpl',
 				    defaults => $defaults,
-				    domain_data => $data->{$FORM{'domain'}},
-				    domain => $FORM{domain},
-				    domain_defined => $domain,
+				    package_data => $data->{$FORM{'package'}},
+				    package => $FORM{package},
 				    cgproversion => $cgproversion
 				   },
 				  );

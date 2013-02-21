@@ -1,3 +1,4 @@
+[% PROCESS _ajaxapp_header.tmpl %]
 <link rel="stylesheet" type="text/css" href="cgpro/tabview.css" />
 <script type='text/javascript' src='cgpro/tabview-min.js'></script>
 <script type="text/javascript">
@@ -104,6 +105,11 @@
 	      </a>
 	    </li>
 	    <li>
+	      <a href="#tab_assign_package">
+		<em>Assign to Package</em>
+	      </a>
+	    </li>
+	    <li>
 	      <a href="#tab_assign">
 		<em>Assign to Domain</em>
 	      </a>
@@ -143,13 +149,24 @@
 	  </form>
 
 	</div> <!-- END MailDelimiter -->
+	<div id="tab_assign_package">
+ 	  <table class="datatable brick" cellspacing="0" cellpadding="5" width="100%" border="0" align="center">
+	    <tbody id="listedPackages">
+	      <tr class="tdshade1_noborder">
+		  <td nowrap="nowrap" clspan="2">
+		    Could not fetch available packages.
+		  </td>
+	      </tr>
+	    </tbody>
+	  </table>
+	</div> <!-- END Assing to Packages -->
 	<div id="tab_assign">
  	  <table class="datatable brick" cellspacing="0" cellpadding="5" width="100%" border="0" align="center">
 	    <tbody>
 	      <tr class="tdshade1_noborder">
 		  <td nowrap="nowrap" align="RIGHT">
 		    Please enter an existing Domain: <br />
-		    (or 'default' for default settings)
+		    (Please use 'Assign to Package' instead. <br />Use 'Assign to Domain' for domain specific changes only.)
 		  </td>
 		  <td nowrap="nowrap">
 		    <form action="addon_cgpro_manage_classes_assign.cgi" method="post">
@@ -167,4 +184,59 @@
   </div>
 </div>
 [% PROCESS addon_cgpro_footer.tmpl %]
+[% PROCESS _ajaxapp_footer.tmpl %]
+<script type="text/javascript">
+      //
+function build_packages_table_markup(resp) {
+      var text = "";
+      var i = 0;
+      for ( i = 0; i < resp.package.length; i++) {
+	  text = text + '<tr  class="tdshade' + ( i % 2 ? 2 : 1 ) + '_noborder">';
+	  text = text + '<td>';
+	  text = text + resp.package[i].name;
+	  text = text + '</td>';
+	  text = text + '<td>';
+	  text = text + '<form action="addon_cgpro_manage_classes_assign_package.cgi" method="post">';
+	  text = text + '<input type="hidden" name="package" value="' + resp.package[i].name + '" />';
+	  text = text + '<input type="submit" name="submit" value="Manage Classes" />';
+	  text = text + '</form>';
+	  text = text + '</td>';
+	  text = text + '</tr>';
+      }
+      text = text + '<tr  class="tdshade' + ( i % 2 ? 2 : 1 ) + '_noborder">';
+      text = text + '<td>';
+      text = text + 'default';
+      text = text + '</td>';
+      text = text + '<td>';
+      text = text + '<form action="addon_cgpro_manage_classes_assign_package.cgi" method="post">';
+      text = text + '<input type="hidden" name="package" value="default" />';
+      text = text + '<input type="submit" name="submit" value="Manage Classes" />';
+      text = text + '</form>';
+      text = text + '</td>';
+      text = text + '</tr>';
+      return text;
+};
+//  sending request
+var url = CPANEL.security_token + ("/json-api/listpkgs");
+var callback = {
+    success : function(o) {
+	var resp = null, data = null, err;
+	try {
+	    resp = YAHOO.lang.JSON.parse(o.responseText);
+	}
+	catch(e) {
+	    try { console.warn(o.responseText,e) } catch(e) {}
+	    err = LOCALE.maketext("The API response could not be parsed.");
+	}
+	if (resp) {
+	    YAHOO.util.Dom.get("listedPackages").innerHTML = build_packages_table_markup(resp);
+	}
+    },
+    failure : function(o) { }
+};
+YAHOO.util.Connect.asyncRequest("GET", url, callback, "");
+  
+</script>
 
+[% USE dumper %]
+[% USE JSON %]
