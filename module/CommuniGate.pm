@@ -206,42 +206,20 @@ sub api2_listpopswithdisk {
 	return @result;
 }
 
-sub api2_addalias {
-        my %OPTS = @_;
-        my $domain = $OPTS{'domain'}; 
-        my $user = $OPTS{'email'}; 
-        my $fwdemail = $OPTS{'fwdemail'} . '@' . $OPTS{'domain'}; 
-	my $cli = getCLI();
-	my $aliases = $cli->GetAccountAliases("$fwdemail");
-	my $found = 0;
-	for my $alias (@$aliases) {
-	    $found = 1 if "$alias" eq "$user";
-	}
-	push @$aliases, "$user" unless $found;
-	my $aliases = $cli->SetAccountAliases("$fwdemail", $aliases);
-	my $error_msg = $cli->getErrMessage();
-	my @result;
-	if ($error_msg eq "OK") {
-		push( @result, { email => "$user\@$domain", forward => "$fwdemail", domain => "$domain" } );
-	} else {
-		$Cpanel::CPERROR{'CommuniGate'} = $error_msg;
-	}
-        $cli->Logout();         
-	return @result;
-}          
-
 sub api2_addforward {
         my %OPTS = @_;
  	my $domain = $OPTS{'domain'};
         my $user = $OPTS{'email'}; 
         my $fwdemail = $OPTS{'fwdemail'};
 	my $cli = getCLI();
-	return addforward (
+	my $return =  addforward (
 	    domain => $domain,
 	    email => $user,
 	    fwdemail => $fwdemail,
 	    cli => $cli
 	    );
+	$cli->Logout();
+	return $return;
 }       
 
 sub addforward {
@@ -250,159 +228,189 @@ sub addforward {
         my $user = $OPTS{'email'}; 
         my $fwdemail = $OPTS{'fwdemail'};
         my $cli = $OPTS{'cli'};
-        my $Rules=$cli->GetAccountMailRules("$user\@$domain");
-	my $error_msg = $cli->getErrMessage();
-        if (!($error_msg eq "OK")) {
+	my @result;
+	my $account = $cli->GetAccountSettings("$user\@$domain");
+	# IF forwarding existing account
+	if ($account) {
+	    my $Rules=$cli->GetAccountMailRules("$user\@$domain");
+	    my $error_msg = $cli->getErrMessage();
+	    if (!($error_msg eq "OK")) {
                 $Cpanel::CPERROR{'CommuniGate'} = $error_msg;
-		return undef;
-        }
-	my $found=0;
-	my @NewRules;
-        my @result;
-        foreach my $Rule (@$Rules) {
-                  if ($Rule->[1] eq "#Redirect") {
-		      my %rules;
-		      for my $mail (split(',', $Rule->[3]->[0]->[1])) {
-			  $rules{$mail} = 1;
-		      }
-		      $rules{$fwdemail} = 1;
-		      $Rule->[3]->[0]->[1] = join(',', keys(%rules));
-		      $found=1;
-                  }       
-		  push(@NewRules,$Rule);
-        }
-	if (!$found) {
-		my $Rule= [1,'#Redirect',[],[['Mirror to',$fwdemail]]];
-		push(@NewRules,$Rule);
-	}		
-	$cli->SetAccountMailRules("$user\@$domain",\@NewRules);
-	$error_msg = $cli->getErrMessage();
-        if ($error_msg eq "OK") {
-                push( @result, { email => "$user\@$domain", forward => "$fwdemail", domain => "$domain" } );
-        } else {
-	    $Cpanel::CPERROR{'CommuniGate'} = $error_msg;
-        }
-	$cli->Logout();
-        return @result;
-
-}
-
-sub api2_listaliases {
-    my %OPTS = @_;
-    my $specified_domain  = $OPTS{'domain'};
-    my @domains = Cpanel::Email::listmaildomains($OPTS{'domain'});
-    my $cli = getCLI();
-    my @result;
-    foreach my $domain (@domains) {
-	if (($specified_domain eq "") || ($specified_domain eq $domain)){
-	    my $accounts = $cli->ListAccounts($domain);
-	    foreach my $userName (sort keys %$accounts) {
-		my $aliases = $cli->GetAccountAliases("$userName\@$domain");
-		# die $aliases if $userName eq 'borislav';
+	    } else {
+		my $found=0;
+		my @NewRules;
+		foreach my $Rule (@$Rules) {
+		    if ($Rule->[1] eq "#Redirect") {
+			my %rules;
+			for my $mail (split(',', $Rule->[3]->[0]->[1])) {
+			    $rules{$mail} = 1;
+			}
+			$rules{$fwdemail} = 1;
+			$Rule->[3]->[0]->[1] = join(',', keys(%rules));
+			$found=1;
+		    }       
+		    push(@NewRules,$Rule);
+		}
+		if (!$found) {
+		    my $Rule= [1,'#Redirect',[],[['Mirror to',$fwdemail]]];
+		    push(@NewRules,$Rule);
+		}		
+		$cli->SetAccountMailRules("$user\@$domain",\@NewRules);
+		$error_msg = $cli->getErrMessage();
+		if ($error_msg eq "OK") {
+		    push( @result, { email => "$user\@$domain", forward => "$fwdemail", domain => "$domain" } );
+		} else {
+		    $Cpanel::CPERROR{'CommuniGate'} = $error_msg;
+		}
+	    }
+	#  IF forwarding nonexisting account
+	} else {
+	    # IF forwarding TO local account
+	    if ($cli->GetAccountSettings("$fwdemail")) {
+		my $aliases = $cli->GetAccountAliases("$fwdemail");
+		my $found = 0;
 		for my $alias (@$aliases) {
-		    push( @result, { uri_dest => "$userName%40$domain",
-				     html_dest => "$userName\@$domain",
-				     dest => "$userName\@$domain",
-				     uri_forward => "$alias%40$domain",
-				     html_forward => "$alias\@$domain" ,
-				     forward => "$alias\@$domain" } );
+		    $found = 1 if "$alias" eq "$user";
+		}
+		push @$aliases, "$user" unless $found;
+		my $aliases = $cli->SetAccountAliases($fwdemail, $aliases);
+		my $error_msg = $cli->getErrMessage();
+		if ($error_msg eq "OK") {
+		    push( @result, { email => "$user\@$domain", forward => "$fwdemail", domain => "$domain" } );
+		} else {
+		    $Cpanel::CPERROR{'CommuniGate'} = $error_msg;
+		}
+            # IF forwarding to NON local acount
+	    } else {
+		$cli->CreateForwarder("$user\@$domain", "$fwdemail");
+		my $error_msg = $cli->getErrMessage();
+		if ($error_msg eq "OK") {
+		    push( @result, { email => "$user\@$domain", forward => "$fwdemail", domain => "$domain" } );
+		} else {
+		    $Cpanel::CPERROR{'CommuniGate'} = $error_msg;
 		}
 	    }
 	}
-    }
-    $cli->Logout();
-    return @result;
-} 
+        return @result;
 
-
-
+}
 
 sub api2_listforwards {
-        my %OPTS = @_;
-        my $specified_domain  = $OPTS{'domain'};
-        my @domains = Cpanel::Email::listmaildomains($OPTS{'domain'});
-	my $cli = getCLI();
-        my @result;
-        foreach my $domain (@domains) {
-          if (($specified_domain eq "") || ($specified_domain eq $domain)){
-		my $accounts=$cli->ListAccounts($domain);
-  		foreach my $userName (sort keys %$accounts) {
-		 my $Rules=$cli->GetAccountMailRules("$userName\@$domain") || die "Error: ".$cli->getErrMessage.", quitting";
-        	 foreach my $Rule (@$Rules) {
-                  if ($Rule->[1] eq "#Redirect") {
-			my @dest = split(",",$Rule->[3]->[0]->[1]);
-			foreach my $value (@dest) {
-			 push( @result, {       uri_dest => "$userName%40$domain",
-                                                html_dest => "$userName\@$domain",
-                                                dest => "$userName\@$domain",
-                                                uri_forward => "$value",
-                                                html_forward => "$value" ,
-                                                forward => "$value" } );
-			}
-                  }
-        	 }
-		}
-          }
-        }
-	$cli->Logout();
-        return @result;
-}
-
-
-
-sub api2_delalias {
-        my %OPTS = @_;
-        my $email = $OPTS{'email'};
-        my $thealias = $OPTS{'alias'};
-	$thealias =~ s/\@.*?$//;
-	my $cli = getCLI();
-	my $aliases = $cli->GetAccountAliases("$email");
-	my $newaliases = [];
+  my %OPTS = @_;
+  my $specified_domain  = $OPTS{'domain'};
+  my @domains = Cpanel::Email::listmaildomains($OPTS{'domain'});
+  my $cli = getCLI();
+  my @result;
+  foreach my $domain (@domains) {
+    if (($specified_domain eq "") || ($specified_domain eq $domain)) {
+      my $accounts=$cli->ListAccounts($domain);
+      foreach my $userName (sort keys %$accounts) {
+	my $Rules=$cli->GetAccountMailRules("$userName\@$domain") || die "Error: ".$cli->getErrMessage.", quitting";
+	foreach my $Rule (@$Rules) {
+	  if ($Rule->[1] eq "#Redirect") {
+	    my @dest = split(",",$Rule->[3]->[0]->[1]);
+	    foreach my $value (@dest) {
+	      push( @result, {       uri_dest => "$userName%40$domain",
+				     html_dest => "$userName\@$domain",
+				     dest => "$userName\@$domain",
+				     uri_forward => "$value",
+				     html_forward => "$value" ,
+				     forward => "$value" } );
+	    }
+	  }
+	}
+	my $aliases = $cli->GetAccountAliases("$userName\@$domain");
 	for my $alias (@$aliases) {
-	    push @$newaliases, $alias unless $alias eq $thealias;
+	  push( @result, { uri_dest => "$alias%40$domain",
+			   html_dest => "$alias\@$domain",
+			   dest => "$alias\@$domain",
+			   uri_forward => "$useName%40$domain",
+			   html_forward => "$userName\@$domain" ,
+			   forward => "$userName\@$domain" } );
 	}
-	my $aliases = $cli->SetAccountAliases("$email", $newaliases);
-	my $error_msg = $cli->getErrMessage();
-	my @result;
-	if ($error_msg eq "OK") {
-		push( @result, { forwarder => $OPTS{'alias'}} );
-	} else {
-		$Cpanel::CPERROR{'CommuniGate'} = $error_msg;
-	}
-        $cli->Logout();         
-	return @result;
+      }
+      my $forwarders = $cli->ListForwarders($domain);
+      foreach my $forwarder (@$forwarders) {
+	my $fwd = $cli->GetForwarder("$forwarder\@$domain");
+	push( @result, { uri_dest => "$forwarder%40$domain",
+			 html_dest => "$forwarder\@$domain",
+			 dest => "$forwarder\@$domain",
+			 uri_forward => "$fwd",
+			 html_forward => "$fwd" ,
+			 forward => "$fwd" } );
+
+      }
+    }
+  }
+  $cli->Logout();
+  return @result;
 }
+
+
 
 sub api2_delforward {
         my %OPTS = @_;
         my $domain = $OPTS{'domain'};
-        my $account = $OPTS{'account'};
+        my $user = $OPTS{'account'};
         my $fwdemail = $OPTS{'forwarder'};
 	my $cli = getCLI();
-        my $Rules=$cli->GetAccountMailRules("$account") || die "Error: ".$cli->getErrMessage.", quitting";
-        foreach my $Rule (@$Rules) {
-                  if ($Rule->[1] eq "#Redirect") {
-			my @dest = split(",",$Rule->[3]->[0]->[1]);
-			$Rule->[3]->[0]->[1] ="";
-			my $found=0;
-                        foreach my $value (@dest) {
-				if ((!($value eq $fwdemail)) || $found) {
-					if ($Rule->[3]->[0]->[1]) {$Rule->[3]->[0]->[1]  .=	",".$value; }
-				 	else {$Rule->[3]->[0]->[1]  =     $value; }	
-				} else {
-			   		$found = 1;	
-				} 
-                        }
-                  }
-        }
-        $cli->SetAccountMailRules("$account",$Rules);
-        my $error_msg = $cli->getErrMessage();
         my @result;
-        if ($error_msg eq "OK") {
-                push( @result, { email => "$user\@$domain", forward => "$fwdemail", domain => "$domain" } );
-        } else {
-                $Cpanel::CPERROR{'CommuniGate'} = $error_msg;
-        }
+	my $account = $cli->GetAccountSettings("$user");
+	# IF forwarding existing account
+	if ($account) {
+	  my $Rules = $cli->GetAccountMailRules("$user") || die "Error: ".$cli->getErrMessage.", quitting";
+	  foreach my $Rule (@$Rules) {
+	    if ($Rule->[1] eq "#Redirect") {
+	      my @dest = split(",",$Rule->[3]->[0]->[1]);
+	      $Rule->[3]->[0]->[1] ="";
+	      my $found=0;
+	      foreach my $value (@dest) {
+		if ((!($value eq $fwdemail)) || $found) {
+		  if ($Rule->[3]->[0]->[1]) {
+		    $Rule->[3]->[0]->[1]  .=	",".$value;
+		  } else {
+		    $Rule->[3]->[0]->[1]  =     $value;
+		  }	
+		} else {
+		  $found = 1;	
+		} 
+	      }
+	    }
+	  }
+	  $cli->SetAccountMailRules("$user",$Rules);
+	  my $error_msg = $cli->getErrMessage();
+	  if ($error_msg eq "OK") {
+	    push( @result, { email => "$user", forward => "$fwdemail"} );
+	  } else {
+	    $Cpanel::CPERROR{'CommuniGate'} = $error_msg;
+	  }
+	} else {
+	  # IF forwarding TO local account
+	  if ($cli->GetAccountSettings("$fwdemail")) {
+	    my $aliases = $cli->GetAccountAliases("$fwdemail");
+	    my $newaliases = [];
+	    my ($thealias, undef) = split "@", $user;
+	    for my $alias (@$aliases) {
+	      push @$newaliases, $alias unless $alias eq $thealias;
+	    }
+	    $cli->SetAccountAliases("$fwdemail", $newaliases);
+	    my $error_msg = $cli->getErrMessage();
+	    if ($error_msg eq "OK") {
+	      push( @result, { email => "$user", forward => "$fwdemail"} );
+	    } else {
+	      $Cpanel::CPERROR{'CommuniGate'} = $error_msg;
+	    }
+            # IF forwarding to NON local acount
+	  } else {
+	    $cli->DeleteForwarder("$user");
+	    my $error_msg = $cli->getErrMessage();
+	    if ($error_msg eq "OK") {
+	      push( @result, { email => "$user", forward => "$fwdemail" } );
+	    } else {
+	      $Cpanel::CPERROR{'CommuniGate'} = $error_msg;
+	    }
+	  }
+	}
 	$cli->Logout();
         return @result;
 }
@@ -1536,9 +1544,8 @@ sub api2_UploadForwarders {
 
 sub api2_RestoreForwarders {
     my %OPTS = @_;
-    
     my @domains = Cpanel::Email::listmaildomains();
-	my $cli = getCLI();
+    my $cli = getCLI();
     my @result;
     my $gzfile = $Cpanel::homedir . '/tmp/forwardersimport/' . $Cpanel::CPVAR{'forwardersimportid'};
     open(IN, "gunzip -c $gzfile |") || die "can't open pipe to $file";
@@ -1546,21 +1553,18 @@ sub api2_RestoreForwarders {
     close IN;
     unlink $gzfile;
     foreach my $domain (@domains) {
-	my $accounts=$cli->ListAccounts($domain);
-	foreach my $userName (sort keys %$accounts) {
-	    my $email = "$userName\@$domain";
-	    for my $row (@input) {
-		if ( $row =~ m/^\Q$email\:/i ) {
-		    my (undef, $fwdemail) = split '[\:\s]+', $row, 2;
-		    chomp $fwdemail;
-		    addforward(
-			domain => $domain,
-			email => $userName,
-			fwdemail => $fwdemail,
-			cli => $cli
-			);
-		    push @result, {row => $row};
-		}
+	for my $row (@input) {
+	    if ( $row =~ m/\@$domain\:/i ) {
+		my ($email, $fwdemail) = split '[\:\s]+', $row, 2;
+		my ($userName, undef) = split '@', $email;
+		chomp $fwdemail;
+		addforward(
+		    domain => $domain,
+		    email => $userName,
+		    fwdemail => $fwdemail,
+		    cli => $cli
+		    );
+		push @result, {row => $row};
 	    }
 	}
     }
