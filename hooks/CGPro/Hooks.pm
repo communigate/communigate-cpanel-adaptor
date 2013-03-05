@@ -229,6 +229,9 @@ sub doaddpop {
     if ($response) {
     	$cli->CreateMailbox("$user\@$domain", "Calendar");
     	$cli->CreateMailbox("$user\@$domain", "Spam");
+    } else {	
+    	my $apiref = Cpanel::Api2::Exec::api2_preexec( 'Email', 'delpop' );
+    	my ( $data, $status ) = Cpanel::Api2::Exec::api2_exec( 'Email', 'delpop', $apiref, {domain => $domain, email=> $user} );
     }
     $cli->Logout();
 }
