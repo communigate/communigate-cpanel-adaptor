@@ -18,7 +18,7 @@ var toggle_menu = function(e, o) {
         // configure email
         menu_items.push({
 		text: 'Configure Email Client',
-		    url: "../../mail/clientconf.html?acct=" + encodeURIComponent(ACCOUNTS[o.index]['user']) + "@" + encodeURIComponent(ACCOUNTS[o.index]['domain'])
+		    url: "clientconf.html?acct=" + encodeURIComponent(ACCOUNTS[o.index]['user']) + "@" + encodeURIComponent(ACCOUNTS[o.index]['domain'])
         });
         
         MENUS[o.index].addItems(menu_items);
