@@ -82,6 +82,7 @@ do
     then
         continue
     fi
+    rm -rf ${THEMES[$i]}/cgpro
     cp -r "${PACKSRC}/theme/cgpro" "${THEMES[$i]}/"
     rm -f ${THEMES[$i]}/branding/cgpro_*
     cp "${PACKSRC}/icons/"* "${THEMES[$i]}/branding"
