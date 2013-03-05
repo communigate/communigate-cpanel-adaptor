@@ -54,10 +54,10 @@
 		[td class="truncate nobrd-left"]%[/td]
 		[td class="nobrd-left"]$LANG{'EFaddedto'}[/td]
 		[td class="truncate"]%[/td]
-		[td align="center" class="nobrd"][a href="../../mail/showroute.html?fwd=1&amp;domain=$FORM{'domain'}&amp;email=%"]$LANG{'EMDTrace'}[/a][/td]
+		[td align="center" class="nobrd"][a href="../../mail/showroute.html?fwd=%&amp;domain=$FORM{'domain'}&amp;email=%"]$LANG{'EMDTrace'}[/a][/td]
 		[td][a href="dodelfwdconfirm.html?domain=$FORM{'domain'}&amp;email=%&amp;emaildest=%"]$LANG{'BrandingDPackage'}[/a][/td]
 	[/tr]
-	,*num,html_dest,html_forward,uri_dest,uri_dest,^forward,^forward) domain=$FORM{'domain'},regex=$FORM{'searchregex'},api2_paginate=1,api2_paginate_start=$FORM{'api2_paginate_start'},api2_paginate_size=$CPVAR{'itemsperpage'} || '[tr][td colspan="5" class="errors"]$LANG{'NoFwds'}.[/td][/tr]' ?>
+	,*num,html_dest,html_forward,uri_dest,^forward,uri_dest,^forward) domain=$FORM{'domain'},regex=$FORM{'searchregex'},api2_paginate=1,api2_paginate_start=$FORM{'api2_paginate_start'},api2_paginate_size=$CPVAR{'itemsperpage'} || '[tr][td colspan="5" class="errors"]$LANG{'NoFwds'}.[/td][/tr]' ?>
 
 </table>
 
