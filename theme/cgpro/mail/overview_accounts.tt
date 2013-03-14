@@ -14,7 +14,6 @@
 [% END -%]
 
 [% MACRO filter_option(pval, val, text) BLOCK -%]
-<!-- <option value="[% val %]"[% val == pval and " selected" %]>[% cptext(text) %]</option> -->
 <p>
 <input type="radio" name="class" value="[% val %]"[% val == pval ? " checked" : "" %] id="[% val %]-[% account %]" />
 <label for="[% val %]-[% account %]">
@@ -30,14 +29,9 @@
 [% FOREACH account IN accounts.keys.sort -%]
 <tr class="info-[% loop.count % 2 ? 'even' : 'odd' %]">
   <td class="cell truncate" truncate="80">[% account %]</td>
-  <td class="col2">
-    [% accounts.$account.used %] / <span id="quota_0">[%  IF accounts.$account.quota == 'unlimited'; '∞'; ELSE; accounts.$account.quota; END %]</span> <span class="megabyte_font">MB</span><br />
-    <div id="usage_bar_0" class="table_progress_bar">
-      <div style="position: relative; width: [% accounts.$account.usedpercent %]%; height: 100%; padding: 0px; margin: 0px; border: 0px" title="0%" class="cpanel_widget_progress_bar"></div>
-    </div>
-  </td>
-  <td class="maindisp" nowrap="nowrap">
+  <td class="maindisp" nowrap="nowrap" style="text-align: center;">
     [% myclass = accounts.$account.class -%]
+    <p style="margin: 0 0 5px 0;"><em>[% myclass -%]</em></p>
     [% classstring = classes.$myclass.AccessModes.join(',') -%]
     [% features('Mail', 'cgpro_mini_mail', 'Mail') %]
     [% features('XMPP', 'cgpro_mini_xmpp', 'Chat/Jabber/XMPP') %]
@@ -51,6 +45,12 @@
 //]]>
   </script>
 <!--   </form> -->
+  </td>
+  <td class="col2">
+    [% accounts.$account.used %] / <span id="quota_0">[%  IF accounts.$account.quota == 'unlimited'; '∞'; ELSE; accounts.$account.quota; END %]</span> <span class="megabyte_font">MB</span><br />
+    <div id="usage_bar_0" class="table_progress_bar">
+      <div style="position: relative; width: [% accounts.$account.usedpercent %]%; height: 100%; padding: 0px; margin: 0px; border: 0px" title="0%" class="cpanel_widget_progress_bar"></div>
+    </div>
   </td>
   <td  class="cell" nowrap="nowrap">
     <a target="_blank" href="webmailform.html?user=[% account %]&amp;domain=[% accounts.$account.domain %]">
@@ -180,12 +180,12 @@
 	<p>Change account type of <strong>[% account %]</strong>?</p>
 	<form action="" method="post" id="form-[% account %]">
 	  [% domain = account.split('@').1; plan = CPANEL.CPDATA.PLAN -%]
-	  [%# settings = data.$domain ? data.$domain : (data.$plan ? data.$plan : data.default) %]
+	  [% settings = data.$domain ? data.$domain : (data.$plan ? data.$plan : data.default) %]
 	  [% FOREACH class IN classes.keys.sort -%]
-	  [%# UNLESS settings.$class.all == 0 -%]
+	  [% UNLESS settings.$class.all == 0 -%]
 	  [% classstring = classes.$class.AccessModes.join(',') -%]
 	  [% filter_option(myclass, class, class) %]
-	  [%# END -%]
+	  [% END -%]
 	  [% END -%]
 	  <input type="hidden" name="account" value="[% account %]" />
 	  <p>
