@@ -7,14 +7,6 @@ source ${PACKSRC}/config.ini
 #               CommuniGate Specific  	 	#
 #################################################
 
-# Stop some services
-service exim stop
-service dovecot stop
-chkconfig exim off
-chkconfig dovecot off
-service cpanel stop
-service httpd stop
-
 #################################################
 #		cPanel Specific			#
 #################################################
@@ -64,12 +56,6 @@ cp -r ${PACKSRC}/cgpro-webmail/CommuniGate /usr/local/cpanel/base/3rdparty/
 # Install SSO for Webmail
 mkdir -p /var/CommuniGate/cgi
 cp ${PACKSRC}/sso/login.pl /var/CommuniGate/cgi/
-
-# chkservd for CGServer & spamd
-cp ${PACKSRC}/chkservd/CommuniGate /etc/chkserv.d/
-cp ${PACKSRC}/chkservd/CommuniGate_spamd /etc/chkserv.d/
-echo "CommuniGate:1" >> /etc/chkserv.d/chkservd.conf
-echo "CommuniGate_spamd:1" >> /etc/chkserv.d/chkservd.conf
 
 # Check the scripts have executable flag
 chmod +x /usr/local/cpanel/whostmgr/docroot/cgi/addon_cgpro*
@@ -142,19 +128,3 @@ ${PACKSRC}/scripts/editconfig.pl
 #################################################
 #             	  OS Specific	  	 	#
 #################################################
-
-# Firewall opening for CommuniGate Ports
-iptables -I INPUT -p tcp -d `hostname` --dport 8010 -j ACCEPT
-iptables -I INPUT -p tcp -d `hostname` --dport 9010 -j ACCEPT
-iptables -I INPUT -p tcp -d `hostname` --dport 8100 -j ACCEPT
-iptables -I INPUT -p tcp -d `hostname` --dport 9100 -j ACCEPT
-iptables-save
-
-# Start needed services
-service	cpanel start
-service	httpd start
-
-# Installing iTool Labs webmail
-sh ${PACKSRC}/webmail-install.sh
-
-echo "Dont forget to run disable-services.pl script to stop cPanel's native mail software"

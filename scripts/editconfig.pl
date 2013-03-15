@@ -28,38 +28,27 @@ do {
   $cgprouser = <>;
   chomp $cgprouser;
   $cgprouser = $newdata->{cgprouser} unless $cgprouser;
-  my $changepass = 'y';
+  # Enter pass
+  system('stty', '-echo');	# Disable echo
+  my $repass = "";
   do {
-    print "Change CommuniGate Pro password? [Y/n]: ";
-    $changepass = <>;
-    chomp $changepass;
-    $changepass = 'y' unless $changepass;
-    print "Please answer 'y' or 'n'.\n" unless $changepass =~ m/[yn]/i;
-  } while ($changepass !~ m/^[yn]$/i);
-
-  if ( $changepass =~ m/^y$/i ) {
-    # Enter pass
-    system('stty', '-echo');	# Disable echo
-    my $repass = "";
-    do {
-      print "Enter CommuniGate Pro Password: ";
-      $cgpropass = <>;
-      chomp $cgpropass;
+    print "Enter CommuniGate Pro Password: ";
+    $cgpropass = <>;
+    chomp $cgpropass;
+    print "\n";
+    print "Enter CommuniGate Pro Password again: ";
+    $repass = <>;
+    chomp $repass;
+    if ($cgpropass ne $repass) {
       print "\n";
-      print "Enter CommuniGate Pro Password again: ";
-      $repass = <>;
-      chomp $repass;
-      if ($cgpropass ne $repass) {
-        print "\n";
-        print "Passwords do not match! \n";
-      } else {
-        print "\n";
-        print "Password must be at least 4 symbols! \n" unless $repass =~ m/\S{4}/;
-      }
+      print "Passwords do not match! \n";
+    } else {
       print "\n";
-    } while (($cgpropass ne $repass) || $repass !~ m/\S{4}/);
-    system('stty', 'echo');	# Turn echo back on
-  }
+      print "Password must be at least 4 symbols! \n" unless $repass =~ m/\S{4}/;
+    }
+    print "\n";
+  } while (($cgpropass ne $repass) || $repass !~ m/\S{4}/);
+  system('stty', 'echo');	# Turn echo back on
   do {
     print "==- Verify Data -==================== \n";
     print "CommuniGate Pro IP address: $cgprohost \n";
