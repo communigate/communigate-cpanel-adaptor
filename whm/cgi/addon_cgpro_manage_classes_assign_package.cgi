@@ -1,6 +1,8 @@
+#!/bin/sh                                                                                                                                                                                               
+ eval 'if [ -x /usr/local/cpanel/3rdparty/bin/perl ]; then exec /usr/local/cpanel/3rdparty/bin/perl -x -- $0 ${1+"$@"}; else exec /usr/bin/perl -x $0 ${1+"$@"}; fi;'
+    if 0;
 #!/usr/bin/perl
 
-use lib '/usr/local/cpanel';
 use Cpanel::Form            ();
 use Whostmgr::HTMLInterface ();
 use Whostmgr::ACLS          ();

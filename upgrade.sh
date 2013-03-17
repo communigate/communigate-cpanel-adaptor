@@ -17,10 +17,10 @@ cp ${PACKSRC}/module/CommuniGate.pm /usr/local/cpanel/Cpanel/
 
 # Lets add CGPro perl lib
 cp ${PACKSRC}/library/CLI.pm /usr/local/cpanel/perl/
-if [ ! -L /usr/local/lib/perl5/5.8.8/CLI.pm ]
+if [ ! -L /usr/local/cpanel/CLI.pm ]
 then
-    rm -f /usr/local/lib/perl5/5.8.8/CLI.pm
-    ln -s /usr/local/cpanel/perl/CLI.pm /usr/local/lib/perl5/5.8.8/
+    rm -f /usr/local/cpanel/CLI.pm
+    ln -s /usr/local/cpanel/perl/CLI.pm /usr/local/cpanel
 fi
 
 # CGPro cPanel Wrapper

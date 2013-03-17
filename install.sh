@@ -78,7 +78,7 @@ cp ${PACKSRC}/module/CommuniGate.pm /usr/local/cpanel/Cpanel/
 
 # Lets add CGPro perl lib
 cp ${PACKSRC}/library/CLI.pm /usr/local/cpanel/perl/
-ln -s /usr/local/cpanel/perl/CLI.pm /usr/local/lib/perl5/5.8.8/
+ln -s /usr/local/cpanel/perl/CLI.pm /usr/local/cpanel
 
 # CGPro cPanel Wrapper
 cp ${PACKSRC}/cpwrap/ccaadmin /usr/local/cpanel/bin/
