@@ -1,5 +1,23 @@
 2.0 Release notes:
 
+* Added	Energy HTML5 "WebTalk" module in webmail. Allows in-browser HD VoIP calling.
+* Updated webmail url
+* Renaming "Accounts Overview" to "Manage Accounts"
+* Added Pronto! HTML5 Icon/Link
+* Removing JS and CSS files from WHM plugins. Using native ones
+* Bugfix: Fixing hook rollback delete account
+* Bugfix: Fixed route path in Forwarders
+* Merging Mali Aliases and Mail Forwarders into single module
+* Assigning "Standard / Premium" Class of Services to default provisioning templates
+* Bugfix: Clear version number in update manager
+* Correct file naming in upgrade insterface
+* Fixed chmod webmail-install.sh
+* Updated upgrade folder name
+* Fixed groupware migrate script
+* cPanel 11.36 fully compatible with their new RPM based install process
+
+2.0 Release notes:
+
 * Groupware accounts replaced with the more detailed Overview Accounts manager
 * Replacing postwwwacct script with a Hook
 * Showing a info message in User Filters when there are not any email accounts

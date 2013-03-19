@@ -20,7 +20,7 @@ echo "CommuniGate cPanel plugin is already installed. Exiting..."
 exit;
 fi
 
-# Installing CGPro 6.0.1
+# Installing CGPro 6.0.2
 if [ ! -d "$SERVERFOLDER" ]; then
 wget -P${PACKSRC} http://www.communigate.com/pub/CommuniGatePro/CGatePro-Linux.x86_64.rpm
 rpm -Uvh ${PACKSRC}/CGatePro-Linux.x86_64.rpm
@@ -30,7 +30,6 @@ service CommuniGate start
 service CommuniGate stop
 mkdir -p ${BASEFOLDER}/cPanel/
 mkdir -p ${BASEFOLDER}/spamassassin/
-rsync -az ${PACKSRC}/CGP/initCommuniGate /etc/init.d/CommuniGate
 rsync -az ${PACKSRC}/CGP/Settings/* ${BASEFOLDER}/Settings/
 rsync -az ${PACKSRC}/CGP/Accounts/postmaster.macnt/postmaster.macnt ${BASEFOLDER}/Accounts/postmaster.macnt/account.settings
 rsync -az ${PACKSRC}/sso/scanspam.sh ${BASEFOLDER}/spamassassin/
