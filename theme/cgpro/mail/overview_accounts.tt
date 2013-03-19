@@ -1,38 +1,200 @@
 [% USE CPBranding -%]
-[% MACRO filter_option(pval, val, text) BLOCK -%]
-<option value="[% val %]"[% val == pval and " selected" %]>[% cptext(text) %]</option>
+[% MACRO features(feature, icon, text, nolink) BLOCK -%]
+[% UNLESS nolink -%]
+<a href="javascript:toggle_action_div(null, {id:'classes_module_[% loop.count - 1 %]', index:[% loop.count - 1 %], action:'classes'})" title="[% text %]">
 [% END -%]
+[% UNLESS classstring.search(feature) || classstring == "All" -%]
+<img src="[% CPBranding.image(icon _ '_off') %]" alt="[% text %]" title="[% text %] - N/A" />
+[% ELSE -%]
+<img src="[% CPBranding.image(icon) %]" alt="[% text %]" title="[% text %]" />
+[% END -%]
+[% UNLESS nolink -%]
+</a>
+[% END -%]
+[% END -%]
+
+[% MACRO filter_option(pval, val, text) BLOCK -%]
+<p>
+<input type="radio" name="class" value="[% val %]"[% val == pval ? " checked" : "" %] id="[% val %]-[% account %]" />
+<label for="[% val %]-[% account %]">
+[% features('Mail', 'cgpro_mini_mail', 'Mail', 1) %]
+[% features('XMPP', 'cgpro_mini_xmpp', 'Chat/Jabber/XMPP', 1) %]
+[% features('SIP', 'cgpro_mini_sip', 'SIP (Internet calls)', 1) %]
+[% features('WebCAL', 'cgpro_mini_cal', 'Calendar', 1) %]
+<span>[% cptext(text) %]</span>
+</label>
+</p>
+[% END -%]
+
 [% FOREACH account IN accounts.keys.sort -%]
-<tr class="info-even">
+<tr class="info-[% loop.count % 2 ? 'even' : 'odd' %]">
   <td class="cell truncate" truncate="80">[% account %]</td>
-  <td  class="cell">
-    <a target="_blank" href="webmailform.html?user=[% account %]&amp;domain=[% accounts.$account.domain %]">
-      <img src="[% CPBranding.image('cgpro_webemail') %]" alt="Access Webmail" title="Access Webmail" />
-    </a>
+  <td class="maindisp" nowrap="nowrap" style="text-align: center;">
     [% myclass = accounts.$account.class -%]
-    [% IF classes.$myclass.AccessModes.join(',').search('(XMPP)') -%]
-    <a target="_blank" href="pronto.html?user=[% account %]&amp;domain=[% accounts.$account.domain %]">
-      <img alt="Pronto! Web" title="Pronto! Web" src="[% CPBranding.image('cgpro_pronto') %]" />
-    </a>
-    [% END -%]
+    <p style="margin: 0 0 5px 0;"><em>[% myclass -%]</em></p>
+    [% classstring = classes.$myclass.AccessModes.join(',') -%]
+    [% features('Mail', 'cgpro_mini_mail', 'Mail') %]
+    [% features('XMPP', 'cgpro_mini_xmpp', 'Chat/Jabber/XMPP') %]
+    [% features('SIP', 'cgpro_mini_sip', 'SIP (Internet calls)') %]
+    [% features('WebCAL', 'cgpro_mini_cal', 'Calendar') %]
+  <script type="text/javascript">
+    //<![CDATA[    
+    ACCOUNTS[[% loop.count - 1 %]] = [];
+    ACCOUNTS[[% loop.count - 1 %]]['domain'] = '[% account.split('@').1 -%]';
+    ACCOUNTS[[% loop.count - 1 %]]['user'] = '[% account.split('@').0 -%]';
+//]]>
+  </script>
   </td>
-  <td class="maindisp" colspan="4" nowrap="nowrap">
-  <form action="" method="post" id="form-[% account %]">
-    <select name="class" id="select-[% account %]" >
-      [% FOREACH class IN classes.keys.sort -%]
-      [% filter_option(myclass, class, class) %]
-      [% END -%]
-    </select>
-    <input type="hidden" name="account" value="[% account %]" />
-    <noscript>
-      <input type="submit" name="save" class="input-button" value="[% cptext("Save") %]" />
-    </noscript>
-    <script type="text/javascript">
-       document.getElementById('select-[% account %]').onchange = function () {
-       document.forms["form-[% account %]"].submit();
-       }
-    </script>
-  </form>
+  <td class="col2">
+    [% accounts.$account.used %] / <span id="quota_0">[%  IF accounts.$account.quota == 'unlimited'; '∞'; ELSE; accounts.$account.quota; END %]</span> <span class="megabyte_font">MB</span><br />
+    <div id="usage_bar_0" class="table_progress_bar">
+      <div style="position: relative; width: [% accounts.$account.usedpercent %]%; height: 100%; padding: 0px; margin: 0px; border: 0px" title="0%" class="cpanel_widget_progress_bar"></div>
+    </div>
+  </td>
+  <td class="actions">
+    <table summary="">
+      <tr>
+	<td><span class="action_link" onclick="toggle_action_div(null, {id:'change_password_module_[% loop.count - 1 %]', index:[% loop.count - 1 %], action:'change_password'})">Change Password</span></td>
+	<td><span class="action_link" onclick="toggle_action_div(null, {id:'change_quota_module_[% loop.count - 1 %]', index:[% loop.count - 1 %], action:'change_quota'})">Change Quota</span></td>
+	<td><span class="action_link" onclick="toggle_action_div(null, {id:'delete_module_[% loop.count - 1 %]', index:[% loop.count - 1 %], action:'delete'})">Delete</span></td>
+	<td nowrap="nowrap">
+	  <div id="email_table_menu_button_[% loop.count - 1 %]" class="email_table_more_button email_table_more_options" onclick="toggle_menu(null, {index:[% loop.count - 1 %]})"> More <img alt="" src="[% CPBranding.image('moredropdown') %]"></div>
+	</td>
+      </tr>
+    </table>
+  </td>
+</tr>
+<!-- Hidden Row -->
+<tr class="rowA" id="dt_module_row_[% loop.count - 1 %]">
+  <td colspan="5">
+    <!-- Change Password -->
+    <div style="display: none;" class="dt_module" id="change_password_module_[% loop.count - 1 %]">
+      <form action="dopasswdpop.html" method="post">
+	<table style="width: 500px; text-align: center; padding: 8px 0px; margin: 0px auto">
+	  <tbody>
+	    <tr>
+	      <td width="33%" style="text-align: right">Password:</td>
+	      <td width="33%">
+		<input type="password" style="width: 150px" id="change_password_input_1_[% loop.count - 1 %]" name="password" />
+	      </td>
+	      <td width="33%" style="text-align: left">
+		<span style="width: 16px; height: 16px;" id="change_password_input_1_[% loop.count - 1 %]_error" class="cjt_validation_error">
+		</span>
+	      </td>
+	    </tr>
+	    <tr>
+	      <td style="text-align: right">Password (again):</td>
+	      <td>
+		<input type="password" style="width: 150px" id="change_password_input_2_[% loop.count - 1 %]" name="password2" />
+	      </td>
+	      <td style="text-align: left">
+		<span style="width: 16px; height: 16px;" id="change_password_input_2_[% loop.count - 1 %]_error" class="cjt_validation_error">
+		</span>
+	      </td>
+	    </tr>
+	    <tr>
+	      <td style="text-align: right">Strength:</td>
+	      <td>
+		<center>
+		  <div style="width: 150px; height: 20px; border: 1px solid black" id="password_strength_bar_[% loop.count - 1 %]"></div>
+		</center>
+	      </td>
+	      <td style="text-align: left">
+		<input type="button" value="Password Generator" id="create_strong_password_[% loop.count - 1 %]" tabindex="-1" class="input-button">
+	      </td>
+	    </tr>
+	    <tr>
+	      <td colspan="3">
+		<div style="height: 8px">&nbsp;</div>
+		<div id="change_password_input_[% loop.count - 1 %]">
+		  <input type="hidden" name="quota" value="[% accounts.$account.quota %]" />
+		  <input type="hidden" name="email" value="[% account.split('@').0 %]" />
+		  <input type="hidden" name="domain" value="[% account.split('@').1 %]" />
+		  <a href="javascript:toggle_action_div(null, {id:'change_password_module_[% loop.count - 1 %]', index:[% loop.count - 1 %], action:'change_password'})">cancel</a> or
+		  <input type="submit" id="email_table_change_password_confirm_[% loop.count - 1 %]" value="Change Password" class="input-button">
+		</div>
+		<div id="change_password_status_[% loop.count - 1 %]">
+		</div>
+	      </td>
+	    </tr>
+	  </tbody>
+	</table>
+      </form>
+    </div>
+    <!-- END Change Password -->
+    <!-- Change Quota -->
+    <div style="display: none;" class="dt_module" id="change_quota_module_[% loop.count - 1 %]">
+      <form action="doeditquota.html" method="post">
+	<table style="width: 500px; margin: 0px auto">
+	  <tbody>
+	    <tr>
+	      <td width="45%" style="text-align: right">Mailbox Quota: </td>
+	      <td width="55%" style="text-align: left">
+		<input type="text" value="[% accounts.$account.quota %]" maxlength="4" size="4" name="quota" id="quota_number_input_[% loop.count - 1 %]"> <span class="megabyte_font">MB</span> <span id="quota_number_input_[% loop.count - 1 %]_error" style="width: 16px; height: 16px;" class="cjt_validation_error">
+		</span>
+	      </td>
+	    </tr>
+	    <tr>
+	      <td style="text-align: center" colspan="2">
+		<div style="height: 4px">&nbsp;</div>
+		<div id="change_quota_input_[% loop.count - 1 %]">
+		  <input type="hidden" name="email" value="[% account.split('@').0 %]" />
+		  <input type="hidden" name="domain" value="[% account.split('@').1 %]" />
+		  <a href="javascript:toggle_action_div(null, {id:'change_quota_module_[% loop.count - 1 %]', index:[% loop.count - 1 %], action:'change_quota'})">cancel</a> or
+		  <input type="submit" id="change_quota_confirm_[% loop.count - 1 %]" value="Change Quota" class="input-button">
+		</div>
+		<div id="change_quota_status_[% loop.count - 1 %]">
+		</div>
+	      </td>
+	    </tr>
+	  </tbody>
+	</table>
+      </form>
+    </div>
+    <!-- END Change Quota -->
+    <!-- Delete -->
+    <div style="display: none" class="dt_module" id="delete_module_[% loop.count - 1 %]">
+      <div style="width: 500px; margin: 0px auto; padding: 8px 0px; text-align: center">
+      <p>Delete account <em class="status">[% account %]</em>?</p>
+      <p>
+	<a href="javascript:toggle_action_div(null, {id:'delete_module_[% loop.count - 1 %]', index:[% loop.count - 1 %], action:'delete'})">cancel</a> or
+	<a class="create-button" href="realdelpop.html?domain=[% account.split('@').1 %]&amp;email=[% account.split('@').0 %]">Delete</a>        
+      </p>
+      </div>
+    </div>
+    <!-- END Delete -->
+    <!-- classes -->
+    <div style="display: none" class="dt_module" id="classes_module_[% loop.count - 1 %]">
+      <div style="width: 500px; margin: 0px auto; padding: 8px 0px;">
+	<p>Change account type of <strong>[% account %]</strong>?</p>
+	<form action="" method="post" id="form-[% account %]">
+	  [% domain = account.split('@').1; plan = CPANEL.CPDATA.PLAN -%]
+	  [% settings = data.$domain ? data.$domain : (data.$plan ? data.$plan : data.default) %]
+	  [% FOREACH class IN classes.keys.sort -%]
+	  [% UNLESS settings.$class.all == 0 -%]
+	  [% classstring = classes.$class.AccessModes.join(',') -%]
+	  [% filter_option(myclass, class, class) %]
+	  [% END -%]
+	  [% END -%]
+	  <input type="hidden" name="account" value="[% account %]" />
+	  <p>
+	    <a href="javascript:toggle_action_div(null, {id:'classes_module_[% loop.count - 1 %]', index:[% loop.count - 1 %], action:'classes'})">cancel</a> or
+	    <input type="submit" name="submit" value="Change" class="input-button" />
+	  </p>
+	</form>
+      </div>
+    </div>
+    <!-- END classess -->
+    <div style="padding: 15px 0px 20px 0px" class="cjt_status_bar" id="status_bar_[% loop.count - 1 %]">
+    </div>
+  </td>
+</tr>
+
+[% END -%]
+[%  UNLESS accounts.keys.size -%]
+<tr>
+  <td>
+    Please create E-mail accounts first.
   </td>
 </tr>
 [% END -%]

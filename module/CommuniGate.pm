@@ -52,25 +52,30 @@ sub getCLI {
     }
 }
 
-sub max_class_accounts_domain {
+sub max_class_accounts {
  my ($domain, $class) = @_;
  my $data = Cpanel::CachedDataStore::fetch_ref( '/var/cpanel/cgpro/classes.yaml' ) || {};
  if ($data->{$domain}) {
      return $data->{$domain}->{$class}->{all};
+ } elsif ($data->{$Cpanel::CPDATA{'PLAN'}}) {
+     return $data->{$Cpanel::CPDATA{'PLAN'}}->{$class}->{all};
  } else {
      return $data->{default}->{$class}->{all};
  }
 }
 
-sub current_class_accounts_domain {
-    my ($domain, $class, $cli) = @_;
+sub current_class_accounts {
+    my ($class, $cli) = @_;
     my $count = 0;
-     my $accounts = $cli->ListAccounts($domain);
-    foreach my $userName (sort keys %$accounts) {      
-     	my $accountData = $cli->GetAccountEffectiveSettings("$userName\@$domain");
-	my $service = $accountData->{'ServiceClass'} || '';
-	if ($service eq $class) {
-	    $count++;
+    my @domains = Cpanel::Email::listmaildomains(); 
+    foreach my $domain (@domains) {
+	my $accounts = $cli->ListAccounts($domain);
+	foreach my $userName (sort keys %$accounts) {      
+	    my $accountData = $cli->GetAccountEffectiveSettings("$userName\@$domain");
+	    my $service = $accountData->{'ServiceClass'} || '';
+	    if ($service eq $class) {
+		$count++;
+	    }
 	}
     }
     return $count;
@@ -89,11 +94,26 @@ sub api2_AccountsOverview {
 	    foreach my $userName (sort keys %$accounts) {	
 		my $accountData = $cli->GetAccountEffectiveSettings("$userName\@$domain");
 		my $service = @$accountData{'ServiceClass'} || '';
+
+		$accountData = $cli->GetAccountEffectiveSettings("$userName\@$domain");
+		my $diskquota = @$accountData{'MaxAccountSize'} || '';
+		$diskquota =~ s/M//g;
+		my $_diskused = $cli->GetAccountInfo("$userName\@$domain","StorageUsed");
+		my $diskused = $_diskused / 1024 /1024;
+		my $diskusedpercent;
+		if ($diskquota eq "unlimited") {
+		    $diskusedpercent = 0;
+		} else {
+		    $diskusedpercent = $diskused / $diskquota * 100;
+		}
+
 		$return_accounts->{$userName . "@" . $domain} = {
 		    domain => $domain,
-		    class => $service
+		    class => $service,
+		    quota => $diskquota,
+		    used => $diskused,
+		    usedpercent => $diskusedpercent
 		};
-
 	    }
 	}
 	my $defaults = $cli->GetServerAccountDefaults();
@@ -105,16 +125,16 @@ sub api2_UpdateAccountClass {
     my %OPTS = @_;
     my $cli = getCLI();
     my (undef, $domain) = split "@", $OPTS{'account'};
-    my $max = max_class_accounts_domain($domain, $OPTS{'class'});
+    my $max = max_class_accounts($domain, $OPTS{'class'});
     my $current = 0;
-    $current = current_class_accounts_domain($domain, $OPTS{'class'}, $cli) if $max > 0;
+    $current = current_class_accounts($OPTS{'class'}, $cli) if $max > 0;
     if ($max > $current || $max == -1) {
 	$cli->UpdateAccountSettings($OPTS{'account'}, { ServiceClass => $OPTS{'class'} });
 	$cli->Logout();
 	return { msg => "Updated Successfuly." };
     } else {
 	$cli->Logout();
-	return { msg => "Maximum $class acounts is $max." };
+	return { msg => "Maximum " .$OPTS{'class'} . " accounts for your plan is $max. Upgrade your plan for more " .$OPTS{'class'} . " accounts." };
     }
 }
 
