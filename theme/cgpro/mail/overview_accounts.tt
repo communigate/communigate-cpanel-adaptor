@@ -54,11 +54,11 @@
   <td class="actions">
     <table summary="">
       <tr>
-	<td><span class="action_link" onclick="toggle_action_div(null, {id:'change_password_module_[% loop.count - 1 %]', index:[% loop.count - 1 %], action:'change_password'})">Change Password</span></td>
-	<td><span class="action_link" onclick="toggle_action_div(null, {id:'change_quota_module_[% loop.count - 1 %]', index:[% loop.count - 1 %], action:'change_quota'})">Change Quota</span></td>
-	<td><span class="action_link" onclick="toggle_action_div(null, {id:'delete_module_[% loop.count - 1 %]', index:[% loop.count - 1 %], action:'delete'})">Delete</span></td>
+	<td><span class="action_link" onclick="toggle_action_div(null, {id:'change_password_module_[% loop.count - 1 %]', index:[% loop.count - 1 %], action:'change_password'})">[% locale.maketext("CGPChangePassword") %]</span></td>
+	<td><span class="action_link" onclick="toggle_action_div(null, {id:'change_quota_module_[% loop.count - 1 %]', index:[% loop.count - 1 %], action:'change_quota'})">[% locale.maketext("CGPChangeQuota") %]</span></td>
+	<td><span class="action_link" onclick="toggle_action_div(null, {id:'delete_module_[% loop.count - 1 %]', index:[% loop.count - 1 %], action:'delete'})">[% locale.maketext('CGPDelete') %]</span></td>
 	<td nowrap="nowrap">
-	  <div id="email_table_menu_button_[% loop.count - 1 %]" class="email_table_more_button email_table_more_options" onclick="toggle_menu(null, {index:[% loop.count - 1 %]})"> More <img alt="" src="[% CPBranding.image('moredropdown') %]"></div>
+	  <div id="email_table_menu_button_[% loop.count - 1 %]" class="email_table_more_button email_table_more_options" onclick="toggle_menu(null, {index:[% loop.count - 1 %]})"> [% locale.maketext("CGPMore") %] <img alt="" src="[% CPBranding.image('moredropdown') %]"></div>
 	</td>
       </tr>
     </table>
@@ -73,7 +73,7 @@
 	<table style="width: 500px; text-align: center; padding: 8px 0px; margin: 0px auto">
 	  <tbody>
 	    <tr>
-	      <td width="33%" style="text-align: right">Password:</td>
+	      <td width="33%" style="text-align: right">[% locale.maketext("CGPPassword") %]:</td>
 	      <td width="33%">
 		<input type="password" style="width: 150px" id="change_password_input_1_[% loop.count - 1 %]" name="password" />
 	      </td>
@@ -83,7 +83,7 @@
 	      </td>
 	    </tr>
 	    <tr>
-	      <td style="text-align: right">Password (again):</td>
+	      <td style="text-align: right">[% locale.maketext("CGPPasswordAgain") %]:</td>
 	      <td>
 		<input type="password" style="width: 150px" id="change_password_input_2_[% loop.count - 1 %]" name="password2" />
 	      </td>
@@ -93,14 +93,14 @@
 	      </td>
 	    </tr>
 	    <tr>
-	      <td style="text-align: right">Strength:</td>
+	      <td style="text-align: right">[% locale.maketext("CGPStrenth") %]:</td>
 	      <td>
 		<center>
 		  <div style="width: 150px; height: 20px; border: 1px solid black" id="password_strength_bar_[% loop.count - 1 %]"></div>
 		</center>
 	      </td>
 	      <td style="text-align: left">
-		<input type="button" value="Password Generator" id="create_strong_password_[% loop.count - 1 %]" tabindex="-1" class="input-button">
+		<input type="button" value="[% locale.maketext("CGPPasswordGenerator") %]" id="create_strong_password_[% loop.count - 1 %]" tabindex="-1" class="input-button">
 	      </td>
 	    </tr>
 	    <tr>
@@ -110,8 +110,8 @@
 		  <input type="hidden" name="quota" value="[% accounts.$account.quota %]" />
 		  <input type="hidden" name="email" value="[% account.split('@').0 %]" />
 		  <input type="hidden" name="domain" value="[% account.split('@').1 %]" />
-		  <a href="javascript:toggle_action_div(null, {id:'change_password_module_[% loop.count - 1 %]', index:[% loop.count - 1 %], action:'change_password'})">cancel</a> or
-		  <input type="submit" id="email_table_change_password_confirm_[% loop.count - 1 %]" value="Change Password" class="input-button">
+		  <a href="javascript:toggle_action_div(null, {id:'change_password_module_[% loop.count - 1 %]', index:[% loop.count - 1 %], action:'change_password'})">[% locale.maketext("CGPcancel") %]</a> [% locale.maketext("CGPor") %]
+		  <input type="submit" id="email_table_change_password_confirm_[% loop.count - 1 %]" value="[% locale.maketext("CGPChangePassword") %]" class="input-button">
 		</div>
 		<div id="change_password_status_[% loop.count - 1 %]">
 		</div>
@@ -128,7 +128,7 @@
 	<table style="width: 500px; margin: 0px auto">
 	  <tbody>
 	    <tr>
-	      <td width="45%" style="text-align: right">Mailbox Quota: </td>
+	      <td width="45%" style="text-align: right">[% locale.maketext("CGPMailboxQuota") %]: </td>
 	      <td width="55%" style="text-align: left">
 		<input type="text" value="[% accounts.$account.quota %]" maxlength="4" size="4" name="quota" id="quota_number_input_[% loop.count - 1 %]"> <span class="megabyte_font">MB</span> <span id="quota_number_input_[% loop.count - 1 %]_error" style="width: 16px; height: 16px;" class="cjt_validation_error">
 		</span>
@@ -140,8 +140,8 @@
 		<div id="change_quota_input_[% loop.count - 1 %]">
 		  <input type="hidden" name="email" value="[% account.split('@').0 %]" />
 		  <input type="hidden" name="domain" value="[% account.split('@').1 %]" />
-		  <a href="javascript:toggle_action_div(null, {id:'change_quota_module_[% loop.count - 1 %]', index:[% loop.count - 1 %], action:'change_quota'})">cancel</a> or
-		  <input type="submit" id="change_quota_confirm_[% loop.count - 1 %]" value="Change Quota" class="input-button">
+		  <a href="javascript:toggle_action_div(null, {id:'change_quota_module_[% loop.count - 1 %]', index:[% loop.count - 1 %], action:'change_quota'})">[% locale.maketext("CGPcancel") %]</a> [% locale.maketext("CGPor") %]
+		  <input type="submit" id="change_quota_confirm_[% loop.count - 1 %]" value="[% locale.maketext("CGPChangeQuota") %]" class="input-button">
 		</div>
 		<div id="change_quota_status_[% loop.count - 1 %]">
 		</div>
@@ -155,10 +155,10 @@
     <!-- Delete -->
     <div style="display: none" class="dt_module" id="delete_module_[% loop.count - 1 %]">
       <div style="width: 500px; margin: 0px auto; padding: 8px 0px; text-align: center">
-      <p>Delete account <em class="status">[% account %]</em>?</p>
+      <p>[% locale.maketext("CGPDeleteAccount") %] <em class="status">[% account %]</em>?</p>
       <p>
-	<a href="javascript:toggle_action_div(null, {id:'delete_module_[% loop.count - 1 %]', index:[% loop.count - 1 %], action:'delete'})">cancel</a> or
-	<a class="create-button" href="realdelpop.html?domain=[% account.split('@').1 %]&amp;email=[% account.split('@').0 %]">Delete</a>        
+	<a href="javascript:toggle_action_div(null, {id:'delete_module_[% loop.count - 1 %]', index:[% loop.count - 1 %], action:'delete'})">[% locale.maketext("CGPcancel") %]</a> [% locale.maketext("CGPor") %]
+	<a class="create-button" href="realdelpop.html?domain=[% account.split('@').1 %]&amp;email=[% account.split('@').0 %]">[% locale.maketext("CGPDelete") %]</a>        
       </p>
       </div>
     </div>
@@ -166,7 +166,7 @@
     <!-- classes -->
     <div style="display: none" class="dt_module" id="classes_module_[% loop.count - 1 %]">
       <div style="width: 500px; margin: 0px auto; padding: 8px 0px;">
-	<p>Change account type of <strong>[% account %]</strong>?</p>
+	<p>[% locale.maketext("CGPChangeAccType") %] <strong>[% account %]</strong>?</p>
 	<form action="" method="post" id="form-[% account %]">
 	  [% domain = account.split('@').1; plan = CPANEL.CPDATA.PLAN -%]
 	  [% settings = data.$domain ? data.$domain : (data.$plan ? data.$plan : data.default) %]
@@ -178,8 +178,8 @@
 	  [% END -%]
 	  <input type="hidden" name="account" value="[% account %]" />
 	  <p>
-	    <a href="javascript:toggle_action_div(null, {id:'classes_module_[% loop.count - 1 %]', index:[% loop.count - 1 %], action:'classes'})">cancel</a> or
-	    <input type="submit" name="submit" value="Change" class="input-button" />
+	    <a href="javascript:toggle_action_div(null, {id:'classes_module_[% loop.count - 1 %]', index:[% loop.count - 1 %], action:'classes'})">[% locale.maketext("CGPcancel") %]</a> [% locale.maketext("CGPor") %]
+	    <input type="submit" name="submit" value="[% locale.maketext("CGPChange") %]" class="input-button" />
 	  </p>
 	</form>
       </div>
