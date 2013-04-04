@@ -106,9 +106,7 @@ cp ${PACKSRC}/sso/login.pl /var/CommuniGate/cgi/
 
 # chkservd for CGServer & spamd
 cp ${PACKSRC}/chkservd/CommuniGate /etc/chkserv.d/
-cp ${PACKSRC}/chkservd/CommuniGate_spamd /etc/chkserv.d/
 echo "CommuniGate:1" >> /etc/chkserv.d/chkservd.conf
-echo "CommuniGate_spamd:1" >> /etc/chkserv.d/chkservd.conf
 
 # Check the scripts have executable flag
 chmod +x /usr/local/cpanel/whostmgr/docroot/cgi/addon_cgpro*
