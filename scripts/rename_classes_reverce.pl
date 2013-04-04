@@ -1,4 +1,4 @@
-#!/bin/sh                                                                                                                                                                                               
+#!/bin/sh
  eval 'if [ -x /usr/local/cpanel/3rdparty/bin/perl ]; then exec /usr/local/cpanel/3rdparty/bin/perl -x -- $0 ${1+"$@"}; else exec /usr/bin/perl -x $0 ${1+"$@"}; fi;'
     if 0;
 #!/usr/bin/perl
@@ -31,6 +31,7 @@ foreach my $classname (keys %{$defaults->{ServiceClasses}}) {
 }
 
 $cli->UpdateServerAccountDefaults({
-    ServiceClasses => $defaults->{ServiceClasses}
+    ServiceClasses => $defaults->{ServiceClasses},
+    ServiceClass => 'default'
 				  });
 print "ServiceClasses Names updated! \n";

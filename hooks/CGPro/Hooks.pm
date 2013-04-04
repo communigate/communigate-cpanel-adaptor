@@ -146,7 +146,7 @@ sub editquota {
     my $data=$cli->GetDomainSettings("$domain");
     if (!$data) {
 	$cli->CreateDomain("$domain");
-    } 
+    }
     my $UserData;
     @$UserData{'MaxAccountSize'}=$quota;
 
@@ -220,16 +220,15 @@ sub doaddpop {
     my $data = $cli->GetDomainSettings("$domain");
     if (!$data) {
     	$cli->CreateDomain("$domain");
-    } 
+    }
     my $UserData;
     @$UserData{'Password'}=$password;
-    @$UserData{'ServiceClass'}="mailonly";
     @$UserData{'MaxAccountSize'}=$quota;
     my $response = $cli->CreateAccount(accountName => "$user\@$domain", settings => $UserData);
     if ($response) {
     	$cli->CreateMailbox("$user\@$domain", "Calendar");
     	$cli->CreateMailbox("$user\@$domain", "Spam");
-    } else {	
+    } else {
     	my $apiref = Cpanel::Api2::Exec::api2_preexec( 'Email', 'delpop' );
     	my ( $data, $status ) = Cpanel::Api2::Exec::api2_exec( 'Email', 'delpop', $apiref, {domain => $domain, email=> $user} );
     }
