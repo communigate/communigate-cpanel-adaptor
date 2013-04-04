@@ -192,14 +192,9 @@
 
 [% END -%]
 [%  UNLESS accounts.keys.size -%]
-<tr>
+<tr class="info-even">
   <td>
     Please create E-mail accounts first.
   </td>
-</tr>
-[% END -%]
-[% UNLESS accounts.keys.0 -%]
-<tr class="info-even">
-  <td colspan="6">Please create email account first!</td>
 </tr>
 [% END -%]

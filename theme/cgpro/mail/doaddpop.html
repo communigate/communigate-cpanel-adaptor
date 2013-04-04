@@ -17,7 +17,7 @@
 	<h2><cpanel langprint="EAdocreated"></h2>
 	<p<cptext 'The email account “[output,class,_1,status]” was successfully [boolean,_2,created,modified,removed].',"$FORM{'email'}@$FORM{'domain'}",1></p>	
 	<p><cpanel langprint="EAConfMailTxt"></p>
-	<a href="clientconf.html?redirectdomain=<cpanel print="$FORM{'domain'}">&acct=<cpanel print="$URI_ENCODED_FORM{'email'}">@<cpanel print="$URI_ENCODED_FORM{'domain'}">" class="create-button"><cpanel langprint="Yes"></a> <a href="pops_noscript.html" class="create-button"><cpanel langprint="No"></a>
+	<a href="clientconf.html?redirectdomain=<cpanel print="$FORM{'domain'}">&acct=<cpanel print="$URI_ENCODED_FORM{'email'}">@<cpanel print="$URI_ENCODED_FORM{'domain'}">" class="create-button"><cpanel langprint="Yes"></a> <a href="overview_accounts.html" class="create-button"><cpanel langprint="No"></a>
 </cpanelif>
 	
 <cpanelif $CPERROR{'email'}>
