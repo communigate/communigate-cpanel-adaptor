@@ -1,0 +1,26 @@
+<table border="0" cellpadding="0" width="98%" cellspacing="0" id="mailtbl" class="nonsortable">
+  <thead>
+    <tr>
+      <th>[% locale.maketext("CGPRule Name") %]</th>
+      <th>[% locale.maketext("CGPTools") %]</th>
+    </tr>
+  </thead>
+  <tbody>
+    [% FOR rule IN rules -%]
+    <tr>
+      <td>[% rule.1 %]</td>
+      <td>
+	<a href="addcallrule.html?rule=[% rule.1 %]&domain=[% rule.4 %]">[% locale.maketext("CGPEdit") %]</a>
+	<a href="delcallrule.html?rule=[% rule.1 %]&domain=[% rule.4 %]">[% locale.maketext("CGPDelete") %]</a>
+      </td>
+    </tr>
+    [% END -%]
+    [% UNLESS rules.size -%]
+    <tr>
+      <td colspan="2">
+	[% locale.maketext("No rules added!") %]
+      </td>
+    </tr>
+    [% END -%]
+  </tbody>
+</table>

@@ -2005,6 +2005,130 @@ sub api2_updatearchive {
     $cli->Logout();
     return {msg => "Changes saved."};
 }
+
+sub api2_listSignalRules {
+    my $cli = getCLI();
+    my @domains = Cpanel::Email::listmaildomains();
+    my $rules = [];
+    for my $domain (@domains) {
+	my $rule = $cli->GetDomainSignalRules( $domain );
+	for my $r (@$rule) {
+	    $r->[4] = $domain;
+	}
+	@$rules = (@$rules, @$rule);
+    }
+    $cli->Logout();
+    return {rules => $rules};
+}
+
+sub api2_updateSignalRule {
+    my %OPTS = @_;
+    my $therule = $OPTS{'therule'};
+    my $dom = $OPTS{'domain'};
+    my $cli = getCLI();
+    my $return = {};
+    if ($therule) {
+	my @domains = Cpanel::Email::listmaildomains();
+	for my $domain (@domains) {
+	    if ($domain eq $dom) {
+		my $rules = $cli->GetDomainSignalRules( $domain );
+		for my $rule (@$rules) {
+		    if ($rule->[1] eq $therule) {
+			$return->{rule} = {};
+			$return->{rule}->{name} = $rule->[1];
+			my $stage = $rule->[0];
+			$stage =~ s/\d\d$//;
+			$return->{rule}->{Stage} = $stage;
+			$return->{rule}->{conditions} = {};
+			for my $condition (@{$rule->[2]}) {
+			    $condition->[0] =~ s/\s+//g;
+			    $return->{rule}->{conditions}->{$condition->[0]} = $condition->[$#{$condition}];
+			}
+			$return->{rule}->{action} = $rule->[3]->[0];
+			last;
+		    }
+		}
+		last;
+	    }
+	}
+    }
+    $cli->Logout();
+    return $return;
+}
+
+sub api2_doUpdateSignalRule {
+    my %OPTS = @_;
+    my $formdump = $OPTS{'formdump'};
+    my $params = {};
+    my $locale = Cpanel::Locale->get_handle();
+    for my $row (split "\n", $formdump) {
+	if ($row =~ m/^(\S+)\s\=\s(.*?)$/) {
+	    my $key =$1;
+	    my $value = $2;
+	    $params->{$key} = $value;
+	}
+    }
+    my $return = {};
+    my $cli = getCLI();
+    if ($params->{ruleName} && $params->{RequestURI}) {
+	my $rule = [];
+	my (undef, $domain) = split '@', $params->{RequestURI};
+	my $rules = $cli->GetDomainSignalRules( $domain );
+	$rule->[0] = $params->{Stage} . '06';
+	$rule->[1] = $params->{ruleName};
+	$rule->[2] = [];
+	push @{	$rule->[2]}, ['Method', 'is', 'INVITE'];
+	push @{	$rule->[2]}, ['RequestURI', 'is', "sip:" . $params->{RequestURI}];
+	my $timeOfDay = $params->{fromHour} . ":" .$params->{fromMinutes} . "-" . $params->{toHour} . ":" . $params->{toMinutes};
+	if ($timeOfDay =~ m/^\d\d:\d\d-\d\d:\d\d$/) {
+	    push @{$rule->[2]}, ["Time Of Day", 'in', $params->{fromHour} . ":" .$params->{fromMinutes} . "-" . $params->{toHour} . ":" . $params->{toMinutes}];
+	}
+	if ($params->{weekDays}) {
+	    push @{$rule->[2]}, [ "Current Day", "in", join(",", map { $params->{$_} } grep { /^weekDays\-?/ }  sort keys %$params)];
+	}
+	if ($params->{status}) {
+	    push @{$rule->[2]}, [ 'Presence', 'in', $params->{status}];
+	}
+	$rule->[3] = [["Redirect to", $params->{actionText}]] if $params->{action} eq 'Redirect to' && $params->{actionText};
+	$rule->[3] = [["Fork to", $params->{actionText}]] if $params->{action} eq 'Fork to' && $params->{actionText};
+	$rule->[3] = [["Reject with", 603]] if $params->{action} eq 'Reject with';
+	$rule->[3] = [["Stop processing"]] if $params->{action} eq 'Stop processing';
+	my $ruleFound = 0;
+	for my $r (@$rules) {
+	    if ($r->[1] eq $params->{ruleOldName}) {
+		$r = $rule;
+		$ruleFound = 1;
+		last;
+	    }
+	}
+	push @$rules, $rule unless $ruleFound;
+	$cli->SetDomainSignalRules($domain, $rules);
+	return {msg => $locale->maketext('Rules updated successfuly!')};
+    }
+    return {msg => $locale->maketext('Rules are NOT update. Please check your form!')};
+}
+
+sub api2_delSignalRule {
+    my %OPTS = @_;
+    my $rule = $OPTS{'rule'};
+    my $dom = $OPTS{'domain'};
+    my @domains = Cpanel::Email::listmaildomains();
+    my $cli = getCLI();
+    my $locale = Cpanel::Locale->get_handle();
+    for my $domain (@domains) {
+	if ($domain eq $dom) {
+	    my $newrules = [];
+	    my $rules = $cli->GetDomainSignalRules( $domain );
+	    for my $r (@$rules) {
+		push @$newrules, $r unless $r->[1] eq $rule;
+	    }
+	    $cli->SetDomainSignalRules($domain, $newrules);
+	    last;
+	}
+    }
+    return {msg => $locale->maketext('Rule deleted!')};
+}
+
 sub IsGroupInternal {
   	my $groupwithdomain = shift;
 	my @values = split("@",$groupwithdomain);

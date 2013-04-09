@@ -1,0 +1,21 @@
+<cpanel setvar="headerimg=../images/mailmenu.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+<div class="body-content">
+  <h1><cpanel langprint="CGPIncoming calls rules"></h1>
+  <form action="doaddcallrule.html" method="post">
+    <?cptt CommuniGate::updateSignalRule(cgpro/addcallrule.tmpl) therule=$FORM{rule},domain=$FORM{domain} ?>
+    <p style="text-align: center;">
+      <input type="submit" id="activate-button" name="submit" value="<cpanel langprint="CGPSave">" class="input-button" />
+    </p>
+    <div class="return-link">
+      <a href="call_rules.html">&larr; <cptext "Go Back"></a>
+    </div>
+  </form>
+</div> <!-- END body-content -->
+<script type="text/javascript">
+//<![CDATA[
+<cpanel relrawinclude="cgpro/addcallrule.js">
+//]]>
+</script>
+<cpanel Branding="include(stdfooter.html)">

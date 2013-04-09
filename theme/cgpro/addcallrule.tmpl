@@ -1,0 +1,144 @@
+[%-
+USE Api2;
+SET accounts = Api2.exec( 'CommuniGate', 'AccountsOverview', {} );
+-%]
+[% MACRO filter_option(pval, val, text) BLOCK -%]
+<option value="[% val %]"[% val == pval ? " selected='selected'" : "" %]>[% cptext(text) %]</option>
+[% END -%]
+[% MACRO filter_check(name, pval, val, text) BLOCK -%]
+<input type="checkbox" name="[% name %]" value="[% val %]" id="[% name %]-[% val %]"[% IF pval.join("").search(val); " checked='checked'"; END %] />
+<label for="[% name %]-[% val %]">[% text %]</label>
+[% END -%]
+
+<h2>[% locale.maketext('CGPRuleName') %]</h2>
+<div class="highlight2">
+  <table border="0">
+    <tr>
+      <td colspan="2">
+	<input type="text" name="ruleName" id="rulename" value="[% rule.name %]" />
+	<input type="hidden" name="ruleOldName" value="[% rule.name %]" />
+	<span id="rulename_error" style="margin-left: 10px"></span>
+      </td>
+    </tr>
+  </table>
+</div>
+<h2>[% locale.maketext('CGPRule Conditions') %]</h2>
+<div class="highlight2">
+  <table border="0">
+    <tr>
+      <td nowrap="nowrap" align="RIGHT" valign="TOP">[% locale.maketext("CGPaddressedto") %]:</td>
+      <td>
+	<select name="RequestURI" id="RequestURI">
+	  <option value="">[% locale.maketext("CGPPlease select account") %]</option>
+	  [% foundSome = 0 -%]
+	  [% FOR account IN accounts.0.accounts.keys.sort -%]
+	  [% myclass = accounts.0.accounts.$account.class -%]
+	  [% classstring = accounts.0.classes.$myclass.AccessModes.join(',') -%]
+	  [% IF classstring.search('SIP') || classstring == "All" -%]
+	  [% filter_option(rule.conditions.RequestURI.split(":").1, account, account) %]
+	  [% foundSome = 1 -%]
+	  [% END -%]
+	  [% END -%]
+	</select>
+	<span id="RequestURI_error" style="margin-left: 10px"></span>
+	[% UNLESS foundSome -%]
+	<p>[% locale.maketext("CGPNoCallAccounts",'<a href="mail/overview_accounts.html">', '</a>') %]</p>
+	[% END -%]
+      </td>
+    </tr>
+    <tr>
+      <td nowrap="nowrap" align="RIGHT"><label for="timeInterval">[% locale.maketext("CGPDuring the time interval") %]</label>:</td>
+      <td>
+	[% locale.maketext("CGPFrom") %]
+	[% tod = rule.conditions.TimeOfDay.split("[:-]") -%]
+	<input type="text" name="fromHour" maxlength="2" value="[% tod.0 %]" style="width: 25px;"/>:<input type="text" name="fromMinutes" maxlength="2" value="[% tod.1 %]" style="width: 25px;"/>
+	[% locale.maketext("CGPTo") %]
+	<input type="text" name="toHour" maxlength="2" value="[% tod.2 %]" style="width: 25px;"/>:<input type="text" name="toMinutes" maxlength="2" value="[% tod.3 %]" style="width: 25px;"/> <span>HH:MM-HH:MM</span>
+      </td>
+    </tr>
+    <tr>
+      <td nowrap="nowrap" align="RIGHT"><label for="weekDaysEnabled">[% locale.maketext("CGPOn week days") %]</label>:</td>
+      <td>
+	[% filter_check("weekDays", rule.conditions.CurrentDay, "Sun", locale.maketext("CGPSun")) %]
+	[% filter_check("weekDays", rule.conditions.CurrentDay, "Mon", locale.maketext("CGPMon")) %]
+	[% filter_check("weekDays", rule.conditions.CurrentDay, "Tue", locale.maketext("CGPTue")) %]
+	[% filter_check("weekDays", rule.conditions.CurrentDay, "Wed", locale.maketext("CGPWed")) %]
+	[% filter_check("weekDays", rule.conditions.CurrentDay, "Thu", locale.maketext("CGPThu")) %]
+	[% filter_check("weekDays", rule.conditions.CurrentDay, "Fri", locale.maketext("CGPFri")) %]
+	[% filter_check("weekDays", rule.conditions.CurrentDay, "Sat", locale.maketext("CGPSat")) %]
+      </td>
+    </tr>
+    <tr>
+      <td nowrap="nowrap" align="RIGHT">
+	[% locale.maketext("CGPOn Stage") %]:
+      </td>
+      <td>
+	<select name="Stage">
+	  [% filter_option(rule.Stage, "1000", "0 s") %]
+	  [% filter_option(rule.Stage, "999", "1 s") %]
+	  [% filter_option(rule.Stage, "998", "2 s") %]
+	  [% filter_option(rule.Stage, "997", "3 s") %]
+	  [% filter_option(rule.Stage, "996", "4 s") %]
+	  [% filter_option(rule.Stage, "996", "5 s") %]
+	  [% filter_option(rule.Stage, "993", "7 s") %]
+	  [% filter_option(rule.Stage, "990", "10 s") %]
+	  [% filter_option(rule.Stage, "985", "15 s") %]
+	  [% filter_option(rule.Stage, "980", "20 s") %]
+	  [% filter_option(rule.Stage, "975", "25 s") %]
+	  [% filter_option(rule.Stage, "970", "30 s") %]
+	  [% filter_option(rule.Stage, "960", "40 s") %]
+	  [% filter_option(rule.Stage, "940", "60 s") %]
+	  [% filter_option(rule.Stage, "910", "90 s") %]
+	  [% filter_option(rule.Stage, "880", "2 min") %]
+	  [% filter_option(rule.Stage, "400", "10 min") %]
+	  [% filter_option(rule.Stage, "5", "No Answer") %]
+	  [% filter_option(rule.Stage, "3", "Busy") %]
+	  [% filter_option(rule.Stage, "1", "Failure") %]
+	</select>
+      </td>
+    </tr>
+    <tr>
+      <td nowrap="nowrap" align="RIGHT">
+	[% locale.maketext("CGPfor user with status") %]:
+      </td>
+      <td>
+	<select name="status">
+	  [% filter_option(rule.conditions.Presence, "", locale.maketext("CGPany")) %]
+	  [% filter_option(rule.conditions.Presence, "busy", locale.maketext("CGPbusy")) %]
+	  [% filter_option(rule.conditions.Presence, "away", locale.maketext("CGPaway")) %]
+	  [% filter_option(rule.conditions.Presence, "busy,away", locale.maketext("CGPaway or busy")) %]
+	</select>
+      </td>
+    </tr>
+  </table>
+</div>
+<h2>[% locale.maketext('CGPRule Action') %]</h2>
+<div class="highlight2">
+  <table border="0">
+    <tr>
+      <td colspan="2">
+	<select name="action" id="action">
+	  [% filter_option(rule.action.0, "", locale.maketext("Please select action")) %]
+	  [% filter_option(rule.action.0, "Redirect to", locale.maketext("CGPRedirect to")) %]
+	  [% filter_option(rule.action.0, "Fork to", locale.maketext("CGPFork to")) %]
+	  [% filter_option(rule.action.0, "Reject with", locale.maketext("CGPReject")) %]
+	  [% filter_option(rule.action.0, "Stop processing", locale.maketext("CGPStop processing")) %]
+	</select>
+	<span id="actionText">sip:<input type="text" name="actionText" value="[% UNLESS rule.action.0 == "Reject with"; rule.action.1; END -%]"  /></span>
+	<span id="action_error" style="margin-left: 10px; foat: right;"></span>
+	<script type="text/javascript">
+	  var sel = document.getElementById("action");
+	  var inp = document.getElementById("actionText");
+	  var showHideInput = function () {
+	  inp.style.display = "none";
+	  if (sel.value ==  "Redirect to" || sel.value ==  "Fork to") {
+	  inp.style.display = "inline";
+	  };
+	  };
+	  showHideInput();
+	  sel.onchange=function(){showHideInput()};
+	</script>
+      </td>
+    </tr>
+  </table>
+</div>
