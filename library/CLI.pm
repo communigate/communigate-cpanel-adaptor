@@ -4057,6 +4057,9 @@ sub convertOutput {
     $outp.= ')';
     return $outp;
   } else {
+      if ($data =~ m/^#\d+$/) {
+	  return $data;
+      }
     if($data =~ /[\W_]/ || $data eq '') {
       if($translate) {
         $data =~ s/\\((?![enr\d]))/\\\\$1/g;
