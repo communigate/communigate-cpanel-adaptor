@@ -46,7 +46,7 @@
   </script>
   </td>
   <td class="col2">
-    [% accounts.$account.used %] / <span id="quota_0">[%  IF accounts.$account.quota == 'unlimited'; '∞'; ELSE; accounts.$account.quota; END %]</span> <span class="megabyte_font">MB</span><br />
+    [% accounts.$account.used FILTER format('%02.1f') %] / <span id="quota_0">[%  IF accounts.$account.quota == 'unlimited'; '∞'; ELSE; accounts.$account.quota; END %]</span> <span class="megabyte_font">MB</span><br />
     <div id="usage_bar_0" class="table_progress_bar">
       <div style="position: relative; width: [% accounts.$account.usedpercent %]%; height: 100%; padding: 0px; margin: 0px; border: 0px" title="0%" class="cpanel_widget_progress_bar"></div>
     </div>
