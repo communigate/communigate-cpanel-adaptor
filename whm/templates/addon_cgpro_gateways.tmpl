@@ -114,24 +114,14 @@
 		<tr class="tdshade[% (loop.count % 2 - 1) * -1 + 1 %]_noborder">
 		  <td nowrap="nowrap">[% prefs.Gateways.$provider.name %]</td>
 		  <td nowrap="nowrap">
-		    <form action="addon_cgpro_gateways_edit.cgi" method="post">
-		      <input type="hidden" name="provider" value="[% provider %]" />
-		      <input type="submit" value="View/Edit" name="submit" style="float: left;" />
-		    </form>
-		    <form action="addon_cgpro_gateways_delete.cgi" method="post">
-		      <input type="hidden" name="provider" value="[% provider %]" />
-		      <input type="submit" value="Delete" name="submit" />
-		    </form>
+		    <a href="addon_cgpro_gateways_edit.cgi?provider=[% provider %]" class="input-button">View/Edit</a>
+		    <a href="addon_cgpro_gateways_delete.cgi?provider=[% provider %]" class="input-button">Delete</a>
 		  </td>
 		</tr>	    
 		[% END -%]
 		<tr class="tdshade1_noborder">
 		  <td nowrap="nowrap" colspan="2">
-		    <form action="addon_cgpro_gateways_edit.cgi" method="post">
-		      <p>
-			<input type="submit" value="Add New Provider" name="submit" />
-		      </p>
-		    </form>
+		    <a href="addon_cgpro_gateways_edit.cgi" class="input-button">Add New Provider</a>
 		  </td>
 		</tr>
 	      </tbody>
