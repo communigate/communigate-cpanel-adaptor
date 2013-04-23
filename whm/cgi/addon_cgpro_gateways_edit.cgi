@@ -86,7 +86,7 @@ if ($FORM{submitedit} && $FORM{provider} && $FORM{name}) {
 }
 
 if ($FORM{submitdialin} && $FORM{provider}) {
-    if ($FORM{dialInEnabled}) {
+    if ($FORM{dialInEnabled} && $FORM{dialInEnabled} ne '#NULL#') {
 	$prefs->{Gateways}->{$FORM{provider}}->{callInGw} = {
 	    disabled => undef,
 	    proxyType => "registrar",
@@ -220,8 +220,6 @@ if ($FORM{submitdialin} && $FORM{provider}) {
 		    push @{$prefs->{Gateways}->{$FORM{provider}}->{callInGw}->{callerIdReRules}}, [$r, $range, $a, '#1'];
 		}
 	    }
-	    use Data::Dumper;
-	    warn Dumper $prefs->{Gateways}->{$FORM{provider}}->{callInGw}->{callerIdReRules};
 	} else {
 	    delete $prefs->{Gateways}->{$FORM{provider}}->{callInGw}->{CLIDEnabled};
 	    delete $prefs->{Gateways}->{$FORM{provider}}->{callInGw}->{CLIDTrusted};
@@ -299,10 +297,8 @@ if ($FORM{submitdialin} && $FORM{provider}) {
 	}
 	$cli->UpdateAccountPrefs('pbx@' . $domain, {Gateways => $prefs->{Gateways}});
     } else {
-	if ($prefs->{Gateways}->{$FORM{provider}}->{callInGw}) {
-	    delete $prefs->{Gateways}->{$FORM{provider}}->{callInGw};
-	    $cli->UpdateAccountPrefs('pbx@' . $domain, {Gateways => $prefs->{Gateways}});
-	}
+	delete $prefs->{Gateways}->{$FORM{provider}}->{callInGw};
+	$cli->UpdateAccountPrefs('pbx@' . $domain, {Gateways => $prefs->{Gateways}});
     }
 }
 my $prefs = $cli->GetAccountPrefs('pbx@' . $domain);
@@ -319,36 +315,37 @@ for my $telnum (@$telnums) {
     }
 }
 
-my $telnumDetails = {};
-for $num (@{$prefs->{Gateways}->{$FORM{provider}}->{callInGw}->{telnums}}) {
-    $telnumDetails->{$num->{telnum}} = $num;
-}
-
-my $methods = {};
-my $i = 0;
-for $method (@{$prefs->{Gateways}->{$FORM{provider}}->{callInGw}->{CLIDMethods}}) {
-    $methods->{$method} = ++$i;
-}
-
-my $callerIdReRules;
-for my $rule (@{$prefs->{Gateways}->{$FORM{provider}}->{callInGw}->{callerIdReRules}}) {
-    my $condition = $rule->[0];
-    my $digits = $rule->[1];
-    my $action = $rule->[2];
-    if ($digits eq '#NULL#') {
-	$digits = '*';
-    } else {
-	$digits = $digits->[0];
-	unless ($digits =~ s/^\#(\d+)$/$1/) {
-	    $digits = join "-", map {$_ =~ s/^\#(\d+)$/$1/ ? $_ : ""} @$digits;
-	}
-	$digits = "($digits)";
+if ($prefs->{Gateways}->{$FORM{provider}}->{callInGw} && $prefs->{Gateways}->{$FORM{provider}}->{callInGw} ne '#NULL#') {
+    my $telnumDetails = {};
+    for $num (@{$prefs->{Gateways}->{$FORM{provider}}->{callInGw}->{telnums}}) {
+	$telnumDetails->{$num->{telnum}} = $num;
     }
-    $condition =~ s/^\^(.*?)\(.*\)\$$/$1/;
-    $condition =~ s/[\\\?]//g;
-    $callerIdReRules .= "$condition$digits -> $action*\n";
-}
 
+    my $methods = {};
+    my $i = 0;
+    for $method (@{$prefs->{Gateways}->{$FORM{provider}}->{callInGw}->{CLIDMethods}}) {
+	$methods->{$method} = ++$i;
+    }
+
+    my $callerIdReRules;
+    for my $rule (@{$prefs->{Gateways}->{$FORM{provider}}->{callInGw}->{callerIdReRules}}) {
+	my $condition = $rule->[0];
+	my $digits = $rule->[1];
+	my $action = $rule->[2];
+	if ($digits eq '#NULL#') {
+	    $digits = '*';
+	} else {
+	    $digits = $digits->[0];
+	    unless ($digits =~ s/^\#(\d+)$/$1/) {
+		$digits = join "-", map {$_ =~ s/^\#(\d+)$/$1/ ? $_ : ""} @$digits;
+	    }
+	    $digits = "($digits)";
+	}
+	$condition =~ s/^\^(.*?)\(.*\)\$$/$1/;
+	$condition =~ s/[\\\?]//g;
+	$callerIdReRules .= "$condition$digits -> $action*\n";
+    }
+}
 print "Content-type: text/html\r\n\r\n";
 Whostmgr::HTMLInterface::defheader( "CGPro Edit Gateways",'', '/cgi/addon_cgpro_gateways_edit.cgi' );
 Cpanel::Template::process_template(
