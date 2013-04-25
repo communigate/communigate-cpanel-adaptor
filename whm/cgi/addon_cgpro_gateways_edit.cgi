@@ -193,33 +193,7 @@ if ($FORM{submitdialin} && $FORM{provider}) {
 	    }
 	    $prefs->{Gateways}->{$FORM{provider}}->{callInGw}->{CLIDMethods} = $mth;
 	    # Rules
-	    $prefs->{Gateways}->{$FORM{provider}}->{callInGw}->{callerIdReRules} = [];
-	    for my $rul (split "\r?\n", $FORM{callerIdReRules}) {
-		$rul =~ s/\s+//g;
-		my ($r,$a) = split "->", $rul;
-		if ($r && $a && $r =~ m/^(.*?)(\(.*?\)|\*)$/) {
-		    my $numbers = $1;
-		    my $wildcard = $2;
-		    my $range = "";
-		    if ($wildcard eq '*') {
-			$range = undef;
-			$r =~ s/\*/(.*)/;
-		    } else {
-			$r =~ s/(\(.*?\))/([0-9]+)/;
-			$wildcard =~ s/[\(\)]//g;
-			my ($from, $to) = split "-", $wildcard;
-			if ($to) {
-			    $range = [["#".$from, "#".$to]];
-			} else {
-			    $range = ["#".$from];
-			}
-		    }
-		    $r =~ s/^\+/\\\\+?/;
-		    $r =~ s/^(.*?)$/^$1\$/;
-		    $a =~ s/(\(.*?\)|\*)//;
-		    push @{$prefs->{Gateways}->{$FORM{provider}}->{callInGw}->{callerIdReRules}}, [$r, $range, $a, '#1'];
-		}
-	    }
+	    $prefs->{Gateways}->{$FORM{provider}}->{callInGw}->{callerIdReRules} = textToRules($FORM{callerIdReRules});
 	} else {
 	    delete $prefs->{Gateways}->{$FORM{provider}}->{callInGw}->{CLIDEnabled};
 	    delete $prefs->{Gateways}->{$FORM{provider}}->{callInGw}->{CLIDTrusted};
@@ -295,12 +269,179 @@ if ($FORM{submitdialin} && $FORM{provider}) {
 	    $prefs->{Gateways}->{$FORM{provider}}->{callInGw}->{telnums} = $tels;
 	    $cli->SetAccountRSIPs('pbx@' . $domain, $rsips);
 	}
-	$cli->UpdateAccountPrefs('pbx@' . $domain, {Gateways => $prefs->{Gateways}});
     } else {
 	delete $prefs->{Gateways}->{$FORM{provider}}->{callInGw};
-	$cli->UpdateAccountPrefs('pbx@' . $domain, {Gateways => $prefs->{Gateways}});
     }
+    $cli->UpdateAccountPrefs('pbx@' . $domain, {Gateways => $prefs->{Gateways}});
 }
+
+# #### Call OUT
+if ($FORM{submitdialout} && $FORM{provider}) {
+    if ($FORM{dialOutEnabled} && $FORM{dialOutEnabled} ne '#NULL#') {
+	# Create default unless exists
+	$prefs->{Gateways}->{$FORM{provider}}->{callOutGw} = {
+	    'disabled' => undef,
+	    'proxy' => []
+	} unless $prefs->{Gateways}->{$FORM{provider}}->{callOutGw};
+	# Temporary disable
+	if ($FORM{dialOutDisable}) {
+	    $prefs->{Gateways}->{$FORM{provider}}->{callOutGw}->{disabled} = "YES";
+	} else {
+	    $prefs->{Gateways}->{$FORM{provider}}->{callOutGw}->{disabled} = undef;
+	}
+	# destinationCL
+	if ($FORM{'destinationCL-except'} || $FORM{destinationCL}) {
+	    my $cl = [];
+	    $FORM{'destinationCL-except'} =~ s/\+/-/g;
+	    @$cl = (split "\r?\n", $FORM{'destinationCL-except'});
+	    @$cl = (@$cl, $FORM{'destinationCL'} ? split "\r?\n", $FORM{'destinationCL'} : ('+'));
+	    $prefs->{Gateways}->{$FORM{provider}}->{callOutGw}->{destinationCL} = $cl;
+	} else {
+	    delete $prefs->{Gateways}->{$FORM{provider}}->{callOutGw}->{destinationCL} if $prefs->{Gateways}->{$FORM{provider}}->{callOutGw}->{destinationCL};
+	}
+	# Authenticate
+	for (my $i = 0; $i <= $#{$prefs->{Gateways}->{$FORM{provider}}->{callOutGw}->{proxy}}; $i++) {
+	    # Delete Gateway
+	    if ($FORM{'delete-' . $i}) {
+		delete $prefs->{Gateways}->{$FORM{provider}}->{callOutGw}->{proxy}->[$i];
+	    } else {
+		# Change type
+		$prefs->{Gateways}->{$FORM{provider}}->{callOutGw}->{proxy}->[$i] = {};
+		if ($FORM{authenticate}) {
+		    $prefs->{Gateways}->{$FORM{provider}}->{callOutGw}->{proxy}->[$i] = {
+			'authname' => $FORM{'authname-' . $i} || undef,
+			'proto' => $FORM{'proto-' . $i} || undef,
+			'domain' => $FORM{'domain-' . $i} || undef,
+			'address' => $FORM{'address-' . $i} || undef,
+			'authpass' => $FORM{'password-' . $i} || undef,
+			'username' => $FORM{'username-' . $i} || undef
+		    };
+		} else {
+		    $prefs->{Gateways}->{$FORM{provider}}->{callOutGw}->{proxy}->[$i] = {
+			'proto' => $FORM{'proto-' . $i} || undef,
+			'domain' => $FORM{'domain-' . $i} || undef,
+			'address' => $FORM{'address-' . $i} || undef,
+		    };
+		}
+	    }
+	}
+	if ($FORM{domain}) {
+	    if ($FORM{authenticate}) {
+		push @{$prefs->{Gateways}->{$FORM{provider}}->{callOutGw}->{proxy}}, {
+		    'authname' => $FORM{'authname'} || undef,
+		    'proto' => $FORM{'proto'} || undef,
+		    'domain' => $FORM{'domain'} || undef,
+		    'address' => $FORM{'address'} || undef,
+		    'authpass' => $FORM{'authpass'} || undef,
+		    'username' => $FORM{'username'} || undef
+		};
+	    } else {
+		push @{$prefs->{Gateways}->{$FORM{provider}}->{callOutGw}->{proxy}}, {
+		    'proto' => $FORM{'proto'} || undef,
+		    'domain' => $FORM{'domain'} || undef,
+		    'address' => $FORM{'address'} || undef,
+		};
+	    }
+	}
+	# Custom timeout
+	if ($FORM{TimerB}) {
+	    $prefs->{Gateways}->{$FORM{provider}}->{callOutGw}->{TimerB} = $FORM{TimerB};
+	} else {
+	    delete $prefs->{Gateways}->{$FORM{provider}}->{callOutGw}->{TimerB};
+	}
+	# Force Media relay
+	if ($FORM{forceRelay}) {
+	    $prefs->{Gateways}->{$FORM{provider}}->{callOutGw}->{forceRelay} = "YES";
+	} else {
+	    delete $prefs->{Gateways}->{$FORM{provider}}->{callOutGw}->{forceRelay};
+	    delete $prefs->{Gateways}->{$FORM{provider}}->{callOutGw}->{forceMediaProcessing};
+	}	
+	if ($FORM{forceMediaProcessing}) {
+	    $prefs->{Gateways}->{$FORM{provider}}->{callOutGw}->{forceRelay} = "YES";
+	    $prefs->{Gateways}->{$FORM{provider}}->{callOutGw}->{forceMediaProcessing} = "YES";
+	} else {
+	    delete $prefs->{Gateways}->{$FORM{provider}}->{callOutGw}->{forceMediaProcessing};
+	}
+	if ($FORM{'forceRelay'} && {$FORM{'forceRelayCL-except'} || $FORM{'forceRelayCL'}}) {
+	    my $cl = [];
+	    @$cl = map { '-' . $_ } (split "\r?\n", $FORM{'forceRelayCL-except'}) if $FORM{'forceRelayCL-except'};
+	    @$cl = (@$cl, map { '+' . $_ } split "\r?\n", $FORM{'forceRelayCL'}) if $FORM{'forceRelayCL'};
+	    $prefs->{Gateways}->{$FORM{provider}}->{callOutGw}->{forceRelayCL} = $cl;
+	} else {
+	    delete $prefs->{Gateways}->{$FORM{provider}}->{callOutGw}->{forceRelayCL} if $prefs->{Gateways}->{$FORM{provider}}->{callOutGw}->{forceRelayCL};
+	}
+	if ($FORM{'forceMediaProcessing'} && {$FORM{'forceTranscodingCL-except'} || $FORM{'forceTranscodingCL'}}) {
+	    my $cl = [];
+	    @$cl = map { '-' . $_ } (split "\r?\n", $FORM{'forceTranscodingCL-except'}) if $FORM{'forceTranscodingCL-except'};
+	    @$cl = (@$cl, map { '+' . $_ } split "\r?\n", $FORM{'forceTranscodingCL'}) if $FORM{'forceTranscodingCL'};
+	    $prefs->{Gateways}->{$FORM{provider}}->{callOutGw}->{forceTranscodingCL} = $cl;
+	} else {
+	    delete $prefs->{Gateways}->{$FORM{provider}}->{callOutGw}->{forceTranscodingCL} if $prefs->{Gateways}->{$FORM{provider}}->{callOutGw}->{forceTranscodingCL};
+	}
+	# Retry Codes
+	if ($FORM{'retryCodes-check'}) {
+	    $prefs->{Gateways}->{$FORM{provider}}->{callOutGw}->{retryCodes} = [];
+	    $prefs->{Gateways}->{$FORM{provider}}->{callOutGw}->{retryCodes} = [map { '#' . $_ } split "\r?\n", $FORM{'retryCodes'}] if $FORM{'retryCodes'};
+	} else {
+	    delete $prefs->{Gateways}->{$FORM{provider}}->{callOutGw}->{retryCodes} if $prefs->{Gateways}->{$FORM{provider}}->{callOutGw}->{retryCodes};
+	}
+	if ($FORM{calledIdReRules}){
+	    $prefs->{Gateways}->{$FORM{provider}}->{callOutGw}->{calledIdReRules} = textToRules($FORM{calledIdReRules});
+	} else {
+	    delete $prefs->{Gateways}->{$FORM{provider}}->{callOutGw}->{calledIdReRules};
+	}
+	# CallerID enabled
+	if ($FORM{CLIDEnabled}){
+	    $prefs->{Gateways}->{$FORM{provider}}->{callOutGw}->{CLIDEnabled} = "YES";
+	    if ($FORM{CLIDPass}) {
+		$prefs->{Gateways}->{$FORM{provider}}->{callOutGw}->{CLIDPass} = $FORM{CLIDPass};
+	    } else {
+		delete $prefs->{Gateways}->{$FORM{provider}}->{callOutGw}->{CLIDPass};
+	    }
+	    if ($FORM{CLIDSendLocal}) {
+		$prefs->{Gateways}->{$FORM{provider}}->{callOutGw}->{CLIDSendLocal} = $FORM{CLIDSendLocal};
+	    } else {
+		delete $prefs->{Gateways}->{$FORM{provider}}->{callOutGw}->{CLIDSendLocal};
+	    }
+	    # Rules
+	    if ($FORM{callerIdReRulesOut}){
+		$prefs->{Gateways}->{$FORM{provider}}->{callOutGw}->{callerIdReRules} = textToRules($FORM{callerIdReRulesOut});
+	    } else {
+		delete $prefs->{Gateways}->{$FORM{provider}}->{callOutGw}->{callerIdReRules};
+	    }
+	    # CallerID Methods
+	    my $methodFound = 0;
+	    my $methods = {};
+	    for my $method ( ('from', 'rpi', 'pai', 'ppi') ) {
+		if ($FORM{"CLIDMethods-" . $method}) {
+		    $methods->{$FORM{"CLIDMethods-" . $method . "-order"} || rand()} = $method;
+		    $methodFound = 1;
+		}
+	    }
+	    if ($methodFound) {
+		my $mth = [];
+		for my $key (sort keys %$methods) {
+		    push @$mth, $methods->{$key};
+		}
+		$prefs->{Gateways}->{$FORM{provider}}->{callOutGw}->{CLIDMethods} = $mth;
+	    } else {
+		delete $prefs->{Gateways}->{$FORM{provider}}->{callOutGw}->{CLIDMethods};
+	    }
+	} else {
+	    delete $prefs->{Gateways}->{$FORM{provider}}->{callOutGw}->{CLIDEnabled};
+	    delete $prefs->{Gateways}->{$FORM{provider}}->{callOutGw}->{CLIDPass};
+	    delete $prefs->{Gateways}->{$FORM{provider}}->{callOutGw}->{CLIDSendLocal};
+	    delete $prefs->{Gateways}->{$FORM{provider}}->{callOutGw}->{callerIdReRules};
+	    delete $prefs->{Gateways}->{$FORM{provider}}->{callOutGw}->{CLIDMethods};
+	}
+    } else {
+	delete $prefs->{Gateways}->{$FORM{provider}}->{callOutGw};
+    }
+    $cli->UpdateAccountPrefs('pbx@' . $domain, {Gateways => $prefs->{Gateways}});
+}
+
+
+# GETS
 my $prefs = $cli->GetAccountPrefs('pbx@' . $domain);
 $telnums = $cli->ListForwarders($domain);
 $tels = {};
@@ -320,15 +461,17 @@ if ($prefs->{Gateways}->{$FORM{provider}}->{callInGw} && $prefs->{Gateways}->{$F
     for $num (@{$prefs->{Gateways}->{$FORM{provider}}->{callInGw}->{telnums}}) {
 	$telnumDetails->{$num->{telnum}} = $num;
     }
-
+    
     my $methods = {};
     my $i = 0;
     for $method (@{$prefs->{Gateways}->{$FORM{provider}}->{callInGw}->{CLIDMethods}}) {
 	$methods->{$method} = ++$i;
-    }
-
+    }   
+}
+sub rulesToText {
+    my $rules = shift;
     my $callerIdReRules;
-    for my $rule (@{$prefs->{Gateways}->{$FORM{provider}}->{callInGw}->{callerIdReRules}}) {
+    for my $rule (@$rules) {
 	my $condition = $rule->[0];
 	my $digits = $rule->[1];
 	my $action = $rule->[2];
@@ -345,7 +488,41 @@ if ($prefs->{Gateways}->{$FORM{provider}}->{callInGw} && $prefs->{Gateways}->{$F
 	$condition =~ s/[\\\?]//g;
 	$callerIdReRules .= "$condition$digits -> $action*\n";
     }
+    return $callerIdReRules;
+};
+
+sub textToRules {
+    my $param = shift;
+    my $rules = [];
+    for my $rul (split "\r?\n", $param) {
+	$rul =~ s/\s+//g;
+	my ($r,$a) = split "->", $rul;
+	if ($r && $a && $r =~ m/^(.*?)(\(.*?\)|\*)$/) {
+	    my $numbers = $1;
+	    my $wildcard = $2;
+	    my $range = "";
+	    if ($wildcard eq '*') {
+		$range = undef;
+		$r =~ s/\*/(.*)/;
+	    } else {
+		$r =~ s/(\(.*?\))/([0-9]+)/;
+		$wildcard =~ s/[\(\)]//g;
+		my ($from, $to) = split "-", $wildcard;
+		if ($to) {
+		    $range = [["#".$from, "#".$to]];
+		} else {
+		    $range = ["#".$from];
+		}
+	    }
+	    $r =~ s/^\+/\\\\+?/;
+	    $r =~ s/^(.*?)$/^$1\$/;
+	    $a =~ s/(\(.*?\)|\*)//;
+	    push @{$rules}, [$r, $range, $a, '#1'];
+	}
+    }
+    return $rules;
 }
+
 print "Content-type: text/html\r\n\r\n";
 Whostmgr::HTMLInterface::defheader( "CGPro Edit Gateways",'', '/cgi/addon_cgpro_gateways_edit.cgi' );
 Cpanel::Template::process_template(
@@ -358,7 +535,9 @@ Cpanel::Template::process_template(
 				    telnums => $tels,
 				    telnumDetails => $telnumDetails,
 				    methods => $methods,
-				    callerIdReRules => $callerIdReRules
+				    callerIdReRules => rulesToText( defined ($prefs->{Gateways}->{$FORM{provider}}->{callInGw}) ? $prefs->{Gateways}->{$FORM{provider}}->{callInGw}->{callerIdReRules} : [] ),
+				    calledIdReRules => rulesToText( defined ($prefs->{Gateways}->{$FORM{provider}}->{callOutGw}) ? $prefs->{Gateways}->{$FORM{provider}}->{callOutGw}->{calledIdReRules} : [] ),
+				    callerIdReRulesOut => rulesToText( defined ($prefs->{Gateways}->{$FORM{provider}}->{callOutGw}) ? $prefs->{Gateways}->{$FORM{provider}}->{callOutGw}->{callerIdReRules} : [] ),
 				   },
 				  );
 
