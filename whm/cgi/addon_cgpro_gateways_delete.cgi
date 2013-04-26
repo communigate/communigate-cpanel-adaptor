@@ -33,14 +33,45 @@ my $domain = $cli->MainDomainName();
 
 if ($FORM{provider}) {
     my $prefs = $cli->GetAccountPrefs('pbx@' . $domain);
+    my $id = $prefs->{Gateways}->{$FORM{provider}}->{shortId};
+    $id =~ s/\D//g;
     my $gateways;
     for my $pref (keys %{$prefs->{Gateways}}) {
-	unless ($pref eq $FORM{provider}) {
-	    $gateways->{$pref} = $prefs->{Gateways}->{$pref};
-	}
+    	unless ($pref eq $FORM{provider}) {
+    	    $gateways->{$pref} = $prefs->{Gateways}->{$pref};
+    	}
     }
     my $update = {Gateways => $gateways};
     $cli->UpdateAccountPrefs('pbx@' . $domain, $update);
+
+    my $telnums = $cli->ListForwarders($domain);
+    my $tels = {};
+    for my $telnum (@$telnums) {
+	if ($telnum =~ m/^i\-(\d+)$/) {
+	    my $tel = $1;
+	    my $to = $cli->GetForwarder($telnum);
+	    $to =~ s/\.local//;
+	    if ($to =~ m/$FORM{provider}\@(.*?)$/) {
+		$tels->{$tel} = $1;
+	    }
+	}
+    }
+    for my $tel (sort keys %$tels) {
+    	$cli->DeleteForwarder($tel . '@central.telnum');
+    	$cli->DeleteForwarder("i-" . $tel . '@' . $domain);
+    	$cli->DeleteForwarder("tn-" . $tel . '@' . $domain);
+    	if ($tels->{$tel} ne 'null') {
+    	    $cli->DeleteForwarder("tn-" . $tel . '@' . $tels->{$tel});
+    	    $cli->DeleteForwarder("i-" . $tel . '@' . $tels->{$tel});
+    	}
+    }
+    my $rsips = $cli->GetAccountRSIPs('pbx@' . $domain);
+    for my $rsip (keys %$rsips) {
+	if ($rsip =~ m/^rsip\-$id/) {
+	    delete $rsips->{$rsip};
+	}
+    }
+    $cli->SetAccountRSIPs('pbx@' . $domain, $rsips);
 }
 
 print "HTTP/1.1 303 See Other\r\nLocation: addon_cgpro_gateways.cgi\r\n\r\n";
