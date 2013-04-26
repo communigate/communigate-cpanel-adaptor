@@ -46,7 +46,7 @@ for my $telnum (@$telnums) {
 	}
     }
 }
-    my $prefs = $cli->GetAccountPrefs('pbx@' . $domain);
+my $prefs = $cli->GetAccountPrefs('pbx@' . $domain);
 my $id = $prefs->{Gateways}->{$FORM{provider}}->{shortId};
 $id =~ s/\D//g;
 if ($FORM{submitedit} && $FORM{provider} && $FORM{name}) {
@@ -456,8 +456,8 @@ for my $telnum (@$telnums) {
     }
 }
 
+my $telnumDetails = {};
 if ($prefs->{Gateways}->{$FORM{provider}}->{callInGw} && $prefs->{Gateways}->{$FORM{provider}}->{callInGw} ne '#NULL#') {
-    my $telnumDetails = {};
     for $num (@{$prefs->{Gateways}->{$FORM{provider}}->{callInGw}->{telnums}}) {
 	$telnumDetails->{$num->{telnum}} = $num;
     }

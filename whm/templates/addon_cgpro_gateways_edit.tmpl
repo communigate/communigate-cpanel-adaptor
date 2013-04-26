@@ -257,7 +257,7 @@
  				[% filter_option( telnumDetails.$telnum.expires, "8h", "8 hours") %]
  				[% filter_option( telnumDetails.$telnum.expires, "10h", "10 hours") %]
  				[% filter_option( telnumDetails.$telnum.expires, "12h", "12 hours") %]
- 				[% filter_option( telnumDetails.$telnum.expires, "24h", "24 hours") %]
+ 				[% filter_option( telnumDetails.$telnum.expires, "1d", "24 hours") %]
 			      </select>
 			    </td>
 			    [% END -%]
@@ -272,6 +272,7 @@
 			  <tr class="tdshade[% (loop.count % 2 - 1) * -1 + 1 %]_noborder">
 			    <td colspan="3">
 			      <a href="addon_cgpro_gateways_addnumber.cgi?provider=[% provider %]" class="input-button">Add number</a>
+			      <a href="addon_cgpro_gateways_importcsvnumbers.cgi?provider=[% provider %]" class="input-button">CSV Import Numberts</a>
 			    </td>
 			  </tr>
 			</tbody>
@@ -702,10 +703,6 @@
       </div>
     </div>
   </div>
-[% USE dumper %]
-<pre>
-[% dumper.dump() %]
-</pre>
 [% PROCESS addon_cgpro_footer.tmpl %]
 <script type="text/javascript">
 // Page initialization script
@@ -719,7 +716,3 @@ var init = function() {
 
 EVENT.onDOMReady(init);
 </script>
-[% USE dumper %]
-<pre>
-  [% dumper.dump(prefs.Gateways.antonkatsarov) %]
-</pre>
