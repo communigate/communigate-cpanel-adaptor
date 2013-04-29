@@ -88,14 +88,13 @@ if ($FORM{submitedit} && $FORM{provider} && $FORM{name}) {
 if ($FORM{submitdialin} && $FORM{provider}) {
     if ($FORM{dialInEnabled} && $FORM{dialInEnabled} ne '#NULL#') {
 	$prefs->{Gateways}->{$FORM{provider}}->{callInGw} = {
-	    disabled => undef,
 	    proxyType => "registrar",
 	    telnums => []
 	} unless $prefs->{Gateways}->{$FORM{provider}}->{callInGw};
 	if ($FORM{dialInDisable}) {
 	    $prefs->{Gateways}->{$FORM{provider}}->{callInGw}->{disabled} = "YES";
 	} else {
-	    $prefs->{Gateways}->{$FORM{provider}}->{callInGw}->{disabled} = undef;
+		delete $prefs->{Gateways}->{$FORM{provider}}->{callInGw}->{disabled};
 	}
 
 	$prefs->{Gateways}->{$FORM{provider}}->{callInGw}->{proxyType} = $FORM{proxyType};
@@ -280,14 +279,13 @@ if ($FORM{submitdialout} && $FORM{provider}) {
     if ($FORM{dialOutEnabled} && $FORM{dialOutEnabled} ne '#NULL#') {
 	# Create default unless exists
 	$prefs->{Gateways}->{$FORM{provider}}->{callOutGw} = {
-	    'disabled' => undef,
 	    'proxy' => []
 	} unless $prefs->{Gateways}->{$FORM{provider}}->{callOutGw};
 	# Temporary disable
 	if ($FORM{dialOutDisable}) {
 	    $prefs->{Gateways}->{$FORM{provider}}->{callOutGw}->{disabled} = "YES";
 	} else {
-	    $prefs->{Gateways}->{$FORM{provider}}->{callOutGw}->{disabled} = undef;
+	    delete $prefs->{Gateways}->{$FORM{provider}}->{callOutGw}->{disabled};
 	}
 	# destinationCL
 	if ($FORM{'destinationCL-except'} || $FORM{destinationCL}) {
@@ -312,7 +310,7 @@ if ($FORM{submitdialout} && $FORM{provider}) {
 			'authname' => $FORM{'authname-' . $i} || undef,
 			'proto' => $FORM{'proto-' . $i} || undef,
 			'domain' => $FORM{'domain-' . $i} || undef,
-			'address' => $FORM{'address-' . $i} || undef,
+			'address' => $FORM{'address-' . $i} || '',
 			'authpass' => $FORM{'password-' . $i} || undef,
 			'username' => $FORM{'username-' . $i} || undef
 		    };
