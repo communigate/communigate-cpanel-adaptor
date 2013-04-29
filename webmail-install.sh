@@ -4,7 +4,7 @@ PACKSRC=`pwd`
 source ${PACKSRC}/config.ini
 
 cd ${PACKSRC}
-wget -O${PACKSRC}/webmail-distro.tgz 'itoolabs.com/download_protected/27ewefryg15sa1b35gf4enb8743iu44a2r/webmail-cpanel/2.0.1/webmail-distro.tgz'
+wget -O${PACKSRC}/webmail-distro.tgz 'itoolabs.com/download_protected/27ewefryg15sa1b35gf4enb8743iu44a2r/webmail-cpanel/2.0.2/webmail-distro.tgz'
 tar -xvf ${PACKSRC}/webmail-distro.tgz
 cd ${PACKSRC}/webmail/
 rm -f ${PACKSRC}/webmail/itoolabs_webmail.cpanelplugin
