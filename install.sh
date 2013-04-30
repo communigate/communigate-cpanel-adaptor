@@ -92,9 +92,14 @@ cp -rf ${PACKSRC}/hooks/CGPro /var/cpanel/perl5/lib/
 # Register installed hooks
 /usr/local/cpanel/bin/manage_hooks add module CGPro::Hooks
 
-#Install config file
+#Install config files
 cp ${PACKSRC}/etc/cpanel_cgpro.conf /var/cpanel/communigate.yaml
 chmod 600 /var/cpanel/communigate.yaml
+if [ ! -d /var/cpanel/cgpro/ ]
+then
+    mkdir -p /var/cpanel/cgpro/
+fi
+cp ${PACKSRC}/etc/classes.yaml /var/cpanel/cgpro/classes.yaml
 
 # Install CommuniGate Webmail in cPanel
 cp ${PACKSRC}/cgpro-webmail/webmail_communigate.yaml /var/cpanel/webmail/
