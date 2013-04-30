@@ -1,6 +1,7 @@
 package CGPro::Hooks;
 
 use CLI;
+use Cpanel::Logger ();
 use Cpanel::AdminBin ();
 use Cpanel::Api2::Exec ();
 use Cpanel::CachedDataStore ();
@@ -87,9 +88,9 @@ sub getCLI {
 				  login => $loginData[2],
 				  password => $loginData[3]
 				});
+	my $logger = Cpanel::Logger->new();
 	unless($cli) {
 	    $logger->warn("Can't login to CGPro: ".$CGP::ERR_STRING);
-	    exit(0);
 	}
 	$CLI = $cli;
 	return $cli;
@@ -216,7 +217,6 @@ sub doaddpop {
     }else{
         $quota .= "M";
     }
-    my $cli = getCLI();
     my $data = $cli->GetDomainSettings("$domain");
     if (!$data) {
     	$cli->CreateDomain("$domain");
@@ -228,9 +228,6 @@ sub doaddpop {
     if ($response) {
     	$cli->CreateMailbox("$user\@$domain", "Calendar");
     	$cli->CreateMailbox("$user\@$domain", "Spam");
-    } else {
-    	my $apiref = Cpanel::Api2::Exec::api2_preexec( 'Email', 'delpop' );
-    	my ( $data, $status ) = Cpanel::Api2::Exec::api2_exec( 'Email', 'delpop', $apiref, {domain => $domain, email=> $user} );
     }
     $cli->Logout();
 }

@@ -45,7 +45,6 @@ sub getCLI {
 				});
 	unless($cli) {
 	    $logger->warn("Can't login to CGPro: ".$CGP::ERR_STRING);
-	    exit(0);
 	}
 	$CLI = $cli;
 	return $cli;
@@ -2005,6 +2004,25 @@ sub api2_updatearchive {
     $cli->Logout();
     return {msg => "Changes saved."};
 }
+
+sub api2_VerifyAccount {
+    my %OPTS = @_;
+    my $user = $OPTS{'email'};
+    my $domain = $OPTS{'domain'};
+    my $cli = "";
+    my $settings = "";
+    eval { 
+	$cli = getCLI();
+	$settings = $cli->GetAccountSettings("$user\@$domain");
+    };
+    unless ($settings) {
+    	my $apiref = Cpanel::Api2::Exec::api2_preexec( 'Email', 'delpop' );
+    	my ( $data, $status ) = Cpanel::Api2::Exec::api2_exec( 'Email', 'delpop', $apiref, {domain => $domain, email=> $user} );
+    }
+    $cli->Logout();
+    return;
+}
+
 sub IsGroupInternal {
   	my $groupwithdomain = shift;
 	my @values = split("@",$groupwithdomain);
