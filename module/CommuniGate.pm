@@ -2023,6 +2023,11 @@ sub api2_VerifyAccount {
     return;
 }
 
+sub api2_checkSSLlinks {
+    $Cpanel::CPVAR{"ssllinks"} = 0;
+    $Cpanel::CPVAR{"ssllinks"} = 1 if -f "/var/cpanel/cgpro/ssllinks";
+}
+
 sub IsGroupInternal {
   	my $groupwithdomain = shift;
 	my @values = split("@",$groupwithdomain);

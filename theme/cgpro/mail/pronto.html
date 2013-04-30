@@ -1,17 +1,7 @@
-<div class="body-content">
-
-
-<cpanelif !$ENV{'SERVER_PORT'}==2082>
+<!-- <?cp CommuniGate::checkSSLlinks() ?> -->
 <script type="text/javascript">
-  document.location.href = "<cpanel print="http://"><cpanel hostname=""><cpanel print=":8100/Pronto4">"; 
+  document.location.href = "http<cpanelif $CPVAR{'ssllinks'}>s</cpanelif>://<cpanel print="$ENV{'HTTP_HOST'}">:<cpanelif $CPVAR{'ssllinks'}>9100</cpanelif><cpanelif !$CPVAR{'ssllinks'}>8100</cpanelif>/?Skin=hPronto-#pronto-login"; 
 </script>
-</cpanelif>
-
-<cpanelif $ENV{'SERVER_PORT'}==2082>
-<script type="text/javascript">
-document.location.href = "<cpanel print="http://"><cpanel hostname=""><cpanel print=":8100/Pronto4">";    
-</script>
-</cpanelif>
-
-
-</div>
+<noscript>
+<a href="http<cpanelif $CPVAR{'ssllinks'}>s</cpanelif>://<cpanel print="$ENV{'HTTP_HOST'}">:<cpanelif $CPVAR{'ssllinks'}>9100</cpanelif><cpanelif !$CPVAR{'ssllinks'}>8100</cpanelif>/?Skin=hPronto-#pronto-login">Click here if not redirected.</a>
+</noscript>

@@ -26,6 +26,8 @@ unless($cli) {
 
 my $cgproversion = $cli->getversion();
 
+my %FORM = Cpanel::Form::parseform();
+
 Whostmgr::HTMLInterface::defheader( "CGPro SSL Manager",'', '/cgi/addon_cgpro_ssl_manager.cgi' );
 my $hostname = `hostname`;
 chomp $hostname;
@@ -35,7 +37,17 @@ if ($hostname) {
 }
 
 my $MSG = update_ssl();
-
+my $ssllinks = 0;
+if ($FORM{'submit'}) {
+    if ($FORM{'ssllinks'}) {
+	unless (-f '/var/cpanel/cgpro/ssllinks') {
+	    open(FO, ">", "/var/cpanel/cgpro/ssllinks"); close(FO);
+	}
+    } else {
+	unlink "/var/cpanel/cgpro/ssllinks" if -f "/var/cpanel/cgpro/ssllinks";
+    }
+}
+$ssllinks = 1 if -f "/var/cpanel/cgpro/ssllinks";
 Cpanel::Template::process_template(
     'whostmgr',
     {
@@ -44,13 +56,13 @@ Cpanel::Template::process_template(
 	settings => $settings,
 	MSG => $MSG,
 	cgproversion => $cgproversion,
+	ssllinks => $ssllinks
     },
     );
 
 $cli->Logout();
 
 sub update_ssl {
-    my %FORM = Cpanel::Form::parseform();
     if ($FORM{'submit'}) {
       if ($FORM{'key'}) {
 	my $newkey = "[" . cleanup_input($FORM{'key'}) . "]";
