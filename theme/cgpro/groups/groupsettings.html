@@ -27,7 +27,7 @@
 
 
 <cpanelif $FORM{'SubmitMLSettings'}>
-<?cp CommuniGate::SetGroupSettings() email=$FORM{'email'},RemoveToAndCc=$FORM{'RemoveToAndCc'},Expand=$FORM{'Expand'},FinalDelivery=$FORM{'FinalDelivery'},RealName=$FORM{'RealName'},RejectAutomatic=$FORM{'RejectAutomatic'},RemoveAuthor=$FORM{'RemoveAuthor'},SetReplyTo=$FORM{'SetReplyTo'},spectre=$FORM{'spectre'} ?>
+<?cp CommuniGate::SetGroupSettings() email=$FORM{'email'},RemoveToAndCc=$FORM{'RemoveToAndCc'},Expand=$FORM{'Expand'},FinalDelivery=$FORM{'FinalDelivery'},RealName=$FORM{'RealName'},RejectAutomatic=$FORM{'RejectAutomatic'},RemoveAuthor=$FORM{'RemoveAuthor'},SetReplyTo=$FORM{'SetReplyTo'},spectre=$FORM{'spectre'},SignalDisabled=$FORM{'SignalDisabled'},EmailDisabled=$FORM{'EmailDisabled'} ?>
 </cpanelif>
 
 <cpanelif $CPERROR{'CommuniGate'} && $FORM{'SubmitMLSettings'}>
@@ -93,6 +93,14 @@
 <tr>
 <td></td>
 <td nowrap="nowrap" ><input type="checkbox" name="SetReplyTo" value="1" <cpanelif $CPDATA{'SetReplyTo'}=='YES'><cpanel print=' checked'></cpanelif>/>Set Reply-To to Group</td>
+</tr>
+<tr>
+<td></td>
+<td nowrap="nowrap" ><input type="checkbox" name="EmailDisabled" value="1" <cpanelif $CPDATA{'EmailDisabled'}=='YES'><cpanel print=' checked'></cpanelif>/>Disable E-mails</td>
+</tr>
+<tr>
+<td></td>
+<td nowrap="nowrap" ><input type="checkbox" name="SignalDisabled" value="1" <cpanelif $CPDATA{'SignalDisabled'}=='YES'><cpanel print=' checked'></cpanelif>/>Disable Signals</td>
 </tr>
 
 </table>

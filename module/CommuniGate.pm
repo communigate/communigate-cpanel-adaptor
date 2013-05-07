@@ -1855,6 +1855,8 @@ sub api2_SetGroupSettings {
         @$Settings{'RejectAutomatic'}=($OPTS{'RejectAutomatic'}?'YES':'NO');;
         @$Settings{'RemoveAuthor'}=($OPTS{'RemoveAuthor'}?'YES':'NO');;
         @$Settings{'SetReplyTo'}=($OPTS{'SetReplyTo'}?'YES':'NO');;
+        @$Settings{'EmailDisabled'}=($OPTS{'EmailDisabled'}?'YES':'NO');;
+        @$Settings{'SignalDisabled'}=($OPTS{'SignalDisabled'}?'YES':'NO');;
         $cli->SetGroup($email,$Settings);
         my $error_msg = $cli->getErrMessage();
         my @result;
