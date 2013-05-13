@@ -1,0 +1,14 @@
+[% MACRO filter_check(name, pval, val, text) BLOCK -%]
+<span style="display: block; float: left; text-align: center; padding-right: 5px;">
+<label   style="display: block;" for="[% name %]-[% val %]">[% text %]</label>
+<input type="checkbox" name="[% name %]" value="[% val %]" id="[% name %]-[% val %]"[% IF pval.join("").search(val); " checked='checked'"; END %]/>
+</span>
+[% END -%]
+[% filter_check("WorkDays", default || defaultServerAccountPrefs.WorkDays, "Sun", "Sun") %]
+[% filter_check("WorkDays", default || defaultServerAccountPrefs.WorkDays, "Mon", "Mon") %]
+[% filter_check("WorkDays", default || defaultServerAccountPrefs.WorkDays, "Tue", "Tue") %]
+[% filter_check("WorkDays", default || defaultServerAccountPrefs.WorkDays, "Wed", "Wed") %]
+[% filter_check("WorkDays", default || defaultServerAccountPrefs.WorkDays, "Thu", "Thu") %]
+[% filter_check("WorkDays", default || defaultServerAccountPrefs.WorkDays, "Fri", "Fri") %]
+[% filter_check("WorkDays", default || defaultServerAccountPrefs.WorkDays, "Sat", "Sat") %]
+

@@ -133,7 +133,6 @@ sub editquota {
     my (undef, $params) = @_;
     my $args = $params->{args};
     my $cli = getCLI();
-
     my $domain = $args->{'domain'};
     my $user= $args->{'email'};
     my $quota = $args->{'quota'};
@@ -148,9 +147,25 @@ sub editquota {
 	$cli->CreateDomain("$domain");
     }
     my $UserData;
-    @$UserData{'MaxAccountSize'}=$quota;
-
-    $cli->UpdateAccountSettings("$user\@$domain", { MaxAccountSize => $quota });
+    $UserData->{'MaxAccountSize'} = $quota;
+    $UserData->{'RealName'} = $args->{'realaname'} if $args->{'realaname'};
+    # Update WorkDays
+    if ($args->{'WorkDays'}) {
+	my $WorkDays = [];
+	@$WorkDays = grep(/\w/, ($args->{'WorkDays'}, $args->{'WorkDays-0'}, $args->{'WorkDays-1'}, $args->{'WorkDays-2'}, $args->{'WorkDays-3'}, $args->{'WorkDays-4'}, $args->{'WorkDays-5'})); # remove empty entries
+	my $serverDefaults = $cli->GetServerAccountPrefs();
+	my $domainDefaults = $cli->GetAccountDefaultPrefs($domain);
+	my $defaultWorkDays = $serverDefaults->{WorkDays};
+	$defaultWorkDays = $domainDefaults->{WorkDays} if $domainDefaults->{WorkDays};
+	my $prefs = {};
+	if (join(',',$defaultWorkDays) eq join(',',$WorkDays)) {
+	    $prefs->{WorkDays} = 'default';
+	} else {
+	    $prefs->{WorkDays} = $WorkDays;
+	}
+	$cli->UpdateAccountPrefs("$user\@$domain", $prefs);
+    }
+    $cli->UpdateAccountSettings("$user\@$domain", $UserData);
     $cli->Logout();
 }
 
@@ -205,11 +220,12 @@ sub reorderfilters {
 sub addpop1 {
     my (undef, $params) = @_;
     my $args = $params->{args};
-    doaddpop($args->[0], $args->[1], $args->[2], $args->[3]);
+    doaddpop($args->[0], $args->[1], $args->[2], $args->[3], $args->[4], $args->[5], [$args->[6],$args->[7],$args->[8],$args->[9],$args->[10],$args->[11],$args->[12]]);
 }
 
 sub doaddpop {
-    my ($user, $password, $quota, $domain) = @_;
+    my ($user, $password, $quota, $domain, $realname, $type, $workDays) = @_;
+    @$workDays = grep(/\w/, @$workDays); # remove empty entries
     my $cli = getCLI();
     if ($quota == 0) {
         $quota="unlimited" ;
@@ -228,6 +244,21 @@ sub doaddpop {
     if ($response) {
     	$cli->CreateMailbox("$user\@$domain", "Calendar");
     	$cli->CreateMailbox("$user\@$domain", "Spam");
+	my $settings = {};
+	$settings->{RealName} = $realname if $realname;
+	$settings->{ServiceClass} = $type if $type;
+	$cli->UpdateAccountSettings("$user\@$domain", $settings);
+	my $serverDefaults = $cli->GetServerAccountPrefs();
+	my $domainDefaults = $cli->GetAccountDefaultPrefs($domain);
+	my $defaultWorkDays = $serverDefaults->{WorkDays};
+	$defaultWorkDays = $domainDefaults->{WorkDays} if $domainDefaults->{WorkDays};
+	my $prefs = {};
+	if (join(',',$defaultWorkDays) eq join(',',$workDays)) {
+	    $prefs->{WorkDays} = 'default';
+	} else {
+	    $prefs->{WorkDays} = $workDays;
+	}
+	$cli->UpdateAccountPrefs("$user\@$domain", $prefs);
     } else {
     	my $apiref = Cpanel::Api2::Exec::api2_preexec( 'Email', 'delpop' );
     	my ( $data, $status ) = Cpanel::Api2::Exec::api2_exec( 'Email', 'delpop', $apiref, {domain => $domain, email=> $user} );
