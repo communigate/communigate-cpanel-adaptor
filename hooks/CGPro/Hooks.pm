@@ -142,13 +142,32 @@ sub editquota {
 	$quota .= "M";
     }
 
-    my $data=$cli->GetDomainSettings("$domain");
+    my $data = $cli->GetDomainSettings("$domain");
     if (!$data) {
 	$cli->CreateDomain("$domain");
     }
-    my $UserData;
-    $UserData->{'MaxAccountSize'} = $quota;
-    $UserData->{'RealName'} = $args->{'realaname'} if $args->{'realaname'};
+    my $data;
+    $data->{'MaxAccountSize'} = $quota;
+    if ($args->{'realaname'}) {
+	$data->{'RealName'} = $args->{'realaname'};
+    } else {
+	delete $data->{'RealName'} if $data->{'RealName'};
+    }
+    if ($args->{'unit'}) {
+	$data->{'ou'} = $args->{'unit'};
+    } else {
+	delete $data->{'ou'} if $data->{'ou'};
+    }
+    if ($args->{'mobile'}) {
+	$data->{'MobilePhone'} = $args->{'mobile'};
+    } else {
+	delete $data->{'MobilePhone'} if $data->{'MobilePhone'};
+    }
+    if ($args->{'workphone'}) {
+	$data->{'WorkPhone'} = $args->{'workphone'};
+    } else {
+	delete $data->{'WorkPhone'} if $data->{'WorkPhone'};
+    }
     # Update WorkDays
     if ($args->{'WorkDays'}) {
 	my $WorkDays = [];
@@ -165,7 +184,7 @@ sub editquota {
 	}
 	$cli->UpdateAccountPrefs("$user\@$domain", $prefs);
     }
-    $cli->UpdateAccountSettings("$user\@$domain", $UserData);
+    $cli->SetAccountSettings("$user\@$domain", $data);
     $cli->Logout();
 }
 
@@ -220,11 +239,11 @@ sub reorderfilters {
 sub addpop1 {
     my (undef, $params) = @_;
     my $args = $params->{args};
-    doaddpop($args->[0], $args->[1], $args->[2], $args->[3], $args->[4], $args->[5], [$args->[6],$args->[7],$args->[8],$args->[9],$args->[10],$args->[11],$args->[12]]);
+    doaddpop($args->[0], $args->[1], $args->[2], $args->[3], $args->[4], $args->[5], [$args->[6],$args->[7],$args->[8],$args->[9],$args->[10],$args->[11],$args->[12]], $args->[13], $args->[14], $args->[15]);
 }
 
 sub doaddpop {
-    my ($user, $password, $quota, $domain, $realname, $type, $workDays) = @_;
+    my ($user, $password, $quota, $domain, $realname, $type, $workDays, $unit, $mobilePhone, $workPhone) = @_;
     @$workDays = grep(/\w/, @$workDays); # remove empty entries
     my $cli = getCLI();
     if ($quota == 0) {
@@ -247,6 +266,9 @@ sub doaddpop {
 	my $settings = {};
 	$settings->{RealName} = $realname if $realname;
 	$settings->{ServiceClass} = $type if $type;
+	$settings->{ou} = $unit if $unit;
+	$settings->{MobilePhone} = $mobilePhone if $mobilePhone;
+	$settings->{WorkPhone} = $workPhone if $workPhone;
 	$cli->UpdateAccountSettings("$user\@$domain", $settings);
 	my $serverDefaults = $cli->GetServerAccountPrefs();
 	my $domainDefaults = $cli->GetAccountDefaultPrefs($domain);

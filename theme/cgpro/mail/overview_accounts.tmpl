@@ -88,8 +88,26 @@
 	    <tbody>
 	      <tr>
 		<th style="text-align: left;">[% locale.maketext('CGPRealName') %]:</th>
-		<td>
+		<td style="text-align: left;">
 		  [% accounts.$account.data.RealName %]
+		</td>
+	      </tr>
+	      <tr>
+		<th style="text-align: left;">[% locale.maketext('CGPUnit') %]:</th>
+		<td style="text-align: left;">
+		  [% accounts.$account.data.ou %]
+		</td>
+	      </tr>
+	      <tr>
+		<th style="text-align: left;">[% locale.maketext('CGPMobilePhone') %]:</th>
+		<td style="text-align: left;">
+		  [% accounts.$account.data.MobilePhone %]
+		</td>
+	      </tr>
+	      <tr>
+		<th style="text-align: left;">[% locale.maketext('CGPWorkPhone') %]:</th>
+		<td style="text-align: left;">
+		  [% accounts.$account.data.WorkPhone %]
 		</td>
 	      </tr>
 	      <tr style="text-align: left;">
@@ -180,6 +198,18 @@
 		  <input type="text" value="[% accounts.$account.quota %]" maxlength="4" size="4" name="quota" id="quota_number_input_[% loop.count - 1 %]"> <span class="megabyte_font">MB</span> <span id="quota_number_input_[% loop.count - 1 %]_error" style="width: 16px; height: 16px;" class="cjt_validation_error">
 		  </span>
 		</td>
+	      </tr>
+	      <tr>
+		<td align="right">[% locale.maketext("CGPUnit") %]:</td>
+		<td><input type="text" name="unit" value="[% accounts.$account.data.ou %]" /></td>
+	      </tr>
+	      <tr>
+		<td align="right">[% locale.maketext("CGPMobilePhone") %]:</td>
+		<td><input type="text" name="mobile" value="[% accounts.$account.data.MobilePhone %]" /></td>
+	      </tr>
+	      <tr>
+		<td align="right">[% locale.maketext("CGPWorkPhone") %]:</td>
+		<td><input type="text" name="workphone" value="[% accounts.$account.data.WorkPhone %]" /></td>
 	      </tr>
 	      <tr>
 		<td align="right">[% locale.maketext("CGPWorkDays") %]:</td>

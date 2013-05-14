@@ -90,24 +90,40 @@ if (self['CPANEL']) {
 	</td>
 	<td colspan="2"><div id="type_error"></div></td>
       </tr>
-      <tr><td colspan="4"><div style="height: 10px"></div></td></tr>
+    </table>
+    <p style="text-indent: 1em;"><a href="javascript:toggle_action_div(null, {id:'advanced_module', index:0, action:'advanced'})"><cpanel langprint="CGPAdvancedOptions"></a></p>
+    <div style="display: none;" id="advanced_module">
+      <table border="0" style="margin-left: 20px;">
+	<tr>
+	  <td align="right"><cpanel langprint="CGPUnit">:</td>
+	  <td><input type="text" name="unit" id="unit" style="width: 150px" /></td>
+	</tr>
+	<tr>
+	  <td align="right"><cpanel langprint="CGPMobilePhone">:</td>
+	  <td><input type="text" name="mobile" id="mobile" style="width: 150px" /></td>
+	</tr>
+	<tr>
+	  <td align="right"><cpanel langprint="CGPWorkPhone">:</td>
+	  <td><input type="text" name="workphone" id="workphone" style="width: 150px" /></td>
+	</tr>
+	<tr>
+	  <td align="right"><cpanel langprint="CGPWorkDays">:</td>
+	  <td colspan="2">
+	    <?cptt CommuniGate::ListWorkDays(cgpro/mail/workdayschecks.tt) ?>
+	    <div id="WorkDays_error"></div>
+	  </td>
+	</tr>
+      </table>
+    </div>
+    <table border="0" style="margin-left: 5px; margin-top: 1em;">
       <tr>
-	<td align="right"><cpanel langprint="CGPWorkDays">:</td>
-	<td colspan="2">
-	  <?cptt CommuniGate::ListWorkDays(cgpro/mail/workdayschecks.tt) ?>
-	  <div id="WorkDays_error"></div>
-	</td>
-      </tr>
-      <tr><td colspan="4"><div style="height: 10px"></div></td></tr>
-      <tr>
-	<td></td>
 	<td><input id="new_email_submit" class="input-button" type="submit" value="<cpanel langprint="ARCreate">" tabindex="5" /></td>
 	<td></td>
 	<td></td>
       </tr>
     </table>
   </div>
-  <div id="why_strong_passwords" style="display: none">
+  <div id="why_strong_passwords">
     <cpanel langprint="email_password_why"><br /><br />
       <cpanel langprint="email_password_tip">
   </div>
