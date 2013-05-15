@@ -1,0 +1,85 @@
+[% MACRO filter_option(pval, val, text) BLOCK -%]
+<option value="[% val %]"[% val == pval and " selected" %]>[% cptext(text) %]</option>
+[% END -%]
+[% FOREACH account IN accounts.keys.sort -%]
+<tr class="info-[% loop.count % 2 ? 'even' : 'odd' %]">
+  <td class="cell truncate" truncate="80">[% account %]</td>
+  <td>
+    <span onclick="toggle_action_div(null, {id:'classes_module_[% loop.count - 1 %]', index:[% loop.count - 1 %], action:'classes'})" [% IF accounts.$account.prefs.item('2FA').defined %]style="cursor: pointer; color: green">[% locale.maketext('CGPEnabled') %][% ELSE -%]style="cursor: pointer; color: gray">[% locale.maketext('CGPDisabled') %][% END %]</span> </td>
+  <td class="actions">
+    <table summary="">
+      <tr>
+	<td><span class="action_link" onclick="toggle_action_div(null, {id:'classes_module_[% loop.count - 1 %]', index:[% loop.count - 1 %], action:'classes'})">[% locale.maketext('CGPEdit') %]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+<!-- Hidden Row -->
+<tr class="rowA" id="dt_module_row_[% loop.count - 1 %]">
+  <td colspan="5">
+    <!-- classes -->
+    <div style="display: none" class="dt_module" id="classes_module_[% loop.count - 1 %]">
+      <form action="update2fa.html" method="post">
+	<table style="width: 500px; margin: 0px auto">
+	  <tbody>
+	    <tr>
+	      <td width="45%" style="text-align: right">[% locale.maketext("CGPEnabled") %]: </td>
+	      <td width="55%" style="text-align: left">
+		<input type="checkbox" name="enabled" id="enabled-[% loop.count %]" value="1"[% IF accounts.$account.prefs.item('2FA').defined %] checked="checked"[% END %]  />
+	      </td>
+	    </tr>
+	    <tr>
+	      <td width="45%" style="text-align: right">[% locale.maketext("CGPSecretQuestion") %]: </td>
+	      <td width="55%" style="text-align: left">
+		    <select name="SecretQuestion">
+		      [% filter_option(accounts.$account.prefs.item('2FA').SecretQuestion, "What was your childhood nickname?", locale.maketext("What was your childhood nickname?")) %]
+		      [% filter_option(accounts.$account.prefs.item('2FA').SecretQuestion, "What is the name of your favorite childhood friend?", locale.maketext("What is the name of your favorite childhood friend?")) %]
+		      [% filter_option(accounts.$account.prefs.item('2FA').SecretQuestion, "What street did you live on in third grade?", locale.maketext("What street did you live on in third grade?")) %]
+		      [% filter_option(accounts.$account.prefs.item('2FA').SecretQuestion, "What is your oldest sibling’s birthday month and year?", locale.maketext("What is your oldest sibling’s birthday month and year?")) %]
+		      [% filter_option(accounts.$account.prefs.item('2FA').SecretQuestion, "What is your oldest sibling's middle name?", locale.maketext("What is your oldest sibling's middle name?")) %]
+		      [% filter_option(accounts.$account.prefs.item('2FA').SecretQuestion, "What is your oldest cousin's first and last name?", locale.maketext("What is your oldest cousin's first and last name?")) %]
+		      [% filter_option(accounts.$account.prefs.item('2FA').SecretQuestion, "What was the name of your first stuffed animal?", locale.maketext("What was the name of your first stuffed animal?")) %]
+		      [% filter_option(accounts.$account.prefs.item('2FA').SecretQuestion, "In what city or town was your first job?", locale.maketext("In what city or town was your first job?")) %]
+		      [% filter_option(accounts.$account.prefs.item('2FA').SecretQuestion, "What is your maternal grandmother's maiden name?", locale.maketext("What is your maternal grandmother's maiden name?")) %]
+		    </select>
+	      </td>
+	    </tr>
+	    <tr>
+	      <td width="45%" style="text-align: right">[% locale.maketext("CGPAnswer") %]: </td>
+	      <td width="55%" style="text-align: left">
+		<input type="text" name="SecretAnswer" value="[% accounts.$account.prefs.item('2FA').SecretAnswer %]"  />
+	      </td>
+	    </tr>
+	    <tr>
+	      <td width="45%" style="text-align: right">[% locale.maketext("CGPIPWhitelisted") %]: </td>
+	      <td width="55%" style="text-align: left">
+		<textarea name="WhitelistedIPs" rows="5" cols="30">[% accounts.$account.prefs.item('2FA').WhitelistedIPs.join("\n") %]</textarea>
+	      </td>
+	    </tr>
+	    <tr>
+	      <td style="text-align: center" colspan="2">
+		<div style="height: 4px">&nbsp;</div>
+		<div id="change_quota_input_[% loop.count - 1 %]">
+		  <input type="hidden" name="email" value="[% account.split('@').0 %]" />
+		  <input type="hidden" name="domain" value="[% account.split('@').1 %]" />
+		  <a href="javascript:toggle_action_div(null, {id:'claesses_module_[% loop.count - 1 %]', index:[% loop.count - 1 %], action:'classes'})">[% locale.maketext("CGPcancel") %]</a> [% locale.maketext("CGPor") %]
+		  <input type="submit" id="change_quota_confirm_[% loop.count - 1 %]" value="[% locale.maketext("CGPSave") %]" class="input-button">
+		</div>
+	      </td>
+	    </tr>
+	  </tbody>
+	</table>
+      </form>
+    </div>
+    <!-- END classess -->
+  </td>
+</tr>
+
+[% END -%]
+[%  UNLESS accounts.keys.size -%]
+<tr class="info-even">
+  <td>
+    Please create accounts first.
+  </td>
+</tr>
+[% END -%]

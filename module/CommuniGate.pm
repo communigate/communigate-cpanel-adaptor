@@ -2005,6 +2005,76 @@ sub api2_updatearchive {
     $cli->Logout();
     return {msg => "Changes saved."};
 }
+
+sub api2_2fa {
+        my @domains = Cpanel::Email::listmaildomains();
+        my $cli = getCLI();
+        my @result;
+        my $return_accounts = {};
+        foreach my $domain (@domains) {
+            my $accounts=$cli->ListAccounts($domain);
+            foreach my $userName (sort keys %$accounts) {
+                my $accountData = $cli->GetAccountPrefs("$userName\@$domain");
+                $return_accounts->{$userName . "@" . $domain} = {
+                    domain => $domain,
+                    prefs => $accountData
+                };
+            }
+        }
+        $cli->Logout();
+        return { accounts => $return_accounts };
+}
+
+sub api2_update2fa {
+        my %OPTS = @_;
+        my $email = $OPTS{'email'} . '@' . $OPTS{'domain'};
+        my @domains = Cpanel::Email::listmaildomains();
+        my $cli = getCLI();
+        my $msg = "Unknown error!";
+        my $found = 1;
+        foreach my $domain (@domains) {
+            my $accounts=$cli->ListAccounts($domain);
+            foreach my $userName (sort keys %$accounts) {
+                if ($email eq "$userName\@$domain") {
+                    my $accountData = $cli->GetAccountPrefs($email);
+                    if ($OPTS{'enabled'}) {
+                        $accountData->{'2FA'} = {} unless defined $accountData->{'2FA'};
+                        if ($OPTS{'answer'}) {
+                            $accountData->{'2FA'}->{"SecretQuestion"} = $OPTS{'question'};
+                            $accountData->{'2FA'}->{"SecretAnswer"} = $OPTS{'answer'};
+                        } else {
+                            delete $accountData->{'2FA'}->{"SecretQuestion"} if $accountData->{'2FA'}->{'SecretQuestion'};
+                            delete $accountData->{'2FA'}->{"SecretAnswer"} if $accountData->{'2FA'}->{'SecretAnswer'};
+                        }
+                        if ($OPTS{'whitelistedips'}) {
+			  # Remove NON digits at beginning and end
+                            $OPTS{'whitelistedips'} =~ s/^\D+//g;
+                            $OPTS{'whitelistedips'} =~ s/\D+$//g;
+                            # Replace non IP with ##
+                            $OPTS{'whitelistedips'} =~ s/\./D/g;
+                            $OPTS{'whitelistedips'} =~ s/(?<=(\d))\W+/##/g;
+                            $OPTS{'whitelistedips'} =~ s/D/./g;
+                            $accountData->{'2FA'}->{"WhitelistedIPs"} = [split "##", $OPTS{'whitelistedips'}];
+                        } else {
+                            delete $accountData->{'2FA'}->{"WhitelistedIPs"} if $accountData->{'2FA'}->{'WhitelistedIPs'};
+                        }
+                    } else {
+                        delete $accountData->{'2FA'} if $accountData->{'2FA'};
+                    }
+                    $cli->SetAccountPrefs($email, $accountData);
+                    $found = 1;
+                    $msg = "Updated Successfuly.";
+                    last;
+                }
+            }
+            last if $found;
+        }
+        $msg = "Account not Found" unless $found;
+        $cli->Logout();
+        return { msg => $msg };
+}
+
+
 sub IsGroupInternal {
   	my $groupwithdomain = shift;
 	my @values = split("@",$groupwithdomain);
