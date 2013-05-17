@@ -70,7 +70,32 @@ sub describe {
         'hook'     => 'CGPro::Hooks::AccountsRemove',
         'exectype' => 'module',
     };
-    return [$mail_addpop, $mail_delpop, $mail_passwdpop, $mail_editquota, $mail_deletefilter, $mail_reorderfilters, $mail_addpop1, $AccountsCreate, $AccountsRemove];
+    my $dkim_install = {
+        'category' => 'Cpanel',
+        'event'    => 'Api2::DKIMUI::install',
+        'stage'    => 'post',
+        'hook'     => 'CGPro::Hooks::dkim_install',
+        'exectype' => 'module',
+    };
+    my $dkim_uninstall = {
+        'category' => 'Cpanel',
+        'event'    => 'Api2::DKIMUI::uninstall',
+        'stage'    => 'post',
+        'hook'     => 'CGPro::Hooks::dkim_uninstall',
+        'exectype' => 'module',
+    };
+    return [$mail_addpop,
+	    $mail_delpop,
+	    $mail_passwdpop,
+	    $mail_editquota,
+	    $mail_deletefilter,
+	    $mail_reorderfilters,
+	    $mail_addpop1,
+	    $AccountsCreate,
+	    $AccountsRemove,
+	    $dkim_install,
+	    $dkim_uninstall
+	];
 }
 
 sub getCLI {
@@ -259,5 +284,36 @@ sub AccountsRemove {
     }
     return 1;
 }
+
+sub dkim_install {
+    my (undef, $params) = @_;
+    my $user = $params->{'user'};
+    my $cli = getCLI();
+    my @domains = Cpanel::Email::listmaildomains(); 
+    for my $domain (@domains) {
+	my $key = Cpanel::AdminBin::adminrun('cca', 'READFILE', "/var/cpanel/domain_keys/private/" . $domain);
+	$key =~ s/(\-{5}.*?\-{5}|^\.|\n|\r)//g;
+	$cli->UpdateDomainSettings(domain => $domain,settings => {
+	    DKIM => {
+		DKIMEnabled => 'Yes',
+		DKIMkey => $key,
+		DKIMSelector => "default"
+	    }
+				   });
+    }
+    $cli->Logout();
+}
+
+sub dkim_uninstall {
+    my (undef, $params) = @_;
+    my $user = $params->{'user'};
+    my $cli = getCLI();
+    my @domains = Cpanel::Email::listmaildomains(); 
+    for my $domain (@domains) {
+	$cli->UpdateDomainSettings(domain => $domain,settings => {DKIM => {DKIMEnabled => 'No'}});
+    }
+    $cli->Logout();
+}
+
 
 1;

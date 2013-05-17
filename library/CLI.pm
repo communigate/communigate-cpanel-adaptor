@@ -3465,7 +3465,19 @@ sub SetClusterNetwork {
   $this->send ('SetClusterNetwork '.$this->printWords($settings));
   $this->_parseResponse();
 }
-
+sub GetServerSettings {
+  my ($this) = @_;
+  $this->send('GetServerSettings');
+  return undef unless $this->_parseResponse();
+  $this->parseWords($this->getWords);
+}
+sub UpdateServerSettings {
+  my ($this, $settings) = @_;
+  croak 'usage CGP::CLI->UpdateServerSettings(\%settings)'
+    unless defined $settings;
+  $this->send('UpdateServerSettings ' . $this->printWords($settings));
+  $this->_parseResponse();
+}
 sub GetServerRules {
   my $this = shift;
   $this->send('GetServerRules');

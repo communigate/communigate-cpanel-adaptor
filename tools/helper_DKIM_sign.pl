@@ -17,7 +17,7 @@ Creating keys:
    openssl genrsa -out dkim.key 1024
    openssl rsa -in dkim.key -out dkim.public -pubout -outform PEM
  You will find two files: dkim.key & dkim.public.
- Open dkim.public and copy the contents excluding the –Begin– and –End– section. This is your DKIM key.  
+ Open dkim.public and copy the contents excluding the â€“Beginâ€“ and â€“Endâ€“ section. This is your DKIM key.
 
 Adding DNS records for signature verification:
  Choose a value for Selector, e.g. "mx1" or "mail"
@@ -32,7 +32,7 @@ Configuring CommuniGate Pro:
    Name: DKIM_sign
    Program Path: /usr/bin/perl helper_DKIM_sign.pl
 
- Then create a server-wide rule: 
+ Then create a server-wide rule:
    Data:
    [Source] [in] [trusted,authenticated]
    [Header Field] [is not] [DKIM-Signature:*]
@@ -46,23 +46,10 @@ Please mail your comments to support@communigate.com
 =cut
 
 use Mail::DKIM::Signer;  # http://search.cpan.org/~jaslong/Mail-DKIM/lib/Mail/DKIM/Signer.pm
-use Mail::DKIM::TextWrap;  #recommended 
+use Mail::DKIM::TextWrap;  #recommended
 use strict;
 
 ## BEGIN CONFIG
-
-my %domainList = (
-  'domain1.dom' => {
-    Algorithm => "rsa-sha1",
-    Method => "relaxed",
-    Selector => "mail",
-    KeyFile => "domain1.key",
-  }, 
-  'domain2.dom' => {
-    KeyFile => "domain2.key",
-  }, 
-
-);
 
 my $useFork=1;
 
@@ -77,25 +64,24 @@ my $counter=0;
 while(<STDIN>) {
   chomp;
   my ($command,$prefix);
-  my @args;             
+  my @args;
   ($prefix,$command,@args) = split(/ /);
   if($command eq 'INTF') {
     print "$prefix INTF 3\n";
-
   } elsif($command eq 'QUIT') {
     print "$prefix OK\n";
-    last; 
+    last;
   } elsif($command eq 'KEY') {
     print "$prefix OK\n";
   } elsif($command eq 'FILE') {
     if($useFork) {  # process async
       unless(my $pid = fork) {
         die "cannot fork: $!" unless defined $pid;
-        processFILE($prefix,$args[0]); 
-        exit;  
+        processFILE($prefix,$args[0]);
+        exit;
       }
-    } else {        # process synchronously 
-       processFILE($prefix,$args[0]); 
+    } else {        # process synchronously
+       processFILE($prefix,$args[0]);
     }
   } else {
     print "$prefix ERROR unexpected command: $command\n";
@@ -106,28 +92,24 @@ while(<STDIN>) {
 print "* stoppig helper_DKIM_sign.pl\n";
 exit(0);
 
-
-
-
 sub processFILE {
   my ($prefix,$fileName) = @_;
-  
+
   unless( open (FILE,"$fileName")) {
     print qq/$prefix REJECTED can't open $fileName: $!\n/;
     return undef;
   }
-  
   while(<FILE>) { #skip the envelope
     chomp;
     last if($_ eq '');
-  }    
+  }
   my @messageText;
-  my $fromAddress; 
+  my $fromAddress;
   while(<FILE>) {
     chomp;
-    s/\015$//;
+    $_ =~ s/\015$//;
     push(@messageText,$_);
-    $fromAddress=$1 if(!$fromAddress && /^from: (.*)/i) 
+    $fromAddress=$1 if(!$fromAddress && /^from: (.*)/i)
   }
   close(FILE);
   unless($fromAddress) {
@@ -138,38 +120,47 @@ sub processFILE {
   my $domain=lc($1);
   $domain=$1 if($domain=~/^(.*)[\s>]/);
 
-  my $domainRef=$domainList{$domain};
-  unless($domainRef) {
-    print qq/$prefix OK the $domain is not served\n/;
+  open(CONF, "<", "/var/CommuniGate/Domains/$domain/Settings/domain.settings");
+  my $domainRef = {Enabled => "No"};
+  while (<CONF>) {
+      for my $elements (split ';', $_) {
+	  $elements =~ s/\s+\=\s+/=/g;
+	  if ($elements =~ s/.*?DKIMEnabled\=\"?(.*?)\"?$/$1/) {$domainRef->{Enabled} = $elements};
+	  if ($elements =~ s/.*?DKIMSelector\=\"?(.*?)\"?$/$1/) {$domainRef->{Selector} = $elements};
+	  if ($elements =~ s/.*?DKIMkey\=\"?(.*?)\"?$/$1/) {$domainRef->{Key} = $elements};
+	  if ($elements =~ s/.*?DKIMAlgorithm\=\"?(.*?)\"?$/$1/) {$domainRef->{Algorithm} = $elements};
+	  if ($elements =~ s/.*?DKIMMethod\=\"?(.*?)\"?$/$1/) {$domainRef->{Method} = $elements};
+      }
+  }
+  close(CONF);
+  unless($domainRef->{Enabled} eq "Yes") {
+    print qq/$prefix OK the $domain is not served $domainRef->{Enabled} \n/;
     return undef;
   }
-
   my $dkim = Mail::DKIM::Signer->new(
-                  Domain => $domain,
-                  Algorithm => $domainRef->{Algorithm} || "rsa-sha1",
-                  Method => $domainRef->{Method} || "relaxed",
-                  Selector => $domainRef->{Selector} || "selector1",
-                  KeyFile => $domainRef->{KeyFile} || "private.key",
-             );
-
+      Domain => $domain,
+      Algorithm => $domainRef->{Algorithm} || "rsa-sha1",
+      Method => $domainRef->{Method} || "relaxed",
+      Selector => $domainRef->{Selector} || "selector1",
+      Key => Mail::DKIM::PrivateKey->load(Data => $domainRef->{Key}) || "",
+      );
   foreach(@messageText) {
-    $dkim->PRINT("$_\015\012");
+      $dkim->PRINT("$_\015\012");
   }
   $dkim->CLOSE;
   my $signature = $dkim->signature->as_string;
-  
+
   if($signature) {
     $signature=~s/\015\012/\\e/g;
     $signature=~s/\t/\\t/g;
     $signature=~s/\"/\\\"/g;
     print qq/$prefix ADDHEADER "$signature"\n/;
+    $dkim->add_signature($signature);
   } else {
     print qq/$prefix OK failed to sign\n/;
   }
-  return undef; 
+  return undef;
 }#processFile
-
-
 
 __END__
 
