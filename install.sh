@@ -172,6 +172,7 @@ do
         cat ${LOCALES[$j]} >> ${TARGET}
     done
 done
+
 # Update Feature List
 cp ${PACKSRC}/featurelists/cgpro /usr/local/cpanel/whostmgr/addonfeatures/
 chmod +x ${PACKSRC}/scripts/*
@@ -182,6 +183,11 @@ ${PACKSRC}/scripts/rename_classes.pl
 /usr/local/cpanel/bin/build_locale_databases
 
 replace "cpanel.communigate.com" "${HOSTNAME}" -- /var/CommuniGate/Settings/Main.settings
+
+# install DKIM tools FOR CGPro server Only
+chmod +x ${PACKSRC}/tools/*
+cp ${PACKSRC}/tools/helper_DKIM_sign.pl /var/CommuniGate/
+${PACKSRC}/scripts/install_dkim_signer.pl
 
 #################################################
 #             	  OS Specific	  	 	#
