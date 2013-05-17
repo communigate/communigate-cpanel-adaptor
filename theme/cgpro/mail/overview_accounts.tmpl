@@ -50,8 +50,12 @@
       [% FOREACH account IN sort -%]
       <li[% IF loop.count == 1; ' class="selected"'; END %]>
 	<a href="#tab_[% account %]">
-	  <span class="img"><img src="http://www.gravatar.com/avatar/[% accounts.$account.md5 %]?s=24&d=[% 'http://communigate-cpanel-adaptor.googlecode.com/files/default_avatar.png' | uri %]" alt="avatar" /></span>
-	  <span class="name"><strong>[% account %]</strong><span class="classname">[% accounts.$account.class %]</span></span>
+	  <span class="img"[% IF accounts.$account.class == "Standard" %] style="border-color: #3B6FBE;"[% END %][% IF accounts.$account.class == "Premium" %] style="border-color: #BE3B48;"[% END %]><img src="http://www.gravatar.com/avatar/[% accounts.$account.md5 %]?s=32&d=[% 'http://communigate-cpanel-adaptor.googlecode.com/files/Default_avatar.png' | uri %]" alt="avatar" /></span>
+	  <span class="name">
+	    <span class="realname">[% accounts.$account.data.RealName %]</span>
+	    <span class="strong">[% account %]</span>
+	    <span class="classname">[% accounts.$account.class %]</span>
+	  </span>
 	</a>
       </li>
       [% END -%]
@@ -60,10 +64,13 @@
   <div class="yui-content user-details">
     [% FOREACH account IN sort -%]
     <div id="[% account %]">
-      <h2>
-	<span class="img"><img src="http://www.gravatar.com/avatar/[% accounts.$account.md5 %]?s=24&d=[% 'http://communigate-cpanel-adaptor.googlecode.com/files/default_avatar.png' | uri %]" alt="avatar" /></span>
-	<span class="name">[% account %]</span>
-      </h2>
+      <div class="h2">
+	<span class="img"><img src="http://www.gravatar.com/avatar/[% accounts.$account.md5 %]?s=32&d=[% 'http://communigate-cpanel-adaptor.googlecode.com/files/Default_avatar.png' | uri %]" alt="avatar" /></span>
+	<span class="name">
+	  <span class="realname">[% accounts.$account.data.RealName %]</span>
+	  <span class="strong">[% account %]</span>
+	</span>
+      </div>
       <div class="user-features">
 	[% myclass = accounts.$account.class -%]
 	[% classstring = classes.$myclass.AccessModes.join(',') -%]
@@ -74,16 +81,9 @@
 	<span class="classname">[% accounts.$account.class %]</span>
       </div>
       <div class="clear"></div>
-      <p>
-	<span class="action_link" onclick="toggle_action_div(null, {id:'account_details_module_[% loop.count - 1 %]', index:[% loop.count - 1 %], action:'account_details'})">[% locale.maketext("CGPAccountDetails") %]</span>,
-	<span class="action_link" onclick="toggle_action_div(null, {id:'change_password_module_[% loop.count - 1 %]', index:[% loop.count - 1 %], action:'change_password'})">[% locale.maketext("CGPChangePassword") %]</span>,
-	<span class="action_link" onclick="toggle_action_div(null, {id:'change_quota_module_[% loop.count - 1 %]', index:[% loop.count - 1 %], action:'change_quota'})">[% locale.maketext("CGPChangeDetails") %]</span>,
-	<span class="action_link" onclick="toggle_action_div(null, {id:'classes_module_[% loop.count - 1 %]', index:[% loop.count - 1 %], action:'classes'})">[% locale.maketext("CGPChangeAccountType") %]</span>,
-	<span class="action_link" onclick="toggle_action_div(null, {id:'delete_module_[% loop.count - 1 %]', index:[% loop.count - 1 %], action:'delete'})">[% locale.maketext('CGPDelete') %]</span>
-      </p>
+	<h3><span class="action_link" onclick="toggle_action_div(null, {id:'account_details_module_[% loop.count - 1 %]', index:[% loop.count - 1 %], action:'account_details'})">[% locale.maketext("CGPAccountDetails") %]</span></h3>
       <!-- Account Details -->
       <div  style="display: none;" class="user-section" id="account_details_module_[% loop.count - 1 %]">
-	<h3>[% locale.maketext("CGPAccountDetails") %]</h3>
 	<table style="text-align: center; margin: 0px auto">
 	    <tbody>
 	      <tr>
@@ -123,9 +123,9 @@
 	  </table>
       </div>
       <!-- END Account Details -->
+	<h3><span class="action_link" onclick="toggle_action_div(null, {id:'change_password_module_[% loop.count - 1 %]', index:[% loop.count - 1 %], action:'change_password'})">[% locale.maketext("CGPChangePassword") %]</span></h3>
       <!-- Change Password -->
       <div style="display: none;" class="user-section" id="change_password_module_[% loop.count - 1 %]">
-	<h3>[% locale.maketext("CGPChangePassword") %]</h3>
 	<div class="clear"></div>
 	<form action="dopasswdpop.html" method="post">
 	  <table style="text-align: center; margin: 0px auto">
@@ -180,9 +180,9 @@
 	</form>
       </div>
       <!-- END Change Password -->
+	<h3><span class="action_link" onclick="toggle_action_div(null, {id:'change_quota_module_[% loop.count - 1 %]', index:[% loop.count - 1 %], action:'change_quota'})">[% locale.maketext("CGPChangeDetails") %]</span></h3>
       <!-- Change Quota -->
       <div style="display: none;" class="user-section" id="change_quota_module_[% loop.count - 1 %]">
-	<h3>[% locale.maketext("CGPChangeDetails") %]</h3>
 	<form action="doeditquota.html" method="post">
 	  <table style="margin: 0px auto">
 	    <tbody>
@@ -243,20 +243,9 @@
 	</form>
       </div>
       <!-- END Change Quota -->
-      <!-- Delete -->
-      <div style="display: none" class="dt_module user-section" id="delete_module_[% loop.count - 1 %]">
-	<div style="margin: 0px auto; padding: 8px 0px; text-align: center">
-	  <p>[% locale.maketext("CGPDeleteAccount") %] <em class="status">[% account %]</em>?</p>
-	  <p>
-	    <a href="javascript:toggle_action_div(null, {id:'delete_module_[% loop.count - 1 %]', index:[% loop.count - 1 %], action:'delete'})">[% locale.maketext("CGPcancel") %]</a> [% locale.maketext("CGPor") %]
-	    <a class="create-button" href="realdelpop.html?domain=[% account.split('@').1 %]&amp;email=[% account.split('@').0 %]">[% locale.maketext("CGPDelete") %]</a>        
-	  </p>
-	</div>
-      </div>
-      <!-- END Delete -->
+	<h3><span class="action_link" onclick="toggle_action_div(null, {id:'classes_module_[% loop.count - 1 %]', index:[% loop.count - 1 %], action:'classes'})">[% locale.maketext("CGPChangeAccountType") %]</span></h3>
       <!-- classes -->
       <div style="display: none" class="user-section" id="classes_module_[% loop.count - 1 %]">
-	<h3>[% locale.maketext("CGPChangeAccountType") %]</h3>
 	<div style="margin: 0px auto;">
 	  <p>[% locale.maketext("CGPChangeAccType") %] <strong>[% account %]</strong>?</p>
 	  <form action="" method="post" id="form-[% account %]">
@@ -277,6 +266,18 @@
 	</div>
       </div>
       <!-- END classess -->
+	<h3><span class="action_link" onclick="toggle_action_div(null, {id:'delete_module_[% loop.count - 1 %]', index:[% loop.count - 1 %], action:'delete'})">[% locale.maketext('CGPDelete') %]</span></h3>
+      <!-- Delete -->
+      <div style="display: none" class="dt_module user-section" id="delete_module_[% loop.count - 1 %]">
+	<div style="margin: 0px auto; padding: 8px 0px; text-align: center">
+	  <p>[% locale.maketext("CGPDeleteAccount") %] <em class="status">[% account %]</em>?</p>
+	  <p>
+	    <a href="javascript:toggle_action_div(null, {id:'delete_module_[% loop.count - 1 %]', index:[% loop.count - 1 %], action:'delete'})">[% locale.maketext("CGPcancel") %]</a> [% locale.maketext("CGPor") %]
+	    <a class="create-button" href="realdelpop.html?domain=[% account.split('@').1 %]&amp;email=[% account.split('@').0 %]">[% locale.maketext("CGPDelete") %]</a>        
+	  </p>
+	</div>
+      </div>
+      <!-- END Delete -->
 
     </div>
     [% END -%]    
