@@ -78,24 +78,27 @@ td.actions table tr td {
     border-width: 2px;
     border-style: solid;
     border-color: #666666;
+    overflow: hidden;
 }
 .name .strong {
     display: block;
-    margin-top: 0px;
+    margin-top: -2px;
     font-style: 1.1em;
     font-weight: bold;
+    margin-top: -3px;
 }
-.user-accounts ul li a .name .classname {
+.user-accounts ul .name .classname {
     font-style: italic;
     font-size: 1em;
+    display: block;
+    margin-top: -3px;
 }
 .name .realname {
     font-size: 1.2em;
     height: 1.25em;
-    line-height: 1.2em;
+    line-height: 0.8em;
     display: block;
     font-weight: bold;
-    margin-top: -0.25em;
 }
 .user-details .h2 .realname {
     font-size: 1.5em;
@@ -137,7 +140,7 @@ td.actions table tr td {
     text-decoration: underline;
 }
 h3 {
-    margin: 2px 0;
+    margin: 7px 0 2px 0;
     height: 24px;
     line-height: 24px;
 }
@@ -145,6 +148,9 @@ h3 span {
     display: block;
     padding: 0 10px;
     color: #666666 !important;
+    background-position: 5px center;
+    background-repeat: no-repeat;
+    text-indent: 1.5em;
 }
 h3 span:hover {
     color: #126174 !important;

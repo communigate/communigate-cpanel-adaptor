@@ -81,7 +81,7 @@
 	<span class="classname">[% accounts.$account.class %]</span>
       </div>
       <div class="clear"></div>
-	<h3><span class="action_link" onclick="toggle_action_div(null, {id:'account_details_module_[% loop.count - 1 %]', index:[% loop.count - 1 %], action:'account_details'})">[% locale.maketext("CGPAccountDetails") %]</span></h3>
+	<h3><span class="action_link" style="background-image: url([% CPBranding.image('cgpro_account_change_details') %])" onclick="toggle_action_div(null, {id:'account_details_module_[% loop.count - 1 %]', index:[% loop.count - 1 %], action:'account_details'})">[% locale.maketext("CGPAccountDetails") %]</span></h3>
       <!-- Account Details -->
       <div  style="display: none;" class="user-section" id="account_details_module_[% loop.count - 1 %]">
 	<table style="text-align: center; margin: 0px auto">
@@ -123,7 +123,7 @@
 	  </table>
       </div>
       <!-- END Account Details -->
-	<h3><span class="action_link" onclick="toggle_action_div(null, {id:'change_password_module_[% loop.count - 1 %]', index:[% loop.count - 1 %], action:'change_password'})">[% locale.maketext("CGPChangePassword") %]</span></h3>
+	<h3><span class="action_link" style="background-image: url([% CPBranding.image('cgpro_account_change_password') %])" onclick="toggle_action_div(null, {id:'change_password_module_[% loop.count - 1 %]', index:[% loop.count - 1 %], action:'change_password'})">[% locale.maketext("CGPChangePassword") %]</span></h3>
       <!-- Change Password -->
       <div style="display: none;" class="user-section" id="change_password_module_[% loop.count - 1 %]">
 	<div class="clear"></div>
@@ -180,7 +180,7 @@
 	</form>
       </div>
       <!-- END Change Password -->
-	<h3><span class="action_link" onclick="toggle_action_div(null, {id:'change_quota_module_[% loop.count - 1 %]', index:[% loop.count - 1 %], action:'change_quota'})">[% locale.maketext("CGPChangeDetails") %]</span></h3>
+	<h3><span class="action_link" style="background-image: url([% CPBranding.image('cgpro_account_change_details') %])" onclick="toggle_action_div(null, {id:'change_quota_module_[% loop.count - 1 %]', index:[% loop.count - 1 %], action:'change_quota'})">[% locale.maketext("CGPChangeDetails") %]</span></h3>
       <!-- Change Quota -->
       <div style="display: none;" class="user-section" id="change_quota_module_[% loop.count - 1 %]">
 	<form action="doeditquota.html" method="post">
@@ -243,7 +243,7 @@
 	</form>
       </div>
       <!-- END Change Quota -->
-	<h3><span class="action_link" onclick="toggle_action_div(null, {id:'classes_module_[% loop.count - 1 %]', index:[% loop.count - 1 %], action:'classes'})">[% locale.maketext("CGPChangeAccountType") %]</span></h3>
+	<h3><span class="action_link" style="background-image: url([% CPBranding.image('cgpro_account_change_type') %])"  onclick="toggle_action_div(null, {id:'classes_module_[% loop.count - 1 %]', index:[% loop.count - 1 %], action:'classes'})">[% locale.maketext("CGPChangeAccountType") %]</span></h3>
       <!-- classes -->
       <div style="display: none" class="user-section" id="classes_module_[% loop.count - 1 %]">
 	<div style="margin: 0px auto;">
@@ -266,7 +266,7 @@
 	</div>
       </div>
       <!-- END classess -->
-	<h3><span class="action_link" onclick="toggle_action_div(null, {id:'delete_module_[% loop.count - 1 %]', index:[% loop.count - 1 %], action:'delete'})">[% locale.maketext('CGPDelete') %]</span></h3>
+	<h3><span class="action_link" style="background-image: url([% CPBranding.image('cgpro_account_delete') %])" onclick="toggle_action_div(null, {id:'delete_module_[% loop.count - 1 %]', index:[% loop.count - 1 %], action:'delete'})">[% locale.maketext('CGPDelete') %]</span></h3>
       <!-- Delete -->
       <div style="display: none" class="dt_module user-section" id="delete_module_[% loop.count - 1 %]">
 	<div style="margin: 0px auto; padding: 8px 0px; text-align: center">
