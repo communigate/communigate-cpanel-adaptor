@@ -292,9 +292,9 @@ sub dkim_install {
 	$key =~ s/(\-{5}.*?\-{5}|^\.|\n|\r)//g;
 	$cli->UpdateDomainSettings(domain => $domain,settings => {
 	    DKIM => {
-		DKIMEnabled => 'Yes',
-		DKIMkey => $key,
-		DKIMSelector => "default"
+		Enabled => 'Yes',
+		key => $key,
+		Selector => "default"
 	    }
 				   });
     }

@@ -47,6 +47,7 @@ Please mail your comments to support@communigate.com
 
 use Mail::DKIM::Signer;  # http://search.cpan.org/~jaslong/Mail-DKIM/lib/Mail/DKIM/Signer.pm
 use Mail::DKIM::TextWrap;  #recommended
+use CLI;
 use strict;
 
 ## BEGIN CONFIG
@@ -59,10 +60,35 @@ $SIG{CHLD}='IGNORE' if($useFork);
 $| = 1;
 print "* helper_DKIM_sign.pl started.\n";
 
-my $counter=0;
+unless (open(CONF, "<", "/var/cpanel/communigate.yaml")) {
+    print "* Error opening config file: $! \n";
+    exit 0;
+}
+my $conf = {};
+for my $row (<CONF>) {
+    if ($row =~ m/(\w+)\:\s+\'(.*?)\'/) {
+	$conf->{$1} = $2;
+      }
+}
+close(CONF);
+my $cli = undef;
+sub getCLI {
+    my $c =  new CGP::CLI( { PeerAddr => $conf->{cgprohost},
+		       PeerPort => $conf->{cgproport},
+		       login => $conf->{cgprouser},
+		       password => $conf->{cgpropass}
+		     });
+    unless( $c ) {
+	print("* Can't login to CGPro.");
+	exit 0;
+    }
+    return $c;
+}
 
+my $counter=0;
 while(<STDIN>) {
   chomp;
+  $cli = getCLI() unless $cli;
   my ($command,$prefix);
   my @args;
   ($prefix,$command,@args) = split(/ /);
@@ -90,6 +116,7 @@ while(<STDIN>) {
 
 
 print "* stoppig helper_DKIM_sign.pl\n";
+$cli->Logout();
 exit(0);
 
 sub processFILE {
@@ -120,29 +147,17 @@ sub processFILE {
   my $domain=lc($1);
   $domain=$1 if($domain=~/^(.*)[\s>]/);
 
-  open(CONF, "<", "/var/CommuniGate/Domains/$domain/Settings/domain.settings");
-  my $domainRef = {Enabled => "No"};
-  while (<CONF>) {
-      for my $elements (split ';', $_) {
-	  $elements =~ s/\s+\=\s+/=/g;
-	  if ($elements =~ s/.*?DKIMEnabled\=\"?(.*?)\"?$/$1/) {$domainRef->{Enabled} = $elements};
-	  if ($elements =~ s/.*?DKIMSelector\=\"?(.*?)\"?$/$1/) {$domainRef->{Selector} = $elements};
-	  if ($elements =~ s/.*?DKIMkey\=\"?(.*?)\"?$/$1/) {$domainRef->{Key} = $elements};
-	  if ($elements =~ s/.*?DKIMAlgorithm\=\"?(.*?)\"?$/$1/) {$domainRef->{Algorithm} = $elements};
-	  if ($elements =~ s/.*?DKIMMethod\=\"?(.*?)\"?$/$1/) {$domainRef->{Method} = $elements};
-      }
-  }
-  close(CONF);
-  unless($domainRef->{Enabled} eq "Yes") {
-    print qq/$prefix OK the $domain is not served $domainRef->{Enabled} \n/;
+  my $dsettings = $cli->GetDomainSettings($domain);
+  unless($dsettings->{DKIM}->{Enabled} eq "Yes" && $dsettings->{DKIM}->{key}) {
+    print qq/$prefix OK the $domain is not served $dsettings->{DKIM}->{Enabled} \n/;
     return undef;
   }
   my $dkim = Mail::DKIM::Signer->new(
       Domain => $domain,
-      Algorithm => $domainRef->{Algorithm} || "rsa-sha1",
-      Method => $domainRef->{Method} || "relaxed",
-      Selector => $domainRef->{Selector} || "selector1",
-      Key => Mail::DKIM::PrivateKey->load(Data => $domainRef->{Key}) || "",
+      Algorithm => $dsettings->{DKIM}->{Algorithm} || "rsa-sha1",
+      Method => $dsettings->{DKIM}->{Method} || "relaxed",
+      Selector => $dsettings->{DKIM}->{Selector} || "default",
+      Key => Mail::DKIM::PrivateKey->load(Data => $dsettings->{DKIM}->{key}),
       );
   foreach(@messageText) {
       $dkim->PRINT("$_\015\012");
