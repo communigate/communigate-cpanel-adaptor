@@ -116,6 +116,7 @@ sub getCLI {
 	my $logger = Cpanel::Logger->new();
 	unless($cli) {
 	    $logger->warn("Can't login to CGPro: ".$CGP::ERR_STRING);
+	    exit(0);
 	}
 	$CLI = $cli;
 	return $cli;
@@ -169,14 +170,49 @@ sub editquota {
 	$quota .= "M";
     }
 
-    my $data=$cli->GetDomainSettings("$domain");
+    my $data = $cli->GetDomainSettings("$domain");
     if (!$data) {
 	$cli->CreateDomain("$domain");
     }
-    my $UserData;
-    @$UserData{'MaxAccountSize'}=$quota;
-
-    $cli->UpdateAccountSettings("$user\@$domain", { MaxAccountSize => $quota });
+    my $data;
+    $data->{'MaxAccountSize'} = $quota;
+    if ($args->{'realaname'}) {
+	$data->{'RealName'} = $args->{'realaname'};
+    } else {
+	delete $data->{'RealName'} if $data->{'RealName'};
+    }
+    if ($args->{'unit'}) {
+	$data->{'ou'} = $args->{'unit'};
+    } else {
+	delete $data->{'ou'} if $data->{'ou'};
+    }
+    if ($args->{'mobile'}) {
+	$data->{'MobilePhone'} = $args->{'mobile'};
+    } else {
+	delete $data->{'MobilePhone'} if $data->{'MobilePhone'};
+    }
+    if ($args->{'workphone'}) {
+	$data->{'WorkPhone'} = $args->{'workphone'};
+    } else {
+	delete $data->{'WorkPhone'} if $data->{'WorkPhone'};
+    }
+    # Update WorkDays
+    if ($args->{'WorkDays'}) {
+	my $WorkDays = [];
+	@$WorkDays = grep(/\w/, ($args->{'WorkDays'}, $args->{'WorkDays-0'}, $args->{'WorkDays-1'}, $args->{'WorkDays-2'}, $args->{'WorkDays-3'}, $args->{'WorkDays-4'}, $args->{'WorkDays-5'})); # remove empty entries
+	my $serverDefaults = $cli->GetServerAccountPrefs();
+	my $domainDefaults = $cli->GetAccountDefaultPrefs($domain);
+	my $defaultWorkDays = $serverDefaults->{WorkDays};
+	$defaultWorkDays = $domainDefaults->{WorkDays} if $domainDefaults->{WorkDays};
+	my $prefs = {};
+	if (join(',',$defaultWorkDays) eq join(',',$WorkDays)) {
+	    $prefs->{WorkDays} = 'default';
+	} else {
+	    $prefs->{WorkDays} = $WorkDays;
+	}
+	$cli->UpdateAccountPrefs("$user\@$domain", $prefs);
+    }
+    $cli->SetAccountSettings("$user\@$domain", $data);
     $cli->Logout();
 }
 
@@ -231,11 +267,12 @@ sub reorderfilters {
 sub addpop1 {
     my (undef, $params) = @_;
     my $args = $params->{args};
-    doaddpop($args->[0], $args->[1], $args->[2], $args->[3]);
+    doaddpop($args->[0], $args->[1], $args->[2], $args->[3], $args->[4], $args->[5], [$args->[6],$args->[7],$args->[8],$args->[9],$args->[10],$args->[11],$args->[12]], $args->[13], $args->[14], $args->[15]);
 }
 
 sub doaddpop {
-    my ($user, $password, $quota, $domain) = @_;
+    my ($user, $password, $quota, $domain, $realname, $type, $workDays, $unit, $mobilePhone, $workPhone) = @_;
+    @$workDays = grep(/\w/, @$workDays); # remove empty entries
     my $cli = getCLI();
     if ($quota == 0) {
         $quota="unlimited" ;
@@ -253,6 +290,27 @@ sub doaddpop {
     if ($response) {
     	$cli->CreateMailbox("$user\@$domain", "Calendar");
     	$cli->CreateMailbox("$user\@$domain", "Spam");
+	my $settings = {};
+	$settings->{RealName} = $realname if $realname;
+	$settings->{ServiceClass} = $type if $type;
+	$settings->{ou} = $unit if $unit;
+	$settings->{MobilePhone} = $mobilePhone if $mobilePhone;
+	$settings->{WorkPhone} = $workPhone if $workPhone;
+	$cli->UpdateAccountSettings("$user\@$domain", $settings);
+	my $serverDefaults = $cli->GetServerAccountPrefs();
+	my $domainDefaults = $cli->GetAccountDefaultPrefs($domain);
+	my $defaultWorkDays = $serverDefaults->{WorkDays};
+	$defaultWorkDays = $domainDefaults->{WorkDays} if $domainDefaults->{WorkDays};
+	my $prefs = {};
+	if (join(',',$defaultWorkDays) eq join(',',$workDays)) {
+	    $prefs->{WorkDays} = 'default';
+	} else {
+	    $prefs->{WorkDays} = $workDays;
+	}
+	$cli->UpdateAccountPrefs("$user\@$domain", $prefs);
+    } else {
+    	my $apiref = Cpanel::Api2::Exec::api2_preexec( 'Email', 'delpop' );
+    	my ( $data, $status ) = Cpanel::Api2::Exec::api2_exec( 'Email', 'delpop', $apiref, {domain => $domain, email=> $user} );
     }
     $cli->Logout();
 }
@@ -286,7 +344,7 @@ sub dkim_install {
     my (undef, $params) = @_;
     my $user = $params->{'user'};
     my $cli = getCLI();
-    my @domains = Cpanel::Email::listmaildomains(); 
+    my @domains = Cpanel::Email::listmaildomains();
     for my $domain (@domains) {
 	my $key = Cpanel::AdminBin::adminrun('cca', 'READFILE', "/var/cpanel/domain_keys/private/" . $domain);
 	$key =~ s/(\-{5}.*?\-{5}|^\.|\n|\r)//g;
@@ -305,7 +363,7 @@ sub dkim_uninstall {
     my (undef, $params) = @_;
     my $user = $params->{'user'};
     my $cli = getCLI();
-    my @domains = Cpanel::Email::listmaildomains(); 
+    my @domains = Cpanel::Email::listmaildomains();
     for my $domain (@domains) {
 	$cli->UpdateDomainSettings(domain => $domain,settings => {DKIM => {DKIMEnabled => 'No'}});
     }

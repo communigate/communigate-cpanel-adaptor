@@ -18,6 +18,7 @@ use Cpanel::Sys::Hostname		();
 use Cpanel::Api2::Exec ();
 use Storable                         ();
 use Time::Local  'timelocal_nocheck';
+use Digest::MD5 qw(md5_hex);
 
 require Exporter;
 @ISA    = qw(Exporter);
@@ -93,8 +94,7 @@ sub api2_AccountsOverview {
 	    foreach my $userName (sort keys %$accounts) {	
 		my $accountData = $cli->GetAccountEffectiveSettings("$userName\@$domain");
 		my $service = @$accountData{'ServiceClass'} || '';
-
-		$accountData = $cli->GetAccountEffectiveSettings("$userName\@$domain");
+		my $accountPrefs = $cli->GetAccountEffectivePrefs("$userName\@$domain");
 		my $diskquota = @$accountData{'MaxAccountSize'} || '';
 		$diskquota =~ s/M//g;
 		my $_diskused = $cli->GetAccountInfo("$userName\@$domain","StorageUsed");
@@ -105,19 +105,56 @@ sub api2_AccountsOverview {
 		} else {
 		    $diskusedpercent = $diskused / $diskquota * 100;
 		}
-
 		$return_accounts->{$userName . "@" . $domain} = {
 		    domain => $domain,
+		    username => $userName,
 		    class => $service,
 		    quota => $diskquota,
 		    used => $diskused,
-		    usedpercent => $diskusedpercent
+		    data => $accountData,
+		    prefs => $accountPrefs,
+		    usedpercent => $diskusedpercent,
+		    md5 => md5_hex(lc $userName . "@" . $domain),
 		};
 	    }
 	}
 	my $defaults = $cli->GetServerAccountDefaults();
 	$cli->Logout();
-	return { accounts => $return_accounts, classes => $defaults->{'ServiceClasses'}, data => $data };
+	return { accounts => $return_accounts,
+		 classes => $defaults->{'ServiceClasses'},
+		 data => $data,
+		 sort_keys_by => sub {
+		     my $hash = shift;
+		     my $sort_field = shift;
+		     my $reverse = shift;
+		     $sort_field = 'username' if $sort_field !~ /^\w+$/;
+		     return sort { $hash->{$b}->{$sort_field} cmp $hash->{$a}->{$sort_field} || $hash->{$b}->{'username'} cmp $hash->{$a}->{'username'} || $hash->{$b}->{'domain'} cmp $hash->{$a}->{'domain'}} keys %$hash if $reverse == 1;
+		     return sort { $hash->{$a}->{$sort_field} cmp $hash->{$b}->{$sort_field} || $hash->{$a}->{'username'} cmp $hash->{$b}->{'username'} || $hash->{$a}->{'domain'} cmp $hash->{$b}->{'domain'}} keys %$hash;
+		 }
+	};
+}
+
+sub api2_ListClasses {
+	my %OPTS = @_;
+	my $invert = $OPTS{'invert'};
+	my $cli = getCLI();
+	my $defaults = $cli->GetServerAccountDefaults();
+	my @return;
+	for my $class (sort keys %{$defaults->{'ServiceClasses'}}) {
+	    push @return, {class => $class};
+	}
+	$cli->Logout();
+	return @return;
+}
+
+sub api2_ListWorkDays {
+	my %OPTS = @_;
+	my $invert = $OPTS{'invert'};
+	my @domains = Cpanel::Email::listmaildomains(); 
+	my $cli = getCLI();
+	my $defaults = $cli->GetServerAccountPrefs();
+	$cli->Logout();
+	return { default => $defaults->{WorkDays} };
 }
 
 sub api2_UpdateAccountClass {
