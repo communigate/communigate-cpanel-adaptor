@@ -84,7 +84,7 @@
 	<h3><span class="action_link" style="background-image: url([% CPBranding.image('cgpro_account_change_details') %])" onclick="toggle_action_div(null, {id:'account_details_module_[% loop.count - 1 %]', index:[% loop.count - 1 %], action:'account_details'})">[% locale.maketext("CGPAccountDetails") %]</span></h3>
       <!-- Account Details -->
       <div  style="display: none;" class="user-section" id="account_details_module_[% loop.count - 1 %]">
-	<table style="text-align: center; margin: 0px auto">
+	<table style="text-align: center; margin: 0px auto" class="account-details">
 	    <tbody>
 	      <tr>
 		<th style="text-align: left;">[% locale.maketext('CGPRealName') %]:</th>
@@ -112,11 +112,25 @@
 	      </tr>
 	      <tr style="text-align: left;">
 		<th>[% locale.maketext('CGPUsageQuota') %]:</th>
-		<td>
+		<td style="text-align: center;">
+		  <div style="float: left;">
 		[% accounts.$account.used FILTER format('%02.1f') %] / <span id="quota_0">[%  IF accounts.$account.quota == 'unlimited'; '∞'; ELSE; accounts.$account.quota; END %]</span> <span class="megabyte_font">MB</span><br />
 		<div id="usage_bar_0" class="table_progress_bar">
 		  <div style="position: relative; width: [% accounts.$account.usedpercent %]%; height: 100%; padding: 0px; margin: 0px; border: 0px" title="0%" class="cpanel_widget_progress_bar"></div>
 		</div>
+		  </div>
+		</td>
+	      </tr>
+	      <tr style="text-align: left;">
+		<th>[% locale.maketext('CGPMessagesSent') %]:</th>
+		<td>
+		  [% accounts.$account.stats.MessagesSent.split("#").1 || locale.maketext('CGPunknown') %]
+		</td>
+	      </tr>
+	      <tr style="text-align: left;">
+		<th>[% locale.maketext('CGPMessagesReceived') %]:</th>
+		<td>
+		  [% accounts.$account.stats.MessagesReceived.split("#").1 || locale.maketext('CGPunknown') %]
 		</td>
 	      </tr>
 	    </tbody>

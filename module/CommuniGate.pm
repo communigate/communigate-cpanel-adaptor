@@ -93,6 +93,7 @@ sub api2_AccountsOverview {
 	    my $accounts=$cli->ListAccounts($domain);
 	    foreach my $userName (sort keys %$accounts) {	
 		my $accountData = $cli->GetAccountEffectiveSettings("$userName\@$domain");
+		my $accountStats = $cli->GetAccountStat("$userName\@$domain");
 		my $service = @$accountData{'ServiceClass'} || '';
 		my $accountPrefs = $cli->GetAccountEffectivePrefs("$userName\@$domain");
 		my $diskquota = @$accountData{'MaxAccountSize'} || '';
@@ -114,6 +115,7 @@ sub api2_AccountsOverview {
 		    data => $accountData,
 		    prefs => $accountPrefs,
 		    usedpercent => $diskusedpercent,
+		    stats => $accountStats,
 		    md5 => md5_hex(lc $userName . "@" . $domain),
 		};
 	    }
