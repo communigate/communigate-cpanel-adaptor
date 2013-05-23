@@ -196,6 +196,11 @@ sub editquota {
     } else {
 	delete $data->{'WorkPhone'} if $data->{'WorkPhone'};
     }
+    if ($args->{'PasswordComplexity'}) {
+	$data->{'PasswordComplexity'} = 'MixedCaseDigit';
+    } else {
+	delete $data->{'PasswordComplexity'} if $data->{'PasswordComplexity'};
+    }
     # Update WorkDays
     if ($args->{'WorkDays'}) {
 	my $WorkDays = [];

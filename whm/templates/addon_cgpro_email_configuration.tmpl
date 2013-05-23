@@ -110,6 +110,11 @@
 		  <em>RBLs</em>
 		</a>
 	      </li>
+	      <li>
+		<a href="#tab_DKIM">
+		  <em>DKIM</em>
+		</a>
+	      </li>
 	    </ul>
 	  </div>
 	</div> <!-- END TABS -->
@@ -120,13 +125,16 @@
 	  <div id="tab_RBLs">
 	    [% PROCESS addon_cgpro_email_configuration_rbls.tmpl %]
 	  </div> <!-- END RBLs -->
+	  <div id="tab_DKIM">
+	    [% PROCESS addon_cgpro_email_configuration_dkim.tmpl %]
+	  </div> <!-- END RBLs -->
 	</div>
 
       </div>
     </div>
   </div>
   <p>
-    <input type="submit" value="Save" class="input-button" />
+    <input type="submit" value="Save" class="input-button" name="submit" />
   </p>
 </form>
 

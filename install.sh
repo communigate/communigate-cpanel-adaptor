@@ -188,6 +188,7 @@ replace "cpanel.communigate.com" "${HOSTNAME}" -- /var/CommuniGate/Settings/Main
 # install DKIM tools FOR CGPro server Only
 chmod +x ${PACKSRC}/tools/*
 cp ${PACKSRC}/tools/helper_DKIM_sign.pl /var/CommuniGate/
+cp ${PACKSRC}/tools/helper_DKIM_verify.pl /var/CommuniGate/
 ${PACKSRC}/scripts/install_dkim_signer.pl
 
 #################################################

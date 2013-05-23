@@ -81,7 +81,7 @@
 	<span class="classname">[% accounts.$account.class %]</span>
       </div>
       <div class="clear"></div>
-	<h3><span class="action_link" style="background-image: url([% CPBranding.image('cgpro_account_change_details') %])" onclick="toggle_action_div(null, {id:'account_details_module_[% loop.count - 1 %]', index:[% loop.count - 1 %], action:'account_details'})">[% locale.maketext("CGPAccountDetails") %]</span></h3>
+      <h3><span class="action_link" style="background-image: url([% CPBranding.image('cgpro_account_change_details') %])" onclick="toggle_action_div(null, {id:'account_details_module_[% loop.count - 1 %]', index:[% loop.count - 1 %], action:'account_details'})">[% locale.maketext("CGPAccountDetails") %]</span></h3>
       <!-- Account Details -->
       <div  style="display: none;" class="user-section" id="account_details_module_[% loop.count - 1 %]">
 	<table style="text-align: center; margin: 0px auto" class="account-details">
@@ -238,7 +238,10 @@
 		  <div id="WorkDays_error"></div>
 		</td>
 	      </tr>
-
+	      <tr>
+		<td align="right">[% locale.maketext("CGPUseComplexPassword") %]:</td>
+		<td><input type="checkbox" name="PasswordComplexity" value="1"[% IF accounts.$account.data.PasswordComplexity == 'MixedCaseDigit'; ' checked="checked"'; END %] /></td>
+	      </tr>
 	      <tr>
 		<td style="text-align: center" colspan="2">
 		  <div style="height: 4px">&nbsp;</div>

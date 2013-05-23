@@ -2067,6 +2067,28 @@ sub api2_checkSSLlinks {
     $Cpanel::CPVAR{"ssllinks"} = 1 if -f "/var/cpanel/cgpro/ssllinks";
 }
 
+sub api2_DKIMVerification {
+    my %OPTS = @_;
+    $cli = getCLI();
+    if ($OPTS{DKIMVerifyReject}) {
+	for my $domain (@domains) {
+	    my $settings = {
+		'DKIMVerifyEnable' => ($OPTS{DKIMVerifyEnable} ? 'YES' : 'NO'),
+		'DKIMVerifyReject' => $OPTS{DKIMVerifyReject}
+	    };
+	    $cli->UpdateAccountDefaultPrefs(domain => $domain, settings => $settings);
+	}
+    }
+    my $serverPrefs = $cli->GetServerAccountPrefs();
+    $Cpanel::CPVAR{"serverPrefsEnable"} = $serverPrefs->{DKIMVerifyEnable};
+    $Cpanel::CPVAR{"serverPrefsReject"} = $serverPrefs->{DKIMVerifyReject};
+    my @domains = Cpanel::Email::listmaildomains();
+    my $domainPrefs = $cli->GetAccountDefaultPrefs($domains[0]);
+    $Cpanel::CPVAR{"domainPrefsEnable"} = $domainPrefs->{DKIMVerifyEnable};
+    $Cpanel::CPVAR{"domainPrefsReject"} = $domainPrefs->{DKIMVerifyReject};
+    $cli->Logout();
+}
+
 sub IsGroupInternal {
   	my $groupwithdomain = shift;
 	my @values = split("@",$groupwithdomain);

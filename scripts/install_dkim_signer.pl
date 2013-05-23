@@ -30,7 +30,15 @@ unless ($found) {
 	ProgramName => "/usr/bin/perl helper_DKIM_sign.pl",
 	RestartPause => '5m',
 	Timeout => '10s'
-    }; 
+    };
+    push @{$settings->{ExternalFilters}}, {
+	Enabled => 'YES',
+	LogLevel =>  2,
+	Name => 'DKIM_verify',
+	ProgramName => "/usr/bin/perl helper_DKIM_verify.pl",
+	RestartPause => '5m',
+	Timeout => '10s'
+    };
     $cli->UpdateServerSettings($settings);
 }
 my $rules = $cli->GetServerMailRules();
@@ -47,6 +55,14 @@ unless ($rfound) {
 	 ["Header Field", "is not", "DKIM-Signature:*"]
 	],
 	[['ExternalFilter', 'DKIM_sign']]
+    ];
+    push @$rules, [
+	5,
+	'DKIM_verify',
+	[
+	 ["Header Field", "is", "DKIM-Signature:*"]
+	],
+	[['ExternalFilter', 'DKIM_verify']]
     ];
     $cli->SetServerMailRules($rules)
 }
