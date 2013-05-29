@@ -136,6 +136,47 @@ sub api2_AccountsOverview {
 	};
 }
 
+sub api2_AccountDefaults {
+	my %OPTS = @_;
+	my @domains = Cpanel::Email::listmaildomains(); 
+	my $cli = getCLI();
+	if ($OPTS{'save'}) {
+	    my $defaultServerAccountPrefs = $cli->GetServerAccountPrefs();
+	    for my $domain (@domains) {
+		$cli->UpdateDomainSettings(
+		    domain => $domain,
+		    settings => {
+			MailToUnknown => $OPTS{'MailToUnknown'},
+			MailRerouteAddress => $OPTS{'MailRerouteAddress'},
+			MailToAllAction => $OPTS{'MailToAllAction'},
+		    }
+		    );
+		my $workdays = [map { $OPTS{$_} } grep { /^WorkDays\-?/ }  sort keys %OPTS];
+		$cli->UpdateAccountDefaultPrefs(
+		    domain => $domain,
+		    settings => {
+			TimeZone => $OPTS{'TimeZone'},
+			WorkDayStart => $OPTS{'WorkDayStart'},
+			WorkDayEnd => $OPTS{'WorkDayEnd'},
+			WeekStart => $OPTS{'WeekStart'},
+			WorkDays => (join(",",@$workdays) eq join(",",@{$defaultServerAccountPrefs->{WorkDays}}) ? 'default' : $workdays),
+		    }
+		    );
+	    }
+	}
+	my $serverDomainDefaults = $cli->GetDomainDefaults();
+	my $serverAccountPrefs = $cli->GetServerAccountPrefs();
+	my $domainSettings = $cli->GetDomainSettings($domains[0]);
+	my $accountDefaultPrefs = $cli->GetAccountDefaultPrefs($domains[0]);
+	$cli->Logout();
+	return { 
+	    serverDomainDefaults => $serverDomainDefaults,
+	    serverAccountPrefs => $serverAccountPrefs,
+	    domainSettings => $domainSettings,
+	    accountDefaultPrefs => $accountDefaultPrefs
+	};
+}
+
 sub api2_ListClasses {
 	my %OPTS = @_;
 	my $invert = $OPTS{'invert'};
