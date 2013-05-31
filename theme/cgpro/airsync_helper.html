@@ -24,7 +24,7 @@ hr {
     clear: both;
 }
 </style>
-<h1>Jabber/XMPP Settings</h1>
+<h1><cpanel langprint="CGPAirSync"></h1>
 <cpanelif !$FORM{'account'}>
 <form action="" method="get">
 <p>
@@ -41,7 +41,7 @@ hr {
 </form>
 </cpanelif>
 
-<?cptt cgpro/xmpp_helper.tmpl ?>
+<?cptt cgpro/airsync_helper.tmpl ?>
 
 <cpanelif $FORM{'account'}>
   <div class="return-link"><a href="javascript:history.back()">&larr; <cptext "Go Back"></a></div>

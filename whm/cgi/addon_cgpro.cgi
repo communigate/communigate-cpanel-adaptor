@@ -3,21 +3,37 @@
     if 0;
 #!/usr/bin/perl
 #WHMADDON:communigatepro:CGPro <strong>Administration</strong>
-
-
 # (c) 2011 CommuniGate Systems
+use CLI;
 
-use CLI
+my $conf = Cpanel::CachedDataStore::fetch_ref( '/var/cpanel/communigate.yaml' ) || {};
+my $cli = new CGP::CLI( { PeerAddr => $conf->{cgprohost},
+                            PeerPort => $conf->{cgproport},
+                            login => $conf->{cgprouser},
+                            password => $conf->{cgpropass} } );
+unless($cli) {
+  print STDERR "Can't login to CGPro: ".$CGP::ERR_STRING,"\n";
+   exit(0);
+}
+
+my $cgproversion = $cli->getversion();
 
 print "HTTP/1.0\r\nStatus: 200 OK\r\nContext-type: text/html\r\n\r\n";
-
-my $version="b0.1";
 
 sub platform_owner {
  my $host=$ENV{'HTTP_HOST'};
  my $myurl="http://$host:8010";
  Whostmgr::HTMLInterface::defheader( '<br><br><br><H1>CommuniGate Pro cPanel Plugin<H1>', '/images/communigate.gif', '/cgi/addon_cgs.cgi' );
- print "<p class=\"description\">You are running CommuniGate Pro cPanel Plugin version $version. This plugin installed CommuniGate Pro as mail system and proposes new features for end users (groupware, mobile synchronisation, presence and IM, etc.)<br>On the front end the plugin enables traditional cPanel account and reseller management methods and interface. The plugin uses hooks and cPanel APIs in the back to configure the CommuniGate instance. CommuniGate Theme should be chosen for the users.</p><br>";
+Cpanel::Template::process_template(
+				   'whostmgr',
+				   {
+				    'template_file' => 'addon_cgpro_footer.tmpl',
+				    cgproversion => $cgproversion,
+				   },
+				  );
+
+
+print "<p class=\"description\"> This plugin installed CommuniGate Pro as mail system and proposes new features for end users (groupware, mobile synchronisation, presence and IM, etc.)<br>On the front end the plugin enables traditional cPanel account and reseller management methods and interface. The plugin uses hooks and cPanel APIs in the back to configure the CommuniGate instance. CommuniGate Theme should be chosen for the users.</p><br>";
  print "<ul>";
  print "<div id=\"doctitle\"><H2>Local Server Administration</h2></div>";
  print "<ul>";
@@ -52,7 +68,13 @@ print "<div id=\"doctitle\"><H2>Contact CommuniGate Systems</h2></div>";
  print "</ul>";
  print "</ul>";
 
- #print "<META http-equiv=\"refresh\" content=\"0; URL=",$myurl,"\">";
+Cpanel::Template::process_template(
+				   'whostmgr',
+				   {
+				    'template_file' => 'addon_cgpro_footer.tmpl',
+				    cgproversion => $cgproversion,
+				   },
+				  );
 }
 
 sub reseller {

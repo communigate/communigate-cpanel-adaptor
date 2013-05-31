@@ -1,0 +1,518 @@
+[% MACRO filter_option(pval, val, text) BLOCK -%]
+<option value="[% val %]"[% val == pval ? " selected='selected'" : "" %]>[% cptext(text) %]</option>
+[% END -%]
+[% MACRO filter_check(name, pval, val, text) BLOCK -%]
+<input type="checkbox" name="[% name %]" value="[% val %]" id="[% name %]-[% val %]"[% IF pval.join("").search(val); " checked='checked'"; END %] />
+<label for="[% name %]-[% val %]">[% text %]</label>
+[% END -%]
+<table class="datatable brick" cellspacing="0" cellpadding="5" width="100%" border="0" align="center">
+  <tbody>
+    <tr class="tdshade1_noborder">
+      <td nowrap="nowrap" align="RIGHT" style="width: 30%">Password Modification allowed:</td>
+      <td nowrap="nowrap">
+	<select name="PWDAllowed" id="PWDAllowed">
+ 	  [% IF domain; filter_option("", "default", "default (" _ globalServerAccountDefaults.PWDAllowed _ ")"); END %]
+ 	  [% filter_option(serverAccountDefaults.PWDAllowed, "NO", "No") %]
+ 	  [% filter_option(serverAccountDefaults.PWDAllowed, "YES", "Yes") %]
+	</select>
+      </td>
+    </tr>
+    <tr class="tdshade2_noborder">
+      <td nowrap="nowrap" align="RIGHT" style="width: 30%">Password encryption:</td>
+      <td nowrap="nowrap">
+	<select name="PasswordEncryption" id="PasswordEncryption">
+ 	  [% IF domain; filter_option("", "default", "default (" _ globalServerAccountDefaults.PasswordEncryption _ ")"); END %]
+ 	  [% filter_option(serverAccountDefaults.PasswordEncryption, "clear", "Clear") %]
+ 	  [% filter_option(serverAccountDefaults.PasswordEncryption, "A-crpt", "A-crpt") %]
+	</select>
+      </td>
+    </tr>
+    <tr class="tdshade1_noborder">
+      <td nowrap="nowrap" align="RIGHT" style="width: 30%">Accepts Mail to «all»:</td>
+      <td nowrap="nowrap">
+	<select name="MailToAll" id="MailToAll">
+ 	  [% IF domain; filter_option("", "default", "default (" _ globalServerAccountDefaults.MailToAll _ ")"); END %]
+ 	  [% filter_option(serverAccountDefaults.MailToAll, "NO", "No") %]
+ 	  [% filter_option(serverAccountDefaults.MailToAll, "YES", "Yes") %]
+	</select>
+      </td>
+    </tr>
+    <tr class="tdshade2_noborder">
+      <td nowrap="nowrap" align="RIGHT" style="width: 30%">IVR Language:</td>
+      <td nowrap="nowrap">
+	<select name="IVRLanguage" id="IVRLanguage">
+ 	  [% IF domain; filter_option("", "default", "default (" _ defaultServerAccountPrefs.IVRLanguage _ ")"); END %]
+ 	  [% filter_option(serverAccountPrefs.IVRLanguage, "english", "English") %]
+ 	  [% filter_option(serverAccountPrefs.IVRLanguage, "albanian", "Albanian") %]
+ 	  [% filter_option(serverAccountPrefs.IVRLanguage, "arabic", "Arabic") %]
+ 	  [% filter_option(serverAccountPrefs.IVRLanguage, "bulgarian", "Bulgarian") %]
+ 	  [% filter_option(serverAccountPrefs.IVRLanguage, "chinese", "Chinese") %]
+ 	  [% filter_option(serverAccountPrefs.IVRLanguage, "croatian", "Croatian") %]
+ 	  [% filter_option(serverAccountPrefs.IVRLanguage, "czech", "Czech") %]
+ 	  [% filter_option(serverAccountPrefs.IVRLanguage, "danish", "Danish") %]
+ 	  [% filter_option(serverAccountPrefs.IVRLanguage, "dutch", "Dutch") %]
+ 	  [% filter_option(serverAccountPrefs.IVRLanguage, "farsi", "Farsi") %]
+ 	  [% filter_option(serverAccountPrefs.IVRLanguage, "filipino", "Filipino") %]
+ 	  [% filter_option(serverAccountPrefs.IVRLanguage, "finnish", "Finnish") %]
+ 	  [% filter_option(serverAccountPrefs.IVRLanguage, "french", "French") %]
+ 	  [% filter_option(serverAccountPrefs.IVRLanguage, "german", "German") %]
+ 	  [% filter_option(serverAccountPrefs.IVRLanguage, "greek", "Greek") %]
+ 	  [% filter_option(serverAccountPrefs.IVRLanguage, "hebrew", "Hebrew") %]
+ 	  [% filter_option(serverAccountPrefs.IVRLanguage, "hindi", "Hindi") %]
+ 	  [% filter_option(serverAccountPrefs.IVRLanguage, "hungarian", "Hungarian") %]
+ 	  [% filter_option(serverAccountPrefs.IVRLanguage, "indonesian", "Indonesian") %]
+ 	  [% filter_option(serverAccountPrefs.IVRLanguage, "italian", "Italian") %]
+ 	  [% filter_option(serverAccountPrefs.IVRLanguage, "japanese", "Japanese") %]
+ 	  [% filter_option(serverAccountPrefs.IVRLanguage, "kazakh", "Kazakh") %]
+ 	  [% filter_option(serverAccountPrefs.IVRLanguage, "korean", "Korean") %]
+ 	  [% filter_option(serverAccountPrefs.IVRLanguage, "norwegian", "Norwegian") %]
+ 	  [% filter_option(serverAccountPrefs.IVRLanguage, "polish", "Polish") %]
+ 	  [% filter_option(serverAccountPrefs.IVRLanguage, "portuguese", "Portuguese") %]
+ 	  [% filter_option(serverAccountPrefs.IVRLanguage, "russian", "Russian") %]
+ 	  [% filter_option(serverAccountPrefs.IVRLanguage, "serbian", "Slovak") %]
+ 	  [% filter_option(serverAccountPrefs.IVRLanguage, "slovenian", "Slovenian") %]
+ 	  [% filter_option(serverAccountPrefs.IVRLanguage, "spanish", "Spanish") %]
+ 	  [% filter_option(serverAccountPrefs.IVRLanguage, "swedish", "Swedish") %]
+ 	  [% filter_option(serverAccountPrefs.IVRLanguage, "thai", "Thai") %]
+ 	  [% filter_option(serverAccountPrefs.IVRLanguage, "turkish", "Turkish") %]
+ 	  [% filter_option(serverAccountPrefs.IVRLanguage, "ukrainian", "Ukrainian") %]
+ 	  [% filter_option(serverAccountPrefs.IVRLanguage, "vietnamese", "Vietnamese") %]
+	</select>
+      </td>
+    </tr>
+    <tr class="tdshade1_noborder">
+      <td nowrap="nowrap" align="RIGHT" style="width: 30%">Time Zone:</td>
+      <td nowrap="nowrap">
+	<select name="TimeZone" id="TimeZone">
+ 	  [% IF domain; filter_option("", "default", "default (" _ (defaultServerAccountPrefs.TimeZone == "HostOS" ? "Fictitious Server Zone" : defaultServerAccountPrefs.TimeZone ) _ ")"); END %]
+ 	  [% filter_option(serverAccountPrefs.TimeZone, "HostOS", "Fictitious Server Zone") %]
+ 	  [% filter_option(serverAccountPrefs.TimeZone, "Europe/Eastern", "Europe/Eastern") %]
+ 	  [% filter_option(serverAccountPrefs.TimeZone, "Europe/Central", "Europe/Central") %]
+ 	  [% filter_option(serverAccountPrefs.TimeZone, "Europe/Western", "Europe/Western") %]
+ 	  [% filter_option(serverAccountPrefs.TimeZone, "Europe/Moscow", "Europe/Moscow") %]
+ 	  [% filter_option(serverAccountPrefs.TimeZone, "NorthAmerica/Alaska", "NorthAmerica/Alaska") %]
+ 	  [% filter_option(serverAccountPrefs.TimeZone, "NorthAmerica/Pacific", "NorthAmerica/Pacific") %]
+ 	  [% filter_option(serverAccountPrefs.TimeZone, "NorthAmerica/Mountain", "NorthAmerica/Mountain") %]
+ 	  [% filter_option(serverAccountPrefs.TimeZone, "NorthAmerica/Eastern", "NorthAmerica/Eastern") %]
+ 	  [% filter_option(serverAccountPrefs.TimeZone, "NorthAmerica/Atlantic", "NorthAmerica/Atlantic") %]
+ 	  [% filter_option(serverAccountPrefs.TimeZone, "Newfoundland", "Newfoundland") %]
+ 	  [% filter_option(serverAccountPrefs.TimeZone, "Russia/Ekaterinburg", "Russia/Ekaterinburg") %]
+ 	  [% filter_option(serverAccountPrefs.TimeZone, "Russia/Novosibirsk", "Russia/Novosibirsk") %]
+ 	  [% filter_option(serverAccountPrefs.TimeZone, "Russia/Krasnoyarsk", "Russia/Krasnoyarsk") %]
+ 	  [% filter_option(serverAccountPrefs.TimeZone, "Russia/Irkutsk", "Russia/Irkutsk") %]
+ 	  [% filter_option(serverAccountPrefs.TimeZone, "Russia/Yakutsk", "Russia/Yakutsk") %]
+ 	  [% filter_option(serverAccountPrefs.TimeZone, "Russia/Vladivostok", "Russia/Vladivostok") %]
+ 	  [% filter_option(serverAccountPrefs.TimeZone, "Russia/Magadan", "Russia/Magadan") %]
+ 	  [% filter_option(serverAccountPrefs.TimeZone, "Russia/Kamchatka", "Russia/Kamchatka") %]
+ 	  [% filter_option(serverAccountPrefs.TimeZone, "SouthAmerica/Chile", "SouthAmerica/Chile") %]
+ 	  [% filter_option(serverAccountPrefs.TimeZone, "SouthAmerica/Brasil", "SouthAmerica/Brasil") %]
+ 	  [% filter_option(serverAccountPrefs.TimeZone, "SouthAmerica/Paraguay", "SouthAmerica/Paraguay") %]
+ 	  [% filter_option(serverAccountPrefs.TimeZone, "Australia/Adelaide", "Australia/Adelaide") %]
+ 	  [% filter_option(serverAccountPrefs.TimeZone, "Australia/NorthernTerritory", "Australia/NorthernTerritory") %]
+ 	  [% filter_option(serverAccountPrefs.TimeZone, "Australia/East", "Australia/East") %]
+ 	  [% filter_option(serverAccountPrefs.TimeZone, "NewZealand/Auckland", "NewZealand/Auckland") %]
+ 	  [% filter_option(serverAccountPrefs.TimeZone, "Asia/Lebanon", "Asia/Lebanon") %]
+ 	  [% filter_option(serverAccountPrefs.TimeZone, "Asia/Jordan", "Asia/Jordan") %]
+ 	  [% filter_option(serverAccountPrefs.TimeZone, "Asia/Syria", "Asia/Syria") %]
+ 	  [% filter_option(serverAccountPrefs.TimeZone, "Asia/Israel", "Asia/Israel") %]
+ 	  [% filter_option(serverAccountPrefs.TimeZone, "Asia/Iraq", "Asia/Iraq") %]
+ 	  [% filter_option(serverAccountPrefs.TimeZone, "Asia/Iran", "Asia/Iran") %]
+ 	  [% filter_option(serverAccountPrefs.TimeZone, "Asia/Afghanistan", "Asia/Afghanistan") %]
+ 	  [% filter_option(serverAccountPrefs.TimeZone, "Asia/India", "Asia/India") %]
+ 	  [% filter_option(serverAccountPrefs.TimeZone, "(-1100) Samoa", "(-1100) Samoa") %]
+ 	  [% filter_option(serverAccountPrefs.TimeZone, "(-1000) Hawaii/Tahiti", "(-1000) Hawaii/Tahiti") %]
+ 	  [% filter_option(serverAccountPrefs.TimeZone, "(-0900) Marquesas Islands", "(-0900) Marquesas Islands") %]
+ 	  [% filter_option(serverAccountPrefs.TimeZone, "(-0700) Arizona", "(-0700) Arizona") %]
+ 	  [% filter_option(serverAccountPrefs.TimeZone, "(-0600) Central America", "(-0600) Central America") %]
+ 	  [% filter_option(serverAccountPrefs.TimeZone, "(-0500) Haiti/Peru", "(-0500) Haiti/Peru") %]
+ 	  [% filter_option(serverAccountPrefs.TimeZone, "(-0400) Venezuela/Guyana", "(-0400) Venezuela/Guyana") %]
+ 	  [% filter_option(serverAccountPrefs.TimeZone, "(-0300) Argentina/Uruguay", "(-0300) Argentina/Uruguay") %]
+ 	  [% filter_option(serverAccountPrefs.TimeZone, "GMT (+0000)", "GMT (+0000)") %]
+ 	  [% filter_option(serverAccountPrefs.TimeZone, "(+0100) Algeria/Congo", "(+0100) Algeria/Congo") %]
+ 	  [% filter_option(serverAccountPrefs.TimeZone, "(+0200) Egypt/South Africa", "(+0200) Egypt/South Africa") %]
+ 	  [% filter_option(serverAccountPrefs.TimeZone, "(+0300) Saudi Arabia", "(+0300) Saudi Arabia") %]
+ 	  [% filter_option(serverAccountPrefs.TimeZone, "(+0400) Oman", "(+0400) Oman") %]
+ 	  [% filter_option(serverAccountPrefs.TimeZone, "(+0500) Pakistan", "(+0500) Pakistan") %]
+ 	  [% filter_option(serverAccountPrefs.TimeZone, "(+0600) Bangladesh", "(+0600) Bangladesh") %]
+ 	  [% filter_option(serverAccountPrefs.TimeZone, "(+0700) Thailand/Vietnam", "(+0700) Thailand/Vietnam") %]
+ 	  [% filter_option(serverAccountPrefs.TimeZone, "(+0800) China/Malaysia", "(+0800) China/Malaysia") %]
+ 	  [% filter_option(serverAccountPrefs.TimeZone, "(+0900) Japan/Korea", "(+0900) Japan/Korea") %]
+ 	  [% filter_option(serverAccountPrefs.TimeZone, "(+1000) Queensland", "(+1000) Queensland") %]
+ 	  [% filter_option(serverAccountPrefs.TimeZone, "(+1100) Micronesia", "(+1100) Micronesia") %]
+ 	  [% filter_option(serverAccountPrefs.TimeZone, "(+1200) Fiji", "(+1200) Fiji") %]
+	</select>
+      </td>
+    </tr>
+    <tr class="tdshade2_noborder">
+      <td nowrap="nowrap" align="RIGHT" style="width: 30%">Require Fixed Network Address:</td>
+      <td nowrap="nowrap">
+	<select name="IPWatch" id="IPWatch">
+	  [% IF domain; filter_option("", "default", "default (" _ defaultServerAccountPrefs.IPWatch _ ")"); END %]
+ 	  [% filter_option(serverAccountPrefs.IPWatch, "NO", "No") %]
+ 	  [% filter_option(serverAccountPrefs.IPWatch, "YES", "Yes") %]
+	</select>
+      </td>
+    </tr>
+    <tr class="tdshade1_noborder">
+      <td nowrap="nowrap" align="RIGHT" style="width: 30%">Use Cookies:</td>
+      <td nowrap="nowrap">
+	<select name="UseCookie" id="UseCookie">
+	  [% IF domain; filter_option("", "default", "default (" _ defaultServerAccountPrefs.UseCookie _ ")"); END %]
+ 	  [% filter_option(serverAccountPrefs.UseCookie, "NO", "No") %]
+ 	  [% filter_option(serverAccountPrefs.UseCookie, "YES", "Yes") %]
+	</select>
+      </td>
+    </tr>
+    <tr class="tdshade2_noborder">
+      <td nowrap="nowrap" align="RIGHT" style="width: 30%">Save Sent Messages in:</td>
+      <td nowrap="nowrap">
+	<input type="text" name="SentBox" value="[% serverAccountPrefs.SentBox || defaultServerAccountPrefs.SentBox %]" />
+      </td>
+    </tr>
+    <tr class="tdshade1_noborder">
+      <td nowrap="nowrap" align="RIGHT" style="width: 30%">Notes Folder:</td>
+      <td nowrap="nowrap">
+	<input type="text" name="NotesBox" value="[% serverAccountPrefs.NotesBox || defaultServerAccountPrefs.NotesBox %]" />
+      </td>
+    </tr>
+    <tr class="tdshade2_noborder">
+      <td nowrap="nowrap" align="RIGHT" style="width: 30%">Main Calendar:</td>
+      <td nowrap="nowrap">
+	<input type="text" name="CalendarBox" value="[% serverAccountPrefs.CalendarBox || defaultServerAccountPrefs.CalendarBox %]" />
+      </td>
+    </tr>
+    <tr class="tdshade1_noborder">
+      <td nowrap="nowrap" align="RIGHT" style="width: 30%">History Folder:</td>
+      <td nowrap="nowrap">
+	<input type="text" name="HistoryBox" value="[% serverAccountPrefs.HistoryBox || defaultServerAccountPrefs.HistoryBox %]" />
+      </td>
+    </tr>
+    <tr class="tdshade2_noborder">
+      <td nowrap="nowrap" align="RIGHT" style="width: 30%">Store Drafts in:</td>
+      <td nowrap="nowrap">
+	<input type="text" name="DraftsBox" value="[% serverAccountPrefs.DraftsBox || defaultServerAccountPrefs.DraftsBox %]" />
+      </td>
+    </tr>
+    <tr class="tdshade1_noborder">
+      <td nowrap="nowrap" align="RIGHT" style="width: 30%">Main Contacts Folder:</td>
+      <td nowrap="nowrap">
+	<input type="text" name="ContactsBox" value="[% serverAccountPrefs.ContactsBox || defaultServerAccountPrefs.ContactsBox %]" />
+      </td>
+    </tr>
+    <tr class="tdshade2_noborder">
+      <td nowrap="nowrap" align="RIGHT" style="width: 30%">Main Tasks:</td>
+      <td nowrap="nowrap">
+	<input type="text" name="TasksBox" value="[% serverAccountPrefs.TasksBox || defaultServerAccountPrefs.TasksBox %]" />
+      </td>
+    </tr>
+    <tr class="tdshade1_noborder">
+      <td nowrap="nowrap" align="RIGHT" style="width: 30%">Compose Time Step:</td>
+      <td nowrap="nowrap">
+	<select name="CalendarTimePeriod" id="CalendarTimePeriod">
+	  [% IF domain; filter_option("", "default", "default (" _ defaultServerAccountPrefs.CalendarTimePeriod _ ")"); END %]
+ 	  [% filter_option(serverAccountPrefs.CalendarTimePeriod, "5m", "5 min") %]
+ 	  [% filter_option(serverAccountPrefs.CalendarTimePeriod, "10m", "10 min") %]
+ 	  [% filter_option(serverAccountPrefs.CalendarTimePeriod, "15m", "15 min") %]
+ 	  [% filter_option(serverAccountPrefs.CalendarTimePeriod, "30m", "30 min") %]
+ 	  [% filter_option(serverAccountPrefs.CalendarTimePeriod, "60m", "1 hour") %]
+ 	  [% filter_option(serverAccountPrefs.CalendarTimePeriod, "2h", "2 hours") %]
+ 	  [% filter_option(serverAccountPrefs.CalendarTimePeriod, "3h", "3 hours") %]
+ 	  [% filter_option(serverAccountPrefs.CalendarTimePeriod, "4h", "4 hours") %]
+ 	  [% filter_option(serverAccountPrefs.CalendarTimePeriod, "6h", "6 hours") %]
+ 	  [% filter_option(serverAccountPrefs.CalendarTimePeriod, "8h", "8 hours") %]
+	</select>
+      </td>
+    </tr>
+    <tr class="tdshade2_noborder">
+      <td nowrap="nowrap" align="RIGHT" style="width: 30%">Working Hours (start):</td>
+      <td nowrap="nowrap">
+	<select name="WorkDayStart" id="WorkDayStart">
+	  [% IF domain; filter_option("", "default", "default (" _ defaultServerAccountPrefs.WorkDayStart _ ")"); END %]
+	  [% FOR hour IN [ 0..23 ] -%]
+ 	  [% filter_option(serverAccountPrefs.WorkDayStart, hour * 3600, hour _ ":00") %]
+ 	  [% filter_option(serverAccountPrefs.WorkDayStart, (hour + 0.5) * 3600, hour _ ":30") %]
+	  [% END %]
+	</select>
+      </td>
+    </tr>
+    <tr class="tdshade1_noborder">
+      <td nowrap="nowrap" align="RIGHT" style="width: 30%">Working Hours (end):</td>
+      <td nowrap="nowrap">
+	<select name="WorkDayEnd" id="WorkDayEnd">
+	  [% IF domain; filter_option("", "default", "default (" _ defaultServerAccountPrefs.WorkDayEnd _ ")"); END %]
+	  [% FOR hour IN [ 0..23 ] -%]
+ 	  [% filter_option(serverAccountPrefs.WorkDayEnd, hour * 3600, hour _ ":00") %]
+ 	  [% filter_option(serverAccountPrefs.WorkDayEnd, (hour + 0.5) * 3600, hour _ ":30") %]
+	  [% END %]
+	</select>
+      </td>
+    </tr>
+    <tr class="tdshade2_noborder">
+      <td nowrap="nowrap" align="RIGHT" style="width: 30%">Week start:</td>
+      <td nowrap="nowrap">
+	<select name="WeekStart" id="WeekStart">
+	  [% IF domain; filter_option("", "default", "default (" _ defaultServerAccountPrefs.WeekStart _ ")"); END %]
+ 	  [% filter_option(serverAccountPrefs.WeekStart, "Sun", "Sun") %]
+ 	  [% filter_option(serverAccountPrefs.WeekStart, "Mon", "Mon") %]
+ 	  [% filter_option(serverAccountPrefs.WeekStart, "Tue", "Tue") %]
+ 	  [% filter_option(serverAccountPrefs.WeekStart, "Wed", "Wed") %]
+ 	  [% filter_option(serverAccountPrefs.WeekStart, "Thu", "Thu") %]
+ 	  [% filter_option(serverAccountPrefs.WeekStart, "Fri", "Fri") %]
+ 	  [% filter_option(serverAccountPrefs.WeekStart, "Sat", "Sat") %]
+	</select>
+      </td>
+    </tr>
+    <tr class="tdshade1_noborder">
+      <td nowrap="nowrap" align="RIGHT" style="width: 30%">Work Days:</td>
+      <td nowrap="nowrap">
+ 	[% filter_check("WorkDays", serverAccountPrefs.WorkDays || defaultServerAccountPrefs.WorkDays, "Sun", "Sun") %]
+ 	[% filter_check("WorkDays", serverAccountPrefs.WorkDays || defaultServerAccountPrefs.WorkDays, "Mon", "Mon") %]
+ 	[% filter_check("WorkDays", serverAccountPrefs.WorkDays || defaultServerAccountPrefs.WorkDays, "Tue", "Tue") %]
+ 	[% filter_check("WorkDays", serverAccountPrefs.WorkDays || defaultServerAccountPrefs.WorkDays, "Wed", "Wed") %]
+ 	[% filter_check("WorkDays", serverAccountPrefs.WorkDays || defaultServerAccountPrefs.WorkDays, "Thu", "Thu") %]
+ 	[% filter_check("WorkDays", serverAccountPrefs.WorkDays || defaultServerAccountPrefs.WorkDays, "Fri", "Fri") %]
+ 	[% filter_check("WorkDays", serverAccountPrefs.WorkDays || defaultServerAccountPrefs.WorkDays, "Sat", "Sat") %]
+      </td>
+    </tr>
+    <tr class="tdshade2_noborder">
+      <td nowrap="nowrap" align="RIGHT" style="width: 30%">Calendar Days to Display:</td>
+      <td nowrap="nowrap">
+	<select name="CalendarDays" id="CalendarDays">
+	  [% IF domain; filter_option("", "default", "default (" _ defaultServerAccountPrefs.CalendarDays _ ")"); END %]
+ 	  [% filter_option(serverAccountPrefs.CalendarDays, "1", "1") %]
+ 	  [% filter_option(serverAccountPrefs.CalendarDays, "2", "2") %]
+ 	  [% filter_option(serverAccountPrefs.CalendarDays, "3", "3") %]
+ 	  [% filter_option(serverAccountPrefs.CalendarDays, "4", "4") %]
+ 	  [% filter_option(serverAccountPrefs.CalendarDays, "5", "5") %]
+ 	  [% filter_option(serverAccountPrefs.CalendarDays, "7", "7") %]
+ 	  [% filter_option(serverAccountPrefs.CalendarDays, "14", "14") %]
+ 	  [% filter_option(serverAccountPrefs.CalendarDays, "21", "21") %]
+ 	  [% filter_option(serverAccountPrefs.CalendarDays, "30", "30") %]
+	</select>
+      </td>
+    </tr>
+    <tr class="tdshade1_noborder">
+      <td nowrap="nowrap" align="RIGHT" style="width: 30%">Calendar Time to Display:</td>
+      <td nowrap="nowrap">
+	<select name="CalendarTime" id="CalendarTime">
+	  [% IF domain; filter_option("", "default", "default (" _ defaultServerAccountPrefs.CalendarTime _ ")"); END %]
+ 	  [% filter_option(serverAccountPrefs.CalendarTime, "1h", "1 hour") %]
+ 	  [% filter_option(serverAccountPrefs.CalendarTime, "2h", "2 hours") %]
+ 	  [% filter_option(serverAccountPrefs.CalendarTime, "3h", "3 hours") %]
+ 	  [% filter_option(serverAccountPrefs.CalendarTime, "4h", "4 hours") %]
+ 	  [% filter_option(serverAccountPrefs.CalendarTime, "5h", "5 hours") %]
+ 	  [% filter_option(serverAccountPrefs.CalendarTime, "6h", "6 hours") %]
+ 	  [% filter_option(serverAccountPrefs.CalendarTime, "7h", "7 hours") %]
+ 	  [% filter_option(serverAccountPrefs.CalendarTime, "8h", "8 hours") %]
+ 	  [% filter_option(serverAccountPrefs.CalendarTime, "10h", "10 hours") %]
+ 	  [% filter_option(serverAccountPrefs.CalendarTime, "12h", "12 hours") %]
+ 	  [% filter_option(serverAccountPrefs.CalendarTime, "14h", "14 hours") %]
+ 	  [% filter_option(serverAccountPrefs.CalendarTime, "16h", "16 hours") %]
+ 	  [% filter_option(serverAccountPrefs.CalendarTime, "18h", "18 hours") %]
+ 	  [% filter_option(serverAccountPrefs.CalendarTime, "20h", "20 hours") %]
+ 	  [% filter_option(serverAccountPrefs.CalendarTime, "22h", "22 hours") %]
+ 	  [% filter_option(serverAccountPrefs.CalendarTime, "24h", "24 hours") %]
+	</select>
+      </td>
+    </tr>
+    <tr class="tdshade2_noborder">
+      <td nowrap="nowrap" align="RIGHT" style="width: 30%">Calendar Time Slice:</td>
+      <td nowrap="nowrap">
+	<select name="CalendarTimeSlice" id="CalendarTimeSlice">
+	  [% IF domain; filter_option("", "default", "default (" _ defaultServerAccountPrefs.CalendarTimeSlice _ ")"); END %]
+ 	  [% filter_option(serverAccountPrefs.CalendarTimeSlice, "5m", "5m") %]
+ 	  [% filter_option(serverAccountPrefs.CalendarTimeSlice, "10m", "10m") %]
+ 	  [% filter_option(serverAccountPrefs.CalendarTimeSlice, "15m", "15m") %]
+ 	  [% filter_option(serverAccountPrefs.CalendarTimeSlice, "30m", "30m") %]
+ 	  [% filter_option(serverAccountPrefs.CalendarTimeSlice, "1h", "1 hour") %]
+ 	  [% filter_option(serverAccountPrefs.CalendarTimeSlice, "2h", "2 hours") %]
+ 	  [% filter_option(serverAccountPrefs.CalendarTimeSlice, "3h", "3 hours") %]
+ 	  [% filter_option(serverAccountPrefs.CalendarTimeSlice, "4h", "4 hours") %]
+ 	  [% filter_option(serverAccountPrefs.CalendarTimeSlice, "5h", "5 hours") %]
+ 	  [% filter_option(serverAccountPrefs.CalendarTimeSlice, "6h", "6 hours") %]
+ 	  [% filter_option(serverAccountPrefs.CalendarTimeSlice, "7h", "7 hours") %]
+ 	  [% filter_option(serverAccountPrefs.CalendarTimeSlice, "8h", "8 hours") %]
+ 	  [% filter_option(serverAccountPrefs.CalendarTimeSlice, "10h", "10 hours") %]
+ 	  [% filter_option(serverAccountPrefs.CalendarTimeSlice, "12h", "12 hours") %]
+	</select>
+      </td>
+    </tr>
+    <tr class="tdshade1_noborder">
+      <td nowrap="nowrap" align="RIGHT" style="width: 30%">Calendar by Day:</td>
+      <td nowrap="nowrap">
+	<select name="CalendarByDay" id="CalendarByDay">
+	  [% IF domain; filter_option("", "default", "default (" _ defaultServerAccountPrefs.CalendarByDay _ ")"); END %]
+ 	  [% filter_option(serverAccountPrefs.CalendarByDay, "NO", "No") %]
+ 	  [% filter_option(serverAccountPrefs.CalendarByDay, "YES", "Yes") %]
+	</select>
+      </td>
+    </tr>
+    <tr class="tdshade2_noborder">
+      <td nowrap="nowrap" align="RIGHT" style="width: 30%">Days to Publish:</td>
+      <td nowrap="nowrap">
+	<select name="PublishFreeBusy" id="PublishFreeBusy">
+	  [% IF domain; filter_option("", "default", "default (" _ defaultServerAccountPrefs.PublishFreeBusy _ ")"); END %]
+ 	  [% filter_option(serverAccountPrefs.PublishFreeBusy, "1", "1") %]
+ 	  [% filter_option(serverAccountPrefs.PublishFreeBusy, "2", "2") %]
+ 	  [% filter_option(serverAccountPrefs.PublishFreeBusy, "3", "3") %]
+ 	  [% filter_option(serverAccountPrefs.PublishFreeBusy, "4", "4") %]
+ 	  [% filter_option(serverAccountPrefs.PublishFreeBusy, "5", "5") %]
+ 	  [% filter_option(serverAccountPrefs.PublishFreeBusy, "7", "7") %]
+ 	  [% filter_option(serverAccountPrefs.PublishFreeBusy, "14", "14") %]
+ 	  [% filter_option(serverAccountPrefs.PublishFreeBusy, "21", "21") %]
+ 	  [% filter_option(serverAccountPrefs.PublishFreeBusy, "30", "30") %]
+ 	  [% filter_option(serverAccountPrefs.PublishFreeBusy, "45", "45") %]
+ 	  [% filter_option(serverAccountPrefs.PublishFreeBusy, "60", "60") %]
+ 	  [% filter_option(serverAccountPrefs.PublishFreeBusy, "90", "90") %]
+ 	  [% filter_option(serverAccountPrefs.PublishFreeBusy, "180", "180") %]
+ 	  [% filter_option(serverAccountPrefs.PublishFreeBusy, "365", "365") %]
+	</select>
+      </td>
+    </tr>
+    <tr class="tdshade1_noborder">
+      <td nowrap="nowrap" align="RIGHT" style="width: 30%">Task Days to Display:</td>
+      <td nowrap="nowrap">
+	<select name="TasksDays" id="TasksDays">
+	  [% IF domain; filter_option("", "default", "default (" _ defaultServerAccountPrefs.TasksDays _ ")"); END %]
+ 	  [% filter_option(serverAccountPrefs.TasksDays, "1", "1") %]
+ 	  [% filter_option(serverAccountPrefs.TasksDays, "2", "2") %]
+ 	  [% filter_option(serverAccountPrefs.TasksDays, "3", "3") %]
+ 	  [% filter_option(serverAccountPrefs.TasksDays, "4", "4") %]
+ 	  [% filter_option(serverAccountPrefs.TasksDays, "5", "5") %]
+ 	  [% filter_option(serverAccountPrefs.TasksDays, "7", "7") %]
+ 	  [% filter_option(serverAccountPrefs.TasksDays, "10", "10") %]
+ 	  [% filter_option(serverAccountPrefs.TasksDays, "14", "14") %]
+ 	  [% filter_option(serverAccountPrefs.TasksDays, "21", "21") %]
+ 	  [% filter_option(serverAccountPrefs.TasksDays, "30", "30") %]
+	</select>
+      </td>
+    </tr>
+    <tr class="tdshade2_noborder">
+      <td nowrap="nowrap" align="RIGHT" style="width: 30%">Task to Display:</td>
+      <td nowrap="nowrap">
+	<select name="TasksToDisplay" id="TasksDays">
+	  [% IF domain; filter_option("", "default", "default (" _ defaultServerAccountPrefs.TasksToDisplay _ ")"); END %]
+ 	  [% filter_option(serverAccountPrefs.TasksToDisplay, "1", "1") %]
+ 	  [% filter_option(serverAccountPrefs.TasksToDisplay, "2", "2") %]
+ 	  [% filter_option(serverAccountPrefs.TasksToDisplay, "3", "3") %]
+ 	  [% filter_option(serverAccountPrefs.TasksToDisplay, "4", "4") %]
+ 	  [% filter_option(serverAccountPrefs.TasksToDisplay, "5", "5") %]
+ 	  [% filter_option(serverAccountPrefs.TasksToDisplay, "10", "10") %]
+ 	  [% filter_option(serverAccountPrefs.TasksToDisplay, "15", "15") %]
+ 	  [% filter_option(serverAccountPrefs.TasksToDisplay, "20", "20") %]
+ 	  [% filter_option(serverAccountPrefs.TasksToDisplay, "25", "25") %]
+ 	  [% filter_option(serverAccountPrefs.TasksToDisplay, "30", "30") %]
+ 	  [% filter_option(serverAccountPrefs.TasksToDisplay, "50", "50") %]
+ 	  [% filter_option(serverAccountPrefs.TasksToDisplay, "100", "100") %]
+ 	  [% filter_option(serverAccountPrefs.TasksToDisplay, "300", "300") %]
+ 	  [% filter_option(serverAccountPrefs.TasksToDisplay, "1000", "1000") %]
+	</select>
+      </td>
+    </tr>
+    <tr class="tdshade1_noborder">
+      <td nowrap="nowrap" align="RIGHT" style="width: 30%">Show Completed Tasks:</td>
+      <td nowrap="nowrap">
+	<select name="TasksDisplayCompleted" id="TasksDisplayCompleted">
+	  [% IF domain; filter_option("", "default", "default (" _ defaultServerAccountPrefs.TasksDisplayCompleted _ ")"); END %]
+ 	  [% filter_option(serverAccountPrefs.TasksDisplayCompleted, "NO", "No") %]
+ 	  [% filter_option(serverAccountPrefs.TasksDisplayCompleted, "YES", "Yes") %]
+	</select>
+      </td>
+    </tr>
+    <tr class="tdshade2_noborder">
+      <td nowrap="nowrap" align="RIGHT" style="width: 30%">Hide Caller ID:</td>
+      <td nowrap="nowrap">
+	<select name="CallOutPrivacy" id="CallOutPrivacy">
+	  [% IF domain; filter_option("", "default", "default (" _ defaultServerAccountPrefs.CallOutPrivacy _ ")"); END %]
+ 	  [% filter_option(serverAccountPrefs.CallOutPrivacy, "NO", "No") %]
+ 	  [% filter_option(serverAccountPrefs.CallOutPrivacy, "YES", "Yes") %]
+	</select>
+      </td>
+    </tr>
+    <tr class="tdshade1_noborder">
+      <td nowrap="nowrap" align="RIGHT" style="width: 30%">Play Music on Hold:</td>
+      <td nowrap="nowrap">
+	<select name="HoldMusic" id="HoldMusic">
+	  [% IF domain; filter_option("", "default", "default (" _ defaultServerAccountPrefs.HoldMusic _ ")"); END %]
+ 	  [% filter_option(serverAccountPrefs.HoldMusic, "NO", "No") %]
+ 	  [% filter_option(serverAccountPrefs.HoldMusic, "YES", "Yes") %]
+	</select>
+      </td>
+    </tr>
+    <tr class="tdshade2_noborder">
+      <td nowrap="nowrap" align="RIGHT" style="width: 30%">Message Delete Method:</td>
+      <td nowrap="nowrap">
+	<select name="DeleteMode" id="DeleteMode">
+	  [% IF domain; filter_option("", "default", "default (" _ defaultServerAccountPrefs.DeleteMode _ ")"); END %]
+ 	  [% filter_option(serverAccountPrefs.DeleteMode, "Immediately", "Immediately") %]
+ 	  [% filter_option(serverAccountPrefs.DeleteMode, "Mark as deleted", "Mark as deleted") %]
+ 	  [% filter_option(serverAccountPrefs.DeleteMode, "Move To Trash", "Move To Trash") %]
+	</select>
+      </td>
+    </tr>
+    <tr class="tdshade1_noborder">
+      <td nowrap="nowrap" align="RIGHT" style="width: 30%">Keep deleted in:</td>
+      <td nowrap="nowrap">
+	<input type="text" name="TrashBox" value="[% serverAccountPrefs.TrashBox || defaultServerAccountPrefs.TrashBox %]" />
+      </td>
+    </tr>
+    <tr class="tdshade2_noborder">
+      <td nowrap="nowrap" align="RIGHT" style="width: 30%">On Logout Remove from Trash if older than:</td>
+      <td nowrap="nowrap">
+	<select name="EmptyTrash" id="EmptyTrash">
+	  [% IF domain; filter_option("", "default", "default (" _ ( defaultServerAccountPrefs.EmptyTrash == 0 ? "Never" : defaultServerAccountPrefs.EmptyTrash)  _ ")"); END %]
+ 	  [% filter_option(serverAccountPrefs.EmptyTrash, "0", "Never") %]
+ 	  [% filter_option(serverAccountPrefs.EmptyTrash, "1h", "1 hour") %]
+ 	  [% filter_option(serverAccountPrefs.EmptyTrash, "2h", "2 hours") %]
+ 	  [% filter_option(serverAccountPrefs.EmptyTrash, "3h", "3 hours") %]
+ 	  [% filter_option(serverAccountPrefs.EmptyTrash, "6h", "6 hours") %]
+ 	  [% filter_option(serverAccountPrefs.EmptyTrash, "12h", "12 hours") %]
+ 	  [% filter_option(serverAccountPrefs.EmptyTrash, "1d", "1 day") %]
+ 	  [% filter_option(serverAccountPrefs.EmptyTrash, "2d", "2 days") %]
+ 	  [% filter_option(serverAccountPrefs.EmptyTrash, "3d", "3 days") %]
+ 	  [% filter_option(serverAccountPrefs.EmptyTrash, "7d", "7 days") %]
+ 	  [% filter_option(serverAccountPrefs.EmptyTrash, "10d", "10 days") %]
+ 	  [% filter_option(serverAccountPrefs.EmptyTrash, "15d", "15 days") %]
+ 	  [% filter_option(serverAccountPrefs.EmptyTrash, "20d", "20 days") %]
+ 	  [% filter_option(serverAccountPrefs.EmptyTrash, "30d", "30 days") %]
+ 	  [% filter_option(serverAccountPrefs.EmptyTrash, "60d", "60 days") %]
+ 	  [% filter_option(serverAccountPrefs.EmptyTrash, "90d", "90 days") %]
+ 	  [% filter_option(serverAccountPrefs.EmptyTrash, "180d", "180 days") %]
+ 	  [% filter_option(serverAccountPrefs.EmptyTrash, "360d", "360 days") %]
+	</select>
+      </td>
+    </tr>
+    <tr class="tdshade1_noborder">
+      <td nowrap="nowrap" align="RIGHT" style="width: 30%">Keep Spam in:</td>
+      <td nowrap="nowrap">
+	<input type="text" name="JunkBox" value="[% serverAccountPrefs.JunkBox || defaultServerAccountPrefs.JunkBox %]" />
+      </td>
+    </tr>
+    <tr class="tdshade2_noborder">
+      <td nowrap="nowrap" align="RIGHT" style="width: 30%">On Logout Spam from Trash if older than:</td>
+      <td nowrap="nowrap">
+	<select name="EmptyJunk" id="EmptyJunk">
+	  [% IF domain; filter_option("", "default", "default (" _ ( defaultServerAccountPrefs.EmptyJunk == 0 ? "Never" : defaultServerAccountPrefs.EmptyJunk)  _ ")"); END %]
+ 	  [% filter_option(serverAccountPrefs.EmptyJunk, "0", "Never") %]
+ 	  [% filter_option(serverAccountPrefs.EmptyJunk, "1h", "1 hour") %]
+ 	  [% filter_option(serverAccountPrefs.EmptyJunk, "2h", "2 hours") %]
+ 	  [% filter_option(serverAccountPrefs.EmptyJunk, "3h", "3 hours") %]
+ 	  [% filter_option(serverAccountPrefs.EmptyJunk, "6h", "6 hours") %]
+ 	  [% filter_option(serverAccountPrefs.EmptyJunk, "12h", "12 hours") %]
+ 	  [% filter_option(serverAccountPrefs.EmptyJunk, "1d", "1 day") %]
+ 	  [% filter_option(serverAccountPrefs.EmptyJunk, "2d", "2 days") %]
+ 	  [% filter_option(serverAccountPrefs.EmptyJunk, "3d", "3 days") %]
+ 	  [% filter_option(serverAccountPrefs.EmptyJunk, "7d", "7 days") %]
+ 	  [% filter_option(serverAccountPrefs.EmptyJunk, "10d", "10 days") %]
+ 	  [% filter_option(serverAccountPrefs.EmptyJunk, "15d", "15 days") %]
+ 	  [% filter_option(serverAccountPrefs.EmptyJunk, "20d", "20 days") %]
+ 	  [% filter_option(serverAccountPrefs.EmptyJunk, "30d", "30 days") %]
+ 	  [% filter_option(serverAccountPrefs.EmptyJunk, "60d", "60 days") %]
+ 	  [% filter_option(serverAccountPrefs.EmptyJunk, "90d", "90 days") %]
+ 	  [% filter_option(serverAccountPrefs.EmptyJunk, "180d", "180 days") %]
+ 	  [% filter_option(serverAccountPrefs.EmptyJunk, "360d", "360 days") %]
+	</select>
+      </td>
+    </tr>
+  </tbody>
+</table>

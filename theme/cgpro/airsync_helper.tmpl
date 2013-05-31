@@ -1,0 +1,38 @@
+[%
+ SET account = CPANEL.get_raw_form('account');
+%]
+
+<h2>Settings[% IF account %] for [% account; END %]</h2>
+<div id="manual_settings_area">
+  <div id="ssl_settings_area" class="vertical_half preferred-selection">
+    <table class="manual_settings_table">
+      <tbody>
+	<tr>
+	  <td>E-mail:</td>
+	  <td class="data"><strong>[% account || '&lt;your.email@address&gt;' %]</strong></td>
+        </tr>
+        <tr>
+          <td>Username:</td>
+          <td class="data">
+	    <strong>[% account.split('@').0 || '&lt;your.email&gt; (without the domain name)' %]</strong>
+          </td>
+        </tr>
+        <tr>
+	  <td>Password:</td>
+	  <td class="escape-note"><em>( Use the email account’s password. )</em></td>
+        </tr>
+        <tr>
+	  <td>Description:</td>
+	  <td class="escape-note"><em>( Anything you like here. )</em></td>
+        </tr>
+        <tr>
+          <td>Server:</td>
+          <td class="data">
+	    <strong>mail.[% account.split('@').1 || '&lt;your.domain.name&gt;' %]</strong>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+

@@ -2,26 +2,57 @@
  SET account = CPANEL.get_raw_form('account');
 %]
 
-<h2>Setup</h2>
-<table class="settings settings_ssl">
-  <tbody>
-    <tr>
-      <td>Username/JabberID:</td>
-      <td class="data"><strong>[% account %]</strong></td>
-    </tr>
-    <tr>
-      <td>Password:</td>
-      <td class="escape-note"><em>( Use the email account’s password. )</em></td>
-    </tr>
-    <tr>
-      <td>Server:</td>
-      <td class="data">
-	<strong>mail.[% account.split('@').1 %]</strong>
-      </td>
-    </tr>
-    <tr>
-      <td>Port:</td>
-      <td><strong>5222</strong></td>
-    </tr>
-  </tbody>
-</table>
+<h2>Settings[% IF account %] for [% account; END %]</h2>
+<div id="manual_settings_area">
+  <div id="ssl_settings_area" class="vertical_half preferred-selection">
+    <div class="caption">Secure SSL/TLS Settings</div>
+    <div class="caption">(Recommended)</div>
+    <table class="manual_settings_table">
+      <tbody>
+	<tr>
+	  <td>Username/JabberID:</td>
+	  <td class="data"><strong>[% account || '&lt;your.email@address&gt;' %]</strong></td>
+        </tr>
+        <tr>
+	  <td>Password:</td>
+	  <td class="escape-note"><em>( Use the email account’s password. )</em></td>
+        </tr>
+        <tr>
+          <td>Server:</td>
+          <td class="data">
+	    <strong>mail.[% account.split('@').1 || '&lt;your.domain.name&gt;' %]</strong>
+          </td>
+        </tr>
+	<tr>
+	  <td>Port:</td>
+	  <td><strong>5223</strong></td>
+	</tr>        
+      </tbody>
+    </table>
+  </div>
+  <div class="vertical_half" id="non_ssl_settings_area">
+    <div class="caption">Non-SSL Settings</div>
+    <div class="caption not-recommended">(NOT Recommended)</div>
+    <table class="manual_settings_table">
+      <tbody><tr>
+	  <td>Username/JabberID:</td>
+	  <td class="data"><strong>[% account || '&lt;your.email@address&gt;' %]</strong></td>
+        </tr>
+        <tr>
+	  <td>Password:</td>
+	  <td class="escape-note"><em>( Use the email account’s password. )</em></td>
+        </tr>
+        <tr>
+          <td>Server:</td>
+          <td class="data">
+	    <strong>mail.[% account.split('@').1 || '&lt;your.domain.name&gt;' %]</strong>
+          </td>
+        </tr>
+	<tr>
+	  <td>Port:</td>
+	  <td><strong>5222</strong></td>
+	</tr>        
+    </tbody></table>
+  </div>
+</div>
+

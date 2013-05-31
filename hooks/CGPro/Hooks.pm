@@ -29,6 +29,13 @@ sub describe {
         'hook'     => 'CGPro::Hooks::passwdpop',
         'exectype' => 'module',
     };
+    my $mail_passwdpop1 = {
+        'category' => 'Cpanel',
+        'event'    => 'Api1::Email::passwdpop',
+        'stage'    => 'pre',
+        'hook'     => 'CGPro::Hooks::passwdpop1',
+        'exectype' => 'module',
+    };
     my $mail_editquota = {
         'category' => 'Cpanel',
         'event'    => 'Api2::Email::editquota',
@@ -88,6 +95,7 @@ sub describe {
     return [$mail_addpop,
 	    $mail_delpop,
 	    $mail_passwdpop,
+	    $mail_passwdpop1,
 	    $mail_editquota,
 	    $mail_deletefilter,
 	    $mail_reorderfilters,
@@ -152,7 +160,18 @@ sub passwdpop {
     my $domain = $args->{'domain'};
     my $user= $args->{'email'};
     my $pass= $args->{'password'};
-    $cli->SetAccountPassword("$user\@$domain","$pass",0);
+    my $response = $cli->SetAccountPassword("$user\@$domain","$pass",0);
+    $Cpanel::CPERROR{'email'} = $response unless $response == 1;
+    $cli->Logout();
+}
+
+sub passwdpop1 {
+    my (undef, $params) = @_;
+    my $args = $params->{args};
+    my $cli = getCLI();
+    my ($user, $pass, undef, $domain) = @$args;
+    my $response = $cli->SetAccountPassword("$user\@$domain","$pass",0);
+    $Cpanel::CPERROR{'email'} = $response unless $response == 1;
     $cli->Logout();
 }
 
@@ -301,6 +320,7 @@ sub doaddpop {
 	$settings->{ou} = $unit if $unit;
 	$settings->{MobilePhone} = $mobilePhone if $mobilePhone;
 	$settings->{WorkPhone} = $workPhone if $workPhone;
+	$settings->{PasswordComplexity} = 'MixedCaseDigit';
 	$cli->UpdateAccountSettings("$user\@$domain", $settings);
 	my $serverDefaults = $cli->GetServerAccountPrefs();
 	my $domainDefaults = $cli->GetAccountDefaultPrefs($domain);

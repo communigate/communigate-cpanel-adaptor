@@ -1,0 +1,184 @@
+[% MACRO filter_option(pval, val, text) BLOCK -%]
+<option value="[% val %]"[% val == pval ? " selected='selected'" : "" %]>[% cptext(text) %]</option>
+[% END -%]
+<table class="datatable brick" cellspacing="0" cellpadding="5" width="100%" border="0" align="center">
+  <tbody>
+    <tr class="tdshade1_noborder">
+      <td nowrap="nowrap" align="RIGHT">Mail to Unknown:</td>
+      <td nowrap="nowrap">
+	<select name="MailToUnknown" id="MailToUnknown">
+ 	  [% IF domain; filter_option("", "default", "default (" _ serverDomainDefaults.MailToUnknown _ ")"); END %]
+ 	  [% filter_option(domainDefaults.MailToUnknown, "Rejected", "Rejected") %]
+ 	  [% filter_option(domainDefaults.MailToUnknown, "Discarded", "Discarded") %]
+ 	  [% filter_option(domainDefaults.MailToUnknown, "Rerouted to", "Rerouted to") %]
+ 	  [% filter_option(domainDefaults.MailToUnknown, "Accepted and Bounced", "Accepted and Bounced") %]
+	</select>
+	<input type="text" name="MailRerouteAddress" id="MailRerouteAddress" value="[% domainDefaults.MailRerouteAddress %]" />
+	<script type="text/javascript">
+	  var sel = document.getElementById("MailToUnknown");
+	  var inp = document.getElementById("MailRerouteAddress");
+	  var showHideInput = function () {
+	  inp.style.display = "none";
+	  if (sel.value ==  "Rerouted to") {
+	  inp.style.display = "inline";
+	  };
+	  };
+	  showHideInput();
+	  sel.onchange=function(){showHideInput()};
+	</script>
+      </td>
+    </tr>
+    <tr class="tdshade2_noborder">
+      <td nowrap="nowrap" align="RIGHT">Mail to All is distributed for (all@domain):</td>
+      <td nowrap="nowrap">
+	<select name="MailToAllAction" id="MailToAllAction">
+ 	  [% IF domain; filter_option("", "default", "default (" _ serverDomainDefaults.MailToAllAction _ ")"); END %]
+ 	  [% filter_option(domainDefaults.MailToAllAction, "anybody", "anybody") %]
+ 	  [% filter_option(domainDefaults.MailToAllAction, "clients", "clients") %]
+ 	  [% filter_option(domainDefaults.MailToAllAction, "Authenticated Users", "Authenticated Users") %]
+ 	  [% filter_option(domainDefaults.MailToAllAction, "Authenticated Domain Users", "Authenticated Domain Users") %]
+ 	  [% filter_option(domainDefaults.MailToAllAction, "Authenticated Administrator", "Authenticated Administrator") %]
+ 	  [% filter_option(domainDefaults.MailToAllAction, "nobody", "nobody") %]
+	</select>
+      </td>
+    </tr>
+    <tr class="tdshade1_noborder">
+      <td nowrap="nowrap" align="RIGHT">Mail to All is sent to Forwarders:</td>
+      <td nowrap="nowrap">
+	<select name="AllWithForwarders" id="AllWithForwarders">
+ 	  [% IF domain; filter_option("", "default", "default (" _ serverDomainDefaults.AllWithForwarders _ ")"); END %]
+ 	  [% filter_option(domainDefaults.AllWithForwarders, "YES", "Yes") %]
+ 	  [% filter_option(domainDefaults.AllWithForwarders, "NO", "No") %]
+	</select>
+      </td>
+    </tr>
+    <tr class="tdshade2_noborder">
+      <td nowrap="nowrap" align="RIGHT">Force SMTP AUTH for:</td>
+      <td nowrap="nowrap">
+	<select name="ForceSMTPAUTH" id="ForceSMTPAUTH">
+ 	  [% IF domain; filter_option("", "default", "default (" _ serverDomainDefaults.MailToUnknown _ ")"); END %]
+ 	  [% filter_option(domainDefaults.ForceSMTPAUTH, "nobody", "nobody") %]
+ 	  [% filter_option(domainDefaults.ForceSMTPAUTH, "non-clients", "non-clients") %]
+ 	  [% filter_option(domainDefaults.ForceSMTPAUTH, "clients", "clients") %]
+ 	  [% filter_option(domainDefaults.ForceSMTPAUTH, "everybody", "everybody") %]
+	</select>
+      </td>
+    </tr>
+    <tr class="tdshade1_noborder">
+      <td nowrap="nowrap" align="RIGHT">Accounts limit:</td>
+      <td nowrap="nowrap">
+	<select name="AccountsLimit" id="AccountsLimit">
+ 	  [% IF domain; filter_option("", "default", "default (" _ (serverDomainDefaults.AccountsLimit < 0 ? 'unlimited' : serverDomainDefaults.AccountsLimit)  _ ")"); END %]
+ 	  [% filter_option(domainDefaults.AccountsLimit, "-1", "unlimited") %]
+ 	  [% filter_option(domainDefaults.AccountsLimit, "0", "0") %]
+ 	  [% filter_option(domainDefaults.AccountsLimit, "1", "1") %]
+ 	  [% filter_option(domainDefaults.AccountsLimit, "3", "3") %]
+ 	  [% filter_option(domainDefaults.AccountsLimit, "5", "5") %]
+ 	  [% filter_option(domainDefaults.AccountsLimit, "10", "10") %]
+ 	  [% filter_option(domainDefaults.AccountsLimit, "30", "30") %]
+ 	  [% filter_option(domainDefaults.AccountsLimit, "100", "100") %]
+ 	  [% filter_option(domainDefaults.AccountsLimit, "300", "300") %]
+ 	  [% filter_option(domainDefaults.AccountsLimit, "1000", "1 000") %]
+ 	  [% filter_option(domainDefaults.AccountsLimit, "3000", "3 000") %]
+ 	  [% filter_option(domainDefaults.AccountsLimit, "10000", "10 000") %]
+ 	  [% filter_option(domainDefaults.AccountsLimit, "30000", "30 000") %]
+ 	  [% filter_option(domainDefaults.AccountsLimit, "100000", "100 000") %]
+ 	  [% filter_option(domainDefaults.AccountsLimit, "1000000", "1 000 000") %]
+ 	  [% filter_option(domainDefaults.AccountsLimit, "10000000", "10 000 000") %]
+	</select>
+      </td>
+    </tr>
+    <tr class="tdshade2_noborder">
+      <td nowrap="nowrap" align="RIGHT">Mailing lists limit:</td>
+      <td nowrap="nowrap">
+	<select name="ListsLimit" id="ListsLimit">
+ 	  [% IF domain; filter_option("", "default", "default (" _ (serverDomainDefaults.ListsLimit < 0 ? 'unlimited' : serverDomainDefaults.ListsLimit)  _ ")"); END %]
+ 	  [% filter_option(domainDefaults.ListsLimit, "-1", "unlimited") %]
+ 	  [% filter_option(domainDefaults.ListsLimit, "0", "0") %]
+ 	  [% filter_option(domainDefaults.ListsLimit, "1", "1") %]
+ 	  [% filter_option(domainDefaults.ListsLimit, "3", "3") %]
+ 	  [% filter_option(domainDefaults.ListsLimit, "5", "5") %]
+ 	  [% filter_option(domainDefaults.ListsLimit, "10", "10") %]
+ 	  [% filter_option(domainDefaults.ListsLimit, "30", "30") %]
+ 	  [% filter_option(domainDefaults.ListsLimit, "100", "100") %]
+ 	  [% filter_option(domainDefaults.ListsLimit, "300", "300") %]
+ 	  [% filter_option(domainDefaults.ListsLimit, "1000", "1 000") %]
+ 	  [% filter_option(domainDefaults.ListsLimit, "3000", "3 000") %]
+ 	  [% filter_option(domainDefaults.ListsLimit, "10000", "10 000") %]
+ 	  [% filter_option(domainDefaults.ListsLimit, "30000", "30 000") %]
+ 	  [% filter_option(domainDefaults.ListsLimit, "100000", "100 000") %]
+	</select>
+      </td>
+    </tr>
+    [% UNLESS domain -%]
+    <tr class="tdshade1_noborder">
+      <td nowrap="nowrap" align="RIGHT" width="30%">Settings per domain:</td>
+      <td nowrap="nowrap">
+	Domain: <input type="text" name="domain_delimiter" value="" id="domain_delimiter" />
+	<a class="button" href="addon_cgpro_email_configuration_delimiter_per_domain.cgi?domain=" id="domain_delimiter_link">Go</a>
+	<script type="text/javascript">
+	  var domain_delimiter = document.getElementById("domain_delimiter");
+	  var domain_delimiter_link = document.getElementById("domain_delimiter_link");
+	  domain_delimiter_link.onmouseover = function () {
+	  domain_delimiter_link.href = "addon_cgpro_da_settings_domain_per_domain.cgi?domain=" + domain_delimiter.value;
+	  if (domain_delimiter.value.length > 0) {
+	  domain_delimiter_link.style.display = "inline";
+	  }
+	  }
+	</script>
+      </td>
+    </tr>
+    [% END -%]
+    [% IF domain -%]
+    <tr class="tdshade1_noborder">
+      <td nowrap="nowrap" align="RIGHT">Client IP Addresses:</td>
+      <td nowrap="nowrap">
+	<textarea name="ClientIPs" rows="5" cols="40">[% domainDefaults.ClientIPs.replace('\\\e', "\r\n") %]</textarea>
+      </td>
+    </tr>
+    <tr class="tdshade2_noborder">
+      <td nowrap="nowrap" align="RIGHT">Billing:</td>
+      <td nowrap="nowrap">
+	<select name="Billing" id="Billing">
+ 	  [% accountPrefs.Billing ? "" : filter_option(accountPrefs.Billing, "", "") %]
+ 	  [% filter_option(accountPrefs.Billing, "NO", "Disabled") %]
+ 	  [% filter_option(accountPrefs.Billing, "YES", "None") %]
+ 	  [% filter_option(accountPrefs.Billing, "pre", "Prepaid") %]
+ 	  [% filter_option(accountPrefs.Billing, "post", "Postpaid") %]
+	</select>
+      </td>
+    </tr>
+    <tr class="tdshade1_noborder">
+      <td nowrap="nowrap" align="RIGHT">As Caller ID use phone number of:</td>
+      <td nowrap="nowrap">
+	<select name="CallOutTelnumSelector" id="CallOutTelnumSelector">
+ 	  [% filter_option(domainDefaults.CallOutTelnumSelector, "account", "Account") %]
+ 	  [% filter_option(domainDefaults.CallOutTelnumSelector, "group", "Group") %]
+ 	  [% filter_option(domainDefaults.CallOutTelnumSelector, "any", "Any") %]
+	</select>
+      </td>
+    </tr>
+    <tr class="tdshade2_noborder">
+      <td nowrap="nowrap" align="RIGHT">Use only external SIP devices to place calls:</td>
+      <td nowrap="nowrap">
+	<select name="ITLCMakeCall" id="ITLCMakeCall">
+ 	  [% accountDefaultPrefs.ITLCMakeCall ? "" : filter_option(accountDefaultPrefs.ITLCMakeCall, "", "") %]
+ 	  [% filter_option(accountDefaultPrefs.ITLCMakeCall, "YES", "Yes") %]
+ 	  [% filter_option(accountDefaultPrefs.ITLCMakeCall, "NO", "No") %]
+	</select>
+      </td>
+    </tr>
+    <tr class="tdshade1_noborder">
+      <td nowrap="nowrap" align="RIGHT">Use additional emails:</td>
+      <td nowrap="nowrap">
+	<select name="AllowMultipleIdentities" id="AllowMultipleIdentities">
+ 	  [% accountDefaultPrefs.AllowMultipleIdentities %]
+ 	  [% accountDefaultPrefs.AllowMultipleIdentities ? "" : filter_option(accountDefaultPrefs.AllowMultipleIdentities, "", "") %]
+ 	  [% filter_option(accountDefaultPrefs.AllowMultipleIdentities, "YES", "Yes") %]
+ 	  [% filter_option(accountDefaultPrefs.AllowMultipleIdentities, "NO", "No") %]
+	</select>
+      </td>
+    </tr>
+    [% END -%]
+  </tbody>
+</table>

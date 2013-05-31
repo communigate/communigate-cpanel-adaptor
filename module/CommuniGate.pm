@@ -140,13 +140,17 @@ sub api2_AccountDefaults {
 	my %OPTS = @_;
 	my @domains = Cpanel::Email::listmaildomains(); 
 	my $cli = getCLI();
+	my $domain = $domains[0];
+	for my $dom (@domains) {
+	    if ($dom eq $OPTS{'domain'}) {
+		$domain = $dom;
+	    }
+	}
 	if ($OPTS{'save'}) {
 	    my $defaultServerAccountPrefs = $cli->GetServerAccountPrefs();
-	    for my $domain (@domains) {
 		$cli->UpdateDomainSettings(
 		    domain => $domain,
 		    settings => {
-			MailToUnknown => $OPTS{'MailToUnknown'},
 			MailRerouteAddress => $OPTS{'MailRerouteAddress'},
 			MailToAllAction => $OPTS{'MailToAllAction'},
 		    }
@@ -162,18 +166,18 @@ sub api2_AccountDefaults {
 			WorkDays => (join(",",@$workdays) eq join(",",@{$defaultServerAccountPrefs->{WorkDays}}) ? 'default' : $workdays),
 		    }
 		    );
-	    }
 	}
 	my $serverDomainDefaults = $cli->GetDomainDefaults();
 	my $serverAccountPrefs = $cli->GetServerAccountPrefs();
-	my $domainSettings = $cli->GetDomainSettings($domains[0]);
-	my $accountDefaultPrefs = $cli->GetAccountDefaultPrefs($domains[0]);
+	my $domainSettings = $cli->GetDomainSettings($domain);
+	my $accountDefaultPrefs = $cli->GetAccountDefaultPrefs($domain);
 	$cli->Logout();
 	return { 
 	    serverDomainDefaults => $serverDomainDefaults,
 	    serverAccountPrefs => $serverAccountPrefs,
 	    domainSettings => $domainSettings,
-	    accountDefaultPrefs => $accountDefaultPrefs
+	    accountDefaultPrefs => $accountDefaultPrefs,
+	    domain => $domain
 	};
 }
 
@@ -192,12 +196,38 @@ sub api2_ListClasses {
 
 sub api2_ListWorkDays {
 	my %OPTS = @_;
-	my $invert = $OPTS{'invert'};
-	my @domains = Cpanel::Email::listmaildomains(); 
+	my $domain = $OPTS{'domain'};
 	my $cli = getCLI();
 	my $defaults = $cli->GetServerAccountPrefs();
+	if ($domain) {
+	    my @domains = Cpanel::Email::listmaildomains(); 
+	    for $dom (@domains) {
+		if ($dom eq $domain) {
+		    $prefs = $cli->GetAccountDefaultPrefs($domain);
+		    $defaults->{WorkDays} = $prefs->{WorkDays} if $prefs->{WorkDays};
+		    last;
+		}
+	    }
+	}
 	$cli->Logout();
 	return { default => $defaults->{WorkDays} };
+}
+sub api2_getDomainAccounts {
+	my %OPTS = @_;
+	my $domain = $OPTS{'domain'};
+	my $cli = getCLI();
+	my $accounts = undef;
+	if ($domain) {
+	    my @domains = Cpanel::Email::listmaildomains(); 
+	    for $dom (@domains) {
+		if ($dom eq $domain) {
+		    $accounts = $cli->ListAccounts($domain);
+		    last;
+		}
+	    }
+	}
+	$cli->Logout();
+	return $accounts;
 }
 
 sub api2_UpdateAccountClass {

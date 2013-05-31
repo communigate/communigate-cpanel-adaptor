@@ -4,14 +4,35 @@
   <!-- <?cp CommuniGate::checkSSLlinks() ?> -->
 <div class="body-content">
 
-  <h1> Pronto!</h1>
+  <h1>Pronto!</h1>
+  <p><cptext 'Pronto! is a family of clients that provide an amazing set of features form email to voice and video.'></p>
+  <h2>Connetcion Assistant</h2>
+  
+  <p><cpanel langprint="You can install Pronto! Pro desktop (Apple OSX and Microsoft Windows) and Pronto! Mobile Android directly by downloading and installing the software from the cPanel Cloudware section."></p>
+  
+  <p><cpanel langprint="The iPhone/iPad version is available from the Apple Store. The link is also available on your cPanel Cloudware section."></p>
+  
+  <p><cpanel langprint="Then to connect Pronto! Pro or Pronto! Mobile (for Grouware accounts only) simply enter your domain and port 8100 in the host field in the form of your_domain:8100 and use your credentials."></p>
+
+  <h2>Pronto!</h2>
   <ul>
-    <li><img src="../branding/cgpro_pronto.png" alt="" /> <a href="http<cpanelif $CPVAR{'ssllinks'}>s</cpanelif>://<cpanel print="$ENV{'HTTP_HOST'}">:<cpanelif $CPVAR{'ssllinks'}>9100</cpanelif><cpanelif !$CPVAR{'ssllinks'}>8100</cpanelif>/Pronto4" id="item_cgpro_pronto">Pronto! Web</a>
-    <li><img src="../branding/cgpro_prontoosx.png" alt="" /> <a href="http<cpanelif $CPVAR{'ssllinks'}>s</cpanelif>://<cpanel print="$ENV{'HTTP_HOST'}">:<cpanelif $CPVAR{'ssllinks'}>9100</cpanelif><cpanelif !$CPVAR{'ssllinks'}>8100</cpanelif>/SkinFiles/<cpanel print="$CPDATA{'DNS'}">/Pronto4/pronto4.dmg" id="item_cgpro_prontoosx">Pronto! OSX</a>
-    <li><img src="../branding/cgpro_prontoios.png" alt="" /> <a href="http<cpanelif $CPVAR{'ssllinks'}>s</cpanelif>://itunes.apple.com/ph/app/pronto!/id490538357?mt=8" id="item_cgpro_prontoios">Pronto! iPhone/iPad</a>
-    <li><img src="../branding/cgpro_prontoms.png" alt="" /> <a href="http<cpanelif $CPVAR{'ssllinks'}>s</cpanelif>://<cpanel print="$ENV{'HTTP_HOST'}">:<cpanelif $CPVAR{'ssllinks'}>9100</cpanelif><cpanelif !$CPVAR{'ssllinks'}>8100</cpanelif>/SkinFiles/<cpanel print="$CPDATA{'DNS'}">/Pronto4/pronto4.exe" id="item_cgpro_prontoms">Pronto! Windows</a>
-    <li><img src="../branding/cgpro_prontoandroid.png" alt="" /> <a href="http<cpanelif $CPVAR{'ssllinks'}>s</cpanelif>://<cpanel print="$ENV{'HTTP_HOST'}">:<cpanelif $CPVAR{'ssllinks'}>9100</cpanelif><cpanelif !$CPVAR{'ssllinks'}>8100</cpanelif>/SkinFiles/<cpanel print="$CPDATA{'DNS'}">/Pronto4/pronto.apk" id="item_cgpro_prontoandroid">Pronto! Android</a>
-    <li><img src="../branding/cgpro_pronto.png" alt="" /> <a href="pronto/assistant.html" id="item_cgpro_pronto">Connection Assistant</a>
+    <li>
+      <p><img src="../branding/cgpro_pronto_html5.png" alt="" /> <a href="mail/pronto.html" id="item_cgpro_pronto">Pronto! HTML5</a></p>
+      <p><cptext 'Pronto! HTML5 is the next generation Pronto! Web client technology and is currently in Beta format. The power of HTML5 with WebRTC will enable Pronto! Web to provide realtime services like Voice and video calls all without any plugins when WebRTC is fully implemented.'></p>
+    </li>
+    <li>
+      <p><img src="../branding/cgpro_pronto.png" alt="" /> <a href="http<cpanelif $CPVAR{'ssllinks'}>s</cpanelif>://<cpanel print="$ENV{'HTTP_HOST'}">:<cpanelif $CPVAR{'ssllinks'}>9100</cpanelif><cpanelif !$CPVAR{'ssllinks'}>8100</cpanelif>/Pronto4" id="item_cgpro_pronto">Pronto! Web</a></p>
+      <p><cptext 'Pronto! Web is the client that is based in Adobe Flash and delivers email, calendar, contacts, VoIP and video calling all in one.'></p>
+    </li>
+    <li>
+      <p><img src="../branding/cgpro_prontoosx.png" alt="" /> <a href="http<cpanelif $CPVAR{'ssllinks'}>s</cpanelif>://<cpanel print="$ENV{'HTTP_HOST'}">:<cpanelif $CPVAR{'ssllinks'}>9100</cpanelif><cpanelif !$CPVAR{'ssllinks'}>8100</cpanelif>/SkinFiles/<cpanel print="$CPDATA{'DNS'}">/Pronto4/pronto4.dmg" id="item_cgpro_prontoosx">Pronto! OSX</a></p>
+      <p><img src="../branding/cgpro_prontoms.png" alt="" /> <a href="http<cpanelif $CPVAR{'ssllinks'}>s</cpanelif>://<cpanel print="$ENV{'HTTP_HOST'}">:<cpanelif $CPVAR{'ssllinks'}>9100</cpanelif><cpanelif !$CPVAR{'ssllinks'}>8100</cpanelif>/SkinFiles/<cpanel print="$CPDATA{'DNS'}">/Pronto4/pronto4.exe" id="item_cgpro_prontoms">Pronto! Windows</a></p>
+      <p><cptext 'Pronto! Pro is a desktop client for Apple OSX and Windows that is just like the Web version, but is installed on the local operating system. This client provides a single install and is designed to be the primary desktop client.'></p>
+    <li>
+      <p><img src="../branding/cgpro_prontoios.png" alt="" /> <a href="http<cpanelif $CPVAR{'ssllinks'}>s</cpanelif>://itunes.apple.com/ph/app/pronto!/id490538357?mt=8" id="item_cgpro_prontoios">Pronto! iPhone/iPad</a></p>
+      <p><img src="../branding/cgpro_prontoandroid.png" alt="" /> <a href="http<cpanelif $CPVAR{'ssllinks'}>s</cpanelif>://<cpanel print="$ENV{'HTTP_HOST'}">:<cpanelif $CPVAR{'ssllinks'}>9100</cpanelif><cpanelif !$CPVAR{'ssllinks'}>8100</cpanelif>/SkinFiles/<cpanel print="$CPDATA{'DNS'}">/Pronto4/pronto.apk" id="item_cgpro_prontoandroid">Pronto! Android</a></p>
+      <p><cptext 'Pronto! Mobile is available for Apple iOS and Android operating systems, and is downloaded form their respective AppStores. These clients are focused on Voice over IP, secure IM, and file share management.'></p>
+    </li>
   </ul>
 </div>
 <cpanel Branding="include(stdfooter.html)">

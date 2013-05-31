@@ -40,13 +40,12 @@
 		<col width="10%" align="center" />
 		<col width="30%" align="left" />
 		<col width="15%" align="center" />
-		<col width="15%" align="center" />
 	</colgroup>
 	<tr>
 		<th><cpanel langprint="EMAILAddress"></th>
 		<th class="sorttable_nosort">&nbsp;</th>
 		<th><cpanel langprint="EAFwdTo"></th>
-		<th colspan="2" class="sorttable_nosort"><cpanel langprint="FTPFunctions"></th>
+		<th class="sorttable_nosort"><cpanel langprint="FTPFunctions"></th>
 	</tr>
 	
 	<?cp CommuniGate::listforwards(
@@ -54,7 +53,6 @@
 		[td class="truncate nobrd-left"]%[/td]
 		[td class="nobrd-left"]$LANG{'EFaddedto'}[/td]
 		[td class="truncate"]%[/td]
-		[td align="center" class="nobrd"][a href="../../mail/showroute.html?fwd=%&amp;domain=$FORM{'domain'}&amp;email=%"]$LANG{'EMDTrace'}[/a][/td]
 		[td][a href="dodelfwdconfirm.html?domain=$FORM{'domain'}&amp;email=%&amp;emaildest=%"]$LANG{'BrandingDPackage'}[/a][/td]
 	[/tr]
 	,*num,html_dest,html_forward,uri_dest,^forward,uri_dest,^forward) domain=$FORM{'domain'},regex=$FORM{'searchregex'},api2_paginate=1,api2_paginate_start=$FORM{'api2_paginate_start'},api2_paginate_size=$CPVAR{'itemsperpage'} || '[tr][td colspan="5" class="errors"]$LANG{'NoFwds'}.[/td][/tr]' ?>

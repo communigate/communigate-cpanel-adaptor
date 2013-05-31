@@ -579,7 +579,9 @@ sub SetAccountPassword {
   my $line = 'SetAccountPassword '.$accountName.' PASSWORD '.$this->printWords($newPass); 
   $line .= ' CHECK' if($check);
   $this->send($line);
-  $this->_parseResponse();
+  my $response = $this->_parseResponse();
+  return $this->{errMsg} unless $response;
+  return $response;
 }
 
 sub VerifyAccountPassword {

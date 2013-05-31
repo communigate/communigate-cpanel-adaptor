@@ -39,11 +39,11 @@ if (self['CPANEL']) {
 	<td>@
 
 	  <cpanelif $CPVAR{'maildomainscount'}==1>
-	    <?cp Email::listmaildomains(%[input type="hidden" name="domain" value="%"],domain,domain) ?>
+	    <?cp Email::listmaildomains(%[input type="hidden" name="domain" id="domain" value="%"],domain,domain) ?>
 	  </cpanelif>
 
 	  <cpanelif $CPVAR{'maildomainscount'}=gt=1>
-	    <select name="domain">
+	    <select name="domain" id="domain">
 	      <?cp Email::listmaildomains([option value="%"]%[/option],domain,domain) ?>
 	    </select>
 	  </cpanelif>
@@ -109,7 +109,7 @@ if (self['CPANEL']) {
 	<tr>
 	  <td align="right"><cpanel langprint="CGPWorkDays">:</td>
 	  <td colspan="2">
-	    <?cptt CommuniGate::ListWorkDays(cgpro/mail/workdayschecks.tt) ?>
+	    <div id="workdays"><?cptt CommuniGate::ListWorkDays(cgpro/mail/workdayschecks.tt) ?></div>
 	    <div id="WorkDays_error"></div>
 	  </td>
 	</tr>
@@ -127,3 +127,18 @@ if (self['CPANEL']) {
     <cpanel langprint="email_password_why"><br /><br />
       <cpanel langprint="email_password_tip">
   </div>
+<script type="text/javascript">
+var checkDomainSettings = function () {
+    var select = document.getElementById("domain");
+    var wrap = document.getElementById("workdays");
+    YAHOO.util.Connect.asyncRequest('GET', 'checkDomainSettings.live.cgi?domain=' + select.value, {
+	    success: function(o) {
+		wrap.innerHTML = o.responseText;
+	    },
+		}, null);
+};
+YAHOO.util.Event.onDOMReady(function () {
+	checkDomainSettings();
+	YAHOO.util.Event.addListener("domain", "change", checkDomainSettings);
+    });
+</script>

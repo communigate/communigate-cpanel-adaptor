@@ -37,31 +37,33 @@
 <form method="post" action="doaddlist.html" id="userform" name="userform">
 <!-- <?cp Email::listmaildomains(,) ?> -->
 <cpanelif $CPVAR{'maildomainscount'}==1>
-	<?cp Email::listmaildomains([input type="hidden" name="domain" value="%" /],domain) ?>
+  <?cp Email::listmaildomains([input type="hidden" name="domain" id="domain" value="%" /],domain) ?>
 </cpanelif>
 <table>
-	<tr>
-		<td style="width: 150px" align="right"><cpanel langprint="MLListName">:</td>
-		<td><input type="text" name="email" id="email" style="width: 150px" /></td>
-		<td><div id="email_error"></div></td>
-	</tr>
-	<cpanelif $CPVAR{'maildomainscount'}=gt=1>
-		<tr>
-			<td align="right"><cpanel langprint="MLDomain"></td>
-			<td colspan="2">
-				<select name="domain" id="domain"><?cp Email::listmaildomains([option value="%"]%[/option],domain,domain) ?></select>
-			</td>
-		</tr>
-	</cpanelif>	
-	<tr>
-		<td align="right"><cpanel langprint="CGPListOwner"></td>
-		<td><input type="text" size="15" name="owner" id="owner" style="width: 150px" /></td>
-	</tr>
-	<tr><td colspan="3"><br /></td></tr>
-	<tr>
-		<td>&nbsp;</td>
-		<td colspan="2"><input type="submit" id="submit" value="<cpanel langprint="MLAddHead">" class="input-button" style="width: 150px" /></td>
-	</tr>
+  <tr>
+    <td style="width: 150px" align="right"><cpanel langprint="MLListName">:</td>
+    <td><input type="text" name="email" id="email" style="width: 150px" /></td>
+    <td><div id="email_error"></div></td>
+  </tr>
+  <cpanelif $CPVAR{'maildomainscount'}=gt=1>
+    <tr>
+      <td align="right"><cpanel langprint="MLDomain"></td>
+      <td colspan="2">
+	<select name="domain" id="domain"><?cp Email::listmaildomains([option value="%"]%[/option],domain,domain) ?></select>
+      </td>
+    </tr>
+  </cpanelif>	
+  <tr>
+    <td align="right"><cpanel langprint="CGPListOwner"></td>
+    <td id="wrap">
+      <input type="text" size="15" name="owner" id="owner" style="width: 150px" />
+    </td>
+  </tr>
+  <tr><td colspan="3"><br /></td></tr>
+  <tr>
+    <td>&nbsp;</td>
+    <td colspan="2"><input type="submit" id="submit" value="<cpanel langprint="MLAddHead">" class="input-button" style="width: 150px" /></td>
+  </tr>
 </table>
 </form>
 <div id="why_strong_passwords_text" style="display: none"><cpanel langprint="email_password_why"><br /><br /><cpanel langprint="email_password_tip"></div>
@@ -126,5 +128,20 @@ YAHOO.util.Event.onDOMReady(init_lists);
 </cpanelif>
 
 </div><!-- end body-content -->
+<script type="text/javascript">
+var checkDomainAccounts = function () {
+    var select = document.getElementById("domain");
+    var wrap = document.getElementById("wrap");
+    YAHOO.util.Connect.asyncRequest('GET', 'getDomainAccounts.live.cgi?domain=' + select.value, {
+	    success: function(o) {
+		wrap.innerHTML = o.responseText;
+	    },
+		}, null);
+};
+YAHOO.util.Event.onDOMReady(function () {
+	checkDomainAccounts();
+	YAHOO.util.Event.addListener("domain", "change", checkDomainAccounts);
+    });
+</script>
 
 <cpanel Branding="include(stdfooter.html)">

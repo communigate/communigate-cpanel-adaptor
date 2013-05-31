@@ -6,6 +6,23 @@
 <form action="" method="post">
   <div class="form_action">
     <fieldset>
+      <h3>SSL links in cPanel</h3>
+      <table>
+	<tbody>
+	  <tr>
+            <td style="vertical-align: top;">
+	      <label for="ssllinks">Use SSL links for CommuniGate Pro services in cPanel:</label>
+	    </td>
+            <td>
+	      <input type="checkbox" value="1" name="ssllinks" id="ssllinks"[% IF ssllinks; ' checked="checked"'; END %] />
+            </td>
+          </tr>
+	</tbody>
+      </table>
+    </fieldset>
+  </div>
+  <div class="form_action">
+    <fieldset>
       <h3>Import SSL for host [% hostname %]</h3>
       <table>
 	<tbody>
@@ -47,23 +64,6 @@
 	    </td>
             <td>
 	      <textarea name="ca" rows="12" cols="65"></textarea>
-            </td>
-          </tr>
-	</tbody>
-      </table>
-    </fieldset>
-  </div>
-  <div class="form_action">
-    <fieldset>
-      <h3>SSL links in cPanel</h3>
-      <table>
-	<tbody>
-	  <tr>
-            <td style="vertical-align: top;">
-	      <label for="ssllinks">Use SSL links for CommuniGate Pro services in cPanel:</label>
-	    </td>
-            <td>
-	      <input type="checkbox" value="1" name="ssllinks" id="ssllinks"[% IF ssllinks; ' checked="checked"'; END %] />
             </td>
           </tr>
 	</tbody>

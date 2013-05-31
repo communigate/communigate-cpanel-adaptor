@@ -198,7 +198,7 @@
       <!-- Change Quota -->
       <div style="display: none;" class="user-section" id="change_quota_module_[% loop.count - 1 %]">
 	<form action="doeditquota.html" method="post">
-	  <table style="margin: 0px auto">
+	  <table style="margin: 0px auto; width: 100%;">
 	    <tbody>
 	      <tr>
 		<td width="45%" style="text-align: right">[% locale.maketext("CGPRealName") %]: </td>
@@ -228,6 +228,7 @@
 	      <tr>
 		<td align="right">[% locale.maketext("CGPWorkDays") %]:</td>
 		<td>
+		  <div style="width: 250px;">
 		  [% filter_check("WorkDays", default || accounts.$account.prefs.WorkDays, "Sun", "Sun") %]
 		  [% filter_check("WorkDays", default || accounts.$account.prefs.WorkDays, "Mon", "Mon") %]
 		  [% filter_check("WorkDays", default || accounts.$account.prefs.WorkDays, "Tue", "Tue") %]
@@ -236,6 +237,7 @@
 		  [% filter_check("WorkDays", default || accounts.$account.prefs.WorkDays, "Fri", "Fri") %]
 		  [% filter_check("WorkDays", default || accounts.$account.prefs.WorkDays, "Sat", "Sat") %]
 		  <div id="WorkDays_error"></div>
+		  </div>
 		</td>
 	      </tr>
 	      <tr>

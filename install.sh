@@ -100,7 +100,9 @@ if [ ! -d /var/cpanel/cgpro/ ]
 then
     mkdir -p /var/cpanel/cgpro/
 fi
-cp ${PACKSRC}/etc/classes.yaml /var/cpanel/cgpro/classes.yaml
+if [ ! -f /var/cpanel/cgpro/classes.yaml ]
+    cp ${PACKSRC}/etc/classes.yaml /var/cpanel/cgpro/classes.yaml
+fi
 
 # Install CommuniGate Webmail in cPanel
 cp ${PACKSRC}/cgpro-webmail/webmail_communigate.yaml /var/cpanel/webmail/
@@ -162,6 +164,8 @@ do
     chmod +x ${THEMES[$i]}/cgpro/backup/getaccbackup.live.cgi
     chmod +x ${THEMES[$i]}/cgpro/backup/getaliasesbackup.live.cgi
     chmod +x ${THEMES[$i]}/cgpro/backup/getfiltersbackup.live.cgi
+    chmod +x ${THEMES[$i]}/cgpro/mail/checkDomainSettings.live.cgi
+    chmod +x ${THEMES[$i]}/cgpro/mail/getDomainAccounts.live.cgi
     for ((j=0; j<${lLen}; j++)); do
         TARGET=${THEMES[$i]}/locale/`basename ${LOCALES[$j]} '{}'`.yaml.local
         if [ ! -f ${TARGET} ]
