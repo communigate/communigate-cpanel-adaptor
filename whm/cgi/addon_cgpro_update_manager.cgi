@@ -10,7 +10,7 @@ use Whostmgr::ACLS          ();
 use Cpanel::API::Branding        ();
 use LWP::UserAgent;
 
-$VERSION = '2.1.1';
+$VERSION = '2.2';
 
 print "Content-type: text/html\r\n\r\n";
 
