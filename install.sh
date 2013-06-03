@@ -184,6 +184,7 @@ chmod +x ${PACKSRC}/scripts/*
 ${PACKSRC}/scripts/migrate_groupware.pl
 ${PACKSRC}/scripts/modify_features.pl
 ${PACKSRC}/scripts/rename_classes.pl
+${PACKSRC}/scripts/init_pbx.pl
 /usr/local/cpanel/bin/rebuild_sprites
 /usr/local/cpanel/bin/build_locale_databases
 

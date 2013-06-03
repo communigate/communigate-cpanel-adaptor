@@ -161,6 +161,7 @@ chmod +x ${PACKSRC}/tools/*
 cp ${PACKSRC}/tools/helper_DKIM_sign.pl /var/CommuniGate/
 cp ${PACKSRC}/tools/helper_DKIM_verify.pl /var/CommuniGate/
 ${PACKSRC}/scripts/install_dkim_signer.pl
+${PACKSRC}/scripts/init_pbx.pl
 
 # Install the WHM plugins (administration and groupware control)
 rm -f /usr/local/cpanel/whostmgr/docroot/templates/cgpro_*
