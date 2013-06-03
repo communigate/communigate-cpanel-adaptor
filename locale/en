@@ -306,7 +306,6 @@ CGPUseComplexPassword: 'Force use complex password'
 CGPEmailVerification: 'Email Verification'
 CGPDKIMEnableVerify: 'Enable DKIM verification for incoming messages'
 CGPDKIMRejectVerify: 'Reject mail at SMTP time if the sender fails DKIM key validation'
-
 CGPReject: 'Reject'
 CGPStop processing: 'Stop processing'
 CGPRule Conditions: 'Rule Conditions'
