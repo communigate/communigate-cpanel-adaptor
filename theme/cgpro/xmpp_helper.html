@@ -3,15 +3,29 @@
 <cpanel Branding="include(stdheader.html)">
 <div class="body-content">
 <style type="text/css">
-table.settings {
-width: 50%;
+.vertical_half {
+    width: 43%;
+    float: left;
+    margin: 0 0.5%;
+    padding: 2%;
 }
-table.settings_ssl {
-background: #dddddd;
-border: 1px solid #cccccc;
+.caption {
+    text-align: center;
+    font-weight: bold;
+}
+.preferred-selection {
+    background-color: #DFDFDF;
+    border: 1px solid #C2C2C2;
+}
+#manual_settings_area {
+    overflow: hidden;
+}
+hr {
+    clear: both;
 }
 </style>
 <h1>Jabber/XMPP Settings</h1>
+<cpanelif !$FORM{'account'}>
 <form action="" method="get">
 <p>
   <label><cptext 'Please select account:'></label>
@@ -25,40 +39,13 @@ border: 1px solid #cccccc;
   <input type="submit" value="<cpanel langprint="Show">" />
 </p>
 </form>
-<cpanelif !$FORM{'account'}>
-
-<h2>Setup</h2>
-<table class="settings settings_ssl">
-  <tbody>
-    <tr>
-      <td>Username/JabberID:</td>
-      <td class="data"><strong>&lt;your.email@address&gt;</strong></td>
-    </tr>
-    <tr>
-      <td>Password:</td>
-      <td class="escape-note"><em>( Use the email account’s password. )</em></td>
-    </tr>
-    <tr>
-      <td>Server:</td>
-      <td class="data">
-	<strong>mail.&lt;your.domain.name&gt;</strong>
-      </td>
-    </tr>
-    <tr>
-      <td>Port:</td>
-      <td class="data">
-	<strong>5222</strong>
-      </td>
-    </tr>
-  </tbody>
-</table>
-
 </cpanelif>
+
+<?cptt cgpro/xmpp_helper.tmpl ?>
 
 <cpanelif $FORM{'account'}>
-<?cptt cgpro/xmpp_helper.tmpl ?>
+  <div class="return-link"><a href="javascript:history.back()">&larr; <cptext "Go Back"></a></div>
 </cpanelif>
-
 
 </div><!-- end body-content -->
 

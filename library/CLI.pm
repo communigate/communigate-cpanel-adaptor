@@ -579,7 +579,9 @@ sub SetAccountPassword {
   my $line = 'SetAccountPassword '.$accountName.' PASSWORD '.$this->printWords($newPass); 
   $line .= ' CHECK' if($check);
   $this->send($line);
-  $this->_parseResponse();
+  my $response = $this->_parseResponse();
+  return $this->{errMsg} unless $response;
+  return $response;
 }
 
 sub VerifyAccountPassword {
@@ -3465,7 +3467,19 @@ sub SetClusterNetwork {
   $this->send ('SetClusterNetwork '.$this->printWords($settings));
   $this->_parseResponse();
 }
-
+sub GetServerSettings {
+  my ($this) = @_;
+  $this->send('GetServerSettings');
+  return undef unless $this->_parseResponse();
+  $this->parseWords($this->getWords);
+}
+sub UpdateServerSettings {
+  my ($this, $settings) = @_;
+  croak 'usage CGP::CLI->UpdateServerSettings(\%settings)'
+    unless defined $settings;
+  $this->send('UpdateServerSettings ' . $this->printWords($settings));
+  $this->_parseResponse();
+}
 sub GetServerRules {
   my $this = shift;
   $this->send('GetServerRules');

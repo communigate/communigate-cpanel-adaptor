@@ -1,5 +1,5 @@
 #!/bin/sh                                                                                                                                                                                               
- eval 'if [ -x /usr/local/cpanel/3rdparty/bin/perl ]; then exec /usr/local/cpanel/3rdparty/bin/perl -x -- $0 ${1+"$@"}; else exec /usr/bin/perl -x $0 ${1+"$@"}; fi;'
+eval 'if [ -x /usr/local/cpanel/3rdparty/bin/perl ]; then exec /usr/local/cpanel/3rdparty/bin/perl -x -- $0 ${1+"$@"}; else exec /usr/bin/perl -x $0 ${1+"$@"}; fi;'
     if 0;
 #!/usr/bin/perl
 
@@ -13,18 +13,18 @@ use Cpanel::CachedDataStore;
 
 Whostmgr::ACLS::init_acls();
 if ( !Whostmgr::ACLS::hasroot() ) {
-  print "You need to be root to see the hello world example.\n";
-  exit();
+    print "You need to be root to see the hello world example.\n";
+    exit();
 }
 
 my $conf = Cpanel::CachedDataStore::fetch_ref( '/var/cpanel/communigate.yaml' ) || {};
 my $cli = new CGP::CLI( { PeerAddr => $conf->{cgprohost},
-                            PeerPort => $conf->{cgproport},
-                            login => $conf->{cgprouser},
-                            password => $conf->{cgpropass} } );
+			  PeerPort => $conf->{cgproport},
+			  login => $conf->{cgprouser},
+			  password => $conf->{cgpropass} } );
 unless($cli) {
-  print STDERR "Can't login to CGPro: ".$CGP::ERR_STRING,"\n";
-   exit(0);
+    print STDERR "Can't login to CGPro: ".$CGP::ERR_STRING,"\n";
+    exit(0);
 }
 
 my $cgproversion = $cli->getversion();
@@ -56,6 +56,14 @@ if ($FORM{'classname'}) {
     $cli->UpdateServerAccountDefaults({
 	ServiceClasses => $defaults->{ServiceClasses}
 				      });
+    my $data = Cpanel::CachedDataStore::fetch_ref( '/var/cpanel/cgpro/classes.yaml' ) || {};
+    unless (defined $data->{'default'}->{$FORM{'classname'}}) {
+	$data->{'default'}->{$FORM{'classname'}} = {
+	    'all' => -1,
+	    'free' => -1
+	};
+	Cpanel::CachedDataStore::store_ref( '/var/cpanel/cgpro/classes.yaml', $data );
+    }
     print "HTTP/1.1 303 See Other\r\nLocation: addon_cgpro_manage_classes.cgi\r\n\r\n";
 } else {
     my $ServiceClasses = $defaults->{ServiceClasses};

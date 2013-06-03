@@ -1,0 +1,312 @@
+[% USE CPBranding -%]
+[% MACRO features(feature, icon, text, nolink) BLOCK -%]
+[% UNLESS nolink -%]
+<a href="javascript:toggle_action_div(null, {id:'classes_module_[% loop.count - 1 %]', index:[% loop.count - 1 %], action:'classes'})" title="[% text %]">
+[% END -%]
+[% UNLESS classstring.search(feature) || classstring == "All" -%]
+<img src="[% CPBranding.image(icon _ '_off') %]" alt="[% text %]" title="[% text %] - N/A" />
+[% ELSE -%]
+<img src="[% CPBranding.image(icon) %]" alt="[% text %]" title="[% text %]" />
+[% END -%]
+[% UNLESS nolink -%]
+</a>
+[% END -%]
+[% END -%]
+[% MACRO filter_option(pval, val, text) BLOCK -%]
+<p>
+<input type="radio" name="class" value="[% val %]"[% val == pval ? " checked" : "" %] id="[% val %]-[% account %]" />
+<label for="[% val %]-[% account %]">
+[% features('Mail', 'cgpro_mini_mail', 'Mail', 1) %]
+[% features('XMPP', 'cgpro_mini_xmpp', 'Chat/Jabber/XMPP', 1) %]
+[% features('SIP', 'cgpro_mini_sip', 'SIP (Internet calls)', 1) %]
+[% features('WebCAL', 'cgpro_mini_cal', 'Calendar', 1) %]
+<span>[% cptext(text) %]</span>
+</label>
+</p>
+[% END -%]
+[% MACRO filter_check(name, pval, val, text) BLOCK -%]
+<span style="display: block; float: left; text-align: center; padding-right: 5px;">
+<label   style="display: block;" for="[% name %]-[% val %]">[% text %]</label>
+<input type="checkbox" name="[% name %]" value="[% val %]" id="[% name %]-[% val %]"[% IF pval.join("").search(val); " checked='checked'"; END %]/>
+</span>
+[% END -%]
+
+<script type='text/javascript' src="[% MagicRevision('/yui/tabview/tabview.js') %]"></script>
+<script type="text/javascript">
+  var tweakTabs = new YAHOO.widget.TabView('Accounts');
+</script>
+<h2>Accounts</h2>
+<div class="yui-navset user-box clear" id="Accounts">
+  <span class="sort_by">
+    Sort by:
+    <a href="overview_accounts.html[% IF ! FORM.sort.match('(class|domain)'); FORM.reverse == 1 ? '' : '?reverse=1'; END %]"[% IF ! FORM.sort.match('(class|domain)');' class="active"'; END %]>Email</a>,
+    <a href="overview_accounts.html?sort=class[% IF FORM.sort == 'class'; FORM.reverse == 1 ? '' : '&reverse=1'; END %]"[% IF FORM.sort == 'class'; ' class="active"'; END %]>Type</a>,
+    <a href="overview_accounts.html?sort=domain[% IF FORM.sort == 'domain'; FORM.reverse == 1 ? '' : '&reverse=1'; END %]"[% IF FORM.sort == 'domain'; ' class="active"'; END %]>Domain</a>
+  </span>
+  <div class="clear"></div>
+  <div class="user-accounts">
+    [% sort = sort_keys_by(accounts, FORM.sort, FORM.reverse) -%]
+    <ul class="yui-nav" id="yui_tabs">
+      [% FOREACH account IN sort -%]
+      <li[% IF loop.count == 1; ' class="selected"'; END %]>
+	<a href="#tab_[% account %]">
+	  <span class="img"[% IF accounts.$account.class == "Standard" %] style="border-color: #3B6FBE;"[% END %][% IF accounts.$account.class == "Premium" %] style="border-color: #BE3B48;"[% END %]><img src="http://www.gravatar.com/avatar/[% accounts.$account.md5 %]?s=32&d=[% 'http://communigate-cpanel-adaptor.googlecode.com/files/Default_avatar.png' | uri %]" alt="avatar" /></span>
+	  <span class="name">
+	    <span class="realname">[% accounts.$account.data.RealName %]</span>
+	    <span class="strong">[% account %]</span>
+	    <span class="classname">[% accounts.$account.class %]</span>
+	  </span>
+	</a>
+      </li>
+      [% END -%]
+    </ul>
+  </div>
+  <div class="yui-content user-details">
+    [% FOREACH account IN sort -%]
+    <div id="[% account %]">
+      <div class="h2">
+	<span class="img"><img src="http://www.gravatar.com/avatar/[% accounts.$account.md5 %]?s=32&d=[% 'http://communigate-cpanel-adaptor.googlecode.com/files/Default_avatar.png' | uri %]" alt="avatar" /></span>
+	<span class="name">
+	  <span class="realname">[% accounts.$account.data.RealName %]</span>
+	  <span class="strong">[% account %]</span>
+	</span>
+      </div>
+      <div class="user-features">
+	[% myclass = accounts.$account.class -%]
+	[% classstring = classes.$myclass.AccessModes.join(',') -%]
+	[% features('Mail', 'cgpro_mini_mail', 'Mail') %]
+	[% features('XMPP', 'cgpro_mini_xmpp', 'Chat/Jabber/XMPP') %]
+	[% features('SIP', 'cgpro_mini_sip', 'SIP (Internet calls)') %]
+	[% features('WebCAL', 'cgpro_mini_cal', 'Calendar') %]
+	<span class="classname">[% accounts.$account.class %]</span>
+      </div>
+      <div class="clear"></div>
+      <h3><span class="action_link" style="background-image: url([% CPBranding.image('cgpro_account_change_details') %])" onclick="toggle_action_div(null, {id:'account_details_module_[% loop.count - 1 %]', index:[% loop.count - 1 %], action:'account_details'})">[% locale.maketext("CGPAccountDetails") %]</span></h3>
+      <!-- Account Details -->
+      <div  style="display: none;" class="user-section" id="account_details_module_[% loop.count - 1 %]">
+	<table style="text-align: center; margin: 0px auto" class="account-details">
+	    <tbody>
+	      <tr>
+		<th style="text-align: left;">[% locale.maketext('CGPRealName') %]:</th>
+		<td style="text-align: left;">
+		  [% accounts.$account.data.RealName %]
+		</td>
+	      </tr>
+	      <tr>
+		<th style="text-align: left;">[% locale.maketext('CGPUnit') %]:</th>
+		<td style="text-align: left;">
+		  [% accounts.$account.data.ou %]
+		</td>
+	      </tr>
+	      <tr>
+		<th style="text-align: left;">[% locale.maketext('CGPMobilePhone') %]:</th>
+		<td style="text-align: left;">
+		  [% accounts.$account.data.MobilePhone %]
+		</td>
+	      </tr>
+	      <tr>
+		<th style="text-align: left;">[% locale.maketext('CGPWorkPhone') %]:</th>
+		<td style="text-align: left;">
+		  [% accounts.$account.data.WorkPhone %]
+		</td>
+	      </tr>
+	      <tr style="text-align: left;">
+		<th>[% locale.maketext('CGPUsageQuota') %]:</th>
+		<td style="text-align: center;">
+		  <div style="float: left;">
+		[% accounts.$account.used FILTER format('%02.1f') %] / <span id="quota_0">[%  IF accounts.$account.quota == 'unlimited'; '∞'; ELSE; accounts.$account.quota; END %]</span> <span class="megabyte_font">MB</span><br />
+		<div id="usage_bar_0" class="table_progress_bar">
+		  <div style="position: relative; width: [% accounts.$account.usedpercent %]%; height: 100%; padding: 0px; margin: 0px; border: 0px" title="0%" class="cpanel_widget_progress_bar"></div>
+		</div>
+		  </div>
+		</td>
+	      </tr>
+	      <tr style="text-align: left;">
+		<th>[% locale.maketext('CGPMessagesSent') %]:</th>
+		<td>
+		  [% accounts.$account.stats.MessagesSent.split("#").1 || locale.maketext('CGPunknown') %]
+		</td>
+	      </tr>
+	      <tr style="text-align: left;">
+		<th>[% locale.maketext('CGPMessagesReceived') %]:</th>
+		<td>
+		  [% accounts.$account.stats.MessagesReceived.split("#").1 || locale.maketext('CGPunknown') %]
+		</td>
+	      </tr>
+	    </tbody>
+	  </table>
+      </div>
+      <!-- END Account Details -->
+	<h3><span class="action_link" style="background-image: url([% CPBranding.image('cgpro_account_change_password') %])" onclick="toggle_action_div(null, {id:'change_password_module_[% loop.count - 1 %]', index:[% loop.count - 1 %], action:'change_password'})">[% locale.maketext("CGPChangePassword") %]</span></h3>
+      <!-- Change Password -->
+      <div style="display: none;" class="user-section" id="change_password_module_[% loop.count - 1 %]">
+	<div class="clear"></div>
+	<form action="dopasswdpop.html" method="post">
+	  <table style="text-align: center; margin: 0px auto">
+	    <tbody>
+	      <tr>
+		<td width="33%" style="text-align: right">[% locale.maketext("CGPPassword") %]:</td>
+		<td width="33%">
+		  <input type="password" style="width: 150px" id="change_password_input_1_[% loop.count - 1 %]" name="password" />
+		</td>
+		<td width="33%" style="text-align: left">
+		  <span style="width: 16px; height: 16px;" id="change_password_input_1_[% loop.count - 1 %]_error" class="cjt_validation_error">
+		  </span>
+		</td>
+	      </tr>
+	      <tr>
+		<td style="text-align: right">[% locale.maketext("CGPPasswordAgain") %]:</td>
+		<td>
+		  <input type="password" style="width: 150px" id="change_password_input_2_[% loop.count - 1 %]" name="password2" />
+		</td>
+		<td style="text-align: left">
+		  <span style="width: 16px; height: 16px;" id="change_password_input_2_[% loop.count - 1 %]_error" class="cjt_validation_error">
+		  </span>
+		</td>
+	      </tr>
+	      <tr>
+		<td style="text-align: right">[% locale.maketext("CGPStrenth") %]:</td>
+		<td>
+		  <center>
+		    <div style="width: 150px; height: 20px; border: 1px solid black" id="password_strength_bar_[% loop.count - 1 %]"></div>
+		  </center>
+		</td>
+		<td style="text-align: left">
+		  <input type="button" value="[% locale.maketext("CGPPasswordGenerator") %]" id="create_strong_password_[% loop.count - 1 %]" tabindex="-1" class="input-button">
+		</td>
+	      </tr>
+	      <tr>
+		<td colspan="3">
+		  <div style="height: 8px">&nbsp;</div>
+		  <div id="change_password_input_[% loop.count - 1 %]">
+		    <input type="hidden" name="quota" value="[% accounts.$account.quota %]" />
+		    <input type="hidden" name="email" value="[% account.split('@').0 %]" />
+		    <input type="hidden" name="domain" value="[% account.split('@').1 %]" />
+		    <a href="javascript:toggle_action_div(null, {id:'change_password_module_[% loop.count - 1 %]', index:[% loop.count - 1 %], action:'change_password'})">[% locale.maketext("CGPcancel") %]</a> [% locale.maketext("CGPor") %]
+		    <input type="submit" id="email_table_change_password_confirm_[% loop.count - 1 %]" value="[% locale.maketext("CGPChangePassword") %]" class="input-button">
+		  </div>
+		  <div id="change_password_status_[% loop.count - 1 %]">
+		  </div>
+		</td>
+	      </tr>
+	    </tbody>
+	  </table>
+	</form>
+      </div>
+      <!-- END Change Password -->
+	<h3><span class="action_link" style="background-image: url([% CPBranding.image('cgpro_account_change_details') %])" onclick="toggle_action_div(null, {id:'change_quota_module_[% loop.count - 1 %]', index:[% loop.count - 1 %], action:'change_quota'})">[% locale.maketext("CGPChangeDetails") %]</span></h3>
+      <!-- Change Quota -->
+      <div style="display: none;" class="user-section" id="change_quota_module_[% loop.count - 1 %]">
+	<form action="doeditquota.html" method="post">
+	  <table style="margin: 0px auto; width: 100%;">
+	    <tbody>
+	      <tr>
+		<td width="45%" style="text-align: right">[% locale.maketext("CGPRealName") %]: </td>
+		<td width="55%" style="text-align: left">
+		  <input type="text" value="[% accounts.$account.data.RealName %]" name="realname" id="realaname_input_[% loop.count - 1 %]"> <span id="relaname_input_[% loop.count - 1 %]_error" style="width: 16px; height: 16px;" class="cjt_validation_error"></span>
+		</td>
+	      </tr>
+	      <tr>
+		<td width="45%" style="text-align: right">[% locale.maketext("CGPMailboxQuota") %]: </td>
+		<td width="55%" style="text-align: left">
+		  <input type="text" value="[% accounts.$account.quota %]" maxlength="4" size="4" name="quota" id="quota_number_input_[% loop.count - 1 %]"> <span class="megabyte_font">MB</span> <span id="quota_number_input_[% loop.count - 1 %]_error" style="width: 16px; height: 16px;" class="cjt_validation_error">
+		  </span>
+		</td>
+	      </tr>
+	      <tr>
+		<td align="right">[% locale.maketext("CGPUnit") %]:</td>
+		<td><input type="text" name="unit" value="[% accounts.$account.data.ou %]" /></td>
+	      </tr>
+	      <tr>
+		<td align="right">[% locale.maketext("CGPMobilePhone") %]:</td>
+		<td><input type="text" name="mobile" value="[% accounts.$account.data.MobilePhone %]" /></td>
+	      </tr>
+	      <tr>
+		<td align="right">[% locale.maketext("CGPWorkPhone") %]:</td>
+		<td><input type="text" name="workphone" value="[% accounts.$account.data.WorkPhone %]" /></td>
+	      </tr>
+	      <tr>
+		<td align="right">[% locale.maketext("CGPWorkDays") %]:</td>
+		<td>
+		  <div style="width: 250px;">
+		  [% filter_check("WorkDays", default || accounts.$account.prefs.WorkDays, "Sun", "Sun") %]
+		  [% filter_check("WorkDays", default || accounts.$account.prefs.WorkDays, "Mon", "Mon") %]
+		  [% filter_check("WorkDays", default || accounts.$account.prefs.WorkDays, "Tue", "Tue") %]
+		  [% filter_check("WorkDays", default || accounts.$account.prefs.WorkDays, "Wed", "Wed") %]
+		  [% filter_check("WorkDays", default || accounts.$account.prefs.WorkDays, "Thu", "Thu") %]
+		  [% filter_check("WorkDays", default || accounts.$account.prefs.WorkDays, "Fri", "Fri") %]
+		  [% filter_check("WorkDays", default || accounts.$account.prefs.WorkDays, "Sat", "Sat") %]
+		  <div id="WorkDays_error"></div>
+		  </div>
+		</td>
+	      </tr>
+	      <tr>
+		<td align="right">[% locale.maketext("CGPUseComplexPassword") %]:</td>
+		<td><input type="checkbox" name="PasswordComplexity" value="1"[% IF accounts.$account.data.PasswordComplexity == 'MixedCaseDigit'; ' checked="checked"'; END %] /></td>
+	      </tr>
+	      <tr>
+		<td style="text-align: center" colspan="2">
+		  <div style="height: 4px">&nbsp;</div>
+		  <div id="change_quota_input_[% loop.count - 1 %]">
+		    <input type="hidden" name="email" value="[% account.split('@').0 %]" />
+		    <input type="hidden" name="domain" value="[% account.split('@').1 %]" />
+		    <a href="javascript:toggle_action_div(null, {id:'change_quota_module_[% loop.count - 1 %]', index:[% loop.count - 1 %], action:'change_quota'})">[% locale.maketext("CGPcancel") %]</a> [% locale.maketext("CGPor") %]
+		    <input type="submit" id="change_quota_confirm_[% loop.count - 1 %]" value="[% locale.maketext("CGPChangeDetails") %]" class="input-button">
+		  </div>
+		  <div id="change_quota_status_[% loop.count - 1 %]">
+		  </div>
+		</td>
+	      </tr>
+	    </tbody>
+	  </table>
+	</form>
+      </div>
+      <!-- END Change Quota -->
+	<h3><span class="action_link" style="background-image: url([% CPBranding.image('cgpro_account_change_type') %])"  onclick="toggle_action_div(null, {id:'classes_module_[% loop.count - 1 %]', index:[% loop.count - 1 %], action:'classes'})">[% locale.maketext("CGPChangeAccountType") %]</span></h3>
+      <!-- classes -->
+      <div style="display: none" class="user-section" id="classes_module_[% loop.count - 1 %]">
+	<div style="margin: 0px auto;">
+	  <p>[% locale.maketext("CGPChangeAccType") %] <strong>[% account %]</strong>?</p>
+	  <form action="" method="post" id="form-[% account %]">
+	    [% domain = account.split('@').1; plan = CPANEL.CPDATA.PLAN -%]
+	    [% settings = data.$domain ? data.$domain : (data.$plan ? data.$plan : data.default) %]
+	    [% FOREACH class IN classes.keys.sort -%]
+	    [% UNLESS settings.$class.all == 0 -%]
+	    [% classstring = classes.$class.AccessModes.join(',') -%]
+	    [% filter_option(myclass, class, class) %]
+	    [% END -%]
+	    [% END -%]
+	    <input type="hidden" name="account" value="[% account %]" />
+	    <p>
+	      <a href="javascript:toggle_action_div(null, {id:'classes_module_[% loop.count - 1 %]', index:[% loop.count - 1 %], action:'classes'})">[% locale.maketext("CGPcancel") %]</a> [% locale.maketext("CGPor") %]
+	      <input type="submit" name="submit" value="[% locale.maketext("CGPChange") %]" class="input-button" />
+	    </p>
+	  </form>
+	</div>
+      </div>
+      <!-- END classess -->
+	<h3><span class="action_link" style="background-image: url([% CPBranding.image('cgpro_account_delete') %])" onclick="toggle_action_div(null, {id:'delete_module_[% loop.count - 1 %]', index:[% loop.count - 1 %], action:'delete'})">[% locale.maketext('CGPDelete') %]</span></h3>
+      <!-- Delete -->
+      <div style="display: none" class="dt_module user-section" id="delete_module_[% loop.count - 1 %]">
+	<div style="margin: 0px auto; padding: 8px 0px; text-align: center">
+	  <p>[% locale.maketext("CGPDeleteAccount") %] <em class="status">[% account %]</em>?</p>
+	  <p>
+	    <a href="javascript:toggle_action_div(null, {id:'delete_module_[% loop.count - 1 %]', index:[% loop.count - 1 %], action:'delete'})">[% locale.maketext("CGPcancel") %]</a> [% locale.maketext("CGPor") %]
+	    <a class="create-button" href="realdelpop.html?domain=[% account.split('@').1 %]&amp;email=[% account.split('@').0 %]">[% locale.maketext("CGPDelete") %]</a>        
+	  </p>
+	</div>
+      </div>
+      <!-- END Delete -->
+
+    </div>
+    [% END -%]    
+  </div>
+</div>
+
+<script type="text/javascript">
+[% FOREACH account IN sort -%]
+  ACCOUNTS[[% loop.count - 1 %]] = [];
+  ACCOUNTS[[% loop.count - 1 %]]['domain'] = '[% account.split('@').1 -%]';
+  ACCOUNTS[[% loop.count - 1 %]]['user'] = '[% account.split('@').0 -%]';
+[% END -%]
+</script>

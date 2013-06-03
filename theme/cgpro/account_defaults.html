@@ -1,0 +1,13 @@
+<cpanel setvar="headerimg=../images/mailmenu.gif">
+<cpanel setvar="dprefix=../">
+<cpanel setvar="headerinclude=mail/pops_head.html">
+<cpanel Branding="include(stdheader.html)">
+<div class="body-content">
+  <h1><cpanel langprint="CGPDomainSettings"></h1>
+	<?cptt CommuniGate::AccountDefaults(cgpro/account_defaults.tmpl) save=$FORM{'save'},MailToUnknown=$FORM{'MailToUnknown'},MailToAllAction=$FORM{'MailToAllAction'},TimeZone=$FORM{'TimeZone'},WorkDayStart=$FORM{'WorkDayStart'},WorkDayEnd=$FORM{'WorkDayEnd'},WeekStart=$FORM{'WeekStart'},WorkDays=$FORM{'WorkDays'},WorkDays-0=$FORM{'WorkDays-0'},WorkDays-1=$FORM{'WorkDays-1'},WorkDays-2=$FORM{'WorkDays-2'},WorkDays-3=$FORM{'WorkDays-3'},WorkDays-4=$FORM{'WorkDays-4'},WorkDays-5=$FORM{'WorkDays-5'},domain=$FORM{'domain'} ?>
+
+</div><!-- end body-content div -->
+
+<div id="menus_div"></div>
+
+<cpanel Branding="include(stdfooter.html)">

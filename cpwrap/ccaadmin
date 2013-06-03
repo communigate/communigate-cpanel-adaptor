@@ -1,3 +1,6 @@
+#!/bin/sh
+ eval 'if [ -x /usr/local/cpanel/3rdparty/bin/perl ]; then exec /usr/local/cpanel/3rdparty/bin/perl -x -- $0 ${1+"$@"}; else exec /usr/bin/perl -x $0 ${1+"$@"}; fi;'
+  if 0;
 #!/usr/bin/perl
 
 # Sanatize @INC
@@ -204,6 +207,16 @@ my %commands = (
     'GETLOGIN' => sub {
 	my $conf = Cpanel::CachedDataStore::fetch_ref( '/var/cpanel/communigate.yaml' ) || {};
 	print $conf->{cgprohost} , "::" , $conf->{cgproport} , "::" , $conf->{cgprouser} , "::" , $conf->{cgpropass};
+    },
+    'READFILE' => sub {
+	my ($filename) = @_;
+	if ( -f $filename) {
+	    open(FILE, "<", $filename) or die "Failed: $!";
+	    while (<FILE>) {
+		print $_;
+	    }
+	    close(FILE);
+	}
     }
     );
 

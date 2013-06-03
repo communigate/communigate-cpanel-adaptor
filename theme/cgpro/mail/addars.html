@@ -143,23 +143,6 @@ function parseForm() {
 	</table>
 	<br />
 	<table style="width: 100%" cellspacing="0" cellpadding="3">
-		<!-- <tr> -->
-		<!-- 	<td align="right"><cpanel langprint="ARCharacterset"></td> -->
-		<!-- 	<td> -->
-		<!-- 		<table><tr> -->
-		<!-- 			<td> -->
-		<!-- 				<select name="charset" onchange="checkcharset(this);" id="charset"> -->
-		<!-- 					<cpanel Email="getarscharset($FORM{'email'},$FORM{'__cpanel__temp__charset__'})"> -->
-		<!-- 				</select> -->
-		<!-- 			</td> -->
-		<!-- 			<td><em><cpanel Locale="maketext('Note: You must select this option before changing anything else or you will lose your changes.')"></td> -->
-		<!-- 		</tr></table> -->
-		<!-- 	</td> -->
-		<!-- </tr> -->
-	<!-- 	<tr> -->
-        <!--     <td align="right"><cptext 'Interval:'></td> -->
-        <!--     <td><input size="4" maxlength="4" type="text" autofill="off" autocomplete="off" id="interval" name="interval" value="<cpanel Email="getarsinterval($FORM{'email'})">" /> <cptext '[numerate,_1,hour,hours]'> <span id="interval_error"></span></td> -->
-        <!-- </tr> -->
         <tr>
 			<td align="right"><cpanel langprint="AREmail"></td>
 			<input type="hidden" name="charset" value="utf-8" />
@@ -180,10 +163,6 @@ function parseForm() {
 			<td><input style="width: 150px" type="text" id="from" name="from" value="<cpanel Email="getarsfrom($FORM{'email'})">" /> <span id="from_error"></span>
 			</td>
 		</tr>
-		<!-- <tr> -->
-		<!-- 	<td align="right"><cptext 'HTML[boolean,_1,:,]'></td> -->
-		<!-- 	<td><input type="checkbox" name="html" id="html_message" value="1" <cpanel Email="getarshtml($FORM{'email'})"> /> <label for="html_message"><cptext 'This message contains HTML.'></label></td> -->
-		<!-- </tr> -->
 <?cp CommuniGate::EditAutoresponder(
 		[tr]
 			[td align="right"]$LANG{'ARSubject'}:[/td]

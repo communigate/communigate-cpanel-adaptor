@@ -1,0 +1,31 @@
+<table class="sortable truncate-table" summary="" style="margin-left: 0;" >
+  <tbody>
+    <tr>
+      <th>[% locale.maketext('CGPAccount') %]</th>
+      <th>[% locale.maketext('CGPAccountDetails') %]</th>
+    </tr>
+    [% found = 0 -%]
+    [% FOREACH account IN accounts.sort -%]
+    [% myclass = accounts.$account.class -%]
+    [% classstring = classes.$myclass.AccessModes.join(',') -%]
+    [% IF classstring.search('XMPP') || classstring == "All" -%]
+    [% found = 1 -%]
+    <tr>
+      <td>
+	[% account %]
+      </td>
+      <td>
+	<a href="xmpp_helper.html?account=[% account %]">[% locale.maketext('Settings') %]</a>
+      </td>
+    </tr>
+    [% END -%]
+    [% END -%]
+    [% UNLESS found -%]
+    <tr>
+      <td colspan="2">
+	No accounts with enabled XMPP.
+      </td>
+    </tr>
+    [% END -%]
+  </tbody>
+</table>

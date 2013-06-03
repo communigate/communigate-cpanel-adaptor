@@ -32,15 +32,19 @@ my $cgproversion = $cli->getversion();
 
 Whostmgr::HTMLInterface::defheader( "CGPro Manage Classes",'', '/cgi/addon_cgpro_manage_classes.cgi' );
 
+my %FORM = Cpanel::Form::parseform();
+if ($FORM{'default-class'}) {
+	$cli->UpdateServerAccountDefaults({ServiceClass => $FORM{'default-class'}});
+}
 my $defaults = $cli->GetServerAccountDefaults();
 my $ServiceClasses = $defaults->{ServiceClasses};
-
 
 Cpanel::Template::process_template(
 				   'whostmgr',
 				   {
 				    'template_file' => 'addon_cgpro_manage_classes.tmpl',
 				    ServiceClasses => $ServiceClasses,
+				    ServiceClass => $defaults->{ServiceClass},
 				    cgproversion => $cgproversion,
 				   },
 				  );

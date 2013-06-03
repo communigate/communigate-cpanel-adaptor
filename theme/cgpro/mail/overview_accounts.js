@@ -71,6 +71,10 @@ var verify_local = function (i) {
 	});
     CPANEL.validate.attach_to_form("email_table_change_password_confirm_" + i, [VAL_PWD, VAL_PWD2]);
 };
-for (var i=0; i < ACCOUNTS.length; i++) {
-    verify_local(i);
-};
+
+YAHOO.util.Event.onDOMReady(function () {
+	for (var i=0; i < ACCOUNTS.length; i++) {
+	    verify_local(i);
+	    toggle_action_div(null, {id:'account_details_module_' + i, index: i, action:'account_details'});
+	};
+});

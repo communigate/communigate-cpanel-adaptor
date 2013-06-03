@@ -1,0 +1,57 @@
+<cpanel setvar="headerinclude=mail/archiver_head.html">
+<cpanel setvar="headerimg=../images/mailmenu.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+<style type="text/css">
+<?cp Branding::spritelist(.spriteicon_img_mini {float:left;margin-right:5px;background: url\{leftparenthesis}"%"\{rightparenthesis};} %,@spriteurl,images::#icon-${img}_mini {background-position\{colon}0 -${cssposition}px;width\{colon}${width}px;height\{colon}${height}px; }:) imgtype=icon,subtype=img,method=scale_60percent,format=png,img=emailarch ?>
+</style>
+<!-- <?cp CommuniGate::DKIMVerification() DKIMVerifyEnable=$FORM{'DKIMVerifyEnable'},DKIMVerifyReject=$FORM{'DKIMVerifyReject'} ?> -->
+<div class="body-content">
+  <div class="h1Title"><cpanel langprint="CGPEmailVerification"></div>
+  <h2>DKIM</h2>  
+  <p><cptext 'Domain Keys Identified Mail (DKIM) is a method for associating a domain name to an email message. For example, you would low that this email came from that domain because it is digitally signed.'></p>
+  <div class="highlight">
+    <cpanelif !$CPVAR{'serverPrefsEnable'}=='YES'>
+      <p>Service not available.</p>
+      <!--
+    </cpanelif>
+    <cpanelif $CPVAR{'serverPrefsEnable'}=='YES'>
+      <form id="mainform" method="post" action="" name="mainform">
+	<table border="0" style="margin-left: 20px">
+	  <tr>
+	    <td align="right"><cpanel langprint="CGPDKIMEnableVerify">:</td>
+	    <td>
+	      <input type="Checkbox" value="YES" name="DKIMVerifyEnable" id="dkim_verify" <cpanelif $CPVAR{'domainPrefsEnable'}=='YES'> checked="checked"</cpanelif> />
+	    </td>
+	    <td colspan="2"><div id="quota_error"></div></td>
+	  </tr>
+	  <tr>
+	    <td align="right"><cpanel langprint="CGPDKIMRejectVerify">:</td>
+	    <td>
+	      <select name="DKIMVerifyReject" style="width: 150px">
+ 	    <option value="default"><cpanel langprint="CGPdefault"> (<cpanelif $CPVAR{'serverPrefsReject'}=='YES'><cpanel langprint="CGPReject"></cpanelif><cpanelif !$CPVAR{'serverPrefsReject'}=='YES'><cpanel langprint="CGPAcceptAndModify"></cpanelif>)</option>
+		<option <cpanelif $CPVAR{'domainPrefsReject'}=='YES'> selected="selected"</cpanelif> value="YES"><cpanel langprint="CGPReject"></option>
+		<option <cpanelif $CPVAR{'domainPrefsReject'}=='NO'> selected="selected"</cpanelif> value="NO"><cpanel langprint="CGPAcceptAndModify"></option>
+	      </select>
+	    </td>
+	    <td colspan="2"><div id="type_error"></div></td>
+	  </tr>
+	  <tr>
+	    <td>&nbsp;</td>
+	    <td>&nbsp;</td>
+	    <td>&nbsp;</td>
+	  </tr>
+	  <tr>
+	    <td><input id="new_email_submit" class="input-button" type="submit" value="<cpanel langprint="CGPSave">" tabindex="5" /></td>
+	    <td></td>
+	    <td></td>
+	  </tr>
+	</table>
+      </form>
+    </cpanelif>
+    <cpanelif !$CPVAR{'serverPrefsEnable'}=='YES'>
+      -->
+    </cpanelif>
+  </div>
+</div>
+<cpanel Branding="include(stdfooter.html)">

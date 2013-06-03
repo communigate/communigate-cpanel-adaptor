@@ -125,16 +125,25 @@
 	      <tr class="tdshade[% (loop.count % 2 - 1) * -1 + 1 %]_noborder">
 		<td>
 		  [% class %]
+		  [% IF class == ServiceClass -%]
+		  (default)
+		  [% END %]
 		</td>
 		<td>
-		  <form action="addon_cgpro_manage_classes_edit.cgi" method="post">
+		  <form action="addon_cgpro_manage_classes_edit.cgi" method="post"  style="float: left;">
 		    <input type="hidden" name="class" value="[% class %]" />
 		    <input type="submit" value="View/Edit" name="submit" style="float: left;" />
 		  </form>
 		  [% UNLESS class == 'mailonly' -%]
-		  <form action="addon_cgpro_manage_classes_delete.cgi" method="post">
+		  <form action="addon_cgpro_manage_classes_delete.cgi" method="post" style="float: left;">
 		    <input type="hidden" name="class" value="[% class %]" />
 		    <input type="submit" value="Delete" name="submit" />
+		  </form>
+		  [% END %]
+		  [% UNLESS class == ServiceClass -%]
+		  <form action="addon_cgpro_manage_classes.cgi" method="post" style="float: left;">
+		    <input type="hidden" name="default-class" value="[% class %]" />
+		    <input type="submit" value="Set as Default" name="submit" />
 		  </form>
 		  [% END %]
 		</td>

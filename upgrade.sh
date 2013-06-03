@@ -22,6 +22,13 @@ then
     rm -f /usr/local/cpanel/CLI.pm
     ln -s /usr/local/cpanel/perl/CLI.pm /usr/local/cpanel
 fi
+if [ ! -L /usr/local/lib/perl5/`perl -v | grep 'This is perl' | cut -f 2 -d 'v' | cut -f1 -d ' '`/CLI.pm ]
+then
+    rm -f /usr/local/lib/perl5/`perl -v | grep 'This is perl' | cut -f 2 -d 'v' | cut -f1 -d ' '`/CLI.pm
+    ln -s /usr/local/cpanel/perl/CLI.pm /usr/local/lib/perl5/`perl -v | grep 'This is perl' | cut -f 2 -d 'v' | cut -f1 -d ' '`/CLI.pm
+fi
+ln -s /usr/local/cpanel/perl/CLI.pm /usr/local/lib/perl5/`perl -v | grep 'This is perl' | cut -f 2 -d 'v' | cut -f1 -d ' '`/
+
 
 # CGPro cPanel Wrapper
 cp ${PACKSRC}/cpwrap/ccaadmin /usr/local/cpanel/bin/
@@ -106,6 +113,8 @@ do
     chmod +x ${THEMES[$i]}/cgpro/backup/getaccbackup.live.cgi
     chmod +x ${THEMES[$i]}/cgpro/backup/getaliasesbackup.live.cgi
     chmod +x ${THEMES[$i]}/cgpro/backup/getfiltersbackup.live.cgi
+    chmod +x ${THEMES[$i]}/cgpro/mail/checkDomainSettings.live.cgi
+    chmod +x ${THEMES[$i]}/cgpro/mail/getDomainAccounts.live.cgi
     if [ -f ${THEMES[$i]}cgpro/mail/groupware.html ]
     then
 	rm -f ${THEMES[$i]}cgpro/mail/groupware.html
@@ -146,6 +155,12 @@ cp ${PACKSRC}/featurelists/cgpro /usr/local/cpanel/whostmgr/addonfeatures/
 ${PACKSRC}/scripts/modify_features.pl
 /usr/local/cpanel/bin/rebuild_sprites
 /usr/local/cpanel/bin/build_locale_databases
+
+# install DKIM tools FOR CGPro server Only
+chmod +x ${PACKSRC}/tools/*
+cp ${PACKSRC}/tools/helper_DKIM_sign.pl /var/CommuniGate/
+cp ${PACKSRC}/tools/helper_DKIM_verify.pl /var/CommuniGate/
+${PACKSRC}/scripts/install_dkim_signer.pl
 
 # Install the WHM plugins (administration and groupware control)
 rm -f /usr/local/cpanel/whostmgr/docroot/templates/cgpro_*

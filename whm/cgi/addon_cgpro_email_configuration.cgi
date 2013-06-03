@@ -67,8 +67,30 @@ if ($FORM{'UseRBL'}) {
   }
   $cli->SetNetwork($defaultsNetwork);
 }
-
-
+# DKIM
+my $serverSettings = {};
+if ($FORM{'submit'}) {
+    if ($FORM{'DKIMVerifyEnable'}) {
+	$serverSettings->{'DKIMVerifyEnable'} = "YES";
+	if ($FORM{'DKIMVerifyReject'}) {
+	    $serverSettings->{'DKIMVerifyReject'} = "YES";
+	} else {
+	    $serverSettings->{'DKIMVerifyReject'} = "NO";
+	}
+	
+    } else {
+	$serverSettings->{'DKIMVerifyEnable'} = "NO";
+	$serverSettings->{'DKIMVerifyReject'} = "NO";
+    }
+    $cli->UpdateServerAccountPrefs($serverSettings);
+    my $serverMailRules = $cli->GetServerMailRules();
+    for my $rule (@$serverMailRules) {
+	if ($rule->[1] eq 'DKIM_verify') {
+	    $rule->[0] = ($FORM{'DKIMVerifyEnable'} eq "YES" ? "5" : "0");
+	}
+    }
+    $cli->SetServerMailRules($serverMailRules);
+}
 Cpanel::Template::process_template(
 				   'whostmgr',
 				   {
@@ -82,6 +104,7 @@ Cpanel::Template::process_template(
 				    UseRBL => $defaultsNetwork->{UseRBL},
 				    RBLDomain => $defaultsNetwork->{RBLDomain},
 				    cgproversion => $cgproversion,
+				    serverSettings => $cli->GetServerAccountPrefs()
 				   },
 				  );
 

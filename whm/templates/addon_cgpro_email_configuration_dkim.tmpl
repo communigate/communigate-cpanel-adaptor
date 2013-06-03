@@ -1,0 +1,28 @@
+<table cellspacing="0" cellpadding="5" width="100%" border="0" align="center" id="group_RBLs" class="datatable brick">
+  <thead>
+    <tr id="idgen5" class="tdshade1_noborder" style="display: none;">
+      <th align="left" colspan="100">RBLs</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr class="tdshade2_noborder" id="acl_spamhaus_rbl_container">
+      <td id="labelhelp-acl_spamhaus_rbl" class="label_and_help" style="width: 50%;">
+	<div id="label-acl_spamhaus_rbl"><label for="dkim_verify">Enable DKIM verification for incoming messages</label></div>
+      </td>
+      <td valign="middle" class="controls">
+	<div class="brickcontainer">
+	  <input type="Checkbox" value="YES" name="DKIMVerifyEnable" id="dkim_verify"[% IF serverSettings.DKIMVerifyEnable == 'YES'; ' checked="checked"'; END %] />
+	</div>
+      </td>
+    </tr>
+    <tr class="tdshade1_noborder">
+      <td class="label_and_help">
+	<div id="label-manage_rbls_button"><label for="dkim_reject">Reject mail at SMTP time if the sender fails DKIM key validation</label></div>
+      </td>
+      <td valign="middle" class="controls">
+	<input type="Checkbox" value="YES" name="DKIMVerifyReject" id="dkim_reject"[% IF serverSettings.DKIMVerifyReject == 'YES'; ' checked="checked"'; END %] />
+      </td>
+    </tr>
+  </tbody>
+</table>
+

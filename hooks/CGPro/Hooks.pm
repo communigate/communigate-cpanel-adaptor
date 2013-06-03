@@ -1,6 +1,7 @@
 package CGPro::Hooks;
 
 use CLI;
+use Cpanel::Logger ();
 use Cpanel::AdminBin ();
 use Cpanel::Api2::Exec ();
 use Cpanel::CachedDataStore ();
@@ -26,6 +27,13 @@ sub describe {
         'event'    => 'Api2::Email::passwdpop',
         'stage'    => 'pre',
         'hook'     => 'CGPro::Hooks::passwdpop',
+        'exectype' => 'module',
+    };
+    my $mail_passwdpop1 = {
+        'category' => 'Cpanel',
+        'event'    => 'Api1::Email::passwdpop',
+        'stage'    => 'pre',
+        'hook'     => 'CGPro::Hooks::passwdpop1',
         'exectype' => 'module',
     };
     my $mail_editquota = {
@@ -70,7 +78,33 @@ sub describe {
         'hook'     => 'CGPro::Hooks::AccountsRemove',
         'exectype' => 'module',
     };
-    return [$mail_addpop, $mail_delpop, $mail_passwdpop, $mail_editquota, $mail_deletefilter, $mail_reorderfilters, $mail_addpop1, $AccountsCreate, $AccountsRemove];
+    my $dkim_install = {
+        'category' => 'Cpanel',
+        'event'    => 'Api2::DKIMUI::install',
+        'stage'    => 'post',
+        'hook'     => 'CGPro::Hooks::dkim_install',
+        'exectype' => 'module',
+    };
+    my $dkim_uninstall = {
+        'category' => 'Cpanel',
+        'event'    => 'Api2::DKIMUI::uninstall',
+        'stage'    => 'post',
+        'hook'     => 'CGPro::Hooks::dkim_uninstall',
+        'exectype' => 'module',
+    };
+    return [$mail_addpop,
+	    $mail_delpop,
+	    $mail_passwdpop,
+	    $mail_passwdpop1,
+	    $mail_editquota,
+	    $mail_deletefilter,
+	    $mail_reorderfilters,
+	    $mail_addpop1,
+	    $AccountsCreate,
+	    $AccountsRemove,
+	    $dkim_install,
+	    $dkim_uninstall
+	];
 }
 
 sub getCLI {
@@ -87,6 +121,7 @@ sub getCLI {
 				  login => $loginData[2],
 				  password => $loginData[3]
 				});
+	my $logger = Cpanel::Logger->new();
 	unless($cli) {
 	    $logger->warn("Can't login to CGPro: ".$CGP::ERR_STRING);
 	    exit(0);
@@ -125,7 +160,18 @@ sub passwdpop {
     my $domain = $args->{'domain'};
     my $user= $args->{'email'};
     my $pass= $args->{'password'};
-    $cli->SetAccountPassword("$user\@$domain","$pass",0);
+    my $response = $cli->SetAccountPassword("$user\@$domain","$pass",0);
+    $Cpanel::CPERROR{'email'} = $response unless $response == 1;
+    $cli->Logout();
+}
+
+sub passwdpop1 {
+    my (undef, $params) = @_;
+    my $args = $params->{args};
+    my $cli = getCLI();
+    my ($user, $pass, undef, $domain) = @$args;
+    my $response = $cli->SetAccountPassword("$user\@$domain","$pass",0);
+    $Cpanel::CPERROR{'email'} = $response unless $response == 1;
     $cli->Logout();
 }
 
@@ -143,14 +189,54 @@ sub editquota {
 	$quota .= "M";
     }
 
-    my $data=$cli->GetDomainSettings("$domain");
+    my $data = $cli->GetDomainSettings("$domain");
     if (!$data) {
 	$cli->CreateDomain("$domain");
-    } 
-    my $UserData;
-    @$UserData{'MaxAccountSize'}=$quota;
-
-    $cli->UpdateAccountSettings("$user\@$domain", { MaxAccountSize => $quota });
+    }
+    my $data;
+    $data->{'MaxAccountSize'} = $quota;
+    if ($args->{'realaname'}) {
+	$data->{'RealName'} = $args->{'realaname'};
+    } else {
+	delete $data->{'RealName'} if $data->{'RealName'};
+    }
+    if ($args->{'unit'}) {
+	$data->{'ou'} = $args->{'unit'};
+    } else {
+	delete $data->{'ou'} if $data->{'ou'};
+    }
+    if ($args->{'mobile'}) {
+	$data->{'MobilePhone'} = $args->{'mobile'};
+    } else {
+	delete $data->{'MobilePhone'} if $data->{'MobilePhone'};
+    }
+    if ($args->{'workphone'}) {
+	$data->{'WorkPhone'} = $args->{'workphone'};
+    } else {
+	delete $data->{'WorkPhone'} if $data->{'WorkPhone'};
+    }
+    if ($args->{'PasswordComplexity'}) {
+	$data->{'PasswordComplexity'} = 'MixedCaseDigit';
+    } else {
+	delete $data->{'PasswordComplexity'} if $data->{'PasswordComplexity'};
+    }
+    # Update WorkDays
+    if ($args->{'WorkDays'}) {
+	my $WorkDays = [];
+	@$WorkDays = grep(/\w/, ($args->{'WorkDays'}, $args->{'WorkDays-0'}, $args->{'WorkDays-1'}, $args->{'WorkDays-2'}, $args->{'WorkDays-3'}, $args->{'WorkDays-4'}, $args->{'WorkDays-5'})); # remove empty entries
+	my $serverDefaults = $cli->GetServerAccountPrefs();
+	my $domainDefaults = $cli->GetAccountDefaultPrefs($domain);
+	my $defaultWorkDays = $serverDefaults->{WorkDays};
+	$defaultWorkDays = $domainDefaults->{WorkDays} if $domainDefaults->{WorkDays};
+	my $prefs = {};
+	if (join(',',$defaultWorkDays) eq join(',',$WorkDays)) {
+	    $prefs->{WorkDays} = 'default';
+	} else {
+	    $prefs->{WorkDays} = $WorkDays;
+	}
+	$cli->UpdateAccountPrefs("$user\@$domain", $prefs);
+    }
+    $cli->SetAccountSettings("$user\@$domain", $data);
     $cli->Logout();
 }
 
@@ -205,31 +291,49 @@ sub reorderfilters {
 sub addpop1 {
     my (undef, $params) = @_;
     my $args = $params->{args};
-    doaddpop($args->[0], $args->[1], $args->[2], $args->[3]);
+    doaddpop($args->[0], $args->[1], $args->[2], $args->[3], $args->[4], $args->[5], [$args->[6],$args->[7],$args->[8],$args->[9],$args->[10],$args->[11],$args->[12]], $args->[13], $args->[14], $args->[15]);
 }
 
 sub doaddpop {
-    my ($user, $password, $quota, $domain) = @_;
+    my ($user, $password, $quota, $domain, $realname, $type, $workDays, $unit, $mobilePhone, $workPhone) = @_;
+    @$workDays = grep(/\w/, @$workDays); # remove empty entries
     my $cli = getCLI();
     if ($quota == 0) {
         $quota="unlimited" ;
     }else{
         $quota .= "M";
     }
-    my $cli = getCLI();
     my $data = $cli->GetDomainSettings("$domain");
     if (!$data) {
     	$cli->CreateDomain("$domain");
-    } 
+    }
     my $UserData;
     @$UserData{'Password'}=$password;
-    @$UserData{'ServiceClass'}="mailonly";
     @$UserData{'MaxAccountSize'}=$quota;
     my $response = $cli->CreateAccount(accountName => "$user\@$domain", settings => $UserData);
     if ($response) {
     	$cli->CreateMailbox("$user\@$domain", "Calendar");
     	$cli->CreateMailbox("$user\@$domain", "Spam");
-    } else {	
+	my $settings = {};
+	$settings->{RealName} = $realname if $realname;
+	$settings->{ServiceClass} = $type if $type;
+	$settings->{ou} = $unit if $unit;
+	$settings->{MobilePhone} = $mobilePhone if $mobilePhone;
+	$settings->{WorkPhone} = $workPhone if $workPhone;
+	$settings->{PasswordComplexity} = 'MixedCaseDigit';
+	$cli->UpdateAccountSettings("$user\@$domain", $settings);
+	my $serverDefaults = $cli->GetServerAccountPrefs();
+	my $domainDefaults = $cli->GetAccountDefaultPrefs($domain);
+	my $defaultWorkDays = $serverDefaults->{WorkDays};
+	$defaultWorkDays = $domainDefaults->{WorkDays} if $domainDefaults->{WorkDays};
+	my $prefs = {};
+	if (join(',',$defaultWorkDays) eq join(',',$workDays)) {
+	    $prefs->{WorkDays} = 'default';
+	} else {
+	    $prefs->{WorkDays} = $workDays;
+	}
+	$cli->UpdateAccountPrefs("$user\@$domain", $prefs);
+    } else {
     	my $apiref = Cpanel::Api2::Exec::api2_preexec( 'Email', 'delpop' );
     	my ( $data, $status ) = Cpanel::Api2::Exec::api2_exec( 'Email', 'delpop', $apiref, {domain => $domain, email=> $user} );
     }
@@ -260,5 +364,36 @@ sub AccountsRemove {
     }
     return 1;
 }
+
+sub dkim_install {
+    my (undef, $params) = @_;
+    my $user = $params->{'user'};
+    my $cli = getCLI();
+    my @domains = Cpanel::Email::listmaildomains();
+    for my $domain (@domains) {
+	my $key = Cpanel::AdminBin::adminrun('cca', 'READFILE', "/var/cpanel/domain_keys/private/" . $domain);
+	$key =~ s/(\-{5}.*?\-{5}|^\.|\n|\r)//g;
+	$cli->UpdateDomainSettings(domain => $domain,settings => {
+	    DKIM => {
+		Enabled => 'Yes',
+		key => $key,
+		Selector => "default"
+	    }
+				   });
+    }
+    $cli->Logout();
+}
+
+sub dkim_uninstall {
+    my (undef, $params) = @_;
+    my $user = $params->{'user'};
+    my $cli = getCLI();
+    my @domains = Cpanel::Email::listmaildomains();
+    for my $domain (@domains) {
+	$cli->UpdateDomainSettings(domain => $domain,settings => {DKIM => {DKIMEnabled => 'No'}});
+    }
+    $cli->Logout();
+}
+
 
 1;

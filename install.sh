@@ -78,6 +78,7 @@ cp ${PACKSRC}/module/CommuniGate.pm /usr/local/cpanel/Cpanel/
 # Lets add CGPro perl lib
 cp ${PACKSRC}/library/CLI.pm /usr/local/cpanel/perl/
 ln -s /usr/local/cpanel/perl/CLI.pm /usr/local/cpanel
+ln -s /usr/local/cpanel/perl/CLI.pm /usr/local/lib/perl5/`perl -v | grep 'This is perl' | cut -f 2 -d 'v' | cut -f1 -d ' '`/
 
 # CGPro cPanel Wrapper
 cp ${PACKSRC}/cpwrap/ccaadmin /usr/local/cpanel/bin/
@@ -92,9 +93,16 @@ cp -rf ${PACKSRC}/hooks/CGPro /var/cpanel/perl5/lib/
 # Register installed hooks
 /usr/local/cpanel/bin/manage_hooks add module CGPro::Hooks
 
-#Install config file
+#Install config files
 cp ${PACKSRC}/etc/cpanel_cgpro.conf /var/cpanel/communigate.yaml
 chmod 600 /var/cpanel/communigate.yaml
+if [ ! -d /var/cpanel/cgpro/ ]
+then
+    mkdir -p /var/cpanel/cgpro/
+fi
+if [ ! -f /var/cpanel/cgpro/classes.yaml ]
+    cp ${PACKSRC}/etc/classes.yaml /var/cpanel/cgpro/classes.yaml
+fi
 
 # Install CommuniGate Webmail in cPanel
 cp ${PACKSRC}/cgpro-webmail/webmail_communigate.yaml /var/cpanel/webmail/
@@ -106,9 +114,7 @@ cp ${PACKSRC}/sso/login.pl /var/CommuniGate/cgi/
 
 # chkservd for CGServer & spamd
 cp ${PACKSRC}/chkservd/CommuniGate /etc/chkserv.d/
-cp ${PACKSRC}/chkservd/CommuniGate_spamd /etc/chkserv.d/
 echo "CommuniGate:1" >> /etc/chkserv.d/chkservd.conf
-echo "CommuniGate_spamd:1" >> /etc/chkserv.d/chkservd.conf
 
 # Check the scripts have executable flag
 chmod +x /usr/local/cpanel/whostmgr/docroot/cgi/addon_cgpro*
@@ -158,6 +164,8 @@ do
     chmod +x ${THEMES[$i]}/cgpro/backup/getaccbackup.live.cgi
     chmod +x ${THEMES[$i]}/cgpro/backup/getaliasesbackup.live.cgi
     chmod +x ${THEMES[$i]}/cgpro/backup/getfiltersbackup.live.cgi
+    chmod +x ${THEMES[$i]}/cgpro/mail/checkDomainSettings.live.cgi
+    chmod +x ${THEMES[$i]}/cgpro/mail/getDomainAccounts.live.cgi
     for ((j=0; j<${lLen}; j++)); do
         TARGET=${THEMES[$i]}/locale/`basename ${LOCALES[$j]} '{}'`.yaml.local
         if [ ! -f ${TARGET} ]
@@ -169,6 +177,7 @@ do
         cat ${LOCALES[$j]} >> ${TARGET}
     done
 done
+
 # Update Feature List
 cp ${PACKSRC}/featurelists/cgpro /usr/local/cpanel/whostmgr/addonfeatures/
 chmod +x ${PACKSRC}/scripts/*
@@ -179,6 +188,12 @@ ${PACKSRC}/scripts/rename_classes.pl
 /usr/local/cpanel/bin/build_locale_databases
 
 replace "cpanel.communigate.com" "${HOSTNAME}" -- /var/CommuniGate/Settings/Main.settings
+
+# install DKIM tools FOR CGPro server Only
+chmod +x ${PACKSRC}/tools/*
+cp ${PACKSRC}/tools/helper_DKIM_sign.pl /var/CommuniGate/
+cp ${PACKSRC}/tools/helper_DKIM_verify.pl /var/CommuniGate/
+${PACKSRC}/scripts/install_dkim_signer.pl
 
 #################################################
 #             	  OS Specific	  	 	#

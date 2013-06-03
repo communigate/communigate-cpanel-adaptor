@@ -18,6 +18,7 @@ use Cpanel::Sys::Hostname		();
 use Cpanel::Api2::Exec ();
 use Storable                         ();
 use Time::Local  'timelocal_nocheck';
+use Digest::MD5 qw(md5_hex);
 
 require Exporter;
 @ISA    = qw(Exporter);
@@ -93,9 +94,9 @@ sub api2_AccountsOverview {
 	    my $accounts=$cli->ListAccounts($domain);
 	    foreach my $userName (sort keys %$accounts) {	
 		my $accountData = $cli->GetAccountEffectiveSettings("$userName\@$domain");
+		my $accountStats = $cli->GetAccountStat("$userName\@$domain");
 		my $service = @$accountData{'ServiceClass'} || '';
-
-		$accountData = $cli->GetAccountEffectiveSettings("$userName\@$domain");
+		my $accountPrefs = $cli->GetAccountEffectivePrefs("$userName\@$domain");
 		my $diskquota = @$accountData{'MaxAccountSize'} || '';
 		$diskquota =~ s/M//g;
 		my $_diskused = $cli->GetAccountInfo("$userName\@$domain","StorageUsed");
@@ -109,16 +110,126 @@ sub api2_AccountsOverview {
 
 		$return_accounts->{$userName . "@" . $domain} = {
 		    domain => $domain,
+		    username => $userName,
 		    class => $service,
 		    quota => $diskquota,
 		    used => $diskused,
-		    usedpercent => $diskusedpercent
+		    data => $accountData,
+		    prefs => $accountPrefs,
+		    usedpercent => $diskusedpercent,
+		    stats => $accountStats,
+		    md5 => md5_hex(lc $userName . "@" . $domain),
 		};
 	    }
 	}
 	my $defaults = $cli->GetServerAccountDefaults();
 	$cli->Logout();
-	return { accounts => $return_accounts, classes => $defaults->{'ServiceClasses'}, data => $data };
+	return { accounts => $return_accounts,
+		 classes => $defaults->{'ServiceClasses'},
+		 data => $data,
+		 sort_keys_by => sub {
+		     my $hash = shift;
+		     my $sort_field = shift;
+		     my $reverse = shift;
+		     $sort_field = 'username' if $sort_field !~ /^\w+$/;
+		     return sort { $hash->{$b}->{$sort_field} cmp $hash->{$a}->{$sort_field} || $hash->{$b}->{'username'} cmp $hash->{$a}->{'username'} || $hash->{$b}->{'domain'} cmp $hash->{$a}->{'domain'}} keys %$hash if $reverse == 1;
+		     return sort { $hash->{$a}->{$sort_field} cmp $hash->{$b}->{$sort_field} || $hash->{$a}->{'username'} cmp $hash->{$b}->{'username'} || $hash->{$a}->{'domain'} cmp $hash->{$b}->{'domain'}} keys %$hash;
+		 }
+	};
+}
+
+sub api2_AccountDefaults {
+	my %OPTS = @_;
+	my @domains = Cpanel::Email::listmaildomains(); 
+	my $cli = getCLI();
+	my $domain = $domains[0];
+	for my $dom (@domains) {
+	    if ($dom eq $OPTS{'domain'}) {
+		$domain = $dom;
+	    }
+	}
+	if ($OPTS{'save'}) {
+	    my $defaultServerAccountPrefs = $cli->GetServerAccountPrefs();
+		$cli->UpdateDomainSettings(
+		    domain => $domain,
+		    settings => {
+			MailRerouteAddress => $OPTS{'MailRerouteAddress'},
+			MailToAllAction => $OPTS{'MailToAllAction'},
+		    }
+		    );
+		my $workdays = [map { $OPTS{$_} } grep { /^WorkDays\-?/ }  sort keys %OPTS];
+		$cli->UpdateAccountDefaultPrefs(
+		    domain => $domain,
+		    settings => {
+			TimeZone => $OPTS{'TimeZone'},
+			WorkDayStart => $OPTS{'WorkDayStart'},
+			WorkDayEnd => $OPTS{'WorkDayEnd'},
+			WeekStart => $OPTS{'WeekStart'},
+			WorkDays => (join(",",@$workdays) eq join(",",@{$defaultServerAccountPrefs->{WorkDays}}) ? 'default' : $workdays),
+		    }
+		    );
+	}
+	my $serverDomainDefaults = $cli->GetDomainDefaults();
+	my $serverAccountPrefs = $cli->GetServerAccountPrefs();
+	my $domainSettings = $cli->GetDomainSettings($domain);
+	my $accountDefaultPrefs = $cli->GetAccountDefaultPrefs($domain);
+	$cli->Logout();
+	return { 
+	    serverDomainDefaults => $serverDomainDefaults,
+	    serverAccountPrefs => $serverAccountPrefs,
+	    domainSettings => $domainSettings,
+	    accountDefaultPrefs => $accountDefaultPrefs,
+	    domain => $domain
+	};
+}
+
+sub api2_ListClasses {
+	my %OPTS = @_;
+	my $invert = $OPTS{'invert'};
+	my $cli = getCLI();
+	my $defaults = $cli->GetServerAccountDefaults();
+	my @return;
+	for my $class (sort keys %{$defaults->{'ServiceClasses'}}) {
+	    push @return, {class => $class};
+	}
+	$cli->Logout();
+	return @return;
+}
+
+sub api2_ListWorkDays {
+	my %OPTS = @_;
+	my $domain = $OPTS{'domain'};
+	my $cli = getCLI();
+	my $defaults = $cli->GetServerAccountPrefs();
+	if ($domain) {
+	    my @domains = Cpanel::Email::listmaildomains(); 
+	    for $dom (@domains) {
+		if ($dom eq $domain) {
+		    $prefs = $cli->GetAccountDefaultPrefs($domain);
+		    $defaults->{WorkDays} = $prefs->{WorkDays} if $prefs->{WorkDays};
+		    last;
+		}
+	    }
+	}
+	$cli->Logout();
+	return { default => $defaults->{WorkDays} };
+}
+sub api2_getDomainAccounts {
+	my %OPTS = @_;
+	my $domain = $OPTS{'domain'};
+	my $cli = getCLI();
+	my $accounts = undef;
+	if ($domain) {
+	    my @domains = Cpanel::Email::listmaildomains(); 
+	    for $dom (@domains) {
+		if ($dom eq $domain) {
+		    $accounts = $cli->ListAccounts($domain);
+		    last;
+		}
+	    }
+	}
+	$cli->Logout();
+	return $accounts;
 }
 
 sub api2_UpdateAccountClass {
@@ -1855,8 +1966,6 @@ sub api2_SetGroupSettings {
         @$Settings{'RejectAutomatic'}=($OPTS{'RejectAutomatic'}?'YES':'NO');;
         @$Settings{'RemoveAuthor'}=($OPTS{'RemoveAuthor'}?'YES':'NO');;
         @$Settings{'SetReplyTo'}=($OPTS{'SetReplyTo'}?'YES':'NO');;
-        @$Settings{'EmailDisabled'}=($OPTS{'EmailDisabled'}?'YES':'NO');;
-        @$Settings{'SignalDisabled'}=($OPTS{'SignalDisabled'}?'YES':'NO');;
         $cli->SetGroup($email,$Settings);
         my $error_msg = $cli->getErrMessage();
         my @result;
@@ -2056,6 +2165,50 @@ sub api2_updateSignalRule {
     }
     $cli->Logout();
     return $return;
+}
+sub api2_VerifyAccount {
+    my %OPTS = @_;
+    my $user = $OPTS{'email'};
+    my $domain = $OPTS{'domain'};
+    my $cli = "";
+    my $settings = "";
+    eval { 
+	$cli = getCLI();
+	$settings = $cli->GetAccountSettings("$user\@$domain");
+    };
+    unless ($settings) {
+    	my $apiref = Cpanel::Api2::Exec::api2_preexec( 'Email', 'delpop' );
+    	my ( $data, $status ) = Cpanel::Api2::Exec::api2_exec( 'Email', 'delpop', $apiref, {domain => $domain, email=> $user} );
+    }
+    $cli->Logout();
+    return;
+}
+
+sub api2_checkSSLlinks {
+    $Cpanel::CPVAR{"ssllinks"} = 0;
+    $Cpanel::CPVAR{"ssllinks"} = 1 if -f "/var/cpanel/cgpro/ssllinks";
+}
+
+sub api2_DKIMVerification {
+    my %OPTS = @_;
+    $cli = getCLI();
+    if ($OPTS{DKIMVerifyReject}) {
+	for my $domain (@domains) {
+	    my $settings = {
+		'DKIMVerifyEnable' => ($OPTS{DKIMVerifyEnable} ? 'YES' : 'NO'),
+		'DKIMVerifyReject' => $OPTS{DKIMVerifyReject}
+	    };
+	    $cli->UpdateAccountDefaultPrefs(domain => $domain, settings => $settings);
+	}
+    }
+    my $serverPrefs = $cli->GetServerAccountPrefs();
+    $Cpanel::CPVAR{"serverPrefsEnable"} = $serverPrefs->{DKIMVerifyEnable};
+    $Cpanel::CPVAR{"serverPrefsReject"} = $serverPrefs->{DKIMVerifyReject};
+    my @domains = Cpanel::Email::listmaildomains();
+    my $domainPrefs = $cli->GetAccountDefaultPrefs($domains[0]);
+    $Cpanel::CPVAR{"domainPrefsEnable"} = $domainPrefs->{DKIMVerifyEnable};
+    $Cpanel::CPVAR{"domainPrefsReject"} = $domainPrefs->{DKIMVerifyReject};
+    $cli->Logout();
 }
 
 sub api2_doUpdateSignalRule {
