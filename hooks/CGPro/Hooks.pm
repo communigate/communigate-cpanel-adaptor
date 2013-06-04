@@ -189,8 +189,8 @@ sub editquota {
 	$quota .= "M";
     }
 
-    my $data = $cli->GetDomainSettings("$domain");
-    if (!$data) {
+    my $DomainData = $cli->GetDomainSettings("$domain");
+    if (!$DomainData) {
 	$cli->CreateDomain("$domain");
     }
     my $data;
@@ -236,7 +236,7 @@ sub editquota {
 	}
 	$cli->UpdateAccountPrefs("$user\@$domain", $prefs);
     }
-    $cli->SetAccountSettings("$user\@$domain", $data);
+    $cli->UpdateAccountSettings("$user\@$domain", $data);
     $cli->Logout();
 }
 
