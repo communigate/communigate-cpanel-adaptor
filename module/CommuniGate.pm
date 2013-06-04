@@ -90,6 +90,7 @@ sub api2_AccountsOverview {
 	my @result;
 	my $data = Cpanel::CachedDataStore::fetch_ref( '/var/cpanel/cgpro/classes.yaml' ) || {};
 	my $return_accounts = {};
+	my $freeExtensions = {};
 	foreach my $domain (@domains) {
 	    my $accounts=$cli->ListAccounts($domain);
 	    foreach my $userName (sort keys %$accounts) {	
@@ -121,11 +122,21 @@ sub api2_AccountsOverview {
 		    md5 => md5_hex(lc $userName . "@" . $domain),
 		};
 	    }
+	    my $forwarders = $cli->ListForwarders($domain);
+	    for my $forwarder (@$forwarders) {
+		if ($forwarder =~ m/^tn\-\d+/) {
+		    my $to = $cli->GetForwarder("$forwarder\@$domain");
+		    $freeExtensions->{$domain} = [] unless $freeExtensions->{$domain};
+		    push @{$freeExtensions->{$domain}}, $forwarder if $to eq 'null';
+		    $return_accounts->{$to}->{extension} = $forwarder if $to ne 'null';
+		}
+	    }
 	}
 	my $defaults = $cli->GetServerAccountDefaults();
 	$cli->Logout();
 	return { accounts => $return_accounts,
 		 classes => $defaults->{'ServiceClasses'},
+		 freeExtensions => $freeExtensions,
 		 data => $data,
 		 sort_keys_by => sub {
 		     my $hash = shift;

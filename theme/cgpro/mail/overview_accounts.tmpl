@@ -1,4 +1,7 @@
 [% USE CPBranding -%]
+[% MACRO filter_options(pval, val, text) BLOCK -%]
+<option value="[% val %]"[% val == pval ? " selected='selected'" : "" %]>[% cptext(text) %]</option>
+[% END -%]
 [% MACRO features(feature, icon, text, nolink) BLOCK -%]
 [% UNLESS nolink -%]
 <a href="javascript:toggle_action_div(null, {id:'classes_module_[% loop.count - 1 %]', index:[% loop.count - 1 %], action:'classes'})" title="[% text %]">
@@ -86,6 +89,17 @@
       <div  style="display: none;" class="user-section" id="account_details_module_[% loop.count - 1 %]">
 	<table style="text-align: center; margin: 0px auto" class="account-details">
 	    <tbody>
+	      [% IF classstring == 'All' || classstring.search("SIP") -%]
+	      <tr>
+		<th style="text-align: left">[% locale.maketext("CGPExtension") %]: </th>
+		<td style="text-align: left">
+		  [% IF accounts.$account.extension -%]
+		  [% accounts.$account.extension.split('-').1 %]
+		  [% END -%]
+		  <span id="extension_input_[% loop.count - 1 %]_error" style="width: 16px; height: 16px;" class="cjt_validation_error"></span>
+		</td>
+	      </tr>
+	      [% END -%]
 	      <tr>
 		<th style="text-align: left;">[% locale.maketext('CGPRealName') %]:</th>
 		<td style="text-align: left;">
@@ -206,6 +220,24 @@
 		  <input type="text" value="[% accounts.$account.data.RealName %]" name="realname" id="realaname_input_[% loop.count - 1 %]"> <span id="relaname_input_[% loop.count - 1 %]_error" style="width: 16px; height: 16px;" class="cjt_validation_error"></span>
 		</td>
 	      </tr>
+	      [% IF classstring == 'All' || classstring.search("SIP") -%]
+	      <tr>
+		<td width="45%" style="text-align: right">[% locale.maketext("CGPExtension") %]: </td>
+		<td width="55%" style="text-align: left">
+		  <select name="extension">
+		    [% domain = account.split('@').1 %]
+		    [% filter_options("", "", "---") %]
+		    [% IF accounts.$account.extension -%]
+		    [% filter_options(accounts.$account.extension, accounts.$account.extension, accounts.$account.extension.split('-').1 ) %]
+		    [% END -%]
+		    [% FOR ex IN freeExtensions.$domain -%]
+		    [% filter_options(accounts.$account.extension, ex, ex.split('-').1) %]
+		    [% END -%]
+		  </select>
+		  <span id="extension_input_[% loop.count - 1 %]_error" style="width: 16px; height: 16px;" class="cjt_validation_error"></span>
+		</td>
+	      </tr>
+	      [% END -%]
 	      <tr>
 		<td width="45%" style="text-align: right">[% locale.maketext("CGPMailboxQuota") %]: </td>
 		<td width="55%" style="text-align: left">
