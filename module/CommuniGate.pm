@@ -1380,16 +1380,15 @@ sub api2_AddGroup{
         my @result;
         if ($error_msg eq "OK") {
                 push( @result, { email => "$listname", domain => "$domain" } );
+		# set real name
+		$Settings=$cli->GetGroup("$listname\@$domain");
+		@$Settings{'RealName'}=$realname; 
+		@$Settings{'SignalDisabled'}= 'YES'; 
+		$cli->SetGroup("$listname\@$domain",$Settings);
         } else {
                 $Cpanel::CPERROR{'CommuniGate'} = $error_msg;
         }
-
-	# set real name
-	$Settings=$cli->GetGroup("$listname\@$domain");
-  	@$Settings{'RealName'}=$realname; 
-  	$cli->SetGroup("$listname\@$domain",$Settings);
 	$cli->Logout();
-
 
 	# Create rule if posting is restricted to members : (spectre = 0)
 	if (!$spectre) {
@@ -1981,6 +1980,7 @@ sub api2_SetGroupSettings {
         @$Settings{'RejectAutomatic'}=($OPTS{'RejectAutomatic'}?'YES':'NO');;
         @$Settings{'RemoveAuthor'}=($OPTS{'RemoveAuthor'}?'YES':'NO');;
         @$Settings{'SetReplyTo'}=($OPTS{'SetReplyTo'}?'YES':'NO');;
+        @$Settings{'SignalDisabled'}=($OPTS{'SignalDisabled'}?'NO':'YES');;
         $cli->SetGroup($email,$Settings);
         my $error_msg = $cli->getErrMessage();
         my @result;

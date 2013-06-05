@@ -20,9 +20,6 @@
 <cpanel setvar="vidtut_height=269">	
 
 <p class="description"><cpanel langprint="CGPGroupSettingsDesc"></p>
-<div class="return-link"><a href="http://www.communigate.com/communigatepro/Groups.html#Settings" target="_blank"><cptext "Documentation"></a></div>
-<br>
-<br>
 
 
 
@@ -96,11 +93,7 @@
 </tr>
 <tr>
 <td></td>
-<td nowrap="nowrap" ><input type="checkbox" name="EmailDisabled" value="1" <cpanelif $CPDATA{'EmailDisabled'}=='YES'><cpanel print=' checked'></cpanelif>/>Disable E-mails</td>
-</tr>
-<tr>
-<td></td>
-<td nowrap="nowrap" ><input type="checkbox" name="SignalDisabled" value="1" <cpanelif $CPDATA{'SignalDisabled'}=='YES'><cpanel print=' checked'></cpanelif>/>Disable Signals</td>
+<td nowrap="nowrap" ><input type="checkbox" name="SignalDisabled" value="1" <cpanelif $CPDATA{'SignalDisabled'}=='NO'><cpanel print=' checked'></cpanelif>/>Signaling Enabled</td>
 </tr>
 
 </table>
