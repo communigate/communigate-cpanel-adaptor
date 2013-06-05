@@ -130,6 +130,10 @@ sub api2_AccountsOverview {
 		    push @{$freeExtensions->{$domain}}, $forwarder if $to eq 'null';
 		    $return_accounts->{$to}->{extension} = $forwarder if $to ne 'null';
 		}
+		if ($forwarder =~ m/^\d{3}$/) {
+		    my $to = $cli->GetForwarder("$forwarder\@$domain");
+		    $return_accounts->{$to}->{local_extension} = $forwarder;
+		}
 	    }
 	}
 	my $defaults = $cli->GetServerAccountDefaults();

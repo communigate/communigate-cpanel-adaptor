@@ -46,6 +46,9 @@ var toggle_action_div = function(e, o) {
     }
 };
 
+var verify_local_extension_local = function (e) {
+    return CPANEL.validate.positive_integer(e) && CPANEL.validate.greater_than(e,200) && CPANEL.validate.less_than(e,1000);
+};
 var verify_local = function (i) {
     var PWD_BAR = new CPANEL.password.strength_bar("password_strength_bar_" + i);
     var VAL_PWD = new CPANEL.validate.validator(LANG.password_input);
@@ -70,6 +73,12 @@ var verify_local = function (i) {
 		});
 	});
     CPANEL.validate.attach_to_form("email_table_change_password_confirm_" + i, [VAL_PWD, VAL_PWD2]);
+    if (document.getElementById("local_extension_input_" + i)) {
+	var VAL_LOCAL_EXT = new CPANEL.validate.validator(LANG.local_extension_input);
+	VAL_LOCAL_EXT.add("local_extension_input_" + i, 'if_not_empty(%input%,verify_local_extension_local)', YAHOO.lang.substitute(LANG.local_extension_input_invalid,{min: 200, max: 999}));
+	VAL_LOCAL_EXT.attach();
+	CPANEL.validate.attach_to_form("change_quota_confirm_" + i, [VAL_LOCAL_EXT]);
+    }
 };
 
 YAHOO.util.Event.onDOMReady(function () {

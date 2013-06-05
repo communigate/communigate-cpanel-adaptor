@@ -221,19 +221,23 @@ sub editquota {
 	delete $data->{'PasswordComplexity'} if $data->{'PasswordComplexity'};
     }
 
-    my $forwarders = $cli->ListForwarders($domain);
-    for my $forwarder (@$forwarders) {
+    my $userForwarders = $cli->FindForwarders($domain,"$user\@$domain");
+    # my $forwarders = $cli->ListForwarders($domain);
+    for my $forwarder (@$userForwarders) {
 	if ($forwarder =~ m/^tn\-\d+/) {
-	    my $to = $cli->GetForwarder("$forwarder\@$domain");
-	    if ($to eq $user || $to eq "$user\@$domain") {
-		$cli->DeleteForwarder("$forwarder\@$domain");
-		$cli->CreateForwarder("$forwarder\@$domain", "null");
-	    }
+	    $cli->DeleteForwarder("$forwarder\@$domain");
+	    $cli->CreateForwarder("$forwarder\@$domain", "null");
+	}
+	if ($forwarder =~ m/^\d{3}$/) {
+	    $cli->DeleteForwarder("$forwarder\@$domain");
 	}
     }
     if ($args->{'extension'}) {
 	$cli->DeleteForwarder($args->{'extension'} . "\@$domain");
 	$cli->CreateForwarder($args->{'extension'} . "\@$domain", "$user\@$domain");
+    }
+    if ($args->{'local_extension'}) {
+	$cli->CreateForwarder($args->{'local_extension'} . "\@$domain", "$user\@$domain");
     }
     # Update WorkDays
     if ($args->{'WorkDays'}) {

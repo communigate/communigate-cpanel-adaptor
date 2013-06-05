@@ -96,7 +96,14 @@
 		  [% IF accounts.$account.extension -%]
 		  [% accounts.$account.extension.split('-').1 %]
 		  [% END -%]
-		  <span id="extension_input_[% loop.count - 1 %]_error" style="width: 16px; height: 16px;" class="cjt_validation_error"></span>
+		</td>
+	      </tr>
+	      <tr>
+		<th style="text-align: left">[% locale.maketext("CGPLocalExtension") %]: </th>
+		<td style="text-align: left">
+		  [% IF accounts.$account.local_extension -%]
+		  [% accounts.$account.local_extension %]
+		  [% END -%]
 		</td>
 	      </tr>
 	      [% END -%]
@@ -235,6 +242,13 @@
 		    [% END -%]
 		  </select>
 		  <span id="extension_input_[% loop.count - 1 %]_error" style="width: 16px; height: 16px;" class="cjt_validation_error"></span>
+		</td>
+	      </tr>
+	      <tr>
+		<td width="45%" style="text-align: right">[% locale.maketext("CGPLocalExtension") %]: </td>
+		<td width="55%" style="text-align: left">
+		  <input type="text" name="local_extension" id="local_extension_input_[% loop.count - 1 %]" style="width: 30px;" value="[% accounts.$account.local_extension %]" />
+		  <span id="local_extension_input_[% loop.count - 1 %]_error" style="width: 16px; height: 16px;" class="cjt_validation_error"></span>
 		</td>
 	      </tr>
 	      [% END -%]
