@@ -456,12 +456,12 @@ sub api2_listforwards {
 	  if ($Rule->[1] eq "#Redirect") {
 	    my @dest = split(",",$Rule->[3]->[0]->[1]);
 	    foreach my $value (@dest) {
-	      push( @result, {       uri_dest => "$userName%40$domain",
-				     html_dest => "$userName\@$domain",
-				     dest => "$userName\@$domain",
-				     uri_forward => "$value",
-				     html_forward => "$value" ,
-				     forward => "$value" } );
+		push( @result, {       uri_dest => "$userName%40$domain",
+				       html_dest => "$userName\@$domain",
+				       dest => "$userName\@$domain",
+				       uri_forward => "$value",
+				       html_forward => "$value" ,
+				       forward => "$value" } );
 	    }
 	  }
 	}
@@ -477,14 +477,14 @@ sub api2_listforwards {
       }
       my $forwarders = $cli->ListForwarders($domain);
       foreach my $forwarder (@$forwarders) {
-	my $fwd = $cli->GetForwarder("$forwarder\@$domain");
-	push( @result, { uri_dest => "$forwarder%40$domain",
-			 html_dest => "$forwarder\@$domain",
-			 dest => "$forwarder\@$domain",
-			 uri_forward => "$fwd",
-			 html_forward => "$fwd" ,
-			 forward => "$fwd" } );
-
+	  next if $forwarder =~ m/^(i|tn)\-\d+$/i;
+	  my $fwd = $cli->GetForwarder("$forwarder\@$domain");
+	  push( @result, { uri_dest => "$forwarder%40$domain",
+			   html_dest => "$forwarder\@$domain",
+			   dest => "$forwarder\@$domain",
+			   uri_forward => "$fwd",
+			   html_forward => "$fwd" ,
+			   forward => "$fwd" } );
       }
     }
   }
