@@ -1,0 +1,83 @@
+<cpanel setvar="headerimg=../images/mailmenu.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+
+
+	
+<style type="text/css">
+<?cp Branding::spritelist(.spriteicon_img_mini {float:left;margin-right:5px;background: url\{leftparenthesis}"%"\{rightparenthesis};} %,@spriteurl,images::#icon-${img}_mini {background-position\{colon}0 -${cssposition}px;width\{colon}${width}px;height\{colon}${height}px; }:) imgtype=icon,subtype=img,method=scale_60percent,format=png,img=maillist ?>
+</style>	
+	
+<div class="body-content">
+
+<div class="h1Title"><div class="spriteicon_img_mini" id="icon-maillist_mini"></div> <cpanel langprint="GGPDepartureSettings"> <cpanel print="$FORM{'email'}"></div>
+
+<cpanel setvar="vidtut_name=mailinglists">
+<cpanel setvar="vidtut_header=VidMailingList">
+<cpanel setvar="vidtut_description=VidMailingListDesc">
+<cpanel setvar="vidtut_video_name=mailinglists-low">
+<cpanel setvar="vidtut_width=450">
+<cpanel setvar="vidtut_height=269">	
+
+<cpanelif $FORM{'SubmitMLSettings'}>
+<?cp CommuniGate::SetDepartureSettings() email=$FORM{'email'},Expand=$FORM{'Expand'},RealName=$FORM{'RealName'},EmailDisabled=$FORM{'EmailDisabled'} ?>
+</cpanelif>
+
+<cpanelif $CPERROR{'CommuniGate'} && $FORM{'SubmitMLSettings'}>
+<p><cpanel print="CGP ERROR : $CPERROR{'CommuniGate'}"></p>
+</cpanelif>
+
+<cpanelif !$CPERROR{'CommuniGate'} && $FORM{'SubmitMLSettings'}>
+<p><b><cpanel print="Settings were successfully saved."></b></p>
+</cpanelif>
+
+
+<?cp CommuniGate::GetGroupSettings() email=$FORM{'email'}?>
+
+
+<cpanelif $CPERROR{'CommuniGate'}>
+<p><cpanel print="CGP ERROR : $CPERROR{'CommuniGate'}"></p>
+</cpanelif>
+
+
+<form action="groupsettings.html">
+
+<input type=hidden name="SubmitMLSettings" value="true">
+<input type=hidden name="email" value="<cpanel print="$FORM{'email'}">">
+
+<div class="highlight">
+
+
+<table width="100%" class="settingsBox">
+ <tr>
+                <td style="width: 150px" align="right"><cpanel langprint="CGPDepartureRealName">:</td>
+                <td><input type="text" name="RealName" id="RealName" value="<cpanel print=$CPDATA{'RealName'}>" style="width: 150px" /></td>
+                <td><div id="email_error"></div></td>
+        </tr>
+
+<tr>
+<td></td>
+<td nowrap="nowrap" ><input type="checkbox" name="Expand" value="1" <cpanelif $CPDATA{'Expand'}=='YES'><cpanel print=' checked'></cpanelif>/>Expand Departure Members</td>
+</tr>
+<tr>
+<td></td>
+<td nowrap="nowrap" ><input type="checkbox" name="EmailDisabled" value="1" <cpanelif $CPDATA{'EmailDisabled'}=='NO'><cpanel print=' checked'></cpanelif>/>Emails Enabled</td>
+</tr>
+
+</table>
+</div>
+
+
+
+<BR>
+
+<p>
+<center><p><input type="submit" value="<cpanel langprint="CGPMailListSubmitSettings">" class="input-button"></p></center>
+</form>
+</p>
+<div class="return-link"><a href="groups.html">&larr; <cptext "Go Back"></a></div>
+
+
+</div><!-- end body-content -->
+
+<cpanel Branding="include(stdfooter.html)">

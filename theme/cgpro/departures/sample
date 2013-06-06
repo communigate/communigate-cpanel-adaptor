@@ -1,0 +1,8 @@
+(
+  (
+    5,
+    test,
+    (("Any To or Cc", is, sales@dev.cpanel.communigate.com)),
+    (("Reject with", "Sender not allowed."))
+  )
+)

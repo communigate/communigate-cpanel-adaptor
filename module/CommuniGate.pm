@@ -1326,7 +1326,23 @@ sub api2_ListGroups{
         foreach my $domain (@domains) {
                 my $groups=$cli->ListGroups($domain);
                 foreach $groupName (sort @$groups) {
-                 push( @result, { list => "$groupName\@$domain" , domain =>"$domain"} );
+		    my $details = $cli->GetGroup("$groupName\@$domain");
+		    push( @result, { list => "$groupName\@$domain" , domain =>"$domain"} ) unless (defined($details->{EmailDisabled}) && $details->{EmailDisabled} eq "YES");
+                }
+        }
+	$cli->Logout();
+        return @result;
+}
+sub api2_ListDepartures {
+        my %OPTS = @_;
+        @domains = Cpanel::Email::listmaildomains();
+	my $cli = getCLI();
+        my @result;
+        foreach my $domain (@domains) {
+                my $groups=$cli->ListGroups($domain);
+                foreach $groupName (sort @$groups) {
+		    my $details = $cli->GetGroup("$groupName\@$domain");
+		    push( @result, { list => "$groupName\@$domain" , domain =>"$domain"} ) unless (defined($details->{SignalDisabled}) && $details->{SignalDisabled} eq "YES");
                 }
         }
 	$cli->Logout();
@@ -1388,16 +1404,39 @@ sub api2_AddGroup{
         } else {
                 $Cpanel::CPERROR{'CommuniGate'} = $error_msg;
         }
-	$cli->Logout();
-
 	# Create rule if posting is restricted to members : (spectre = 0)
 	if (!$spectre) {
 		SetGroupInternal("$listname\@$domain");
 	}
 
+	$cli->Logout();
         return @result;
 }
 
+sub api2_AddDeparture {
+        my %OPTS = @_;
+        my $domain = $OPTS{'domain'};
+        my $listname = $OPTS{'email'};
+        my $spectre = $OPTS{'spectre'};
+        my $realname = $OPTS{'realname'};
+	my $cli = getCLI();
+        $cli->CreateGroup("$listname\@$domain");
+        my $error_msg = $cli->getErrMessage();
+        my @result;
+        if ($error_msg eq "OK") {
+                push( @result, { email => "$listname", domain => "$domain" } );
+		# set real name
+		$Settings=$cli->GetGroup("$listname\@$domain");
+		@$Settings{'RealName'}=$realname; 
+		@$Settings{'EmailDisabled'} = 'YES'; 
+		$cli->SetGroup("$listname\@$domain",$Settings);
+        } else {
+                $Cpanel::CPERROR{'CommuniGate'} = $error_msg;
+        }
+
+	$cli->Logout();
+        return @result;
+}
 
 sub api2_ListGroupMembers {
         my %OPTS = @_;
@@ -1984,19 +2023,34 @@ sub api2_SetGroupSettings {
         $cli->SetGroup($email,$Settings);
         my $error_msg = $cli->getErrMessage();
         my @result;
-        if ($error_msg eq "OK") {
-                #noop
-        } else {
-                $Cpanel::CPERROR{'CommuniGate'} = $error_msg;
+        unless ($error_msg eq "OK") {
+	    $Cpanel::CPERROR{'CommuniGate'} = $error_msg;
         }
-	$cli->Logout();
 	if ($OPTS{'spectre'} && IsGroupInternal($email)) {
-		SetGroupExternal($email);
+	    SetGroupExternal($email);
 	}
 	if (!$OPTS{'spectre'} && (!IsGroupInternal($email))) {
-                SetGroupInternal($email);
+	    SetGroupInternal($email);
         } 
+	$cli->Logout();
+        return @result;
+}
+sub api2_SetDepartureSettings {
+        my %OPTS = @_;
+        my $email = $OPTS{'email'};
+	my $cli = getCLI();
 
+        $Settings=$cli->GetGroup($email);
+        @$Settings{'RealName'}=$OPTS{'RealName'};
+        @$Settings{'Expand'}=($OPTS{'Expand'}?'YES':'NO');;
+        @$Settings{'EmailDisabled'}=($OPTS{'EmailDisabled'}?'NO':'YES');;
+        $cli->SetGroup($email,$Settings);
+        my $error_msg = $cli->getErrMessage();
+        my @result;
+        unless ($error_msg eq "OK") {
+	    $Cpanel::CPERROR{'CommuniGate'} = $error_msg;
+        }
+	$cli->Logout();
         return @result;
 }
 
@@ -2333,7 +2387,6 @@ sub GroupMembersForRule{
                 }
         }       
 	$cli->Logout();
-        return $result;
 }
 
 sub SetGroupInternal {
@@ -2358,7 +2411,7 @@ sub SetGroupInternal {
                                 ['Discard']
                         ]
                 ];
-        push(@NewRules,$NewRule);
+	push(@NewRules,$NewRule);
         foreach my $Rule (@$ExistingRules) {
                 push(@NewRules,$Rule);
         }
