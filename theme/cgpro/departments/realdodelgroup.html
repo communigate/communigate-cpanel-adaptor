@@ -3,15 +3,15 @@
 <cpanel Branding="include(stdheader.html)">
 
 <div class="body-content">
-<h1><cpanel langprint="CGPDepartureMaintenance"></h1>
+<h1><cpanel langprint="CGPDepartmentMaintenance"></h1>
 
 
-<p><?cp CommuniGate::DelGroup() email=$FORM{'email'} || 'maketext('The departure could not be removed.')' ?></p>
+<p><?cp CommuniGate::DelGroup() email=$FORM{'email'} || 'maketext('The department could not be removed.')' ?></p>
 <cpanelif $CPERROR{'CommuniGate'}>
 <p><cpanel print="$CPERROR{'CommuniGate'}"></p>
 </cpanelif>
 <cpanelif !$CPERROR{'CommuniGate'}>
-    <p><b><cpanel print="$FORM{'email'}"></b> <cpanel langprint="CGPDepartureDeleted"> 
+    <p><b><cpanel print="$FORM{'email'}"></b> <cpanel langprint="CGPDepartmentDeleted"> 
 </cpanelif>
 
 <div class="return-link"><a href="groups.html">&larr; <cptext "Go Back"></a></div>

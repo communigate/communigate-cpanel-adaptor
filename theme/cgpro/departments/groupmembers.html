@@ -39,9 +39,9 @@
 	
 <div class="body-content">
 
-<div class="h1Title"><div class="spriteicon_img_mini" id="icon-maillist_mini"></div> <cpanel langprint="CGPDepartureMembers"> <cpanel print="$FORM{'listname'}"></div>
+<div class="h1Title"><div class="spriteicon_img_mini" id="icon-maillist_mini"></div> <cpanel langprint="CGPDepartmentMembers"> <cpanel print="$FORM{'listname'}"></div>
 
-<h2><cpanel langprint="CGPAddDepartureMember"></h2>
+<h2><cpanel langprint="CGPAddDepartmentMember"></h2>
 <?cp StatsBar::stat( [p class="caution"]$LANG{'statsattention'}&nbsp;%&nbsp;$LANG{'statsoutof'}&nbsp;%$LANG{'available'}&nbsp;$LANG{'INDXMailingLists'}[/p],count,max) display=mailinglists,warnings=1,warninglevel=80,infinitylang=true ?>
 
 
@@ -84,7 +84,7 @@ var init_lists = function() {
 </script>
 
 
-<h2><cpanel langprint="CGPDepartureCurrentMembers"></h2>
+<h2><cpanel langprint="CGPDepartmentCurrentMembers"></h2>
 
 <table border="0" cellpadding="5" cellspacing="0" id="mailtbl" class="sortable" width="650">
 
@@ -108,7 +108,7 @@ var init_lists = function() {
 		[/td]
 
 	[/tr]
-,*num,subemail,subemail,r_feedsel,r_digestsel,r_indexsel,r_nullsel,r_bannedsel,r_subscribesel,r_unsubscribesel,mod1sel,mod2sel,mod3sel,mod4sel,mod5sel,modallsel,unmodsel,nopostsel,numpost,subemail,subemail,subemail,subemail,subemail) listname=$FORM{'listname'},regex=$FORM{'searchregex'},api2_paginate=1,api2_paginate_start=$FORM{'api2_paginate_start'},api2_paginate_size=$CPVAR{'itemsperpage'} || '[tr][td colspan="4" class="errors"]$LANG{'CGPDepartureNoSub'}[/td][/tr]' ?>
+,*num,subemail,subemail,r_feedsel,r_digestsel,r_indexsel,r_nullsel,r_bannedsel,r_subscribesel,r_unsubscribesel,mod1sel,mod2sel,mod3sel,mod4sel,mod5sel,modallsel,unmodsel,nopostsel,numpost,subemail,subemail,subemail,subemail,subemail) listname=$FORM{'listname'},regex=$FORM{'searchregex'},api2_paginate=1,api2_paginate_start=$FORM{'api2_paginate_start'},api2_paginate_size=$CPVAR{'itemsperpage'} || '[tr][td colspan="4" class="errors"]$LANG{'CGPDepartmentNoSub'}[/td][/tr]' ?>
 
 
 

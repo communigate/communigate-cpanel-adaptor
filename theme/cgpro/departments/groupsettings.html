@@ -10,7 +10,7 @@
 	
 <div class="body-content">
 
-<div class="h1Title"><div class="spriteicon_img_mini" id="icon-maillist_mini"></div> <cpanel langprint="GGPDepartureSettings"> <cpanel print="$FORM{'email'}"></div>
+<div class="h1Title"><div class="spriteicon_img_mini" id="icon-maillist_mini"></div> <cpanel langprint="GGPDepartmentSettings"> <cpanel print="$FORM{'email'}"></div>
 
 <cpanel setvar="vidtut_name=mailinglists">
 <cpanel setvar="vidtut_header=VidMailingList">
@@ -20,7 +20,7 @@
 <cpanel setvar="vidtut_height=269">	
 
 <cpanelif $FORM{'SubmitMLSettings'}>
-<?cp CommuniGate::SetDepartureSettings() email=$FORM{'email'},Expand=$FORM{'Expand'},RealName=$FORM{'RealName'},EmailDisabled=$FORM{'EmailDisabled'} ?>
+<?cp CommuniGate::SetDepartmentSettings() email=$FORM{'email'},Expand=$FORM{'Expand'},RealName=$FORM{'RealName'},EmailDisabled=$FORM{'EmailDisabled'} ?>
 </cpanelif>
 
 <cpanelif $CPERROR{'CommuniGate'} && $FORM{'SubmitMLSettings'}>
@@ -50,14 +50,14 @@
 
 <table width="100%" class="settingsBox">
  <tr>
-                <td style="width: 150px" align="right"><cpanel langprint="CGPDepartureRealName">:</td>
+                <td style="width: 150px" align="right"><cpanel langprint="CGPDepartmentRealName">:</td>
                 <td><input type="text" name="RealName" id="RealName" value="<cpanel print=$CPDATA{'RealName'}>" style="width: 150px" /></td>
                 <td><div id="email_error"></div></td>
         </tr>
 
 <tr>
 <td></td>
-<td nowrap="nowrap" ><input type="checkbox" name="Expand" value="1" <cpanelif $CPDATA{'Expand'}=='YES'><cpanel print=' checked'></cpanelif>/>Expand Departure Members</td>
+<td nowrap="nowrap" ><input type="checkbox" name="Expand" value="1" <cpanelif $CPDATA{'Expand'}=='YES'><cpanel print=' checked'></cpanelif>/>Expand Department Members</td>
 </tr>
 <tr>
 <td></td>

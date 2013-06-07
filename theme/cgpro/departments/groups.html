@@ -14,7 +14,7 @@
 	
 <div class="body-content">
 
-<div class="h1Title"><div class="spriteicon_img_mini" id="icon-maillist_mini"></div> <cpanel langprint="CGPDepartures"></div>
+<div class="h1Title"><div class="spriteicon_img_mini" id="icon-maillist_mini"></div> <cpanel langprint="CGPDepartments"></div>
 
 <cpanel setvar="vidtut_name=mailinglists">
 <cpanel setvar="vidtut_header=VidMailingList">
@@ -24,7 +24,7 @@
 <cpanel setvar="vidtut_height=269">	
 
 
-<h2><cpanel langprint="CGPDepartureCreate"></h2>
+<h2><cpanel langprint="CGPDepartmentCreate"></h2>
 <?cp StatsBar::stat( [p class="caution"]$LANG{'statsattention'}&nbsp;%&nbsp;$LANG{'statsoutof'}&nbsp;%$LANG{'available'}&nbsp;$LANG{'INDXMailingLists'}[/p],count,max) display=mailinglists,warnings=1,warninglevel=80,infinitylang=true ?>
 
 
@@ -37,12 +37,12 @@
 <table>
 
    <tr>
-                <td style="width: 150px" align="right"><cpanel langprint="CGPDepartureRealName">:</td>
+                <td style="width: 150px" align="right"><cpanel langprint="CGPDepartmentRealName">:</td>
                 <td><input type="text" name="realname" id="realname" style="width: 150px" /></td>
                 <td><div id="email_error"></div></td>
         </tr>
 	<tr>
-		<td style="width: 150px" align="right"><cpanel langprint="CGPDepartureEmailName">:</td>
+		<td style="width: 150px" align="right"><cpanel langprint="CGPDepartmentEmailName">:</td>
 		<td><input type="text" name="email" id="email" style="width: 150px" />
 			<cpanel langprint="@">
 				<select name="domain" id="domain"><?cp Email::listmaildomains([option value="%"]%[/option],domain,domain) ?></select>
@@ -52,7 +52,7 @@
 	<tr>
 		<td>&nbsp;</td>
 		<td colspan="2">
-		  <input type="submit" id="submit" value="<cpanel langprint="CGPDepartureAdd">" class="input-button" style="width: 150px" />
+		  <input type="submit" id="submit" value="<cpanel langprint="CGPDepartmentAdd">" class="input-button" style="width: 150px" />
 		</td>
 	</tr>
 </table>
@@ -61,17 +61,17 @@
 </div><!-- end highlight -->
 
 
-<h2><cpanel langprint="CGPCurrentDepartures"></h2>
+<h2><cpanel langprint="CGPCurrentDepartments"></h2>
 
 <table border="0" cellpadding="5" cellspacing="0" id="mailtbl" class="sortable" width="650">
 
     <tr >
-		<th class="cell"><cpanel langprint="CGPDepartureEmailName"></th>
+		<th class="cell"><cpanel langprint="CGPDepartmentEmailName"></th>
 		<th class="cell-end sorttable_nosort" colspan="4"><cpanel langprint="AHFucn"></th>
 	</tr>
 
 
-<?cp CommuniGate::ListDepartures(
+<?cp CommuniGate::ListDepartments(
 	[tr class="row-%"]
 		[td class="cell nobrd-center-t"]%[/td]
 		[td class="nobrd" align="center"]
@@ -85,10 +85,10 @@
                 [/td]
 
                 [td class="nobrd" align="center"]
-                        [a href="groupmembers.html?listname=%"]$LANG{'CGPDepartureMembers'} [/a]
+                        [a href="groupmembers.html?listname=%"]$LANG{'CGPDepartmentMembers'} [/a]
                 [/td]
 	[/tr]
-,*num,list,list,list,domain,list,list,list) domain=$FORM{'domain'},regex=$FORM{'searchregex'},api2_paginate=1,api2_paginate_start=$FORM{'api2_paginate_start'},api2_paginate_size=$CPVAR{'itemsperpage'} || '[tr][td colspan="4" class="errors"]$LANG{'CGPNoDepartures'}[/td][/tr]' ?>
+,*num,list,list,list,domain,list,list,list) domain=$FORM{'domain'},regex=$FORM{'searchregex'},api2_paginate=1,api2_paginate_start=$FORM{'api2_paginate_start'},api2_paginate_size=$CPVAR{'itemsperpage'} || '[tr][td colspan="4" class="errors"]$LANG{'CGPNoDepartments'}[/td][/tr]' ?>
 
 
 

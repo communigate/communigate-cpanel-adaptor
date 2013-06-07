@@ -492,6 +492,33 @@ sub api2_listforwards {
   return @result;
 }
 
+sub api2_ListExtensions {
+  my %OPTS = @_;
+  my $specified_domain  = $OPTS{'domain'};
+  my @domains = Cpanel::Email::listmaildomains($OPTS{'domain'});
+  my $cli = getCLI();
+  my @result;
+  foreach my $domain (@domains) {
+      my $forwarders = $cli->ListForwarders($domain);
+      foreach my $forwarder (@$forwarders) {
+	  next unless $forwarder =~ m/^(tn\-\d+|\d{3})$/i;
+	  my $short = $forwarder;
+	  $short =~ s/^(i|tn)\-(\d+)$/$2/i;
+	  my $fwd = $cli->GetForwarder("$forwarder\@$domain");
+	  next if $fwd eq 'null';
+	  push( @result, { uri_dest => "$forwarder%40$domain",
+			   html_dest => "$short\@$domain",
+			   dest => "$forwarder\@$domain",
+			   uri_forward => "$fwd",
+			   html_forward => "$fwd",
+			   forward => "$fwd"
+		} );
+      }
+  }
+  $cli->Logout();
+  return @result;
+}
+
 
 
 sub api2_delforward {
@@ -1333,7 +1360,7 @@ sub api2_ListGroups{
 	$cli->Logout();
         return @result;
 }
-sub api2_ListDepartures {
+sub api2_ListDepartments {
         my %OPTS = @_;
         @domains = Cpanel::Email::listmaildomains();
 	my $cli = getCLI();
@@ -1413,7 +1440,7 @@ sub api2_AddGroup{
         return @result;
 }
 
-sub api2_AddDeparture {
+sub api2_AddDepartment {
         my %OPTS = @_;
         my $domain = $OPTS{'domain'};
         my $listname = $OPTS{'email'};
@@ -2035,7 +2062,7 @@ sub api2_SetGroupSettings {
 	$cli->Logout();
         return @result;
 }
-sub api2_SetDepartureSettings {
+sub api2_SetDepartmentSettings {
         my %OPTS = @_;
         my $email = $OPTS{'email'};
 	my $cli = getCLI();
