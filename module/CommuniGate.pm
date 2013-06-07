@@ -494,7 +494,6 @@ sub api2_listforwards {
 
 sub api2_ListExtensions {
   my %OPTS = @_;
-  my $specified_domain  = $OPTS{'domain'};
   my @domains = Cpanel::Email::listmaildomains($OPTS{'domain'});
   my $cli = getCLI();
   my @result;
@@ -507,7 +506,7 @@ sub api2_ListExtensions {
 	  my $fwd = $cli->GetForwarder("$forwarder\@$domain");
 	  next if $fwd eq 'null';
 	  push( @result, { uri_dest => "$forwarder%40$domain",
-			   html_dest => "$short\@$domain",
+			   html_dest => "$short",
 			   dest => "$forwarder\@$domain",
 			   uri_forward => "$fwd",
 			   html_forward => "$fwd",
@@ -519,7 +518,112 @@ sub api2_ListExtensions {
   return @result;
 }
 
+sub api2_AssignExtension {
+  my %OPTS = @_;
+  my @domains = Cpanel::Email::listmaildomains();
+  my $cli = getCLI();
 
+  if ($OPTS{'extension'} || $OPTS{'local_extension'}) {
+      my (undef, $domain) = split '@', $OPTS{'account'};
+      for my $dom (@domains) {
+	  if ($dom eq $domain) {
+	      my $userForwarders = $cli->FindForwarders($domain,$OPTS{'account'});
+	      if ($OPTS{'local_extension'}) {
+		  $cli->CreateForwarder($OPTS{'local_extension'} . "\@$domain", $OPTS{'account'});
+		  unless ($cli->getErrMessage eq "OK") {
+		      $Cpanel::CPERROR{'CommuniGate_local_extension'} = $cli->getErrMessage;
+		      last;
+		  }
+	      }
+	      for my $forwarder (@$userForwarders) {
+		  if ($forwarder =~ m/^tn\-\d+/ && $OPTS{'extension'}) {
+		      $cli->DeleteForwarder("$forwarder\@$domain");
+		      $cli->CreateForwarder("$forwarder\@$domain", "null");
+		  }
+		  if ($forwarder =~ m/^\d{3}$/ && $OPTS{'local_extension'} && $OPTS{'local_extension'} ne "$forwarder\@$domain") {
+		      $cli->DeleteForwarder("$forwarder\@$domain");
+		  }
+	      }
+	      if ($OPTS{'extension'}) {
+		  $cli->DeleteForwarder($OPTS{'extension'});
+		  $cli->CreateForwarder($OPTS{'extension'}, $OPTS{'account'});
+	      }
+	      last;
+	  }
+      }
+  }
+
+  my $result = {};
+  my $defaults = $cli->GetServerAccountDefaults();
+  $result->{"classes"} = $defaults->{"ServiceClasses"};
+  foreach my $domain (@domains) {
+      my $accounts = $cli->ListAccounts($domain);
+      foreach my $userName (sort keys %$accounts) {
+	  my $account = $cli->GetAccountSettings("$userName\@$domain");
+	  $result->{"accounts"}->{"$userName\@$domain"}->{details} = $account;
+      }
+      my $groups = $cli->ListGroups($domain);
+      foreach $groupName (sort @$groups) {
+	  my $details = $cli->GetGroup("$groupName\@$domain");
+	  $result->{'departments'} = [] unless $result->{'departments'};
+	  push @{$result->{'departments'}}, "$groupName\@$domain" unless (defined($details->{SignalDisabled}) && $details->{SignalDisabled} eq "YES");
+
+      }
+  }
+  $cli->Logout();
+  return $result;
+}
+
+sub api2_DeleteExtension {
+  my %OPTS = @_;
+  my @domains = Cpanel::Email::listmaildomains();
+  my $cli = getCLI();
+  if ($OPTS{'extension'}) {
+      my (undef, $domain) = split '@', $OPTS{'extension'};
+      for my $dom (@domains) {
+	  if ($dom eq $domain) {
+	      $cli->DeleteForwarder($OPTS{'extension'});
+	      unless ($cli->getErrMessage eq "OK") {
+		  $Cpanel::CPERROR{'CommuniGate'} = $cli->getErrMessage;
+		  last;
+	      }
+	      if ($OPTS{'extension'} =~ m/^tn\-\d+/) {
+		  $cli->CreateForwarder($OPTS{'extension'}, "null");
+	      }
+	      last;
+	  }
+      }
+  }
+  $cli->Logout();
+  return $result;
+}
+
+sub api2_GetExtensions {
+  my %OPTS = @_;
+  my $domain = $OPTS{'domain'};
+  my @domains = Cpanel::Email::listmaildomains();
+  my $cli = getCLI();
+  my @result;
+  for my $dom (@domains) {
+      if ($dom eq $domain) {
+	  my $forwarders = $cli->ListForwarders($domain);
+	  foreach my $forwarder (@$forwarders) {
+	      next unless $forwarder =~ m/^tn\-\d+$/i;
+	      my $fwd = $cli->GetForwarder("$forwarder\@$domain");
+	      next unless $fwd eq 'null';
+	      my $short = $forwarder;
+	      $short =~ s/^(i|tn)\-(\d+)$/$2/i;
+	      push @result, {extension => "$forwarder\@$domain", short => $short};
+	  }
+	  last;
+      }
+  }
+  if ($#result == -1) {
+      push @result, {extension => "", short => "No extansion available for $domain"};
+  }
+  $cli->Logout();
+  return @result;
+}
 
 sub api2_delforward {
         my %OPTS = @_;
