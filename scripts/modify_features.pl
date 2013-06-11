@@ -1,4 +1,4 @@
-#!/bin/sh                                                                                                                                                                                               
+#!/bin/sh
  eval 'if [ -x /usr/local/cpanel/3rdparty/bin/perl ]; then exec /usr/local/cpanel/3rdparty/bin/perl -x -- $0 ${1+"$@"}; else exec /usr/bin/perl -x $0 ${1+"$@"}; fi;'
     if 0;
 #!/usr/bin/perl
@@ -12,7 +12,7 @@ if (! -f '/var/cpanel/features/default' ) {
   open(FO, ">>", '/var/cpanel/features/default');
   close(FO);
 }
-my @stop_features = ("webmail", "default_spamassassin", "forwarders", "emaildomainfwd", "autoresponders", "boxtrapper", "lists", "blockers", "backup", "defaultaddress", "emailarchive");
+my @stop_features = ("webmail", "default_spamassassin", "forwarders", "emaildomainfwd", "autoresponders", "boxtrapper", "lists", "blockers", "backup", "defaultaddress", "emailarchive", "cgpro_popaccts");
 my @feature_lists = Cpanel::Features::get_feature_lists();
 foreach my $feature_list_name (@feature_lists) {
   if ($feature_list_name ne 'disabled') {
