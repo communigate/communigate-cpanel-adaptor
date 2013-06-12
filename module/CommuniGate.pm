@@ -19,6 +19,7 @@ use Cpanel::Api2::Exec ();
 use Storable                         ();
 use Time::Local  'timelocal_nocheck';
 use Digest::MD5 qw(md5_hex);
+use XIMSS;
 
 require Exporter;
 @ISA    = qw(Exporter);
@@ -51,6 +52,25 @@ sub getCLI {
 	$CLI = $cli;
 	return $cli;
     }
+}
+
+sub getXIMSS {
+    my ($authData, $password) = @_;
+    my $loginData = Cpanel::AdminBin::adminrun('cca', 'GETLOGIN');
+    $loginData =~ s/^\.\n//;
+    my @loginData = split "::", $loginData;
+    my $ximss = new XIMSS({
+    	PeerAddr => $loginData[0],
+    	PeerPort => '11024',
+    	authData => $authData,
+    	password => $password,
+    	Proto    => 'tcp'
+    			  });
+    unless($ximss) {
+    	$logger->warn("Can't connect to CGPro XIMSS: ".$CGP::ERR_STRING);
+    	exit(0);
+    }
+    return $ximss;
 }
 
 sub max_class_accounts {
@@ -2481,9 +2501,120 @@ sub api2_delSignalRule {
 	    last;
 	}
     }
+    $cli->Logout();
     return {msg => $locale->maketext('Rule deleted!')};
 }
 
+sub api2_ListContacts {
+    my %OPTS = @_;
+    my $account = $OPTS{'account'};
+    my (undef,$dom) = split "@", $account;
+    my @domains = Cpanel::Email::listmaildomains();
+    my $cli = getCLI();
+    my $locale = Cpanel::Locale->get_handle();
+    my @return;
+    for my $domain (@domains) {
+	if ($domain eq $dom) {
+	    $password = $cli->GetAccountPlainPassword($account);
+	    if ($password) {
+		my $ximss = getXIMSS($account, $password);
+		my $time = time();
+		$ximss->send({folderOpen => {
+		    id => "$time-mailbox",
+		    folder => "Contacts",
+		    sortField => "To"
+			      }});
+		my $mailbox = $ximss->parseResponse("$time-mailbox");
+		if ($mailbox->{'folderReport'}) {
+		    $ximss->send(
+			{
+			    folderBrowse => {
+				id => "$time-messages",
+				folder => "Contacts",
+				index => {
+				    from => 0,
+				    till => ($mailbox->{'folderReport'}->{'messages'})
+				}
+			    }
+			});
+		    my $messages = $ximss->parseResponse("$time-messages");
+		    if ($messages->{'folderReport'}) {
+			for my $message (@{forceArray($messages->{'folderReport'})}) {
+			    $ximss->send({folderRead => {
+				id => "$time-contact",
+				folder => "Contacts",
+				UID => $message->{"UID"},
+				totalSizeLimit => 1000
+					  }});
+			    my $contact = $ximss->parseResponse("$time-contact");
+			    if ($contact->{'folderMessage'}) {
+				push @return, {
+				    email => join(", ", map {$_->{VALUE}} @{forceArray( $contact->{'folderMessage'}->{EMail}->{MIME}->{vCard}->{EMAIL} )}),
+				    tel => join(", ", map {$_->{VALUE}} @{forceArray( $contact->{'folderMessage'}->{EMail}->{MIME}->{vCard}->{TEL} )}),
+				    name => $contact->{'folderMessage'}->{EMail}->{MIME}->{vCard}->{FN}->{VALUE},
+				    uid => $message->{UID}
+				};
+			    }
+			}
+		    }
+		}
+		$ximss->send({folderClose => {id => "$time-close", folder=>"Contacts"}});
+		$ximss->close();
+	    }
+	    last;
+	}
+    }
+    $cli->Logout();
+    return @return;
+}
+sub api2_DeleteContact {
+    my %OPTS = @_;
+    my $account = $OPTS{'account'};
+    my (undef,$dom) = split "@", $account;
+    my @domains = Cpanel::Email::listmaildomains();
+    my $cli = getCLI();
+    my $locale = Cpanel::Locale->get_handle();
+    my @return;
+    for my $domain (@domains) {
+	if ($domain eq $dom) {
+	    $password = $cli->GetAccountPlainPassword($account);
+	    if ($password) {
+		my $time = time();
+	    	my $ximss = getXIMSS($account, $password);
+	    	$ximss->send({folderOpen => {
+	    	    id => "$time-mailbox",
+	    	    folder => "Contacts",
+	    	    sortField => "To"
+	    		      }});
+	    	my $mailbox = $ximss->parseResponse("$time-mailbox");
+	    	if ($mailbox->{'folderReport'}) {
+		    $ximss->send({messageRemove => {
+			id => "$time-remove",
+			folder => "Contacts",
+			mode => "Immediately",
+			UID => [$OPTS{"uid"}]
+				  }});
+		    $ximss->parseResponse("$time-remove");
+	    	}
+		$ximss->send({folderClose => {id => "$time-close", folder=>"Contacts"}});
+	    	$ximss->send({bye => {id => "$time-bye"}});
+	    } else {
+	    	# Error! Cannot fetch contacts;
+	    }
+	    last;
+	}
+    }
+    $cli->Logout();
+    return 1;
+}
+sub forceArray {
+    my $data = shift;
+    if (ref($data) eq "ARRAY") {
+	return $data;
+    } else {
+	return [$data];
+    }
+}
 sub IsGroupInternal {
   	my $groupwithdomain = shift;
 	my @values = split("@",$groupwithdomain);

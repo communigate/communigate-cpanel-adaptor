@@ -79,6 +79,7 @@ cp ${PACKSRC}/module/CommuniGate.pm /usr/local/cpanel/Cpanel/
 cp ${PACKSRC}/library/CLI.pm /usr/local/cpanel/perl/
 ln -s /usr/local/cpanel/perl/CLI.pm /usr/local/cpanel
 ln -s /usr/local/cpanel/perl/CLI.pm /usr/local/lib/perl5/`perl -v | grep 'This is perl' | cut -f 2 -d 'v' | cut -f1 -d ' '`/
+cp ${PACKSRC}/library/XIMSS.pm /usr/local/cpanel/
 
 # CGPro cPanel Wrapper
 cp ${PACKSRC}/cpwrap/ccaadmin /usr/local/cpanel/bin/
