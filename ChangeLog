@@ -1,3 +1,44 @@
+2.2 Release notes:
+
+* Updated Language strings for Manage Accounts
+* Updated Locale file
+* Updated Autoresponders template (Removed commented content)
+* Icons linksd using Branding
+* Updated localization of Filter editor
+* Updated Account Manager
+* Updated Manage accounts interface
+* Updated Manage Accounts
+* Updated localization for e-mail archiving
+* Added basic Domain Wide Settings
+* Added DKIM tolls scripts
+* Added DKIM mail signing
+* Updated webmail Download URL
+* SSL links changed to NON SSL
+* Configurable cPanels SSL links
+* Updated non SSL links
+* Updated DKIM signing - using CLI
+* Added icons to Accourdion in Manage accounts
+* Fixed bugs with Real Name text
+* Updated Manage Accounts Details.
+* Details open by default
+* accourdion icons made transparent
+* Added password complexity checkbox to acount details settings
+* DKIM Verifier
+* Complex password tick
+* Bugfix: fixed h2 title width in Manage Accounts
+* Added Default Account Settings in cPanel
+* Added menu item for Account Defaults
+* Added XMPP Client List
+* Added Selectable Extensions to Manage Accounts
+* Bugfix: !!! set changed to delete in change quoota hook
+* Bugfix: Default Class to Standard.
+* Bugfix: Fixed wrong link
+* Bugfix: Default Class to Standard.
+* Bugfix: [Issue 60] Trimmed disk usage
+* [Issue: 59] Added default ServiceClass conf during instalation
+* [Issue: 61] delete local cPanel account if creating of Communigate account fails.
+* [Issue: 63] Selectable default Service Class
+
 2.0 Release notes:
 
 * Added	Energy HTML5 "WebTalk" module in webmail. Allows in-browser HD VoIP calling.
