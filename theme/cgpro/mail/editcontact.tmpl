@@ -1,0 +1,200 @@
+[% MACRO filter_option(pval, val, text) BLOCK -%]
+<option value="[% val %]"[% val == pval ? " selected='selected'" : "" %]>[% cptext(text) %]</option>
+[% END -%]
+<div class="highlight">
+  <table border="0" style="margin-left: 20px">
+    <tr>
+      <td align="right">[% locale.maketext("CGPFirstName") %]:</td>
+      <td><input type="text" name="GIVEN" style="width: 150px" value="[% vcard.N.GIVEN %]" /></td>
+      <td colspan="2"></td>
+    </tr>
+    <tr>
+      <td align="right">[% locale.maketext("CGPMiddleName") %]:</td>
+      <td><input type="text" name="MIDDLE" style="width: 150px" value="[% vcard.N.MIDDLE %]" /></td>
+      <td colspan="2"></td>
+    </tr>
+    <tr>
+      <td align="right">[% locale.maketext("CGPFamilyName") %]:</td>
+      <td><input type="text" name="FAMILY" style="width: 150px" value="[% vcard.N.FAMILY %]" /></td>
+      <td colspan="2"></td>
+    </tr>
+    <tr>
+      <td align="right">[% locale.maketext("CGPCompany") %]:</td>
+      <td><input type="text" name="ORGNAME" style="width: 150px" value="[% vcard.ORG.ORGNAME %]" /></td>
+      <td colspan="2"></td>
+    </tr>
+    <tr>
+      <td align="right">[% locale.maketext("CGPDepartment") %]:</td>
+      <td><input type="text" name="ORGUNIT" style="width: 150px" value="[% vcard.ORG.ORGUNIT %]" /></td>
+      <td colspan="2"></td>
+    </tr>
+    <tr>
+      <td align="right">[% locale.maketext("CGPJobTitle") %]:</td>
+      <td><input type="text" name="TITLE" style="width: 150px" value="[% vcard.TITLE.VALUE %]" /></td>
+      <td colspan="2"></td>
+    </tr>
+    <tr>
+      <td align="right">[% locale.maketext("CGPBirthday") %]:</td>
+      <td>
+	<select name="BDAY">
+	  <option value=""></option>
+	  [% BDAY = vcard.BDAY.VALUE.split('-') %]
+	  [% FOR i IN [1 .. 31] -%]
+	  [% if = FILTER format('%02d'); i; END %]
+	  [% filter_option(BDAY.2, if , if) %]
+	  [% END -%]
+	</select>
+	<select name="BMONTH">
+	  <option value=""></option>
+	  [% months = ['', 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'Ocober', 'November', 'December'] -%]
+	  [% FOR i IN [1 .. 12] -%]
+	  [% if = FILTER format('%02d'); i; END %]
+	  [% filter_option(BDAY.1, if, locale.maketext( "CGP" _ months.$i)) %]
+	  [% END -%]
+	</select>
+	<select name="BYEAR">
+	  <option value=""></option>
+	  [% FOR i IN [1900 .. YEAR] -%]
+	  [% filter_option(BDAY.0, i, i) %]
+	  [% END -%]
+	</select>
+      </td>
+      <td colspan="2"></td>
+    </tr>
+    <!-- <td><input id="new_email_submit" class="input-button" type="submit" value="[% locale.maketext("ARCreate") %]" tabindex="5" /></td> -->
+    <!-- <td></td> -->
+    <!-- <td></td> -->
+    </tr>
+   </table>
+</div>
+<h2>[% locale.maketext('CGPEmails') %]</h2>
+<div class="highlight">
+  <table border="0" style="margin-left: 20px">
+    [% FOR mail IN forceArray(vcard.EMAIL) %]
+    <tr>
+      <td align="right">
+	[% type = mail.keys.grep('(HOME|WORK|OTHER)').0 -%]
+	<select name="mailtype">
+	  [% filter_option(type, "HOME", locale.maketext("CGPHOME")) %]
+	  [% filter_option(type, "WORK", locale.maketext("CGPWORK")) %]
+	  [% filter_option(type, "OTHER", locale.maketext("CGPOTHER")) %]
+	</select>
+	</td>
+      <td><input type="text" name="TITLE" style="width: 150px" value="[% mail.VALUE %]" /></td>
+      <td colspan="2"></td>
+    </tr>
+    [% END %]
+  </table>
+  <p><a href="#">Add new</a>
+</div>
+<h2>[% locale.maketext('CGPPhoneNumbers') %]</h2>
+<div class="highlight">
+  <table border="0" style="margin-left: 20px">
+    [% FOR tel IN forceArray(vcard.TEL) %]
+    <tr>
+      <td align="right">
+	[% type = tel.keys.grep('(HOME|WORK|CELL|FAX|VIDEO|AGENT|PAGER|OTHER)').0 -%]
+	<select name="mailtype">
+	  [% filter_option(type, "OTHER", locale.maketext("CGPOTHER")) %]
+	  [% filter_option(type, "HOME", locale.maketext("CGPHOME")) %]
+	  [% filter_option(type, "WORK", locale.maketext("CGPWORK")) %]
+	  [% filter_option(type, "CELL", locale.maketext("CGPCELL")) %]
+	  [% filter_option(type, "FAX", locale.maketext("CGPFAX")) %]
+	  [% filter_option(type, "VIDEO", locale.maketext("CGPVIDEO")) %]
+	  [% filter_option(type, "AGENT", locale.maketext("CGPAGENT")) %]
+	  [% filter_option(type, "PAGER", locale.maketext("CGPPAGER")) %]
+	</select>
+	</td>
+      <td><input type="text" name="TITLE" style="width: 150px" value="[% tel.VALUE %]" /></td>
+      <td colspan="2"></td>
+    </tr>
+    [% END %]
+  </table>
+  <p><a href="#">Add new</a>
+</div>
+<h2>[% locale.maketext('CGPAddresses') %]</h2>
+<div class="highlight">
+  <table border="0" style="margin-left: 20px">
+    [% FOR adr IN forceArray(vcard.ADR) %]
+    <tr>
+      <td align="right" style="vertical-align: top;">
+	[% type = adr.keys.grep('(HOME|WORK|DOM|POSTAL|PARCEL|OTHER)').0 -%]
+	<select name="mailtype">
+	  [% filter_option(type, "OTHER", locale.maketext("CGPOTHER")) %]
+	  [% filter_option(type, "HOME", locale.maketext("CGPHOME")) %]
+	  [% filter_option(type, "WORK", locale.maketext("CGPWORK")) %]
+	  [% filter_option(type, "DOM", locale.maketext("CGPDOM")) %]
+	  [% filter_option(type, "POSTAL", locale.maketext("CGPPOSTAL")) %]
+	  [% filter_option(type, "PARCEL", locale.maketext("CGPPARCEL")) %]
+	</select>
+	</td>
+      <td>
+	<label>[% locale.maketext("CGPPoBox") %]</label><br  />
+	<input type="text" name="TITLE" style="width: 150px" value="[% adr.POBOX %]" /><br  />
+	<label>[% locale.maketext("CGPCountry") %]</label><br  />
+	<input type="text" name="TITLE" style="width: 150px" value="[% adr.CTRY %]" /><br  />
+	<label>[% locale.maketext("CGPAddress") %]</label><br  />
+	<input type="text" name="TITLE" style="width: 150px" value="[% adr.STREET %]" /><br  />
+	<label>[% locale.maketext("CGPTownCity") %]</label><br  />
+	<input type="text" name="TITLE" style="width: 150px" value="[% adr.LOCALITY %]" /><br  />
+	<label>[% locale.maketext("CGPState") %]</label><br  />
+	<input type="text" name="TITLE" style="width: 150px" value="[% adr.REGION %]" /><br  />
+	<label>[% locale.maketext("CGPZipCode") %]</label><br  />
+	<input type="text" name="TITLE" style="width: 150px" value="[% adr.PCODE %]" /><br  />
+      </td>
+      <td colspan="2"></td>
+    </tr>
+    [% END %]
+  </table>
+  <p><a href="#">Add new</a>
+</div>
+<h2>[% locale.maketext('CGPWebPages') %]</h2>
+<div class="highlight">
+  <table border="0" style="margin-left: 20px">
+    [% FOR page IN forceArray(vcard.URL) %]
+    <tr>
+      <td align="right">
+	[% type = page.keys.grep('(HOME|WORK|OTHER)').0 -%]
+	<select name="mailtype">
+	  [% filter_option(type, "HOME", locale.maketext("CGPHOME")) %]
+	  [% filter_option(type, "WORK", locale.maketext("CGPWORK")) %]
+	  [% filter_option(type, "OTHER", locale.maketext("CGPOTHER")) %]
+	</select>
+	</td>
+      <td><input type="text" name="TITLE" style="width: 150px" value="[% page.VALUE %]" /></td>
+      <td colspan="2"></td>
+    </tr>
+    [% END %]
+  </table>
+  <p><a href="#">Add new</a>
+</div>
+<h2>[% locale.maketext('CGPAdditionalInfo') %]</h2>
+<div class="highlight">
+  <table border="0" style="margin-left: 20px">
+    <tr>
+      <td align="right">[% locale.maketext("CGPNickName") %]:</td>
+      <td><input type="text" name="GIVEN" style="width: 150px" value="[% vcard.NICKNAME.VALUE %]" /></td>
+      <td colspan="2"></td>
+    </tr>
+    <tr>
+      <td align="right">[% locale.maketext("CGPBusinessCategory") %]:</td>
+      <td><input type="text" name="GIVEN" style="width: 150px" value="[% vcard.ROLE.VALUE %]" /></td>
+      <td colspan="2"></td>
+    </tr>
+    <tr>
+      <td align="right">[% locale.maketext("CGPTimeZone") %]:</td>
+      <td><input type="text" name="GIVEN" style="width: 150px" value="[% vcard.TZ.VALUE %]" /></td>
+      <td colspan="2"></td>
+    </tr>
+    <tr>
+      <td align="right">[% locale.maketext("CGPGeoPosition") %]:</td>
+      <td><input type="text" name="GIVEN" style="width: 150px" value="[% vcard.GEO.VALUE %]" /></td>
+      <td colspan="2"></td>
+    </tr>
+    <tr>
+      <td align="right">[% locale.maketext("CGPNote") %]:</td>
+      <td><input type="text" name="GIVEN" style="width: 150px" value="[% vcard.NOTE.VALUE %]" /></td>
+      <td colspan="2"></td>
+    </tr>
+  </table>
+</div>

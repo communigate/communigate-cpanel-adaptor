@@ -52,7 +52,7 @@
     <ul class="yui-nav" id="yui_tabs">
       [% FOREACH account IN sort -%]
       <li[% IF loop.count == 1; ' class="selected"'; END %]>
-	<a href="#tab_[% account %]">
+	<a href="#tab_[% account %]" id="[% account %]">
 	  <span class="img"[% IF accounts.$account.class == "Standard" %] style="border-color: #3B6FBE;"[% END %][% IF accounts.$account.class == "Premium" %] style="border-color: #BE3B48;"[% END %]><img src="http://www.gravatar.com/avatar/[% accounts.$account.md5 %]?s=32&d=[% 'http://communigate-cpanel-adaptor.googlecode.com/files/Default_avatar.png' | uri %]" alt="avatar" /></span>
 	  <span class="name">
 	    <span class="realname">[% accounts.$account.data.RealName %]</span>
@@ -84,6 +84,7 @@
 	<span class="classname">[% accounts.$account.class %]</span>
       </div>
       <div class="clear"></div>
+      <a href="contacts.html?account=[% account %]">Contacts</a>
       <h3><span class="action_link" style="background-image: url([% CPBranding.image('cgpro_account_change_details') %])" onclick="toggle_action_div(null, {id:'account_details_module_[% loop.count - 1 %]', index:[% loop.count - 1 %], action:'account_details'})">[% locale.maketext("CGPAccountDetails") %]</span></h3>
       <!-- Account Details -->
       <div  style="display: none;" class="user-section" id="account_details_module_[% loop.count - 1 %]">
@@ -350,6 +351,7 @@
 </div>
 
 <script type="text/javascript">
+var ACCOUNT = '[% FORM.account %]';
 [% FOREACH account IN sort -%]
   ACCOUNTS[[% loop.count - 1 %]] = [];
   ACCOUNTS[[% loop.count - 1 %]]['domain'] = '[% account.split('@').1 -%]';

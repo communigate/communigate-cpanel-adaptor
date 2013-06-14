@@ -2544,16 +2544,79 @@ sub api2_ListContacts {
 				id => "$time-contact",
 				folder => "Contacts",
 				UID => $message->{"UID"},
-				totalSizeLimit => 1000
+				totalSizeLimit => 5000
 					  }});
 			    my $contact = $ximss->parseResponse("$time-contact");
 			    if ($contact->{'folderMessage'}) {
 				push @return, {
-				    email => join(", ", map {$_->{VALUE}} @{forceArray( $contact->{'folderMessage'}->{EMail}->{MIME}->{vCard}->{EMAIL} )}),
-				    tel => join(", ", map {$_->{VALUE}} @{forceArray( $contact->{'folderMessage'}->{EMail}->{MIME}->{vCard}->{TEL} )}),
+				    email => [map {{ value => $_->{VALUE}, type => [keys(%$_)] }} @{forceArray( $contact->{'folderMessage'}->{EMail}->{MIME}->{vCard}->{EMAIL} )}],
+				    tel => [map {{ value => $_->{VALUE}, type => [keys(%$_)] }} @{forceArray( $contact->{'folderMessage'}->{EMail}->{MIME}->{vCard}->{TEL} )}],
 				    name => $contact->{'folderMessage'}->{EMail}->{MIME}->{vCard}->{FN}->{VALUE},
 				    uid => $message->{UID}
 				};
+			    }
+			}
+		    }
+		}
+		$ximss->send({folderClose => {id => "$time-close", folder=>"Contacts"}});
+		$ximss->close();
+	    }
+	    last;
+	}
+    }
+    $cli->Logout();
+    return {contacts => \@return, account => $OPTS{'account'}};
+}
+sub api2_EditContact {
+    my %OPTS = @_;
+    my $account = $OPTS{'account'};
+    my (undef,$dom) = split "@", $account;
+    my @domains = Cpanel::Email::listmaildomains();
+    my $cli = getCLI();
+    my $locale = Cpanel::Locale->get_handle();
+    my @return;
+    for my $domain (@domains) {
+	if ($domain eq $dom) {
+	    $password = $cli->GetAccountPlainPassword($account);
+	    if ($password) {
+		my $ximss = getXIMSS($account, $password);
+		my $time = time();
+		$ximss->send({folderOpen => {
+		    id => "$time-mailbox",
+		    folder => "Contacts",
+		    sortField => "To"
+			      }});
+		my $mailbox = $ximss->parseResponse("$time-mailbox");
+		if ($mailbox->{'folderReport'}) {
+		    $ximss->send(
+			{
+			    folderBrowse => {
+				id => "$time-messages",
+				folder => "Contacts",
+				index => {
+				    from => 0,
+				    till => ($mailbox->{'folderReport'}->{'messages'})
+				}
+			    }
+			});
+		    my $messages = $ximss->parseResponse("$time-messages");
+		    if ($messages->{'folderReport'}) {
+			$ximss->send({folderRead => {
+			    id => "$time-contact",
+			    folder => "Contacts",
+			    UID => $OPTS{'UID'},
+			    totalSizeLimit => 5000
+				      }});
+			my $contact = $ximss->parseResponse("$time-contact");
+			if ($contact->{'folderMessage'}) {
+			    $ximss->send({folderClose => {id => "$time-close", folder=>"Contacts"}});
+			    $ximss->close();
+			    my @localtime = localtime(time);
+			    return {
+				vcard => $contact->{folderMessage}->{EMail}->{MIME}->{vCard},
+				contact => $contact,
+				YEAR => ($localtime[5] + 1900),
+				forceArray => \&forceArray
 			    }
 			}
 		    }

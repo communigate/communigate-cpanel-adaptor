@@ -82,6 +82,11 @@ var verify_local = function (i) {
 };
 
 YAHOO.util.Event.onDOMReady(function () {
+	if (ACCOUNT) {
+	    var active_account = DOM.get(ACCOUNT);
+	    active_account.click();
+	    document.location.hash = "Accounts";
+	}
 	for (var i=0; i < ACCOUNTS.length; i++) {
 	    verify_local(i);
 	    toggle_action_div(null, {id:'account_details_module_' + i, index: i, action:'account_details'});

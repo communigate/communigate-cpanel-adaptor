@@ -198,27 +198,27 @@ sub editquota {
     if ($args->{'realaname'}) {
 	$data->{'RealName'} = $args->{'realaname'};
     } else {
-	delete $data->{'RealName'} if $data->{'RealName'};
+	$data->{'RealName'} = undef;
     }
     if ($args->{'unit'}) {
 	$data->{'ou'} = $args->{'unit'};
     } else {
-	delete $data->{'ou'} if $data->{'ou'};
+	$data->{'ou'} = undef;
     }
     if ($args->{'mobile'}) {
 	$data->{'MobilePhone'} = $args->{'mobile'};
     } else {
-	delete $data->{'MobilePhone'} if $data->{'MobilePhone'};
+	$data->{'MobilePhone'} = undef;
     }
     if ($args->{'workphone'}) {
 	$data->{'WorkPhone'} = $args->{'workphone'};
     } else {
-	delete $data->{'WorkPhone'} if $data->{'WorkPhone'};
+	$data->{'WorkPhone'} = undef;
     }
     if ($args->{'PasswordComplexity'}) {
 	$data->{'PasswordComplexity'} = 'MixedCaseDigit';
     } else {
-	delete $data->{'PasswordComplexity'} if $data->{'PasswordComplexity'};
+	$data->{'PasswordComplexity'} = undef;
     }
 
     my $userForwarders = $cli->FindForwarders($domain,"$user\@$domain");

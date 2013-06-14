@@ -1,0 +1,19 @@
+[% FOR contact IN contacts -%]
+<tr>
+  <td class="truncate">[% contact.name %]</td>
+  <td class="truncate nobrd-left"  style="vertical-align: top;">
+    [% FOR mail IN contact.email; mail.t = mail.type.grep('(HOME|WORK|OTHER)').0; -%]
+    <a href="mailto:[% mail.value %]">[% mail.value %]</a> [% IF mail.t %]([% locale.maketext('CGP' _ mail.t) %])[% END -%] <br/>
+    [% END -%]
+  </td>
+  <td class="truncate" style="vertical-align: top;">
+    [% FOR tel IN contact.tel; tel.t = tel.type.grep('(HOME|WORK|CELL|FAX|VIDEO|AGENT|PAGER|OTHER)').0; -%]
+    <a href="tel:[% tel.value %]">[% tel.value %]</a> [% IF tel.t %]([% locale.maketext('CGP' _ tel.t) %])[% END -%] <br/>
+    [% END -%]
+  </td>
+  <td>
+    <a href="editcontact.html?account=[% account %]&amp;contact=[% contact.uid %]">[% locale.maketext('CGPViewEdit') %]</a>,
+    <a href="deletecontact.html?account=[% account %]&amp;contact=[% contact.uid %]&amp;name=[% contact.name %]">[% locale.maketext('BrandingDPackage') %]</a>
+  </td>
+</tr>
+[% END -%]

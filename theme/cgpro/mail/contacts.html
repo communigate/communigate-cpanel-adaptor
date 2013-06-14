@@ -5,21 +5,15 @@
 <div class="body-content">
   <h1><cpanel langprint="CGPContactsFor">: <cpanel print="$FORM{'account'}"></h1>
   <table border="0" cellpadding="5" cellspacing="0" id="mailtbl" class="sortable" width="650">
-    <tr >
+    <tr>
       <th class="cell" colspan="3"><cpanel langprint="CGPContact"></th>
       <th class="cell-end sorttable_nosort"><cpanel langprint="AHFucn"></th>
     </tr>
-    <?cp CommuniGate::ListContacts(
-	 [tr class="row-%"]
-	 [td class="truncate"]%[/td]
-	 [td class="truncate nobrd-left"]%[/td]
-	 [td class="truncate"]%[/td]
-	 [td][a href="deletecontact.html?account=$FORM{'account'}&amp;contact=%&amp;name=%"]$LANG{'BrandingDPackage'}[/a][/td]
-	 [/tr]
-	 ,*num,name,email,tel,uid,name) account=$FORM{'account'} || '[tr][td colspan="5" class="errors"]$LANG{'CGPNoContacts'}.[/td][/tr]' ?>
+    <?cptt CommuniGate::ListContacts(cgpro/mail/contacts.tmpl) account=$FORM{'account'} || '[tr][td colspan="5" class="errors"]$LANG{'CGPNoContacts'}.[/td][/tr]' ?>
 
   </table>
 
+  <div class="return-link"><a href="overview_accounts.html?account=<cpanel formprint="$FORM{account'}">">&larr; <cptext "Go Back"></a></div>
 </div><!-- end body-content div -->
 
 <cpanel Branding="include(stdfooter.html)">
