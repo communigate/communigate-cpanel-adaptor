@@ -84,7 +84,7 @@
 	<span class="classname">[% accounts.$account.class %]</span>
       </div>
       <div class="clear"></div>
-      <a href="contacts.html?account=[% account %]">Contacts</a>
+      [% UNLESS CPANEL.CPDATA.item('FEATURE-CGPRO_CONTACTS') == 0 %]<a href="contacts.html?account=[% account %]">[% locale.maketext("CGPContacts") %]</a>[% END %]
       <h3><span class="action_link" style="background-image: url([% CPBranding.image('cgpro_account_change_details') %])" onclick="toggle_action_div(null, {id:'account_details_module_[% loop.count - 1 %]', index:[% loop.count - 1 %], action:'account_details'})">[% locale.maketext("CGPAccountDetails") %]</span></h3>
       <!-- Account Details -->
       <div  style="display: none;" class="user-section" id="account_details_module_[% loop.count - 1 %]">
