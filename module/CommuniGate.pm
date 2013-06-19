@@ -2630,6 +2630,137 @@ sub api2_EditContact {
     $cli->Logout();
     return @return;
 }
+
+sub api2_DoEditContact {
+    my %OPTS = @_;
+    my $formdump = $OPTS{'formdump'};
+    my $params = {};
+    for my $row (split "\n", $formdump) {
+	if ($row =~ m/^(\S+)\s\=\s(.*?)$/) {
+	    my $key =$1;
+	    my $value = $2;
+	    $params->{$key} = $value;
+	}
+    }
+    my $message = {};
+    if ($params->{save}) {
+	my (undef,$dom) = split "@", $params->{account};
+	my @domains = Cpanel::Email::listmaildomains();
+	my $cli = getCLI();
+	my $locale = Cpanel::Locale->get_handle();
+	my @return;
+	for my $domain (@domains) {
+	    if ($domain eq $dom) {
+		$password = $cli->GetAccountPlainPassword($params->{account});
+		if ($password) {
+		    $message = {};
+		    $message->{"FN"} = [join(" ", grep(/.+/, ($params->{FAMILY}, $params->{GIVEN}, $params->{MIDDLE}) ) )];
+		    $message->{"X-FILE-AS"} = [join(" ", grep(/.+/, ($params->{FAMILY}, $params->{GIVEN}, $params->{MIDDLE}) ) )];
+		    $message->{"N"}->{"GIVEN"} = [$params->{GIVEN}] if $params->{GIVEN};
+		    $message->{"N"}->{"MIDDLE"} = [$params->{MIDDLE}] if $params->{MIDDLE};
+		    $message->{"N"}->{"FAMILY"} = [$params->{FAMILY}] if $params->{FAMILY};
+
+		    # $message->{EMail}->{'Organization'} = [join(", ", grep(/.+/, ($params->{ORGNAME}, $params->{ORGUNIT}) ) )] if $params->{ORGNAME} && $params->{ORGUNIT};
+		    $message->{"ORG"}->{"ORGNAME"} = [$params->{ORGNAME}] if $params->{ORGNAME};
+		    $message->{"ORG"}->{"ORGUNIT"} = [$params->{ORGUNIT}] if $params->{ORGUNIT};
+
+		    $message->{"TITLE"}->{"VALUE"} = [$params->{TITLE}] if $params->{TITLE};
+
+		    $message->{"BDAY"}->{"VALUE"} = [join("-", ($params->{BYEAR}, $params->{BMONTH}, $params->{BDAY} ) )] if $params->{BYEAR} && $params->{BMONTH} && $params->{BDAY};
+
+		    $message->{"NICKNAME"}->{"VALUE"} = [$params->{NICKNAME}] if $params->{NICKNAME};
+		    $message->{"ROLE"}->{"VALUE"} = [$params->{ROLE}] if $params->{ROLE};
+		    $message->{"TZ"}->{"VALUE"} = [$params->{TZ}] if $params->{TZ};
+		    $message->{"GEO"}->{"VALUE"} = [$params->{GEO}] if $params->{GEO};
+		    $message->{"NOTE"}->{"VALUE"} = [$params->{NOTE}] if $params->{NOTE};
+		    
+		    my $newUID = join ".", map{ join "", map { int rand(9) } 1..$_} (10,1);
+		    $newUID .= "." . $params->{account};
+		    $message->{"UID"}->{"VALUE"} = [$params->{oldMessageID} ? $params->{oldMessageID} : $newUID];
+
+		    my $emails = [];
+		    for (my $i = 0; $i < $params->{emailcount}; $i++) {
+			if ($params->{"mail-$i"} && $params->{"mailtype-$i"}) {
+			    push @$emails, {
+				VALUE => [$params->{"mail-$i"}],
+				USERID => [$params->{"mail-$i"}],
+				$params->{"mailtype-$i"} => {}
+			    };
+			}
+		    }
+		    $message->{'EMAIL'} = $emails if $#{$emails} >= 0;
+
+		    my $tels = [];
+		    for (my $i = 0; $i < $params->{telcount}; $i++) {
+			if ($params->{"TEL-$i"} && $params->{"teltype-$i"}) {
+			    push @$tels, {
+				VALUE => [$params->{"TEL-$i"}],
+				NUMBER => [$params->{"TEL-$i"}],
+				$params->{"teltype-$i"} => {}
+			    };
+			}
+		    }
+		    $message->{'TEL'} = $tels if $#{$tels} >= 0;
+
+		    my $url = [];
+		    for (my $i = 0; $i < $params->{wwwcount}; $i++) {
+			if ($params->{"URL-$i"} && $params->{"urltype-$i"}) {
+			    push @$url, {
+				VALUE => [$params->{"URL-$i"}],
+				$params->{"urltype-$i"} => {}
+			    };
+			}
+		    }
+		    $message->{'URL'} = $url if $#{$url} >= 0;
+
+		    my $address = [];
+		    for (my $i = 0; $i < $params->{addresscount}; $i++) {
+			if ($params->{"LOCALITY-$i"} && $params->{"addresstype-$i"}) {
+			    push @$address, {
+				STREET => [$params->{"STREET-$i"}],
+				REGION => [$params->{"REGION-$i"}],
+				LOCALITY => [$params->{"LOCALITY-$i"}],
+				POBOX => [$params->{"POBOX-$i"}],
+				CTRY => [$params->{"CTRY-$i"}],
+				PCODE => [$params->{"PCODE-$i"}],
+				$params->{"teltype-$i"} => {}
+			    };
+			}
+		    }
+		    $message->{'ADR'} = $address if $#{$address} >= 0;
+
+		    my $time = time();
+		    my $ximss = getXIMSS($params->{account}, $password);
+
+		    $ximss->send({folderOpen => {
+			id => "$time-mailbox",
+			folder => "Contacts",
+			sortField => "To"
+				  }});
+		    my $mailbox = $ximss->parseResponse("$time-mailbox");
+		    if ($mailbox->{'folderReport'}) {
+			my $contact = {
+			    id => "$time-append",
+			    folder => "Contacts",
+			    vCard => $message
+			};
+			if ($params->{oldUID}) {
+			    $contact->{'replacesUID'} = $params->{oldUID};
+			    $contact->{'checkOld'} = 'yes';
+			}
+			$ximss->send({contactAppend => $contact});
+			my $append = $ximss->parseResponse("$time-append");
+			$Cpanel::CPERROR{'CommuniGate'} = $append->{response}->{errorText} if $append->{response}->{errorText};
+		    }
+		    $ximss->send({folderClose => {id => "$time-close", folder=>"Contacts"}});
+		    $ximss->close();
+		}
+	    }
+	}	
+    }
+    return;
+}
+
 sub api2_DeleteContact {
     my %OPTS = @_;
     my $account = $OPTS{'account'};
@@ -2672,6 +2803,7 @@ sub api2_DeleteContact {
 }
 sub forceArray {
     my $data = shift;
+    return undef unless $data;
     if (ref($data) eq "ARRAY") {
 	return $data;
     } else {

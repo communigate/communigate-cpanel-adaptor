@@ -1,0 +1,31 @@
+[% MACRO filter_option(pval, val, text) BLOCK -%]
+<option value="[% val %]"[% val == pval ? " selected='selected'" : "" %]>[% cptext(text) %]</option>
+[% END -%]
+<tr>
+  <td align="right" style="vertical-align: top;">
+    [% type = adr.keys.grep('(HOME|WORK|DOM|POSTAL|PARCEL|OTHER)').0 -%]
+    <select name="addresstype-[% CPANEL.CPVAR.id %]">
+      [% filter_option(type, "OTHER", locale.maketext("CGPOTHER")) %]
+      [% filter_option(type, "HOME", locale.maketext("CGPHOME")) %]
+      [% filter_option(type, "WORK", locale.maketext("CGPWORK")) %]
+      [% filter_option(type, "DOM", locale.maketext("CGPDOM")) %]
+      [% filter_option(type, "POSTAL", locale.maketext("CGPPOSTAL")) %]
+      [% filter_option(type, "PARCEL", locale.maketext("CGPPARCEL")) %]
+    </select>
+  </td>
+  <td>
+    <label>[% locale.maketext("CGPPoBox") %]</label><br  />
+    <input type="text" name="POBOX-[% CPANEL.CPVAR.id %]" style="width: 150px" value="[% adr.POBOX %]" /><br  />
+    <label>[% locale.maketext("CGPCountry") %]</label><br  />
+    <input type="text" name="CTRY-[% CPANEL.CPVAR.id %]" style="width: 150px" value="[% adr.CTRY %]" /><br  />
+    <label>[% locale.maketext("CGPAddress") %]</label><br  />
+    <input type="text" name="STREET-[% CPANEL.CPVAR.id %]" style="width: 150px" value="[% adr.STREET %]" /><br  />
+    <label>[% locale.maketext("CGPTownCity") %]</label><br  />
+    <input type="text" name="LOCALITY-[% CPANEL.CPVAR.id %]" style="width: 150px" value="[% adr.LOCALITY %]" /><br  />
+    <label>[% locale.maketext("CGPState") %]</label><br  />
+    <input type="text" name="REGION-[% CPANEL.CPVAR.id %]" style="width: 150px" value="[% adr.REGION %]" /><br  />
+    <label>[% locale.maketext("CGPZipCode") %]</label><br  />
+    <input type="text" name="PCODE-[% CPANEL.CPVAR.id %]" style="width: 150px" value="[% adr.PCODE %]" /><br  />
+  </td>
+  <td colspan="2"><a href="#" class="removerow">Remove</a></td>
+</tr>

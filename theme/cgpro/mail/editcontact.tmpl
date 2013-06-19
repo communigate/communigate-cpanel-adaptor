@@ -1,6 +1,7 @@
 [% MACRO filter_option(pval, val, text) BLOCK -%]
 <option value="[% val %]"[% val == pval ? " selected='selected'" : "" %]>[% cptext(text) %]</option>
 [% END -%]
+<form action="doeditcontact.html?account=[% FORM.account %]" method="post">
 <div class="highlight">
   <table border="0" style="margin-left: 20px">
     <tr>
@@ -60,141 +61,122 @@
 	</select>
       </td>
       <td colspan="2"></td>
-    </tr>
-    <!-- <td><input id="new_email_submit" class="input-button" type="submit" value="[% locale.maketext("ARCreate") %]" tabindex="5" /></td> -->
-    <!-- <td></td> -->
-    <!-- <td></td> -->
-    </tr>
    </table>
 </div>
 <h2>[% locale.maketext('CGPEmails') %]</h2>
 <div class="highlight">
-  <table border="0" style="margin-left: 20px">
-    [% FOR mail IN forceArray(vcard.EMAIL) %]
-    <tr>
-      <td align="right">
-	[% type = mail.keys.grep('(HOME|WORK|OTHER)').0 -%]
-	<select name="mailtype">
-	  [% filter_option(type, "HOME", locale.maketext("CGPHOME")) %]
-	  [% filter_option(type, "WORK", locale.maketext("CGPWORK")) %]
-	  [% filter_option(type, "OTHER", locale.maketext("CGPOTHER")) %]
-	</select>
-	</td>
-      <td><input type="text" name="TITLE" style="width: 150px" value="[% mail.VALUE %]" /></td>
-      <td colspan="2"></td>
-    </tr>
-    [% END %]
+  <table border="0" style="margin-left: 20px" id="emailstable">
+    [% CPANEL.CPVAR.id = 0 -%]
+    [% FOR mail IN forceArray(vcard.EMAIL) -%]
+    [% PROCESS cgpro/mail/contacts_emailrow.tmpl -%]
+    [% CPANEL.CPVAR.id = loop.count %]
+    [% END -%]
   </table>
-  <p><a href="#">Add new</a>
+  <p><a href="#" id="emailsclick">Add new</a><input type="hidden" name="emailcount" id="emailcount" value="[% CPANEL.CPVAR.id %]" /></p>
 </div>
 <h2>[% locale.maketext('CGPPhoneNumbers') %]</h2>
 <div class="highlight">
-  <table border="0" style="margin-left: 20px">
-    [% FOR tel IN forceArray(vcard.TEL) %]
-    <tr>
-      <td align="right">
-	[% type = tel.keys.grep('(HOME|WORK|CELL|FAX|VIDEO|AGENT|PAGER|OTHER)').0 -%]
-	<select name="mailtype">
-	  [% filter_option(type, "OTHER", locale.maketext("CGPOTHER")) %]
-	  [% filter_option(type, "HOME", locale.maketext("CGPHOME")) %]
-	  [% filter_option(type, "WORK", locale.maketext("CGPWORK")) %]
-	  [% filter_option(type, "CELL", locale.maketext("CGPCELL")) %]
-	  [% filter_option(type, "FAX", locale.maketext("CGPFAX")) %]
-	  [% filter_option(type, "VIDEO", locale.maketext("CGPVIDEO")) %]
-	  [% filter_option(type, "AGENT", locale.maketext("CGPAGENT")) %]
-	  [% filter_option(type, "PAGER", locale.maketext("CGPPAGER")) %]
-	</select>
-	</td>
-      <td><input type="text" name="TITLE" style="width: 150px" value="[% tel.VALUE %]" /></td>
-      <td colspan="2"></td>
-    </tr>
+  <table border="0" style="margin-left: 20px" id="telstable">
+    [% CPANEL.CPVAR.id = 0 -%]
+    [% FOR tel IN forceArray(vcard.TEL) -%]
+    [% PROCESS cgpro/mail/contacts_telrow.tmpl -%]
+    [% CPANEL.CPVAR.id = loop.count -%]
     [% END %]
   </table>
-  <p><a href="#">Add new</a>
+  <p><a href="#" id="telsclick">Add new</a><input type="hidden" name="telcount" id="telcount" value="[% CPANEL.CPVAR.id %]" /></p>
 </div>
 <h2>[% locale.maketext('CGPAddresses') %]</h2>
 <div class="highlight">
-  <table border="0" style="margin-left: 20px">
+  <table border="0" style="margin-left: 20px" id="addresstable">
+    [% CPANEL.CPVAR.id = 0 -%]
     [% FOR adr IN forceArray(vcard.ADR) %]
-    <tr>
-      <td align="right" style="vertical-align: top;">
-	[% type = adr.keys.grep('(HOME|WORK|DOM|POSTAL|PARCEL|OTHER)').0 -%]
-	<select name="mailtype">
-	  [% filter_option(type, "OTHER", locale.maketext("CGPOTHER")) %]
-	  [% filter_option(type, "HOME", locale.maketext("CGPHOME")) %]
-	  [% filter_option(type, "WORK", locale.maketext("CGPWORK")) %]
-	  [% filter_option(type, "DOM", locale.maketext("CGPDOM")) %]
-	  [% filter_option(type, "POSTAL", locale.maketext("CGPPOSTAL")) %]
-	  [% filter_option(type, "PARCEL", locale.maketext("CGPPARCEL")) %]
-	</select>
-	</td>
-      <td>
-	<label>[% locale.maketext("CGPPoBox") %]</label><br  />
-	<input type="text" name="TITLE" style="width: 150px" value="[% adr.POBOX %]" /><br  />
-	<label>[% locale.maketext("CGPCountry") %]</label><br  />
-	<input type="text" name="TITLE" style="width: 150px" value="[% adr.CTRY %]" /><br  />
-	<label>[% locale.maketext("CGPAddress") %]</label><br  />
-	<input type="text" name="TITLE" style="width: 150px" value="[% adr.STREET %]" /><br  />
-	<label>[% locale.maketext("CGPTownCity") %]</label><br  />
-	<input type="text" name="TITLE" style="width: 150px" value="[% adr.LOCALITY %]" /><br  />
-	<label>[% locale.maketext("CGPState") %]</label><br  />
-	<input type="text" name="TITLE" style="width: 150px" value="[% adr.REGION %]" /><br  />
-	<label>[% locale.maketext("CGPZipCode") %]</label><br  />
-	<input type="text" name="TITLE" style="width: 150px" value="[% adr.PCODE %]" /><br  />
-      </td>
-      <td colspan="2"></td>
-    </tr>
+    [% PROCESS cgpro/mail/contacts_addressrow.tmpl -%]
+    [% CPANEL.CPVAR.id = loop.count -%]
     [% END %]
   </table>
-  <p><a href="#">Add new</a>
+  <p><a href="#" id="addresssclick">Add new</a><input type="hidden" name="addresscount" id="addresscount" value="[% CPANEL.CPVAR.id %]" /></p>
 </div>
 <h2>[% locale.maketext('CGPWebPages') %]</h2>
 <div class="highlight">
-  <table border="0" style="margin-left: 20px">
+  <table border="0" style="margin-left: 20px" id="wwwtable">
+    [% CPANEL.CPVAR.id = 0 -%]
     [% FOR page IN forceArray(vcard.URL) %]
-    <tr>
-      <td align="right">
-	[% type = page.keys.grep('(HOME|WORK|OTHER)').0 -%]
-	<select name="mailtype">
-	  [% filter_option(type, "HOME", locale.maketext("CGPHOME")) %]
-	  [% filter_option(type, "WORK", locale.maketext("CGPWORK")) %]
-	  [% filter_option(type, "OTHER", locale.maketext("CGPOTHER")) %]
-	</select>
-	</td>
-      <td><input type="text" name="TITLE" style="width: 150px" value="[% page.VALUE %]" /></td>
-      <td colspan="2"></td>
-    </tr>
+    [% PROCESS cgpro/mail/contacts_wwwrow.tmpl -%]
+    [% CPANEL.CPVAR.id = loop.count -%]
     [% END %]
   </table>
-  <p><a href="#">Add new</a>
+  <p><a href="#" id="wwwsclick">Add new</a><input type="hidden" name="wwwcount" id="wwwcount" value="[% CPANEL.CPVAR.id %]" /></p>
 </div>
 <h2>[% locale.maketext('CGPAdditionalInfo') %]</h2>
 <div class="highlight">
   <table border="0" style="margin-left: 20px">
     <tr>
       <td align="right">[% locale.maketext("CGPNickName") %]:</td>
-      <td><input type="text" name="GIVEN" style="width: 150px" value="[% vcard.NICKNAME.VALUE %]" /></td>
+      <td><input type="text" name="NICKNAME" style="width: 150px" value="[% vcard.NICKNAME.VALUE %]" /></td>
       <td colspan="2"></td>
     </tr>
     <tr>
       <td align="right">[% locale.maketext("CGPBusinessCategory") %]:</td>
-      <td><input type="text" name="GIVEN" style="width: 150px" value="[% vcard.ROLE.VALUE %]" /></td>
+      <td><input type="text" name="ROLE" style="width: 150px" value="[% vcard.ROLE.VALUE %]" /></td>
       <td colspan="2"></td>
     </tr>
     <tr>
       <td align="right">[% locale.maketext("CGPTimeZone") %]:</td>
-      <td><input type="text" name="GIVEN" style="width: 150px" value="[% vcard.TZ.VALUE %]" /></td>
+      <td><input type="text" name="TZ" style="width: 150px" value="[% vcard.TZ.VALUE %]" /></td>
       <td colspan="2"></td>
     </tr>
     <tr>
       <td align="right">[% locale.maketext("CGPGeoPosition") %]:</td>
-      <td><input type="text" name="GIVEN" style="width: 150px" value="[% vcard.GEO.VALUE %]" /></td>
+      <td><input type="text" name="GEO" style="width: 150px" value="[% vcard.GEO.VALUE %]" /></td>
       <td colspan="2"></td>
     </tr>
     <tr>
       <td align="right">[% locale.maketext("CGPNote") %]:</td>
-      <td><input type="text" name="GIVEN" style="width: 150px" value="[% vcard.NOTE.VALUE %]" /></td>
+      <td><input type="text" name="NOTE" style="width: 150px" value="[% vcard.NOTE.VALUE %]" /></td>
       <td colspan="2"></td>
-    </tr>
+    </tr> 
   </table>
 </div>
+<div class="highlight">
+  <table border="0" style="margin-left: 20px">
+    </tr>
+    <td>
+      <input type="hidden" name="oldMessageID" value="[% vcard.UID.VALUE.item('Message-ID') %]" />
+      <input type="hidden" name="oldUID" value="[% FORM.contact %]" />
+      <input id="new_email_submit" class="input-button" type="submit" value="[% locale.maketext("CGPSave") %]" name="save" />
+    </td>
+    <td></td>
+    <td></td>
+    </tr>
+ </table>
+</div>
+</form>
+<script type="text/javascript">
+var getRow = function (e, data) {
+    YAHOO.util.Event.preventDefault(e); 
+    var wrap = YAHOO.util.Dom.get(data.wrap);
+    var index = YAHOO.util.Dom.get(data.index);
+    YAHOO.util.Connect.asyncRequest('GET', data.url + '?id=' + index.value, {
+	    success: function(o) {
+                wrap.innerHTML = wrap.innerHTML + o.responseText;
+                var removers = YAHOO.util.Dom.getElementsByClassName('removerow');
+ 	        YAHOO.util.Event.addListener(removers, "click", removeRow);
+	    },
+		}, null);
+    index.value = parseInt(index.value) + 1;
+};
+var removeRow = function (e) {
+    YAHOO.util.Event.preventDefault(e);
+    var row = this.parentNode.parentNode;
+    var table = row.parentNode;
+    table.removeChild(row);
+};
+YAHOO.util.Event.onDOMReady(function () {
+ 	YAHOO.util.Event.addListener("emailsclick", "click", getRow, {url: 'contacts_emailrow.html', wrap: 'emailstable', index: 'emailcount'});
+ 	YAHOO.util.Event.addListener("telsclick", "click", getRow, {url: 'contacts_telrow.html', wrap: 'telstable', index: 'telcount'});
+ 	YAHOO.util.Event.addListener("addresssclick", "click", getRow, {url: 'contacts_addressrow.html', wrap: 'addresstable', index: 'addresscount'});
+ 	YAHOO.util.Event.addListener("wwwsclick", "click", getRow, {url: 'contacts_wwwrow.html', wrap: 'wwwtable', index: 'wwwcount'});
+        var removers = YAHOO.util.Dom.getElementsByClassName('removerow');
+ 	YAHOO.util.Event.addListener(removers, "click", removeRow);
+    });
+</script>
