@@ -10,7 +10,7 @@
     <h1><cpanel langprint="CGPEditContact"></h1>
   </cpanelif>
 
-  <?cptt CommuniGate::EditContact(cgpro/mail/editcontact.tmpl) account=$FORM{'account'}, UID=$FORM{'contact'} ?>
+  <?cptt CommuniGate::EditContact(cgpro/mail/editcontact.tmpl) account=$FORM{'account'}, UID=$FORM{'contact'}, box=$FORM{'box'} ?>
   <div class="return-link"><a href="contacts.html?account=<cpanel formprint="$FORM{account'}">">&larr; <cptext "Go Back"></a></div>
 </div><!-- end body-content div -->
 

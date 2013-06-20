@@ -2,10 +2,10 @@
 <cpanel setvar="dprefix=../">
 <cpanel Branding="include(stdheader.html)">
 <div class="body-content">
-  <h1><cpanel langprint="CGPDeleteContact"></h1>
-  <p><cpanel Locale="maketext('Are you sure you want to delete contanct "[_1]" ?',$FORM{'name'})"></p>
+  <h1><cpanel langprint="CGPDeleteBox"></h1>
+  <p><cpanel Locale="maketext('Are you sure you want to delete contacts box "[_1]" ?',$FORM{'box'})"></p>
   <p> 
-    <a class="create-button" href="dodeletecontact.html?contact=<cpanel formprint="$FORM{'contact'}">&account=<cpanel formprint="$FORM{'account'}">&name=<cpanel formprint="$FORM{'name'}">&box=<cpanel formprint="$FORM{'box'}">"><cpanel Locale="maketext('CGPDelete')"></a> 
+    <a class="create-button" href="dodeletebox.html?box=<cpanel formprint="$FORM{'box'}">&account=<cpanel formprint="$FORM{'account'}">"><cpanel Locale="maketext('CGPDelete')"></a> 
     <a class="cancel_link" href="contacts.html?account=<cpanel formprint="$FORM{account'}">"><cpanel Locale="maketext('CGPcancel')"></a>
   </p>
   <div class="return-link"><a href="contacts.html?account=<cpanel formprint="$FORM{account'}">">&larr; <cptext "Go Back"></a></div>

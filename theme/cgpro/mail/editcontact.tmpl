@@ -1,7 +1,7 @@
 [% MACRO filter_option(pval, val, text) BLOCK -%]
 <option value="[% val %]"[% val == pval ? " selected='selected'" : "" %]>[% cptext(text) %]</option>
 [% END -%]
-<form action="doeditcontact.html?account=[% FORM.account %]" method="post">
+<form action="doeditcontact.html?account=[% FORM.account %]&amp;box=[% FORM.box %]" method="post">
 <div class="highlight">
   <table border="0" style="margin-left: 20px">
     <tr>
