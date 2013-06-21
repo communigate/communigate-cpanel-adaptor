@@ -9,6 +9,7 @@
 <h2>[% box %][% IF prefs.ContactsBox == box %] ([% locale.maketext("CGPdefault") %])[% END %]</h2>
 <p>
   <a class="create-button" href="editcontact.html?account=[% account %]&amp;box=[% box %]">[% locale.maketext("CGPAddContact") %]</a>
+  <a class="create-button" href="editcontactsgroup.html?account=[% account %]&amp;box=[% box %]">[% locale.maketext("CGPAddContactsGroup") %]</a>
   <a class="create-button" href="editbox.html?account=[% account %]&amp;box=[% box %]">[% locale.maketext("CGPBoxAccess") %]</a>
   [% UNLESS prefs.ContactsBox == box -%]
   <a class="create-button" href="deletebox.html?account=[% account %]&amp;box=[% box %]">[% locale.maketext("CGPDeleteBox") %]</a>
@@ -22,8 +23,11 @@
   </tr>
   [% FOR contact IN contacts.$box -%]
   <tr>
-    <td class="truncate"><a href="editcontact.html?account=[% account %]&amp;contact=[% contact.uid %]&amp;box=[% box %]">[% contact.name %]</a></td>
+    <td class="truncate"><a href="editcontact[% IF contact.group %]sgroup[% END %].html?account=[% account %]&amp;contact=[% contact.uid %]&amp;box=[% box %]">[% contact.name %]</a></td>
     <td class="truncate nobrd-left"  style="vertical-align: top;">
+      [% IF contact.group -%]
+      ([% locale.maketext('CGPContactsGroup') %])
+      [% END -%]
       [% FOR mail IN contact.email; mail.t = mail.type.grep('(HOME|WORK|OTHER)').0; -%]
       <a href="mailto:[% mail.value %]">[% mail.value %]</a> [% IF mail.t %]([% locale.maketext('CGP' _ mail.t) %])[% END -%] <br/>
       [% END -%]
@@ -34,7 +38,7 @@
       [% END -%]
     </td>
     <td>
-      <a href="editcontact.html?account=[% account %]&amp;contact=[% contact.uid %]&amp;box=[% box %]">[% locale.maketext('CGPViewEdit') %]</a>,
+      <a href="editcontact[% IF contact.group %]sgroup[% END %].html?account=[% account %]&amp;contact=[% contact.uid %]&amp;box=[% box %]">[% locale.maketext('CGPViewEdit') %]</a>,
       <a href="deletecontact.html?account=[% account %]&amp;contact=[% contact.uid %]&amp;name=[% contact.name %]&amp;box=[% box %]">[% locale.maketext('BrandingDPackage') %]</a>
     </td>
   </tr>

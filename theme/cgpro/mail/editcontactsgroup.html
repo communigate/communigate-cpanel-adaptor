@@ -1,0 +1,18 @@
+<cpanel setvar="headerimg=../images/mailmenu.gif">
+<cpanel setvar="dprefix=../">
+<cpanel setvar="headerinclude=mail/pops_head.html">
+<cpanel Branding="include(stdheader.html)">
+<div class="body-content">
+  <cpanelif !$FORM{'group'}>
+    <h1><cpanel langprint="CGPAddContactsGroup"></h1>
+  </cpanelif>
+  <cpanelif $FORM{'group'}>
+    <h1><cpanel langprint="CGPEditContactsGroup"></h1>
+  </cpanelif>
+
+  <?cptt CommuniGate::EditContactsGroup(cgpro/mail/editcontactsgroup.tmpl) account=$FORM{'account'}, box=$FORM{'box'}, UID=$FORM{'contact'} ?>
+  <div class="return-link"><a href="contacts.html?account=<cpanel formprint="$FORM{account'}">">&larr; <cptext "Go Back"></a></div>
+</div><!-- end body-content div -->
+
+<cpanel Branding="include(stdfooter.html)">
+
