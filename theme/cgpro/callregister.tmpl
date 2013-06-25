@@ -26,7 +26,7 @@
     <th class="cell">[% locale.maketext("CGPDuration") %]</th>
     <th class="cell-end">[% locale.maketext("CGPError") %]</th>
   </tr>
-[% FOR call IN calls -%]
+[% FOR call IN calls.reverse -%]
   <tr>
     <td style="white-space: nowrap">[% call.1 %]</td>
     <td>[% call.2 == "I" ? "In" : "Out"%]</td>
