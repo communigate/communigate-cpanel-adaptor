@@ -114,6 +114,7 @@ sub api2_AccountsOverview {
 	my $freeExtensions = {};
 	foreach my $domain (@domains) {
 	    my $accounts=$cli->ListAccounts($domain);
+	    use Data::Dumper;
 	    foreach my $userName (sort keys %$accounts) {	
 		my $accountData = $cli->GetAccountEffectiveSettings("$userName\@$domain");
 		my $accountStats = $cli->GetAccountStat("$userName\@$domain");
@@ -129,7 +130,6 @@ sub api2_AccountsOverview {
 		} else {
 		    $diskusedpercent = $diskused / $diskquota * 100;
 		}
-
 		$return_accounts->{$userName . "@" . $domain} = {
 		    domain => $domain,
 		    username => $userName,
@@ -149,11 +149,11 @@ sub api2_AccountsOverview {
 		    my $to = $cli->GetForwarder("$forwarder\@$domain");
 		    $freeExtensions->{$domain} = [] unless $freeExtensions->{$domain};
 		    push @{$freeExtensions->{$domain}}, $forwarder if $to eq 'null';
-		    $return_accounts->{$to}->{extension} = $forwarder if $to ne 'null';
+		    $return_accounts->{$to}->{extension} = $forwarder if $to ne 'null' && defined $return_accounts->{$to};
 		}
 		if ($forwarder =~ m/^\d{3}$/) {
 		    my $to = $cli->GetForwarder("$forwarder\@$domain");
-		    $return_accounts->{$to}->{local_extension} = $forwarder;
+		    $return_accounts->{$to}->{local_extension} = $forwarder if defined $return_accounts->{$to};
 		}
 	    }
 	}
