@@ -20,6 +20,7 @@ use Storable                         ();
 use Time::Local  'timelocal_nocheck';
 use Digest::MD5 qw(md5_hex);
 use XIMSS;
+use Cpanel::CPAN::MIME::Base64::Perl qw(decode_base64);
 
 require Exporter;
 @ISA    = qw(Exporter);
@@ -3115,16 +3116,50 @@ sub api2_DoEditContactsBox {
     my $cli = getCLI();
     return 1;
 }
+sub api2_ListCalls {
+    my %OPTS = @_;
+    my $account = $OPTS{'account'};
+    my $period = $OPTS{'period'};
+    my (undef,$dom) = split "@", $account;
 
-sub forceArray {
-    my $data = shift;
-    return undef unless $data;
-    if (ref($data) eq "ARRAY") {
-	return $data;
-    } else {
-	return [$data];
+    my @domains = Cpanel::Email::listmaildomains();
+    my $cli = getCLI();
+
+    my $calls = [];
+    my $periods = {};
+    for my $domain (@domains) {
+	if ($domain eq $dom) {
+	    my $files = $cli->ListStorageFiles($account, 'private/logs/');
+	    for (keys %$files) {
+		my (undef, undef,undef,$month,$year,undef,undef,undef) = split '\D', $files->{$_}->{STModified};
+		if ($_ =~ m/^calls\-/) {
+		    $periods->{"$year-$month-$_"} = $_;
+		    $periods->{"$year-$month-$_"} =~ s/^\w+\-//;
+		}
+	    }
+	    my $target = "";
+	    if ($period =~ /^calls\-\d+/) {
+		$target = $period;
+	    } else {
+		my $keys = [sort {$b <=> $a} keys %$periods];
+		$target = 'calls-' . $periods->{$keys->[0]} if $keys->[0];
+	    }
+	    my $file = $cli->ReadStorageFile($account, 'private/logs/' . $target);
+	    my $error_msg = $cli->getErrMessage();
+	    my $content = $file->[0];
+	    $content =~ s/(^\[|\]$)?//g;
+	    for (split "\n", decode_base64($content)) {
+		push @$calls, [split "\t", $_];
+	    };
+	    print $error_msg unless ($error_msg eq "OK");
+	    $Cpanel::CPERROR{'CommuniGate'} = $error_msg unless ($error_msg eq "OK");
+	    last;
+	}
     }
+    $cli->Logout();
+    return {calls => $calls, files => $periods};
 }
+
 sub IsGroupInternal {
   	my $groupwithdomain = shift;
 	my @values = split("@",$groupwithdomain);
