@@ -1,0 +1,32 @@
+function findFreeAgents(groupN) is
+  agents = groupN? ReadGroupMembers(groupN): null;
+  syslog("Group: " + ObjectToString(agents));
+
+  if isArray(agents) and then length(agents) > 0 then
+    groupDomain = FindSubstring(groupN,"@") < 0? MyDomain(): EmailDomainPart(groupN);
+    result = NewArray(); count = Length(agents);
+    shift = RandomNumber() % count;
+    index = 0; while index < count loop
+      member = agents[(index + shift) % count];
+      if FindSubstring(member,"@") < 0 then member += "@" + groupDomain; end if;
+      routed = RouteLocalURI(EmailToSIPURI(member));
+      if routed then
+        callInfo = ReadCallInfo(routed);
+        busy = false;
+        if IsDictionary(callInfo) and then Length(callInfo) > 0 then
+          xCall = 0; while not busy and then xCall < Length(callInfo) loop
+            theSegment = callInfo.(callInfo[xCall]);
+            theCall    = theSegment.("");
+            if theCall.connected != null then busy = true; end if;
+          exitif busy;
+            xCall += 1;
+          end loop;
+        end if;
+        if not busy then AddElement(result, EmailToSIPURI(routed)); end if;
+      end if;
+      index += 1;
+    end loop;
+    return Length(result) == 0? null: Length(result) == 1? result[0]: result;
+  end if;
+  return null;
+end function;

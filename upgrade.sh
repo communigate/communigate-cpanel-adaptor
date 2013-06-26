@@ -164,6 +164,9 @@ cp ${PACKSRC}/tools/helper_DKIM_verify.pl /var/CommuniGate/
 ${PACKSRC}/scripts/install_dkim_signer.pl
 ${PACKSRC}/scripts/init_pbx.pl
 
+# Install Active Queue Scripts
+cp ${PACKSRC}/ActiveQueue/*spp* /opt/CommuniGate/PBXApps/
+
 # Install the WHM plugins (administration and groupware control)
 rm -f /usr/local/cpanel/whostmgr/docroot/templates/cgpro_*
 cp ${PACKSRC}/whm/templates/* /usr/local/cpanel/whostmgr/docroot/templates/

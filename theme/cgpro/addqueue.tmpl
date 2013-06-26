@@ -1,0 +1,26 @@
+[% MACRO filter_option(pval, val, text) BLOCK -%]
+<option value="[% val %]"[% val == pval ? " selected='selected'" : "" %]>[% cptext(text) %]</option>
+[% END -%]
+<div class="highlight2">
+  <table border="0">
+    <tr>
+      <td>[% locale.maketext('CGPQueueName') %]:</td>
+      <td>
+	<input type="text" name="queueName" value="[% name %]" />
+	<input type="hidden" name="queue" value="[% FORM.queue %]" />
+      </td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>[% locale.maketext('CGPCallDepartment') %]:</td>
+      <td>
+	<select name="department">
+	  [% FOR dep IN departments -%]
+	  [% filter_option(department, dep, dep) %]
+	  [% END -%]
+	</select>
+      </td>
+      <td></td>
+    </tr>
+  </table>
+</div>

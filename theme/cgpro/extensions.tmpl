@@ -16,6 +16,9 @@
 	    [% FOR account = departments -%]
 	    <option value="[% account %]">[% account %] ([% locale.maketext("CGPDepartment") %])</option>
 	    [% END -%]
+	    [% FOR queue = queues -%]
+	    <option value="[% queue.value %]">[% queue.name %] ([% locale.maketext("CGPQueue") %])</option>
+	    [% END -%]
 	  </select>
 	</td>
 	<td colspan="2"><div id="realanem_error"></div></td>
@@ -59,6 +62,9 @@
 	    [% END -%]
 	    [% FOR account = departments -%]
 	    <option value="[% account %]">[% account %] ([% locale.maketext("CGPDepartment") %])</option>
+	    [% END -%]
+	    [% FOR queue = queues -%]
+	    <option value="[% queue.value %]">[% queue.name %] ([% locale.maketext("CGPQueue") %])</option>
 	    [% END -%]
 	  </select>
 	</td>

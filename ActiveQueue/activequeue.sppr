@@ -1,0 +1,112 @@
+// ============================================= //
+//          Active Queue Application            //
+//                                               //
+// Version 1.0                                   //
+// Copyright (c) 2008, Stalker Software, Inc.    //
+// ============================================= //
+//
+// Description:
+//  Agents are callers listed in some group object
+//    They should be authenticated.
+//    An Agent is informed about the number of Users
+//    waiting in this Queue.
+//    An Agent is connected to the first waiting
+//    User in the Queue when the Agent presses "*"
+//    An Agent can disconnect from a User by
+//      pressing "#"
+//
+// Callers not listed in the group are treated as Users
+//    Users are placed into this Queue and they are
+//    informed about their Queue positions.
+//    A user can abandon waiting by pressing "#"
+//
+//
+procedure playNumber(theNumber) external;
+function  activeQueueCaller(queueName,announce,holdFileName,groupName) external;
+function  findFreeAgents(groupN) external;
+procedure bridgedLoop(param) external;
+
+procedure doAgent(queueN) forward;
+
+entry Main is
+  params = Vars().startParameter;
+  groupN = isArray(params)? params[0]: params;
+  agents = groupN? ReadGroupMembers(groupN): null;
+  syslog("Group: " + ObjectToString(agents));
+  queueN = isArray(params)? params[1]: null;
+  queueT = isArray(params) and then Number(params[2]) > 0? Number(params[2]): 15;
+
+  fromWhom = RouteLocalURI(RemoteURI());
+  fromAgent = false;
+
+  if isArray(agents) and then length(agents) > 0 then
+    groupDomain = FindSubstring(groupN,"@") < 0? MyDomain(): EmailDomainPart(groupN);
+    //syslog("Domain: " + groupDomain);
+    index = length(agents) - 1; while index >= 0 loop
+      member = agents[index];
+      if FindSubstring(member,"@") < 0 then member = member + "@" + groupDomain; end if;
+      syslog("Member: " + member);
+      if RouteLocalURI(EmailToSIPURI(member)) == fromWhom then
+        fromAgent = true;
+      end if;
+    exitif fromAgent;
+      index -= 1;
+    end loop;
+    if length(agents) == 0 then agents = null; end if;
+  else
+    agents = null;
+  end if;  
+
+  if not fromAgent then
+
+    free = findFreeAgents(groupN);
+    if free then
+      ForkCall(free);
+      input = ReadInput(queueT);
+    end if;
+
+    if AcceptCall() != null then stop; end if;
+    PlayFileInLoop("Blank",1000);
+    playFile("Welcome");
+    input = activeQueueCaller(queueN,true,"HoldMusic",groupN);
+    if input != null then bridgedLoop(input); end if;
+
+  elif RemoteAuthentication() == null then
+    rejectCall(401); stop;
+//  elif EmailDomainPart(RemoteAuthentication()) != MyDomain() then
+//    rejectCall(403); stop;
+  else
+    if acceptCall() != null then stop; end if;
+    doAgent(queueN);
+  end if;
+
+  ClearDTMF();
+  PlayFileInLoop("Blank",500);
+  PlayFile("GoodBye");
+end entry;
+
+procedure doAgent(queueN) is
+  loop
+    queueInfo = CheckQueue(queueN);
+    playNumber(queueInfo.length); PlayFile("caller-pl");
+    PlayFile("WaitingInQueue");
+
+    input = ReadInput(10);
+
+    if IsDisconnectEvent(input) or else input == "#" then return; end if;
+
+    if input == "*" then
+      PlayFile("ConnectingNow");
+      queueData = ReadQueue(queueN);
+      if queueData == null then
+        PlayFile("NoWaitingCalls");
+      elif StartBridge(queueData.id) != null then
+        PlayFile("Failure");
+      else
+        bridgedLoop(queueData.id);
+      end if;
+    elif IsString(input) then
+      PlayFile("InvalidEntry");
+    end if;
+  end loop;
+end procedure;

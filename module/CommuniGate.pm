@@ -116,6 +116,7 @@ sub api2_AccountsOverview {
 	    my $accounts=$cli->ListAccounts($domain);
 	    use Data::Dumper;
 	    foreach my $userName (sort keys %$accounts) {	
+		next if $userName eq 'pbx';
 		my $accountData = $cli->GetAccountEffectiveSettings("$userName\@$domain");
 		my $accountStats = $cli->GetAccountStat("$userName\@$domain");
 		my $service = @$accountData{'ServiceClass'} || '';
@@ -342,6 +343,7 @@ sub api2_listpopswithdisk {
                 my $accounts=$cli->ListAccounts($domain);
                 my $userName;
                 foreach $userName (sort keys %$accounts) {      
+		    next if $userName eq 'pbx';
                         my $accountData = $cli->GetAccountEffectiveSettings("$userName\@$domain");
                         my $diskquota = @$accountData{'MaxAccountSize'} || '';
 			$diskquota =~ s/M//g;
@@ -500,6 +502,7 @@ sub api2_listforwards {
       foreach my $forwarder (@$forwarders) {
 	  next if $forwarder =~ m/^(i|tn)\-\d+$/i;
 	  my $fwd = $cli->GetForwarder("$forwarder\@$domain");
+	  next if $forwarder =~ m/^activequeue_/i || $fwd =~ m/^activequeue_/i;
 	  push( @result, { uri_dest => "$forwarder%40$domain",
 			   html_dest => "$forwarder\@$domain",
 			   dest => "$forwarder\@$domain",
@@ -526,6 +529,13 @@ sub api2_ListExtensions {
 	  $short =~ s/^(i|tn)\-(\d+)$/$2/i;
 	  my $fwd = $cli->GetForwarder("$forwarder\@$domain");
 	  next if $fwd eq 'null';
+	  if ($fwd =~ /^activequeue\_/) {
+	      my $to = $cli->GetForwarder($fwd);
+	      $to =~ s/activequeue\{(.*?)\}\#.*?$/$1/;
+	      (undef, $fwd, undef) = split ",", $to;
+	      ($fwd, undef) = split '@', $to unless $fwd;
+	      $fwd = "$fwd (Caller Queue)";
+	  }
 	  push( @result, { uri_dest => "$forwarder%40$domain",
 			   html_dest => "$short",
 			   dest => "$forwarder\@$domain",
@@ -588,6 +598,20 @@ sub api2_AssignExtension {
 	  my $details = $cli->GetGroup("$groupName\@$domain");
 	  $result->{'departments'} = [] unless $result->{'departments'};
 	  push @{$result->{'departments'}}, "$groupName\@$domain" unless (defined($details->{SignalDisabled}) && $details->{SignalDisabled} eq "YES");
+
+      }
+      my $forwarders = $cli->ListForwarders($domain);
+      foreach my $forwarder (sort @$forwarders) {
+	  # my $details = $cli->GetGroup("$groupName\@$domain");
+	  # $result->{'departments'} = [] unless $result->{'departments'};
+	  if ($forwarder =~ /^activequeue\_/) {
+	      my $name = "";
+	      my $to = $cli->GetForwarder("$forwarder\@$domain");
+	      $to =~ s/activequeue\{(.*?)\}\#.*?$/$1/;
+	      (undef, $name, undef) = split ",", $to;
+	      ($name, undef) = split '@', $to unless $name;
+	      push @{$result->{'queues'}}, {value => "$forwarder\@$domain", name => $name};
+	  }
 
       }
   }
@@ -3158,6 +3182,81 @@ sub api2_ListCalls {
     }
     $cli->Logout();
     return {calls => $calls, files => $periods};
+}
+
+sub api2_AddQueue {
+    my %OPTS = @_;
+    my @domains = Cpanel::Email::listmaildomains();
+    my $cli = getCLI();
+    my ($forwarder,$dom) = split '@', $OPTS{'queue'};
+    my (undef,$dom2) = split '@', $OPTS{'department'};
+    my $departments = [];
+    my $name;
+    my $departments;
+    for my $domain (@domains) {
+	my $groups = $cli->ListGroups($domain);
+	foreach $groupName (sort @$groups) {
+	    my $details = $cli->GetGroup("$groupName\@$domain");
+	    push(@$departments, "$groupName\@$domain") unless (defined($details->{SignalDisabled}) && $details->{SignalDisabled} eq "YES");
+	}
+	if ($domain eq $dom) {
+	    my $queue = $cli->GetForwarder($OPTS{'queue'});
+	    if ($queue) {
+		$queue =~ s/activequeue\{(.*?)\}\#.*?$/$1/;
+		($department,$name,undef) = split ",", $queue;
+		($name,undef) = split "@", $department unless $name;
+	    }
+	}
+    }
+    $cli->Logout();
+    return {departments => $departments, name => $name, department => $department};
+}
+
+sub api2_DoAddQueue {
+    my %OPTS = @_;
+    my @domains = Cpanel::Email::listmaildomains();
+    my $cli = getCLI();
+    my (undef,$dom) = split '@', $OPTS{'department'};
+    for my $domain (@domains) {
+	if ($domain eq $dom && $OPTS{'department'}) {
+	    unless ($cli->GetAccountSettings("pbx\@$domain")) {
+		$cli->CreateAccount(accountName => "pbx\@$domain");
+		$cli->SetAccountRights("pbx\@$domain", ['Domain', 'CanImpersonate']);
+	    }
+	    if ($OPTS{'queue'}) {
+	    	$cli->DeleteForwarder($OPTS{'queue'});
+	    }
+	    my $queuestring = $OPTS{'department'};
+	    if ($OPTS{'name'}) {
+		$queuestring .= "," . $OPTS{'name'} if $OPTS{'name'};
+	    }
+	    $cli->CreateForwarder("activequeue_" . $OPTS{'department'}, 'activequeue{' . $queuestring . '}#pbx@' . $domain);
+	}
+    }
+    $cli->Logout();
+    return { msg => ""};
+}
+
+sub api2_ListQueues {
+    my %OPTS = @_;
+    my @domains = Cpanel::Email::listmaildomains();
+    my $cli = getCLI();
+
+    my @return;
+    for my $domain (@domains) {
+	  my $forwarders = $cli->ListForwarders($domain);
+	  foreach my $forwarder (@$forwarders) {
+	      if ($forwarder =~ /^activequeue\_/) {
+		  my $queue = $cli->GetForwarder("$forwarder\@$domain");
+		  $queue =~ s/activequeue\{(.*?)\}\#.*?$/$1/;
+		  my ($department,$name,undef) = split ",", $queue;
+		  ($name,undef) = split "@", $department unless $name;
+		  push @return, {name => $name, department => $department, queue => "$forwarder\@$domain" };
+	      }
+	  }
+    }
+    $cli->Logout();
+    return @return;
 }
 
 sub IsGroupInternal {
