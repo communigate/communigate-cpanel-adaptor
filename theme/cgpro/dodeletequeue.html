@@ -4,7 +4,7 @@
 <div class="body-content">
   <h1><cpanel langprint="CGPCallerQueues"></h1>
 
-  <p><?cp CommuniGate::DeleteExtension() extension=$FORM{'queue'} || 'maketext('The queue could not be removed.')' ?></p>
+  <p><?cp CommuniGate::DeleteQueue() queue=$FORM{'queue'} || 'maketext('The queue could not be removed.')' ?></p>
   <cpanelif $CPERROR{'CommuniGate'}>
     <p><cpanel print="$CPERROR{'CommuniGate'}"></p>
   </cpanelif>
