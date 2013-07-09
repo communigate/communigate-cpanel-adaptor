@@ -3518,6 +3518,27 @@ sub api2_ListIVRs {
     return @result;
 }
 
+sub api2_DeleteIVR {
+    my %OPTS = @_;
+    my @domains = Cpanel::Email::listmaildomains();
+    my $domain = $domains[0];
+    $domain = $OPTS{'domain'} if $OPTS{'domain'};
+    my $ivr = $OPTS{'ivr'};
+    my $cli = getCLI();
+    foreach my $dom (@domains) {
+	if ($dom eq $domain) {
+	    my $prefs = $cli->GetAccountPrefs("ivr\@$domain");
+	    if ($prefs->{IVRMenus} && $prefs->{IVRMenus}->{$ivr}) {
+		delete $prefs->{IVRMenus}->{$ivr};
+		$cli->UpdateAccountPrefs("ivr\@$domain", $prefs);
+	    }
+	    last;
+	}
+    }
+    $cli->Logout();
+    return {msg => "Deleted."};
+}
+
 sub IsGroupInternal {
   	my $groupwithdomain = shift;
 	my @values = split("@",$groupwithdomain);
