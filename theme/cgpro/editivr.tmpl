@@ -6,8 +6,8 @@
   <table border="0" style="margin-left: 20px">
     <tr>
       <td align="right">[% locale.maketext("CGPName") %]:</td>
-      <td><input type="text" name="GIVEN" style="width: 150px" value="[% ivr.NAME %]" /></td>
-      <td colspan="2"></td>
+      <td><input type="text" name="GIVEN" style="width: 150px" value="[% ivr.NAME %]" id="name" /></td>
+      <td colspan="2"><span id="name_error" class="cjt_validation_error"></td>
     </tr>
    </table>
 </div>
@@ -169,7 +169,7 @@
     <td>
       <input type="hidden" name="oldMessageID" value="[% vcard.UID.VALUE.item('Message-ID') %]" />
       <input type="hidden" name="oldUID" value="[% FORM.contact %]" />
-      <input id="new_email_submit" class="input-button" type="submit" value="[% locale.maketext("CGPSave") %]" name="save" />
+      <input id="ivr_submit" class="input-button" type="submit" value="[% locale.maketext("CGPSave") %]" name="save" />
     </td>
     <td></td>
     <td></td>
@@ -178,6 +178,9 @@
 </div>
 </form>
 <script type="text/javascript">
+var LANG = {};
+LANG.name_input = "[% locale.maketext("CGPName") %]";
+LANG.name_input_invalid = "[% locale.maketext("CGPThisFieldIsRequired") %]!";
 var domain = '[% domain %]';
 var getRow = function (e, data) {
     YAHOO.util.Event.preventDefault(e); 
@@ -205,5 +208,9 @@ YAHOO.util.Event.onDOMReady(function () {
  	YAHOO.util.Event.addListener("playatendeverybutton", "click", getRow, {url: 'ivr_soundrow.html', wrap: 'playatendevery', index: 'playatendeverycount', basename:'playatendevery'});
         var removers = YAHOO.util.Dom.getElementsByClassName('removerow');
  	YAHOO.util.Event.addListener(removers, "click", removeRow);
+	var VAL_NAME = new CPANEL.validate.validator(LANG.name_input);
+	VAL_NAME.add("name", 'min_length(%input%,1)', LANG.name_input_invalid);
+	VAL_NAME.attach();
+	CPANEL.validate.attach_to_form("ivr_submit", [VAL_NAME]);
     });
 </script>
