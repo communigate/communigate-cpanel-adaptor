@@ -165,7 +165,7 @@ ${PACKSRC}/scripts/install_dkim_signer.pl
 ${PACKSRC}/scripts/init_pbx.pl
 
 # Install Active Queue Scripts
-cp ${PACKSRC}/ActiveQueue/*spp* /opt/CommuniGate/PBXApps/
+cp ${PACKSRC}/PBXApps/*spp* /var/CommuniGate/PBXApps/
 
 # Install the WHM plugins (administration and groupware control)
 rm -f /usr/local/cpanel/whostmgr/docroot/templates/cgpro_*

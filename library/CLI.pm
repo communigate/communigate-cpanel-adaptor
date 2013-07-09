@@ -2900,6 +2900,16 @@ sub ListServerPBXFiles {
   $this->parseWords($this->getWords);
 }
 
+sub ListStockPBXFiles {
+  my ($this,$language) = @_;
+
+  my $line = 'ListStockPBXFiles ';
+  $line .= $this->printWords($language) if($language);
+  $this->send($line);
+  return undef unless $this->_parseResponse();
+  $this->parseWords($this->getWords);
+}
+
 sub ReadServerPBXFile {
   my ( $this, $fileName ) = @_;
   croak 'usage CGP::CLI->ReadServerPBXFile($fileName)'

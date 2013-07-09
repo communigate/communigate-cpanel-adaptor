@@ -3357,6 +3357,167 @@ sub api2_DeleteQueue {
     return $result;
 }
 
+sub api2_EditIVR {
+    my %OPTS = @_;
+    my @domains = Cpanel::Email::listmaildomains();
+    my $domain = $domains[0];
+    $domain = $OPTS{'domain'} if $OPTS{'domain'};
+
+    my $cli = getCLI();
+    my $result = {};
+    my $defaults = $cli->GetServerAccountDefaults();
+    $result->{"classes"} = $defaults->{"ServiceClasses"};
+    foreach my $dom (@domains) {
+	if ($dom eq $domain) {
+	    my $accounts = $cli->ListAccounts($domain);
+	    foreach my $userName (sort keys %$accounts) {
+		my $account = $cli->GetAccountSettings("$userName\@$domain");
+		$result->{"accounts"}->{"$userName\@$domain"}->{details} = $account;
+	    }
+	    my $groups = $cli->ListGroups($domain);
+	    foreach $groupName (sort @$groups) {
+		next if $groupName =~ m/^activequeuegroup\_/i;
+		my $details = $cli->GetGroup("$groupName\@$domain");
+		$result->{'departments'} = [] unless $result->{'departments'};
+		push @{$result->{'departments'}}, "$groupName\@$domain" unless (defined($details->{SignalDisabled}) && $details->{SignalDisabled} eq "YES");
+
+	    }
+	    my $forwarders = $cli->ListForwarders($domain);
+	    foreach my $forwarder (sort @$forwarders) {
+		# my $details = $cli->GetGroup("$groupName\@$domain");
+		# $result->{'departments'} = [] unless $result->{'departments'};
+		if ($forwarder =~ /^activequeue\_/) {
+		    my $name = "";
+		    my $to = $cli->GetForwarder("$forwarder\@$domain");
+		    $to =~ s/activequeue\{(.*?)\}\#.*?$/$1/;
+		    (undef, $name, undef) = split ",", $to;
+		    ($name, undef) = split '@', $to unless $name;
+		    push @{$result->{'queues'}}, {value => "$forwarder\@$domain", name => $name};
+		}
+	    }
+	    my $prefs = $cli->GetAccountPrefs("ivr\@$domain");
+	    if ($prefs->{IVRMenus}) {
+		for my $menu (keys %{$prefs->{IVRMenus}}) {
+		    push @{$result->{'ivrs'}}, {value => "ivrmenu{$menu}#ivr\@$domain", name => $prefs->{IVRMenus}->{$menu}->{NAME}};
+		}
+	    }
+	    $result->{files} = $cli->ListStockPBXFiles();
+	    my $domainPBX = $cli->ListDomainPBXFiles($domain);
+	    %{$result->{files}} = (%{$result->{files}}, %$domainPBX);
+	    $result->{domain} = $domain;
+	    if ($OPTS{'ivr'}) {
+		$result->{ivr} = $prefs->{IVRMenus}->{$OPTS{'ivr'}};
+	    }
+	    last;
+	}
+    }
+
+    $cli->Logout();
+    return $result;
+}
+
+sub api2_DoEditIVR {
+    my %OPTS = @_;
+    my $formdump = $OPTS{'formdump'};
+    my $params = {};
+    for my $row (split "\n", $formdump) {
+	if ($row =~ m/^(\S+)\s\=\s(.*?)$/) {
+	    my $key =$1;
+	    my $value = $2;
+	    $params->{$key} = $value;
+	}
+    }
+    my @domains = Cpanel::Email::listmaildomains();
+    my $domain = $domains[0];
+    $domain = $params->{'domain'} if $params->{'domain'};
+
+    my $cli = getCLI();
+    my $result = {};
+    foreach my $dom (@domains) {
+	if ($dom eq $domain) {
+	    my $id = $params->{'GIVEN'};
+	    $id =~ s/\W//g;
+	    my $prefs = $cli->GetAccountPrefs("ivr\@$domain");
+	    $prefs->{IVRMenus}->{$id} = {
+		'NAME' => $params->{'GIVEN'},
+		'playatstart' => [map {$params->{$_}} grep {/^playatstart\-/} sort keys %$params],
+		'playatstartevery' => [map {$params->{$_}} grep {/^playatstartevery\-/} sort keys %$params],
+		'playatend' => [map {$params->{$_}} grep {/^playatend\-/} sort keys %$params],
+		'playatendevery' => [map {$params->{$_}} grep {/^playatendevery\-/} sort keys %$params],
+	    };
+	    $prefs->{IVRMenus}->{$id}->{'activebuttons'} = [];
+	    for my $button ((1, 2, 3, 4, 5, 6, 7, 8 ,9 ,0, '*', '#', 'invalid')) {
+		if ($params->{'action-' . $button}) {
+		    push @{$prefs->{IVRMenus}->{$id}->{'activebuttons'}}, $button;
+		    $prefs->{IVRMenus}->{$id}->{'buttons'}->{$button}->{'action'} = $params->{'action-' . $button};
+		    $prefs->{IVRMenus}->{$id}->{'buttons'}->{$button}->{'sound'} = $params->{'sound-' . $button} if $params->{'sound-' . $button};
+		} else {
+		    delete $prefs->{IVRMenus}->{$id}->{'buttons'}->{$button} if $prefs->{IVRMenus}->{$id}->{'buttons'}->{$button};
+		}
+	    }
+	    if ($params->{'DED'}) {
+		$prefs->{IVRMenus}->{$id}->{'DED'} = "Yes";
+	    } else {
+		delete $prefs->{IVRMenus}->{$id}->{'DED'} if $prefs->{IVRMenus}->{$id}->{'DED'};
+	    }
+	    $prefs->{IVRMenus}->{$id}->{'languages'} = [map {{ (split('\-',$_))[1] => $params->{$_}}} grep {/^language\-\d$/ && $params->{$_}} sort keys %$params];
+	    $prefs->{IVRMenus}->{$id}->{'languages'}->[0]->{'mute'} = 'YES' if  $prefs->{IVRMenus}->{$id}->{'languages'}->[0] && ! $params->{'speaklang-1'};
+
+	    $cli->UpdateAccountPrefs("ivr\@$domain", $prefs);
+	    last;
+	}
+    }
+
+    $cli->Logout();
+    return $result;
+}
+
+sub api2_GetIVRSounds {
+    my %OPTS = @_;
+    my @domains = Cpanel::Email::listmaildomains();
+    my $domain = $domains[0];
+    $domain = $OPTS{'domain'} if $OPTS{'domain'};
+
+    my $cli = getCLI();
+    my $result = {};
+    foreach my $dom (@domains) {
+	if ($dom eq $domain) {
+	    $result->{files} = $cli->ListStockPBXFiles();
+	    last;
+	}
+    }
+
+    $cli->Logout();
+    return $result;
+}
+
+sub api2_ListIVRs {
+    my %OPTS = @_;
+    my @domains = Cpanel::Email::listmaildomains();
+    my $domain = $domains[0];
+    $domain = $OPTS{'domain'} if $OPTS{'domain'};
+
+    my $cli = getCLI();
+    my @result;
+    foreach my $dom (@domains) {
+	if ($dom eq $domain) {
+	    my $prefs = $cli->GetAccountPrefs("ivr\@$domain");
+	    if ($prefs->{IVRMenus}) {
+		for my $ivr (sort keys %{$prefs->{IVRMenus}}) {
+		    push @result, {
+			id => $ivr,
+			name => $prefs->{IVRMenus}->{$ivr}->{NAME},
+			domain => $domain
+		    };
+		}
+	    }
+	    last;
+	}
+    }
+    $cli->Logout();
+    return @result;
+}
+
 sub IsGroupInternal {
   	my $groupwithdomain = shift;
 	my @values = split("@",$groupwithdomain);

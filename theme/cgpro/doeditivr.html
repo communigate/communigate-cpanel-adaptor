@@ -1,0 +1,17 @@
+<cpanel setvar="headerimg=../images/mailmenu.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+  <div class="body-content">
+    <h1><cpanel langprint="CGPEditIVRmenu"></h1>
+    <?cp CommuniGate::DoEditIVR() formdump=$formdump ?>
+    <cpanelif $CPERROR{'CommuniGate'}>
+      <p><cpanel langprint="CGPError">: <em><cpanel print="$CPERROR{'CommuniGate'}">!</em></p>
+    </cpanelif>
+    <cpanelif !$CPERROR{'CommuniGate'}>
+      <p><cpanel langprint="CGPIVRmenuUpdated">!</p>
+    </cpanelif>
+    <div class="return-link"><a href="ivr.html">&larr; <cptext "Go Back"></a></div>
+  </div><!-- end body-content div -->
+
+<cpanel Branding="include(stdfooter.html)">
+

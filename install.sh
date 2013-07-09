@@ -198,7 +198,7 @@ cp ${PACKSRC}/tools/helper_DKIM_verify.pl /var/CommuniGate/
 ${PACKSRC}/scripts/install_dkim_signer.pl
 
 # Install Active Queue Scripts
-cp ${PACKSRC}/ActiveQueue/*spp* /opt/CommuniGate/PBXApps/
+cp ${PACKSRC}/PBXApps/*spp* /var/CommuniGate/PBXApps/
 
 #################################################
 #             	  OS Specific	  	 	#
