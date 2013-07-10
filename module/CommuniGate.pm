@@ -523,6 +523,7 @@ sub api2_ListExtensions {
   my @result;
   foreach my $domain (@domains) {
       my $forwarders = $cli->ListForwarders($domain);
+      my $prefs = $cli->GetAccountPrefs("ivr\@$domain");
       foreach my $forwarder (@$forwarders) {
 	  next unless $forwarder =~ m/^(tn\-\d+|\d{3})$/i;
 	  my $short = $forwarder;
@@ -540,7 +541,14 @@ sub api2_ListExtensions {
 	      $to =~ s/activequeue?\{(.*?)\}\#.*?$/$1/;
 	      (undef, $fwd, undef) = split ",", $to;
 	      ($fwd, undef) = split '@', $to unless $fwd;
+	      $fwd .= "\@$domain";
 	      $fwd = $toggle ? "$fwd (Caller Queue - Toggle Agent)" : "$fwd (Caller Queue)";
+	  }
+	  if ($fwd =~ /^ivrmenu\{(\w+)\}/) {
+	      if ($prefs && $prefs->{IVRMenus} && $1) {
+		  $fwd = $prefs->{IVRMenus}->{$1}->{NAME};
+		  $fwd .= "\@$domain (IVR Menu)";
+	      }
 	  }
 	  push( @result, { uri_dest => "$forwarder%40$domain",
 			   html_dest => "$short",
@@ -609,17 +617,22 @@ sub api2_AssignExtension {
       }
       my $forwarders = $cli->ListForwarders($domain);
       foreach my $forwarder (sort @$forwarders) {
-	  # my $details = $cli->GetGroup("$groupName\@$domain");
-	  # $result->{'departments'} = [] unless $result->{'departments'};
 	  if ($forwarder =~ /^activequeue\_/) {
 	      my $name = "";
 	      my $to = $cli->GetForwarder("$forwarder\@$domain");
 	      $to =~ s/activequeue\{(.*?)\}\#.*?$/$1/;
 	      (undef, $name, undef) = split ",", $to;
 	      ($name, undef) = split '@', $to unless $name;
-	      push @{$result->{'queues'}}, {value => "$forwarder\@$domain", name => $name};
+	      my $toggle = $forwarder;
+	      $toggle =~ s/activequeue/activequeuetoggle/i;
+	      push @{$result->{'queues'}}, {value => "$forwarder\@$domain", toggle => "$toggle\@$domain", name => "$name\@$domain"};
 	  }
-
+      }
+      my $prefs = $cli->GetAccountPrefs("ivr\@$domain");
+      if ($prefs && $prefs->{IVRMenus}) {
+	  for my $ivr (sort keys %{$prefs->{IVRMenus}}) {
+	      push @{$result->{'ivrs'}}, {value => "ivrmenu{$ivr}#ivr\@$domain", name => $prefs->{IVRMenus}->{$ivr}->{NAME} . "\@$domain"};
+	  }
       }
   }
   $cli->Logout();
@@ -3350,7 +3363,6 @@ sub api2_EditIVR {
     my @domains = Cpanel::Email::listmaildomains();
     my $domain = $domains[0];
     $domain = $OPTS{'domain'} if $OPTS{'domain'};
-
     my $cli = getCLI();
     my $result = {};
     my $defaults = $cli->GetServerAccountDefaults();
@@ -3384,6 +3396,11 @@ sub api2_EditIVR {
 		}
 	    }
 	    my $prefs = $cli->GetAccountPrefs("ivr\@$domain");
+	    unless ($prefs) {
+		$cli->CreateAccount(accountName => "ivr\@$domain");
+		$cli->SetAccountRights("pbx\@$domain", ['Domain', 'CanImpersonate']);
+		$prefs = $cli->GetAccountPrefs("ivr\@$domain");
+	    }
 	    if ($prefs->{IVRMenus}) {
 		for my $menu (keys %{$prefs->{IVRMenus}}) {
 		    push @{$result->{'ivrs'}}, {value => "ivrmenu{$menu}#ivr\@$domain", name => $prefs->{IVRMenus}->{$menu}->{NAME}};
@@ -3418,7 +3435,6 @@ sub api2_DoEditIVR {
     my @domains = Cpanel::Email::listmaildomains();
     my $domain = $domains[0];
     $domain = $params->{'domain'} if $params->{'domain'};
-
     my $cli = getCLI();
     my $result = {};
     foreach my $dom (@domains) {
@@ -3482,25 +3498,20 @@ sub api2_GetIVRSounds {
 sub api2_ListIVRs {
     my %OPTS = @_;
     my @domains = Cpanel::Email::listmaildomains();
-    my $domain = $domains[0];
-    $domain = $OPTS{'domain'} if $OPTS{'domain'};
 
     my $cli = getCLI();
     my @result;
-    foreach my $dom (@domains) {
-	if ($dom eq $domain) {
+    foreach my $domain (@domains) {
 	    my $prefs = $cli->GetAccountPrefs("ivr\@$domain");
 	    if ($prefs->{IVRMenus}) {
 		for my $ivr (sort keys %{$prefs->{IVRMenus}}) {
 		    push @result, {
 			id => $ivr,
-			name => $prefs->{IVRMenus}->{$ivr}->{NAME},
+			name => $prefs->{IVRMenus}->{$ivr}->{NAME} . "\@$domain",
 			domain => $domain
 		    };
 		}
 	    }
-	    last;
-	}
     }
     $cli->Logout();
     return @result;

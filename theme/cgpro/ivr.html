@@ -32,7 +32,7 @@
     <?cp CommuniGate::ListIVRs(
 	 [tr class="row-%"]
 	 [td class="truncate nobrd-left"]%[/td]
-	 [td][a href="editivr.html?ivr=%&domain=%"]$LANG{'CGPViewEdit'}[/a]\, [a href="deleteivr.html??ivr=%&domain=%&name=%"]$LANG{'BrandingDPackage'}[/a][/td]
+	 [td][a href="editivr.html?ivr=%&domain=%"]$LANG{'CGPViewEdit'}[/a]\, [a href="deleteivr.html?ivr=%&domain=%&name=%"]$LANG{'BrandingDPackage'}[/a][/td]
 	 [/tr]
 	 ,*num,name,id,domain,id,domain,name) domain=$FORM{'domain'},regex=$FORM{'searchregex'},api2_paginate=1,api2_paginate_start=$FORM{'api2_paginate_start'},api2_paginate_size=$CPVAR{'itemsperpage'} || '[tr][td colspan="2" class="errors"]$LANG{'CGPNoIVRs'}.[/td][/tr]' ?>
 
