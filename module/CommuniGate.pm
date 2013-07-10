@@ -502,19 +502,7 @@ sub api2_listforwards {
 	  next if $forwarder =~ m/^(i|tn)\-\d+$/i;
 	  next if $forwarder =~ m/^activequeue(toggle)?_/i;
 	  my $fwd = $cli->GetForwarder("$forwarder\@$domain");
-	  if ($fwd =~ /^activequeue(toggle)?\_/) {
-	      my $toggle = 0;
-	      my $to = $cli->GetForwarder($fwd);
-	      if ($1) {
-		  $to =~ s/togglegroupmember\{(.*?)\,.*?\}\#.*?$/activequeue_$1/i;
-		  $to = $cli->GetForwarder($to);
-		  $toggle = 1;
-	      }
-	      $to =~ s/activequeue?\{(.*?)\}\#.*?$/$1/;
-	      (undef, $fwd, undef) = split ",", $to;
-	      ($fwd, undef) = split '@', $to unless $fwd;
-	      $fwd = $toggle ? "$fwd (Caller Queue - Toggle Agent)" : "$fwd (Caller Queue)";
-	  }
+	  next if $fwd =~ m/^(ivrmenu|activequeue(toggle)?_)/i;
 	  push( @result, { uri_dest => "$forwarder%40$domain",
 			   html_dest => "$forwarder\@$domain",
 			   dest => "$forwarder\@$domain",
