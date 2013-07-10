@@ -6,7 +6,11 @@
   <table border="0" style="margin-left: 20px">
     <tr>
       <td align="right">[% locale.maketext("CGPName") %]:</td>
+      [% IF ivr.NAME -%]
+      <td><input type="hidden" name="GIVEN" value="[% ivr.NAME %]" id="name" /> <strong>[% ivr.NAME %]</strong></td>
+      [% ELSE -%]
       <td><input type="text" name="GIVEN" style="width: 150px" value="[% ivr.NAME %]" id="name" /></td>
+      [% END %]
       <td colspan="2"><span id="name_error" class="cjt_validation_error"></td>
     </tr>
    </table>
@@ -208,9 +212,11 @@ YAHOO.util.Event.onDOMReady(function () {
  	YAHOO.util.Event.addListener("playatendeverybutton", "click", getRow, {url: 'ivr_soundrow.html', wrap: 'playatendevery', index: 'playatendeverycount', basename:'playatendevery'});
         var removers = YAHOO.util.Dom.getElementsByClassName('removerow');
  	YAHOO.util.Event.addListener(removers, "click", removeRow);
+      [% UNLESS ivr.NAME -%]
 	var VAL_NAME = new CPANEL.validate.validator(LANG.name_input);
 	VAL_NAME.add("name", 'min_length(%input%,1)', LANG.name_input_invalid);
 	VAL_NAME.attach();
 	CPANEL.validate.attach_to_form("ivr_submit", [VAL_NAME]);
+      [% END -%]
     });
 </script>
