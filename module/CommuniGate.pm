@@ -20,7 +20,7 @@ use Storable                         ();
 use Time::Local  'timelocal_nocheck';
 use Digest::MD5 qw(md5_hex);
 use XIMSS;
-use Cpanel::CPAN::MIME::Base64::Perl qw(decode_base64);
+use Cpanel::CPAN::MIME::Base64::Perl qw(decode_base64 encode_base64);
 
 require Exporter;
 @ISA    = qw(Exporter);
@@ -3498,7 +3498,6 @@ sub api2_GetIVRSounds {
 sub api2_ListIVRs {
     my %OPTS = @_;
     my @domains = Cpanel::Email::listmaildomains();
-
     my $cli = getCLI();
     my @result;
     foreach my $domain (@domains) {
@@ -3538,6 +3537,172 @@ sub api2_DeleteIVR {
     return {msg => "Deleted."};
 }
 
+sub api2_ListSounds {
+    my %OPTS = @_;
+    my @domains = Cpanel::Email::listmaildomains();
+    my $domain = $domains[0];
+    $domain = $OPTS{'domain'} if $OPTS{'domain'};
+    my $cli = getCLI();
+    my $result;
+    my $files = $cli->ListStockPBXFiles();
+    my $domainFiles = $cli->ListDomainPBXFiles($domain);
+    my $serverFiles = $cli->ListServerPBXFiles($domain);
+    $result->{sounds}->{english} = {map {$_ => 'stock'} grep {/\.wav$/} keys %$files};
+    my $domainSounds = {map {$_ => 'domain'} grep {/\.wav$/} keys %$domainFiles};
+    my $serverSounds = {map {$_ => 'server'} grep {/\.wav$/} keys %$serverFiles};
+    %{$result->{sounds}->{english}} = (%{$result->{sounds}->{english}}, %$serverSounds, %$domainSounds);
+
+    $result->{languages} = {map {$_ => 'stock'} grep {! (keys %{$files->{$_}})[0]} grep {!/\./} sort keys %$files};
+    my $domainLangs = {map {$_ => 'domain'} grep {! (keys %{$files->{$_}})[0]} grep {!/\./} sort keys %$domainFiles}; 
+    my $serverLangs = {map {$_ => 'server'} grep {! (keys %{$files->{$_}})[0]} grep {!/\./} sort keys %$serverFiles}; 
+    %{$result->{languages}} = (%{$result->{languages}}, %$serverLangs, %$domainLangs);
+
+    for my $lang (keys %{$result->{languages}}) {
+	my $files = $cli->ListStockPBXFiles($lang);
+	$result->{sounds}->{$lang} = {map {$_ => 'stock'} grep {/\.wav$/} keys %$files};
+	my $domainFiles = $cli->ListDomainPBXFiles($domain, $lang);
+	my $domainSounds = {map {$_ => 'domain'} grep {/\.wav$/} keys %$domainFiles};
+	my $serverFiles = $cli->ListServerPBXFiles($server, $lang);
+	my $serverSounds = {map {$_ => 'server'} grep {/\.wav$/} keys %$serverFiles};
+	%{$result->{sounds}->{$lang}} = (%{$result->{sounds}->{$lang}}, %$serverSounds, %$domainSounds);
+    }
+    $result->{domain} = $domain;
+    $result->{domains} = \@domains;
+    $result->{langs} = $result->{languages};
+    $result->{languages} = [sort keys %{$result->{languages}}];
+    unshift @{$result->{languages}}, 'english';
+    $cli->Logout();
+    return $result;
+}
+
+sub api2_GetSound {
+    my %OPTS = @_;
+    my @domains = Cpanel::Email::listmaildomains();
+    my $domain = $OPTS{'domain'} if $OPTS{'domain'};
+    my $cli = getCLI();
+    my $result;
+    foreach my $dom (@domains) {
+	if ($dom eq $domain) {
+	    my $file = $OPTS{'file'};
+	    $file = $OPTS{'lang'} . "/$file" if $OPTS{'lang'} ne 'english';
+	    $result = $cli->ReadDomainPBXFile($domain, $file);
+	    $result =~ s/(^\[|\]$)//g;
+	    last;
+	}
+    }
+    $cli->Logout();
+    return $result;
+}
+
+sub api2_UploadFile {
+    local $Cpanel::IxHash::Modify = 'none';
+  FILE:
+    foreach my $file ( keys %Cpanel::FORM ) {
+        next FILE if $file =~ m/^file-(.*)-key$/;
+        next FILE if $file !~ m/^file-(.*)/;
+	$Cpanel::CPVAR{"filename"} = $file;
+	$Cpanel::CPVAR{"filename"} =~ s/^file-//;
+	$Cpanel::CPVAR{"filepath"} = $Cpanel::FORM{$file};
+        last;
+    }
+    return 1;
+}
+
+sub api2_DeleteWav {
+    my %OPTS = @_;
+    my @domains = Cpanel::Email::listmaildomains();
+    my $domain = $domains[0];
+    $domain = $OPTS{'domain'} if $OPTS{'domain'};
+    my $cli = getCLI();
+    my $result;
+    foreach my $dom (@domains) {
+	if ($dom eq $domain && $OPTS{'file'} =~ m/\.wav$/i) {
+	    my $filename = $OPTS{'file'};
+	    $filename = $OPTS{'lang'} . "/" .  $filename if $OPTS{'lang'} && $OPTS{'lang'} ne 'english';
+	    $cli->DeleteDomainPBXFile($domain, $filename);
+	    $Cpanel::CPERROR{'CommuniGate'} = $cli->getErrMessage unless ($cli->getErrMessage eq "OK");
+	    last;
+	}
+    }
+    unlink $Cpanel::CPVAR{"filepath"};
+    $cli->Logout();
+    return $result;
+}
+
+sub api2_UpdateWav {
+    my %OPTS = @_;
+    my @domains = Cpanel::Email::listmaildomains();
+    my $domain = $domains[0];
+    $domain = $OPTS{'domain'} if $OPTS{'domain'};
+    my $cli = getCLI();
+    my $result;
+    foreach my $dom (@domains) {
+	if ($dom eq $domain) {
+	    if ($Cpanel::CPVAR{"filepath"} && $Cpanel::CPVAR{"filename"} =~ m/\.wav/i ) {
+		my $buffer;
+		my $address = 0;
+		my $filedata;
+		open(FI, "<", $Cpanel::CPVAR{"filepath"});
+		binmode FI;
+		while ( read( FI, $buffer, 16 ) ) {
+		    $filedata .= $buffer;
+		    $address += 16;
+		}
+		close FI;
+		my $filename = $OPTS{'file'} || $Cpanel::CPVAR{"filename"};
+		$filename = $OPTS{'lang'} . "/" .  $filename if $OPTS{'lang'} && $OPTS{'lang'} ne 'english';
+		$cli->StoreDomainPBXFile($domain, $filename, encode_base64($filedata, ""));
+		$Cpanel::CPERROR{'CommuniGate'} = $cli->getErrMessage unless ($cli->getErrMessage eq "OK");
+	    } else {
+		$Cpanel::CPERROR{'CommuniGate'} = "Error!";
+	    }
+	    last;
+	}
+    }
+    unlink $Cpanel::CPVAR{"filepath"};
+    $cli->Logout();
+    return $result;
+}
+
+sub api2_DeleteLanguage {
+    my %OPTS = @_;
+    my @domains = Cpanel::Email::listmaildomains();
+    my $domain = $domains[0];
+    $domain = $OPTS{'domain'} if $OPTS{'domain'};
+    my $cli = getCLI();
+    my $result;
+    foreach my $dom (@domains) {
+	if ($dom eq $domain && $OPTS{'lang'}) {
+	    $cli->DeleteDomainPBX($domain, $OPTS{'lang'});
+	    $Cpanel::CPERROR{'CommuniGate'} = $cli->getErrMessage unless ($cli->getErrMessage eq "OK");
+	    last;
+	}
+    }
+    unlink $Cpanel::CPVAR{"filepath"};
+    $cli->Logout();
+    return $result;
+}
+
+sub api2_AddLanguage {
+    my %OPTS = @_;
+    my @domains = Cpanel::Email::listmaildomains();
+    my $domain = $domains[0];
+    $domain = $OPTS{'domain'} if $OPTS{'domain'};
+    my $cli = getCLI();
+    my $result;
+    foreach my $dom (@domains) {
+	if ($dom eq $domain && $OPTS{'lang'}) {
+	    $OPTS{'lang'} =~ s/\W//g;
+	    $cli->CreateDomainPBX($domain, lc $OPTS{'lang'});
+	    $Cpanel::CPERROR{'CommuniGate'} = $cli->getErrMessage unless ($cli->getErrMessage eq "OK");
+	    last;
+	}
+    }
+    unlink $Cpanel::CPVAR{"filepath"};
+    $cli->Logout();
+    return $result;
+}
+
 sub IsGroupInternal {
   	my $groupwithdomain = shift;
 	my @values = split("@",$groupwithdomain);
@@ -3552,7 +3717,6 @@ sub IsGroupInternal {
 	$cli->Logout();
 	return(0);
 }
-
 
 sub GroupMembersForRule{
 	my $group = shift;

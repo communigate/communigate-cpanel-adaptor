@@ -1,0 +1,33 @@
+<cpanel setvar="headerimg=../images/mailmenu.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+<div class="body-content">
+  <h1><cpanel langprint="CGPSoundsManager"></h1>
+  <div class="highlight2">
+    <form action="doaddlanguage.html?domain=<cpanel print="$FORM{'domain'}">" method="post" enctype="multipart/form-data">
+      <p>
+	<lable><cpanel langprint="CGPLanguage">:</lable>
+	<input type="text" name="lang" id="lang" />
+	<span id="lang_error" class="cjt_validation_error">
+     </p>
+      <p>
+	<input type="submit" id="activate-button" name="submit" value="<cpanel langprint="CGPSave">" class="input-button" />
+      </p>
+    </form>
+  </div>
+  <div class="return-link">
+    <a href="soundsmanager.html?domain=<cpanel print="$FORM{'domain'}">">&larr; <cptext "Go Back"></a>
+  </div>
+</div> <!-- END body-content -->
+<cpanel Branding="include(stdfooter.html)">
+  <script type="text/javascript">
+    var LANG = {};
+    LANG.lang_input = '<cpanel langprint="CGPLanguage">';
+LANG.lang_input_invalid = '<cpanel langprint="CGPThisFieldIsRequired">!';
+YAHOO.util.Event.onDOMReady(function () {
+	var VAL_LANG = new CPANEL.validate.validator(LANG.lang_input);
+	VAL_LANG.add("lang", 'min_length(%input%,1)', LANG.lang_input_invalid);
+	VAL_LANG.attach();
+	CPANEL.validate.attach_to_form("activate-button", [VAL_LANG]);
+    });
+</script>

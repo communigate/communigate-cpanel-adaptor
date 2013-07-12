@@ -1,0 +1,98 @@
+[% USE CPBranding -%]
+[% MACRO filter_option(pval, val, text) BLOCK -%]
+<option value="[% val %]"[% val == pval ? " selected='selected'" : "" %]>[% cptext(text) %]</option>
+[% END -%]
+[% IF CPANEL.CPVAR.maildomainscount > 1 -%]
+<div class="highlight2">
+  <form action="" method="GET" id="selectDomain">
+    <p>
+      [% locale.maketext("LP-Domain") %]:&nbsp;
+      <select id="domain" onchange="toggle_domain()" name="domain">
+	[% FOR dom IN domains -%]
+	[% filter_option(domain, dom, dom) %]
+	[% END -%]
+      </select>
+    </p>
+  </form>
+  <script type="text/javascript">
+    function toggle_domain () {
+    document.getElementById("selectDomain").submit();
+    }
+  </script>
+</div>
+[% END -%]
+<h2>[% locale.maketext("CGPSounds") %]</h2>
+<p>
+  <a class="create-button" href="updatewav.html?domain=[% domain %]">[% locale.maketext("CGPAddSoundEnglish") %]</a>
+</p>
+<table border="0" cellpadding="5" width="550" cellspacing="0" id="mailtbl" class="sortable truncate-table">
+  <tr>
+    <th>[% locale.maketext("CGPName") %]</th>
+    [% FOR language IN languages -%]
+    <th class="sorttable_nosort">[% language %]</th>
+    [% END %]
+  </tr>
+  [% FOR file IN sounds.english.keys.sort -%]
+  <tr class="row-[% loop.count % 2 ? 'odd' : 'even' %]">
+    <td class="truncate">[% file %]</td>
+    [% FOR language IN languages -%]
+    <td style="text-align: center; white-space: nowrap;">
+      [% IF sounds.$language.$file -%]
+      <a href="updatewav.html?domain=[% domain %]&amp;lang=[% language %]&amp;file=[% file %]">
+	<img src="[% CPBranding.image('cgpro_mini_update') %]" alt="[% locale.maketext("CGPUpdate") %]" title="[% locale.maketext("CGPUpdate") %]" />
+      </a>
+      [% IF sounds.$language.$file != 'stock' -%]
+      <a href="deletewav.html?domain=[% domain %]&amp;lang=[% language %]&amp;file=[% file %]">
+	<img src="[% CPBranding.image('cgpro_mini_remove') %]" alt="[% locale.maketext("CGPDelete") %]" title="[% locale.maketext("CGPDelete") %]" />
+      </a>
+      <a href="getwav.live.cgi?domain=[% domain %]&amp;lang=[% language %]&amp;file=[% file %]">
+	<img src="[% CPBranding.image('cgpro_mini_download') %]" alt="[% locale.maketext("CGPDownload") %]" title="[% locale.maketext("CGPDownload") %]" />
+      </a>
+      <a class="play" href="playwav.live.cgi?domain=[% domain %]&amp;lang=[% language %]&amp;file=[% file %]">
+	<img src="[% CPBranding.image('cgpro_mini_play') %]" alt="[% locale.maketext("CGPPlaySound") %]" title="[% locale.maketext("CGPPlaySound") %]" />
+      </a>
+      [% END -%]
+      [% ELSE -%]
+      <a href="updatewav.html?domain=[% domain %]&amp;lang=[% language %]&amp;file=[% file %]">
+	<img src="[% CPBranding.image('cgpro_mini_add') %]" alt="[% locale.maketext("CGPAdd") %]" title="[% locale.maketext("CGPAdd") %]" />
+      </a>
+      [% END -%]
+    </td>
+    [% END %]
+  </tr>
+  [% END -%]
+</table>
+<h2>[% locale.maketext("CGPLanguages") %]</h2>
+<p>
+  <a class="create-button" href="addlanguage.html?domain=[% domain %]">[% locale.maketext("CGPAddLanguage") %]</a>
+</p>
+<table border="0" cellpadding="5" width="550" cellspacing="0" id="mailtbl" class="sortable truncate-table">
+  <tr>
+    <th>[% locale.maketext("CGPName") %]</th>
+    <th class="sorttable_nosort">[% locale.maketext("FTPFunctions") %]</th>
+    [% FOR language IN languages -%]
+    <tr>
+      <td class="sorttable_nosort">[% language %]</td>
+      <td>
+	[% IF langs.$language == "domain" -%]
+	<a href="deletelanguage.html?domain=[% domain %]&amp;lang=[% language %]">[% locale.maketext("BrandingDPackage") %]</a>
+	[% END -%]
+      </td>
+    </tr>
+    [% END %]
+  </tr>
+</table>
+
+<iframe src="" id="frame" style="width: 0; height: 0; visibility: hidden;">
+</iframe>
+<script type="text/javascript">
+var playFile = function (e) {
+    YAHOO.util.Event.preventDefault(e);
+    var frame = YAHOO.util.Dom.get('frame');
+    frame.src = this;
+ };
+YAHOO.util.Event.onDOMReady(function () {
+        var plays = YAHOO.util.Dom.getElementsByClassName('play');
+	YAHOO.util.Event.addListener(plays, "click", playFile);
+});
+</script>

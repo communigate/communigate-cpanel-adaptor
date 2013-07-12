@@ -1,0 +1,19 @@
+<cpanel setvar="headerimg=../images/mailmenu.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+  <div class="body-content">
+    <h1><cpanel langprint="CGPSoundsManager"></h1>
+      <!-- <?cp CommuniGate::UploadFile(%,msg) file=$FORM{'sound'} ?> -->
+      <p><?cp CommuniGate::UpdateWav(%,msg) file=$FORM{'file'},domain=$FORM{'domain'},lang=$FORM{'lang'} ?></p>
+      <cpanelif $CPERROR{'CommuniGate'}>
+	<p><cpanel langprint="CGPError">: <em><cpanel print="$CPERROR{'CommuniGate'}">!</em></p>
+      </cpanelif>
+      <cpanelif !$CPERROR{'CommuniGate'}>
+	<p><cpanel langprint="CGPSoundUpdated">!</p>
+      </cpanelif>
+
+    <div class="return-link">
+      <a href="soundsmanager.html?domain=<cpanel print="$FORM{'domain'}">">&larr; <cptext "Go Back"></a>
+    </div>
+  </div> <!-- END body-content -->
+<cpanel Branding="include(stdfooter.html)">
