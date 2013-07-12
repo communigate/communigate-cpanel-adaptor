@@ -1,6 +1,21 @@
 [% MACRO filter_option(pval, val, text) BLOCK -%]
 <option value="[% val %]"[% val == pval ? " selected='selected'" : "" %]>[% cptext(text) %]</option>
 [% END -%]
+[% IF FORM.template && ! ivr -%]
+[%
+ ivr = {
+	playatstart => ['welcome'],
+	playatend => ['goodbye'],
+	buttons => {
+		    '1' => {sound => 'fortechsupport'},
+		    '2' => {sound => 'forsales'},
+		    '3' => {sound => 'forhelpdesk'},
+		    '#' => {sound => 'toexit', action => 'hangup'},
+		    'invalid' => {sound => 'invalidentry', action => 'play'}
+		   }
+       }
+-%]
+[% END -%]
 <form action="doeditivr.html?domain=[% FORM.domain %]" method="post">
 <div class="highlight">
   <table border="0" style="margin-left: 20px">
