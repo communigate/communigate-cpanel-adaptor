@@ -31,11 +31,12 @@ function enterIVRMenu(menuName, lang) forward;
 entry Main is
   params = Vars().startParameter;
   menuName = isArray(params)? params[0]: params;
+  Vars().("Call-ID") = PendingRequestData("Call-ID");
   if AcceptCall() != null then stop; end if;
   result = enterIVRMenu(menuName, null);
 end entry;
 
-function tryToCallParty(party, lang) forward;
+function tryToCallParty(party) forward;
 procedure tryButton(prefs, input, lang) forward;
 
 function enterIVRMenu(menuName, lang) is
@@ -77,7 +78,7 @@ function enterIVRMenu(menuName, lang) is
       if IsString(extension[3]) then callee = callee + extension[3]; end if;
       if IsString(extension[4]) then callee = callee + extension[4]; end if;
       PlayFile("Blank",500);PlayFile("tryingextension");
-      response = tryToCallParty("sip:" + callee + "@" + MyDomain(), currentLang);
+      response = tryToCallParty("sip:" + callee + "@" + MyDomain());
       if not response then PlayFile("Failure"); end if;
     end if;
   end if;
@@ -129,7 +130,7 @@ procedure tryButton(prefs, input, lang) is
       response = enterIVRMenu(match[1], lang);
       if not response then PlayFile("Failure"); end if;
     else
-      response = tryToCallParty("sip:" + prefs.buttons.(input).action, lang);
+      response = tryToCallParty("sip:" + prefs.buttons.(input).action);
       if not response then PlayFile("Failure"); end if;
     end if;
   elif IsString(input) && input != "invalid" && not IsDictionary(prefs.buttons.(input)) && IsDictionary(prefs.buttons.invalid) then
@@ -141,22 +142,16 @@ function callerLeg(parameters,callPending) external;
 function callerLegBridge(parameters,peerLeg) external;
 function bridgedLoopHash(peerLeg) external;
 
-function tryToCallParty(party, lang) is
+function tryToCallParty(party) is
   if not party then return false; end if;
   callParams = NewDictionary();
   callParams.("") =  party + ";services=no";
   callParams.activeSide = true;
   callParams.callBridged = true;
-  callParams.("Expires") = 10;
-  callParams.("language") = "tatarshi";
-  if impersonateCaller then
-    callParams.From = RemoteURI();
-    callParams.impersonate = SIPURIToEmail(RemoteURI());
-  end if;
-
-  // TO FIX !!!
+  callParams.("Expires") = 15;
+  callParams.From = RemoteURI();
+  callParams.impersonate = SIPURIToEmail(RemoteURI());
   callParams.("Call-ID") = Vars().("Call-ID") + ".relay";
-
   callParams.referMode   = "peer"; 
   peerLeg = callerLeg(callParams,false);
   if !IsTask(peerLeg) then return(false); end if;

@@ -122,7 +122,7 @@
 	  [% filter_option( ivr.buttons.$id.action, queue.value, queue.name _ " (" _ locale.maketext("CGPQueue") _ ")") %]
 	  [% END -%]
 	  [% FOR menu = ivrs -%]
-	  [% filter_option( ivr.buttons.$id.action, menu.value, menu.name _ " (" _ locale.maketext("CGPIVRmenu") _ ")") %]
+	  [% filter_option( ivr.buttons.$id.action, menu.value, menu.name _ " (" _ locale.maketext("CGPIVRMenu") _ ")") %]
 	  [% END -%]
 	  [% filter_option( ivr.buttons.$id.action, 'hangup', locale.maketext("Return to previous / Hang up")) %]
 	  [% filter_option( ivr.buttons.$id.action, 'play', locale.maketext("Play the sound:")) %]
