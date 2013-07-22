@@ -1,0 +1,13 @@
+<cpanel setvar="headerimg=../images/mailmenu.gif">
+<cpanel setvar="dprefix=../">
+<cpanel setvar="headerinclude=mail/pops_head.html">
+<cpanel Branding="include(stdheader.html)">
+<div class="body-content">
+  <h1><cpanel langprint="CGPBoxAccess">: <cpanel formprint="$FORM{'box'}"></h1>
+
+  <?cptt CommuniGate::EditContactsBox(cgpro/mail/editbox.tmpl) account=$FORM{'account'}, box=$FORM{'box'} ?>
+  <div class="return-link"><a href="contacts.html?account=<cpanel formprint="$FORM{'account'}">">&larr; <cptext "Go Back"></a></div>
+</div><!-- end body-content div -->
+
+<cpanel Branding="include(stdfooter.html)">
+

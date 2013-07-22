@@ -1,0 +1,55 @@
+[% MACRO filter_option(pval, val, text) BLOCK -%]
+<option value="[% val %]"[% val == pval ? " selected='selected'" : "" %]>[% cptext(text) %]</option>
+[% END -%]
+<h2>[% locale.maketext('ACL') %]</h2>
+<form action="doeditbox.html?account=[% FORM.account %]&amp;box=[% FORM.box %]" method="post">
+<div class="highlight">
+  <table border="0" style="margin-left: 20px" id="boxaclstable">
+    [% CPANEL.CPVAR.id = 0 -%]
+    [% FOR acl IN acls.keys.sort -%]
+    [% PROCESS cgpro/mail/contacts_boxaclrow.tmpl -%]
+    [% CPANEL.CPVAR.id = loop.count %]
+    [% END -%]
+  </table>
+  <p><a href="#" id="boxaclsclick">Add new</a><input type="hidden" name="boxaclcount" id="boxaclcount" value="[% CPANEL.CPVAR.id %]" /></p>
+</div>
+<div class="highlight">
+  <table border="0" style="margin-left: 20px">
+    </tr>
+    <td>
+      <input type="hidden" name="oldMessageID" value="[% vcard.UID.VALUE.item('Message-ID') %]" />
+      <input type="hidden" name="oldUID" value="[% FORM.contact %]" />
+      <input id="new_boxacl_submit" class="input-button" type="submit" value="[% locale.maketext("CGPSave") %]" name="save" />
+    </td>
+    <td></td>
+    <td></td>
+    </tr>
+ </table>
+</div>
+</form>
+<script type="text/javascript">
+var getRow = function (e, data) {
+    YAHOO.util.Event.preventDefault(e); 
+    var wrap = YAHOO.util.Dom.get(data.wrap);
+    var index = YAHOO.util.Dom.get(data.index);
+    YAHOO.util.Connect.asyncRequest('GET', data.url + '?id=' + index.value + '&domain=[% FORM.account.split("@").1 %]', {
+	    success: function(o) {
+                wrap.innerHTML = wrap.innerHTML + o.responseText;
+                var removers = YAHOO.util.Dom.getElementsByClassName('removerow');
+ 	        YAHOO.util.Event.addListener(removers, "click", removeRow);
+	    },
+		}, null);
+    index.value = parseInt(index.value) + 1;
+};
+var removeRow = function (e) {
+    YAHOO.util.Event.preventDefault(e);
+    var row = this.parentNode.parentNode;
+    var table = row.parentNode;
+    table.removeChild(row);
+};
+YAHOO.util.Event.onDOMReady(function () {
+ 	YAHOO.util.Event.addListener("boxaclsclick", "click", getRow, {url: 'contacts_boxaclrow.html', wrap: 'boxaclstable', index: 'boxaclcount'});
+var removers = YAHOO.util.Dom.getElementsByClassName('removerow');
+ 	YAHOO.util.Event.addListener(removers, "click", removeRow);
+    });
+</script>

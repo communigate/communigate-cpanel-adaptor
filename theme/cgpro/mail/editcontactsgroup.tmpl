@@ -1,0 +1,98 @@
+[% MACRO filter_option(pval, val, text) BLOCK -%]
+<option value="[% val %]" id="[% val %]"[% val == pval ? " selected='selected'" : "" %]>[% cptext(text) %]</option>
+[% END -%]
+<form action="doeditcontactsgroup.html?account=[% FORM.account %]&amp;box=[% FORM.box %]" method="post" id="form">
+<div class="highlight">
+  <table border="0" style="margin-left: 20px">
+    <tr>
+      <td align="right">[% locale.maketext("GCPGroupName") %]:</td>
+      <td><input type="text" name="NAME" style="width: 150px" value="[% vcard.FN.VALUE %]" /></td>
+      <td colspan="2"></td>
+    </tr>
+    <tr>
+      <td align="right">[% locale.maketext("CGPNote") %]:</td>
+      <td><input type="text" name="NOTE" style="width: 150px" value="[% vcard.NOTE.VALUE %]" /></td>
+      <td colspan="2"></td>
+    </tr>
+  </table>
+</div>
+<h2>[% locale.maketext('CGPGroupMembers') %]</h2>
+<div class="highlight">
+  <table border="0" style="margin-left: 20px" id="emailstable">
+    <tr>
+      <th>
+	[% locale.maketext('CGPAllContacts') %]
+      </th>
+      <th></th>
+      <th>
+	[% locale.maketext('CGPMembers') %]
+      </th>
+    </tr>
+    <tr>
+      <td>
+	<select multiple="multiple" style="height: 250px; width: 290px" id="all">
+	  <option value="" style="display: none;"></option>
+	  [% FOR contact IN contacts -%]
+	  [% FOR mail IN contact.email %]
+	  [% UNLESS allmails.search(mail.VALUE) -%]
+	  [% filter_option("", contact.name _ "|" _ mail.VALUE, contact.name _ " &lt;" _ mail.VALUE _ "&gt;") %]
+	  [% END -%]
+	  [% END -%]
+	  [% END -%]
+	</select>
+      </td>
+      <td style="padding: 0 5px; text-align: center;">
+	<p>
+	  <a href="#" id="add">Add &gt;</a>
+	</p>
+	<p>
+	  <a href="#" id="remove">&lt; Remove</a>
+	</p>
+      </td>
+      <td>
+	<select multiple="multiple" style="height: 250px; width: 290px" id="members" name="members">
+	  <option value="" style="display: none;"></option>
+	  [% FOR member IN forceArray(vcard.MEMBER) %]
+	  [% filter_option("", member.CN _ "|" _ member.VALUE, member.CN _ " &lt;" _ member.VALUE _ "&gt;") %]
+	  [% END -%]
+	</select>
+      </td>
+    </tr>
+  </table>
+</div>
+<div class="highlight">
+  <table border="0" style="margin-left: 20px">
+    </tr>
+    <td>
+      <input type="hidden" name="oldMessageID" value="[% vcard.UID.VALUE %]" />
+      <input type="hidden" name="oldUID" value="[% FORM.contact %]" />
+      <input id="new_email_submit" class="input-button" type="submit" value="[% locale.maketext("CGPSave") %]" name="save" />
+    </td>
+    <td></td>
+    <td></td>
+    </tr>
+ </table>
+</div>
+</form>
+<script type="text/javascript">
+var moveContacts = function (e, data) {
+    YAHOO.util.Event.preventDefault(e);
+    var selected = YAHOO.util.Selector.query('#' + data.from + ' option').filter( function (item) {
+	    return item.selected;
+	});
+    for (var i = 0; i < selected.length; i++) {
+	var members = YAHOO.util.Selector.query('#' + data.to + ' option');
+	YAHOO.util.Dom.insertAfter(selected[i], members[members.length - 1]);
+    }
+};
+YAHOO.util.Event.onDOMReady(function () {
+ 	YAHOO.util.Event.addListener("add", "click", moveContacts, {from: 'all', to: 'members'} );
+ 	YAHOO.util.Event.addListener("remove", "click", moveContacts, {from: 'members', to: 'all'} );
+ 	YAHOO.util.Event.addListener("form", "submit", function () {
+		var members = YAHOO.util.Selector.query('#members option');
+		for (var i = 0; i < members.length; i++) {
+		    members[i].selected = true;
+		}
+	    });
+    });
+</script>

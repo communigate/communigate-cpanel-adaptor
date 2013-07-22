@@ -1,0 +1,32 @@
+[% MACRO filter_option(pval, val, text) BLOCK -%]
+<option value="[% val %]"[% val == pval ? " selected='selected'" : "" %]>[% cptext(text) %]</option>
+[% END -%]
+<tr>
+  <td align="right" style="vertical-align: top; padding: 10px">
+    <select name="aclto-[% CPANEL.CPVAR.id %]">
+      [% filter_option(acl, "anyone@", "CGPAnyoneInDomain" ) %]
+      [% FOR account IN accounts.keys.grep(CPANEL.CPVAR.domain _ '$').sort %]
+      [% filter_option(acl, account.split("@").0, account _ (domain ? '@' _ domain : '') ) %]
+      [% END %]
+    </select>
+  </td>
+  <td style="padding: 10px;">
+    <input type="checkbox" name="acl-[% CPANEL.CPVAR.id %]" value="l"[% IF acls.$acl.search('l') %] checked="checked"[% END %] />
+    <label>Lookup mailbox</label><br />
+    <input type="checkbox" name="acl-[% CPANEL.CPVAR.id %]" value="r"[% IF acls.$acl.search('r') %] checked="checked"[% END %] />
+    <label>Read messages</label><br />
+    <input type="checkbox" name="acl-[% CPANEL.CPVAR.id %]" value="s"[% IF acls.$acl.search('s') %] checked="checked"[% END %] />
+    <label>Mark as read</label><br />
+    <input type="checkbox" name="acl-[% CPANEL.CPVAR.id %]" value="w"[% IF acls.$acl.search('w') %] checked="checked"[% END %] />
+    <label>Write/Change flags</label><br />
+    <input type="checkbox" name="acl-[% CPANEL.CPVAR.id %]" value="d"[% IF acls.$acl.search('d') %] checked="checked"[% END %] />
+    <label>Delete messages</label><br />
+    <input type="checkbox" name="acl-[% CPANEL.CPVAR.id %]" value="i"[% IF acls.$acl.search('i') %] checked="checked"[% END %] />
+    <label>Insert messages</label><br />
+    <input type="checkbox" name="acl-[% CPANEL.CPVAR.id %]" value="c"[% IF acls.$acl.search('c') %] checked="checked"[% END %] />
+    <label>Create mailbox</label><br />
+    <input type="checkbox" name="acl-[% CPANEL.CPVAR.id %]" value="a"[% IF acls.$acl.search('a') %] checked="checked"[% END %] />
+    <label>Administer</label><br />
+  </td>
+  <td colspan="2"><a href="#" class="removerow">Remove</a></td>
+</tr>

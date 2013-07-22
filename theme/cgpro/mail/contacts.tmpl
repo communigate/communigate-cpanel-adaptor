@@ -1,0 +1,52 @@
+<p>
+  <a class="create-button" href="addbox.html?account=[% account %]">[% locale.maketext("CGPAddContactBox") %]</a>
+</p>
+[% FOR box IN boxes.keys.sort -%]
+[% PROCESS contacts_listing %]
+[% END -%]
+[% UNLESS boxes.keys.size; PROCESS contacts_listing box='Contacts'; END %]
+[% BLOCK contacts_listing -%]
+<h2>[% box %][% IF prefs.ContactsBox == box %] ([% locale.maketext("CGPdefault") %])[% END %]</h2>
+<p>
+  <a class="create-button" href="editcontact.html?account=[% account %]&amp;box=[% box %]">[% locale.maketext("CGPAddContact") %]</a>
+  <a class="create-button" href="editcontactsgroup.html?account=[% account %]&amp;box=[% box %]">[% locale.maketext("CGPAddContactsGroup") %]</a>
+  <a class="create-button" href="editbox.html?account=[% account %]&amp;box=[% box %]">[% locale.maketext("CGPBoxAccess") %]</a>
+  [% UNLESS prefs.ContactsBox == box -%]
+  <a class="create-button" href="deletebox.html?account=[% account %]&amp;box=[% box %]">[% locale.maketext("CGPDeleteBox") %]</a>
+  <a class="create-button" href="setdefaultbox.html?account=[% account %]&amp;box=[% box %]">[% locale.maketext("CGPSetAsDefault") %]</a>
+  [% END -%]
+</p>
+<table border="0" cellpadding="5" cellspacing="0" id="mailtbl" class="sortable" width="650">
+  <tr>
+    <th class="cell" colspan="3">[% locale.maketext("CGPContact") %]</th>
+    <th class="cell-end sorttable_nosort">[% locale.maketext("AHFucn") %]</th>
+  </tr>
+  [% FOR contact IN contacts.$box -%]
+  <tr>
+    <td class="truncate"><a href="editcontact[% IF contact.group %]sgroup[% END %].html?account=[% account %]&amp;contact=[% contact.uid %]&amp;box=[% box %]">[% contact.name %]</a></td>
+    <td class="truncate nobrd-left"  style="vertical-align: top;">
+      [% IF contact.group -%]
+      ([% locale.maketext('CGPContactsGroup') %])
+      [% END -%]
+      [% FOR mail IN contact.email; mail.t = mail.type.grep('(HOME|WORK|OTHER)').0; -%]
+      <a href="mailto:[% mail.value %]">[% mail.value %]</a> [% IF mail.t %]([% locale.maketext('CGP' _ mail.t) %])[% END -%] <br/>
+      [% END -%]
+    </td>
+    <td class="truncate" style="vertical-align: top;">
+      [% FOR tel IN contact.tel; tel.t = tel.type.grep('(HOME|WORK|CELL|FAX|VIDEO|AGENT|PAGER|OTHER)').0; -%]
+      <a href="tel:[% tel.value %]">[% tel.value %]</a> [% IF tel.t %]([% locale.maketext('CGP' _ tel.t) %])[% END -%] <br/>
+      [% END -%]
+    </td>
+    <td>
+      <a href="editcontact[% IF contact.group %]sgroup[% END %].html?account=[% account %]&amp;contact=[% contact.uid %]&amp;box=[% box %]">[% locale.maketext('CGPViewEdit') %]</a>,
+      <a href="deletecontact.html?account=[% account %]&amp;contact=[% contact.uid %]&amp;name=[% contact.name %]&amp;box=[% box %]">[% locale.maketext('BrandingDPackage') %]</a>
+    </td>
+  </tr>
+  [% END -%]
+  [% UNLESS contacts.$box.size -%]
+  <tr>
+    <td class="truncate" colspan="4">[% locale.maketext("No contacts in this contactbox.") %]</td>
+  </tr>
+  [% END -%]
+</table>
+[% END -%]

@@ -1,0 +1,15 @@
+[% MACRO filter_option(pval, val, text) BLOCK -%]
+<option value="[% val %]"[% val == pval ? " selected='selected'" : "" %]>[% cptext(text) %]</option>
+[% END -%]
+<tr>
+  <td align="right">
+    [% type = mail.keys.grep('(HOME|WORK|OTHER)').0 -%]
+    <select name="mailtype-[% CPANEL.CPVAR.id %]">
+      [% filter_option(type, "HOME", locale.maketext("CGPHOME")) %]
+      [% filter_option(type, "WORK", locale.maketext("CGPWORK")) %]
+      [% filter_option(type, "OTHER", locale.maketext("CGPOTHER")) %]
+    </select>
+  </td>
+  <td><input type="text" name="mail-[% CPANEL.CPVAR.id %]" style="width: 150px" value="[% mail.VALUE %]" /></td>
+  <td colspan="2"><a href="#" class="removerow">Remove</a></td>
+</tr>
