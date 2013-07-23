@@ -115,6 +115,7 @@ do
     chmod +x ${THEMES[$i]}/cgpro/backup/getfiltersbackup.live.cgi
     chmod +x ${THEMES[$i]}/cgpro/mail/checkDomainSettings.live.cgi
     chmod +x ${THEMES[$i]}/cgpro/mail/getDomainAccounts.live.cgi
+    chmod +x ${THEMES[$i]}/cgpro/mail/getVCARD.live.cgi
     if [ -f ${THEMES[$i]}cgpro/mail/groupware.html ]
     then
 	rm -f ${THEMES[$i]}cgpro/mail/groupware.html

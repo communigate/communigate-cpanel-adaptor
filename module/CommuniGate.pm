@@ -2425,7 +2425,7 @@ sub api2_DoEditContact {
 				POBOX => [$params->{"POBOX-$i"}],
 				CTRY => [$params->{"CTRY-$i"}],
 				PCODE => [$params->{"PCODE-$i"}],
-				$params->{"teltype-$i"} => {}
+				$params->{"addresstype-$i"} => {}
 			    };
 			}
 		    }
@@ -2779,6 +2779,67 @@ sub api2_DoEditContactsBox {
     }
     my $cli = getCLI();
     return 1;
+}
+
+sub api2_exportContacts {
+    my %OPTS = @_;
+    my $account = $OPTS{'account'};
+    my (undef,$dom) = split "@", $account;
+    my @domains = Cpanel::Email::listmaildomains();
+    my $cli = getCLI();
+    my $locale = Cpanel::Locale->get_handle();
+    my $return = [];
+    for my $domain (@domains) {
+	if ($domain eq $dom) {
+	    $password = $cli->GetAccountPlainPassword($account);
+	    if ($password) {
+		my $ximss = getXIMSS($account, $password);
+		my $time = time();
+		$ximss->send({folderOpen => {
+		        id => "$time-mailbox",
+			folder => $OPTS{'box'},
+			    sortField => "To"
+			      }});
+		my $mailbox = $ximss->parseResponse("$time-mailbox");
+		if ($mailbox->{'folderReport'}) {
+		        $ximss->send(
+			    {
+				folderBrowse => {
+				    id => "$time-messages",
+				    folder => $OPTS{'box'},
+				    index => {
+					    from => 0,
+					    till => ($mailbox->{'folderReport'}->{'messages'})
+				    }
+				}
+			    });
+			my $messages = $ximss->parseResponse("$time-messages");
+			for my $message (@{forceArray($messages->{'folderReport'})}) {
+			    next if $OPTS{'uid'} && $OPTS{'uid'} != $message->{"UID"};
+			    if ($messages->{'folderReport'}) {
+				$ximss->send({folderRead => {
+				    id => "$time-contact-" . $message->{"UID"},
+				    folder => $OPTS{'box'},
+				    UID => $message->{"UID"},
+				    totalSizeLimit => 5000
+					      }});
+				my $contact = $ximss->parseResponse("$time-contact-" . $message->{"UID"});
+				if ($contact->{'folderMessage'} && $contact->{folderMessage}->{EMail}->{MIME}->{vCard}) {
+				    push @$return , {
+					vcard => $contact->{folderMessage}->{EMail}->{MIME}->{vCard},
+				    };
+				}
+			    }
+			}
+		}
+		$ximss->send({folderClose => {id => "$time-close", folder=>$OPTS{'box'}}});
+		$ximss->close();
+	    }
+	    last;
+	}
+    }
+    $cli->Logout();
+    return $return;
 }
 
 sub IsGroupInternal {

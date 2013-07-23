@@ -166,6 +166,7 @@ do
     chmod +x ${THEMES[$i]}/cgpro/backup/getfiltersbackup.live.cgi
     chmod +x ${THEMES[$i]}/cgpro/mail/checkDomainSettings.live.cgi
     chmod +x ${THEMES[$i]}/cgpro/mail/getDomainAccounts.live.cgi
+    chmod +x ${THEMES[$i]}/cgpro/mail/getVCARD.live.cgi
     for ((j=0; j<${lLen}; j++)); do
         TARGET=${THEMES[$i]}/locale/`basename ${LOCALES[$j]} '{}'`.yaml.local
         if [ ! -f ${TARGET} ]
