@@ -168,4 +168,7 @@ cp ${PACKSRC}/whm/templates/* /usr/local/cpanel/whostmgr/docroot/templates/
 rm -rf /usr/local/cpanel/whostmgr/docroot/cgi/cgpro*
 cp -rf ${PACKSRC}/whm/cgi/* /usr/local/cpanel/whostmgr/docroot/cgi/
 
+# install Perl dependencies
+/usr/local/cpanel/bin/cpanm -f -q MIME::QuotedPrint::Perl
+
 echo "Upgrade Finished!"

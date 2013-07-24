@@ -1,0 +1,40 @@
+<cpanel setvar="headerimg=../images/mailmenu.gif">
+<cpanel setvar="dprefix=../">
+<cpanel setvar="headerinclude=mail/pops_head.html">
+<cpanel Branding="include(stdheader.html)">
+<div class="body-content">
+  <h1><cpanel langprint="CGPImportContacts"></h1>
+  <form action="doimportcontacts.html?account=<cpanel formprint="$FORM{'account'}">&box=<cpanel formprint="$FORM{'box'}">" method="post" enctype="multipart/form-data">
+<div class="highlight">
+  <table border="0" style="margin-left: 20px">
+    <tr>
+      <td align="right"><cpanel langprint="CGPFilevcf">:</td>
+      <td><input type="file" name="file" id="file" /></td>
+      <td colspan="2"><span id="file_error" class="cjt_validation_error"></td>
+    </tr>
+    </tr>
+    <td>
+      <input id="activate-button" class="input-button" type="submit" value="<cpanel langprint="CGPAdd">" name="save" />
+    </td>
+    <td></td>
+    <td></td>
+    </tr>
+</table>
+</div>
+<div class="return-link"><a href="contacts.html?account=<cpanel formprint="$FORM{account'}">">&larr; <cptext "Go Back"></a></div>
+
+</div><!-- end body-content div -->
+
+<script type="text/javascript">
+    var LANG = {};
+    LANG.file_input = '<cpanel langprint="CGPFile">';
+LANG.file_input_invalid = '<cpanel langprint="CGPThisFieldIsRequired">!';
+YAHOO.util.Event.onDOMReady(function () {
+	var VAL_FILE = new CPANEL.validate.validator(LANG.file_input);
+	VAL_FILE.add("file", 'min_length(%input%,1)', LANG.file_input_invalid);
+	VAL_FILE.attach();
+	CPANEL.validate.attach_to_form("activate-button", [VAL_FILE]);
+    });
+</script>
+
+<cpanel Branding="include(stdfooter.html)">

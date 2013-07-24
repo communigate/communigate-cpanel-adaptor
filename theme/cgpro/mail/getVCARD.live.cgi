@@ -25,7 +25,7 @@ for my $contact (@$contacts) {
 	if ( $contact->{vcard}->{ADR} ) {
 	    for my $address (@{forceArray($contact->{vcard}->{ADR})}) {
 		my @addresstype = grep {m/(HOME|WORK|DOM|POSTAL|PARCEL|OTHER)/} keys %{$address};
-		print "ADR" . ($addresstype[0] ? ";$addresstype[0]" : "") . ";CHARSET=UTF-8;ENCODING=QUOTED-PRINTABLE:","$address->{POBOX};;$address->{STREET};$address->{LOCALITY};$address->{REGION};$address->{PCODE};$address->{CTRY}", "\n";
+		print "ADR" . ($addresstype[0] ? ";$addresstype[0]" : "") . ":","$address->{POBOX};;$address->{STREET};$address->{LOCALITY};$address->{REGION};$address->{PCODE};$address->{CTRY}", "\n";
 	    }
 	}
 	if ( $contact->{vcard}->{TEL} ) {

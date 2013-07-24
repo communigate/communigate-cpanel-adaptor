@@ -20,6 +20,7 @@ use Storable                         ();
 use Time::Local  'timelocal_nocheck';
 use Digest::MD5 qw(md5_hex);
 use XIMSS;
+use MIME::QuotedPrint::Perl;
 
 require Exporter;
 @ISA    = qw(Exporter);
@@ -2841,6 +2842,165 @@ sub api2_exportContacts {
     $cli->Logout();
     return $return;
 }
+
+sub api2_UploadFile {
+    local $Cpanel::IxHash::Modify = 'none';
+  FILE:
+    foreach my $file ( keys %Cpanel::FORM ) {
+        next FILE if $file =~ m/^file-(.*)-key$/;
+        next FILE if $file !~ m/^file-(.*)/;
+	$Cpanel::CPVAR{"filename"} = $file;
+	$Cpanel::CPVAR{"filename"} =~ s/^file-//;
+	$Cpanel::CPVAR{"filepath"} = $Cpanel::FORM{$file};
+        last;
+    }
+    return 1;
+}
+
+sub api2_ImportContacts {
+    my %OPTS = @_;
+    my @domains = Cpanel::Email::listmaildomains();
+    my $account = $OPTS{'account'};
+    my (undef,$domain) = split "@", $account;
+    my $cli = getCLI();
+    my $result;
+    foreach my $dom (@domains) {
+	if ($dom eq $domain) {
+	    if ($Cpanel::CPVAR{"filepath"} && $Cpanel::CPVAR{"filename"} =~ m/\.vcf/i && $OPTS{'box'}) {
+		open(FI, "<", $Cpanel::CPVAR{"filepath"});
+		my $data = [];
+		my $contact = [];
+		my $rowdata = {};
+		my $encoded = undef;
+		for my $row (<FI>) {
+		    $row =~ s/(\n|\r)//g;
+		    $row =~ s/(\n|\r)//g;
+		    if ($row =~ m/^(\w+);?(\w+)?.*?\:(.*?)$/) {
+			$rowdata = {name => $1, value => $3};
+			next if $rowdata->{name} eq 'BEGIN' || $rowdata->{name} eq 'VERSION';
+			$rowdata->{type} = $2 if $2 && $2 ne "CHARSER" && $2 ne "ENCODING";
+			if ($row =~ s/;CHARSET=UTF-8;ENCODING=QUOTED-PRINTABLE//i) {
+			    $encoded = "qp";
+			    next if $rowdata->{value} =~ s/=$//;
+			} else {
+			    $encoded = undef;
+			}
+		    } else {
+			$rowdata->{value} .= $row;
+		    }
+		    next if $rowdata->{name} eq 'PHOTO';
+		    if ($encoded) {
+			$rowdata->{value} = decode_qp($rowdata->{value});
+		    }
+		    if ($rowdata->{name} eq 'END') {
+			push @$data, $contact;
+			$contact = [];
+		    }
+		    push @$contact, $rowdata unless $rowdata->{name} eq "END";
+		}
+		close FI;
+		for my $unit (@$data) {
+		    my $message = {};
+		    $message->{"UID"}->{"VALUE"} = [join ".", map{ join "", map { int rand(9) } 1..$_} (10,1)];
+		    for my $row (@$unit) {
+			if ($row->{'name'} eq 'FN') {
+			    $message->{"X-FILE-AS"} = [$row->{'value'}];
+			    $message->{"FN"} = [$row->{'value'}];
+			} elsif ($row->{'name'} eq 'N') {
+ 			    my @vals = split ';', $row->{'value'};
+			    $message->{"N"}->{"GIVEN"} = [$vals[1]] if $vals[1];
+			    $message->{"N"}->{"MIDDLE"} = [$vals[2]] if $vals[2];
+			    $message->{"N"}->{"FAMILY"} = [$vals[0]] if $vals[0];
+			} elsif ($row->{'name'} eq 'ORG') {
+ 			    my @vals = split ';', $row->{'value'};
+			    $message->{"ORG"}->{"ORGNAME"} = [$vals[0]] if $vals[0];
+			    $message->{"ORG"}->{"ORGUNIT"} = [$vals[2]] if $vals[2];
+			} elsif ($row->{'name'} eq 'TITLE') {
+			    $message->{"TITLE"}->{"VALUE"} = [$row->{'value'}];
+			} elsif ($row->{'name'} eq 'BDAY') {
+			    $message->{"BDAY"}->{"VALUE"} = [$row->{'value'}];
+			} elsif ($row->{'name'} eq 'NICKNAME') {
+			    $message->{"NICKNAME"}->{"VALUE"} = [$row->{'value'}];
+			} elsif ($row->{'name'} eq 'ROLE') {
+			    $message->{"ROLE"}->{"VALUE"} = [$row->{'value'}];
+			} elsif ($row->{'name'} eq 'TZ') {
+			    $message->{"TZ"}->{"VALUE"} = [$row->{'value'}];
+			} elsif ($row->{'name'} eq 'GEO') {
+			    $message->{"GEO"}->{"VALUE"} = [$row->{'value'}];
+			} elsif ($row->{'name'} eq 'NOTE') {
+			    $message->{"NOTE"}->{"VALUE"} = [$row->{'value'}];
+			} elsif ($row->{'name'} eq 'EMAIL') {
+			    $message->{"EMAIL"} = [] unless $message->{"EMAIL"};
+			    push @{$message->{"EMAIL"}}, {
+				VALUE => [$row->{'value'}],
+				USERID => [$row->{'value'}],
+				($row->{'type'} || 'OTHER') => {},
+			    };
+			} elsif ($row->{'name'} eq 'TEL') {
+			    $message->{"TEL"} = [] unless $message->{"TEL"};
+			    push @{$message->{"TEL"}}, {
+				VALUE => [$row->{'value'}],
+				NUMBER => [$row->{'value'}],
+				($row->{'type'} || 'OTHER') => {},
+			    };
+			} elsif ($row->{'name'} eq 'ADR') {
+ 			    my @vals = split ';', $row->{'value'};
+			    $message->{"ADR"} = [] unless $message->{"ADR"};
+			    my $address = {
+				($row->{'type'} || 'OTHER') => {},
+			    };
+			    $address->{POBOX} = [$vals[0]] if $vals[0];
+			    $address->{STREET} = [$vals[2]] if $vals[2];
+			    $address->{LOCALITY} = [$vals[3]] if $vals[3];
+			    $address->{REGION} = [$vals[4]] if $vals[4];
+			    $address->{PCODE} = [$vals[5]] if $vals[5];
+			    $address->{CTRY} = [$vals[6]] if $vals[6];
+			    push @{$message->{"ADR"}}, $address;
+			} elsif ($row->{'name'} eq 'URL') {
+			    $message->{"URL"} = [] unless $message->{"URL"};
+			    push @{$message->{"URL"}}, {
+				VALUE => [$row->{'value'}],
+				($row->{'type'} || 'OTHER') => {},
+			    };
+			}
+		    }
+		    # Insert the contact;
+		    my $time = time();
+		    $password = $cli->GetAccountPlainPassword($account);
+		    if ($password) {
+			my $ximss = getXIMSS($account, $password);
+			$ximss->send({folderOpen => {
+			    id => "$time-mailbox",
+			    folder => $OPTS{'box'},
+			    sortField => "To"
+				      }});
+			my $mailbox = $ximss->parseResponse("$time-mailbox");
+			$Cpanel::CPERROR{'CommuniGate'} = $mailbox->{response}->{errorText} if $mailbox->{response}->{errorText};
+			if ($mailbox->{'folderReport'}) {
+			    my $contact = {
+			        id => "$time-append",
+				folder => $OPTS{'box'},
+				vCard => $message
+			    };
+			    $ximss->send({contactAppend => $contact});
+			    my $append = $ximss->parseResponse("$time-append");
+			    $Cpanel::CPERROR{'CommuniGate'} = $append->{response}->{errorText} if $append->{response}->{errorText};
+			}
+			# $ximss->send({folderClose => {id => "$time-close", folder=>$params->{'box'}}});
+			$ximss->close();
+		    }
+		}
+	    } else {
+		$Cpanel::CPERROR{'CommuniGate'} = "Error!";
+	    }
+	    last;
+	}
+    }
+    unlink $Cpanel::CPVAR{"filepath"};
+    $cli->Logout();
+    return $result;
+}
+
 
 sub IsGroupInternal {
   	my $groupwithdomain = shift;
