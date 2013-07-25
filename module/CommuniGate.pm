@@ -3001,6 +3001,40 @@ sub api2_ImportContacts {
     return $result;
 }
 
+sub api2_ListXmppHistory {
+    my %OPTS = @_;
+    my @domains = Cpanel::Email::listmaildomains();
+    my $account = $OPTS{'account'};
+    my (undef,$domain) = split "@", $account;
+    my $cli = getCLI();
+    my $result;
+    foreach my $dom (@domains) {
+	if ($dom eq $domain) {
+	    $result->{'files'} = $cli->ListStorageFiles($account, 'private/IM');
+	    $result->{'account'} = $account;
+	    last;
+	}
+    }
+    $cli->Logout();
+    return $result;
+}
+
+sub api2_GetFile {
+    my %OPTS = @_;
+    my @domains = Cpanel::Email::listmaildomains();
+    my $account = $OPTS{'account'};
+    my (undef,$domain) = split "@", $account;
+    my $cli = getCLI();
+    my $result;
+    foreach my $dom (@domains) {
+	if ($dom eq $domain) {
+	    $result = $cli->ReadStorageFile($account, 'private/IM/' . $OPTS{'file'});
+	    last;
+	}
+    }
+    $cli->Logout();
+    return $result;
+}
 
 sub IsGroupInternal {
   	my $groupwithdomain = shift;
