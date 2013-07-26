@@ -11,7 +11,7 @@
   <a class="create-button" href="editcontact.html?account=[% account %]&amp;box=[% box %]">[% locale.maketext("CGPAddContact") %]</a>
   <a class="create-button" href="editcontactsgroup.html?account=[% account %]&amp;box=[% box %]">[% locale.maketext("CGPAddContactsGroup") %]</a>
   <a class="create-button" href="editbox.html?account=[% account %]&amp;box=[% box %]">[% locale.maketext("CGPBoxAccess") %]</a>
-  [% UNLESS prefs.ContactsBox == box -%]
+  [% IF prefs.ContactsBox != box && boxes.keys.size > 1 -%]
   <a class="create-button" href="deletebox.html?account=[% account %]&amp;box=[% box %]">[% locale.maketext("CGPDeleteBox") %]</a>
   <a class="create-button" href="setdefaultbox.html?account=[% account %]&amp;box=[% box %]">[% locale.maketext("CGPSetAsDefault") %]</a>
   [% END -%]
