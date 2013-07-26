@@ -4,7 +4,7 @@
   <div class="body-content">
     <h1><cpanel langprint="CGPImportContacts"></h1>
       <!-- <?cp CommuniGate::UploadFile(%,msg) file=$FORM{'file'} ?> -->
-      <p><?cp CommuniGate::ImportContacts(%,msg) file=$FORM{'file'},account=$FORM{'account'},box=$FORM{'box'} ?></p>
+      <p><?cp CommuniGate::ImportContacts(%,msg) file=$FORM{'file'},account=$FORM{'account'},box=$FORM{'box'},header=$FORM{'header'} ?></p>
       <cpanelif $CPERROR{'CommuniGate'}>
 	<p><cpanel langprint="CGPError">: <em><cpanel print="$CPERROR{'CommuniGate'}">!</em></p>
       </cpanelif>

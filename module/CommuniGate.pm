@@ -21,6 +21,7 @@ use Time::Local  'timelocal_nocheck';
 use Digest::MD5 qw(md5_hex);
 use XIMSS;
 use MIME::QuotedPrint::Perl;
+use Cpanel::CSVImport;
 
 require Exporter;
 @ISA    = qw(Exporter);
@@ -2866,7 +2867,7 @@ sub api2_ImportContacts {
     my $result;
     foreach my $dom (@domains) {
 	if ($dom eq $domain) {
-	    if ($Cpanel::CPVAR{"filepath"} && $Cpanel::CPVAR{"filename"} =~ m/\.vcf/i && $OPTS{'box'}) {
+	    if ($Cpanel::CPVAR{"filepath"} && $Cpanel::CPVAR{"filename"} =~ m/\.vcf$/i && $OPTS{'box'}) {
 		open(FI, "<", $Cpanel::CPVAR{"filepath"});
 		my $data = [];
 		my $contact = [];
@@ -2986,10 +2987,117 @@ sub api2_ImportContacts {
 			    my $append = $ximss->parseResponse("$time-append");
 			    $Cpanel::CPERROR{'CommuniGate'} = $append->{response}->{errorText} if $append->{response}->{errorText};
 			}
-			# $ximss->send({folderClose => {id => "$time-close", folder=>$params->{'box'}}});
 			$ximss->close();
 		    }
 		}
+	    } elsif ($Cpanel::CPVAR{"filepath"} && $Cpanel::CPVAR{"filename"} =~ m/\.csv$/i && $OPTS{'box'}) {
+		my $rows = [];
+		system '/usr/local/cpanel/bin/csvprocess', $Cpanel::CPVAR{"filepath"}, ( $OPTS{'header'} ? 1 : 0 ), ',';
+		my $importdata = Storable::lock_retrieve( $Cpanel::CPVAR{"filepath"}  . '.parsed' );
+		for my $row (@{$importdata->{data}}) {
+		    my $message = {};
+		    $message->{"UID"}->{"VALUE"} = [join ".", map{ join "", map { int rand(9) } 1..$_} (10,1)];
+		    $message->{"N"}->{"GIVEN"} = [$row->[0]] if $row->[0];
+ 		    $message->{"N"}->{"MIDDLE"} = [$row->[1]] if $row->[1];
+ 		    $message->{"N"}->{"FAMILY"} = [$row->[2]] if $row->[2];
+		    $message->{"NICKNAME"}->{"VALUE"} = [$row->[3]] if $row->[3];
+		    $message->{"X-FILE-AS"} = [join(" ", grep(/.+/, ($row->[2], $row->[0], $row->[1]) ) )];
+		    $message->{"FN"} = [join(" ", grep(/.+/, ($row->[2], $row->[0], $row->[1]) ) )];
+		    if ($row->[4] || $row->[5] || $row->[6]) {
+			my @home = map {{VALUE => [$_], USERID => [$_], HOME => {}}} split ",", $row->[4];
+			my @work = map {{VALUE => [$_], USERID => [$_], WORK => {}}} split ",", $row->[5];
+ 			my @other = map {{VALUE => [$_], USERID => [$_], OTHER => {}}} split ",", $row->[6];
+			$message->{"EMAIL"} = [(@home, @work, @other)];
+		    }
+		    if ($row->[7] || $row->[8] || $row->[9] || $row->[10] || $row->[11] || $row->[12]) {
+			my @home = map {{VALUE => [$_], NUMBER => [$_], HOME => {}}} split ",", $row->[7];
+			my @work = map {{VALUE => [$_], NUMBER => [$_], WORK => {}}} split ",", $row->[8];
+			my @cell = map {{VALUE => [$_], NUMBER => [$_], CELL => {}}} split ",", $row->[9];
+			my @fax = map {{VALUE => [$_], NUMBER => [$_], FAX => {}}} split ",", $row->[10];
+			my @video = map {{VALUE => [$_], NUMBER => [$_], VIDEO => {}}} split ",", $row->[11];
+ 			my @other = map {{VALUE => [$_], NUMBER => [$_], OTHER => {}}} split ",", $row->[12];
+			$message->{"TEL"} = [(@home, @work, @cell, @fax, @video, @other)];
+		    }
+		    if ($row->[13] || $row->[14] || $row->[15] || $row->[16] || $row->[17] || $row->[18] || $row->[19] || $row->[20] || $row->[21] || $row->[22] || $row->[23] || $row->[24] || $row->[25] || $row->[26] || $row->[27] || $row->[28] || $row->[29] || $row->[30]) {
+			$message->{"ADR"} = [];
+			if ($row->[13] || $row->[14] || $row->[15] || $row->[16] || $row->[17] || $row->[18]) {
+			    my $address = {
+			    	HOME => {},
+			    };
+			        $address->{POBOX} = [$row->[13]] if $row->[13];
+			        $address->{CTRY} = [$row->[14]] if $row->[14];
+			        $address->{STREET} = [$row->[15]] if $row->[15];
+			        $address->{LOCALITY} = [$row->[16]] if $row->[16];
+			        $address->{REGION} = [$row->[17]] if $row->[17];
+			        $address->{PCODE} = [$row->[18]] if $row->[18];
+			        push @{$message->{"ADR"}}, $address;
+			}
+			if ($row->[19] || $row->[20] || $row->[21] || $row->[22] || $row->[23] || $row->[24]) {
+			    my $address = {
+			    	WORK => {},
+			    };
+			        $address->{POBOX} = [$row->[19]] if $row->[19];
+			        $address->{CTRY} = [$row->[20]] if $row->[20];
+			        $address->{STREET} = [$row->[21]] if $row->[21];
+			        $address->{LOCALITY} = [$row->[22]] if $row->[22];
+			        $address->{REGION} = [$row->[23]] if $row->[23];
+			        $address->{PCODE} = [$row->[24]] if $row->[24];
+			        push @{$message->{"ADR"}}, $address;
+			}
+			if ($row->[25] || $row->[26] || $row->[27] || $row->[28] || $row->[29] || $row->[30]) {
+			    my $address = {
+			    	OTHER => {},
+			    };
+			        $address->{POBOX} = [$row->[25]] if $row->[25];
+			        $address->{CTRY} = [$row->[26]] if $row->[26];
+			        $address->{STREET} = [$row->[27]] if $row->[27];
+			        $address->{LOCALITY} = [$row->[28]] if $row->[28];
+			        $address->{REGION} = [$row->[29]] if $row->[29];
+			        $address->{PCODE} = [$row->[30]] if $row->[30];
+			        push @{$message->{"ADR"}}, $address;
+			}
+		    }
+		    $message->{"ORG"}->{"ORGNAME"} = [$row->[31]] if $row->[31];
+		    $message->{"ORG"}->{"ORGUNIT"} = [$row->[32]] if $row->[32];
+		    $message->{"TITLE"}->{"VALUE"} = [$row->[33]] if $row->[33];
+		    $message->{"BDAY"}->{"VALUE"} = [$row->[34]] if $row->[34];
+		    if ($row->[35] || $row->[36] || $row->[37]) {
+			my @home = map {{VALUE => [$_], HOME => {}}} split ",", $row->[35];
+			my @work = map {{VALUE => [$_], WORK => {}}} split ",", $row->[36];
+ 			my @other = map {{VALUE => [$_], OTHER => {}}} split ",", $row->[37];
+			$message->{"URL"} = [(@home, @work, @other)];
+		    }
+		    $message->{"ROLE"}->{"VALUE"} = [$row->[38]] if $row->[38];
+		    $message->{"TZ"}->{"VALUE"} = [$row->[39]] if $row->[39];
+		    $message->{"GEO"}->{"VALUE"} = [$row->[40]] if $row->[40];
+		    $message->{"NOTE"}->{"VALUE"} = [$row->[41]] if $row->[41];
+		    # Insert the contact;
+		    my $time = time();
+		    $password = $cli->GetAccountPlainPassword($account);
+		    if ($password) {
+		    	my $ximss = getXIMSS($account, $password);
+		    	$ximss->send({folderOpen => {
+		    	    id => "$time-mailbox",
+		    	    folder => $OPTS{'box'},
+		    	    sortField => "To"
+		    		      }});
+		    	my $mailbox = $ximss->parseResponse("$time-mailbox");
+		    	$Cpanel::CPERROR{'CommuniGate'} = $mailbox->{response}->{errorText} if $mailbox->{response}->{errorText};
+		    	if ($mailbox->{'folderReport'}) {
+		    	    my $contact = {
+		    	        id => "$time-append",
+		    		folder => $OPTS{'box'},
+		    		vCard => $message
+		    	    };
+		    	    $ximss->send({contactAppend => $contact});
+		    	    my $append = $ximss->parseResponse("$time-append");
+		    	    $Cpanel::CPERROR{'CommuniGate'} = $append->{response}->{errorText} if $append->{response}->{errorText};
+		    	}
+		    	$ximss->close();
+		    }
+		}
+		unlink $Cpanel::CPVAR{"filepath"}  . '.parsed';
+
 	    } else {
 		$Cpanel::CPERROR{'CommuniGate'} = "Error!";
 	    }
