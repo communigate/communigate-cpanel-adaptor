@@ -1,0 +1,16 @@
+<cpanel setvar="headerimg=../images/mailmenu.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+<div class="body-content">
+  <h1><cpanel langprint="CGPRemoveBuddy"></h1>
+  <p><cpanel Locale="maketext('Are you sure you want to remove buddy "[_1]" ?',$FORM{'buddy'})"></p>
+  <p> 
+    <a class="create-button" href="doremovebuddy.html?account=<cpanel formprint="$FORM{'account'}">&buddy=<cpanel formprint="$FORM{'buddy'}">"><cpanel Locale="maketext('CGPRemoveBuddy)"></a> 
+    <a class="cancel_link" href="xmpp_roster.html?account=<cpanel formprint="$FORM{account'}">"><cpanel Locale="maketext('CGPcancel')"></a>
+  </p>
+  <div class="return-link"><a href="xmpp_roster.html?account=<cpanel formprint="$FORM{account'}">">&larr; <cptext "Go Back"></a></div>
+</div>
+</div><!-- end body-content div -->
+
+<cpanel Branding="include(stdfooter.html)">
+

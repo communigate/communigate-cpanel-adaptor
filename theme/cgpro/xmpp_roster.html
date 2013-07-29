@@ -1,0 +1,14 @@
+<cpanel setvar="headerimg=../images/mailmenu.gif">
+<cpanel setvar="dprefix=../">
+<cpanel setvar="headerinclude=mail/pops_head.html">
+<cpanel Branding="include(stdheader.html)">
+<div class="body-content">
+  <h1><cpanel langprint="CGPXmppRoster"><cpanelif $FORM{'account'}>: <cpanel print="$FORM{'account'}"></cpanelif></h1>
+  <?cptt CommuniGate::AccountsOverview(cgpro/xmpp_accounts.tmpl) ?>
+  <cpanelif $FORM{'account'}>
+    <?cptt CommuniGate::ListXmppRoster(cgpro/xmpp_roster.tmpl) account=$FORM{'account'} || '[tr][td colspan="5" class="errors"]$LANG{'CGPNoContacts'}.[/td][/tr]' ?>
+  </cpanelif>
+</div><!-- end body-content div -->
+
+<cpanel Branding="include(stdfooter.html)">
+

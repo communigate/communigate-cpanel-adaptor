@@ -1,0 +1,18 @@
+<cpanel setvar="headerimg=../images/mailmenu.gif">
+<cpanel setvar="dprefix=../">
+<cpanel setvar="headerinclude=mail/pops_head.html">
+<cpanel Branding="include(stdheader.html)">
+  <div class="body-content">
+    <h1><cpanel langprint="CGPImportAccountsToRoster"> <cpanel print="$FORM{'account'}"></h1>
+    <!-- <?cp CommuniGate::ImportLocalRoster() formdump=$formdump ?> -->
+    <cpanelif $CPERROR{'CommuniGate'}>
+      <p><cpanel langprint="CGPError">: <em><cpanel print="$CPERROR{'CommuniGate'}">!</em></p>
+    </cpanelif>
+    <cpanelif !$CPERROR{'CommuniGate'}>
+      <p><cpanel langprint="CGPRosterUpdated">!</p>
+    </cpanelif>
+    <div class="return-link"><a href="xmpp_roster.html?account=<cpanel formprint="$FORM{account'}">">&larr; <cptext "Go Back"></a></div>
+  </div><!-- end body-content div -->
+
+<cpanel Branding="include(stdfooter.html)">
+

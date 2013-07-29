@@ -1,0 +1,65 @@
+<h2>[% locale.maketext("CGPAddBuddy") %]</h2>
+<div class="highlight">
+  <form method="post" action="addbuddy.html?account=[% FORM.account %]" id="userform" name="userform">
+    <table>
+      <tr>
+        <td style="width: 150px" align="right">[% locale.maketext("JabberID") %]:</td>
+        <td><input type="text" name="jid" id="jid" style="width: 150px" /></td>
+        <td><div id="jid_error"></div></td>
+      </tr>
+      <tr>
+        <td style="width: 150px" align="right">[% locale.maketext("CGPRealName") %]:</td>
+        <td><input type="text" name="name" id="name" style="width: 150px" /></td>
+        <td><div id="name_error"></div></td>
+      </tr>
+      <tr>
+        <td style="width: 150px" align="right">[% locale.maketext("CGPGroupRealName") %]:</td>
+        <td><input type="text" name="group" id="group" style="width: 150px" /></td>
+        <td><div id="group_error"></div></td>
+      </tr>
+      <tr><td colspan="3"><br /></td></tr>
+      <tr>
+	<td>&nbsp;</td>
+	<td colspan="2"><input type="submit" id="submit" value="[% locale.maketext("CGPAddBuddy") %]" class="input-button" /></td>
+      </tr>
+    </table>
+  </form>
+</div>
+<p>
+  <a href="importlocalroster.html?account=[% FORM.account %]" class="create-button" >[% locale.maketext("CGPImportAccountsToRoster") %]</a>
+</p>
+<h2>[% locale.maketext("CGPXmppRoster") %]</h2>
+<table border="0" cellpadding="5" cellspacing="0" id="mailtbl" class="sortable" width="650">
+  <tr>
+    <th class="cell">[% locale.maketext("CGPBuddy") %]</th>
+    <th class="cell">[% locale.maketext("CGPName") %]</th>
+    <th class="cell">[% locale.maketext("CGPGroup") %]</th>
+    <th class="cell-end sorttable_nosort">[% locale.maketext("AHFucn") %]</th>
+  </tr>
+  [% FOR buddy IN roster -%]
+  <tr>
+    <td class="truncate">[% buddy.peer %]</td>
+    <td class="truncate">[% buddy.name %]</td>
+    <td class="truncate">[% buddy.group %]</td>
+    <td>
+      <a href="removebuddy.html?account=[% FORM.account %]&amp;buddy=[% buddy.peer %]">[% locale.maketext("CGPRemoveBuddy") %]</a>
+    </td>
+  </tr>
+  [% END -%]
+  [% UNLESS roster.size -%]
+  <tr>
+    <td class="truncate" colspan="4">[% locale.maketext("No buddies for this account.") %]</td>
+  </tr>
+  [% END -%]
+</table>
+ <script type="text/javascript">
+    var LANG = {};
+    LANG.jid_input = '[% locale.maketext("JabberID") %]';
+    LANG.jid_input_invalid = '[% locale.maketext("CGPEnterValidJabberID") %]!';
+YAHOO.util.Event.onDOMReady(function () {
+	var VAL_JID = new CPANEL.validate.validator(LANG.jid_input);
+	VAL_JID.add("jid", 'email', LANG.jid_input_invalid);
+	VAL_JID.attach();
+	CPANEL.validate.attach_to_form("submit", [VAL_JID]);
+    });
+</script>

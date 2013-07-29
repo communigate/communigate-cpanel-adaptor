@@ -3144,6 +3144,141 @@ sub api2_GetFile {
     return $result;
 }
 
+sub api2_ListXmppRoster {
+    my %OPTS = @_;
+    my @domains = Cpanel::Email::listmaildomains();
+    my $account = $OPTS{'account'};
+    my (undef,$domain) = split "@", $account;
+    my $cli = getCLI();
+    my $result;
+    foreach my $dom (@domains) {
+	if ($dom eq $domain) {
+	    my $time = time();
+	    $password = $cli->GetAccountPlainPassword($account);
+	    if ($password) {
+		my $ximss = getXIMSS($account, $password);
+		$ximss->send({rosterList => {
+		    id => "$time-roster",
+			      }});
+		my $roster = $ximss->parseResponse("$time-roster");
+		$Cpanel::CPERROR{'CommuniGate'} = $roster->{response}->{errorText} if $roster->{response}->{errorText};
+		$result->{"roster"} = forceArray($roster->{"rosterItem"}) if $roster->{"rosterItem"};
+		$ximss->close();
+	    }
+	    last;
+	}
+    }
+    $cli->Logout();
+    return $result;
+}
+
+sub api2_AddBuddy {
+    my %OPTS = @_;
+    my @domains = Cpanel::Email::listmaildomains();
+    my $account = $OPTS{'account'};
+    my (undef,$domain) = split "@", $account;
+    my $cli = getCLI();
+    my $result;
+    foreach my $dom (@domains) {
+	if ($dom eq $domain) {
+	    my $time = time();
+	    $password = $cli->GetAccountPlainPassword($account);
+	    if ($password) {
+		my $ximss = getXIMSS($account, $password);
+		my $params = {
+		    id => "$time-roster",
+		    peer => $OPTS{'jid'},
+		    subscription => "subBoth"
+		};
+		$params->{"name"} = $OPTS{"name"} if $OPTS{"name"};
+		$params->{"group"} = [$OPTS{'group'}] if $OPTS{'group'};
+		$ximss->send({rosterSet => $params});
+		my $roster = $ximss->parseResponse("$time-roster");
+		$Cpanel::CPERROR{'CommuniGate'} = $roster->{response}->{errorText} if $roster->{response}->{errorText};
+		$ximss->close();
+	    }
+	    last;
+	}
+    }
+    $cli->Logout();
+    return $result;
+}
+
+sub api2_RemoveBuddy {
+    my %OPTS = @_;
+    my @domains = Cpanel::Email::listmaildomains();
+    my $account = $OPTS{'account'};
+    my (undef,$domain) = split "@", $account;
+    my $cli = getCLI();
+    my $result;
+    foreach my $dom (@domains) {
+	if ($dom eq $domain) {
+	    my $time = time();
+	    $password = $cli->GetAccountPlainPassword($account);
+	    if ($password) {
+		my $ximss = getXIMSS($account, $password);
+		my $params = {
+		    id => "$time-roster",
+		    peer => $OPTS{'buddy'},
+		    subscription => "remove"
+		};
+		$ximss->send({rosterSet => $params});
+		my $roster = $ximss->parseResponse("$time-roster");
+		$Cpanel::CPERROR{'CommuniGate'} = $roster->{response}->{errorText} if $roster->{response}->{errorText};
+		$ximss->close();
+	    }
+	    last;
+	}
+    }
+    $cli->Logout();
+    return $result;
+}
+
+sub api2_ImportLocalRoster {
+    my %OPTS = @_;
+    my $formdump = $OPTS{'formdump'};
+    my $params = {};
+    for my $row (split "\n", $formdump) {
+	if ($row =~ m/^(\S+)\s\=\s(.*?)$/) {
+    my $key =$1;
+    my $value = $2;
+    $params->{$key} = $value;
+	}
+    }
+    my @domains = Cpanel::Email::listmaildomains();
+    my $account = $params->{'account'};
+    my (undef,$domain) = split "@", $account;
+    my $cli = getCLI();
+    my $result;
+    foreach my $dom (@domains) {
+	if ($dom eq $domain) {
+	    my $time = time();
+	    $password = $cli->GetAccountPlainPassword($account);
+	    if ($password) {
+		my $buddies = [map {$params->{$_}} grep {/^buddy/} keys %$params];
+		my $ximss = getXIMSS($account, $password);
+		for my $buddy (@$buddies) {
+		    my $userdata = $cli->GetAccountEffectiveSettings($buddy);
+		    my $param = {
+			id => "$time-roster",
+			peer => $buddy,
+			subscription => "subBoth"
+		    };
+		    $param->{"name"} = $userdata->{'RealName'} if $userdata->{'RealName'};
+		    $ximss->send({rosterSet => $param});
+		    my $roster = $ximss->parseResponse("$time-roster");
+		    $Cpanel::CPERROR{'CommuniGate'} = $roster->{response}->{errorText} if $roster->{response}->{errorText};
+		}
+		 $ximss->close();
+	    }
+	    last;
+	}
+    }
+    $cli->Logout();
+    return $result;
+}
+
+
 sub IsGroupInternal {
   	my $groupwithdomain = shift;
 	my @values = split("@",$groupwithdomain);
