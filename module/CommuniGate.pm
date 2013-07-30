@@ -1393,13 +1393,12 @@ sub api2_AddGroup{
 	$Settings=$cli->GetGroup("$listname\@$domain");
   	@$Settings{'RealName'}=$realname; 
   	$cli->SetGroup("$listname\@$domain",$Settings);
-	$cli->Logout();
-
 
 	# Create rule if posting is restricted to members : (spectre = 0)
 	if (!$spectre) {
 		SetGroupInternal("$listname\@$domain");
 	}
+	$cli->Logout();
 
         return @result;
 }
@@ -1428,24 +1427,19 @@ sub api2_ListGroupMembers {
 sub api2_AddGroupMember {
         my %OPTS = @_;
         my $listname = $OPTS{'listname'};
-        my $subemail = $OPTS{'subemail'};
-	if (!$subemail) {
-	 $Cpanel::CPERROR{'InputWrong'} = "Group Name must not be empty";
+	if (!$OPTS{'account'}) {
+	 $Cpanel::CPERROR{'InputWrong'} = "Please select account";
 	 return;
 	}
-        my $domain = $OPTS{'domain'};
 	my $cli = getCLI();
-
 	my $Settings=$cli->GetGroup($listname);
   	@$Settings{'Members'}=[] unless(@$Settings{'Members'});
   	my $Members=@$Settings{'Members'};
-  	push(@$Members,"$subemail\@$domain");
+  	push(@$Members,$OPTS{'account'});
   	$cli->SetGroup($listname,$Settings);
         my $error_msg = $cli->getErrMessage();
-        if ($error_msg eq "OK") {
-                #noop
-        } else {
-                $Cpanel::CPERROR{'CommuniGate'} = $error_msg;
+        unless ($error_msg eq "OK") {
+	    $Cpanel::CPERROR{'CommuniGate'} = $error_msg;
         }
 	if (IsGroupInternal($listname)) {
 		SetGroupExternal($listname);
@@ -1994,13 +1988,13 @@ sub api2_SetGroupSettings {
         } else {
                 $Cpanel::CPERROR{'CommuniGate'} = $error_msg;
         }
-	$cli->Logout();
 	if ($OPTS{'spectre'} && IsGroupInternal($email)) {
 		SetGroupExternal($email);
 	}
 	if (!$OPTS{'spectre'} && (!IsGroupInternal($email))) {
                 SetGroupInternal($email);
         } 
+ 	$cli->Logout();
 
         return @result;
 }
@@ -3342,8 +3336,7 @@ sub SetGroupInternal {
         foreach my $Rule (@$ExistingRules) {
                 push(@NewRules,$Rule);
         }
-        $cli->SetServerRules(\@NewRules) || die "Error: ".$cli->getErrMessage.", quitting";
-        $cli->Logout();
+        $cli->SetServerRules(\@NewRules);
 }
 
 sub SetGroupExternal{
@@ -3362,7 +3355,6 @@ sub SetGroupExternal{
 		}
         }
         $cli->SetServerRules(\@NewRules) || die "Error: ".$cli->getErrMessage.", quitting";
-        $cli->Logout();
 }
 
 

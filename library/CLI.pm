@@ -382,7 +382,7 @@ sub new {
 
 sub DESTROY {
   my $this = shift;
-  $this->Logout() if($this->{isConnected});
+  $this->Logout() if ($this->{isConnected});
 }
 
 sub getErrCode {
@@ -417,9 +417,11 @@ sub setStringsTranslateMode {
 
 sub Logout {
   my $this = shift;
-  $this->send('QUIT');
-  $this->_parseResponse();
-  $this->{isConnected}=0;
+  if ($this->{isConnected}) {
+      $this->send('QUIT');
+      $this->_parseResponse();
+      $this->{isConnected}=0;
+  }
 }
 
 sub NewPassword {
