@@ -21,6 +21,8 @@ use Time::Local  'timelocal_nocheck';
 use Digest::MD5 qw(md5_hex);
 use XIMSS;
 use Cpanel::CPAN::MIME::Base64::Perl qw(decode_base64 encode_base64);
+use MIME::QuotedPrint::Perl;
+use Cpanel::CSVImport;
 
 require Exporter;
 @ISA    = qw(Exporter);
@@ -48,7 +50,6 @@ sub getCLI {
 				});
 	unless($cli) {
 	    $logger->warn("Can't login to CGPro: ".$CGP::ERR_STRING);
-	    exit(0);
 	}
 	$CLI = $cli;
 	return $cli;
@@ -478,12 +479,12 @@ sub api2_listforwards {
 	  if ($Rule->[1] eq "#Redirect") {
 	    my @dest = split(",",$Rule->[3]->[0]->[1]);
 	    foreach my $value (@dest) {
-		push( @result, {       uri_dest => "$userName%40$domain",
-				       html_dest => "$userName\@$domain",
-				       dest => "$userName\@$domain",
-				       uri_forward => "$value",
-				       html_forward => "$value" ,
-				       forward => "$value" } );
+	      push( @result, {       uri_dest => "$userName%40$domain",
+				     html_dest => "$userName\@$domain",
+				     dest => "$userName\@$domain",
+				     uri_forward => "$value",
+				     html_forward => "$value" ,
+				     forward => "$value" } );
 	    }
 	  }
 	}
@@ -1603,12 +1604,18 @@ sub api2_AddGroup{
         } else {
                 $Cpanel::CPERROR{'CommuniGate'} = $error_msg;
         }
+
+	# set real name
+	$Settings=$cli->GetGroup("$listname\@$domain");
+  	@$Settings{'RealName'}=$realname; 
+  	$cli->SetGroup("$listname\@$domain",$Settings);
+
 	# Create rule if posting is restricted to members : (spectre = 0)
 	if (!$spectre) {
 		SetGroupInternal("$listname\@$domain");
 	}
-
 	$cli->Logout();
+
         return @result;
 }
 
@@ -1660,9 +1667,8 @@ sub api2_ListGroupMembers {
 sub api2_AddGroupMember {
         my %OPTS = @_;
         my $listname = $OPTS{'listname'};
-        my $subemail = $OPTS{'subemail'};
-	if (!$subemail) {
-	 $Cpanel::CPERROR{'InputWrong'} = "Group Name must not be empty";
+	if (!$OPTS{'account'}) {
+	 $Cpanel::CPERROR{'InputWrong'} = "Please select account";
 	 return;
 	}
         my $domain = $OPTS{'domain'};
@@ -1671,13 +1677,11 @@ sub api2_AddGroupMember {
 	my $Settings=$cli->GetGroup($listname);
   	@$Settings{'Members'}=[] unless(@$Settings{'Members'});
   	my $Members=@$Settings{'Members'};
-  	push(@$Members,"$subemail\@$domain");
+  	push(@$Members,$OPTS{'account'});
   	$cli->SetGroup($listname,$Settings);
         my $error_msg = $cli->getErrMessage();
-        if ($error_msg eq "OK") {
-                #noop
-        } else {
-                $Cpanel::CPERROR{'CommuniGate'} = $error_msg;
+        unless ($error_msg eq "OK") {
+	    $Cpanel::CPERROR{'CommuniGate'} = $error_msg;
         }
 	if (IsGroupInternal($listname)) {
 		SetGroupExternal($listname);
@@ -2225,11 +2229,12 @@ sub api2_SetGroupSettings {
         unless ($error_msg eq "OK") {
 	    $Cpanel::CPERROR{'CommuniGate'} = $error_msg;
         }
+	$cli->Logout();
 	if ($OPTS{'spectre'} && IsGroupInternal($email)) {
-	    SetGroupExternal($email);
+		SetGroupExternal($email);
 	}
 	if (!$OPTS{'spectre'} && (!IsGroupInternal($email))) {
-	    SetGroupInternal($email);
+                SetGroupInternal($email);
         } 
 	$cli->Logout();
         return @result;
@@ -2583,12 +2588,12 @@ sub api2_ListContacts {
 			$ximss->send(
 			    {
 				folderBrowse => {
-				    id => "$time-messages",
-				    folder => $box,
-				    index => {
-					from => 0,
-					till => ($mailbox->{'folderReport'}->{'messages'})
-				    }
+				        id => "$time-messages",
+					    folder => $box,
+					index => {
+					    from => 0,
+					    till => ($mailbox->{'folderReport'}->{'messages'})
+					}
 				}
 			    });
 			my $messages = $ximss->parseResponse("$time-messages");
@@ -2596,17 +2601,17 @@ sub api2_ListContacts {
 			    $contacts->{$box} = [] unless $contacts->{$box};
 			    for my $message (@{forceArray($messages->{'folderReport'})}) {
 				$ximss->send({folderRead => {
-				    id => "$time-contact",
-				    folder => $box,
-				    UID => $message->{"UID"},
-				    totalSizeLimit => 5000
+				        id => "$time-contact",
+					    folder => $box,
+					UID => $message->{"UID"},
+					    totalSizeLimit => 5000
 					      }});
 				my $contact = $ximss->parseResponse("$time-contact");
 				if ($contact->{'folderMessage'}) {
 				    if (defined $contact->{'folderMessage'}->{EMail}->{MIME}->{vCardGroup}) {
 					push @{$contacts->{$box}}, {
 					    name => $contact->{'folderMessage'}->{EMail}->{MIME}->{vCardGroup}->{FN}->{VALUE},
-					    group => 1,
+					        group => 1,
 					    uid => $message->{UID}
 					};
 				    } else {
@@ -2648,45 +2653,45 @@ sub api2_EditContact {
 		my $ximss = getXIMSS($account, $password);
 		my $time = time();
 		$ximss->send({folderOpen => {
-		    id => "$time-mailbox",
-		    folder => $OPTS{'box'},
-		    sortField => "To"
+		        id => "$time-mailbox",
+			folder => $OPTS{'box'},
+			    sortField => "To"
 			      }});
 		my $mailbox = $ximss->parseResponse("$time-mailbox");
 		if ($mailbox->{'folderReport'}) {
-		    $ximss->send(
-			{
-			    folderBrowse => {
-				id => "$time-messages",
-				folder => $OPTS{'box'},
-				index => {
-				    from => 0,
-				    till => ($mailbox->{'folderReport'}->{'messages'})
+		        $ximss->send(
+			    {
+				folderBrowse => {
+				    id => "$time-messages",
+				    folder => $OPTS{'box'},
+				    index => {
+					    from => 0,
+					    till => ($mailbox->{'folderReport'}->{'messages'})
+				    }
+				}
+			    });
+			my $messages = $ximss->parseResponse("$time-messages");
+			if ($messages->{'folderReport'}) {
+			    $ximss->send({folderRead => {
+				    id => "$time-contact",
+				    folder => $OPTS{'box'},
+				    UID => $OPTS{'UID'},
+				        totalSizeLimit => 5000
+					  }});
+			    my $contact = $ximss->parseResponse("$time-contact");
+			    if ($contact->{'folderMessage'}) {
+				$ximss->send({folderClose => {id => "$time-close", folder=>$OPTS{'box'}}});
+				$ximss->close();
+				my @localtime = localtime(time);
+				$cli->Logout();
+				return {
+				    vcard => $contact->{folderMessage}->{EMail}->{MIME}->{vCard},
+				    contact => $contact,
+				    YEAR => ($localtime[5] + 1900),
+				    forceArray => \&forceArray
 				}
 			    }
-			});
-		    my $messages = $ximss->parseResponse("$time-messages");
-		    if ($messages->{'folderReport'}) {
-			$ximss->send({folderRead => {
-			    id => "$time-contact",
-			    folder => $OPTS{'box'},
-			    UID => $OPTS{'UID'},
-			    totalSizeLimit => 5000
-				      }});
-			my $contact = $ximss->parseResponse("$time-contact");
-			if ($contact->{'folderMessage'}) {
-			    $ximss->send({folderClose => {id => "$time-close", folder=>$OPTS{'box'}}});
-			    $ximss->close();
-			    my @localtime = localtime(time);
-			    $cli->Logout();
-			    return {
-				vcard => $contact->{folderMessage}->{EMail}->{MIME}->{vCard},
-				contact => $contact,
-				YEAR => ($localtime[5] + 1900),
-				forceArray => \&forceArray
-			    }
 			}
-		    }
 		}
 		$ximss->send({folderClose => {id => "$time-close", folder=>$OPTS{'box'}}});
 		$ximss->close();
@@ -2734,7 +2739,7 @@ sub api2_DoEditContact {
 		    $message->{"N"}->{"MIDDLE"} = [$params->{MIDDLE}] if $params->{MIDDLE};
 		    $message->{"N"}->{"FAMILY"} = [$params->{FAMILY}] if $params->{FAMILY};
 
-		    # $message->{EMail}->{'Organization'} = [join(", ", grep(/.+/, ($params->{ORGNAME}, $params->{ORGUNIT}) ) )] if $params->{ORGNAME} && $params->{ORGUNIT};
+		        # $message->{EMail}->{'Organization'} = [join(", ", grep(/.+/, ($params->{ORGNAME}, $params->{ORGUNIT}) ) )] if $params->{ORGNAME} && $params->{ORGUNIT};
 		    $message->{"ORG"}->{"ORGNAME"} = [$params->{ORGNAME}] if $params->{ORGNAME};
 		    $message->{"ORG"}->{"ORGUNIT"} = [$params->{ORGUNIT}] if $params->{ORGUNIT};
 
@@ -2747,7 +2752,7 @@ sub api2_DoEditContact {
 		    $message->{"TZ"}->{"VALUE"} = [$params->{TZ}] if $params->{TZ};
 		    $message->{"GEO"}->{"VALUE"} = [$params->{GEO}] if $params->{GEO};
 		    $message->{"NOTE"}->{"VALUE"} = [$params->{NOTE}] if $params->{NOTE};
-		    
+		        
 		    my $newUID = join ".", map{ join "", map { int rand(9) } 1..$_} (10,1);
 		    $newUID .= "." . $params->{account};
 		    $message->{"UID"}->{"VALUE"} = [$params->{oldMessageID} ? $params->{oldMessageID} : $newUID];
@@ -2797,7 +2802,7 @@ sub api2_DoEditContact {
 				POBOX => [$params->{"POBOX-$i"}],
 				CTRY => [$params->{"CTRY-$i"}],
 				PCODE => [$params->{"PCODE-$i"}],
-				$params->{"teltype-$i"} => {}
+				$params->{"addresstype-$i"} => {}
 			    };
 			}
 		    }
@@ -2814,9 +2819,9 @@ sub api2_DoEditContact {
 		    my $mailbox = $ximss->parseResponse("$time-mailbox");
 		    if ($mailbox->{'folderReport'}) {
 			my $contact = {
-			    id => "$time-append",
-			    folder => $params->{'box'},
-			    vCard => $message
+			        id => "$time-append",
+				folder => $params->{'box'},
+				    vCard => $message
 			};
 			if ($params->{oldUID}) {
 			    $contact->{'replacesUID'} = $params->{oldUID};
@@ -2830,7 +2835,7 @@ sub api2_DoEditContact {
 		    $ximss->close();
 		}
 	    }
-	}	
+	}
     }
     return;
 }
@@ -2847,14 +2852,14 @@ sub api2_DeleteContact {
 	    $password = $cli->GetAccountPlainPassword($account);
 	    if ($password) {
 		my $time = time();
-	    	my $ximss = getXIMSS($account, $password);
-	    	$ximss->send({folderOpen => {
-	    	    id => "$time-mailbox",
-	    	    folder => $OPTS{'box'},
-	    	    sortField => "To"
-	    		      }});
-	    	my $mailbox = $ximss->parseResponse("$time-mailbox");
-	    	if ($mailbox->{'folderReport'}) {
+		my $ximss = getXIMSS($account, $password);
+		$ximss->send({folderOpen => {
+		        id => "$time-mailbox",
+			folder => $OPTS{'box'},
+			    sortField => "To"
+			      }});
+		my $mailbox = $ximss->parseResponse("$time-mailbox");
+		if ($mailbox->{'folderReport'}) {
 		    $ximss->send({messageRemove => {
 			id => "$time-remove",
 			folder => $OPTS{'box'},
@@ -2862,11 +2867,11 @@ sub api2_DeleteContact {
 			UID => [$OPTS{"uid"}]
 				  }});
 		    $ximss->parseResponse("$time-remove");
-	    	}
+		}
 		$ximss->send({folderClose => {id => "$time-close", folder=>$OPTS{'box'}}});
-	    	$ximss->send({bye => {id => "$time-bye"}});
+		$ximss->send({bye => {id => "$time-bye"}});
 	    } else {
-	    	# Error! Cannot fetch contacts;
+		# Error! Cannot fetch contacts;
 	    }
 	    last;
 	}
@@ -2927,51 +2932,51 @@ sub api2_EditContactsGroup {
 		my $ximss = getXIMSS($account, $password);
 		my $time = time();
 		$ximss->send({folderOpen => {
-		    id => "$time-mailbox",
-		    folder => $OPTS{'box'},
-		    sortField => "To"
+		        id => "$time-mailbox",
+			folder => $OPTS{'box'},
+			    sortField => "To"
 			      }});
 		my $mailbox = $ximss->parseResponse("$time-mailbox");
 		if ($mailbox->{'folderReport'}) {
-		    $ximss->send(
-			{
-			    folderBrowse => {
-				id => "$time-messages",
-				folder => $OPTS{'box'},
-				index => {
-				    from => 0,
-				    till => ($mailbox->{'folderReport'}->{'messages'})
+		        $ximss->send(
+			    {
+				folderBrowse => {
+				    id => "$time-messages",
+				    folder => $OPTS{'box'},
+				    index => {
+					    from => 0,
+					    till => ($mailbox->{'folderReport'}->{'messages'})
+				    }
+				}
+			    });
+			my $messages = $ximss->parseResponse("$time-messages");
+			if ($messages->{'folderReport'}) {
+			    for my $message (@{forceArray($messages->{'folderReport'})}) {
+				$ximss->send({folderRead => {
+				    id => "$time-contact",
+				    folder => $OPTS{box},
+				    UID => $message->{"UID"},
+				    totalSizeLimit => 5000
+					      }});
+				my $contact = $ximss->parseResponse("$time-contact");
+				if ($contact->{'folderMessage'} && defined $contact->{'folderMessage'}->{EMail}->{MIME}->{vCard}) {
+				    push @{$contacts}, {
+					email => forceArray($contact->{'folderMessage'}->{EMail}->{MIME}->{vCard}->{EMAIL}),
+					name => $contact->{'folderMessage'}->{EMail}->{MIME}->{vCard}->{FN}->{VALUE},
+				    };
 				}
 			    }
-			});
-		    my $messages = $ximss->parseResponse("$time-messages");
-		    if ($messages->{'folderReport'}) {
-			for my $message (@{forceArray($messages->{'folderReport'})}) {
 			    $ximss->send({folderRead => {
-				id => "$time-contact",
-				folder => $OPTS{box},
-				UID => $message->{"UID"},
-				totalSizeLimit => 5000
+				    id => "$time-contact",
+				    folder => $OPTS{'box'},
+				    UID => $OPTS{'UID'},
+				        totalSizeLimit => 5000
 					  }});
 			    my $contact = $ximss->parseResponse("$time-contact");
-			    if ($contact->{'folderMessage'} && defined $contact->{'folderMessage'}->{EMail}->{MIME}->{vCard}) {
-				push @{$contacts}, {
-				    email => forceArray($contact->{'folderMessage'}->{EMail}->{MIME}->{vCard}->{EMAIL}),
-				    name => $contact->{'folderMessage'}->{EMail}->{MIME}->{vCard}->{FN}->{VALUE},
-				};
+			    if ($contact->{'folderMessage'}) {
+				$vcard = $contact->{folderMessage}->{EMail}->{MIME}->{vCardGroup};
 			    }
 			}
-			$ximss->send({folderRead => {
-			    id => "$time-contact",
-			    folder => $OPTS{'box'},
-			    UID => $OPTS{'UID'},
-			    totalSizeLimit => 5000
-				      }});
-			my $contact = $ximss->parseResponse("$time-contact");
-			if ($contact->{'folderMessage'}) {
-			    $vcard = $contact->{folderMessage}->{EMail}->{MIME}->{vCardGroup};
-			}
-		    }
 		}
 		$ximss->send({folderClose => {id => "$time-close", folder=>$OPTS{'box'}}});
 		$ximss->close();
@@ -2990,9 +2995,9 @@ sub api2_DoEditContactsGroup {
     my $params = {};
     for my $row (split "\n", $formdump) {
 	if ($row =~ m/^(\S+)\s\=\s(.*?)$/) {
-	    my $key =$1;
-	    my $value = $2;
-	    $params->{$key} = $value;
+    my $key =$1;
+    my $value = $2;
+    $params->{$key} = $value;
 	}
     }
     my $message = {};
@@ -3018,8 +3023,8 @@ sub api2_DoEditContactsGroup {
 		    my $emails = [];
 		    for my $member (@$members) {
 			push @$emails, {
-			    CN => $member->[0],
-			    content => $member->[1],
+			        CN => $member->[0],
+				    content => $member->[1],
 			} if $member->[1];
 		    }
 		    $message->{'MEMBER'} = $emails if $#{$emails} >= 0;
@@ -3032,30 +3037,30 @@ sub api2_DoEditContactsGroup {
 		    my $time = time();
 		    my $ximss = getXIMSS($params->{account}, $password);
 		    $ximss->send({folderOpen => {
-		    	id => "$time-mailbox",
-		    	folder => $params->{'box'},
-		    	sortField => "To"
-		    		  }});
+			id => "$time-mailbox",
+			folder => $params->{'box'},
+			sortField => "To"
+				  }});
 		    my $mailbox = $ximss->parseResponse("$time-mailbox");
 		    if ($mailbox->{'folderReport'}) {
-		    	my $contact = {
-		    	    id => "$time-append",
-		    	    folder => $params->{'box'},
-		    	    vCardGroup => $message
-		    	};
-		    	if ($params->{oldUID}) {
-		    	    $contact->{'replacesUID'} = $params->{oldUID};
-		    	    $contact->{'checkOld'} = 'yes';
-		    	}
-		    	$ximss->send({contactAppend => $contact});
-		    	my $append = $ximss->parseResponse("$time-append");
-		    	$Cpanel::CPERROR{'CommuniGate'} = $append->{response}->{errorText} if $append->{response}->{errorText};
+			my $contact = {
+			        id => "$time-append",
+				folder => $params->{'box'},
+				    vCardGroup => $message
+			};
+			if ($params->{oldUID}) {
+			    $contact->{'replacesUID'} = $params->{oldUID};
+			    $contact->{'checkOld'} = 'yes';
+			}
+			$ximss->send({contactAppend => $contact});
+			my $append = $ximss->parseResponse("$time-append");
+			$Cpanel::CPERROR{'CommuniGate'} = $append->{response}->{errorText} if $append->{response}->{errorText};
 		    }
 		    $ximss->send({folderClose => {id => "$time-close", folder=>$params->{'box'}}});
 		    $ximss->close();
 		}
 	    }
-	}	
+	}
     }
     return;
 }
@@ -3087,49 +3092,38 @@ sub api2_DeleteContactsBox {
     $cli->Logout();
     return 1;
 }
+
 sub api2_EditContactsBox {
     my %OPTS = @_;
-    my $formdump = $OPTS{'formdump'};
     my $params = {};
-    for my $row (split "\n", $formdump) {
-	if ($row =~ m/^(\S+)\s\=\s(.*?)$/) {
-	    my $key =$1;
-	    my $value = $2;
-	    $params->{$key} = $value;
-	}
-    }
-    my $account = $params->{'account'};
-    my $box = $params->{'box'};
+    my $account = $OPTS{'account'};
+    my $box = $OPTS{'box'};
     my (undef,$dom) = split "@", $account;
     my @domains = Cpanel::Email::listmaildomains();
     my $cli = getCLI();
-    my @return;
+    my $return;
     for my $domain (@domains) {
 	if ($domain eq $dom) {
-	    my $acls = $cli->GetMailboxACL($account, $box);
-	    my $accounts = $cli->ListAccounts($domain);
-	    $cli->Logout();
-	    return {
-		accounts => $accounts,
-		acls => $acls,
-		domain => $domain
-	    }
+	    $return->{acls} = $cli->GetMailboxACL($account, $box);
+	}
+	my $accounts = $cli->ListAccounts($domain);
+	foreach my $userName (sort keys %$accounts) {
+	    $return->{accounts}->{"$userName\@$domain"} = 1;
 	}
     }
-    my $error_msg = $cli->getErrMessage();
-    $Cpanel::CPERROR{'CommuniGate'} = $error_msg unless ($error_msg eq "OK");
-    $cli->Logout();
-    return 0;
+    my $cli = getCLI();
+    return $return;
 }
+
 sub api2_DoEditContactsBox {
     my %OPTS = @_;
     my $formdump = $OPTS{'formdump'};
     my $params = {};
     for my $row (split "\n", $formdump) {
 	if ($row =~ m/^(\S+)\s\=\s(.*?)$/) {
-	    my $key =$1;
-	    my $value = $2;
-	    $params->{$key} = $value;
+    my $key =$1;
+    my $value = $2;
+    $params->{$key} = $value;
 	}
     }
     if ($params->{save}) {
@@ -3151,7 +3145,7 @@ sub api2_DoEditContactsBox {
 		for (my $i = 0; $i < $params->{boxaclcount}; $i++) {
 		    if ($params->{"acl-$i"} && $params->{"aclto-$i"}) {
 			my $acl = join "", map {$params->{$_}} grep {$_ =~ m/acl\-$i/} sort keys %$params;
-		       $acls->{$params->{"aclto-$i"}} = $acl;
+			$acls->{$params->{"aclto-$i"}} = $acl;
 		    }
 		}
 		$cli->SetMailboxACL($params->{account}, $params->{box}, $acls);
@@ -3162,6 +3156,501 @@ sub api2_DoEditContactsBox {
     }
     my $cli = getCLI();
     return 1;
+}
+
+sub api2_exportContacts {
+    my %OPTS = @_;
+    my $account = $OPTS{'account'};
+    my (undef,$dom) = split "@", $account;
+    my @domains = Cpanel::Email::listmaildomains();
+    my $cli = getCLI();
+    my $locale = Cpanel::Locale->get_handle();
+    my $return = [];
+    for my $domain (@domains) {
+	if ($domain eq $dom) {
+	    $password = $cli->GetAccountPlainPassword($account);
+	    if ($password) {
+		my $ximss = getXIMSS($account, $password);
+		my $time = time();
+		$ximss->send({folderOpen => {
+		        id => "$time-mailbox",
+			folder => $OPTS{'box'},
+			    sortField => "To"
+			      }});
+		my $mailbox = $ximss->parseResponse("$time-mailbox");
+		if ($mailbox->{'folderReport'}) {
+		        $ximss->send(
+			    {
+				folderBrowse => {
+				    id => "$time-messages",
+				    folder => $OPTS{'box'},
+				    index => {
+					    from => 0,
+					    till => ($mailbox->{'folderReport'}->{'messages'})
+				    }
+				}
+			    });
+			my $messages = $ximss->parseResponse("$time-messages");
+			for my $message (@{forceArray($messages->{'folderReport'})}) {
+			    next if $OPTS{'uid'} && $OPTS{'uid'} != $message->{"UID"};
+			    if ($messages->{'folderReport'}) {
+				$ximss->send({folderRead => {
+				    id => "$time-contact-" . $message->{"UID"},
+				    folder => $OPTS{'box'},
+				    UID => $message->{"UID"},
+				    totalSizeLimit => 5000
+					      }});
+				my $contact = $ximss->parseResponse("$time-contact-" . $message->{"UID"});
+				if ($contact->{'folderMessage'} && $contact->{folderMessage}->{EMail}->{MIME}->{vCard}) {
+				    push @$return , {
+					vcard => $contact->{folderMessage}->{EMail}->{MIME}->{vCard},
+				    };
+				}
+			    }
+			}
+		}
+		$ximss->send({folderClose => {id => "$time-close", folder=>$OPTS{'box'}}});
+		$ximss->close();
+	    }
+	    last;
+	}
+    }
+    $cli->Logout();
+    return $return;
+}
+
+sub api2_UploadFile {
+    local $Cpanel::IxHash::Modify = 'none';
+  FILE:
+    foreach my $file ( keys %Cpanel::FORM ) {
+        next FILE if $file =~ m/^file-(.*)-key$/;
+        next FILE if $file !~ m/^file-(.*)/;
+	$Cpanel::CPVAR{"filename"} = $file;
+	$Cpanel::CPVAR{"filename"} =~ s/^file-//;
+	$Cpanel::CPVAR{"filepath"} = $Cpanel::FORM{$file};
+        last;
+    }
+    return 1;
+}
+
+sub api2_ImportContacts {
+    my %OPTS = @_;
+    my @domains = Cpanel::Email::listmaildomains();
+    my $account = $OPTS{'account'};
+    my (undef,$domain) = split "@", $account;
+    my $cli = getCLI();
+    my $result;
+    foreach my $dom (@domains) {
+	if ($dom eq $domain) {
+	    if ($Cpanel::CPVAR{"filepath"} && $Cpanel::CPVAR{"filename"} =~ m/\.vcf$/i && $OPTS{'box'}) {
+		open(FI, "<", $Cpanel::CPVAR{"filepath"});
+		my $data = [];
+		my $contact = [];
+		my $rowdata = {};
+		my $encoded = undef;
+		for my $row (<FI>) {
+		    $row =~ s/(\n|\r)//g;
+		    $row =~ s/(\n|\r)//g;
+		    if ($row =~ m/^(\w+);?(\w+)?.*?\:(.*?)$/) {
+			$rowdata = {name => $1, value => $3};
+			next if $rowdata->{name} eq 'BEGIN' || $rowdata->{name} eq 'VERSION';
+			$rowdata->{type} = $2 if $2 && $2 ne "CHARSER" && $2 ne "ENCODING";
+			if ($row =~ s/;CHARSET=UTF-8;ENCODING=QUOTED-PRINTABLE//i) {
+			    $encoded = "qp";
+			    next if $rowdata->{value} =~ s/=$//;
+			} else {
+			    $encoded = undef;
+			}
+		    } else {
+			$rowdata->{value} .= $row;
+		    }
+		    next if $rowdata->{name} eq 'PHOTO';
+		    if ($encoded) {
+			$rowdata->{value} = decode_qp($rowdata->{value});
+		    }
+		    if ($rowdata->{name} eq 'END') {
+			push @$data, $contact;
+			$contact = [];
+		    }
+		    push @$contact, $rowdata unless $rowdata->{name} eq "END";
+		}
+		close FI;
+		for my $unit (@$data) {
+		    my $message = {};
+		    $message->{"UID"}->{"VALUE"} = [join ".", map{ join "", map { int rand(9) } 1..$_} (10,1)];
+		    for my $row (@$unit) {
+			if ($row->{'name'} eq 'FN') {
+			    $message->{"X-FILE-AS"} = [$row->{'value'}];
+			    $message->{"FN"} = [$row->{'value'}];
+			} elsif ($row->{'name'} eq 'N') {
+ 			    my @vals = split ';', $row->{'value'};
+			    $message->{"N"}->{"GIVEN"} = [$vals[1]] if $vals[1];
+			    $message->{"N"}->{"MIDDLE"} = [$vals[2]] if $vals[2];
+			    $message->{"N"}->{"FAMILY"} = [$vals[0]] if $vals[0];
+			} elsif ($row->{'name'} eq 'ORG') {
+ 			    my @vals = split ';', $row->{'value'};
+			    $message->{"ORG"}->{"ORGNAME"} = [$vals[0]] if $vals[0];
+			    $message->{"ORG"}->{"ORGUNIT"} = [$vals[2]] if $vals[2];
+			} elsif ($row->{'name'} eq 'TITLE') {
+			    $message->{"TITLE"}->{"VALUE"} = [$row->{'value'}];
+			} elsif ($row->{'name'} eq 'BDAY') {
+			    $message->{"BDAY"}->{"VALUE"} = [$row->{'value'}];
+			} elsif ($row->{'name'} eq 'NICKNAME') {
+			    $message->{"NICKNAME"}->{"VALUE"} = [$row->{'value'}];
+			} elsif ($row->{'name'} eq 'ROLE') {
+			    $message->{"ROLE"}->{"VALUE"} = [$row->{'value'}];
+			} elsif ($row->{'name'} eq 'TZ') {
+			    $message->{"TZ"}->{"VALUE"} = [$row->{'value'}];
+			} elsif ($row->{'name'} eq 'GEO') {
+			    $message->{"GEO"}->{"VALUE"} = [$row->{'value'}];
+			} elsif ($row->{'name'} eq 'NOTE') {
+			    $message->{"NOTE"}->{"VALUE"} = [$row->{'value'}];
+			} elsif ($row->{'name'} eq 'EMAIL') {
+			    $message->{"EMAIL"} = [] unless $message->{"EMAIL"};
+			    push @{$message->{"EMAIL"}}, {
+				VALUE => [$row->{'value'}],
+				USERID => [$row->{'value'}],
+				($row->{'type'} || 'OTHER') => {},
+			    };
+			} elsif ($row->{'name'} eq 'TEL') {
+			    $message->{"TEL"} = [] unless $message->{"TEL"};
+			    push @{$message->{"TEL"}}, {
+				VALUE => [$row->{'value'}],
+				NUMBER => [$row->{'value'}],
+				($row->{'type'} || 'OTHER') => {},
+			    };
+			} elsif ($row->{'name'} eq 'ADR') {
+ 			    my @vals = split ';', $row->{'value'};
+			    $message->{"ADR"} = [] unless $message->{"ADR"};
+			    my $address = {
+				($row->{'type'} || 'OTHER') => {},
+			    };
+			    $address->{POBOX} = [$vals[0]] if $vals[0];
+			    $address->{STREET} = [$vals[2]] if $vals[2];
+			    $address->{LOCALITY} = [$vals[3]] if $vals[3];
+			    $address->{REGION} = [$vals[4]] if $vals[4];
+			    $address->{PCODE} = [$vals[5]] if $vals[5];
+			    $address->{CTRY} = [$vals[6]] if $vals[6];
+			    push @{$message->{"ADR"}}, $address;
+			} elsif ($row->{'name'} eq 'URL') {
+			    $message->{"URL"} = [] unless $message->{"URL"};
+			    push @{$message->{"URL"}}, {
+				VALUE => [$row->{'value'}],
+				($row->{'type'} || 'OTHER') => {},
+			    };
+			}
+		    }
+		    # Insert the contact;
+		    my $time = time();
+		    $password = $cli->GetAccountPlainPassword($account);
+		    if ($password) {
+			my $ximss = getXIMSS($account, $password);
+			$ximss->send({folderOpen => {
+			    id => "$time-mailbox",
+			    folder => $OPTS{'box'},
+			    sortField => "To"
+				      }});
+			my $mailbox = $ximss->parseResponse("$time-mailbox");
+			$Cpanel::CPERROR{'CommuniGate'} = $mailbox->{response}->{errorText} if $mailbox->{response}->{errorText};
+			if ($mailbox->{'folderReport'}) {
+			    my $contact = {
+			        id => "$time-append",
+				folder => $OPTS{'box'},
+				vCard => $message
+			    };
+			    $ximss->send({contactAppend => $contact});
+			    my $append = $ximss->parseResponse("$time-append");
+			    $Cpanel::CPERROR{'CommuniGate'} = $append->{response}->{errorText} if $append->{response}->{errorText};
+			}
+			$ximss->close();
+		    }
+		}
+	    } elsif ($Cpanel::CPVAR{"filepath"} && $Cpanel::CPVAR{"filename"} =~ m/\.csv$/i && $OPTS{'box'}) {
+		my $rows = [];
+		system '/usr/local/cpanel/bin/csvprocess', $Cpanel::CPVAR{"filepath"}, ( $OPTS{'header'} ? 1 : 0 ), ',';
+		my $importdata = Storable::lock_retrieve( $Cpanel::CPVAR{"filepath"}  . '.parsed' );
+		for my $row (@{$importdata->{data}}) {
+		    my $message = {};
+		    $message->{"UID"}->{"VALUE"} = [join ".", map{ join "", map { int rand(9) } 1..$_} (10,1)];
+		    $message->{"N"}->{"GIVEN"} = [$row->[0]] if $row->[0];
+ 		    $message->{"N"}->{"MIDDLE"} = [$row->[1]] if $row->[1];
+ 		    $message->{"N"}->{"FAMILY"} = [$row->[2]] if $row->[2];
+		    $message->{"NICKNAME"}->{"VALUE"} = [$row->[3]] if $row->[3];
+		    $message->{"X-FILE-AS"} = [join(" ", grep(/.+/, ($row->[2], $row->[0], $row->[1]) ) )];
+		    $message->{"FN"} = [join(" ", grep(/.+/, ($row->[2], $row->[0], $row->[1]) ) )];
+		    if ($row->[4] || $row->[5] || $row->[6]) {
+			my @home = map {{VALUE => [$_], USERID => [$_], HOME => {}}} split ",", $row->[4];
+			my @work = map {{VALUE => [$_], USERID => [$_], WORK => {}}} split ",", $row->[5];
+ 			my @other = map {{VALUE => [$_], USERID => [$_], OTHER => {}}} split ",", $row->[6];
+			$message->{"EMAIL"} = [(@home, @work, @other)];
+		    }
+		    if ($row->[7] || $row->[8] || $row->[9] || $row->[10] || $row->[11] || $row->[12]) {
+			my @home = map {{VALUE => [$_], NUMBER => [$_], HOME => {}}} split ",", $row->[7];
+			my @work = map {{VALUE => [$_], NUMBER => [$_], WORK => {}}} split ",", $row->[8];
+			my @cell = map {{VALUE => [$_], NUMBER => [$_], CELL => {}}} split ",", $row->[9];
+			my @fax = map {{VALUE => [$_], NUMBER => [$_], FAX => {}}} split ",", $row->[10];
+			my @video = map {{VALUE => [$_], NUMBER => [$_], VIDEO => {}}} split ",", $row->[11];
+ 			my @other = map {{VALUE => [$_], NUMBER => [$_], OTHER => {}}} split ",", $row->[12];
+			$message->{"TEL"} = [(@home, @work, @cell, @fax, @video, @other)];
+		    }
+		    if ($row->[13] || $row->[14] || $row->[15] || $row->[16] || $row->[17] || $row->[18] || $row->[19] || $row->[20] || $row->[21] || $row->[22] || $row->[23] || $row->[24] || $row->[25] || $row->[26] || $row->[27] || $row->[28] || $row->[29] || $row->[30]) {
+			$message->{"ADR"} = [];
+			if ($row->[13] || $row->[14] || $row->[15] || $row->[16] || $row->[17] || $row->[18]) {
+			    my $address = {
+			    	HOME => {},
+			    };
+			        $address->{POBOX} = [$row->[13]] if $row->[13];
+			        $address->{CTRY} = [$row->[14]] if $row->[14];
+			        $address->{STREET} = [$row->[15]] if $row->[15];
+			        $address->{LOCALITY} = [$row->[16]] if $row->[16];
+			        $address->{REGION} = [$row->[17]] if $row->[17];
+			        $address->{PCODE} = [$row->[18]] if $row->[18];
+			        push @{$message->{"ADR"}}, $address;
+			}
+			if ($row->[19] || $row->[20] || $row->[21] || $row->[22] || $row->[23] || $row->[24]) {
+			    my $address = {
+			    	WORK => {},
+			    };
+			        $address->{POBOX} = [$row->[19]] if $row->[19];
+			        $address->{CTRY} = [$row->[20]] if $row->[20];
+			        $address->{STREET} = [$row->[21]] if $row->[21];
+			        $address->{LOCALITY} = [$row->[22]] if $row->[22];
+			        $address->{REGION} = [$row->[23]] if $row->[23];
+			        $address->{PCODE} = [$row->[24]] if $row->[24];
+			        push @{$message->{"ADR"}}, $address;
+			}
+			if ($row->[25] || $row->[26] || $row->[27] || $row->[28] || $row->[29] || $row->[30]) {
+			    my $address = {
+			    	OTHER => {},
+			    };
+			        $address->{POBOX} = [$row->[25]] if $row->[25];
+			        $address->{CTRY} = [$row->[26]] if $row->[26];
+			        $address->{STREET} = [$row->[27]] if $row->[27];
+			        $address->{LOCALITY} = [$row->[28]] if $row->[28];
+			        $address->{REGION} = [$row->[29]] if $row->[29];
+			        $address->{PCODE} = [$row->[30]] if $row->[30];
+			        push @{$message->{"ADR"}}, $address;
+			}
+		    }
+		    $message->{"ORG"}->{"ORGNAME"} = [$row->[31]] if $row->[31];
+		    $message->{"ORG"}->{"ORGUNIT"} = [$row->[32]] if $row->[32];
+		    $message->{"TITLE"}->{"VALUE"} = [$row->[33]] if $row->[33];
+		    $message->{"BDAY"}->{"VALUE"} = [$row->[34]] if $row->[34];
+		    if ($row->[35] || $row->[36] || $row->[37]) {
+			my @home = map {{VALUE => [$_], HOME => {}}} split ",", $row->[35];
+			my @work = map {{VALUE => [$_], WORK => {}}} split ",", $row->[36];
+ 			my @other = map {{VALUE => [$_], OTHER => {}}} split ",", $row->[37];
+			$message->{"URL"} = [(@home, @work, @other)];
+		    }
+		    $message->{"ROLE"}->{"VALUE"} = [$row->[38]] if $row->[38];
+		    $message->{"TZ"}->{"VALUE"} = [$row->[39]] if $row->[39];
+		    $message->{"GEO"}->{"VALUE"} = [$row->[40]] if $row->[40];
+		    $message->{"NOTE"}->{"VALUE"} = [$row->[41]] if $row->[41];
+		    # Insert the contact;
+		    my $time = time();
+		    $password = $cli->GetAccountPlainPassword($account);
+		    if ($password) {
+		    	my $ximss = getXIMSS($account, $password);
+		    	$ximss->send({folderOpen => {
+		    	    id => "$time-mailbox",
+		    	    folder => $OPTS{'box'},
+		    	    sortField => "To"
+		    		      }});
+		    	my $mailbox = $ximss->parseResponse("$time-mailbox");
+		    	$Cpanel::CPERROR{'CommuniGate'} = $mailbox->{response}->{errorText} if $mailbox->{response}->{errorText};
+		    	if ($mailbox->{'folderReport'}) {
+		    	    my $contact = {
+		    	        id => "$time-append",
+		    		folder => $OPTS{'box'},
+		    		vCard => $message
+		    	    };
+		    	    $ximss->send({contactAppend => $contact});
+		    	    my $append = $ximss->parseResponse("$time-append");
+		    	    $Cpanel::CPERROR{'CommuniGate'} = $append->{response}->{errorText} if $append->{response}->{errorText};
+		    	}
+		    	$ximss->close();
+		    }
+		}
+		unlink $Cpanel::CPVAR{"filepath"}  . '.parsed';
+
+	    } else {
+		$Cpanel::CPERROR{'CommuniGate'} = "Error!";
+	    }
+	    last;
+	}
+    }
+    unlink $Cpanel::CPVAR{"filepath"};
+    $cli->Logout();
+    return $result;
+}
+
+sub api2_ListXmppHistory {
+    my %OPTS = @_;
+    my @domains = Cpanel::Email::listmaildomains();
+    my $account = $OPTS{'account'};
+    my (undef,$domain) = split "@", $account;
+    my $cli = getCLI();
+    my $result;
+    foreach my $dom (@domains) {
+	if ($dom eq $domain) {
+	    $result->{'files'} = $cli->ListStorageFiles($account, 'private/IM');
+	    $result->{'account'} = $account;
+	    last;
+	}
+    }
+    $cli->Logout();
+    return $result;
+}
+
+sub api2_GetFile {
+    my %OPTS = @_;
+    my @domains = Cpanel::Email::listmaildomains();
+    my $account = $OPTS{'account'};
+    my (undef,$domain) = split "@", $account;
+    my $cli = getCLI();
+    my $result;
+    foreach my $dom (@domains) {
+	if ($dom eq $domain) {
+	    $result = $cli->ReadStorageFile($account, 'private/IM/' . $OPTS{'file'});
+	    last;
+	}
+    }
+    $cli->Logout();
+    return $result;
+}
+
+sub api2_ListXmppRoster {
+    my %OPTS = @_;
+    my @domains = Cpanel::Email::listmaildomains();
+    my $account = $OPTS{'account'};
+    my (undef,$domain) = split "@", $account;
+    my $cli = getCLI();
+    my $result;
+    foreach my $dom (@domains) {
+	if ($dom eq $domain) {
+	    my $time = time();
+	    $password = $cli->GetAccountPlainPassword($account);
+	    if ($password) {
+		my $ximss = getXIMSS($account, $password);
+		$ximss->send({rosterList => {
+		    id => "$time-roster",
+			      }});
+		my $roster = $ximss->parseResponse("$time-roster");
+		$Cpanel::CPERROR{'CommuniGate'} = $roster->{response}->{errorText} if $roster->{response}->{errorText};
+		$result->{"roster"} = forceArray($roster->{"rosterItem"}) if $roster->{"rosterItem"};
+		$ximss->close();
+	    }
+	    last;
+	}
+    }
+    $cli->Logout();
+    return $result;
+}
+
+sub api2_AddBuddy {
+    my %OPTS = @_;
+    my @domains = Cpanel::Email::listmaildomains();
+    my $account = $OPTS{'account'};
+    my (undef,$domain) = split "@", $account;
+    my $cli = getCLI();
+    my $result;
+    foreach my $dom (@domains) {
+	if ($dom eq $domain) {
+	    my $time = time();
+	    $password = $cli->GetAccountPlainPassword($account);
+	    if ($password) {
+		my $ximss = getXIMSS($account, $password);
+		my $params = {
+		    id => "$time-roster",
+		    peer => $OPTS{'jid'},
+		    subscription => "subBoth"
+		};
+		$params->{"name"} = $OPTS{"name"} if $OPTS{"name"};
+		$params->{"group"} = [$OPTS{'group'}] if $OPTS{'group'};
+		$ximss->send({rosterSet => $params});
+		my $roster = $ximss->parseResponse("$time-roster");
+		$Cpanel::CPERROR{'CommuniGate'} = $roster->{response}->{errorText} if $roster->{response}->{errorText};
+		$ximss->close();
+	    }
+	    last;
+	}
+    }
+    $cli->Logout();
+    return $result;
+}
+
+sub api2_RemoveBuddy {
+    my %OPTS = @_;
+    my @domains = Cpanel::Email::listmaildomains();
+    my $account = $OPTS{'account'};
+    my (undef,$domain) = split "@", $account;
+    my $cli = getCLI();
+    my $result;
+    foreach my $dom (@domains) {
+	if ($dom eq $domain) {
+	    my $time = time();
+	    $password = $cli->GetAccountPlainPassword($account);
+	    if ($password) {
+		my $ximss = getXIMSS($account, $password);
+		my $params = {
+		    id => "$time-roster",
+		    peer => $OPTS{'buddy'},
+		    subscription => "remove"
+		};
+		$ximss->send({rosterSet => $params});
+		my $roster = $ximss->parseResponse("$time-roster");
+		$Cpanel::CPERROR{'CommuniGate'} = $roster->{response}->{errorText} if $roster->{response}->{errorText};
+		$ximss->close();
+	    }
+	    last;
+	}
+    }
+    $cli->Logout();
+    return $result;
+}
+
+sub api2_ImportLocalRoster {
+    my %OPTS = @_;
+    my $formdump = $OPTS{'formdump'};
+    my $params = {};
+    for my $row (split "\n", $formdump) {
+	if ($row =~ m/^(\S+)\s\=\s(.*?)$/) {
+    my $key =$1;
+    my $value = $2;
+    $params->{$key} = $value;
+	}
+    }
+    my @domains = Cpanel::Email::listmaildomains();
+    my $account = $params->{'account'};
+    my (undef,$domain) = split "@", $account;
+    my $cli = getCLI();
+    my $result;
+    foreach my $dom (@domains) {
+	if ($dom eq $domain) {
+	    my $time = time();
+	    $password = $cli->GetAccountPlainPassword($account);
+	    if ($password) {
+		my $buddies = [map {$params->{$_}} grep {/^buddy/} keys %$params];
+		my $ximss = getXIMSS($account, $password);
+		for my $buddy (@$buddies) {
+		    my $userdata = $cli->GetAccountEffectiveSettings($buddy);
+		    my $param = {
+			id => "$time-roster",
+			peer => $buddy,
+			subscription => "subBoth"
+		    };
+		    $param->{"name"} = $userdata->{'RealName'} if $userdata->{'RealName'};
+		    $ximss->send({rosterSet => $param});
+		    my $roster = $ximss->parseResponse("$time-roster");
+		    $Cpanel::CPERROR{'CommuniGate'} = $roster->{response}->{errorText} if $roster->{response}->{errorText};
+		}
+		 $ximss->close();
+	    }
+	    last;
+	}
+    }
+    $cli->Logout();
+    return $result;
 }
 sub api2_ListCalls {
     my %OPTS = @_;
@@ -3718,6 +4207,7 @@ sub IsGroupInternal {
 	return(0);
 }
 
+
 sub GroupMembersForRule{
 	my $group = shift;
 	my $domain = shift;
@@ -3736,6 +4226,7 @@ sub GroupMembersForRule{
                 }
         }       
 	$cli->Logout();
+    
 }
 
 sub SetGroupInternal {
@@ -3760,12 +4251,11 @@ sub SetGroupInternal {
                                 ['Discard']
                         ]
                 ];
-	push(@NewRules,$NewRule);
+        push(@NewRules,$NewRule);
         foreach my $Rule (@$ExistingRules) {
                 push(@NewRules,$Rule);
         }
-        $cli->SetServerRules(\@NewRules) || die "Error: ".$cli->getErrMessage.", quitting";
-        $cli->Logout();
+        $cli->SetServerRules(\@NewRules);
 }
 
 sub SetGroupExternal{
@@ -3783,7 +4273,7 @@ sub SetGroupExternal{
                 	push(@NewRules,$Rule);
 		}
         }
-        $cli->SetServerRules(\@NewRules) || die "Error: ".$cli->getErrMessage.", quitting";
+        $cli->SetServerRules(\@NewRules);
         $cli->Logout();
 }
 

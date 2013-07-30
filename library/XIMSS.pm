@@ -81,9 +81,10 @@ sub send {
 sub _parseResponse {
     my $this = shift;
     my $socket = $this->{theSocket};
-    IO::Handle->input_record_separator( "\000" );
+    my $prev = $/;
+    $/ = "\000";
     my $responseLine = $this->{theSocket}->getline();
-    IO::Handle->input_record_separator( "\015\012" );
+    $/ = $prev;
     $responseLine =~ s/\000//g;
     $responseLine .= $this->_parseResponse() unless $responseLine =~ m/^\<response\s/i;
     print STDERR "XIMSS->_parseResponse::responseLine = $responseLine\n\n" if $this->{'debug'};

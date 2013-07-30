@@ -1,0 +1,26 @@
+[% FOR box IN boxes.keys.sort -%]
+[% PROCESS contacts_listing %]
+[% END -%]
+[% UNLESS boxes.keys.size; PROCESS contacts_listing box='Contacts'; END %]
+[% BLOCK contacts_listing -%]
+<h2>[% locale.maketext("CGPXmppHistory") %]</h2>
+<table border="0" cellpadding="5" cellspacing="0" id="mailtbl" class="sortable" width="650">
+  <tr>
+    <th class="cell">[% locale.maketext("CGPContact") %]</th>
+    <th class="cell-end sorttable_nosort">[% locale.maketext("AHFucn") %]</th>
+  </tr>
+  [% FOR file IN files.keys.sort -%]
+  <tr>
+    <td class="truncate">[% file.substr(0, -4) %]</td>
+    <td>
+      <a href="getXmppHistory.live.cgi?account=[% account %]&amp;file=[% file %]">[% locale.maketext('CGPDownloadHistory') %]</a>
+    </td>
+  </tr>
+  [% END -%]
+  [% UNLESS files.keys.size -%]
+  <tr>
+    <td class="truncate" colspan="2">[% locale.maketext("No history for this account.") %]</td>
+  </tr>
+  [% END -%]
+</table>
+[% END -%]

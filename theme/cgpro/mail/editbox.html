@@ -5,7 +5,7 @@
 <div class="body-content">
   <h1><cpanel langprint="CGPBoxAccess">: <cpanel formprint="$FORM{'box'}"></h1>
 
-  <?cptt CommuniGate::EditContactsBox(cgpro/mail/editbox.tmpl) formdump=$formdump ?>
+  <?cptt CommuniGate::EditContactsBox(cgpro/mail/editbox.tmpl) account=$FORM{'account'}, box=$FORM{'box'} ?>
   <div class="return-link"><a href="contacts.html?account=<cpanel formprint="$FORM{'account'}">">&larr; <cptext "Go Back"></a></div>
 </div><!-- end body-content div -->
 

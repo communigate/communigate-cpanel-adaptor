@@ -1,0 +1,24 @@
+<div class="highlight">
+  <form method="post" action="doimportlocalroster.html?account=[% FORM.account %]" id="userform" name="userform">
+    <table>
+      [% filter_option(account, "", "CGPPleaseSelect") %]
+      [% FOR account IN accounts.sort -%]
+      [% IF account == FORM.account; NEXT; END -%]
+      [% myclass = accounts.$account.class -%]
+      [% classstring = classes.$myclass.AccessModes.join(',') -%]
+      [% IF classstring.search("XMPP") || classstring == "All" -%]
+      <tr>
+        <td><input type="checkbox" name="buddy" id="[% account %]" value="[% account %]" checked="checked" /></td>
+        <td align="left"><label for="[% account %]">[% account %]</label></td>
+        <td><div id="group_error"></div></td>
+      </tr>
+      [% END -%]
+      [% END -%]
+      <tr><td colspan="3"><br /></td></tr>
+      <tr>
+	<td colspan="2"><input type="submit" id="submit" value="[% locale.maketext("CGPImportAccountsToRoster") %]" class="input-button" /></td>
+	<td>&nbsp;</td>
+      </tr>
+    </table>
+  </form>
+</div>

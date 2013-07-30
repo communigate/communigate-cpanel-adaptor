@@ -116,6 +116,9 @@ do
     chmod +x ${THEMES[$i]}/cgpro/backup/getfiltersbackup.live.cgi
     chmod +x ${THEMES[$i]}/cgpro/mail/checkDomainSettings.live.cgi
     chmod +x ${THEMES[$i]}/cgpro/mail/getDomainAccounts.live.cgi
+    chmod +x ${THEMES[$i]}/cgpro/mail/getVCARD.live.cgi
+    chmod +x ${THEMES[$i]}/cgpro/getXmppHistory.live.cgi
+
     if [ -f ${THEMES[$i]}cgpro/mail/groupware.html ]
     then
 	rm -f ${THEMES[$i]}cgpro/mail/groupware.html
@@ -153,7 +156,6 @@ fi
 
 # Update Feature List
 cp ${PACKSRC}/featurelists/cgpro /usr/local/cpanel/whostmgr/addonfeatures/
-${PACKSRC}/scripts/modify_features.pl
 /usr/local/cpanel/bin/rebuild_sprites
 /usr/local/cpanel/bin/build_locale_databases
 
@@ -172,5 +174,8 @@ rm -f /usr/local/cpanel/whostmgr/docroot/templates/cgpro_*
 cp ${PACKSRC}/whm/templates/* /usr/local/cpanel/whostmgr/docroot/templates/
 rm -rf /usr/local/cpanel/whostmgr/docroot/cgi/cgpro*
 cp -rf ${PACKSRC}/whm/cgi/* /usr/local/cpanel/whostmgr/docroot/cgi/
+
+# install Perl dependencies
+/usr/local/cpanel/bin/cpanm -f -q MIME::QuotedPrint::Perl
 
 echo "Upgrade Finished!"
