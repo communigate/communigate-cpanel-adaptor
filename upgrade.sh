@@ -118,6 +118,8 @@ do
     chmod +x ${THEMES[$i]}/cgpro/mail/getDomainAccounts.live.cgi
     chmod +x ${THEMES[$i]}/cgpro/mail/getVCARD.live.cgi
     chmod +x ${THEMES[$i]}/cgpro/getXmppHistory.live.cgi
+    chmod +x ${THEMES[$i]}/cgpro/playwav.live.cgi
+    chmod +x ${THEMES[$i]}/cgpro/getwav.live.cgi
 
     if [ -f ${THEMES[$i]}cgpro/mail/groupware.html ]
     then
