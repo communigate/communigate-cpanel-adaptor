@@ -25,7 +25,7 @@
 
 
 <cpanelif $FORM{'sub'}>
-<?cp CommuniGate::AddGroupMember() listname=$FORM{'listname'},subemail=$FORM{'subemail'},CGPMLReceivingMode=$FORM{'CGPMLReceivingMode'},CGPMLPostingMode=$FORM{'CGPMLPostingMode'},domain=$FORM{'domain'} ?>
+<?cp CommuniGate::AddGroupMember() listname=$FORM{'listname'},CGPMLReceivingMode=$FORM{'CGPMLReceivingMode'},CGPMLPostingMode=$FORM{'CGPMLPostingMode'},account=$FORM{'account'} ?>
 </cpanelif>
 
 <cpanelif $CPERROR{'CommuniGate'} && $FORM{'sub'}>
@@ -52,13 +52,12 @@
 <input type="hidden" name="listname" value="<cpanel print="$FORM{'listname'}">">
 
 <table>
-                <tr>
-		<td style="width: 150px" align="right"><cpanel langprint="CGPEmailAddress">:</td>
-		<td><input type="text" name="subemail" id="subemail" style="width: 150px" />
- <cpanel langprint="@">
-                                <select name="domain" id="domain"><?cp Email::listmaildomains([option value="%"]%[/option],domain,domain) ?></select>
-
-</td>
+  <tr>
+    <td style="width: 150px" align="right"><cpanel langprint="CGPEmailAddress">:</td>
+    <td>
+      <cpanel setvar="accounttype=XMPP">
+      <?cptt CommuniGate::AccountsOverview(cgpro/select_accounts.tmpl) ?>
+    </td>
 		<td><div id="email_error"></div></td>
 	</tr>
 	<tr><td colspan="3"><br /></td></tr>
