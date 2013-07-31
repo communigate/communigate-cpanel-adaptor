@@ -1,4 +1,4 @@
-#!/bin/sh                                                                                                                                                                                               
+#!/bin/sh
  eval 'if [ -x /usr/local/cpanel/3rdparty/bin/perl ]; then exec /usr/local/cpanel/3rdparty/bin/perl -x -- $0 ${1+"$@"}; else exec /usr/bin/perl -x $0 ${1+"$@"}; fi;'
     if 0;
 #!/usr/bin/perl
@@ -42,8 +42,8 @@ if ($FORM{submitedit} && $FORM{telnum}) {
     # Creating Forwarders
     my $assigned = $cli->GetForwarder("i-" . $FORM{telnum} . '@' . $domain);
     # in central.telnum 35930198900 -> tn-35930198900@ucc.surfstream.net
-    $cli->DeleteForwarder($FORM{telnum} . '@central.telnum');
-    $cli->CreateForwarder($FORM{telnum} . '@central.telnum', 'tn-' . $FORM{telnum} . '@' . $domain );
+    $cli->DeleteForwarder("tn-" . $FORM{telnum} . '@central.telnum');
+    $cli->CreateForwarder("tn-" . $FORM{telnum} . '@central.telnum', 'tn-' . $FORM{telnum} . '@' . $domain );
     # i-35930198900 -> antonkatsarov@anton.bg.local
     $cli->DeleteForwarder("gwin-$id-" . $FROM{telnum} . '@' . $domain);
     $cli->DeleteForwarder("i-" . $FORM{telnum} . '@' . $domain);

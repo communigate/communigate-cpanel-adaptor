@@ -232,7 +232,7 @@ if ($FORM{submitdialin} && $FORM{provider}) {
 	for my $tel (keys %$tels) {
 	    if ($FORM{'delete-' . $tel}) {
 		# Delete Forwarders
-		$cli->DeleteForwarder($tel . '@central.telnum');
+		$cli->DeleteForwarder("tn-" . $tel . '@central.telnum');
 		my $assigned = $cli->GetForwarder("i-" . $tel . '@' . $domain);
 		$assigned =~ s/^.*?@(.*?)\.local$/$1/;
 		$cli->DeleteForwarder("i-" . $tel . '@' . $domain);

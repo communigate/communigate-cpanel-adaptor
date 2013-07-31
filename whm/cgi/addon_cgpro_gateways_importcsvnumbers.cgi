@@ -56,8 +56,8 @@ if (-f $file && $FORM{provider}) {
 	$telnum =~ s/\D//g;
 	next unless $telnum;
 	# Creating Forwarders
-	$cli->DeleteForwarder($telnum . '@central.telnum');
-	$cli->CreateForwarder($telnum . '@central.telnum', 'tn-' . $telnum . '@' . $domain );
+	$cli->DeleteForwarder("tn-" . $telnum . '@central.telnum');
+	$cli->CreateForwarder("tn-" . $telnum . '@central.telnum', 'tn-' . $telnum . '@' . $domain );
 	# i-35930198900 -> antonkatsarov@anton.bg.local
 	$cli->DeleteForwarder("gwin-$id-" . $FROM{telnum} . '@' . $domain);
 	$cli->DeleteForwarder("i-" . $telnum . '@' . $domain);

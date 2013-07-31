@@ -1,4 +1,4 @@
-#!/bin/sh                                                                                                                                                                                               
+#!/bin/sh
  eval 'if [ -x /usr/local/cpanel/3rdparty/bin/perl ]; then exec /usr/local/cpanel/3rdparty/bin/perl -x -- $0 ${1+"$@"}; else exec /usr/bin/perl -x $0 ${1+"$@"}; fi;'
     if 0;
 #!/usr/bin/perl
@@ -57,7 +57,7 @@ if ($FORM{provider}) {
 	}
     }
     for my $tel (sort keys %$tels) {
-    	$cli->DeleteForwarder($tel . '@central.telnum');
+    	$cli->DeleteForwarder("tn-" . $tel . '@central.telnum');
     	$cli->DeleteForwarder("i-" . $tel . '@' . $domain);
     	$cli->DeleteForwarder("tn-" . $tel . '@' . $domain);
     	if ($tels->{$tel} ne 'null') {
