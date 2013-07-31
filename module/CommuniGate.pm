@@ -187,11 +187,13 @@ sub api2_AccountDefaults {
 	}
 	if ($OPTS{'save'}) {
 	    my $defaultServerAccountPrefs = $cli->GetServerAccountPrefs();
+	    $OPTS{'ips'} =~  s/(\r?\n)+/\\e/g;	
 		$cli->UpdateDomainSettings(
 		    domain => $domain,
 		    settings => {
 			MailRerouteAddress => $OPTS{'MailRerouteAddress'},
 			MailToAllAction => $OPTS{'MailToAllAction'},
+			ClientIPs => $OPTS{'ips'}
 		    }
 		    );
 		my $workdays = [map { $OPTS{$_} } grep { /^WorkDays\-?/ }  sort keys %OPTS];
@@ -277,7 +279,17 @@ sub api2_UpdateAccountClass {
     my $current = 0;
     $current = current_class_accounts($OPTS{'class'}, $cli) if $max > 0;
     if ($max > $current || $max == -1) {
-	$cli->UpdateAccountSettings($OPTS{'account'}, { ServiceClass => $OPTS{'class'} });
+	my $setting = { ServiceClass => $OPTS{'class'}, AccessModes => 'default' };
+	$cli->UpdateAccountSettings($OPTS{'account'}, $setting);
+	if ($OPTS{'restrictAccess'}) {
+	    my $defaultSetting = $cli->GetAccountEffectiveSettings($OPTS{"account"});
+	    $setting->{'AccessModes'} = $defaultSetting->{'AccessModes'};
+	    $setting->{'AccessModes'} = [27, "Mail","Relay","Signal","TLS","POP","IMAP","MAPI","AirSync","SIP","XMPP","WebMail","XIMSS","FTP","ACAP","PWD","LDAP","RADIUS","S/MIME","WebCAL","WebSite","PBX","HTTP","MobilePBX","XMedia","YMedia","MobilePronto"] if !$setting->{'AccessModes'} || $setting->{'AccessModes'} eq 'All';
+	    $setting->{'AccessModes'} = [grep {!/^Mobile$/i} @{$setting->{'AccessModes'}}];
+	} else {
+	    $settings->{'AccessModes'} = "default";
+	}
+	$cli->UpdateAccountSettings($OPTS{'account'}, $setting);
 	$cli->Logout();
 	return { msg => "Updated Successfuly." };
     } else {

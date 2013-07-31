@@ -153,8 +153,23 @@
 	  [% filter_check("WorkDays", accountDefaultPrefs.WorkDays || serverAccountPrefs.WorkDays, "Sat", locale.maketext("CGPSat")) %]
 	</td>
       </tr>    
+      <tr class="tdshade1_noborder">
+	<td nowrap="nowrap" align="RIGHT" style="width: 30%; vertical-align: top;">
+	  Client IP addresses: <br />
+	  <div style="text-align: left;">
+<em>Example:</em>
+<pre>
+10.10.12.24               ; our back-up
+10.10.13.32-10.10.13.191  ; our dial-ups
+64.173.55.169             ; our other office
+</pre>
+	  </div>
+	</td>
+	<td nowrap="nowrap">
+	  <textarea name="ips" id="ips" rows="8" cols="45">[% domainSettings.ClientIPs.replace('\\\e', "\n") %]</textarea>
+	</td>
+      </tr>    
 </td>
-<!-- <td><input type="text" name="password" id="password" style="width: 150px" tabindex="2" /></td> -->
 <td colspan="2"></td>
 </tr>
 <tr>

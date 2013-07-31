@@ -325,6 +325,9 @@
 	    [% END -%]
 	    <input type="hidden" name="account" value="[% account %]" />
 	    <p>
+	      <input type="checkbox" name="restrictAccess" id="restrictAccess-[% account %]" value="1" /><label for="restrictAccess-[% account %]">[% locale.maketext("CGPRestrictUserAccessToClientIP") %]</label>
+	    </p>
+	    <p>	      
 	      <a href="javascript:toggle_action_div(null, {id:'classes_module_[% loop.count - 1 %]', index:[% loop.count - 1 %], action:'classes'})">[% locale.maketext("CGPcancel") %]</a> [% locale.maketext("CGPor") %]
 	      <input type="submit" name="submit" value="[% locale.maketext("CGPChange") %]" class="input-button" />
 	    </p>
