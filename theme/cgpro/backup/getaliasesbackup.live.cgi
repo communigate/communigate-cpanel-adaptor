@@ -36,6 +36,7 @@ if ( $domainFound ) {
     print FO $fwd->{dest}, ": ", $fwd->{forward}, "\n";
   }
   close FO;
+  my $output;
   gzip $cpanel->cpanelprint('$homedir') .'/tmp/backupforwarders/' . $domain => \$output;
   print $output;
   unlink $cpanel->cpanelprint('$homedir') .'/tmp/backupforwarders/' . $domain;

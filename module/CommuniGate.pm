@@ -1891,21 +1891,9 @@ sub api2_ListForwardersBackups {
     my @result;
     foreach my $domain (@domains) {
 	my $accounts=$cli->ListAccounts($domain);
-	my $domainFound = 0;
-	foreach my $userName (sort keys %$accounts) {
-	    my $Rules=$cli->GetAccountMailRules("$userName\@$domain") || die "Error: ".$cli->getErrMessage.", quitting";
-	    foreach my $Rule (@$Rules) {
-		if ($Rule->[1] eq "#Redirect" && $Rule->[3]->[0]->[1] ne '' ) {
-		    push( @result, {
-			domain => $domain
-			  } );
-		    $domainFound = 1;
-		}
-		last if $domainFound;
-	    }
-	    last if $domainFound;
-	}
-        next if $domainFound;
+	push( @result, {
+	    domain => $domain
+	      } );
     }
     $cli->Logout();
     return @result;
