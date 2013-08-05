@@ -205,7 +205,9 @@ ${PACKSRC}/scripts/install_dkim_signer.pl
 # Install Active Queue Scripts
 cp ${PACKSRC}/PBXApps/*spp* /var/CommuniGate/PBXApps/
 # install Perl dependencies
-/usr/local/cpanel/bin/cpanm -f -q MIME::QuotedPrint::Perl
+if [ `perldoc -l  MIME::QuotedPrint::Perl | wc -l` == 0 ] then
+    /usr/local/cpanel/bin/cpanm -f -q MIME::QuotedPrint::Perl
+fi
 
 #################################################
 #             	  OS Specific	  	 	#
