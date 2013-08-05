@@ -24,7 +24,7 @@ for my $dom (@$domains) {
   }
 }
 
-if ( $domainFound ) {
+if ( $domainFound  && $cpanel->cpanelfeature('cgpro_backup')) {
   print "Content-type: application/x-gzip\r\n";
   print "Content-Disposition: attachment; filename=\"aliases-" .$domain . ".gz\"\r\n\r\n";
   my $fwds = $cpanel->api2( 'CommuniGate', 'listforwards', { domain => $domain } )->{cpanelresult}->{data};

@@ -2,6 +2,7 @@
 <cpanel setvar="dprefix=../">
 <cpanel Branding="include(stdheader.html)">
 <div class="body-content">
+<cpanelfeature cgpro_xmpp_roster>
   <h1><cpanel langprint="CGPRemoveBuddy"></h1>
 
   <p><?cp CommuniGate::RemoveBuddy() account=$FORM{'account'},buddy=$FORM{'buddy'} || 'maketext('The buddy could not be removed.')' ?></p>
@@ -12,5 +13,6 @@
     <p><b><cpanel print="$FORM{'name'}"></b> <cpanel langprint="CGPDeleted">.
   </cpanelif>  
   <div class="return-link"><a href="xmpp_roster.html?account=<cpanel formprint="$FORM{'account'}">">&larr; <cptext "Go Back"></a></div>
+</cpanelfeature>
 </div>
 <cpanel Branding="include(stdfooter.html)">

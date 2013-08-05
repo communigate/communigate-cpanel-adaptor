@@ -3,6 +3,7 @@
 <cpanel Branding="include(stdheader.html)">
 
  <div class="body-content">
+<cpanelfeature cgpro_autoresponders>
 <h1><cpanel langprint="ARAddautores"></h1>
 <?cp CommuniGate::SetAutoresponder() email=$FORM{'email'},domain=$FORM{'domain'},body=$FORM{'arbody'},start=$FORM{'start'},stop=$FORM{'stop'},subject=$FORM{'subject'},from=$FORM{'from'} ?>
 <cpanelif !$CPERROR{'email'} && !$appname==webmail>
@@ -36,5 +37,6 @@
 <cpanelif !$appname==webmail>
 	<div class="return-link"><a href="autores.html">&larr; <cptext "Go Back"></a></div>
 </cpanelif>
+</cpanelfeature>
 </div>
 <cpanel Branding="include(stdfooter.html)">

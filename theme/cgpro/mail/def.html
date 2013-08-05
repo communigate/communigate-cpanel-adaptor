@@ -2,14 +2,10 @@
 <cpanel setvar="dprefix=../">
 <cpanel setvar="headerinclude=mail/pops_head.html">
 <cpanel Branding="include(stdheader.html)">
-    
-<cpanelfeature popaccts>
-
-  	<cpanelif $FORM{'setdefault'}>
+<cpanelfeature cgpro_defaultemailacct>
+      	<cpanelif $FORM{'setdefault'}>
 		<?cp CommuniGate::SetDefAddress() domain=$FORM{'domain'},action=$FORM{'actionoption'},fwdmail=$FORM{'CGPForwardAddress'} ?>
         </cpanelif>
-
-</cpanelfeature>
 
 <div class="body-content">
 
@@ -21,18 +17,6 @@
 <p class="description"><cpanel langprint="CGPEMDefaultDesc"></p>
 <br />
     
-
-<cpanelfeature !popaccts> 
-    <style text="text/css">
-    .disable,.input-button,.popselect,.expbox { display:none }
-    </style>
-</cpanelfeature>
-
-
-
-
-
-<cpanelfeature popaccts>
  <table border="0" cellpadding="0" width="98%" cellspacing="0" class="sortable truncate-table" id="mailtbl">
         <thead>
     <tr>
@@ -73,8 +57,6 @@
        </tbody>
     </table>
 </cpanelfeature>
-
-
 
 </div><!-- end body-content div -->
 

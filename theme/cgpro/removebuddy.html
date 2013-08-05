@@ -2,6 +2,7 @@
 <cpanel setvar="dprefix=../">
 <cpanel Branding="include(stdheader.html)">
 <div class="body-content">
+<cpanelfeature cgpro_xmpp_roster>
   <h1><cpanel langprint="CGPRemoveBuddy"></h1>
   <p><cpanel Locale="maketext('Are you sure you want to remove buddy "[_1]" ?',$FORM{'buddy'})"></p>
   <p> 
@@ -10,6 +11,7 @@
   </p>
   <div class="return-link"><a href="xmpp_roster.html?account=<cpanel formprint="$FORM{account'}">">&larr; <cptext "Go Back"></a></div>
 </div>
+</cpanelfeature>
 </div><!-- end body-content div -->
 
 <cpanel Branding="include(stdfooter.html)">

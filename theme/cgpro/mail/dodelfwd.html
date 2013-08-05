@@ -2,6 +2,7 @@
 <cpanel setvar="dprefix=../">
 <cpanel Branding="include(stdheader.html)">
 <div class="body-content">
+<cpanelfeature cgpro_forwardersemail>	
 <h1><cpanel langprint="FWMaint"></h1>
 
 <p><?cp CommuniGate::delforward() forwarder=$FORM{'emaildest'},account=$FORM{'email'} || 'maketext('The forwarder could not be removed.')' ?></p>
@@ -19,6 +20,6 @@
 <cpanelif !$appname==webmail>
 		 <div class="return-link"><a href="fwds.html">&larr; <cptext "Go Back"></a></div>
 </cpanelif>
-
+</cpanelfeature>
 </div>
 <cpanel Branding="include(stdfooter.html)">

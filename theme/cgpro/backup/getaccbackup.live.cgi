@@ -22,8 +22,7 @@ for my $dom (@$domains) {
     last;
   }
 }
-
-if ( $domainFound ) {
+if ( $domainFound && $cpanel->cpanelfeature('cgpro_backup')) {
   print "Content-type: text/csv\r\n";
   print "Content-Disposition: attachment; filename=\"emails-" .$domain . ".csv\"\r\n\r\n";
   my $csv = Text::CSV->new ( { binary => 1 } );

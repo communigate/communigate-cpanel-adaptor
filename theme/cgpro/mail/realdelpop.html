@@ -5,7 +5,7 @@
 <?cp Branding::spritelist(.spriteicon_img_mini {float:left;margin-right:5px;background: url\{leftparenthesis}"%"\{rightparenthesis};} %,@spriteurl,images::#icon-${img}_mini {background-position\{colon}0 -${cssposition}px;width\{colon}${width}px;height\{colon}${height}px; }:) imgtype=icon,subtype=img,method=scale_60percent,format=png,img=manageaccounts ?>
 </style>
 <div class="body-content">
-
+<cpanelfeature cgpro_groupware>
 <div class="h1Title"><div class="spriteicon_img_mini" id="icon-manageaccounts_mini"></div> <cpanel langprint="MENUMailmaint"></div>
  
 <h2><cpanel langprint="EADeleted"></h2>
@@ -14,5 +14,6 @@
 <?cp Email::delpop() email=$FORM{'email'},domain=$FORM{'domain'},flag=0 ?>
  
 <div class="return-link"><a href="overview_accounts.html">&larr; <cptext "Go Back"></a></div>
+</cpanelfeature>
 </div>
 <cpanel Branding="include(stdfooter.html)">

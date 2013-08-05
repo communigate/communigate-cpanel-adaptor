@@ -2,6 +2,7 @@
 <cpanel setvar="dprefix=../">
 <cpanel Branding="include(stdheader.html)">
 <div class="body-content">
+<cpanelfeature cgpro_forwardersemail>	
 <h1><cpanel langprint="FWAddanew"></h1>
 
 <p><?cp CommuniGate::addforward($LANG{'FWAddedTextPreSource'} [b]%[/b] $LANG{'FWAddedTextPreTarget'} [b]%[/b].[br /],email,forward) email=$FORM{'email'},domain=$FORM{'domain'},fwdopt=$FORM{'fwdopt'},failmsgs=$FORM{'failmsgs'},pipefwd=$FORM{'pipefwd'},fwdemail=$FORM{'fwdemail'},fwdsystem=$FORM{'fwdsystem'} || 'maketext('The forwarder could not be added.')' ?></p>
@@ -56,5 +57,6 @@
 		 <div class="return-link"><a href="fwds.html">&larr; <cptext "Go Back"></a></div>
 </cpanelif>
 
+</cpanelfeature>	
 </div>
 <cpanel Branding="include(stdfooter.html)">

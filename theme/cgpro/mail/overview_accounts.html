@@ -172,7 +172,7 @@ var ACCOUNTS = [];
 <div class="body-content">
 <h1><cpanel langprint="CGPGWAccounts"></h1>
 
-<cpanelfeature popaccts>
+<cpanelfeature cgpro_groupware>
   <cpanelif $FORM{'class'}>
     <p>
       <?cp CommuniGate::UpdateAccountClass(%, msg) account=$FORM{'account'}, class=$FORM{'class'} ?>
@@ -183,14 +183,9 @@ var ACCOUNTS = [];
     <cpanel include="popsinclude.html">
   </form>
   <br />
-</cpanelfeature>
-
-<cpanelfeature popaccts>
-
   <?cptt CommuniGate::AccountsOverview(cgpro/mail/overview_accounts.tmpl) ?>
 
 </cpanelfeature>
-
 </div><!-- end body-content div -->
 
 <div id="menus_div"></div>
