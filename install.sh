@@ -199,7 +199,8 @@ cp ${PACKSRC}/tools/helper_DKIM_verify.pl /var/CommuniGate/
 ${PACKSRC}/scripts/install_dkim_signer.pl
 
 # install Perl dependencies
-if [ `perldoc -l  MIME::QuotedPrint::Perl | wc -l` == 0 ] then
+if [ `perldoc -l  MIME::QuotedPrint::Perl | wc -l` == 0 ]
+then
     /usr/local/cpanel/bin/cpanm -f -q MIME::QuotedPrint::Perl
 fi
 

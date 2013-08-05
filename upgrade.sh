@@ -171,7 +171,8 @@ rm -rf /usr/local/cpanel/whostmgr/docroot/cgi/cgpro*
 cp -rf ${PACKSRC}/whm/cgi/* /usr/local/cpanel/whostmgr/docroot/cgi/
 
 # install Perl dependencies
-if [ `perldoc -l  MIME::QuotedPrint::Perl | wc -l` == 0 ] then
+if [ `perldoc -l  MIME::QuotedPrint::Perl | wc -l` == 0 ]
+then
     /usr/local/cpanel/bin/cpanm -f -q MIME::QuotedPrint::Perl
 fi
 
