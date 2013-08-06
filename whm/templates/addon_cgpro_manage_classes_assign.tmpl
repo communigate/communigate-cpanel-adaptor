@@ -117,9 +117,6 @@
 		<tr class="tdshade[% loop.count % 2 ? 1 : 2 %]_noborder">
 		  <td>[% class %]</td>
 		  <td>
-		    <input type="text" name="[% class %]-free" value="[% domain_data.$class.free.defined ? domain_data.$class.free : -1 %]" />
-		  </td>
-		  <td>
 		    <input type="text" name="[% class %]-all" value="[% domain_data.$class.all.defined ? domain_data.$class.all : -1 %]" />
 		  </td>
 		</tr>
@@ -128,8 +125,7 @@
 	      <thead>
 		<tr>
 		  <th>Class name</th>
-		  <th>Free Accounts max. (-1 for unlimited)</th>
-		  <th>All Accounts max. (-1 for unlimited)</th>
+		  <th>Accounts max. (-1 for unlimited)</th>
 		</tr>
 	      </thead>
 	      [% ELSE -%]

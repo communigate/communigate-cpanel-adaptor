@@ -2,7 +2,5 @@
 default:
   Premium:
     all: 5
-    free: 5
   Standard:
     all: -1
-    free: -1
