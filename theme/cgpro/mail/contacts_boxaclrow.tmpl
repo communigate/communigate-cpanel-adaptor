@@ -8,6 +8,9 @@
       [% FOR account IN accounts.keys.grep(CPANEL.CPVAR.domain _ '$').sort %]
       [% filter_option(acl, account.split("@").0, account _ (domain ? '@' _ domain : '') ) %]
       [% END %]
+      [% FOR account IN groups.keys.grep(CPANEL.CPVAR.domain _ '$').sort %]
+      [% filter_option(acl, '#' _ account.split("@").0, account _ (domain ? '@' _ domain : '') ) %]
+      [% END %]
     </select>
   </td>
   <td style="padding: 10px;">

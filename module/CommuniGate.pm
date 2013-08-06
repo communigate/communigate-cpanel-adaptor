@@ -2729,6 +2729,11 @@ sub api2_EditContactsBox {
 	foreach my $userName (sort keys %$accounts) {
 	    $return->{accounts}->{"$userName\@$domain"} = 1;
 	}
+	my $groups=$cli->ListGroups($domain);
+	foreach $groupName (sort @$groups) {
+	    $return->{groups}->{"$groupName\@$domain"} = 1;
+	}
+
     }
     my $cli = getCLI();
     return $return;
