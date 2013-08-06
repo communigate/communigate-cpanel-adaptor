@@ -8,6 +8,7 @@
   <cpanelif $FORM{'account'}>
     <?cptt CommuniGate::AccountsOverview(cgpro/importlocalroster.tmpl) account=$FORM{'account'} || '[tr][td colspan="5" class="errors"]$LANG{'CGPNoContacts'}.[/td][/tr]' ?>
   </cpanelif>
+    <div class="return-link"><a href="xmpp_roster.html?account=<cpanel formprint="$FORM{account'}">">&larr; <cptext "Go Back"></a></div>
 </cpanelfeature>
 </div><!-- end body-content div -->
 
