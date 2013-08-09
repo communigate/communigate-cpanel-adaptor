@@ -2,6 +2,7 @@
 <cpanel setvar="dprefix=../">
 <cpanel Branding="include(stdheader.html)">
 <div class="body-content">
+  <cpanelfeature cgpro_caller_queues>
 <h1><cpanel langprint="CGPCallerQueues"></h1>
 <p><cpanel Locale="maketext('Are you sure you want to delete queue "[_1]" ?',$FORM{'name'})"></p>
 <p> 
@@ -9,5 +10,6 @@
   <a class="cancel_link" href="queues.html"><cpanel Locale="maketext('CGPcancel')"></a>
 </p>
 <div class="return-link"><a href="queues.html">&larr; <cptext "Go Back"></a></div>
+  </cpanelfeature>
 </div>
 <cpanel Branding="include(stdfooter.html)">

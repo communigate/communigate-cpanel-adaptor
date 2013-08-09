@@ -2,6 +2,7 @@
 <cpanel setvar="dprefix=../">
 <cpanel Branding="include(stdheader.html)">
 <div class="body-content">
+  <cpanelfeature cgpro_ivr>
   <h1><cpanel langprint="CGPIVRConfiguration"></h1>
 
   <p><?cp CommuniGate::DeleteIVR() ivr=$FORM{'ivr'}, domain=$FORM{'domain'} || 'maketext('The IVR menu could not be removed.')' ?></p>
@@ -12,5 +13,6 @@
     <p><b><cpanel print="$FORM{'name'}"></b> is <cpanel langprint="CGPDeleted">.
   </cpanelif>  
   <div class="return-link"><a href="ivr.html">&larr; <cptext "Go Back"></a></div>
+  </cpanelfeature>
 </div>
 <cpanel Branding="include(stdfooter.html)">

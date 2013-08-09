@@ -2,6 +2,7 @@
 <cpanel setvar="dprefix=../">
 <cpanel Branding="include(stdheader.html)">
 <div class="body-content">
+  <cpanelfeature cgpro_call_rules>
   <h1><cpanel langprint="CGPIncoming calls rules"></h1>
   <form action="doaddcallrule.html" method="post">
     <?cptt CommuniGate::updateSignalRule(cgpro/addcallrule.tmpl) therule=$FORM{rule},domain=$FORM{domain} ?>
@@ -12,6 +13,7 @@
       <a href="call_rules.html">&larr; <cptext "Go Back"></a>
     </div>
   </form>
+  </cpanelfeature>
 </div> <!-- END body-content -->
 <script type="text/javascript">
 //<![CDATA[

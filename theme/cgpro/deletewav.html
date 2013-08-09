@@ -2,6 +2,7 @@
 <cpanel setvar="dprefix=../">
 <cpanel Branding="include(stdheader.html)">
 <div class="body-content">
+  <cpanelfeature cgpro_sounds_manager>
 <h1><cpanel langprint="CGPSoundsManager"></h1>
 <p><cpanel Locale="maketext('Are you sure you want to delete sound "[_1]" ?',$FORM{'file'})"></p>
 <p> 
@@ -9,5 +10,6 @@
   <a class="cancel_link" href="soundsmanager.html?domain=<cpanel print="$FORM{'domain'}">"><cpanel Locale="maketext('CGPcancel')"></a>
 </p>
 <div class="return-link"><a href="soundsmanager.html?domain=<cpanel print="$FORM{'domain'}">">&larr; <cptext "Go Back"></a></div>
+  </cpanelfeature>
 </div>
 <cpanel Branding="include(stdfooter.html)">

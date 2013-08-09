@@ -2,6 +2,7 @@
 <cpanel setvar="dprefix=../">
 <cpanel Branding="include(stdheader.html)">
 <div class="body-content">
+  <cpanelfeature cgpro_sounds_manager>
   <h1><cpanel langprint="CGPSoundsManager"></h1>
   <div class="highlight2">
     <form action="doaddlanguage.html?domain=<cpanel print="$FORM{'domain'}">" method="post" enctype="multipart/form-data">
@@ -18,6 +19,7 @@
   <div class="return-link">
     <a href="soundsmanager.html?domain=<cpanel print="$FORM{'domain'}">">&larr; <cptext "Go Back"></a>
   </div>
+  </cpanelfeature>
 </div> <!-- END body-content -->
 <cpanel Branding="include(stdfooter.html)">
   <script type="text/javascript">

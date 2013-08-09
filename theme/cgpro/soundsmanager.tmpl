@@ -74,6 +74,7 @@
     <tr>
       <td class="sorttable_nosort">[% language %]</td>
       <td>
+	<a href="updatewavs.html?domain=[% domain %]&amp;lang=[% language %]">[% locale.maketext("CGPBatchUpdateWav") %]</a>
 	[% IF langs.$language == "domain" -%]
 	<a href="deletelanguage.html?domain=[% domain %]&amp;lang=[% language %]">[% locale.maketext("BrandingDPackage") %]</a>
 	[% END -%]

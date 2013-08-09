@@ -1,6 +1,7 @@
 <cpanel setvar="headerimg=../images/mailmenu.gif">
 <cpanel setvar="dprefix=../">
 <cpanel Branding="include(stdheader.html)">
+  <cpanelfeature cgpro_departments>
 <cpanelif $FORM{'itemsperpage'}>
 	<cpanel setvar="itemsperpage=$FORM{'itemsperpage'}">
 </cpanelif>
@@ -129,3 +130,4 @@ var init_lists = function() {
 </div><!-- end body-content -->
 
 <cpanel Branding="include(stdfooter.html)">
+  </cpanelfeature>

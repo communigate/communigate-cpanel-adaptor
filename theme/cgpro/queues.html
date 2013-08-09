@@ -2,6 +2,7 @@
 <cpanel setvar="dprefix=../">
 <cpanel Branding="include(stdheader.html)">
 <div class="body-content">
+  <cpanelfeature cgpro_caller_queues>
   <div class="h1Title"><cpanel langprint="CGPCallerQueues"></div>
 
   <p><a class="create-button" href="addqueue.html"><cpanel langprint="CGPCreateQueue"></a></p>
@@ -27,6 +28,7 @@
 	 ,*num,name,department,queue,queue,name) domain=$FORM{'domain'},regex=$FORM{'searchregex'},api2_paginate=1,api2_paginate_start=$FORM{'api2_paginate_start'},api2_paginate_size=$CPVAR{'itemsperpage'} || '[tr][td colspan="5" class="errors"]$LANG{'CGPNoQeueues'}.[/td][/tr]' ?>
 
   </table>
+  </cpanelfeature>
 </div><!-- end body-content -->
 
 <cpanel Branding="include(stdfooter.html)">

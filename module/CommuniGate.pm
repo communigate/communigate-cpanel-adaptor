@@ -116,7 +116,7 @@ sub api2_AccountsOverview {
 	foreach my $domain (@domains) {
 	    my $accounts=$cli->ListAccounts($domain);
 	    foreach my $userName (sort keys %$accounts) {	
-		next if $userName eq 'pbx';
+		next if $userName eq 'pbx' || $userName eq 'ivr';
 		my $accountData = $cli->GetAccountEffectiveSettings("$userName\@$domain");
 		my $accountStats = $cli->GetAccountStat("$userName\@$domain");
 		my $service = @$accountData{'ServiceClass'} || '';
@@ -3108,11 +3108,12 @@ sub api2_EditContactsBox {
 	}
 	my $accounts = $cli->ListAccounts($domain);
 	foreach my $userName (sort keys %$accounts) {
+	    next if $userName eq 'pbx' || $userName eq 'ivr';
 	    $return->{accounts}->{"$userName\@$domain"} = 1;
 	}
-	my $groups=$cli->ListGroups($domain);
+	my $groups = $cli->ListGroups($domain);
 	foreach $groupName (sort @$groups) {
-	    $return->{groups}->{"$groupName\@$domain"} = 1;
+	    $return->{groups}->{"$groupName\@$domain"} = $cli->GetGroup("$groupName\@$domain");
 	}
 
     }
@@ -3735,8 +3736,6 @@ sub api2_AddQueue {
 		if ($forwarder =~ /^\d{3}$/) {
 		    $localExtension = $forwarder if $fwd eq "activequeue_" . $department;
 		    $agentExtension = $forwarder if $fwd eq "activequeuetoggle_" . $department;
-		} else {
-		    print $fwd;
 		}
 	    }
 	}
@@ -4050,7 +4049,6 @@ sub api2_ListSounds {
     my $domainLangs = {map {$_ => 'domain'} grep {! (keys %{$files->{$_}})[0]} grep {!/\./} sort keys %$domainFiles}; 
     my $serverLangs = {map {$_ => 'server'} grep {! (keys %{$files->{$_}})[0]} grep {!/\./} sort keys %$serverFiles}; 
     %{$result->{languages}} = (%{$result->{languages}}, %$serverLangs, %$domainLangs);
-
     for my $lang (keys %{$result->{languages}}) {
 	my $files = $cli->ListStockPBXFiles($lang);
 	$result->{sounds}->{$lang} = {map {$_ => 'stock'} grep {/\.wav$/} keys %$files};
@@ -4063,8 +4061,9 @@ sub api2_ListSounds {
     $result->{domain} = $domain;
     $result->{domains} = \@domains;
     $result->{langs} = $result->{languages};
+    $result->{langs}->{'english'} = "stock";
+    $result->{langs}->{'english'} = "domain" if keys %$domainSounds;
     $result->{languages} = [sort keys %{$result->{languages}}];
-    unshift @{$result->{languages}}, 'english';
     $cli->Logout();
     return $result;
 }
@@ -4098,6 +4097,21 @@ sub api2_UploadFile {
 	$Cpanel::CPVAR{"filename"} =~ s/^file-//;
 	$Cpanel::CPVAR{"filepath"} = $Cpanel::FORM{$file};
         last;
+    }
+    return 1;
+}
+sub api2_UploadFiles {
+    local $Cpanel::IxHash::Modify = 'none';
+    $Cpanel::CPVAR{"filenames"} = [];
+    $Cpanel::CPVAR{"filepaths"} = [];
+  FILE:
+    foreach my $file ( keys %Cpanel::FORM ) {
+        next FILE if $file =~ m/^file-(.*)-key$/;
+        next FILE if $file !~ m/^file-(.*)/;
+	my $filename = $file;
+ 	$filename =~ s/^file-//;
+	push @{$Cpanel::CPVAR{"filenames"}}, $filename;
+	push @{$Cpanel::CPVAR{"filepaths"}}, $Cpanel::FORM{$file};
     }
     return 1;
 }
@@ -4158,6 +4172,43 @@ sub api2_UpdateWav {
     return $result;
 }
 
+sub api2_UpdateWavs {
+    my %OPTS = @_;
+    my @domains = Cpanel::Email::listmaildomains();
+    my $domain = $domains[0];
+    $domain = $OPTS{'domain'} if $OPTS{'domain'};
+    my $cli = getCLI();
+    my $result;
+    foreach my $dom (@domains) {
+	if ($dom eq $domain) {
+	    for (my $i = 0; $i <= $#{$Cpanel::CPVAR{"filepaths"}}; $i++) {
+		if ($Cpanel::CPVAR{"filepaths"}->[$i] && $Cpanel::CPVAR{"filenames"}->[$i] =~ m/\.wav/i ) {
+		    my $buffer;
+		    my $address = 0;
+		    my $filedata;
+		    open(FI, "<", $Cpanel::CPVAR{"filepaths"}->[$i]);
+		    binmode FI;
+		    while ( read( FI, $buffer, 16 ) ) {
+			$filedata .= $buffer;
+			$address += 16;
+		    }
+		    close FI;
+		    my $filename = $Cpanel::CPVAR{"filenames"}->[$i];
+		    $filename = $OPTS{'lang'} . "/" .  $filename if $OPTS{'lang'} && $OPTS{'lang'} ne 'english';
+		    $cli->StoreDomainPBXFile($domain, $filename, encode_base64($filedata, ""));
+		    $Cpanel::CPERROR{'CommuniGate'} = $cli->getErrMessage unless ($cli->getErrMessage eq "OK");
+		} else {
+		    $Cpanel::CPERROR{'CommuniGate'} = "Error!";
+		}
+	    }
+	    last;
+	}
+    }
+    unlink $Cpanel::CPVAR{"filepath"};
+    $cli->Logout();
+    return $result;
+}
+
 sub api2_DeleteLanguage {
     my %OPTS = @_;
     my @domains = Cpanel::Email::listmaildomains();
@@ -4167,7 +4218,13 @@ sub api2_DeleteLanguage {
     my $result;
     foreach my $dom (@domains) {
 	if ($dom eq $domain && $OPTS{'lang'}) {
-	    $cli->DeleteDomainPBX($domain, $OPTS{'lang'});
+	    $OPTS{'lang'} = undef if $OPTS{'lang'} eq 'english';
+	    my $domainFiles = $cli->ListDomainPBXFiles($domain, $OPTS{'lang'});
+	    for my $file (keys %$domainFiles) {
+		$file = $OPTS{'lang'} . "/" .  $file if $OPTS{'lang'} && $OPTS{'lang'} ne 'english';
+		$cli->DeleteDomainPBXFile($domain, $file);
+	    }
+	    $cli->DeleteDomainPBX($domain, $OPTS{'lang'}) if $OPTS{'lang'};
 	    $Cpanel::CPERROR{'CommuniGate'} = $cli->getErrMessage unless ($cli->getErrMessage eq "OK");
 	    last;
 	}

@@ -5,10 +5,11 @@
   <cpanelfeature cgpro_sounds_manager>
   <h1><cpanel langprint="CGPSoundsManager"></h1>
   <div class="highlight2">
-    <form action="doupdatewav.html?domain=<cpanel print="$FORM{'domain'}">&amp;lang=<cpanel print="$FORM{'lang'}">&amp;file=<cpanel print="$FORM{'file'}">" method="post" enctype="multipart/form-data">
+    <form action="doupdatewavs.html?domain=<cpanel print="$FORM{'domain'}">&amp;lang=<cpanel print="$FORM{'lang'}">&amp;file=<cpanel print="$FORM{'file'}">" method="post" enctype="multipart/form-data">
+      <p><cpanel langprint="CGPSelectMultipeFiles">:</p>
       <p>
-	<lable><cpanel langprint="CGPFile">:</lable>
-	<input type="file" name="sound" id="sound" />
+	<lable><cpanel langprint="CGPFiles">:</lable>
+	<input type="file" name="sound" id="sound" multiple="" />
 	<span id="sound_error" class="cjt_validation_error">
       </p>
       <p>

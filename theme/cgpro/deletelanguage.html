@@ -2,12 +2,15 @@
 <cpanel setvar="dprefix=../">
 <cpanel Branding="include(stdheader.html)">
 <div class="body-content">
+  <cpanelfeature cgpro_sounds_manager>
 <h1><cpanel langprint="CGPSoundsManager"></h1>
 <p><cpanel Locale="maketext('Are you sure you want to delete language "[_1]" ?',$FORM{'lang'})"></p>
+<p><strong><cpanel Locale="maketext('Warning!!! This will delete all local audio files for [_1] language!', $FORM{'lang'})"></strong></p>
 <p> 
   <a class="create-button" href="dodeletelanguage.html?lang=<cpanel formprint="$FORM{'lang'}">&domain=<cpanel formprint="$FORM{'domain'}">"><cpanel Locale="maketext('CGPDelete')"></a> 
   <a class="cancel_link" href="soundsmanager.html?domain=<cpanel print="$FORM{'domain'}">"><cpanel Locale="maketext('CGPcancel')"></a>
 </p>
 <div class="return-link"><a href="soundsmanager.html?domain=<cpanel print="$FORM{'domain'}">">&larr; <cptext "Go Back"></a></div>
+  </cpanelfeature>
 </div>
 <cpanel Branding="include(stdfooter.html)">

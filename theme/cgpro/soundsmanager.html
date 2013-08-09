@@ -3,8 +3,10 @@
 <cpanel Branding="include(stdheader.html)">
   <!-- <?cp Email::listmaildomains(,) ?> -->
 <div class="body-content">
+  <cpanelfeature cgpro_sounds_manager>
   <div class="h1Title"><cpanel langprint="CGPSoundsManager"></div>
     <?cptt CommuniGate::ListSounds(cgpro/soundsmanager.tmpl) domain=$FORM{'domain'} ?>
+  </cpanelfeature>
 </div><!-- end body-content -->
 
 <cpanel Branding="include(stdfooter.html)">

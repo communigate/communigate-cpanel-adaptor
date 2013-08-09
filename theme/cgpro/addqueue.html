@@ -8,6 +8,7 @@ LANG.local_extension_input_invalid = "<cptext 'CGPLocalExtensionInvalid','{min}'
   </script>
 
 <div class="body-content">
+  <cpanelfeature cgpro_caller_queues>
   <h1><cpanel langprint="CGPCallerQueues"></h1>
   <form action="doaddqueue.html" method="post">
     <?cptt CommuniGate::AddQueue(cgpro/addqueue.tmpl) queue=$FORM{'queue'} ?>
@@ -18,5 +19,6 @@ LANG.local_extension_input_invalid = "<cptext 'CGPLocalExtensionInvalid','{min}'
       <a href="queues.html">&larr; <cptext "Go Back"></a>
     </div>
   </form>
+  </cpanelfeature>
 </div> <!-- END body-content -->
 <cpanel Branding="include(stdfooter.html)">

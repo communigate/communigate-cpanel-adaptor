@@ -4,12 +4,13 @@
   <div class="body-content">
   <cpanelfeature cgpro_sounds_manager>
     <h1><cpanel langprint="CGPSoundsManager"></h1>
-      <p><?cp CommuniGate::AddLanguage(%,msg) domain=$FORM{'domain'},lang=$FORM{'lang'} ?></p>
+      <!-- <?cp CommuniGate::UploadFiles(%,msg) file=$FORM{'sound'} ?> -->
+      <p><?cp CommuniGate::UpdateWavs(%,msg) domain=$FORM{'domain'},lang=$FORM{'lang'} ?></p>
       <cpanelif $CPERROR{'CommuniGate'}>
 	<p><cpanel langprint="CGPError">: <em><cpanel print="$CPERROR{'CommuniGate'}">!</em></p>
       </cpanelif>
       <cpanelif !$CPERROR{'CommuniGate'}>
-	<p><cpanel langprint="CGPLanguageAdded">!</p>
+	<p><cpanel langprint="CGPSoundUpdated">!</p>
       </cpanelif>
 
     <div class="return-link">

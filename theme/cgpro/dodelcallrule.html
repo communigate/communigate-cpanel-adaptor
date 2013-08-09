@@ -2,8 +2,10 @@
 <cpanel setvar="dprefix=../">
 <cpanel Branding="include(stdheader.html)">
 <div class="body-content">
+  <cpanelfeature cgpro_call_rules>
   <h1><cpanel langprint="CGPIncoming calls rules"></h1>
   <p><?cp CommuniGate::delSignalRule(%,msg) rule=$FORM{rule},domain=$FORM{domain} ?></p>
   <div class="return-link"><a href="call_rules.html">&larr; <cptext "Go Back"></a></div>
+  </cpanelfeature>
 </div>
 <cpanel Branding="include(stdfooter.html)">

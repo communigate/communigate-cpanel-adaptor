@@ -2,6 +2,7 @@
 <cpanel setvar="dprefix=../">
 <cpanel Branding="include(stdheader.html)">
 <div class="body-content">
+  <cpanelfeature cgpro_call_rules>
   <h1><cpanel langprint="CGPIncoming calls rules"></h1>
   <p><cpanel Locale="maketext('Are you sure you want to delete rule "[_1]"?',$FORM{'rule'})"></p>
   <p> 
@@ -9,5 +10,6 @@
     <a class="cancel_link" href="call_rules.html"><cpanel Locale="maketext('CGPcancel')"></a>
   </p>
   <div class="return-link"><a href="call_rules.html">&larr; <cptext "Go Back"></a></div>
+  </cpanelfeature>
 </div>
 <cpanel Branding="include(stdfooter.html)">

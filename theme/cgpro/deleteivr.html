@@ -2,6 +2,7 @@
 <cpanel setvar="dprefix=../">
 <cpanel Branding="include(stdheader.html)">
 <div class="body-content">
+  <cpanelfeature cgpro_ivr>
 <h1><cpanel langprint="CGPIVRConfiguration"></h1>
 <p><cpanel Locale="maketext('Are you sure you want to delete IVR Menu "[_1]" ?',$FORM{'name'})"></p>
 <p> 
@@ -9,5 +10,6 @@
   <a class="cancel_link" href="ivr.html"><cpanel Locale="maketext('CGPcancel')"></a>
 </p>
 <div class="return-link"><a href="ivr.html">&larr; <cptext "Go Back"></a></div>
+  </cpanelfeature>
 </div>
 <cpanel Branding="include(stdfooter.html)">
