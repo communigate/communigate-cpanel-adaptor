@@ -1,0 +1,16 @@
+<cpanel setvar="headerimg=../images/mailmenu.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+<div class="body-content">
+  <h1><cpanel langprint="CGPCallerQueues"></h1>
+
+  <p><?cp CommuniGate::DeleteExtension() extension=$FORM{'queue'} || 'maketext('The queue could not be removed.')' ?></p>
+  <cpanelif $CPERROR{'CommuniGate'}>
+    <p><cpanel print="$CPERROR{'CommuniGate'}"></p>
+  </cpanelif>
+  <cpanelif !$CPERROR{'CommuniGate'}>
+    <p><b><cpanel print="$FORM{'name'}">'s</b> <cpanel langprint="CGPDeleted">.
+  </cpanelif>  
+  <div class="return-link"><a href="queues.html">&larr; <cptext "Go Back"></a></div>
+</div>
+<cpanel Branding="include(stdfooter.html)">

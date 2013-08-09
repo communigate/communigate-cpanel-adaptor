@@ -1,0 +1,98 @@
+// ================================================== //
+//           Passive Queue: Caller loop               //
+//                                                    //
+// Version 1.0                                        //
+// Copyright (c) 2005-2007, Stalker Software, Inc.    //
+// ================================================== //
+//
+// Description:
+//    Users are placed into the specified Queue and they are
+//    informed about their Queue positions.
+//    A user can abandon waiting by pressing "#" or
+//     by disconnecting
+//
+// The function returns either a BridgeStart Event
+//    (if a brigde request from an agent serving the queue
+//     has been received)
+// Or null if the user has abandoned waiting or an error occured
+//
+procedure playNumber(theNumber) external;
+function tryToCallAgents(groupN) forward;
+
+function activeQueueCaller(queueName,announce,holdFileName,groupName) is
+  queueInfo = Enqueue(queueName,RemoteURI(),null);
+  loop
+    ClearDTMF();
+    if queueInfo == null or else queueInfo.position == null then
+      PlayFile("Failure"); return null;
+    end if;
+    if announce != null then
+      PlayFile("QueuePosition");
+      playNumber(queueInfo.position+1);
+    end if;
+
+    if holdFileName != null then
+      PlayFileInLoop("HoldMusic",15000); input = ReadInput(0);
+    else
+       input = ReadInput(15);
+    end if;
+    if input == null then
+      PlayFile("ThankYouForWaiting");
+      input = tryToCallAgents(groupName)? "#": ReadInput(0);
+    end if;
+  exitif IsDictionary(input) or else input == "#";
+    queueInfo = CheckQueue(queueName);
+    clearDTMF();
+    // if we are not in queue any more (queueInfo == null)
+    // we are SUPPOSED to get an event "right now",
+    // just wait for it (up to 10 secs)
+    input = ReadInput(queueInfo == null ? 10 : 0);
+  exitif IsDictionary(input) or else input == "#";
+  end loop;
+
+  if IsStartBridgeEvent(input) then return input; end if;
+
+  Dequeue(queueName);
+
+  if IsDictionary(input) and then not IsDisconnectEvent(input) then 
+    PlayFile("Failure");
+  end if;
+  return null;
+end function;
+
+function findFreeAgents(groupN) external;
+function callerLeg(parameters,callPending) external;
+function callerLegBridge(parameters,peerLeg) external;
+function bridgedLoopHash(peerLeg) external;
+
+function tryToCallAgents(groupN) is
+  agents = findFreeAgents(groupN);
+  Syslog("Agents: " + ObjectToString(agents));
+  if not agents then return false; end if;
+  callParams = NewDictionary();
+  callParams.("")        = (isArray(agents)? agents[0]: agents) + ";services=no";
+  callParams.activeSide  = true;
+  callParams.callBridged = true;    // no bridging, so we generate ringbacks locally
+  callParams.("Expires") = 10;
+  if impersonateCaller then
+    callParams.From        = RemoteURI();
+    callParams.impersonate = SIPURIToEmail(RemoteURI());
+  end if;
+
+  // copy the callID from Task vars, adding ".relay" to it.
+  callParams.("Call-ID") = Vars().("Call-ID") + ".relay-q";
+
+  callParams.referMode   = "peer"; 
+  peerLeg = callerLeg(callParams,false);
+  if !IsTask(peerLeg) then return(false); end if;
+
+  while bridgedLoopHash(peerLeg) == "#" loop
+    void(BreakBridge());
+    PlayFile("Done");
+    if callerLegBridge(callParams,peerLeg) != null then
+      void(SendEvent(peerLeg,"stop",null));
+      PlayFile("Failure"); return(true);
+    end if;
+  end loop;
+  return  true;
+end function;

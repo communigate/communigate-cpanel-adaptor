@@ -1,0 +1,22 @@
+<cpanel setvar="headerimg=../images/mailmenu.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+  <script type="text/javascript">
+var LANG = {};
+LANG.local_extension_input = "<cpanel langprint="CGPLocalExtension">";
+LANG.local_extension_input_invalid = "<cptext 'CGPLocalExtensionInvalid','{min}', '{max}'>";
+  </script>
+
+<div class="body-content">
+  <h1><cpanel langprint="CGPCallerQueues"></h1>
+  <form action="doaddqueue.html" method="post">
+    <?cptt CommuniGate::AddQueue(cgpro/addqueue.tmpl) queue=$FORM{'queue'} ?>
+    <p style="text-align: center;">
+      <input type="submit" id="activate-button" name="submit" value="<cpanel langprint="CGPSave">" class="input-button" />
+    </p>
+    <div class="return-link">
+      <a href="queues.html">&larr; <cptext "Go Back"></a>
+    </div>
+  </form>
+</div> <!-- END body-content -->
+<cpanel Branding="include(stdfooter.html)">

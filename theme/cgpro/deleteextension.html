@@ -1,0 +1,13 @@
+<cpanel setvar="headerimg=../images/mailmenu.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+<div class="body-content">
+<h1><cpanel langprint="FWMaint"></h1>
+<p><cpanel Locale="maketext('Are you sure you want to delete extension "[_1]" ?',$FORM{'display'})"></p>
+<p> 
+  <a class="create-button" href="dodeleteextension.html?extension=<cpanel formprint="$FORM{'extension'}">&display=<cpanel formprint="$FORM{'display'}">"><cpanel Locale="maketext('CGPDelete')"></a> 
+  <a class="cancel_link" href="extensions.html"><cpanel Locale="maketext('CGPcancel')"></a>
+</p>
+<div class="return-link"><a href="extensions.html">&larr; <cptext "Go Back"></a></div>
+</div>
+<cpanel Branding="include(stdfooter.html)">

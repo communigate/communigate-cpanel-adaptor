@@ -29,6 +29,7 @@ then
 fi
 ln -s /usr/local/cpanel/perl/CLI.pm /usr/local/lib/perl5/`perl -v | grep 'This is perl' | cut -f 2 -d 'v' | cut -f1 -d ' '`/
 
+cp ${PACKSRC}/library/XIMSS.pm /usr/local/cpanel/
 
 # CGPro cPanel Wrapper
 cp ${PACKSRC}/cpwrap/ccaadmin /usr/local/cpanel/bin/
@@ -117,6 +118,8 @@ do
     chmod +x ${THEMES[$i]}/cgpro/mail/getDomainAccounts.live.cgi
     chmod +x ${THEMES[$i]}/cgpro/mail/getVCARD.live.cgi
     chmod +x ${THEMES[$i]}/cgpro/getXmppHistory.live.cgi
+    chmod +x ${THEMES[$i]}/cgpro/playwav.live.cgi
+    chmod +x ${THEMES[$i]}/cgpro/getwav.live.cgi
 
     if [ -f ${THEMES[$i]}cgpro/mail/groupware.html ]
     then

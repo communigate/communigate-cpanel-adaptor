@@ -1,0 +1,718 @@
+[% MACRO filter_option(pval, val, text) BLOCK -%]
+<option value="[% val %]"[% val == pval ? " selected='selected'" : "" %]>[% cptext(text) %]</option>
+[% END -%]
+<link rel="stylesheet" type="text/css" href="[% MagicRevision('/yui/tabview/assets/skins/sam/tabview.css') %]" />
+<script type='text/javascript' src="[% MagicRevision('/yui/tabview/tabview.js') %]"></script>
+<script type="text/javascript">
+  var tweakTabs = new YAHOO.widget.TabView('tweaktabs');
+</script>
+
+  <style type="text/css">
+    #find_container {
+    float: right;
+    margin-left: 6px;
+    margin-right: 6px;
+    }
+
+    .yui-navset {
+    position: static;  /* override tabview.css */
+    }
+  </style>
+
+  <style type="text/css">
+    div.yui_tabview_scroll_tabs {
+    position: relative;  /* IE7 */
+    overflow: hidden;
+    white-space: nowrap;
+    }
+    div.yui_tabview_scroll_tabs ul.yui-nav {
+    position: relative;
+    border-bottom-width: 0 ! important;
+    }
+    .scroll_button {
+    background-color: #7697f0;
+    display: inline-block;
+    vertical-align: bottom;
+    font-size: 11px;
+    padding: 0.35em 0.5em;
+    height: auto;
+    color: #ffffff;
+    cursor: pointer;
+    }
+    .scroll_button:hover {
+    background-color: #5677d0;
+    }
+    div.scroll_button.scrolling,
+    .scroll_button.scrolling:hover {
+    background-color: #3657b0;
+    }
+    div.scroll_button.inactive {
+    background-color: buttonface;
+    color: graytext;
+    cursor: default;
+    }
+    div.scroll_button.inactive:hover {
+    background-color: buttonface;
+    }
+    div.scroll_button.hidden {
+    visibility: hidden;
+    }
+
+    #left_scroll_button {
+    float: left;
+    margin: 1px 0.16em 0 0;
+    height:18px;
+    border-top-left-radius: 6px;
+    border-bottom-left-radius: 6px;
+    -moz-border-radius-topleft: 6px;
+    -moz-border-radius-bottomleft: 6px;
+    -webkit-border-top-left-radius: 6px;
+    -webkit-border-bottom-left-radius: 6px;
+    }
+    #right_scroll_button {
+    float: right;
+    height:18px;
+    margin: 1px 0 0 0.16em;
+    border-top-right-radius: 6px;
+    border-bottom-right-radius: 6px;
+    -moz-border-radius-topright: 6px;
+    -moz-border-radius-bottomright: 6px;
+    -webkit-border-top-right-radius: 6px;
+    -webkit-border-bottom-right-radius: 6px;
+    }
+
+    #scrolling_tabs li.last {
+    margin-right: 0 ! important;
+    }
+
+    #alltweaks {
+    clear:both;
+    padding: 0;
+    }
+
+    div.help {
+    margin: 12px 40px;
+    float: none;
+    }
+  </style>
+
+  <div class="tweaksettings">
+    <div class="" style="align:left;">
+      <div id="tweaktabs" class="yui-navset yui-navset-top">
+	<div valign="bottom" id="scrolling_tabs_container">
+	  <div class="yui_tabview_scroll_tabs" id="scrolling_tabs">
+	    <ul class="yui-nav" id="yui_tabs">
+	      <li[% UNLESS FORM.submitdialin || FORM.submitdialout %] class="selected"[% END %]>
+		<a href="#tab_providers">
+		  <em>Provider Details</em>
+		</a>
+	      </li>
+	      [% IF provider -%]
+	      <li[% IF FORM.submitdialin %] class="selected"[% END %]>
+		<a href="#tab_dialin">
+		  <em>Dial-in</em>
+		</a>
+	      </li>
+	      <li[% IF FORM.submitdialout %] class="selected"[% END %]>
+		<a href="#tab_dialout">
+		  <em>Dial-out</em>
+		</a>
+	      </li>
+	      [% END -%]
+	    </ul>
+	  </div>
+	</div> <!-- END TABS -->
+	<div id="alltweaks" class="yui-content"  style="border: none">
+	  <div id="tab_providers">
+	    <form method="post" action="" >
+	      <table class="datatable brick" cellspacing="0" cellpadding="5" width="100%" border="0" align="center" style="border: 1px solid #808080;">
+		<tbody>
+ 		  <tr class="tdshade1_noborder">
+		    <td nowrap="nowrap" align="RIGHT">ID</td>
+		    <td nowrap="nowrap">
+		      <input type="text" name="provider" id="provider" value="[% provider %]"[% IF provider; " readonly='readonly'"; END %]  />
+		      <input type="hidden" name="oldprovider" value="[% provider %]"  />
+		      <span id="provider_error"></span>
+		    </td>
+		  </tr>
+ 		  <tr class="tdshade2_noborder">
+		    <td nowrap="nowrap" align="RIGHT">Name</td>
+		    <td nowrap="nowrap">
+		      <input type="text" name="name" id="name" value="[% prefs.Gateways.$provider.name %]"  />
+		      <span id="name_error"></span>
+		    </td>
+		  </tr>
+ 		  <tr class="tdshade1_noborder">
+		    <td nowrap="nowrap" align="RIGHT">Description</td>
+		    <td nowrap="nowrap">
+		      <textarea name="description" rows="5" cols="30">[% prefs.Gateways.$provider.desc %]</textarea>
+		    </td>
+		  </tr>
+		</tbody>
+	      </table>
+	      <p>
+		<input type="submit" name="submitedit" value="Save" class="input-button" id="activate-button" />
+		<a href="addon_cgpro_gateways.cgi">Back</a>
+	      </p>
+	    </form>
+	  </div> <!-- END providers -->
+	  [% IF provider -%]
+	  <div id="tab_dialin">
+	    <form method="post" action="" >
+	      <table class="datatable brick" cellspacing="0" cellpadding="5" width="100%" border="0" align="center" style="border: 1px solid #808080;">
+		<tbody>
+ 		  <tr class="tdshade1_noborder">
+		    <td nowrap="nowrap" align="RIGHT" style="width: 25%;"><label for="dialInEnabled">Dial-in Enabled</label>:</td>
+		    <td nowrap="nowrap">
+		      <input type="checkbox" name="dialInEnabled" id="dialInEnabled" value="1"[% IF prefs.Gateways.$provider.callInGw; ' checked="checked"'; END %] />
+		      <input type="hidden" name="provider" id="provider" value="[% provider %]"  />
+		    </td>
+		  </tr>
+		  [% IF prefs.Gateways.$provider.callInGw -%]
+ 		  <tr class="tdshade2_noborder">
+		    <td nowrap="nowrap" align="RIGHT" style="width: 25%;"><label for="dialInDisable">Disabled temporary</label>:</td>
+		    <td nowrap="nowrap">
+		      <input type="checkbox" name="dialInDisable" id="dialInDisable" value="1"[% IF prefs.Gateways.$provider.callInGw.disabled == "YES"; ' checked="checked"'; END %] />
+		    </td>
+		  </tr>
+ 		  <tr class="tdshade1_noborder">
+		    <td nowrap="nowrap" align="RIGHT" style="width: 25%;"><label for="forceRelay">Force media relay</label>:</td>
+		    <td nowrap="nowrap">
+		      <input type="checkbox" name="forceRelay" id="forceRelay" value="1"[% IF prefs.Gateways.$provider.callInGw.forceRelay == "YES"; ' checked="checked"'; END %] />
+		    </td>
+		  </tr>
+ 		  <tr class="tdshade2_noborder">
+		    <td nowrap="nowrap" align="RIGHT" style="width: 25%;"><label for="forceMediaProcessing">Force media transcoding</label>:</td>
+		    <td nowrap="nowrap">
+		      <input type="checkbox" name="forceMediaProcessing" id="forceMediaProcessing" value="1"[% IF prefs.Gateways.$provider.callInGw.forceMediaProcessing == "YES"; ' checked="checked"'; END %] />
+		    </td>
+		  </tr>
+ 		  <tr class="tdshade1_noborder">
+		    <td nowrap="nowrap" align="RIGHT" style="width: 25%;"><label for="dialInEnabled">Register</label>:</td>
+		    <td nowrap="nowrap">
+		      <input type="radio" name="proxyType" id="register1" value="registrar"[% prefs.Gateways.$provider.callInGw.proxyType == "registrar" ? 'checked="checked"' : '' -%] /><label for="register1">Register at the gateway with username and password</label> <br />
+		      Do not register at the gateway. Gateway directs calls to: <br  />
+		      <input type="radio" name="proxyType" id="register2" value="trunk"[% prefs.Gateways.$provider.callInGw.proxyType == "trunk" ? 'checked="checked"' : '' -%] /><label for="register2">Server IP Address or local Domain:</label> <input type="text" name="localIP" value="[% prefs.Gateways.$provider.callInGw.destination %]"  /> <br />
+		      <input type="radio" name="proxyType" id="register3" value="director"[% prefs.Gateways.$provider.callInGw.proxyType == "director" ? 'checked="checked"' : '' -%] /><label for="register3">Default server domain</label>
+		      <input type="hidden" id="lastValue" value="[% prefs.Gateways.$provider.callInGw.proxyType %]"  />
+		      <input type="hidden" name="proxyTypeOld" value="[% prefs.Gateways.$provider.callInGw.proxyType %]"  />
+		      <script type="text/javascript">
+			var nodes = YAHOO.util.Selector.query('input[name=proxyType]');
+			YAHOO.util.Event.addListener(nodes, "change", function (e) {
+			var lastValue = document.getElementById('lastValue');
+			if (lastValue.value == 'registrar' && this.value != 'registrar') {
+			alert("This will delete all registration data.")
+			}
+			lastValue.value = this.value;
+			});
+		      </script>
+		    </td>
+		  </tr>
+		  [% IF prefs.Gateways.$provider.callInGw.proxyType != 'registrar' -%]
+ 		  <tr class="tdshade1_noborder">
+		    <td nowrap="nowrap" align="RIGHT" style="width: 25%; vertical-align: top;">Gateways IP addresses or networks:<br/> <em>One per row!</em><br/>(Example: 192.168.0.1 or 192.168.0.0:16 )</td>
+		    <td nowrap="nowrap">
+		      <textarea name="gateways" rows="5" cols="40">[% FOR gw IN prefs.Gateways.$provider.callInGw.trunk; gw.source _ "\n" | remove('[\#I\[\]]') | replace('\:\*', '') ; END %]</textarea>
+		    </td>
+		  </tr>
+		  [% END -%]
+ 		  <tr class="tdshade2_noborder">
+		    <td nowrap="nowrap" align="RIGHT" style="width: 25%; vertical-align: top;">Telephone Numbers:</td>
+		    <td nowrap="nowrap">
+		      <table class="datatable brick" cellspacing="0" cellpadding="5" width="100%" border="0" align="center">
+			<tbody>
+			  [% FOR telnum IN telnums.keys.sort -%]
+			  <tr class="tdshade[% (loop.count % 2 - 1) * -1 + 1 %]_noborder">
+			    <td>
+			      [% telnum %]
+			    </td>
+			    [% IF prefs.Gateways.$provider.callInGw.proxyType == "registrar" -%]
+			    <td>
+			      <input type="text" value="[% telnumDetails.$telnum.domain == "#NULL#" ? "" : telnumDetails.$telnum.domain %]" name="host-[% telnum %]" style="width: 100px;" />
+			    </td>
+			    <td>
+			      <input type="text" value="[% telnumDetails.$telnum.username == "#NULL#" ? "" : telnumDetails.$telnum.username %]" name="username-[% telnum %]" style="width: 100px;"  />
+			    </td>
+			    <td>
+			      <input type="text" value="[% telnumDetails.$telnum.authname == "#NULL#" ? "" : telnumDetails.$telnum.authname %]" name="authname-[% telnum %]" style="width: 100px;" autocomplete="off" />
+			    </td>
+			    <td>
+			      <input type="password" value="[% telnumDetails.$telnum.authpass == "#NULL#" ? "" : telnumDetails.$telnum.authpass %]" name="password-[% telnum %]" style="width: 100px;" autocomplete="off" />
+			    </td>
+			    <td>
+			      <select name="expires-[% telnum %]">
+ 				[% filter_option( telnumDetails.$telnum.expires, "2m", "2 min") %]
+ 				[% filter_option( telnumDetails.$telnum.expires, "3m", "3 min") %]
+ 				[% filter_option( telnumDetails.$telnum.expires, "5m", "5 min") %]
+ 				[% filter_option( telnumDetails.$telnum.expires, "10m", "10 min") %]
+ 				[% filter_option( telnumDetails.$telnum.expires, "15m", "15 min") %]
+ 				[% filter_option( telnumDetails.$telnum.expires, "30m", "30 min") %]
+ 				[% filter_option( telnumDetails.$telnum.expires, "1h", "1 hour") %]
+ 				[% filter_option( telnumDetails.$telnum.expires, "2h", "2 hours") %]
+ 				[% filter_option( telnumDetails.$telnum.expires, "3h", "3 hours") %]
+ 				[% filter_option( telnumDetails.$telnum.expires, "4h", "4 hours") %]
+ 				[% filter_option( telnumDetails.$telnum.expires, "5h", "5 hours") %]
+ 				[% filter_option( telnumDetails.$telnum.expires, "6h", "6 hours") %]
+ 				[% filter_option( telnumDetails.$telnum.expires, "7h", "7 hours") %]
+ 				[% filter_option( telnumDetails.$telnum.expires, "8h", "8 hours") %]
+ 				[% filter_option( telnumDetails.$telnum.expires, "10h", "10 hours") %]
+ 				[% filter_option( telnumDetails.$telnum.expires, "12h", "12 hours") %]
+ 				[% filter_option( telnumDetails.$telnum.expires, "1d", "24 hours") %]
+			      </select>
+			    </td>
+			    [% END -%]
+			    <td>
+			      <input type="text" value="[% telnums.$telnum == 'null' ? "" : telnums.$telnum %]" name="assigned-[% telnum %]" style="width: 100px;"  />
+			    </td>
+			    <td style="width: 30%;">
+			      <input type="checkbox" name="delete-[% telnum %]" id="delete-[% telnum %]" value="1" /> <label for="delete-[% telnum %]">Delete</label>
+			    </td>
+			  </tr>
+			  [% END -%]
+			  <tr class="tdshade[% (loop.count % 2 - 1) * -1 + 1 %]_noborder">
+			    <td colspan="3">
+			      <a href="addon_cgpro_gateways_addnumber.cgi?provider=[% provider %]" class="input-button">Add number</a>
+			      <a href="addon_cgpro_gateways_importcsvnumbers.cgi?provider=[% provider %]" class="input-button">CSV Import Numberts</a>
+			    </td>
+			  </tr>
+			</tbody>
+			<thead>
+			  <tr style="text-align: center; font-weight: bold;">
+			    <td>Number</td>
+			    [% IF prefs.Gateways.$provider.callInGw.proxyType == "registrar" -%]
+			    <td>Gateway Host</td>
+			    <td>Account</td>
+			    <td>Auth Name</td>
+			    <td>Password</td>
+			    <td>Register every</td>
+			    [% END -%]
+			    <td>Assigned to</td>
+			    <td>Tools</td>
+			  </tr>
+			</thead>
+		      </table>
+		    </td>
+		  </tr>
+ 		  <tr class="tdshade1_noborder">
+		    <td nowrap="nowrap" align="RIGHT" style="width: 25%;"><label for="CLIDEnabled">This gateway sends caller ID</label>:</td>
+		    <td nowrap="nowrap">
+		      <input type="checkbox" name="CLIDEnabled" id="CLIDEnabled" value="1"[% IF prefs.Gateways.$provider.callInGw.CLIDEnabled == "YES"; ' checked="checked"'; END %] />
+		    </td>
+		  </tr>
+		  [% IF prefs.Gateways.$provider.callInGw.CLIDEnabled == "YES" -%]
+ 		  <tr class="tdshade2_noborder">
+		    <td nowrap="nowrap" align="RIGHT" style="width: 25%;"><label for="CLIDTrusted">Caller ID is trusted</label>:</td>
+		    <td nowrap="nowrap">
+		      <input type="checkbox" name="CLIDTrusted" id="CLIDTrusted" value="1"[% IF prefs.Gateways.$provider.callInGw.CLIDTrusted == "YES"; ' checked="checked"'; END %] />
+		    </td>
+		  </tr>
+ 		  <tr class="tdshade1_noborder">
+		    <td nowrap="nowrap" align="RIGHT" style="width: 25%; vertical-align: top;">Method:</td>
+		    <td nowrap="nowrap">
+		      [% allMethods = prefs.Gateways.$provider.callInGw.CLIDMethods.join(",") %]
+		      <table summary="">
+			<tbody>
+			  <tr>
+			    <th>Method</th>
+			    <th>Active</th>
+			    <th>Priority</th>
+			  </tr>
+			  <tr>
+			    <td>
+			      <label for="CLIDMethods1">From</label>
+			    </td>
+			    <td>
+			      <input type="checkbox" name="CLIDMethods-dis" id="CLIDMethods1" value="dis"[% IF allMethods.search("dis"); ' checked="checked"'; END %] />
+			    </td>
+			    <td>
+			      <input type="text" name="CLIDMethods-dis-order" style="width: 50px" value="[% methods.dis %]" />
+			    </td>
+			  </tr>
+			  <tr>
+			    <td>
+			      <label for="CLIDMethods2">Remote-Party-Id</label>
+			    </td>
+			    <td>
+			      <input type="checkbox" name="CLIDMethods-rpi" id="CLIDMethods2" value="rpi"[% IF allMethods.search("rpi"); ' checked="checked"'; END %] />
+			    </td>
+			    <td>
+			      <input type="text" name="CLIDMethods-rpi-order" style="width:50px" value="[% methods.rpi %]"  />
+			    </td>
+			  </tr>
+			  <tr>
+			    <td>
+			      <label for="CLIDMethods3">P-Asserted-Identity</label>
+			    </td>
+			    <td>
+			      <input type="checkbox" name="CLIDMethods-pai" id="CLIDMethods3" value="pai"[% IF allMethods.search("pai"); ' checked="checked"'; END %] />
+			    </td>
+			    <td>
+			      <input type="text" name="CLIDMethods-pai-order" style="width:50px" value="[% methods.pai %]" />
+			    </td>
+			  </tr>
+			</tbody>
+		      </table>
+		    </td>
+		  </tr>
+ 		  <tr class="tdshade2_noborder">
+		    <td nowrap="nowrap" style="width: 25%; vertical-align: top;">
+		      <label style="text-align: right; display: block;">Translation rules:</label> <br />
+		      <em style="text-align: left;">
+			Examples: <br  />
+			0(12-20) -> +44* <br  />
+			00* -> +* <br  />
+			+359(10) -> 0*
+		      </em>
+		    </td>
+		    <td nowrap="nowrap">
+		      <textarea name="callerIdReRules" rows="5" cols="40">[% callerIdReRules %]</textarea>
+		    </td>
+		  </tr>
+		  [% END -%]
+		  [% END -%]
+		</tbody>
+	      </table>
+	      <p>
+		<input type="submit" name="submitdialin" value="Save" class="input-button" />
+		<a href="addon_cgpro_gateways.cgi">Back</a>
+	      </p>
+	    </form>
+	  </div> <!-- END dialin -->
+	  <div id="tab_dialout">
+	    <form method="post" action="" >
+	      <table class="datatable brick" cellspacing="0" cellpadding="5" width="100%" border="0" align="center" style="border: 1px solid #808080;">
+		<tbody>
+ 		  <tr class="tdshade1_noborder">
+		    <td nowrap="nowrap" align="RIGHT" style="width: 25%;"><label for="dialOutEnabled">Dial-out Enabled</label>:</td>
+		    <td nowrap="nowrap">
+		      <input type="checkbox" name="dialOutEnabled" id="dialOutEnabled" value="1"[% IF prefs.Gateways.$provider.callOutGw; ' checked="checked"'; END %] />
+		    </td>
+		  </tr>
+		  [% IF prefs.Gateways.$provider.callOutGw -%]
+ 		  <tr class="tdshade2_noborder">
+		    <td nowrap="nowrap" align="RIGHT" style="width: 25%;"><label for="dialOutDisable">Disabled temporary</label>:</td>
+		    <td nowrap="nowrap">
+		      <input type="checkbox" name="dialOutDisable" id="dialOutDisable" value="1"[% IF prefs.Gateways.$provider.callOutGw.disabled == "YES"; ' checked="checked"'; END %] />
+		    </td>
+		  </tr>
+ 		  <tr class="tdshade1_noborder">
+		    <td nowrap="nowrap" align="RIGHT" style="width: 25%; vertical-align: top;">Provider should accept calls only to following destinations:<br /><em>One number per line, starting with '+'</em><br /><em>'All' if blank</em></td>
+		    <td nowrap="nowrap">
+		      <textarea name="destinationCL" rows="5" cols="40">[% FOR row IN prefs.Gateways.$provider.callOutGw.destinationCL; row.match('^\+\d+') ? row _ "\n" : ""; END  %]</textarea>
+		    </td>
+		  </tr>
+ 		  <tr class="tdshade1_noborder">
+		    <td nowrap="nowrap" align="RIGHT" style="width: 25%; vertical-align: top;">except:<br /><em>One number per line, starting with '+'</em><br /><em>'None' if blank</em></td>
+		    <td nowrap="nowrap">
+		      <textarea name="destinationCL-except" rows="5" cols="40">[% FOR row IN prefs.Gateways.$provider.callOutGw.destinationCL; row.match('^\-\d+') ? row.replace('^\-','+') _ "\n" : ""; END  %]</textarea>
+		    </td>
+		  </tr>
+ 		  <tr class="tdshade2_noborder">
+		    <td nowrap="nowrap" align="RIGHT" style="width: 25%; vertical-align: top;">Session expiration:</td>
+		    <td nowrap="nowrap">
+		      <select name="sessionExpiration">
+ 			[% filter_option( prefs.Gateways.$provider.callOutGw.sessionExpiration, "#120", "2 min") %]
+ 			[% filter_option( prefs.Gateways.$provider.callOutGw.sessionExpiration, "#180", "3 min") %]
+ 			[% filter_option( prefs.Gateways.$provider.callOutGw.sessionExpiration, "#300", "5 min") %]
+ 			[% filter_option( prefs.Gateways.$provider.callOutGw.sessionExpiration, "#600", "10 min") %]
+ 			[% filter_option( prefs.Gateways.$provider.callOutGw.sessionExpiration, "#900", "15 min") %]
+ 			[% filter_option( prefs.Gateways.$provider.callOutGw.sessionExpiration, "#1800", "30 min") %]
+ 			[% filter_option( prefs.Gateways.$provider.callOutGw.sessionExpiration, "#3600", "1 hour") %]
+ 			[% filter_option( prefs.Gateways.$provider.callOutGw.sessionExpiration, "#7200", "2 hours") %]
+		      </select>
+		    </td>
+		  </tr>
+
+ 		  <tr class="tdshade1_noborder">
+		    <td nowrap="nowrap" align="RIGHT" style="width: 25%;">Authenticate outgoing calls:</td>
+		    <td nowrap="nowrap">
+		      <input type="radio" name="authenticate" id="authenticate1" value="1"[% prefs.Gateways.$provider.callOutGw.proxy.0.authname.defined ? 'checked="checked"' : '' %] /><label for="authenticate1">Authenticate outgoing calls with username and password</label> <br />
+		      <input type="radio" name="authenticate" id="authenticate2" value="0"[% prefs.Gateways.$provider.callOutGw.proxy.0.authname.defined ? "" : 'checked="checked"' %] /><label for="authenticate2">Do not authenticate outgoing calls</label>
+		    </td>
+		  </tr>
+ 		  <tr class="tdshade2_noborder">
+		    <td nowrap="nowrap" align="RIGHT" style="width: 25%; vertical-align: top;">Gateways:</em></td>
+		    <td nowrap="nowrap">
+		      <table class="datatable brick" cellspacing="0" cellpadding="5" width="100%" border="0" align="center">
+			<tbody>
+			  [% FOR proxy IN prefs.Gateways.$provider.callOutGw.proxy -%]
+			  <tr class="tdshade[% (loop.count % 2 - 1) * -1 + 1 %]_noborder">
+			    <td>
+			      <input type="text" value="[% proxy.domain == "#NULL#" ? "" : proxy.domain %]" name="domain-[% loop.count - 1 %]" style="width: 100px;" />
+			    </td>
+			    <td>
+			      <input type="text" value="[% proxy.address == "#NULL#" ? "" : proxy.address %]" name="address-[% loop.count - 1 %]" style="width: 100px;" />
+			    </td>
+			    <td>
+			      <select name="proto-[% loop.count - 1 %]">
+ 				[% filter_option( proxy.proto, "TCP", "TCP") %]
+ 				[% filter_option( proxy.proto, "#NULL#", "UDP") %]
+ 				[% filter_option( proxy.proto, "TLS", "TLS") %]
+			      </select>
+			    </td>
+			    [%  IF prefs.Gateways.$provider.callOutGw.proxy.0.authname.defined -%]
+			    <td>
+			      <input type="text" value="[% proxy.username == "#NULL#" ? "" : proxy.username %]" name="username-[% loop.count - 1 %]" style="width: 100px;" autocomplete="off" />
+			    </td>
+			    <td>
+			      <input type="text" value="[% proxy.authname == "#NULL#" ? "" : proxy.authname %]" name="authname-[% loop.count - 1 %]" style="width: 100px;" autocomplete="off" />
+			    </td>
+			    <td>
+			      <input type="password" value="[% proxy.authpass == "#NULL#" ? "" : proxy.authpass %]" name="password-[% loop.count - 1 %]" style="width: 100px;" autocomplete="off" />
+			    </td>
+			    [% END -%]
+			    <td style="width: 30%;">
+			      <input type="checkbox" name="delete-[% loop.count - 1 %]" id="delete-[% loop.count - 1 %]" value="1" /> <label for="delete-[% loop.count - 1 %]">Delete</label>
+			    </td>
+			  </tr>
+			  [% END -%]
+			  <tr class="tdshade[% (loop.count % 2 + 1) %]_noborder">
+			    <td>
+			      <input name="domain" type="text" value="" style="width: 100px;" />
+			    </td>
+			    <td>
+			      <input name="address" type="text" value="" style="width: 100px;" />
+			    </td>
+			    <td>
+			      <select name="proto">
+ 				[% filter_option( "", "TCP", "TCP") %]
+ 				[% filter_option( "", "#NULL#", "UDP") %]
+ 				[% filter_option( "", "TLS", "TLS") %]
+			      </select>
+			    </td>
+			    [%  IF prefs.Gateways.$provider.callOutGw.proxy.0.authname.defined -%]
+			    <td>
+			      <input type="text" value="" name="username" style="width: 100px;" autocomplete="off" />
+			    </td>
+			    <td>
+			      <input type="text" value="" name="authname" style="width: 100px;" autocomplete="off" />
+			    </td>
+			    <td>
+			      <input type="password" value="" name="password" style="width: 100px;" autocomplete="off" />
+			    </td>
+			    [% END -%]
+			    <td style="width: 30%;">
+			      Add new
+			    </td>
+			  </tr>
+			</tbody>
+			<thead>
+			  <tr style="text-align: center; font-weight: bold;">
+			    <td>Domain</td>
+			    <td>Address</td>
+			    <td>Protocol</td>
+			    [% IF prefs.Gateways.$provider.callOutGw.proxy.0.authname.defined -%]
+			    <td>Account</td>
+			    <td>Auth Name</td>
+			    <td>Password</td>
+			    [% END -%]
+			    <td>Tools</td>
+			  </tr>
+			</thead>
+		      </table>
+		    </td>
+		  </tr>
+ 		  <tr class="tdshade1_noborder">
+		    <td nowrap="nowrap" align="RIGHT" style="width: 25%;">Use custom timeout:</td>
+		    <td nowrap="nowrap">
+		      <select name="TimerB">
+ 			[% filter_option( prefs.Gateways.$provider.callOutGw.TimerB, "", "Default") %]
+ 			[% filter_option( prefs.Gateways.$provider.callOutGw.TimerB, "#5", "5s") %]
+ 			[% filter_option( prefs.Gateways.$provider.callOutGw.TimerB, "#10", "10s") %]
+ 			[% filter_option( prefs.Gateways.$provider.callOutGw.TimerB, "#15", "15s") %]
+ 			[% filter_option( prefs.Gateways.$provider.callOutGw.TimerB, "#20", "20s") %]
+ 			[% filter_option( prefs.Gateways.$provider.callOutGw.TimerB, "#25", "25s") %]
+ 			[% filter_option( prefs.Gateways.$provider.callOutGw.TimerB, "#30", "30s") %]
+ 			[% filter_option( prefs.Gateways.$provider.callOutGw.TimerB, "#35", "35s") %]
+ 			[% filter_option( prefs.Gateways.$provider.callOutGw.TimerB, "#40", "40s") %]
+ 			[% filter_option( prefs.Gateways.$provider.callOutGw.TimerB, "#45", "45s") %]
+ 			[% filter_option( prefs.Gateways.$provider.callOutGw.TimerB, "#50", "50s") %]
+ 			[% filter_option( prefs.Gateways.$provider.callOutGw.TimerB, "#60", "60s") %]
+ 			[% filter_option( prefs.Gateways.$provider.callOutGw.TimerB, "#120", "120s") %]
+		      </select>
+		    </td>
+		  </tr>
+ 		  <tr class="tdshade2_noborder">
+		    <td nowrap="nowrap" align="RIGHT" style="width: 25%;"><label for="forceRelay">Force media relay</label>:</td>
+		    <td nowrap="nowrap">
+		      <input type="checkbox" name="forceRelay" id="forceRelay" value="1"[% IF prefs.Gateways.$provider.callOutGw.forceRelay == "YES"; ' checked="checked"'; END %] />
+		    </td>
+		  </tr>
+		  [% IF prefs.Gateways.$provider.callOutGw.forceRelay == "YES" -%]
+ 		  <tr class="tdshade2_noborder">
+		    <td nowrap="nowrap" align="RIGHT" style="width: 25%; vertical-align: top;">Addresses:<br /><em>'Any address' if blank</em></td>
+		    <td nowrap="nowrap">
+		      <textarea name="forceRelayCL" rows="5" cols="40">[% FOR row IN prefs.Gateways.$provider.callOutGw.forceRelayCL; row.match('^\+') ? row.replace('^\+','') _ "\n" : ""; END  %]</textarea>
+		    </td>
+		  </tr>
+ 		  <tr class="tdshade2_noborder">
+		    <td nowrap="nowrap" align="RIGHT" style="width: 25%; vertical-align: top;">except:<br /><em>'None' if blank</em></td>
+		    <td nowrap="nowrap">
+		      <textarea name="forceRelayCL-except" rows="5" cols="40">[% FOR row IN prefs.Gateways.$provider.callOutGw.forceRelayCL; row.match('^\-\d+') ? row.replace('^\-','') _ "\n" : ""; END  %]</textarea>
+		    </td>
+		  </tr>
+		  [% END -%]
+ 		  <tr class="tdshade1_noborder">
+		    <td nowrap="nowrap" align="RIGHT" style="width: 25%;"><label for="forceMediaProcessing">Force media transcoding</label>:</td>
+		    <td nowrap="nowrap">
+		      <input type="checkbox" name="forceMediaProcessing" id="forceMediaProcessing" value="1"[% IF prefs.Gateways.$provider.callOutGw.forceMediaProcessing == "YES"; ' checked="checked"'; END %] />
+		    </td>
+		  </tr>
+		  [% IF prefs.Gateways.$provider.callOutGw.forceMediaProcessing == "YES" %]
+ 		  <tr class="tdshade1_noborder">
+		    <td nowrap="nowrap" align="RIGHT" style="width: 25%; vertical-align: top;">Addresses:<br /><em>'Any address' if blank</em></td>
+		    <td nowrap="nowrap">
+		      <textarea name="forceTranscodingCL" rows="5" cols="40">[% FOR row IN prefs.Gateways.$provider.callOutGw.forceTranscodingCL; row.match('^\+') ? row.replace('^\+','') _ "\n" : ""; END  %]</textarea>
+		    </td>
+		  </tr>
+ 		  <tr class="tdshade1_noborder">
+		    <td nowrap="nowrap" align="RIGHT" style="width: 25%; vertical-align: top;">except:<br /><em>'None' if blank</em></td>
+		    <td nowrap="nowrap">
+		      <textarea name="forceTranscodingCL-except" rows="5" cols="40">[% FOR row IN prefs.Gateways.$provider.callOutGw.forceTranscodingCL; row.match('^\-\d+') ? row.replace('^\-','') _ "\n" : ""; END  %]</textarea>
+		    </td>
+		  </tr>
+		  [% END -%]
+ 		  <tr class="tdshade2_noborder">
+		    <td nowrap="nowrap" align="RIGHT" style="width: 25%;"><label for="retryCodes-check">Try next gateway if this one has rejected call with the following code</label>:</td>
+		    <td nowrap="nowrap">
+		      <input type="checkbox" name="retryCodes-check" id="forceRelay" value="1"[% IF prefs.Gateways.$provider.callOutGw.retryCodes.defined; ' checked="checked"'; END %] />
+		    </td>
+		  </tr>
+		  [% IF prefs.Gateways.$provider.callOutGw.retryCodes.defined -%]
+ 		  <tr class="tdshade2_noborder">
+		    <td nowrap="nowrap" align="RIGHT" style="width: 25%; vertical-align: top;">For SIP codes:</td>
+		    <td nowrap="nowrap">
+		      <textarea name="retryCodes" rows="5" cols="40">[% FOR row IN prefs.Gateways.$provider.callOutGw.retryCodes; row.replace('^#','') _ "\n"; END  %]</textarea>
+		    </td>
+		  </tr>
+		  [% END -%]
+ 		  <tr class="tdshade1_noborder">
+		    <td nowrap="nowrap" style="width: 25%; vertical-align: top;">
+		      <label style="text-align: right; display: block;">Called ID Translation rules:</label> <br />
+		      <em style="text-align: left;">
+			Examples: <br  />
+			0(12-20) -> +44* <br  />
+			00* -> +* <br  />
+			+359(10) -> 0*
+		      </em>
+		    </td>
+		    <td nowrap="nowrap">
+		      <textarea name="calledIdReRules" rows="5" cols="40">[% calledIdReRules %]</textarea>
+		    </td>
+		  </tr>
+ 		  <tr class="tdshade2_noborder">
+		    <td nowrap="nowrap" align="RIGHT" style="width: 25%;"><label for="CLIDEnabled">This provider accepts caller ID</label>:</td>
+		    <td nowrap="nowrap">
+		      <input type="checkbox" name="CLIDEnabled" id="CLIDEnabled" value="1"[% IF prefs.Gateways.$provider.callOutGw.CLIDEnabled == "YES"; ' checked="checked"'; END %] />
+		    </td>
+		  </tr>
+		  [% IF prefs.Gateways.$provider.callOutGw.CLIDEnabled == "YES" -%]
+ 		  <tr class="tdshade2_noborder">
+		    <td nowrap="nowrap" align="RIGHT" style="width: 25%;">For pass-through phone calls:</td>
+		    <td nowrap="nowrap">
+		      <select name="CLIDPass">
+ 			[% filter_option( prefs.Gateways.$provider.callOutGw.CLIDPass, "", "Do not pass original caller ID") %]
+ 			[% filter_option( prefs.Gateways.$provider.callOutGw.CLIDPass, "same", "Pass original caller ID only if incoming call came from this provider") %]
+ 			[% filter_option( prefs.Gateways.$provider.callOutGw.CLIDPass, "trusted", "Pass original caller ID only if it's trusted") %]
+ 			[% filter_option( prefs.Gateways.$provider.callOutGw.CLIDPass, "any", "Pass any original caller ID") %]
+		      </select>
+		    </td>
+		  </tr>
+ 		  <tr class="tdshade2_noborder">
+		    <td nowrap="nowrap" align="RIGHT" style="width: 25%;">For VoIP Calls and pass-through Calls with no caller ID available:</td>
+		    <td nowrap="nowrap">
+		      <select name="CLIDSendLocal">
+ 			[% filter_option( prefs.Gateways.$provider.callOutGw.CLIDSendLocal, "", "Do not send caller ID") %]
+ 			[% filter_option( prefs.Gateways.$provider.callOutGw.CLIDSendLocal, "same", "Only if telephone number belongs to the same provider") %]
+ 			[% filter_option( prefs.Gateways.$provider.callOutGw.CLIDSendLocal, "any", "Any assigned number") %]
+		      </select>
+		    </td>
+		  </tr>
+ 		  <tr class="tdshade2_noborder">
+		    <td nowrap="nowrap" style="width: 25%; vertical-align: top;">
+		      <label style="text-align: right; display: block;">Caller ID Translation rules:</label> <br />
+		      <em style="text-align: left;">
+			Examples: <br  />
+			0(12-20) -> +44* <br  />
+			00* -> +* <br  />
+			+359(10) -> 0*
+		      </em>
+		    </td>
+		    <td nowrap="nowrap">
+		      <textarea name="callerIdReRulesOut" rows="5" cols="40">[% callerIdReRulesOut %]</textarea>
+		    </td>
+		  </tr>
+ 		  <tr class="tdshade2_noborder">
+		    <td nowrap="nowrap" align="RIGHT" style="width: 25%; vertical-align: top;">Caller ID sending method:</td>
+		    <td nowrap="nowrap">
+		      [% allMethodsOut = prefs.Gateways.$provider.callOutGw.CLIDMethods.join(",") %]
+		      <table summary="">
+			<tbody>
+			  <tr>
+			    <th>Method</th>
+			    <th>Active</th>
+			  </tr>
+			  <tr>
+			    <td>
+			      <label for="CLIDMethods1">From</label>
+			    </td>
+			    <td>
+			      <input type="checkbox" name="CLIDMethods-from" id="CLIDMethods1" value="dis"[% IF allMethodsOut.search("from"); ' checked="checked"'; END %] />
+			    </td>
+			  </tr>
+			  <tr>
+			    <td>
+			      <label for="CLIDMethods2">Remote-Party-Id</label>
+			    </td>
+			    <td>
+			      <input type="checkbox" name="CLIDMethods-rpi" id="CLIDMethods2" value="rpi"[% IF allMethodsOut.search("rpi"); ' checked="checked"'; END %] />
+			    </td>
+			  </tr>
+			  <tr>
+			    <td>
+			      <label for="CLIDMethods3">P-Asserted-Identity</label>
+			    </td>
+			    <td>
+			      <input type="checkbox" name="CLIDMethods-pai" id="CLIDMethods3" value="pai"[% IF allMethodsOut.search("pai"); ' checked="checked"'; END %] />
+			    </td>
+			  </tr>
+			  <tr>
+			    <td>
+			      <label for="CLIDMethods4">P-Preffered-Identity</label>
+			    </td>
+			    <td>
+			      <input type="checkbox" name="CLIDMethods-ppi" id="CLIDMethods4" value="pai"[% IF allMethodsOut.search("ppi"); ' checked="checked"'; END %] />
+			    </td>
+			  </tr>
+			</tbody>
+		      </table>
+		    </td>
+		  </tr>
+		  [% END -%]
+		  [% END -%]
+		</tbody>
+	      </table>
+	      <p>
+		<input type="submit" name="submitdialout" value="Save" class="input-button" />
+		<a href="addon_cgpro_gateways.cgi">Back</a>
+	      </p>
+	    </form>
+	  </div> <!-- END dialout -->
+	  [% END %]
+	</div>
+      </div>
+    </div>
+  </div>
+[% PROCESS addon_cgpro_footer.tmpl %]
+<script type="text/javascript">
+// Page initialization script
+var init = function() {
+    var validation = new CPANEL.validate.validator(LOCALE.maketext("Gateways"));
+    validation.add("provider", "min_length(%input%, 1)", LOCALE.maketext("The ID cannot be empty."));
+    validation.add("name", "min_length(%input%, 1)", LOCALE.maketext("The name cannot be empty."));
+    validation.attach();
+    CPANEL.validate.attach_to_form("activate-button", validation);
+};
+
+EVENT.onDOMReady(init);
+</script>

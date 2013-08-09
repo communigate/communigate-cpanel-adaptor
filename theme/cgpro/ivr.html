@@ -1,0 +1,44 @@
+<cpanel setvar="headerimg=../images/mailmenu.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+  <!-- <?cp Email::listmaildomains(,) ?> -->
+<div class="body-content">
+  <div class="h1Title"><cpanel langprint="CGPIVRConfiguration"></div>
+  <form action="editivr.html" method="get">
+    <p>
+      <input type="submit" class="create-button" value="<cpanel langprint="CGPAddIVRmenu">" /> for
+      <cpanelif $CPVAR{'maildomainscount'}==1>
+	<?cp Email::listmaildomains(%[input type="hidden" name="domain" id="domain" value="%"],domain,domain) ?>
+      </cpanelif>
+
+      <cpanelif $CPVAR{'maildomainscount'}=gt=1>
+	<select name="domain" id="domain">
+	  <?cp Email::listmaildomains([option value="%"]%[/option],domain,domain) ?>
+	</select>
+      </cpanelif>
+      <input type="checkbox" name="template" id="template" value="1" />
+      <label for="template"><cpanel langprint="CGPLoadDefaultTemplate"></label>
+    </p>
+  </form>
+  <h2><cpanel langprint="CGPIVRmenus"></h2>
+  <table border="0" cellpadding="5" width="550" cellspacing="0" id="mailtbl" class="sortable truncate-table">
+    <colgroup>
+      <col width="70%" align="left" />
+      <col width="15%" align="center" />
+    </colgroup>
+    <tr>
+      <th><cpanel langprint="CGPName"></th>
+      <th class="sorttable_nosort"><cpanel langprint="FTPFunctions"></th>
+    </tr>
+    
+    <?cp CommuniGate::ListIVRs(
+	 [tr class="row-%"]
+	 [td class="truncate nobrd-left"]%[/td]
+	 [td][a href="editivr.html?ivr=%&domain=%"]$LANG{'CGPViewEdit'}[/a]\, [a href="deleteivr.html?ivr=%&domain=%&name=%"]$LANG{'BrandingDPackage'}[/a][/td]
+	 [/tr]
+	 ,*num,name,id,domain,id,domain,name) domain=$FORM{'domain'},regex=$FORM{'searchregex'},api2_paginate=1,api2_paginate_start=$FORM{'api2_paginate_start'},api2_paginate_size=$CPVAR{'itemsperpage'} || '[tr][td colspan="2" class="errors"]$LANG{'CGPNoIVRs'}.[/td][/tr]' ?>
+
+  </table>
+</div><!-- end body-content -->
+
+<cpanel Branding="include(stdfooter.html)">

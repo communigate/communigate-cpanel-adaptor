@@ -198,27 +198,46 @@ sub editquota {
     if ($args->{'realaname'}) {
 	$data->{'RealName'} = $args->{'realaname'};
     } else {
-      $data->{'RealName'} = undef;
+	$data->{'RealName'} = undef;
     }
     if ($args->{'unit'}) {
 	$data->{'ou'} = $args->{'unit'};
     } else {
-      $data->{'ou'} = undef;
+	$data->{'ou'} = undef;
     }
     if ($args->{'mobile'}) {
 	$data->{'MobilePhone'} = $args->{'mobile'};
     } else {
-      $data->{'MobilePhone'} = undef;
+	$data->{'MobilePhone'} = undef;
     }
     if ($args->{'workphone'}) {
-      $data->{'WorkPhone'} = $args->{'workphone'};
+	$data->{'WorkPhone'} = $args->{'workphone'};
     } else {
-      $data->{'WorkPhone'} = undef;
+	$data->{'WorkPhone'} = undef;
     }
     if ($args->{'PasswordComplexity'}) {
 	$data->{'PasswordComplexity'} = 'MixedCaseDigit';
     } else {
-      $data->{'PasswordComplexity'} = undef;
+	$data->{'PasswordComplexity'} = undef;
+    }
+
+    my $userForwarders = $cli->FindForwarders($domain,"$user\@$domain");
+    # my $forwarders = $cli->ListForwarders($domain);
+    for my $forwarder (@$userForwarders) {
+	if ($forwarder =~ m/^tn\-\d+/) {
+	    $cli->DeleteForwarder("$forwarder\@$domain");
+	    $cli->CreateForwarder("$forwarder\@$domain", "null");
+	}
+	if ($forwarder =~ m/^\d{3}$/) {
+	    $cli->DeleteForwarder("$forwarder\@$domain");
+	}
+    }
+    if ($args->{'extension'}) {
+	$cli->DeleteForwarder($args->{'extension'} . "\@$domain");
+	$cli->CreateForwarder($args->{'extension'} . "\@$domain", "$user\@$domain");
+    }
+    if ($args->{'local_extension'}) {
+	$cli->CreateForwarder($args->{'local_extension'} . "\@$domain", "$user\@$domain");
     }
     # Update WorkDays
     if ($args->{'WorkDays'}) {

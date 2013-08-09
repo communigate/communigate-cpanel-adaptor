@@ -1,0 +1,71 @@
+// ============================================= //
+//           Toggle group member                 //
+//                                               //
+// Version 1.0                                   //
+// Copyright (c) 2013, Anton Katsarov <anton@webface.bg> //
+// ============================================= //
+//
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//
+//
+// Description:
+//  Adds/Removes the caller to a group (second paramether)
+//    if the caller is a memberd fo an other group
+//    (the first paramether).
+//
+
+entry Main is
+  fromWhom = RouteLocalURI(RemoteURI());
+  if EmailDomainPart(fromWhom) == MyDomain() then
+     params = Vars().startParameter;
+     groupN = isArray(params)? params[0]: params;
+     agents = groupN? ReadGroupMembers(groupN): null;
+     groupDomain = FindSubstring(groupN,"@") < 0? MyDomain(): EmailDomainPart(groupN);
+     memberAllwoed = Find(agents, fromWhom);
+    if memberAllwoed >= 0 then
+      if AcceptCall() != null then stop; end if;
+      groupA = isArray(params)? params[1]: null;
+      activeAgents = groupA? ReadGroupMembers(groupA): null;
+      activeMemberFound = -1;
+      activeMemberFound = Find(activeAgents, fromWhom);
+      errorcode = ExecuteCLI("GETGROUP " + ObjectToString(groupA));
+      if errorcode == null then
+        groupParams = Vars().executeCLIResult;
+        divertwhat = "divertdisabled";
+        if activeMemberFound >=0 then
+          found = Find(groupParams.Members, fromWhom);
+          if found >=0 then RemoveElement(groupParams.Members, found); end if;
+        else
+           if isArray(groupParams.Members) == null then groupParams.Members = NewArray(); end if;
+           AddElement(groupParams.Members, fromWhom);
+           divertwhat = "divertenabled";
+        end if;
+        errorcode = ExecuteCLI("SETGROUP " + ObjectToString(groupA) + " " + ObjectToString(groupParams));
+        if errorcode != null then syslog("Error: " + ObjectToString(errorcode)); end if;
+        PlayFile("Blank",1000); PlayFile(divertwhat);
+
+      else
+        syslog("Error: " + ObjectToString(errorcode));
+      end if;
+    else
+      syslog("Error: Account is not a member!");
+      rejectCall(403); stop;
+    end if;
+  else
+    syslog("Error: Domains do not match!");
+    rejectCall(403); stop;
+  end if;
+  ClearDTMF();
+  PlayFile("Blank",500); PlayFile("GoodBye");
+end entry;

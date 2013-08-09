@@ -1,0 +1,17 @@
+[% MACRO filter_option(pval, val, text) BLOCK -%]
+<option value="[% val %]"[% val == pval ? " selected='selected'" : "" %]>[% cptext(text) %]</option>
+[% END -%]
+<tr>
+  <td align="right">
+    <select name="[% CPANEL.CPVAR.basename %]-[% CPANEL.CPVAR.id %]">
+      [% filter_option("", "", "None") %]
+      [% FOR file IN files.keys.sort -%]
+      [% name = file.match('^(.*?)\.wav$').0; IF name -%]
+      [% IF name.match('^\d+$'); NEXT; END -%]
+      [% filter_option(item, name, name) %]
+      [% END -%]
+      [% END -%]
+    </select>
+  </td>
+  <td colspan="2"><a href="#" class="removerow">Remove</a></td>
+</tr>

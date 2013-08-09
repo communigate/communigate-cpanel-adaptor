@@ -1,0 +1,9 @@
+<cpanel setvar="headerimg=../images/mailmenu.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+<div class="body-content">
+  <h1><cpanel langprint="CGPIncoming calls rules"></h1>
+  <p>  <a class="create-button" href="addcallrule.html"><cpanel langprint="CGPAddRule"></a></p>
+  <?cptt CommuniGate::listSignalRules(cgpro/listSignalRules.tmpl) ?>
+</div> <!-- END body-content -->
+<cpanel Branding="include(stdfooter.html)">

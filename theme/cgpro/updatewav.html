@@ -1,0 +1,33 @@
+<cpanel setvar="headerimg=../images/mailmenu.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+<div class="body-content">
+  <h1><cpanel langprint="CGPSoundsManager"></h1>
+  <div class="highlight2">
+    <form action="doupdatewav.html?domain=<cpanel print="$FORM{'domain'}">&amp;lang=<cpanel print="$FORM{'lang'}">&amp;file=<cpanel print="$FORM{'file'}">" method="post" enctype="multipart/form-data">
+      <p>
+	<lable><cpanel langprint="CGPFile">:</lable>
+	<input type="file" name="sound" id="sound" />
+	<span id="sound_error" class="cjt_validation_error">
+      </p>
+      <p>
+	<input type="submit" id="activate-button" name="submit" value="<cpanel langprint="CGPSave">" class="input-button" />
+      </p>
+    </form>
+  </div>
+  <div class="return-link">
+    <a href="soundsmanager.html?domain=<cpanel print="$FORM{'domain'}">">&larr; <cptext "Go Back"></a>
+  </div>
+</div> <!-- END body-content -->
+<cpanel Branding="include(stdfooter.html)">
+  <script type="text/javascript">
+    var LANG = {};
+    LANG.sound_input = '<cpanel langprint="CGPFile">';
+LANG.sound_input_invalid = '<cpanel langprint="CGPThisFieldIsRequired">!';
+YAHOO.util.Event.onDOMReady(function () {
+	var VAL_SOUND = new CPANEL.validate.validator(LANG.sound_input);
+	VAL_SOUND.add("sound", 'min_length(%input%,1)', LANG.sound_input_invalid);
+	VAL_SOUND.attach();
+	CPANEL.validate.attach_to_form("activate-button", [VAL_SOUND]);
+    });
+</script>

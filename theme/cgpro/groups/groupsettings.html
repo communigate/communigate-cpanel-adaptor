@@ -20,14 +20,11 @@
 <cpanel setvar="vidtut_height=269">	
 
 <p class="description"><cpanel langprint="CGPGroupSettingsDesc"></p>
-<div class="return-link"><a href="http://www.communigate.com/communigatepro/Groups.html#Settings" target="_blank"><cptext "Documentation"></a></div>
-<br>
-<br>
 
 
 
 <cpanelif $FORM{'SubmitMLSettings'}>
-<?cp CommuniGate::SetGroupSettings() email=$FORM{'email'},RemoveToAndCc=$FORM{'RemoveToAndCc'},Expand=$FORM{'Expand'},FinalDelivery=$FORM{'FinalDelivery'},RealName=$FORM{'RealName'},RejectAutomatic=$FORM{'RejectAutomatic'},RemoveAuthor=$FORM{'RemoveAuthor'},SetReplyTo=$FORM{'SetReplyTo'},spectre=$FORM{'spectre'} ?>
+<?cp CommuniGate::SetGroupSettings() email=$FORM{'email'},RemoveToAndCc=$FORM{'RemoveToAndCc'},Expand=$FORM{'Expand'},FinalDelivery=$FORM{'FinalDelivery'},RealName=$FORM{'RealName'},RejectAutomatic=$FORM{'RejectAutomatic'},RemoveAuthor=$FORM{'RemoveAuthor'},SetReplyTo=$FORM{'SetReplyTo'},spectre=$FORM{'spectre'},SignalDisabled=$FORM{'SignalDisabled'},EmailDisabled=$FORM{'EmailDisabled'} ?>
 </cpanelif>
 
 <cpanelif $CPERROR{'CommuniGate'} && $FORM{'SubmitMLSettings'}>
@@ -93,6 +90,10 @@
 <tr>
 <td></td>
 <td nowrap="nowrap" ><input type="checkbox" name="SetReplyTo" value="1" <cpanelif $CPDATA{'SetReplyTo'}=='YES'><cpanel print=' checked'></cpanelif>/>Set Reply-To to Group</td>
+</tr>
+<tr>
+<td></td>
+<td nowrap="nowrap" ><input type="checkbox" name="SignalDisabled" value="1" <cpanelif $CPDATA{'SignalDisabled'}=='NO'><cpanel print=' checked'></cpanelif>/>Signaling Enabled</td>
 </tr>
 
 </table>

@@ -1,0 +1,135 @@
+<link rel="stylesheet" type="text/css" href="[% MagicRevision('/yui/tabview/assets/skins/sam/tabview.css') %]" />
+<script type='text/javascript' src="[% MagicRevision('/yui/tabview/tabview.js') %]"></script>
+<script type="text/javascript">
+  var tweakTabs = new YAHOO.widget.TabView('tweaktabs');
+</script>
+  <style type="text/css">
+    #find_container {
+    float: right;
+    margin-left: 6px;
+    margin-right: 6px;
+    }
+
+    .yui-navset {
+    position: static;  /* override tabview.css */
+    }
+  </style>
+
+  <style type="text/css">
+    div.yui_tabview_scroll_tabs {
+    position: relative;  /* IE7 */
+    overflow: hidden;
+    white-space: nowrap;
+    }
+    div.yui_tabview_scroll_tabs ul.yui-nav {
+    position: relative;
+    border-bottom-width: 0 ! important;
+    }
+    .scroll_button {
+    background-color: #7697f0;
+    display: inline-block;
+    vertical-align: bottom;
+    font-size: 11px;
+    padding: 0.35em 0.5em;
+    height: auto;
+    color: #ffffff;
+    cursor: pointer;
+    }
+    .scroll_button:hover {
+    background-color: #5677d0;
+    }
+    div.scroll_button.scrolling,
+    .scroll_button.scrolling:hover {
+    background-color: #3657b0;
+    }
+    div.scroll_button.inactive {
+    background-color: buttonface;
+    color: graytext;
+    cursor: default;
+    }
+    div.scroll_button.inactive:hover {
+    background-color: buttonface;
+    }
+    div.scroll_button.hidden {
+    visibility: hidden;
+    }
+
+    #left_scroll_button {
+    float: left;
+    margin: 1px 0.16em 0 0;
+    height:18px;
+    border-top-left-radius: 6px;
+    border-bottom-left-radius: 6px;
+    -moz-border-radius-topleft: 6px;
+    -moz-border-radius-bottomleft: 6px;
+    -webkit-border-top-left-radius: 6px;
+    -webkit-border-bottom-left-radius: 6px;
+    }
+    #right_scroll_button {
+    float: right;    
+    height:18px;
+    margin: 1px 0 0 0.16em;
+    border-top-right-radius: 6px;
+    border-bottom-right-radius: 6px;
+    -moz-border-radius-topright: 6px;
+    -moz-border-radius-bottomright: 6px;
+    -webkit-border-top-right-radius: 6px;
+    -webkit-border-bottom-right-radius: 6px;
+    }
+
+    #scrolling_tabs li.last {
+    margin-right: 0 ! important;
+    }
+
+    #alltweaks {
+    clear:both;
+    padding: 0;
+    }
+
+    div.help {
+    margin: 12px 40px;
+    float: none;
+    }
+  </style>
+
+  <div class="tweaksettings">
+    <div class="" style="align:left;">
+      <div id="tweaktabs" class="yui-navset yui-navset-top">
+	<div valign="bottom" id="scrolling_tabs_container">
+	  <div class="yui_tabview_scroll_tabs" id="scrolling_tabs">
+	    <ul class="yui-nav" id="yui_tabs">
+	      <li class="selected">
+		<a href="#tab_providers">
+		  <em>Providers</em>
+		</a>
+	      </li>
+	    </ul>
+	  </div>
+	</div> <!-- END TABS -->
+	<div id="alltweaks" class="yui-content">
+	  <div id="tab_providers">
+	    <table class="datatable brick" cellspacing="0" cellpadding="5" width="100%" border="0" align="center">
+	      <tbody>
+		[% FOR provider IN prefs.Gateways.keys -%]
+		<tr class="tdshade[% (loop.count % 2 - 1) * -1 + 1 %]_noborder">
+		  <td nowrap="nowrap">[% prefs.Gateways.$provider.name %]</td>
+		  <td nowrap="nowrap">
+		    <a href="addon_cgpro_gateways_edit.cgi?provider=[% provider %]" class="input-button">View/Edit</a>
+		    <a href="addon_cgpro_gateways_delete.cgi?provider=[% provider %]" class="input-button">Delete</a>
+		  </td>
+		</tr>	    
+		[% END -%]
+		<tr class="tdshade1_noborder">
+		  <td nowrap="nowrap" colspan="2">
+		    <a href="addon_cgpro_gateways_edit.cgi" class="input-button">Add New Provider</a>
+		  </td>
+		</tr>
+	      </tbody>
+	    </table>
+	  </div> <!-- END domain -->
+	</div>
+
+      </div>
+    </div>
+  </div>
+[% PROCESS addon_cgpro_footer.tmpl %]

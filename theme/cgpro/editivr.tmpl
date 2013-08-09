@@ -1,0 +1,237 @@
+[% MACRO filter_option(pval, val, text) BLOCK -%]
+<option value="[% val %]"[% val == pval ? " selected='selected'" : "" %]>[% cptext(text) %]</option>
+[% END -%]
+[% IF FORM.template && ! ivr -%]
+[%
+ ivr = {
+	playatstart => ['welcome'],
+	playatend => ['goodbye'],
+	buttons => {
+		    '1' => {sound => 'fortechsupport'},
+		    '2' => {sound => 'forsales'},
+		    '3' => {sound => 'forhelpdesk'},
+		    '#' => {sound => 'toexit', action => 'hangup'},
+		    'invalid' => {sound => 'invalidentry', action => 'play'}
+		   }
+       }
+-%]
+[% END -%]
+<form action="doeditivr.html?domain=[% FORM.domain %]" method="post">
+<div class="highlight">
+  <table border="0" style="margin-left: 20px">
+    <tr>
+      <td align="right">[% locale.maketext("CGPName") %]:</td>
+      [% IF ivr.NAME -%]
+      <td><input type="hidden" name="GIVEN" value="[% ivr.NAME %]" id="name" /> <strong>[% ivr.NAME %]</strong></td>
+      [% ELSE -%]
+      <td><input type="text" name="GIVEN" style="width: 150px" value="[% ivr.NAME %]" id="name" /></td>
+      [% END %]
+      <td colspan="2"><span id="name_error" class="cjt_validation_error"></td>
+    </tr>
+   </table>
+</div>
+<h2>[% locale.maketext('CGPLanguageMenu') %]</h2>
+<div class="highlight">
+  <table border="0" style="margin-left: 20px;text-align: center;">
+    <tr>
+      <th style="padding: 0 10px;">
+	[% locale.maketext('CGPButton') %]
+      </th>
+      <th>
+	[% locale.maketext('CGPLanguage') %]
+      </th>
+      <th></th>
+    </tr>
+    [% FOR id IN [1, 2, 3, 4, 5, 6, 7, 8 ,9] %]
+    <tr>
+      <td style="padding: 0 10px;"><strong>[% id %]</strong></td>
+      <td>
+	<select name="language-[% id %]">
+	  [% index = id - 1 -%]
+	  [% filter_option("", "", "CGPNone") %]
+	  [% filter_option(ivr.languages.$index.$id, "english", "english (Default)") %]
+	  [% FOR file IN files.keys.sort -%]
+	  [% IF files.$file.keys.size == 0 -%]
+	  [% filter_option(ivr.languages.$index.$id, file, file) %]
+	  [% END -%]
+	  [% END -%]
+	</select>
+      </td>
+      <td>
+	[% IF id == 1 -%]
+	<input type="checkbox" name="speaklang-[% id %]" id="speaklang-[% id %]" value="1"[% IF ivr.languages.0 && ! ivr.languages.0.mute %] checked="checked"[% END %] /> <label for="speaklang-[% id %]">[% locale.maketext("CGPAskDefaultLang") %]</label>
+	[% END -%]
+      </td>
+    </tr>
+    [% END -%]
+  </table>
+</div>
+<h2>[% locale.maketext('CGPDialInExtension') %]</h2>
+<div class="highlight">
+  <table border="0">
+    <tr>
+      <td>
+	<input type="checkbox" name="DED" id="DED" value="1"[% IF ivr.DED %] checked="checked"[% END %] />
+      </td>
+      <td><label for="DED">[% locale.maketext('CGPEnableDED') %]</label></td>
+      <td>
+      </td>
+    </tr>
+  </table>
+</div>
+<h2>[% locale.maketext('CGPPlayAtStartOnce') %]</h2>
+<div class="highlight">
+  <table border="0" style="margin-left: 20px" id="playatstart">
+    [% CPANEL.CPVAR.id = 0 -%]
+    [% CPANEL.CPVAR.basename = 'playatstart' -%]
+    [% FOR item IN ivr.playatstart -%]
+    [% PROCESS cgpro/ivr_soundrow.tmpl -%]
+    [% CPANEL.CPVAR.id = loop.count %]
+    [% END -%]
+  </table>
+  <p><a href="#" id="playatstartbutton">Add new</a><input type="hidden" name="playatstartcount" id="playatstartcount" value="[% CPANEL.CPVAR.id %]" /></p>
+</div>
+<h2>[% locale.maketext('CGPPlayAtStartEveryTime') %]</h2>
+<div class="highlight">
+  <table border="0" style="margin-left: 20px" id="playatstartevery">
+    [% CPANEL.CPVAR.id = 0 -%]
+    [% CPANEL.CPVAR.basename = 'playatstartevery' -%]
+    [% FOR item IN ivr.playatstartevery -%]
+    [% PROCESS cgpro/ivr_soundrow.tmpl -%]
+    [% CPANEL.CPVAR.id = loop.count %]
+    [% END -%]
+  </table>
+  <p><a href="#" id="playatstarteverybutton">Add new</a><input type="hidden" name="playatstarteverycount" id="playatstarteverycount" value="[% CPANEL.CPVAR.id %]" /></p>
+</div>
+<h2>[% locale.maketext('CGPButtons') %]</h2>
+<div class="highlight">
+  <table border="0" style="margin-left: 20px; text-align: center;">
+    <tr>
+      <th style="padding: 0 10px;">
+	[% locale.maketext('CGPButton') %]
+      </th>
+      <th>
+	[% locale.maketext('CGPAction') %]
+      </th>
+      <th>
+	[% locale.maketext('CGPSoundToPlay') %]
+      </th>
+    </tr>
+    [% FOR id IN [1, 2, 3, 4, 5, 6, 7, 8 ,9 ,0 , '*', '#', 'invalid'] %]
+    <tr>
+      <td style="padding: 0 10px;"><strong>[% id %]</strong></td>
+      <td>
+	<select name="action-[% id %]">
+	  [% filter_option("", "", "None") %]
+	  [% FOR account = accounts.keys.sort -%]
+	  [% myclass = accounts.$account.details.ServiceClass-%]
+	  [% classstring = classes.$myclass.AccessModes.join(',') -%]
+	  [% IF classstring == 'All' || classstring.search("SIP") -%]
+	  [% filter_option(ivr.buttons.$id.action, account, account _ " (" _ locale.maketext("CGPAccount") _ ")") %]
+	  [% END -%]
+	  [% END -%]
+	  [% FOR account = departments -%]
+	  [% filter_option(ivr.buttons.$id.action, account, account _ " (" _ locale.maketext("CGPDepartment") _ ")") %]
+	  [% END -%]
+	  [% FOR queue = queues -%]
+	  [% filter_option( ivr.buttons.$id.action, queue.value, queue.name _ " (" _ locale.maketext("CGPQueue") _ ")") %]
+	  [% END -%]
+	  [% FOR menu = ivrs -%]
+	  [% filter_option( ivr.buttons.$id.action, menu.value, menu.name _ " (" _ locale.maketext("CGPIVRMenu") _ ")") %]
+	  [% END -%]
+	  [% filter_option( ivr.buttons.$id.action, 'hangup', locale.maketext("Return to previous / Hang up")) %]
+	  [% filter_option( ivr.buttons.$id.action, 'play', locale.maketext("Play the sound:")) %]
+	</select>
+      </td>
+      <td>
+	<select name="sound-[% id %]">
+	  [% filter_option("", "", "None") %]
+	  [% FOR file IN files.keys.sort -%]
+	  [% name = file.match('^(.*?)\.wav$').0; IF name -%]
+	  [% IF name.match('^\d+$'); NEXT; END -%]
+	  [% filter_option(ivr.buttons.$id.sound, name, name) %]
+	  [% END -%]
+	  [% END -%]
+	</select>
+      </td>
+    </tr>
+    [% END -%]
+  </table>
+</div>
+<h2>[% locale.maketext('CGPPlayAtEndEveryTime') %]</h2>
+<div class="highlight">
+  <table border="0" style="margin-left: 20px" id="playatendevery">
+    [% CPANEL.CPVAR.id = 0 -%]
+    [% CPANEL.CPVAR.basename = 'playatendevery' -%]
+    [% FOR item IN ivr.playatendevery -%]
+    [% PROCESS cgpro/ivr_soundrow.tmpl -%]
+    [% CPANEL.CPVAR.id = loop.count %]
+    [% END -%]
+  </table>
+  <p><a href="#" id="playatendeverybutton">Add new</a><input type="hidden" name="playatendeverycount" id="playatendeverycount" value="[% CPANEL.CPVAR.id %]" /></p>
+</div>
+<h2>[% locale.maketext('CGPPlayAtEndOnce') %]</h2>
+<div class="highlight">
+  <table border="0" style="margin-left: 20px" id="playatend">
+    [% CPANEL.CPVAR.id = 0 -%]
+    [% CPANEL.CPVAR.basename = 'playatend' -%]
+    [% FOR item IN ivr.playatend -%]
+    [% PROCESS cgpro/ivr_soundrow.tmpl -%]
+    [% CPANEL.CPVAR.id = loop.count %]
+    [% END -%]
+  </table>
+  <p><a href="#" id="playatendbutton">Add new</a><input type="hidden" name="playatendcount" id="playatendcount" value="[% CPANEL.CPVAR.id %]" /></p>
+</div>
+<div class="highlight">
+  <table border="0" style="margin-left: 20px">
+    </tr>
+    <td>
+      <input type="hidden" name="oldMessageID" value="[% vcard.UID.VALUE.item('Message-ID') %]" />
+      <input type="hidden" name="oldUID" value="[% FORM.contact %]" />
+      <input id="ivr_submit" class="input-button" type="submit" value="[% locale.maketext("CGPSave") %]" name="save" />
+    </td>
+    <td></td>
+    <td></td>
+    </tr>
+ </table>
+</div>
+</form>
+<script type="text/javascript">
+var LANG = {};
+LANG.name_input = "[% locale.maketext("CGPName") %]";
+LANG.name_input_invalid = "[% locale.maketext("CGPThisFieldIsRequired") %]!";
+var domain = '[% domain %]';
+var getRow = function (e, data) {
+    YAHOO.util.Event.preventDefault(e); 
+    var wrap = YAHOO.util.Dom.get(data.wrap);
+    var index = YAHOO.util.Dom.get(data.index);
+    YAHOO.util.Connect.asyncRequest('GET', data.url + '?id=' + index.value + '&basename=' + data.basename + '&domain=' + domain, {
+	    success: function(o) {
+                wrap.innerHTML = wrap.innerHTML + o.responseText;
+                var removers = YAHOO.util.Dom.getElementsByClassName('removerow');
+ 	        YAHOO.util.Event.addListener(removers, "click", removeRow);
+	    },
+		}, null);
+    index.value = parseInt(index.value) + 1;
+};
+var removeRow = function (e) {
+    YAHOO.util.Event.preventDefault(e);
+    var row = this.parentNode.parentNode;
+    var table = row.parentNode;
+    table.removeChild(row);
+};
+YAHOO.util.Event.onDOMReady(function () {
+ 	YAHOO.util.Event.addListener("playatstartbutton", "click", getRow, {url: 'ivr_soundrow.html', wrap: 'playatstart', index: 'playatstartcount', basename:'playatstart'});
+ 	YAHOO.util.Event.addListener("playatstarteverybutton", "click", getRow, {url: 'ivr_soundrow.html', wrap: 'playatstartevery', index: 'playatstarteverycount', basename:'playatstartevery'});
+ 	YAHOO.util.Event.addListener("playatendbutton", "click", getRow, {url: 'ivr_soundrow.html', wrap: 'playatend', index: 'playatendcount', basename:'playatend'});
+ 	YAHOO.util.Event.addListener("playatendeverybutton", "click", getRow, {url: 'ivr_soundrow.html', wrap: 'playatendevery', index: 'playatendeverycount', basename:'playatendevery'});
+        var removers = YAHOO.util.Dom.getElementsByClassName('removerow');
+ 	YAHOO.util.Event.addListener(removers, "click", removeRow);
+      [% UNLESS ivr.NAME -%]
+	var VAL_NAME = new CPANEL.validate.validator(LANG.name_input);
+	VAL_NAME.add("name", 'min_length(%input%,1)', LANG.name_input_invalid);
+	VAL_NAME.attach();
+	CPANEL.validate.attach_to_form("ivr_submit", [VAL_NAME]);
+      [% END -%]
+    });
+</script>

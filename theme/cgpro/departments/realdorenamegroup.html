@@ -1,0 +1,20 @@
+<cpanel setvar="headerimg=../images/mailmenu.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+
+<div class="body-content">
+<h1><cpanel langprint="CGPDepartmentMaintenance"></h1>
+
+
+<p><?cp CommuniGate::RenameGroup() newname=$FORM{'newname'}, email=$FORM{'email'}|| 'maketext('The list could not be renamed.')' ?></p>
+<cpanelif $CPERROR{'CommuniGate'}>
+<p><cpanel print="$CPERROR{'CommuniGate'}"></p>
+</cpanelif>
+<cpanelif !$CPERROR{'CommuniGate'}>
+    <p><cpanel langprint="CGPDepartments"> <b><cpanel print="$FORM{'email'}"></b> <cpanel langprint="CGPDepartmentRenamedTo"> <b><cpanel print="$FORM{'newname'}">@<cpanel print="$FORM{'domain'}">.</b>
+</cpanelif>
+
+<div class="return-link"><a href="groups.html">&larr; <cptext "Go Back"></a></div>
+
+</div>
+<cpanel Branding="include(stdfooter.html)">

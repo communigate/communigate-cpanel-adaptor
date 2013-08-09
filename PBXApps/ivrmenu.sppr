@@ -1,0 +1,168 @@
+// ============================================= //
+//                   IVR Menu                    //
+//                                               //
+// Version 1.0                                   //
+// Copyright (c) 2013,                           //
+// Anton Katsarov <anton@webface.bg>             //
+// ============================================= //
+//
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//
+//
+// Description:
+//  Adds/Removes the caller to a group (second paramether)
+//    if the caller is a memberd fo an other group
+//    (the first paramether).
+//
+
+function enterIVRMenu(menuName, lang) forward;
+
+entry Main is
+  params = Vars().startParameter;
+  menuName = isArray(params)? params[0]: params;
+  Vars().("Call-ID") = PendingRequestData("Call-ID");
+  if AcceptCall() != null then stop; end if;
+  result = enterIVRMenu(menuName, null);
+end entry;
+
+function tryToCallParty(party) forward;
+procedure tryButton(prefs, input, lang) forward;
+
+function enterIVRMenu(menuName, lang) is
+  prefs = GetAccountPreferences("IVRMenus");
+  prefs = prefs.(menuName);
+  if prefs == null then return false; end if;
+  currentLang = IsString(lang)? lang : GetLanguage();
+  if IsArray(prefs.languages) && IsDictionary(prefs.languages[0]) then
+    currentLang = prefs.languages[0].(prefs.languages[0][0]);
+    Langs = NewDictionary();
+    for i = 0  while i < Length(prefs.languages) by i+= 1 loop
+      if not prefs.languages[i].mute then
+        SetLanguage( prefs.languages[i].(prefs.languages[i][0]) );
+        PlayFile("Blank",500); PlayFile( "selectlanguage");PlayFile("press");PlayFile(prefs.languages[i][0]);
+        Langs.(prefs.languages[i][0]) = prefs.languages[i].(prefs.languages[i][0]);
+      end if;
+    end loop;
+    langInput = ReadInput(3);
+    if IsString(langInput) && IsString(Langs.(langInput)) then
+      currentLang = Langs.(langInput);
+    end if;
+    syslog("Language: " + currentLang);
+  end if;
+  SetLanguage(currentLang);
+
+  for i = 0 while i < Length(prefs.playatstart) by i += 1 loop
+    PlayFile("Blank",500); PlayFile(prefs.playatstart[i]);
+  end loop; 
+
+  if prefs.DED then
+    PlayFile("Blank",1000); PlayFile("DialKnownExtension");
+    extension = NewArray();
+    extension[0] = ReadInput(2);
+    for i = 0 while i < 4 by i += 1 loop
+      if IsString(extension[i]) then extension[i + 1] = ReadInput(3); end if;
+    end loop;
+    if IsString(extension[2]) then
+      callee = extension[0] + extension[1] + extension[2];
+      if IsString(extension[3]) then callee = callee + extension[3]; end if;
+      if IsString(extension[4]) then callee = callee + extension[4]; end if;
+      PlayFile("Blank",500);PlayFile("tryingextension");
+      response = tryToCallParty("sip:" + callee + "@" + MyDomain());
+      if not response then PlayFile("Failure"); end if;
+    end if;
+  end if;
+
+  loops = 0;
+  loop
+    for i = 0 while i < Length(prefs.playatstartevery) by i += 1 loop
+      PlayFile("Blank",500); PlayFile(prefs.playatstartevery[i]);
+    end loop; 
+
+    for i = 0 while i < Length(prefs.activebuttons) by i += 1 loop
+      syslog("Key: " + ObjectToString( prefs.buttons.(prefs.activebuttons[i]).action) );
+      button = prefs.activebuttons[i];
+      if button == "#" then button = "poundkey"; end if;
+      if button == "*" then button = "starkey"; end if;
+      syslog("Key: " + ObjectToString(button));
+      if IsString(prefs.buttons.(prefs.activebuttons[i]).sound) && IsString(prefs.buttons.(prefs.activebuttons[i]).action) && prefs.buttons.(prefs.activebuttons[i]).action != "play" then 
+        PlayFile("Blank",500); PlayFile(prefs.buttons.(prefs.activebuttons[i]).sound); PlayFile("press"); PlayFile(button); 
+      end if;
+    end loop; 
+
+    input = ReadInput(5);
+    syslog("Input:" + ObjectToString(input));
+
+    exitif IsString(input) && IsDictionary(prefs.buttons.(input)) && prefs.buttons.(input).action == "hangup";
+    tryButton(prefs, input, currentLang);
+
+    for i = 0 while i < Length(prefs.playatendevery) by i += 1 loop
+      PlayFile("Blank",500); PlayFile(prefs.playatendevery[i]);
+    end loop; 
+    ClearDTMF();
+    if ! IsConnected() then stop; end if;
+    loops += 1;
+    exitif loops > 5;
+  end loop;
+  for i = 0 while i < Length(prefs.playatend) by i += 1 loop
+    PlayFile("Blank",500); PlayFile(prefs.playatend[i]);
+  end loop; 
+  return true;
+end function;
+
+procedure tryButton(prefs, input, lang) is
+  if IsString(input) && IsDictionary(prefs.buttons.(input)) && IsString(prefs.buttons.(input).action) && prefs.buttons.(input).action == "play" then
+    PlayFile("Blank",500); PlayFile(prefs.buttons.(input).sound);
+  elif IsString(input) && IsDictionary(prefs.buttons.(input)) && IsString(prefs.buttons.(input).action) then
+    // match if is another ivrMenu
+    match = FindRegEx(prefs.buttons.(input).action,"ivrmenu\\{(\\w+)\\}#" + MyEmail());
+    if IsArray(match) && IsString(match[1]) then
+      response = enterIVRMenu(match[1], lang);
+      if not response then PlayFile("Failure"); end if;
+    else
+      response = tryToCallParty("sip:" + prefs.buttons.(input).action);
+      if not response then PlayFile("Failure"); end if;
+    end if;
+  elif IsString(input) && input != "invalid" && not IsDictionary(prefs.buttons.(input)) && IsDictionary(prefs.buttons.invalid) then
+    tryButton(prefs, "invalid", lang);
+  end if;
+end procedure;
+
+function callerLeg(parameters,callPending) external;
+function callerLegBridge(parameters,peerLeg) external;
+function bridgedLoopHash(peerLeg) external;
+
+function tryToCallParty(party) is
+  if not party then return false; end if;
+  callParams = NewDictionary();
+  callParams.("") =  party + ";services=no";
+  callParams.activeSide = true;
+  callParams.callBridged = true;
+  callParams.("Expires") = 15;
+  callParams.From = RemoteURI();
+  callParams.impersonate = SIPURIToEmail(RemoteURI());
+  callParams.("Call-ID") = Vars().("Call-ID") + ".relay";
+  callParams.referMode   = "peer"; 
+  peerLeg = callerLeg(callParams,false);
+  if !IsTask(peerLeg) then return(false); end if;
+  
+  while bridgedLoopHash(peerLeg) == "#" loop
+    void(BreakBridge());
+    PlayFile("Done");
+    if callerLegBridge(callParams,peerLeg) != null then
+      void(SendEvent(peerLeg,"stop",null));
+      PlayFile("Failure"); return(true);
+    end if;
+  end loop;
+  return  true;
+end function;

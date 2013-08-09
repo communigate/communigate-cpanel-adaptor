@@ -1,0 +1,39 @@
+[% MACRO filter_option(pval, val, text) BLOCK -%]
+<option value="[% val %]"[% val == pval ? " selected='selected'" : "" %]>[% cptext(text) %]</option>
+[% END -%]
+<div class="highlight2">
+  <form action="" method="GET" id="selectPeriod">
+    <label>[% locale.maketext("CGPPeriod") %]:</label>
+    <select id="period" onchange="toggle_period()" name="period">
+      [% FOR file IN files.keys.sort.reverse -%]
+      [% filter_option(FORM.period, "calls-" _ files.$file, files.$file) %]
+      [% END -%]
+    </select>
+    <input type="hidden" name="account" value="[% FORM.account %]" />
+  </form>
+  <script type="text/javascript">
+    function toggle_period () {
+    document.getElementById("selectPeriod").submit();
+    }
+  </script>
+</div>
+<table border="0" cellpadding="5" cellspacing="0" id="mailtbl" class="sortable" width="650">
+  <tr>
+    <th class="cell">[% locale.maketext("CGPTimeOfCall") %]</th>
+    <th class="cell">[% locale.maketext("CGPInOut") %]</th>
+    <th class="cell">[% locale.maketext("CGPPeer") %]</th>
+    <!-- <th class="cell">[% locale.maketext("CGPCallerId") %]</th> -->
+    <th class="cell">[% locale.maketext("CGPDuration") %]</th>
+    <th class="cell-end">[% locale.maketext("CGPError") %]</th>
+  </tr>
+[% FOR call IN calls.reverse -%]
+  <tr>
+    <td style="white-space: nowrap">[% call.1 %]</td>
+    <td>[% call.2 == "I" ? "In" : "Out"%]</td>
+    <td>[% call.3 | html %]</td>
+    <!-- <td>[% call.4 %]</td> -->
+    <td>[% call.5 || 0 %]s</td>
+    <td>[% call.7 %]</td>
+  </tr>
+[% END -%]
+</table>

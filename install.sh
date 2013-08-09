@@ -79,6 +79,7 @@ cp ${PACKSRC}/module/CommuniGate.pm /usr/local/cpanel/Cpanel/
 cp ${PACKSRC}/library/CLI.pm /usr/local/cpanel/perl/
 ln -s /usr/local/cpanel/perl/CLI.pm /usr/local/cpanel
 ln -s /usr/local/cpanel/perl/CLI.pm /usr/local/lib/perl5/`perl -v | grep 'This is perl' | cut -f 2 -d 'v' | cut -f1 -d ' '`/
+cp ${PACKSRC}/library/XIMSS.pm /usr/local/cpanel/
 
 # CGPro cPanel Wrapper
 cp ${PACKSRC}/cpwrap/ccaadmin /usr/local/cpanel/bin/
@@ -168,6 +169,8 @@ do
     chmod +x ${THEMES[$i]}/cgpro/mail/getDomainAccounts.live.cgi
     chmod +x ${THEMES[$i]}/cgpro/mail/getVCARD.live.cgi
     chmod +x ${THEMES[$i]}/cgpro/getXmppHistory.live.cgi
+    chmod +x ${THEMES[$i]}/cgpro/playwav.live.cgi
+    chmod +x ${THEMES[$i]}/cgpro/getwav.live.cgi
 
     for ((j=0; j<${lLen}; j++)); do
         TARGET=${THEMES[$i]}/locale/`basename ${LOCALES[$j]} '{}'`.yaml.local
@@ -187,6 +190,7 @@ chmod +x ${PACKSRC}/scripts/*
 ${PACKSRC}/scripts/migrate_groupware.pl
 ${PACKSRC}/scripts/modify_features.pl
 ${PACKSRC}/scripts/rename_classes.pl
+${PACKSRC}/scripts/init_pbx.pl
 /usr/local/cpanel/bin/rebuild_sprites
 /usr/local/cpanel/bin/build_locale_databases
 
@@ -198,6 +202,8 @@ cp ${PACKSRC}/tools/helper_DKIM_sign.pl /var/CommuniGate/
 cp ${PACKSRC}/tools/helper_DKIM_verify.pl /var/CommuniGate/
 ${PACKSRC}/scripts/install_dkim_signer.pl
 
+# Install Active Queue Scripts
+cp ${PACKSRC}/PBXApps/*spp* /var/CommuniGate/PBXApps/
 # install Perl dependencies
 if [ `perldoc -l  MIME::QuotedPrint::Perl | wc -l` == 0 ]
 then

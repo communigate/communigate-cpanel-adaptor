@@ -1,4 +1,7 @@
 [% USE CPBranding -%]
+[% MACRO filter_options(pval, val, text) BLOCK -%]
+<option value="[% val %]"[% val == pval ? " selected='selected'" : "" %]>[% cptext(text) %]</option>
+[% END -%]
 [% MACRO features(feature, icon, text, nolink) BLOCK -%]
 [% UNLESS nolink -%]
 <a href="javascript:toggle_action_div(null, {id:'classes_module_[% loop.count - 1 %]', index:[% loop.count - 1 %], action:'classes'})" title="[% text %]">
@@ -49,7 +52,7 @@
     <ul class="yui-nav" id="yui_tabs">
       [% FOREACH account IN sort -%]
       <li[% IF loop.count == 1; ' class="selected"'; END %]>
-	<a href="#tab_[% account %]">
+	<a href="#tab_[% account %]" id="[% account %]">
 	  <span class="img"[% IF accounts.$account.class == "Standard" %] style="border-color: #3B6FBE;"[% END %][% IF accounts.$account.class == "Premium" %] style="border-color: #BE3B48;"[% END %]><img src="http://www.gravatar.com/avatar/[% accounts.$account.md5 %]?s=32&d=[% 'http://communigate-cpanel-adaptor.googlecode.com/files/Default_avatar.png' | uri %]" alt="avatar" /></span>
 	  <span class="name">
 	    <span class="realname">[% accounts.$account.data.RealName %]</span>
@@ -81,11 +84,30 @@
 	<span class="classname">[% accounts.$account.class %]</span>
       </div>
       <div class="clear"></div>
+      [% UNLESS CPANEL.CPDATA.item('FEATURE-CGPRO_CONTACTS') == 0 %]<a href="contacts.html?account=[% account %]">[% locale.maketext("CGPContacts") %]</a>[% END %]
       <h3><span class="action_link" style="background-image: url([% CPBranding.image('cgpro_account_change_details') %])" onclick="toggle_action_div(null, {id:'account_details_module_[% loop.count - 1 %]', index:[% loop.count - 1 %], action:'account_details'})">[% locale.maketext("CGPAccountDetails") %]</span></h3>
       <!-- Account Details -->
       <div  style="display: none;" class="user-section" id="account_details_module_[% loop.count - 1 %]">
 	<table style="text-align: center; margin: 0px auto" class="account-details">
 	    <tbody>
+	      [% IF classstring == 'All' || classstring.search("SIP") -%]
+	      <tr>
+		<th style="text-align: left">[% locale.maketext("CGPExtension") %]: </th>
+		<td style="text-align: left">
+		  [% IF accounts.$account.extension -%]
+		  [% accounts.$account.extension.split('-').1 %]
+		  [% END -%]
+		</td>
+	      </tr>
+	      <tr>
+		<th style="text-align: left">[% locale.maketext("CGPLocalExtension") %]: </th>
+		<td style="text-align: left">
+		  [% IF accounts.$account.local_extension -%]
+		  [% accounts.$account.local_extension %]
+		  [% END -%]
+		</td>
+	      </tr>
+	      [% END -%]
 	      <tr>
 		<th style="text-align: left;">[% locale.maketext('CGPRealName') %]:</th>
 		<td style="text-align: left;">
@@ -206,6 +228,31 @@
 		  <input type="text" value="[% accounts.$account.data.RealName %]" name="realname" id="realaname_input_[% loop.count - 1 %]"> <span id="relaname_input_[% loop.count - 1 %]_error" style="width: 16px; height: 16px;" class="cjt_validation_error"></span>
 		</td>
 	      </tr>
+	      [% IF classstring == 'All' || classstring.search("SIP") -%]
+	      <tr>
+		<td width="45%" style="text-align: right">[% locale.maketext("CGPExtension") %]: </td>
+		<td width="55%" style="text-align: left">
+		  <select name="extension">
+		    [% domain = account.split('@').1 %]
+		    [% filter_options("", "", "---") %]
+		    [% IF accounts.$account.extension -%]
+		    [% filter_options(accounts.$account.extension, accounts.$account.extension, accounts.$account.extension.split('-').1 ) %]
+		    [% END -%]
+		    [% FOR ex IN freeExtensions.$domain -%]
+		    [% filter_options(accounts.$account.extension, ex, ex.split('-').1) %]
+		    [% END -%]
+		  </select>
+		  <span id="extension_input_[% loop.count - 1 %]_error" style="width: 16px; height: 16px;" class="cjt_validation_error"></span>
+		</td>
+	      </tr>
+	      <tr>
+		<td width="45%" style="text-align: right">[% locale.maketext("CGPLocalExtension") %]: </td>
+		<td width="55%" style="text-align: left">
+		  <input type="text" name="local_extension" id="local_extension_input_[% loop.count - 1 %]" style="width: 30px;" value="[% accounts.$account.local_extension %]" />
+		  <span id="local_extension_input_[% loop.count - 1 %]_error" style="width: 16px; height: 16px;" class="cjt_validation_error"></span>
+		</td>
+	      </tr>
+	      [% END -%]
 	      <tr>
 		<td width="45%" style="text-align: right">[% locale.maketext("CGPMailboxQuota") %]: </td>
 		<td width="55%" style="text-align: left">
@@ -278,6 +325,9 @@
 	    [% END -%]
 	    <input type="hidden" name="account" value="[% account %]" />
 	    <p>
+	      <input type="checkbox" name="restrictAccess" id="restrictAccess-[% account %]" value="1" /><label for="restrictAccess-[% account %]">[% locale.maketext("CGPRestrictUserAccessToClientIP") %]</label>
+	    </p>
+	    <p>	      
 	      <a href="javascript:toggle_action_div(null, {id:'classes_module_[% loop.count - 1 %]', index:[% loop.count - 1 %], action:'classes'})">[% locale.maketext("CGPcancel") %]</a> [% locale.maketext("CGPor") %]
 	      <input type="submit" name="submit" value="[% locale.maketext("CGPChange") %]" class="input-button" />
 	    </p>
@@ -304,6 +354,7 @@
 </div>
 
 <script type="text/javascript">
+var ACCOUNT = '[% FORM.account %]';
 [% FOREACH account IN sort -%]
   ACCOUNTS[[% loop.count - 1 %]] = [];
   ACCOUNTS[[% loop.count - 1 %]]['domain'] = '[% account.split('@').1 -%]';

@@ -20,6 +20,7 @@ use Storable                         ();
 use Time::Local  'timelocal_nocheck';
 use Digest::MD5 qw(md5_hex);
 use XIMSS;
+use Cpanel::CPAN::MIME::Base64::Perl qw(decode_base64 encode_base64);
 use MIME::QuotedPrint::Perl;
 use Cpanel::CSVImport;
 
@@ -61,15 +62,15 @@ sub getXIMSS {
     $loginData =~ s/^\.\n//;
     my @loginData = split "::", $loginData;
     my $ximss = new XIMSS({
-	PeerAddr => $loginData[0],
-	PeerPort => '11024',
-	authData => $authData,
-	password => $password,
-	Proto    => 'tcp'
-			  });
+    	PeerAddr => $loginData[0],
+    	PeerPort => '11024',
+    	authData => $authData,
+    	password => $password,
+    	Proto    => 'tcp'
+    			  });
     unless($ximss) {
-	$logger->warn("Can't connect to CGPro XIMSS: ".$CGP::ERR_STRING);
-	exit(0);
+    	$logger->warn("Can't connect to CGPro XIMSS: ".$CGP::ERR_STRING);
+    	exit(0);
     }
     return $ximss;
 }
@@ -111,9 +112,11 @@ sub api2_AccountsOverview {
 	my @result;
 	my $data = Cpanel::CachedDataStore::fetch_ref( '/var/cpanel/cgpro/classes.yaml' ) || {};
 	my $return_accounts = {};
+	my $freeExtensions = {};
 	foreach my $domain (@domains) {
 	    my $accounts=$cli->ListAccounts($domain);
 	    foreach my $userName (sort keys %$accounts) {	
+		next if $userName eq 'pbx';
 		my $accountData = $cli->GetAccountEffectiveSettings("$userName\@$domain");
 		my $accountStats = $cli->GetAccountStat("$userName\@$domain");
 		my $service = @$accountData{'ServiceClass'} || '';
@@ -141,11 +144,25 @@ sub api2_AccountsOverview {
 		    md5 => md5_hex(lc $userName . "@" . $domain),
 		};
 	    }
+	    my $forwarders = $cli->ListForwarders($domain);
+	    for my $forwarder (@$forwarders) {
+		if ($forwarder =~ m/^tn\-\d+/) {
+		    my $to = $cli->GetForwarder("$forwarder\@$domain");
+		    $freeExtensions->{$domain} = [] unless $freeExtensions->{$domain};
+		    push @{$freeExtensions->{$domain}}, $forwarder if $to eq 'null';
+		    $return_accounts->{$to}->{extension} = $forwarder if $to ne 'null' && defined $return_accounts->{$to};
+		}
+		if ($forwarder =~ m/^\d{3}$/) {
+		    my $to = $cli->GetForwarder("$forwarder\@$domain");
+		    $return_accounts->{$to}->{local_extension} = $forwarder if defined $return_accounts->{$to};
+		}
+	    }
 	}
 	my $defaults = $cli->GetServerAccountDefaults();
 	$cli->Logout();
 	return { accounts => $return_accounts,
 		 classes => $defaults->{'ServiceClasses'},
+		 freeExtensions => $freeExtensions,
 		 data => $data,
 		 sort_keys_by => sub {
 		     my $hash = shift;
@@ -170,11 +187,13 @@ sub api2_AccountDefaults {
 	}
 	if ($OPTS{'save'}) {
 	    my $defaultServerAccountPrefs = $cli->GetServerAccountPrefs();
+	    $OPTS{'ips'} =~  s/(\r?\n)+/\\e/g;	
 		$cli->UpdateDomainSettings(
 		    domain => $domain,
 		    settings => {
 			MailRerouteAddress => $OPTS{'MailRerouteAddress'},
 			MailToAllAction => $OPTS{'MailToAllAction'},
+			ClientIPs => $OPTS{'ips'}
 		    }
 		    );
 		my $workdays = [map { $OPTS{$_} } grep { /^WorkDays\-?/ }  sort keys %OPTS];
@@ -260,7 +279,17 @@ sub api2_UpdateAccountClass {
     my $current = 0;
     $current = current_class_accounts($OPTS{'class'}, $cli) if $max > 0;
     if ($max > $current || $max == -1) {
-	$cli->UpdateAccountSettings($OPTS{'account'}, { ServiceClass => $OPTS{'class'} });
+	my $setting = { ServiceClass => $OPTS{'class'}, AccessModes => 'default' };
+	$cli->UpdateAccountSettings($OPTS{'account'}, $setting);
+	if ($OPTS{'restrictAccess'}) {
+	    my $defaultSetting = $cli->GetAccountEffectiveSettings($OPTS{"account"});
+	    $setting->{'AccessModes'} = $defaultSetting->{'AccessModes'};
+	    $setting->{'AccessModes'} = [27, "Mail","Relay","Signal","TLS","POP","IMAP","MAPI","AirSync","SIP","XMPP","WebMail","XIMSS","FTP","ACAP","PWD","LDAP","RADIUS","S/MIME","WebCAL","WebSite","PBX","HTTP","MobilePBX","XMedia","YMedia","MobilePronto"] if !$setting->{'AccessModes'} || $setting->{'AccessModes'} eq 'All';
+	    $setting->{'AccessModes'} = [grep {!/^Mobile$/i} @{$setting->{'AccessModes'}}];
+	} else {
+	    $settings->{'AccessModes'} = "default";
+	}
+	$cli->UpdateAccountSettings($OPTS{'account'}, $setting);
 	$cli->Logout();
 	return { msg => "Updated Successfuly." };
     } else {
@@ -326,6 +355,7 @@ sub api2_listpopswithdisk {
                 my $accounts=$cli->ListAccounts($domain);
                 my $userName;
                 foreach $userName (sort keys %$accounts) {      
+		    next if $userName eq 'pbx';
                         my $accountData = $cli->GetAccountEffectiveSettings("$userName\@$domain");
                         my $diskquota = @$accountData{'MaxAccountSize'} || '';
 			$diskquota =~ s/M//g;
@@ -482,14 +512,16 @@ sub api2_listforwards {
       }
       my $forwarders = $cli->ListForwarders($domain);
       foreach my $forwarder (@$forwarders) {
-	my $fwd = $cli->GetForwarder("$forwarder\@$domain");
-	push( @result, { uri_dest => "$forwarder%40$domain",
-			 html_dest => "$forwarder\@$domain",
-			 dest => "$forwarder\@$domain",
-			 uri_forward => "$fwd",
-			 html_forward => "$fwd" ,
-			 forward => "$fwd" } );
-
+	  next if $forwarder =~ m/^(i|tn)\-\d+$/i;
+	  next if $forwarder =~ m/^activequeue(toggle)?_/i;
+	  my $fwd = $cli->GetForwarder("$forwarder\@$domain");
+	  next if $fwd =~ m/^(ivrmenu|activequeue(toggle)?_)/i;
+	  push( @result, { uri_dest => "$forwarder%40$domain",
+			   html_dest => "$forwarder\@$domain",
+			   dest => "$forwarder\@$domain",
+			   uri_forward => "$fwd",
+			   html_forward => "$fwd" ,
+			   forward => "$fwd" } );
       }
     }
   }
@@ -497,7 +529,181 @@ sub api2_listforwards {
   return @result;
 }
 
+sub api2_ListExtensions {
+  my %OPTS = @_;
+  my @domains = Cpanel::Email::listmaildomains($OPTS{'domain'});
+  my $cli = getCLI();
+  my @result;
+  foreach my $domain (@domains) {
+      my $forwarders = $cli->ListForwarders($domain);
+      my $prefs = $cli->GetAccountPrefs("ivr\@$domain");
+      foreach my $forwarder (@$forwarders) {
+	  next unless $forwarder =~ m/^(tn\-\d+|\d{3})$/i;
+	  my $short = $forwarder;
+	  $short =~ s/^(i|tn)\-(\d+)$/$2/i;
+	  my $fwd = $cli->GetForwarder("$forwarder\@$domain");
+	  next if $fwd eq 'null';
+	  if ($fwd =~ /^activequeue(toggle)?\_/) {
+	      my $toggle = 0;
+	      my $to = $cli->GetForwarder($fwd);
+	      if ($1) {
+		  $to =~ s/togglegroupmember\{(.*?)\,.*?\}\#.*?$/activequeue_$1/i;
+		  $to = $cli->GetForwarder($to);
+		  $toggle = 1;
+	      }
+	      $to =~ s/activequeue?\{(.*?)\}\#.*?$/$1/;
+	      (undef, $fwd, undef) = split ",", $to;
+	      ($fwd, undef) = split '@', $to unless $fwd;
+	      $fwd .= "\@$domain";
+	      $fwd = $toggle ? "$fwd (Caller Queue - Toggle Agent)" : "$fwd (Caller Queue)";
+	  }
+	  if ($fwd =~ /^ivrmenu\{(\w+)\}/) {
+	      if ($prefs && $prefs->{IVRMenus} && $1) {
+		  $fwd = $prefs->{IVRMenus}->{$1}->{NAME};
+		  $fwd .= "\@$domain (IVR Menu)";
+	      }
+	  }
+	  push( @result, { uri_dest => "$forwarder%40$domain",
+			   html_dest => "$short",
+			   dest => "$forwarder\@$domain",
+			   uri_forward => "$fwd",
+			   html_forward => "$fwd",
+			   forward => "$fwd"
+		} );
+      }
+  }
+  $cli->Logout();
+  return @result;
+}
 
+sub api2_AssignExtension {
+  my %OPTS = @_;
+  my @domains = Cpanel::Email::listmaildomains();
+  my $cli = getCLI();
+
+  if ($OPTS{'extension'} || $OPTS{'local_extension'}) {
+      my (undef, $domain) = split '@', $OPTS{'account'};
+      for my $dom (@domains) {
+	  if ($dom eq $domain) {
+	      my $userForwarders = $cli->FindForwarders($domain,$OPTS{'account'});
+	      if ($OPTS{'local_extension'}) {
+		  $cli->CreateForwarder($OPTS{'local_extension'} . "\@$domain", $OPTS{'account'});
+		  unless ($cli->getErrMessage eq "OK") {
+		      $Cpanel::CPERROR{'CommuniGate_local_extension'} = $cli->getErrMessage;
+		      last;
+		  }
+	      }
+	      for my $forwarder (@$userForwarders) {
+		  if ($forwarder =~ m/^tn\-\d+/ && $OPTS{'extension'}) {
+		      $cli->DeleteForwarder("$forwarder\@$domain");
+		      $cli->CreateForwarder("$forwarder\@$domain", "null");
+		  }
+		  if ($forwarder =~ m/^\d{3}$/ && $OPTS{'local_extension'} && $OPTS{'local_extension'} ne "$forwarder\@$domain") {
+		      $cli->DeleteForwarder("$forwarder\@$domain");
+		  }
+	      }
+	      if ($OPTS{'extension'}) {
+		  $cli->DeleteForwarder($OPTS{'extension'});
+		  $cli->CreateForwarder($OPTS{'extension'}, $OPTS{'account'});
+	      }
+	      last;
+	  }
+      }
+  }
+
+  my $result = {};
+  my $defaults = $cli->GetServerAccountDefaults();
+  $result->{"classes"} = $defaults->{"ServiceClasses"};
+  foreach my $domain (@domains) {
+      my $accounts = $cli->ListAccounts($domain);
+      foreach my $userName (sort keys %$accounts) {
+	  my $account = $cli->GetAccountSettings("$userName\@$domain");
+	  $result->{"accounts"}->{"$userName\@$domain"}->{details} = $account;
+      }
+      my $groups = $cli->ListGroups($domain);
+      foreach $groupName (sort @$groups) {
+	  next if $groupName =~ m/^activequeuegroup\_/i;
+	  my $details = $cli->GetGroup("$groupName\@$domain");
+	  $result->{'departments'} = [] unless $result->{'departments'};
+	  push @{$result->{'departments'}}, "$groupName\@$domain" unless (defined($details->{SignalDisabled}) && $details->{SignalDisabled} eq "YES");
+
+      }
+      my $forwarders = $cli->ListForwarders($domain);
+      foreach my $forwarder (sort @$forwarders) {
+	  if ($forwarder =~ /^activequeue\_/) {
+	      my $name = "";
+	      my $to = $cli->GetForwarder("$forwarder\@$domain");
+	      $to =~ s/activequeue\{(.*?)\}\#.*?$/$1/;
+	      (undef, $name, undef) = split ",", $to;
+	      ($name, undef) = split '@', $to unless $name;
+	      my $toggle = $forwarder;
+	      $toggle =~ s/activequeue/activequeuetoggle/i;
+	      push @{$result->{'queues'}}, {value => "$forwarder\@$domain", toggle => "$toggle\@$domain", name => "$name\@$domain"};
+	  }
+      }
+      my $prefs = $cli->GetAccountPrefs("ivr\@$domain");
+      if ($prefs && $prefs->{IVRMenus}) {
+	  for my $ivr (sort keys %{$prefs->{IVRMenus}}) {
+	      push @{$result->{'ivrs'}}, {value => "ivrmenu{$ivr}#ivr\@$domain", name => $prefs->{IVRMenus}->{$ivr}->{NAME} . "\@$domain"};
+	  }
+      }
+  }
+  $cli->Logout();
+  return $result;
+}
+
+sub api2_DeleteExtension {
+  my %OPTS = @_;
+  my @domains = Cpanel::Email::listmaildomains();
+  my $cli = getCLI();
+  if ($OPTS{'extension'}) {
+      my (undef, $domain) = split '@', $OPTS{'extension'};
+      for my $dom (@domains) {
+	  if ($dom eq $domain) {
+	      $cli->DeleteForwarder($OPTS{'extension'});
+	      unless ($cli->getErrMessage eq "OK") {
+		  $Cpanel::CPERROR{'CommuniGate'} = $cli->getErrMessage;
+		  last;
+	      }
+	      if ($OPTS{'extension'} =~ m/^tn\-\d+/) {
+		  $cli->CreateForwarder($OPTS{'extension'}, "null");
+	      }
+	      last;
+	  }
+      }
+  }
+  $cli->Logout();
+  return $result;
+}
+
+sub api2_GetExtensions {
+  my %OPTS = @_;
+  my $domain = $OPTS{'domain'};
+  my @domains = Cpanel::Email::listmaildomains();
+  my $cli = getCLI();
+  my @result;
+  for my $dom (@domains) {
+      if ($dom eq $domain) {
+	  my $forwarders = $cli->ListForwarders($domain);
+	  foreach my $forwarder (@$forwarders) {
+	      next unless $forwarder =~ m/^tn\-\d+$/i;
+	      my $fwd = $cli->GetForwarder("$forwarder\@$domain");
+	      next unless $fwd eq 'null';
+	      my $short = $forwarder;
+	      $short =~ s/^(i|tn)\-(\d+)$/$2/i;
+	      push @result, {extension => "$forwarder\@$domain", short => $short};
+	  }
+	  last;
+      }
+  }
+  if ($#result == -1) {
+      push @result, {extension => "", short => "No extansion available for $domain"};
+  } else {
+      unshift @result, {extension => "", short => "-- Please Select --"};
+  }
+  $cli->Logout();
+  return @result;
+}
 
 sub api2_delforward {
         my %OPTS = @_;
@@ -1331,7 +1537,24 @@ sub api2_ListGroups{
         foreach my $domain (@domains) {
                 my $groups=$cli->ListGroups($domain);
                 foreach $groupName (sort @$groups) {
-                 push( @result, { list => "$groupName\@$domain" , domain =>"$domain"} );
+		    my $details = $cli->GetGroup("$groupName\@$domain");
+		    push( @result, { list => "$groupName\@$domain" , domain =>"$domain"} ) unless (defined($details->{EmailDisabled}) && $details->{EmailDisabled} eq "YES");
+                }
+        }
+	$cli->Logout();
+        return @result;
+}
+sub api2_ListDepartments {
+        my %OPTS = @_;
+        @domains = Cpanel::Email::listmaildomains();
+	my $cli = getCLI();
+        my @result;
+        foreach my $domain (@domains) {
+                my $groups=$cli->ListGroups($domain);
+                foreach $groupName (sort @$groups) {
+		    next if $groupName =~ /^activequeuegroup_/;
+		    my $details = $cli->GetGroup("$groupName\@$domain");
+		    push( @result, { list => "$groupName\@$domain" , domain =>"$domain"} ) unless (defined($details->{SignalDisabled}) && $details->{SignalDisabled} eq "YES");
                 }
         }
 	$cli->Logout();
@@ -1385,6 +1608,11 @@ sub api2_AddGroup{
         my @result;
         if ($error_msg eq "OK") {
                 push( @result, { email => "$listname", domain => "$domain" } );
+		# set real name
+		$Settings=$cli->GetGroup("$listname\@$domain");
+		@$Settings{'RealName'}=$realname; 
+		@$Settings{'SignalDisabled'}= 'YES'; 
+		$cli->SetGroup("$listname\@$domain",$Settings);
         } else {
                 $Cpanel::CPERROR{'CommuniGate'} = $error_msg;
         }
@@ -1403,6 +1631,30 @@ sub api2_AddGroup{
         return @result;
 }
 
+sub api2_AddDepartment {
+        my %OPTS = @_;
+        my $domain = $OPTS{'domain'};
+        my $listname = $OPTS{'email'};
+        my $spectre = $OPTS{'spectre'};
+        my $realname = $OPTS{'realname'};
+	my $cli = getCLI();
+        $cli->CreateGroup("$listname\@$domain");
+        my $error_msg = $cli->getErrMessage();
+        my @result;
+        if ($error_msg eq "OK") {
+                push( @result, { email => "$listname", domain => "$domain" } );
+		# set real name
+		$Settings=$cli->GetGroup("$listname\@$domain");
+		@$Settings{'RealName'}=$realname; 
+		@$Settings{'EmailDisabled'} = 'YES'; 
+		$cli->SetGroup("$listname\@$domain",$Settings);
+        } else {
+                $Cpanel::CPERROR{'CommuniGate'} = $error_msg;
+        }
+
+	$cli->Logout();
+        return @result;
+}
 
 sub api2_ListGroupMembers {
         my %OPTS = @_;
@@ -1431,7 +1683,9 @@ sub api2_AddGroupMember {
 	 $Cpanel::CPERROR{'InputWrong'} = "Please select account";
 	 return;
 	}
+        my $domain = $OPTS{'domain'};
 	my $cli = getCLI();
+
 	my $Settings=$cli->GetGroup($listname);
   	@$Settings{'Members'}=[] unless(@$Settings{'Members'});
   	my $Members=@$Settings{'Members'};
@@ -1649,21 +1903,9 @@ sub api2_ListForwardersBackups {
     my @result;
     foreach my $domain (@domains) {
 	my $accounts=$cli->ListAccounts($domain);
-	my $domainFound = 0;
-	foreach my $userName (sort keys %$accounts) {
-	    my $Rules=$cli->GetAccountMailRules("$userName\@$domain") || die "Error: ".$cli->getErrMessage.", quitting";
-	    foreach my $Rule (@$Rules) {
-		if ($Rule->[1] eq "#Redirect" && $Rule->[3]->[0]->[1] ne '' ) {
-		    push( @result, {
-			domain => $domain
-			  } );
-		    $domainFound = 1;
-		}
-		last if $domainFound;
-	    }
-	    last if $domainFound;
-	}
-        next if $domainFound;
+	push( @result, {
+	    domain => $domain
+	      } );
     }
     $cli->Logout();
     return @result;
@@ -1980,22 +2222,39 @@ sub api2_SetGroupSettings {
         @$Settings{'RejectAutomatic'}=($OPTS{'RejectAutomatic'}?'YES':'NO');;
         @$Settings{'RemoveAuthor'}=($OPTS{'RemoveAuthor'}?'YES':'NO');;
         @$Settings{'SetReplyTo'}=($OPTS{'SetReplyTo'}?'YES':'NO');;
+        @$Settings{'SignalDisabled'}=($OPTS{'SignalDisabled'}?'NO':'YES');;
         $cli->SetGroup($email,$Settings);
         my $error_msg = $cli->getErrMessage();
         my @result;
-        if ($error_msg eq "OK") {
-                #noop
-        } else {
-                $Cpanel::CPERROR{'CommuniGate'} = $error_msg;
+        unless ($error_msg eq "OK") {
+	    $Cpanel::CPERROR{'CommuniGate'} = $error_msg;
         }
+	$cli->Logout();
 	if ($OPTS{'spectre'} && IsGroupInternal($email)) {
 		SetGroupExternal($email);
 	}
 	if (!$OPTS{'spectre'} && (!IsGroupInternal($email))) {
                 SetGroupInternal($email);
         } 
- 	$cli->Logout();
+	$cli->Logout();
+        return @result;
+}
+sub api2_SetDepartmentSettings {
+        my %OPTS = @_;
+        my $email = $OPTS{'email'};
+	my $cli = getCLI();
 
+        $Settings=$cli->GetGroup($email);
+        @$Settings{'RealName'}=$OPTS{'RealName'};
+        @$Settings{'Expand'}=($OPTS{'Expand'}?'YES':'NO');;
+        @$Settings{'EmailDisabled'}=($OPTS{'EmailDisabled'}?'NO':'YES');;
+        $cli->SetGroup($email,$Settings);
+        my $error_msg = $cli->getErrMessage();
+        my @result;
+        unless ($error_msg eq "OK") {
+	    $Cpanel::CPERROR{'CommuniGate'} = $error_msg;
+        }
+	$cli->Logout();
         return @result;
 }
 
@@ -2131,6 +2390,55 @@ sub api2_updatearchive {
     return {msg => "Changes saved."};
 }
 
+sub api2_listSignalRules {
+    my $cli = getCLI();
+    my @domains = Cpanel::Email::listmaildomains();
+    my $rules = [];
+    for my $domain (@domains) {
+	my $rule = $cli->GetDomainSignalRules( $domain );
+	for my $r (@$rule) {
+	    $r->[4] = $domain;
+	}
+	@$rules = (@$rules, @$rule);
+    }
+    $cli->Logout();
+    return {rules => $rules};
+}
+
+sub api2_updateSignalRule {
+    my %OPTS = @_;
+    my $therule = $OPTS{'therule'};
+    my $dom = $OPTS{'domain'};
+    my $cli = getCLI();
+    my $return = {};
+    if ($therule) {
+	my @domains = Cpanel::Email::listmaildomains();
+	for my $domain (@domains) {
+	    if ($domain eq $dom) {
+		my $rules = $cli->GetDomainSignalRules( $domain );
+		for my $rule (@$rules) {
+		    if ($rule->[1] eq $therule) {
+			$return->{rule} = {};
+			$return->{rule}->{name} = $rule->[1];
+			my $stage = $rule->[0];
+			$stage =~ s/\d\d$//;
+			$return->{rule}->{Stage} = $stage;
+			$return->{rule}->{conditions} = {};
+			for my $condition (@{$rule->[2]}) {
+			    $condition->[0] =~ s/\s+//g;
+			    $return->{rule}->{conditions}->{$condition->[0]} = $condition->[$#{$condition}];
+			}
+			$return->{rule}->{action} = $rule->[3]->[0];
+			last;
+		    }
+		}
+		last;
+	    }
+	}
+    }
+    $cli->Logout();
+    return $return;
+}
 sub api2_VerifyAccount {
     my %OPTS = @_;
     my $user = $OPTS{'email'};
@@ -2176,69 +2484,78 @@ sub api2_DKIMVerification {
     $cli->Logout();
 }
 
-sub api2_EditContact {
+sub api2_doUpdateSignalRule {
     my %OPTS = @_;
-    my $account = $OPTS{'account'};
-    my (undef,$dom) = split "@", $account;
+    my $formdump = $OPTS{'formdump'};
+    my $params = {};
+    my $locale = Cpanel::Locale->get_handle();
+    for my $row (split "\n", $formdump) {
+	if ($row =~ m/^(\S+)\s\=\s(.*?)$/) {
+	    my $key =$1;
+	    my $value = $2;
+	    $params->{$key} = $value;
+	}
+    }
+    my $return = {};
+    my $cli = getCLI();
+    if ($params->{ruleName} && $params->{RequestURI}) {
+	my $rule = [];
+	my (undef, $domain) = split '@', $params->{RequestURI};
+	my $rules = $cli->GetDomainSignalRules( $domain );
+	$rule->[0] = $params->{Stage} . '06';
+	$rule->[1] = $params->{ruleName};
+	$rule->[2] = [];
+	push @{	$rule->[2]}, ['Method', 'is', 'INVITE'];
+	push @{	$rule->[2]}, ['RequestURI', 'is', "sip:" . $params->{RequestURI}];
+	my $timeOfDay = $params->{fromHour} . ":" .$params->{fromMinutes} . "-" . $params->{toHour} . ":" . $params->{toMinutes};
+	if ($timeOfDay =~ m/^\d\d:\d\d-\d\d:\d\d$/) {
+	    push @{$rule->[2]}, ["Time Of Day", 'in', $params->{fromHour} . ":" .$params->{fromMinutes} . "-" . $params->{toHour} . ":" . $params->{toMinutes}];
+	}
+	if ($params->{weekDays}) {
+	    push @{$rule->[2]}, [ "Current Day", "in", join(",", map { $params->{$_} } grep { /^weekDays\-?/ }  sort keys %$params)];
+	}
+	if ($params->{status}) {
+	    push @{$rule->[2]}, [ 'Presence', 'in', $params->{status}];
+	}
+	$rule->[3] = [["Redirect to", $params->{actionText}]] if $params->{action} eq 'Redirect to' && $params->{actionText};
+	$rule->[3] = [["Fork to", $params->{actionText}]] if $params->{action} eq 'Fork to' && $params->{actionText};
+	$rule->[3] = [["Reject with", 603]] if $params->{action} eq 'Reject with';
+	$rule->[3] = [["Stop processing"]] if $params->{action} eq 'Stop processing';
+	my $ruleFound = 0;
+	for my $r (@$rules) {
+	    if ($r->[1] eq $params->{ruleOldName}) {
+		$r = $rule;
+		$ruleFound = 1;
+		last;
+	    }
+	}
+	push @$rules, $rule unless $ruleFound;
+	$cli->SetDomainSignalRules($domain, $rules);
+	return {msg => $locale->maketext('Rules updated successfuly!')};
+    }
+    return {msg => $locale->maketext('Rules are NOT update. Please check your form!')};
+}
+
+sub api2_delSignalRule {
+    my %OPTS = @_;
+    my $rule = $OPTS{'rule'};
+    my $dom = $OPTS{'domain'};
     my @domains = Cpanel::Email::listmaildomains();
     my $cli = getCLI();
     my $locale = Cpanel::Locale->get_handle();
-    my @return;
     for my $domain (@domains) {
 	if ($domain eq $dom) {
-	    $password = $cli->GetAccountPlainPassword($account);
-	    if ($password) {
-		my $ximss = getXIMSS($account, $password);
-		my $time = time();
-		$ximss->send({folderOpen => {
-		        id => "$time-mailbox",
-			folder => $OPTS{'box'},
-			    sortField => "To"
-			      }});
-		my $mailbox = $ximss->parseResponse("$time-mailbox");
-		if ($mailbox->{'folderReport'}) {
-		        $ximss->send(
-			    {
-				folderBrowse => {
-				    id => "$time-messages",
-				    folder => $OPTS{'box'},
-				    index => {
-					    from => 0,
-					    till => ($mailbox->{'folderReport'}->{'messages'})
-				    }
-				}
-			    });
-			my $messages = $ximss->parseResponse("$time-messages");
-			if ($messages->{'folderReport'}) {
-			    $ximss->send({folderRead => {
-				    id => "$time-contact",
-				    folder => $OPTS{'box'},
-				    UID => $OPTS{'UID'},
-				        totalSizeLimit => 5000
-					  }});
-			    my $contact = $ximss->parseResponse("$time-contact");
-			    if ($contact->{'folderMessage'}) {
-				$ximss->send({folderClose => {id => "$time-close", folder=>$OPTS{'box'}}});
-				$ximss->close();
-				my @localtime = localtime(time);
-				$cli->Logout();
-				return {
-				    vcard => $contact->{folderMessage}->{EMail}->{MIME}->{vCard},
-				    contact => $contact,
-				    YEAR => ($localtime[5] + 1900),
-				    forceArray => \&forceArray
-				}
-			    }
-			}
-		}
-		$ximss->send({folderClose => {id => "$time-close", folder=>$OPTS{'box'}}});
-		$ximss->close();
+	    my $newrules = [];
+	    my $rules = $cli->GetDomainSignalRules( $domain );
+	    for my $r (@$rules) {
+		push @$newrules, $r unless $r->[1] eq $rule;
 	    }
+	    $cli->SetDomainSignalRules($domain, $newrules);
 	    last;
 	}
     }
     $cli->Logout();
-    return @return;
+    return {msg => $locale->maketext('Rule deleted!')};
 }
 
 sub api2_ListContacts {
@@ -2320,6 +2637,70 @@ sub api2_ListContacts {
     }
     $cli->Logout();
     return undef;
+}
+sub api2_EditContact {
+    my %OPTS = @_;
+    my $account = $OPTS{'account'};
+    my (undef,$dom) = split "@", $account;
+    my @domains = Cpanel::Email::listmaildomains();
+    my $cli = getCLI();
+    my $locale = Cpanel::Locale->get_handle();
+    my @return;
+    for my $domain (@domains) {
+	if ($domain eq $dom) {
+	    $password = $cli->GetAccountPlainPassword($account);
+	    if ($password) {
+		my $ximss = getXIMSS($account, $password);
+		my $time = time();
+		$ximss->send({folderOpen => {
+		        id => "$time-mailbox",
+			folder => $OPTS{'box'},
+			    sortField => "To"
+			      }});
+		my $mailbox = $ximss->parseResponse("$time-mailbox");
+		if ($mailbox->{'folderReport'}) {
+		        $ximss->send(
+			    {
+				folderBrowse => {
+				    id => "$time-messages",
+				    folder => $OPTS{'box'},
+				    index => {
+					    from => 0,
+					    till => ($mailbox->{'folderReport'}->{'messages'})
+				    }
+				}
+			    });
+			my $messages = $ximss->parseResponse("$time-messages");
+			if ($messages->{'folderReport'}) {
+			    $ximss->send({folderRead => {
+				    id => "$time-contact",
+				    folder => $OPTS{'box'},
+				    UID => $OPTS{'UID'},
+				        totalSizeLimit => 5000
+					  }});
+			    my $contact = $ximss->parseResponse("$time-contact");
+			    if ($contact->{'folderMessage'}) {
+				$ximss->send({folderClose => {id => "$time-close", folder=>$OPTS{'box'}}});
+				$ximss->close();
+				my @localtime = localtime(time);
+				$cli->Logout();
+				return {
+				    vcard => $contact->{folderMessage}->{EMail}->{MIME}->{vCard},
+				    contact => $contact,
+				    YEAR => ($localtime[5] + 1900),
+				    forceArray => \&forceArray
+				}
+			    }
+			}
+		}
+		$ximss->send({folderClose => {id => "$time-close", folder=>$OPTS{'box'}}});
+		$ximss->close();
+	    }
+	    last;
+	}
+    }
+    $cli->Logout();
+    return @return;
 }
 
 sub api2_DoEditContact {
@@ -3276,7 +3657,545 @@ sub api2_ImportLocalRoster {
     $cli->Logout();
     return $result;
 }
+sub api2_ListCalls {
+    my %OPTS = @_;
+    my $account = $OPTS{'account'};
+    my $period = $OPTS{'period'};
+    my (undef,$dom) = split "@", $account;
 
+    my @domains = Cpanel::Email::listmaildomains();
+    my $cli = getCLI();
+
+    my $calls = [];
+    my $periods = {};
+    for my $domain (@domains) {
+	if ($domain eq $dom) {
+	    my $files = $cli->ListStorageFiles($account, 'private/logs/');
+	    for (keys %$files) {
+		my (undef, undef,undef,$month,$year,undef,undef,undef) = split '\D', $files->{$_}->{STModified};
+		if ($_ =~ m/^calls\-/) {
+		    $periods->{"$year-$month-$_"} = $_;
+		    $periods->{"$year-$month-$_"} =~ s/^\w+\-//;
+		}
+	    }
+	    my $target = "";
+	    if ($period =~ /^calls\-\d+/) {
+		$target = $period;
+	    } else {
+		my $keys = [sort {$b <=> $a} keys %$periods];
+		$target = 'calls-' . $periods->{$keys->[0]} if $keys->[0];
+	    }
+	    my $file = $cli->ReadStorageFile($account, 'private/logs/' . $target);
+	    my $error_msg = $cli->getErrMessage();
+	    my $content = $file->[0];
+	    $content =~ s/(^\[|\]$)?//g;
+	    for (split "\n", decode_base64($content)) {
+		push @$calls, [split "\t", $_];
+	    };
+	    print $error_msg unless ($error_msg eq "OK");
+	    $Cpanel::CPERROR{'CommuniGate'} = $error_msg unless ($error_msg eq "OK");
+	    last;
+	}
+    }
+    $cli->Logout();
+    return {calls => $calls, files => $periods};
+}
+
+sub api2_AddQueue {
+    my %OPTS = @_;
+    my @domains = Cpanel::Email::listmaildomains();
+    my $cli = getCLI();
+    my ($forwarder,$dom) = split '@', $OPTS{'queue'};
+    my (undef,$dom2) = split '@', $OPTS{'department'};
+    my $departments = [];
+    my $name;
+    my $departments;
+    my $localExtension;
+    my $agentExtension;
+    for my $domain (@domains) {
+	my $groups = $cli->ListGroups($domain);
+	foreach $groupName (sort @$groups) {
+	    next if $groupName =~ /^activequeuegroup_/;
+	    my $details = $cli->GetGroup("$groupName\@$domain");
+	    push(@$departments, "$groupName\@$domain") unless (defined($details->{SignalDisabled}) && $details->{SignalDisabled} eq "YES");
+	}
+	if ($domain eq $dom) {
+	    my $queue = $cli->GetForwarder($OPTS{'queue'});
+	    if ($queue) {
+		$queue =~ s/activequeue\{(.*?)\}\#.*?$/$1/;
+		($department,$name,undef) = split ",", $queue;
+		$department =~ s/^activequeuegroup_//;
+		($name,undef) = split "@", $department unless $name;
+	    }
+	    my $forwarders = $cli->ListForwarders($domain);
+	    foreach my $forwarder (@$forwarders) {
+		next unless $forwarder =~ m/^(tn\-\d+|\d{3})$/i;
+		my $fwd = $cli->GetForwarder("$forwarder\@$domain");
+		next if $fwd eq 'null';
+		if ($forwarder =~ /^\d{3}$/) {
+		    $localExtension = $forwarder if $fwd eq "activequeue_" . $department;
+		    $agentExtension = $forwarder if $fwd eq "activequeuetoggle_" . $department;
+		} else {
+		    print $fwd;
+		}
+	    }
+	}
+    }
+    $cli->Logout();
+    return {departments => $departments, name => $name, department => $department, localExtension => $localExtension, agentExtension => $agentExtension};
+}
+
+sub api2_DoAddQueue {
+    my %OPTS = @_;
+    my @domains = Cpanel::Email::listmaildomains();
+    my $cli = getCLI();
+    my (undef,$dom) = split '@', $OPTS{'department'};
+    for my $domain (@domains) {
+	if ($domain eq $dom && $OPTS{'department'}) {
+	    unless ($cli->GetAccountSettings("pbx\@$domain")) {
+		$cli->CreateAccount(accountName => "pbx\@$domain");
+		$cli->SetAccountRights("pbx\@$domain", ['Domain', 'CanImpersonate', 'CanCreateGroups']);
+	    }
+	    if ($OPTS{'queue'}) {
+	    	$cli->DeleteForwarder($OPTS{'queue'});
+	    }
+	    my $queuestring = "activequeuegroup_" . $OPTS{'department'};
+	    if ($OPTS{'name'}) {
+		$queuestring .= "," . $OPTS{'name'} if $OPTS{'name'};
+	    }
+	    unless ($cli->GetGroup("activequeuegroup_" . $OPTS{'department'})) {
+		$cli->CreateGroup("activequeuegroup_" . $OPTS{'department'}, {EmailDisabled => 'YES'});
+	    }
+	    $cli->CreateForwarder("activequeue_" . $OPTS{'department'}, 'activequeue{' . $queuestring . '}#pbx@' . $domain);
+	    $cli->CreateForwarder("activequeuetoggle_" . $OPTS{'department'}, 'togglegroupmember{' . $OPTS{'department'} . ',' . "activequeuegroup_" . $OPTS{'department'} . '}#pbx@' . $domain);
+	    if ($OPTS{localExtension}) {
+		$cli->CreateForwarder($OPTS{'localExtension'} . "\@$domain", "activequeue_" . $OPTS{'department'});
+	    }
+	    if ($OPTS{agentExtension}) {
+		$cli->CreateForwarder($OPTS{'agentExtension'} . "\@$domain", "activequeuetoggle_" . $OPTS{'department'});
+	    }
+	    my $forwarders = $cli->ListForwarders($domain);
+	    foreach my $forwarder (@$forwarders) {
+		next unless $forwarder =~ m/^tn\-\d+$/i;
+		my $fwd = $cli->GetForwarder("$forwarder\@$domain");
+		if ($fwd eq "activequeue_" . $OPTS{'department'}) {
+		    $cli->DeleteForwarder("$forwarder\@$domain");
+		    $cli->CreateForwarder("$forwarder\@$domain", "null");
+		}
+	    }
+	    if ($OPTS{'extension'} && $OPTS{'extension'} =~ m/$domain$/ ) {
+		$cli->DeleteForwarder($OPTS{'extension'});
+		$cli->CreateForwarder($OPTS{'extension'}, "activequeue_" . $OPTS{'department'});
+	    }
+	}
+    }
+    $cli->Logout();
+    return { msg => ""};
+}
+
+sub api2_ListQueues {
+    my %OPTS = @_;
+    my @domains = Cpanel::Email::listmaildomains();
+    my $cli = getCLI();
+
+    my @return;
+    for my $domain (@domains) {
+	  my $forwarders = $cli->ListForwarders($domain);
+	  foreach my $forwarder (@$forwarders) {
+	      if ($forwarder =~ /^activequeue\_/) {
+		  my $queue = $cli->GetForwarder("$forwarder\@$domain");
+		  $queue =~ s/activequeue\{(.*?)\}\#.*?$/$1/;
+		  my ($department,$name,undef) = split ",", $queue;
+		  ($name,undef) = split "@", $department unless $name;
+		  $department =~ s/^activequeuegroup_//;
+		  $name =~ s/^activequeuegroup_//;
+		  push @return, {name => $name, department => $department, queue => "$forwarder\@$domain" };
+	      }
+	  }
+    }
+    $cli->Logout();
+    return @return;
+}
+
+sub api2_DeleteQueue {
+    my %OPTS = @_;
+    my @domains = Cpanel::Email::listmaildomains();
+    my $cli = getCLI();
+    if ($OPTS{'queue'}) {
+	my (undef, $domain) = split '@', $OPTS{'queue'};
+	for my $dom (@domains) {
+	    if ($dom eq $domain) {
+		my $target = $OPTS{'queue'};
+		$target =~ s/^activequeue_(.*?)\@.*?$/$1/;
+		$cli->DeleteForwarder($OPTS{'queue'});
+		my $forwarders = $cli->ListForwarders($domain);
+		foreach my $forwarder (@$forwarders) {
+		    my $to = $cli->GetForwarder("$forwarder\@$domain");
+		    if ($forwarder eq "activequeuetoggle_" . $target) {
+			$cli->DeleteForwarder("$forwarder\@$domain");
+		    } elsif ( $to eq "activequeue_$target\@$domain" || $to eq "activequeuetoggle_$target\@$domain") {
+			$cli->DeleteForwarder("$forwarder\@$domain");
+			if ($forwarder =~ m/^tn\-\d+/) {
+			    $cli->CreateForwarder("$forwarder\@$domain", "null");
+			}	
+		    }
+		}
+		$cli->DeleteGroup("activequeuegroup_$target\@$domain");
+		unless ($cli->getErrMessage eq "OK") {
+		    $Cpanel::CPERROR{'CommuniGate'} = $cli->getErrMessage;
+		}
+		last;
+	    }
+	}
+    }
+    $cli->Logout();
+    return $result;
+}
+
+sub api2_EditIVR {
+    my %OPTS = @_;
+    my @domains = Cpanel::Email::listmaildomains();
+    my $domain = $domains[0];
+    $domain = $OPTS{'domain'} if $OPTS{'domain'};
+    my $cli = getCLI();
+    my $result = {};
+    my $defaults = $cli->GetServerAccountDefaults();
+    $result->{"classes"} = $defaults->{"ServiceClasses"};
+    foreach my $dom (@domains) {
+	if ($dom eq $domain) {
+	    my $accounts = $cli->ListAccounts($domain);
+	    foreach my $userName (sort keys %$accounts) {
+		my $account = $cli->GetAccountSettings("$userName\@$domain");
+		$result->{"accounts"}->{"$userName\@$domain"}->{details} = $account;
+	    }
+	    my $groups = $cli->ListGroups($domain);
+	    foreach $groupName (sort @$groups) {
+		next if $groupName =~ m/^activequeuegroup\_/i;
+		my $details = $cli->GetGroup("$groupName\@$domain");
+		$result->{'departments'} = [] unless $result->{'departments'};
+		push @{$result->{'departments'}}, "$groupName\@$domain" unless (defined($details->{SignalDisabled}) && $details->{SignalDisabled} eq "YES");
+
+	    }
+	    my $forwarders = $cli->ListForwarders($domain);
+	    foreach my $forwarder (sort @$forwarders) {
+		# my $details = $cli->GetGroup("$groupName\@$domain");
+		# $result->{'departments'} = [] unless $result->{'departments'};
+		if ($forwarder =~ /^activequeue\_/) {
+		    my $name = "";
+		    my $to = $cli->GetForwarder("$forwarder\@$domain");
+		    $to =~ s/activequeue\{(.*?)\}\#.*?$/$1/;
+		    (undef, $name, undef) = split ",", $to;
+		    ($name, undef) = split '@', $to unless $name;
+		    push @{$result->{'queues'}}, {value => "$forwarder\@$domain", name => $name};
+		}
+	    }
+	    my $prefs = $cli->GetAccountPrefs("ivr\@$domain");
+	    unless ($prefs) {
+		$cli->CreateAccount(accountName => "ivr\@$domain");
+		$cli->SetAccountRights("pbx\@$domain", ['Domain', 'CanImpersonate']);
+		$prefs = $cli->GetAccountPrefs("ivr\@$domain");
+	    }
+	    if ($prefs->{IVRMenus}) {
+		for my $menu (keys %{$prefs->{IVRMenus}}) {
+		    push @{$result->{'ivrs'}}, {value => "ivrmenu{$menu}#ivr\@$domain", name => $prefs->{IVRMenus}->{$menu}->{NAME}};
+		}
+	    }
+	    $result->{files} = $cli->ListStockPBXFiles();
+	    my $domainPBX = $cli->ListDomainPBXFiles($domain);
+	    %{$result->{files}} = (%{$result->{files}}, %$domainPBX);
+	    $result->{domain} = $domain;
+	    if ($OPTS{'ivr'}) {
+		$result->{ivr} = $prefs->{IVRMenus}->{$OPTS{'ivr'}};
+	    }
+	    last;
+	}
+    }
+
+    $cli->Logout();
+    return $result;
+}
+
+sub api2_DoEditIVR {
+    my %OPTS = @_;
+    my $formdump = $OPTS{'formdump'};
+    my $params = {};
+    for my $row (split "\n", $formdump) {
+	if ($row =~ m/^(\S+)\s\=\s(.*?)$/) {
+	    my $key =$1;
+	    my $value = $2;
+	    $params->{$key} = $value;
+	}
+    }
+    my @domains = Cpanel::Email::listmaildomains();
+    my $domain = $domains[0];
+    $domain = $params->{'domain'} if $params->{'domain'};
+    my $cli = getCLI();
+    my $result = {};
+    foreach my $dom (@domains) {
+	if ($dom eq $domain) {
+	    my $id = $params->{'GIVEN'};
+	    $id =~ s/\W//g;
+	    my $prefs = $cli->GetAccountPrefs("ivr\@$domain");
+	    $prefs->{IVRMenus}->{$id} = {
+		'NAME' => $params->{'GIVEN'},
+		'playatstart' => [map {$params->{$_}} grep {/^playatstart\-/} sort keys %$params],
+		'playatstartevery' => [map {$params->{$_}} grep {/^playatstartevery\-/} sort keys %$params],
+		'playatend' => [map {$params->{$_}} grep {/^playatend\-/} sort keys %$params],
+		'playatendevery' => [map {$params->{$_}} grep {/^playatendevery\-/} sort keys %$params],
+	    };
+	    $prefs->{IVRMenus}->{$id}->{'activebuttons'} = [];
+	    for my $button ((1, 2, 3, 4, 5, 6, 7, 8 ,9 ,0, '*', '#', 'invalid')) {
+		if ($params->{'action-' . $button}) {
+		    push @{$prefs->{IVRMenus}->{$id}->{'activebuttons'}}, $button;
+		    $prefs->{IVRMenus}->{$id}->{'buttons'}->{$button}->{'action'} = $params->{'action-' . $button};
+		    $prefs->{IVRMenus}->{$id}->{'buttons'}->{$button}->{'sound'} = $params->{'sound-' . $button} if $params->{'sound-' . $button};
+		} else {
+		    delete $prefs->{IVRMenus}->{$id}->{'buttons'}->{$button} if $prefs->{IVRMenus}->{$id}->{'buttons'}->{$button};
+		}
+	    }
+	    if ($params->{'DED'}) {
+		$prefs->{IVRMenus}->{$id}->{'DED'} = "Yes";
+	    } else {
+		delete $prefs->{IVRMenus}->{$id}->{'DED'} if $prefs->{IVRMenus}->{$id}->{'DED'};
+	    }
+	    $prefs->{IVRMenus}->{$id}->{'languages'} = [map {{ (split('\-',$_))[1] => $params->{$_}}} grep {/^language\-\d$/ && $params->{$_}} sort keys %$params];
+	    $prefs->{IVRMenus}->{$id}->{'languages'}->[0]->{'mute'} = 'YES' if  $prefs->{IVRMenus}->{$id}->{'languages'}->[0] && ! $params->{'speaklang-1'};
+
+	    $cli->UpdateAccountPrefs("ivr\@$domain", $prefs);
+	    last;
+	}
+    }
+
+    $cli->Logout();
+    return $result;
+}
+
+sub api2_GetIVRSounds {
+    my %OPTS = @_;
+    my @domains = Cpanel::Email::listmaildomains();
+    my $domain = $domains[0];
+    $domain = $OPTS{'domain'} if $OPTS{'domain'};
+
+    my $cli = getCLI();
+    my $result = {};
+    foreach my $dom (@domains) {
+	if ($dom eq $domain) {
+	    $result->{files} = $cli->ListStockPBXFiles();
+	    last;
+	}
+    }
+
+    $cli->Logout();
+    return $result;
+}
+
+sub api2_ListIVRs {
+    my %OPTS = @_;
+    my @domains = Cpanel::Email::listmaildomains();
+    my $cli = getCLI();
+    my @result;
+    foreach my $domain (@domains) {
+	    my $prefs = $cli->GetAccountPrefs("ivr\@$domain");
+	    if ($prefs->{IVRMenus}) {
+		for my $ivr (sort keys %{$prefs->{IVRMenus}}) {
+		    push @result, {
+			id => $ivr,
+			name => $prefs->{IVRMenus}->{$ivr}->{NAME} . "\@$domain",
+			domain => $domain
+		    };
+		}
+	    }
+    }
+    $cli->Logout();
+    return @result;
+}
+
+sub api2_DeleteIVR {
+    my %OPTS = @_;
+    my @domains = Cpanel::Email::listmaildomains();
+    my $domain = $domains[0];
+    $domain = $OPTS{'domain'} if $OPTS{'domain'};
+    my $ivr = $OPTS{'ivr'};
+    my $cli = getCLI();
+    foreach my $dom (@domains) {
+	if ($dom eq $domain) {
+	    my $prefs = $cli->GetAccountPrefs("ivr\@$domain");
+	    if ($prefs->{IVRMenus} && $prefs->{IVRMenus}->{$ivr}) {
+		delete $prefs->{IVRMenus}->{$ivr};
+		$cli->UpdateAccountPrefs("ivr\@$domain", $prefs);
+	    }
+	    last;
+	}
+    }
+    $cli->Logout();
+    return {msg => "Deleted."};
+}
+
+sub api2_ListSounds {
+    my %OPTS = @_;
+    my @domains = Cpanel::Email::listmaildomains();
+    my $domain = $domains[0];
+    $domain = $OPTS{'domain'} if $OPTS{'domain'};
+    my $cli = getCLI();
+    my $result;
+    my $files = $cli->ListStockPBXFiles();
+    my $domainFiles = $cli->ListDomainPBXFiles($domain);
+    my $serverFiles = $cli->ListServerPBXFiles($domain);
+    $result->{sounds}->{english} = {map {$_ => 'stock'} grep {/\.wav$/} keys %$files};
+    my $domainSounds = {map {$_ => 'domain'} grep {/\.wav$/} keys %$domainFiles};
+    my $serverSounds = {map {$_ => 'server'} grep {/\.wav$/} keys %$serverFiles};
+    %{$result->{sounds}->{english}} = (%{$result->{sounds}->{english}}, %$serverSounds, %$domainSounds);
+
+    $result->{languages} = {map {$_ => 'stock'} grep {! (keys %{$files->{$_}})[0]} grep {!/\./} sort keys %$files};
+    my $domainLangs = {map {$_ => 'domain'} grep {! (keys %{$files->{$_}})[0]} grep {!/\./} sort keys %$domainFiles}; 
+    my $serverLangs = {map {$_ => 'server'} grep {! (keys %{$files->{$_}})[0]} grep {!/\./} sort keys %$serverFiles}; 
+    %{$result->{languages}} = (%{$result->{languages}}, %$serverLangs, %$domainLangs);
+
+    for my $lang (keys %{$result->{languages}}) {
+	my $files = $cli->ListStockPBXFiles($lang);
+	$result->{sounds}->{$lang} = {map {$_ => 'stock'} grep {/\.wav$/} keys %$files};
+	my $domainFiles = $cli->ListDomainPBXFiles($domain, $lang);
+	my $domainSounds = {map {$_ => 'domain'} grep {/\.wav$/} keys %$domainFiles};
+	my $serverFiles = $cli->ListServerPBXFiles($server, $lang);
+	my $serverSounds = {map {$_ => 'server'} grep {/\.wav$/} keys %$serverFiles};
+	%{$result->{sounds}->{$lang}} = (%{$result->{sounds}->{$lang}}, %$serverSounds, %$domainSounds);
+    }
+    $result->{domain} = $domain;
+    $result->{domains} = \@domains;
+    $result->{langs} = $result->{languages};
+    $result->{languages} = [sort keys %{$result->{languages}}];
+    unshift @{$result->{languages}}, 'english';
+    $cli->Logout();
+    return $result;
+}
+
+sub api2_GetSound {
+    my %OPTS = @_;
+    my @domains = Cpanel::Email::listmaildomains();
+    my $domain = $OPTS{'domain'} if $OPTS{'domain'};
+    my $cli = getCLI();
+    my $result;
+    foreach my $dom (@domains) {
+	if ($dom eq $domain) {
+	    my $file = $OPTS{'file'};
+	    $file = $OPTS{'lang'} . "/$file" if $OPTS{'lang'} ne 'english';
+	    $result = $cli->ReadDomainPBXFile($domain, $file);
+	    $result =~ s/(^\[|\]$)//g;
+	    last;
+	}
+    }
+    $cli->Logout();
+    return $result;
+}
+
+sub api2_UploadFile {
+    local $Cpanel::IxHash::Modify = 'none';
+  FILE:
+    foreach my $file ( keys %Cpanel::FORM ) {
+        next FILE if $file =~ m/^file-(.*)-key$/;
+        next FILE if $file !~ m/^file-(.*)/;
+	$Cpanel::CPVAR{"filename"} = $file;
+	$Cpanel::CPVAR{"filename"} =~ s/^file-//;
+	$Cpanel::CPVAR{"filepath"} = $Cpanel::FORM{$file};
+        last;
+    }
+    return 1;
+}
+
+sub api2_DeleteWav {
+    my %OPTS = @_;
+    my @domains = Cpanel::Email::listmaildomains();
+    my $domain = $domains[0];
+    $domain = $OPTS{'domain'} if $OPTS{'domain'};
+    my $cli = getCLI();
+    my $result;
+    foreach my $dom (@domains) {
+	if ($dom eq $domain && $OPTS{'file'} =~ m/\.wav$/i) {
+	    my $filename = $OPTS{'file'};
+	    $filename = $OPTS{'lang'} . "/" .  $filename if $OPTS{'lang'} && $OPTS{'lang'} ne 'english';
+	    $cli->DeleteDomainPBXFile($domain, $filename);
+	    $Cpanel::CPERROR{'CommuniGate'} = $cli->getErrMessage unless ($cli->getErrMessage eq "OK");
+	    last;
+	}
+    }
+    unlink $Cpanel::CPVAR{"filepath"};
+    $cli->Logout();
+    return $result;
+}
+
+sub api2_UpdateWav {
+    my %OPTS = @_;
+    my @domains = Cpanel::Email::listmaildomains();
+    my $domain = $domains[0];
+    $domain = $OPTS{'domain'} if $OPTS{'domain'};
+    my $cli = getCLI();
+    my $result;
+    foreach my $dom (@domains) {
+	if ($dom eq $domain) {
+	    if ($Cpanel::CPVAR{"filepath"} && $Cpanel::CPVAR{"filename"} =~ m/\.wav/i ) {
+		my $buffer;
+		my $address = 0;
+		my $filedata;
+		open(FI, "<", $Cpanel::CPVAR{"filepath"});
+		binmode FI;
+		while ( read( FI, $buffer, 16 ) ) {
+		    $filedata .= $buffer;
+		    $address += 16;
+		}
+		close FI;
+		my $filename = $OPTS{'file'} || $Cpanel::CPVAR{"filename"};
+		$filename = $OPTS{'lang'} . "/" .  $filename if $OPTS{'lang'} && $OPTS{'lang'} ne 'english';
+		$cli->StoreDomainPBXFile($domain, $filename, encode_base64($filedata, ""));
+		$Cpanel::CPERROR{'CommuniGate'} = $cli->getErrMessage unless ($cli->getErrMessage eq "OK");
+	    } else {
+		$Cpanel::CPERROR{'CommuniGate'} = "Error!";
+	    }
+	    last;
+	}
+    }
+    unlink $Cpanel::CPVAR{"filepath"};
+    $cli->Logout();
+    return $result;
+}
+
+sub api2_DeleteLanguage {
+    my %OPTS = @_;
+    my @domains = Cpanel::Email::listmaildomains();
+    my $domain = $domains[0];
+    $domain = $OPTS{'domain'} if $OPTS{'domain'};
+    my $cli = getCLI();
+    my $result;
+    foreach my $dom (@domains) {
+	if ($dom eq $domain && $OPTS{'lang'}) {
+	    $cli->DeleteDomainPBX($domain, $OPTS{'lang'});
+	    $Cpanel::CPERROR{'CommuniGate'} = $cli->getErrMessage unless ($cli->getErrMessage eq "OK");
+	    last;
+	}
+    }
+    unlink $Cpanel::CPVAR{"filepath"};
+    $cli->Logout();
+    return $result;
+}
+
+sub api2_AddLanguage {
+    my %OPTS = @_;
+    my @domains = Cpanel::Email::listmaildomains();
+    my $domain = $domains[0];
+    $domain = $OPTS{'domain'} if $OPTS{'domain'};
+    my $cli = getCLI();
+    my $result;
+    foreach my $dom (@domains) {
+	if ($dom eq $domain && $OPTS{'lang'}) {
+	    $OPTS{'lang'} =~ s/\W//g;
+	    $cli->CreateDomainPBX($domain, lc $OPTS{'lang'});
+	    $Cpanel::CPERROR{'CommuniGate'} = $cli->getErrMessage unless ($cli->getErrMessage eq "OK");
+	    last;
+	}
+    }
+    unlink $Cpanel::CPVAR{"filepath"};
+    $cli->Logout();
+    return $result;
+}
 
 sub IsGroupInternal {
   	my $groupwithdomain = shift;
@@ -3312,7 +4231,7 @@ sub GroupMembersForRule{
                 }
         }       
 	$cli->Logout();
-        return $result;
+    
 }
 
 sub SetGroupInternal {
@@ -3359,7 +4278,8 @@ sub SetGroupExternal{
                 	push(@NewRules,$Rule);
 		}
         }
-        $cli->SetServerRules(\@NewRules) || die "Error: ".$cli->getErrMessage.", quitting";
+        $cli->SetServerRules(\@NewRules);
+        $cli->Logout();
 }
 
 
