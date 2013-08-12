@@ -3683,7 +3683,7 @@ sub api2_ListCalls {
 	    if ($period =~ /^calls\-\d+/) {
 		$target = $period;
 	    } else {
-		my $keys = [sort {$b <=> $a} keys %$periods];
+		my $keys = [reverse sort keys %$periods];
 		$target = 'calls-' . $periods->{$keys->[0]} if $keys->[0];
 	    }
 	    my $file = $cli->ReadStorageFile($account, 'private/logs/' . $target);

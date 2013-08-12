@@ -1,6 +1,7 @@
 [% MACRO filter_option(pval, val, text) BLOCK -%]
 <option value="[% val %]"[% val == pval ? " selected='selected'" : "" %]>[% cptext(text) %]</option>
 [% END -%]
+
 <div class="highlight2">
   <form action="" method="GET" id="selectPeriod">
     <label>[% locale.maketext("CGPPeriod") %]:</label>
@@ -17,6 +18,16 @@
     }
   </script>
 </div>
+<div class="search-panel">
+    <form method="GET" action="callregister.html">
+        <span class="boldit">[% locale.maketext("SESearchButton") %]</span>
+        <input type="text" size="15" name="searchregex" value="[% FORM.searchregex %]">
+        <input type="submit" class="input-button" value="[% locale.maketext("go") %]">
+	<input type="hidden" name="account" value="[% FORM.account %]" />
+	<input type="hidden" name="period" value="[% FORM.period %]" />
+	[% IF FORM.searchregex %]<a href=" callregister.html?account=[% FORM.account %]&amp;period=[% FORM.period %]">[% locale.maketext('CGPClear') %]</a>[% END -%]
+    </form>
+</div>
 <table border="0" cellpadding="5" cellspacing="0" id="mailtbl" class="sortable" width="650">
   <tr>
     <th class="cell">[% locale.maketext("CGPTimeOfCall") %]</th>
@@ -27,6 +38,9 @@
     <th class="cell-end">[% locale.maketext("CGPError") %]</th>
   </tr>
 [% FOR call IN calls.reverse -%]
+  [% searchstring = call.join(',') | lower -%]
+  [% FORM.searchregex = FORM.searchregex | lower -%]
+  [% IF !FORM.searchregex || (matches = searchstring.match(FORM.searchregex)) -%]
   <tr>
     <td style="white-space: nowrap">[% call.1 %]</td>
     <td>[% call.2 == "I" ? "In" : "Out"%]</td>
@@ -35,5 +49,6 @@
     <td>[% call.5 || 0 %]s</td>
     <td>[% call.7 %]</td>
   </tr>
+  [% END -%]
 [% END -%]
 </table>
