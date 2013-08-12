@@ -355,7 +355,7 @@ sub api2_listpopswithdisk {
                 my $accounts=$cli->ListAccounts($domain);
                 my $userName;
                 foreach $userName (sort keys %$accounts) {      
-		    next if $userName eq 'pbx';
+		    next if $userName eq 'pbx' ||  $userName eq 'ivr';
                         my $accountData = $cli->GetAccountEffectiveSettings("$userName\@$domain");
                         my $diskquota = @$accountData{'MaxAccountSize'} || '';
 			$diskquota =~ s/M//g;
@@ -2458,6 +2458,11 @@ sub api2_VerifyAccount {
 }
 
 sub api2_checkSSLlinks {
+    my $loginData = Cpanel::AdminBin::adminrun('cca', 'GETLOGIN');
+    $loginData =~ s/^\.\n//;
+    my @loginData = split "::", $loginData;
+    $Cpanel::CPVAR{"CGPServer"} = $loginData[0];
+    $Cpanel::CPVAR{"CGPServer"} = $ENV{'HTTP_HOST'} if $loginData[0] eq '0' ||  $loginData[0] =~ /^127\.0/ ||  ! $loginData[0] ||  $loginData[0] eq 'localhost';
     $Cpanel::CPVAR{"ssllinks"} = 0;
     $Cpanel::CPVAR{"ssllinks"} = 1 if -f "/var/cpanel/cgpro/ssllinks";
 }
