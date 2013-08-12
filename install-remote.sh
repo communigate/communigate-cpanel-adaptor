@@ -29,7 +29,9 @@ cp ${PACKSRC}/module/CommuniGate.pm /usr/local/cpanel/Cpanel/
 
 # Lets add CGPro perl lib
 cp ${PACKSRC}/library/CLI.pm /usr/local/cpanel/perl/
-ln -s /usr/local/cpanel/perl/CLI.pm /usr/local/lib/perl5/5.8.8/
+ln -s /usr/local/cpanel/perl/CLI.pm /usr/local/cpanel
+ln -s /usr/local/cpanel/perl/CLI.pm /usr/local/lib/perl5/`perl -v | grep 'This is perl' | cut -f 2 -d 'v' | cut -f1 -d ' '`/
+cp ${PACKSRC}/library/XIMSS.pm /usr/local/cpanel/
 
 # CGPro cPanel Wrapper
 cp ${PACKSRC}/cpwrap/ccaadmin /usr/local/cpanel/bin/
@@ -44,10 +46,17 @@ cp -rf ${PACKSRC}/hooks/CGPro /var/cpanel/perl5/lib/
 # Register installed hooks
 /usr/local/cpanel/bin/manage_hooks add module CGPro::Hooks
 
-#Install config file
+#Install config files
 cp ${PACKSRC}/etc/cpanel_cgpro.conf /var/cpanel/communigate.yaml
 
 chmod 600 /var/cpanel/communigate.yaml
+if [ ! -d /var/cpanel/cgpro/ ]
+then
+    mkdir -p /var/cpanel/cgpro/
+fi
+if [ ! -f /var/cpanel/cgpro/classes.yaml ]
+    cp ${PACKSRC}/etc/classes.yaml /var/cpanel/cgpro/classes.yaml
+fi
 
 # Install CommuniGate Webmail in cPanel
 cp ${PACKSRC}/cgpro-webmail/webmail_communigate.yaml /var/cpanel/webmail/
@@ -105,6 +114,13 @@ do
     chmod +x ${THEMES[$i]}/cgpro/backup/getaccbackup.live.cgi
     chmod +x ${THEMES[$i]}/cgpro/backup/getaliasesbackup.live.cgi
     chmod +x ${THEMES[$i]}/cgpro/backup/getfiltersbackup.live.cgi
+    chmod +x ${THEMES[$i]}/cgpro/mail/checkDomainSettings.live.cgi
+    chmod +x ${THEMES[$i]}/cgpro/mail/getDomainAccounts.live.cgi
+    chmod +x ${THEMES[$i]}/cgpro/mail/getVCARD.live.cgi
+    chmod +x ${THEMES[$i]}/cgpro/getXmppHistory.live.cgi
+    chmod +x ${THEMES[$i]}/cgpro/playwav.live.cgi
+    chmod +x ${THEMES[$i]}/cgpro/getwav.live.cgi
+
     for ((j=0; j<${lLen}; j++)); do
         TARGET=${THEMES[$i]}/locale/`basename ${LOCALES[$j]} '{}'`.yaml.local
         if [ ! -f ${TARGET} ]
@@ -121,10 +137,14 @@ cp ${PACKSRC}/featurelists/cgpro /usr/local/cpanel/whostmgr/addonfeatures/
 chmod +x ${PACKSRC}/scripts/*
 ${PACKSRC}/scripts/migrate_groupware.pl
 ${PACKSRC}/scripts/modify_features.pl
+${PACKSRC}/scripts/rename_classes.pl
+${PACKSRC}/scripts/init_pbx.pl
 /usr/local/cpanel/bin/rebuild_sprites
 /usr/local/cpanel/bin/build_locale_databases
-${PACKSRC}/scripts/editconfig.pl
 
-#################################################
-#             	  OS Specific	  	 	#
-#################################################
+# install Perl dependencies
+if [ `perldoc -l  MIME::QuotedPrint::Perl | wc -l` == 0 ]
+then
+    /usr/local/cpanel/bin/cpanm -f -q MIME::QuotedPrint::Perl
+fi
+${PACKSRC}/scripts/editconfig.pl
