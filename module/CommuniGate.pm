@@ -4259,6 +4259,24 @@ sub api2_AddLanguage {
     return $result;
 }
 
+sub api2_GetAccountTypes {
+    my $data = Cpanel::CachedDataStore::fetch_ref( '/var/cpanel/cgpro/classes.yaml' ) || {};
+    my @domains = Cpanel::Email::listmaildomains();
+    my $result = {};
+    $result->{'perdomain'} = {};
+    for my $domain (@domains) {
+	if ($data->{$domain}) {
+	    $result->{'perdomain'}->{$domain} = $data->{$domain};
+	}
+    }
+    $result->{'plan'} = $data->{$Cpanel::CPDATA{'PLAN'}} || $data->{'default'};
+    my $cli = getCLI();
+    my $defaults = $cli->GetServerAccountDefaults();
+    $cli->Logout();
+    $result->{'classes'} = $defaults->{"ServiceClasses"};
+    return $result;
+}
+
 sub IsGroupInternal {
   	my $groupwithdomain = shift;
 	my @values = split("@",$groupwithdomain);

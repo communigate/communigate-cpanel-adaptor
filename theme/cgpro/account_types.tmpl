@@ -1,0 +1,28 @@
+<table border="0" cellpadding="5" cellspacing="0" id="mailtbl" class="sortable" width="650">
+  <tr>
+    <th class="cell">[% locale.maketext("CGPAccountType") %]</th>
+    <th class="cell">[% locale.maketext("CGPAccountTypeFeatures") %]</th>
+    <th class="cell">[% locale.maketext("CGPDefaultMaxAccounts") %]</th>
+    [% FOR domain IN perdomain.keys -%]
+    <th class="cell">[% locale.maketext("CGPDomainMaxAccounts") %]: [% domain %]</th>
+    [% END -%]
+  </tr>
+  [% FOREACH class IN classes.keys.sort -%]
+  [% UNLESS plan.$class.all == 0 -%]
+  <tr>
+    <td><strong>[% class %]</strong></td>
+    <td>
+      [% IF classes.$class.AccessModes == 'All' -%]
+      Mail, Relay, Signal, TLS, POP, IMAP, MAPI, AirSync, SIP, XMPP, WebMail, XIMSS, FTP, ACAP, PWD, LDAP, RADIUS, S/MIME, WebCAL, WebSite, PBX, HTTP, MobilePBX, XMedia, YMedia, MobilePronto
+      [% ELSE -%]
+      [% first = classes.$class.AccessModes.shift; classes.$class.AccessModes.join(', ') %]
+      [% END -%]
+    </td>
+    <td>[% plan.$class.all < 0 ? locale.maketext("CGPunlimited") : plan.$class.all %]</td>
+    [% FOR domain IN perdomain.keys -%]
+    <td>[% perdomain.$domain.$class.all < 0 ? locale.maketext("CGPunlimited") : perdomain.$domain.$class.all %]</td>
+    [% END -%]
+  </tr>
+  [% END -%]
+  [% END -%]
+</table>
