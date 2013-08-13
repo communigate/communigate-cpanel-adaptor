@@ -10,7 +10,7 @@ use Whostmgr::ACLS          ();
 use Cpanel::API::Branding        ();
 use LWP::UserAgent;
 
-$VERSION = '2.2';
+$VERSION = '3.0.1';
 
 print "Content-type: text/html\r\n\r\n";
 
@@ -19,7 +19,7 @@ Whostmgr::HTMLInterface::defheader( "CGPro Update Manager",'', '/cgi/addon_cgpro
 my $ua = LWP::UserAgent->new;
 $ua->timeout(10);
 
-my $response = $ua->get('http://communigate-cpanel-adaptor.googlecode.com/files/LatestVersion.txt');
+my $response = $ua->get('https://raw.github.com/webfacebg/communigate-cpanel-adaptor/master/LatestVersion');
 
 if ($response->is_success) {
     use Data::Dumper;
@@ -34,14 +34,14 @@ if ($response->is_success) {
 	if ($FORM{'upgrade'}) {
 	    print "<h2>Downloading files</h2>";
 	    print "<pre>\n";
-	    $response = $ua->get("http://communigate-cpanel-adaptor.googlecode.com/files/CommuniGate-cPanel-adaptor-$newversion.tar.gz", ':content_file' => "/usr/src/CommuniGate-cPanel-adaptor-$newversion.tar.gz");
+	    $response = $ua->get("https://github.com/webfacebg/communigate-cpanel-adaptor/archive/v$newversion.tar.gz", ':content_file' => "/usr/src/CommuniGate-cPanel-adaptor-$newversion.tar.gz");
 	    if ($response->is_success) {
 		print "Download successful. '/usr/src/CommuniGate-cPanel-adaptor-$newversion.tar.gz' \n";
 		if ( -d '/usr/src/communigate-cpanel-adaptor' ) {
 		    system("rm -rf /usr/src/communigate-cpanel-adaptor");
 		}
 		print "Extracting files...\n";
-		system ("cd /usr/src ; tar -xzf  /usr/src/CommuniGate-cPanel-adaptor-$newversion.tar.gz; cd CommuniGate-cPanel-adaptor-$newversion; /bin/bash ./upgrade.sh");
+		system ("cd /usr/src ; tar -xzf  /usr/src/CommuniGate-cPanel-adaptor-$newversion.tar.gz; cd communigate-cpanel-adaptor-$newversion; /bin/bash ./upgrade.sh");
 	    } else {
 		print "Error while downloading package: <em>" . $response->status_line . "</em>";
 	    }
