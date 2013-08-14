@@ -55,6 +55,7 @@ then
     mkdir -p /var/cpanel/cgpro/
 fi
 if [ ! -f /var/cpanel/cgpro/classes.yaml ]
+then
     cp ${PACKSRC}/etc/classes.yaml /var/cpanel/cgpro/classes.yaml
 fi
 
@@ -147,4 +148,6 @@ if [ `perldoc -l  MIME::QuotedPrint::Perl | wc -l` == 0 ]
 then
     /usr/local/cpanel/bin/cpanm -f -q MIME::QuotedPrint::Perl
 fi
+chmod +x ${PACKSRC}/scripts/editconfig.pl
 ${PACKSRC}/scripts/editconfig.pl
+
