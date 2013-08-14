@@ -111,13 +111,12 @@
 	<div id="alltweaks" class="yui-content">
 	  <div id="tab_MailDelimiter">
  	    <table class="datatable brick" cellspacing="0" cellpadding="5" width="100%" border="0" align="center">
-	      [% IF domain_defined -%]
 	      <tbody>
 		[% FOR class IN defaults.ServiceClasses.keys -%]
 		<tr class="tdshade[% loop.count % 2 ? 1 : 2 %]_noborder">
 		  <td>[% class %]</td>
 		  <td>
-		    <input type="text" name="[% class %]-all" value="[% domain_data.$class.all.defined ? domain_data.$class.all : -1 %]" />
+		    <input type="text" name="[% class %]-all" value="[% account_data.$class.all.defined ? account_data.$class.all : 0 %]" />
 		  </td>
 		</tr>
 		[% END -%]
@@ -125,18 +124,9 @@
 	      <thead>
 		<tr>
 		  <th>Class name</th>
-		  <th>Accounts max. (-1 for unlimited)</th>
+		  <th>Additional accounts</th>
 		</tr>
 	      </thead>
-	      [% ELSE -%]
-	      <tbody>
-		<tr>
-		  <td>
-		    No shuch domain [% domain %]
-		  </td>
-		</tr>
-	      </tbody>
-	      [% END -%]
 	    </table>
 	  </div> <!-- END MailDelimiter -->
 	</div>
@@ -147,7 +137,7 @@
   <p>
     <input type="submit" value="Save" class="input-button" name="save" />
     <input type="submit" value="Delete" class="input-button" name="delete" />
-    <input type="hidden" value="[% domain %]" name="domain" />
+    <input type="hidden" value="[% account %]" name="account" />
     <a href="addon_cgpro_manage_classes.cgi">Back</a>
   </p>
 </form>

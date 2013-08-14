@@ -175,7 +175,7 @@ var ACCOUNTS = [];
 <cpanelfeature cgpro_groupware>
   <cpanelif $FORM{'class'}>
     <p>
-      <?cp CommuniGate::UpdateAccountClass(%, msg) account=$FORM{'account'}, class=$FORM{'class'}, restrictAccess=$FORM{'restrictAccess'} ?>
+      <?cp CommuniGate::UpdateAccountClass() account=$FORM{'account'}, class=$FORM{'class'}, restrictAccess=$FORM{'restrictAccess'} ?>
     </p>
   </cpanelif>
   <h2><cpanel langprint="mailaddacc"></h2>

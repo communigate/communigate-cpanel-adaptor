@@ -39,6 +39,9 @@
   var tweakTabs = new YAHOO.widget.TabView('Accounts');
 </script>
 <h2>Accounts</h2>
+[% IF CPANEL.CPERROR.CommuniGate -%]
+<p><em><strong>[% CPANEL.CPERROR.CommuniGate %]</strong></em></p>
+[% END -%]
 <div class="yui-navset user-box clear" id="Accounts">
   <span class="sort_by">
     Sort by:

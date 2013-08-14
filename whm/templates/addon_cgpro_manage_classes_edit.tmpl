@@ -70,6 +70,36 @@
       </table>
     </fieldset>
   </div>
+  <div class="form_action">
+    <fieldset>
+      <h3>Description</h3>
+      <table>
+	<tbody>
+	  <tr>
+	    <td colspan="2">
+	      <textarea name="description" rows="8" cols="60">[% description %]</textarea>
+            </td>
+          </tr>
+	  <tr>
+            <td>
+	      <label for="DNS">Price per additional accout of this class:</label>
+	    </td>
+            <td>
+	      <input type="text" value="[% price %]" name="price" />
+            </td>
+          </tr>
+	  <tr>
+            <td>
+	      <label for="DNS">Currency:</label>
+	    </td>
+            <td>
+	      <input type="text" value="[% currency %]" name="currency" />
+            </td>
+          </tr>
+	</tbody>
+      </table>
+    </fieldset>
+  </div>
   <p>
     <input type="submit" value="Save" class="input-button" />
     <a href="addon_cgpro_manage_classes.cgi">Back</a>

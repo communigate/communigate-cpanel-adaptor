@@ -3,9 +3,9 @@
     <th class="cell">[% locale.maketext("CGPAccountType") %]</th>
     <th class="cell">[% locale.maketext("CGPAccountTypeFeatures") %]</th>
     <th class="cell">[% locale.maketext("CGPDefaultMaxAccounts") %]</th>
-    [% FOR domain IN perdomain.keys -%]
-    <th class="cell">[% locale.maketext("CGPDomainMaxAccounts") %]: [% domain %]</th>
-    [% END -%]
+    <th class="cell">[% locale.maketext("CGPAdditionalAccounts") %]</th>
+    <th class="cell">[% locale.maketext("CGPPricePerAdditionalAccounts") %]</th>
+    <th class="cell">[% locale.maketext("CGPDescription") %]</th>
   </tr>
   [% FOREACH class IN classes.keys.sort -%]
   [% UNLESS plan.$class.all == 0 -%]
@@ -19,9 +19,9 @@
       [% END -%]
     </td>
     <td>[% plan.$class.all < 0 ? locale.maketext("CGPunlimited") : plan.$class.all %]</td>
-    [% FOR domain IN perdomain.keys -%]
-    <td>[% perdomain.$domain.$class.all < 0 ? locale.maketext("CGPunlimited") : perdomain.$domain.$class.all %]</td>
-    [% END -%]
+    <td>[% plan.$class.all < 0 ? locale.maketext("CGPna") : account.$class.all || 0 %]</td>
+    <td>[% defaults.$class.price ? defaults.$class.currency _ " " _ defaults.$class.price : locale.maketext("CGPna")  %]</td>
+    <td>[% defaults.$class.description %]</td>
   </tr>
   [% END -%]
   [% END -%]

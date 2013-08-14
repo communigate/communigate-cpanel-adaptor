@@ -111,7 +111,7 @@
 	    </li>
 	    <li>
 	      <a href="#tab_assign">
-		<em>Assign to Domain</em>
+		<em>Assign to Account</em>
 	      </a>
 	    </li>
 	  </ul>
@@ -171,19 +171,17 @@
 	</div> <!-- END Assing to Packages -->
 	<div id="tab_assign">
  	  <table class="datatable brick" cellspacing="0" cellpadding="5" width="100%" border="0" align="center">
-	    <tbody>
+	    <thead>
 	      <tr class="tdshade1_noborder">
-		  <td nowrap="nowrap" align="RIGHT">
-		    Please enter an existing Domain: <br />
-		    (Please use 'Assign to Package' instead. <br />Use 'Assign to Domain' for domain specific changes only.)
+		  <td nowrap="nowrap" align="RIGHT" style="width: 30%;">
+		    Please type in an existing account username: <br />
 		  </td>
 		  <td nowrap="nowrap">
-		    <form action="addon_cgpro_manage_classes_assign.cgi" method="post">
-		      <input type="text" name="domain" value="" />
-		      <input type="submit" name="submit" value="Go" />
-		    </form>
+		      <input type="text" name="domain" value="" id="searchfield" />
 		  </td>
 	      </tr>
+	    </thead>
+	    <tbody id="listedAccounts">
 	    </tbody>
 	  </table>
 	</div> <!-- END Assing -->
@@ -225,6 +223,25 @@ function build_packages_table_markup(resp) {
       text = text + '</tr>';
       return text;
 };
+
+function build_accounts_table_markup(resp) {
+      var text = "";
+      var i = 0;
+      for ( i = 0; i < resp.acct.length; i++) {
+	  text = text + '<tr  class="tdshade' + ( i % 2 ? 1 : 2 ) + '_noborder">';
+	  text = text + '<td>';
+	  text = text + resp.acct[i].user;
+	  text = text + '</td>';
+	  text = text + '<td>';
+	  text = text + '<form action="addon_cgpro_manage_classes_assign.cgi" method="post">';
+	  text = text + '<input type="hidden" name="account" value="' + resp.acct[i].user + '" />';
+	  text = text + '<input type="submit" name="submit" value="Manage Classes" />';
+	  text = text + '</form>';
+	  text = text + '</td>';
+	  text = text + '</tr>';
+      }
+      return text;
+};
 //  sending request
 var url = CPANEL.security_token + ("/json-api/listpkgs");
 var callback = {
@@ -244,6 +261,30 @@ var callback = {
     failure : function(o) { }
 };
 YAHOO.util.Connect.asyncRequest("GET", url, callback, "");
+
+YAHOO.util.Event.addListener("searchfield", "keyup", function () {
+	var text = YAHOO.util.Dom.get("searchfield").value;
+	if (text.length > 2) {
+	    var url2 = CPANEL.security_token + ("/json-api/listaccts?searchtype=user&search=" + text);
+	    var callback2 = {
+		success : function(o) {
+		    var resp = null, data = null, err;
+		    try {
+			resp = YAHOO.lang.JSON.parse(o.responseText);
+		    }
+		    catch(e) {
+			try { console.warn(o.responseText,e) } catch(e) {}
+			err = LOCALE.maketext("The API response could not be parsed.");
+		    }
+		    if (resp) {
+			YAHOO.util.Dom.get("listedAccounts").innerHTML = build_accounts_table_markup(resp);
+		    }
+		},
+		failure : function(o) { }
+	    };
+	    YAHOO.util.Connect.asyncRequest("GET", url2, callback2, "");
+	}
+    });
   
 </script>
 

@@ -78,13 +78,12 @@ sub getXIMSS {
 sub max_class_accounts {
  my ($domain, $class) = @_;
  my $data = Cpanel::CachedDataStore::fetch_ref( '/var/cpanel/cgpro/classes.yaml' ) || {};
- if ($data->{$domain}) {
-     return $data->{$domain}->{$class}->{all};
- } elsif ($data->{$Cpanel::CPDATA{'PLAN'}}) {
-     return $data->{$Cpanel::CPDATA{'PLAN'}}->{$class}->{all};
- } else {
-     return $data->{default}->{$class}->{all};
+ my $limit = $data->{default}->{$class}->{all};
+ $limit = $data->{$Cpanel::CPDATA{'PLAN'}}->{$class}->{all} if $data->{$Cpanel::CPDATA{'PLAN'}}->{$class}->{all};
+ if ( $limit >= 0 ) {
+     $limit += $data->{$Cpanel::CPDATA{'USER'}}->{$class}->{all} if $data->{$Cpanel::CPDATA{'USER'}}->{$class}->{all};
  }
+ return $limit;
 }
 
 sub current_class_accounts {
@@ -291,10 +290,12 @@ sub api2_UpdateAccountClass {
 	}
 	$cli->UpdateAccountSettings($OPTS{'account'}, $setting);
 	$cli->Logout();
-	return { msg => "Updated Successfuly." };
+	$Cpanel::CPERROR{'CommuniGate'} = "Updated Successfuly.";
+	return {};
     } else {
 	$cli->Logout();
-	return { msg => "Maximum " .$OPTS{'class'} . " accounts for your plan is $max. Upgrade your plan for more " .$OPTS{'class'} . " accounts." };
+	$Cpanel::CPERROR{'CommuniGate'} = "Maximum " .$OPTS{'class'} . " accounts for your plan is $max. Upgrade your plan for more " .$OPTS{'class'} . " accounts!";
+	return {};
     }
 }
 
@@ -4261,19 +4262,15 @@ sub api2_AddLanguage {
 
 sub api2_GetAccountTypes {
     my $data = Cpanel::CachedDataStore::fetch_ref( '/var/cpanel/cgpro/classes.yaml' ) || {};
-    my @domains = Cpanel::Email::listmaildomains();
     my $result = {};
     $result->{'perdomain'} = {};
-    for my $domain (@domains) {
-	if ($data->{$domain}) {
-	    $result->{'perdomain'}->{$domain} = $data->{$domain};
-	}
-    }
     $result->{'plan'} = $data->{$Cpanel::CPDATA{'PLAN'}} || $data->{'default'};
+    $result->{'account'} = $data->{$Cpanel::CPDATA{'USER'}};
     my $cli = getCLI();
     my $defaults = $cli->GetServerAccountDefaults();
     $cli->Logout();
     $result->{'classes'} = $defaults->{"ServiceClasses"};
+    $result->{'defaults'} = $data->{"default"};
     return $result;
 }
 

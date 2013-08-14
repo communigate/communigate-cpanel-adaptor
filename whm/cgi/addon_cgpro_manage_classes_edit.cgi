@@ -33,6 +33,7 @@ my %FORM = Cpanel::Form::parseform();
 
 my $defaults = $cli->GetServerAccountDefaults();
 
+my $data = Cpanel::CachedDataStore::fetch_ref( '/var/cpanel/cgpro/classes.yaml' ) || {};
 if ($FORM{'classname'}) {
     my $AccessModes;
     if ($FORM{'AccessModes'}) {
@@ -56,14 +57,15 @@ if ($FORM{'classname'}) {
     $cli->UpdateServerAccountDefaults({
 	ServiceClasses => $defaults->{ServiceClasses}
 				      });
-    my $data = Cpanel::CachedDataStore::fetch_ref( '/var/cpanel/cgpro/classes.yaml' ) || {};
     unless (defined $data->{'default'}->{$FORM{'classname'}}) {
 	$data->{'default'}->{$FORM{'classname'}} = {
 	    'all' => -1,
-	    'free' => -1
 	};
-	Cpanel::CachedDataStore::store_ref( '/var/cpanel/cgpro/classes.yaml', $data );
     }
+    $data->{'default'}->{$FORM{'classname'}}->{'description'} = $FORM{'description'};
+    $data->{'default'}->{$FORM{'classname'}}->{'price'} = $FORM{'price'};
+    $data->{'default'}->{$FORM{'classname'}}->{'currency'} = $FORM{'currency'};
+    Cpanel::CachedDataStore::store_ref( '/var/cpanel/cgpro/classes.yaml', $data );
     print "HTTP/1.1 303 See Other\r\nLocation: addon_cgpro_manage_classes.cgi\r\n\r\n";
 } else {
     my $ServiceClasses = $defaults->{ServiceClasses};
@@ -77,6 +79,9 @@ if ($FORM{'classname'}) {
 	    ServiceClasses => $ServiceClasses,
 	    FORM => \%FORM,
 	    cgproversion => $cgproversion,
+	    description => $data->{'default'}->{$FORM{'class'}}->{'description'},
+	    price => $data->{'default'}->{$FORM{'class'}}->{'price'},
+	    currency => $data->{'default'}->{$FORM{'class'}}->{'currency'}
 	},
 	);
 }

@@ -32,35 +32,32 @@ my %FORM = Cpanel::Form::parseform();
 
 # Mail delimiter
 my $defaults = $cli->GetServerAccountDefaults();
-# check if domain is defined in CGPro;
-my $domain = $cli->GetDomainSettings($FORM{domain});
 my $data = Cpanel::CachedDataStore::fetch_ref( '/var/cpanel/cgpro/classes.yaml' ) || {};
 if ($FORM{'delete'}) {
-    $data->{$FORM{'domain'}} = {};
-    delete $data->{$FORM{'domain'}};
+    $data->{$FORM{'account'}} = {};
+    delete $data->{$FORM{'account'}};
     Cpanel::CachedDataStore::store_ref( '/var/cpanel/cgpro/classes.yaml', $data );
     print "HTTP/1.1 303 See Other\r\nLocation: addon_cgpro_manage_classes.cgi\r\n\r\n";
 }
 if ($FORM{'save'}) {
-    $data->{$FORM{'domain'}} = {};
+    $data->{$FORM{'account'}} = {};
     for my $class (keys %{$defaults->{ServiceClasses}}) {
-	$data->{$FORM{'domain'}}->{$class}->{'all'} = $FORM{$class . '-all'};
+	$data->{$FORM{'account'}}->{$class}->{'all'} = $FORM{$class . '-all'};
     }
     Cpanel::CachedDataStore::store_ref( '/var/cpanel/cgpro/classes.yaml', $data );
 }
 
 
 print "Content-type: text/html\r\n\r\n";
-Whostmgr::HTMLInterface::defheader( "CGPro Manage Classes for " . $FORM{domain},'', '/cgi/addon_cgp_manage_classes_assign.cgi' );
+Whostmgr::HTMLInterface::defheader( "CGPro Manage Classes for account: " . $FORM{account},'', '/cgi/addon_cgp_manage_classes_assign.cgi' );
 
 Cpanel::Template::process_template(
 				   'whostmgr',
 				   {
 				    'template_file' => 'addon_cgpro_manage_classes_assign.tmpl',
 				    defaults => $defaults,
-				    domain_data => $data->{$FORM{'domain'}},
-				    domain => $FORM{domain},
-				    domain_defined => $domain,
+				    account_data => $data->{$FORM{'account'}},
+				    account => $FORM{account},
 				    cgproversion => $cgproversion
 				   },
 				  );
