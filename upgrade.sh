@@ -22,18 +22,23 @@ then
     rm -f /usr/local/cpanel/CLI.pm
     ln -s /usr/local/cpanel/perl/CLI.pm /usr/local/cpanel
 fi
-if [ ! -L /usr/local/lib/perl5/`perl -v | grep 'This is perl' | cut -f 2 -d 'v' | cut -f1 -d ' '`/CLI.pm ]
-then
-    rm -f /usr/local/lib/perl5/`perl -v | grep 'This is perl' | cut -f 2 -d 'v' | cut -f1 -d ' '`/CLI.pm
-    ln -s /usr/local/cpanel/perl/CLI.pm /usr/local/lib/perl5/`perl -v | grep 'This is perl' | cut -f 2 -d 'v' | cut -f1 -d ' '`/CLI.pm
-fi
-ln -s /usr/local/cpanel/perl/CLI.pm /usr/local/lib/perl5/`perl -v | grep 'This is perl' | cut -f 2 -d 'v' | cut -f1 -d ' '`/
+ln -s /usr/local/cpanel/perl/CLI.pm /usr/local/share/perl5/
 
 cp ${PACKSRC}/library/XIMSS.pm /usr/local/cpanel/
 
 # CGPro cPanel Wrapper
 cp ${PACKSRC}/cpwrap/ccaadmin /usr/local/cpanel/bin/
 cp ${PACKSRC}/cpwrap/ccawrap /usr/local/cpanel/bin/
+
+# install Perl dependencies
+if [ `perldoc -l  MIME::QuotedPrint::Perl | wc -l` == 0 ]
+then
+    /usr/local/cpanel/bin/cpanm -f -q MIME::QuotedPrint::Perl
+fi
+if [ `perldoc -l YAML::Syck | wc -l` == 0 ]
+then
+    /usr/local/cpanel/bin/cpanm -f -q YAML::Syck
+fi
 
 # Install cPanel Function hooks
 if [ ! -d /var/cpanel/perl5/lib/ ]
@@ -172,11 +177,5 @@ rm -f /usr/local/cpanel/whostmgr/docroot/templates/cgpro_*
 cp ${PACKSRC}/whm/templates/* /usr/local/cpanel/whostmgr/docroot/templates/
 rm -rf /usr/local/cpanel/whostmgr/docroot/cgi/cgpro*
 cp -rf ${PACKSRC}/whm/cgi/* /usr/local/cpanel/whostmgr/docroot/cgi/
-
-# install Perl dependencies
-if [ `perldoc -l  MIME::QuotedPrint::Perl | wc -l` == 0 ]
-then
-    /usr/local/cpanel/bin/cpanm -f -q MIME::QuotedPrint::Perl
-fi
 
 echo "Upgrade Finished!"

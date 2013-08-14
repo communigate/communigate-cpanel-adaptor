@@ -78,12 +78,23 @@ cp ${PACKSRC}/module/CommuniGate.pm /usr/local/cpanel/Cpanel/
 # Lets add CGPro perl lib
 cp ${PACKSRC}/library/CLI.pm /usr/local/cpanel/perl/
 ln -s /usr/local/cpanel/perl/CLI.pm /usr/local/cpanel
-ln -s /usr/local/cpanel/perl/CLI.pm /usr/local/lib/perl5/`perl -v | grep 'This is perl' | cut -f 2 -d 'v' | cut -f1 -d ' '`/
+ln -s /usr/local/cpanel/perl/CLI.pm /usr/local/share/perl5/
+
 cp ${PACKSRC}/library/XIMSS.pm /usr/local/cpanel/
 
 # CGPro cPanel Wrapper
 cp ${PACKSRC}/cpwrap/ccaadmin /usr/local/cpanel/bin/
 cp ${PACKSRC}/cpwrap/ccawrap /usr/local/cpanel/bin/
+
+# install Perl dependencies
+if [ `perldoc -l  MIME::QuotedPrint::Perl | wc -l` == 0 ]
+then
+    /usr/local/cpanel/bin/cpanm -f -q MIME::QuotedPrint::Perl
+fi
+if [ `perldoc -l YAML::Syck | wc -l` == 0 ]
+then
+    /usr/local/cpanel/bin/cpanm -f -q YAML::Syck
+fi
 
 # Install cPanel Function hooks
 if [ ! -d /var/cpanel/perl5/lib/ ]
@@ -205,11 +216,6 @@ ${PACKSRC}/scripts/install_dkim_signer.pl
 
 # Install Active Queue Scripts
 cp ${PACKSRC}/PBXApps/*spp* /var/CommuniGate/PBXApps/
-# install Perl dependencies
-if [ `perldoc -l  MIME::QuotedPrint::Perl | wc -l` == 0 ]
-then
-    /usr/local/cpanel/bin/cpanm -f -q MIME::QuotedPrint::Perl
-fi
 
 #################################################
 #             	  OS Specific	  	 	#
