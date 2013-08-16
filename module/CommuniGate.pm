@@ -21,7 +21,6 @@ use Time::Local  'timelocal_nocheck';
 use Digest::MD5 qw(md5_hex);
 use XIMSS;
 use Cpanel::CPAN::MIME::Base64::Perl qw(decode_base64 encode_base64);
-use MIME::QuotedPrint::Perl;
 use Cpanel::CSVImport;
 
 require Exporter;
@@ -3249,45 +3248,14 @@ sub api2_ImportContacts {
     my %OPTS = @_;
     my @domains = Cpanel::Email::listmaildomains();
     my $account = $OPTS{'account'};
+    $account =~ s/%40/@/g;
     my (undef,$domain) = split "@", $account;
     my $cli = getCLI();
     my $result;
     foreach my $dom (@domains) {
 	if ($dom eq $domain) {
-	    if ($Cpanel::CPVAR{"filepath"} && $Cpanel::CPVAR{"filename"} =~ m/\.vcf$/i && $OPTS{'box'}) {
-		open(FI, "<", $Cpanel::CPVAR{"filepath"});
-		my $data = [];
-		my $contact = [];
-		my $rowdata = {};
-		my $encoded = undef;
-		for my $row (<FI>) {
-		    $row =~ s/(\n|\r)//g;
-		    $row =~ s/(\n|\r)//g;
-		    if ($row =~ m/^(\w+);?(\w+)?.*?\:(.*?)$/) {
-			$rowdata = {name => $1, value => $3};
-			next if $rowdata->{name} eq 'BEGIN' || $rowdata->{name} eq 'VERSION';
-			$rowdata->{type} = $2 if $2 && $2 ne "CHARSER" && $2 ne "ENCODING";
-			if ($row =~ s/;CHARSET=UTF-8;ENCODING=QUOTED-PRINTABLE//i) {
-			    $encoded = "qp";
-			    next if $rowdata->{value} =~ s/=$//;
-			} else {
-			    $encoded = undef;
-			}
-		    } else {
-			$rowdata->{value} .= $row;
-		    }
-		    next if $rowdata->{name} eq 'PHOTO';
-		    if ($encoded) {
-			$rowdata->{value} = decode_qp($rowdata->{value});
-		    }
-		    if ($rowdata->{name} eq 'END') {
-			push @$data, $contact;
-			$contact = [];
-		    }
-		    push @$contact, $rowdata unless $rowdata->{name} eq "END";
-		}
-		close FI;
-		for my $unit (@$data) {
+	    if ($OPTS{"filename"} =~ m/\.vcf$/i && $OPTS{'box'}) {
+		for my $unit (@{$OPTS{data}}) {
 		    my $message = {};
 		    $message->{"UID"}->{"VALUE"} = [join ".", map{ join "", map { int rand(9) } 1..$_} (10,1)];
 		    for my $row (@$unit) {
@@ -3377,11 +3345,11 @@ sub api2_ImportContacts {
 			$ximss->close();
 		    }
 		}
-	    } elsif ($Cpanel::CPVAR{"filepath"} && $Cpanel::CPVAR{"filename"} =~ m/\.csv$/i && $OPTS{'box'}) {
-		my $rows = [];
-		system '/usr/local/cpanel/bin/csvprocess', $Cpanel::CPVAR{"filepath"}, ( $OPTS{'header'} ? 1 : 0 ), ',';
-		my $importdata = Storable::lock_retrieve( $Cpanel::CPVAR{"filepath"}  . '.parsed' );
-		for my $row (@{$importdata->{data}}) {
+	    } elsif ($OPTS{"filename"} =~ m/\.csv$/i && $OPTS{'box'}) {
+		my $file = $Cpanel::homedir . '/tmp/' . $OPTS{"filename"};
+                system '/usr/local/cpanel/bin/csvprocess', $file, ( $OPTS{'header'} ? 1 : 0 ), ',';
+		my $importdata = Storable::lock_retrieve( $file  . '.parsed' );
+                for my $row (@{$importdata->{data}}) {
 		    my $message = {};
 		    $message->{"UID"}->{"VALUE"} = [join ".", map{ join "", map { int rand(9) } 1..$_} (10,1)];
 		    $message->{"N"}->{"GIVEN"} = [$row->[0]] if $row->[0];
@@ -3423,25 +3391,25 @@ sub api2_ImportContacts {
 			    my $address = {
 			    	WORK => {},
 			    };
-			        $address->{POBOX} = [$row->[19]] if $row->[19];
-			        $address->{CTRY} = [$row->[20]] if $row->[20];
-			        $address->{STREET} = [$row->[21]] if $row->[21];
-			        $address->{LOCALITY} = [$row->[22]] if $row->[22];
-			        $address->{REGION} = [$row->[23]] if $row->[23];
-			        $address->{PCODE} = [$row->[24]] if $row->[24];
-			        push @{$message->{"ADR"}}, $address;
+			    $address->{POBOX} = [$row->[19]] if $row->[19];
+			    $address->{CTRY} = [$row->[20]] if $row->[20];
+			    $address->{STREET} = [$row->[21]] if $row->[21];
+			    $address->{LOCALITY} = [$row->[22]] if $row->[22];
+			    $address->{REGION} = [$row->[23]] if $row->[23];
+			    $address->{PCODE} = [$row->[24]] if $row->[24];
+			    push @{$message->{"ADR"}}, $address;
 			}
 			if ($row->[25] || $row->[26] || $row->[27] || $row->[28] || $row->[29] || $row->[30]) {
 			    my $address = {
 			    	OTHER => {},
 			    };
-			        $address->{POBOX} = [$row->[25]] if $row->[25];
-			        $address->{CTRY} = [$row->[26]] if $row->[26];
-			        $address->{STREET} = [$row->[27]] if $row->[27];
-			        $address->{LOCALITY} = [$row->[28]] if $row->[28];
-			        $address->{REGION} = [$row->[29]] if $row->[29];
-			        $address->{PCODE} = [$row->[30]] if $row->[30];
-			        push @{$message->{"ADR"}}, $address;
+			    $address->{POBOX} = [$row->[25]] if $row->[25];
+			    $address->{CTRY} = [$row->[26]] if $row->[26];
+			    $address->{STREET} = [$row->[27]] if $row->[27];
+			    $address->{LOCALITY} = [$row->[28]] if $row->[28];
+			    $address->{REGION} = [$row->[29]] if $row->[29];
+			    $address->{PCODE} = [$row->[30]] if $row->[30];
+			    push @{$message->{"ADR"}}, $address;
 			}
 		    }
 		    $message->{"ORG"}->{"ORGNAME"} = [$row->[31]] if $row->[31];
@@ -3483,15 +3451,14 @@ sub api2_ImportContacts {
 		    	$ximss->close();
 		    }
 		}
-		unlink $Cpanel::CPVAR{"filepath"}  . '.parsed';
-
-	    } else {
+		unlink $file;
+		unlink $file . '.parsed';
+	     } else {
 		$Cpanel::CPERROR{'CommuniGate'} = "Error!";
 	    }
 	    last;
 	}
     }
-    unlink $Cpanel::CPVAR{"filepath"};
     $cli->Logout();
     return $result;
 }

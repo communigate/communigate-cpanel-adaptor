@@ -102,14 +102,13 @@ cp ${PACKSRC}/cpwrap/ccaadmin /usr/local/cpanel/bin/
 cp ${PACKSRC}/cpwrap/ccawrap /usr/local/cpanel/bin/
 
 # install Perl dependencies
-if [ `perldoc -l  MIME::QuotedPrint::Perl | wc -l` == 0 ]
-then
-    /usr/local/cpanel/bin/cpanm -f -q MIME::QuotedPrint::Perl
-fi
 if [ `perldoc -l YAML::Syck | wc -l` == 0 ]
 then
     /usr/local/cpanel/bin/cpanm -f -q YAML::Syck
 fi
+
+chmod +x ${PACKSRC}/scripts/install_cpanel_module.pl
+${PACKSRC}/scripts/install_cpanel_module.pl MIME::QuotedPrint::Perl
 
 # Install cPanel Function hooks
 if [ ! -d /var/cpanel/perl5/lib/ ]
@@ -195,6 +194,7 @@ do
     chmod +x ${THEMES[$i]}/cgpro/mail/checkDomainSettings.live.cgi
     chmod +x ${THEMES[$i]}/cgpro/mail/getDomainAccounts.live.cgi
     chmod +x ${THEMES[$i]}/cgpro/mail/getVCARD.live.cgi
+    chmod +x ${THEMES[$i]}/cgpro/mail/contactsimport.live.cgi
     chmod +x ${THEMES[$i]}/cgpro/getXmppHistory.live.cgi
     chmod +x ${THEMES[$i]}/cgpro/playwav.live.cgi
     chmod +x ${THEMES[$i]}/cgpro/getwav.live.cgi
