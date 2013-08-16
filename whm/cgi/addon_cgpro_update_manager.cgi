@@ -22,7 +22,6 @@ $ua->timeout(10);
 my $response = $ua->get('https://raw.github.com/webfacebg/communigate-cpanel-adaptor/master/LatestVersion');
 
 if ($response->is_success) {
-    use Data::Dumper;
     my $newversion = $response->decoded_content;  # or whatever
     $newversion =~ s/Version:\s+(\S+)/$1/;
     chomp $newversion;

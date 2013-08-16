@@ -17,8 +17,6 @@ use HTTP::Request::Common;
 use URI::Escape;
 use Cpanel::CachedDataStore;
 
-use Data::Dumper;
-
 my $account = param("user");
 my $password = param("pass");
 my $cgpurl= param("cgpurl");
