@@ -1,0 +1,23 @@
+<cpanel setvar="headerimg=../images/mailmenu.gif">
+<cpanel setvar="dprefix=../">
+<cpanel setvar="headerinclude=mail/pops_head.html">
+<cpanel Branding="include(stdheader.html)">
+  <div class="body-content">
+  <cpanelif !$FORM{'rpop'}>
+    <h1><cpanel langprint="CGPAddRemotePOP"></h1>
+  </cpanelif>
+  <cpanelif $FORM{'rpop'}>
+    <h1><cpanel langprint="CGPEditRemotePOP"></h1>
+  </cpanelif>
+    <!-- <?cp CommuniGate::DoEditRPOP() account=$FORM{'account'},name=$FORM{'name'},authName=$FORM{'authName'},domain=$FORM{'domain'},password=$FORM{'password'},mailbox=$FORM{'mailbox'},leave=$FORM{'leave'},APOP=$FORM{'APOP'},TLS=$FORM{'TLS'},period=$FORM{'period'} ?> -->
+    <cpanelif $CPERROR{'CommuniGate'}>
+      <p><cpanel langprint="CGPError">: <em><cpanel print="$CPERROR{'CommuniGate'}">!</em></p>
+    </cpanelif>
+    <cpanelif !$CPERROR{'CommuniGate'}>
+      <p><cpanel langprint="CGPRemotePOPUpdated">!</p>
+    </cpanelif>
+    <div class="return-link"><a href="rpop.html?account=<cpanel formprint="$FORM{account'}">">&larr; <cptext "Go Back"></a></div>
+  </div><!-- end body-content div -->
+
+<cpanel Branding="include(stdfooter.html)">
+

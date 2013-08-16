@@ -1,0 +1,14 @@
+<cpanel setvar="headerimg=../images/mailmenu.gif">
+<cpanel setvar="dprefix=../">
+<cpanel setvar="headerinclude=mail/pops_head.html">
+<cpanel Branding="include(stdheader.html)">
+<div class="body-content">
+  <h1><cpanel langprint="CGPRemotePOP"><cpanelif $FORM{'account'}>: <cpanel print="$FORM{'account'}"></cpanelif></h1>
+  <?cptt CommuniGate::AccountsOverview(cgpro/mail/contacts_accounts.tmpl) ?>
+  <cpanelif $FORM{'account'}>
+    <?cptt CommuniGate::ListRPOP(cgpro/mail/rpop.tmpl) account=$FORM{'account'} ?>
+  </cpanelif>
+</div><!-- end body-content div -->
+
+<cpanel Branding="include(stdfooter.html)">
+

@@ -1,0 +1,23 @@
+<p>
+  <a class="create-button" href="editrpop.html?account=[% FORM.account %]">[% locale.maketext("CGPAddRemotePOP") %]</a>
+</p>
+<table border="0" cellpadding="5" cellspacing="0" id="mailtbl" class="sortable" width="650">
+  <tr>
+    <th class="cell">[% locale.maketext("CGPRemotePOP") %]</th>
+    <th class="cell-end sorttable_nosort">[% locale.maketext("AHFucn") %]</th>
+  </tr>
+  [% FOR pop IN rpop.keys -%]
+  <tr>
+    <td class="truncate">[% pop %]</td>
+    <td>
+      <a href="editrpop.html?account=[% FORM.account %]&amp;rpop=[% pop %]">[% locale.maketext('CGPViewEdit') %]</a>,
+      <a href="deleterpop.html?account=[% FORM.account %]&amp;rpop=[% pop %]">[% locale.maketext('BrandingDPackage') %]</a>
+    </td>
+  </tr>
+  [% END -%]
+  [% UNLESS rpop.keys.size -%]
+  <tr>
+    <td class="truncate" colspan="4">[% locale.maketext("No Remote POPs.") %]</td>
+  </tr>
+  [% END -%]
+</table>

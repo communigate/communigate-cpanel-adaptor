@@ -1,0 +1,85 @@
+[% MACRO filter_option(pval, val, text) BLOCK -%]
+<option value="[% val %]"[% val == pval ? " selected='selected'" : "" %]>[% cptext(text) %]</option>
+[% END -%]
+<form action="doeditrpop.html?account=[% FORM.account %]" method="post">
+<div class="highlight">
+  <table border="0" style="margin-left: 20px">
+    <tr>
+      <td align="right">[% locale.maketext("CGPDisplayName") %]:</td>
+      <td><input type="text" name="name" style="width: 150px" value="[% FORM.rpop %]"[% IF FORM.rpop %] readonly=""[% END %] /></td>
+      <td colspan="2"></td>
+    </tr>
+    <tr>
+      <td align="right">[% locale.maketext("CGPAccount") %]:</td>
+      <td><input type="text" name="authName" style="width: 150px" value="[% rpop.authName %]" /></td>
+      <td colspan="2"></td>
+    </tr>
+    <tr>
+      <td align="right">[% locale.maketext("CGPHost") %]:</td>
+      <td><input type="text" name="domain" style="width: 150px" value="[% rpop.domain %]" /></td>
+      <td colspan="2"></td>
+    </tr>
+    <tr>
+      <td align="right">[% locale.maketext("CGPPassword") %]:</td>
+      <td><input type="password" name="password" style="width: 150px" value="[% rpop.password %]" /></td>
+      <td colspan="2"></td>
+    </tr>
+    <tr>
+      <td align="right">[% locale.maketext("CGPMailbox") %]:</td>
+      <td><input type="text" name="mailbox" style="width: 150px" value="[% rpop.mailbox %]" /></td>
+      <td colspan="2"></td>
+    </tr>
+    <tr>
+      <td align="right">[% locale.maketext("CGPLeaveMessagesOnServer") %]:</td>
+      <td><input type="checkbox" name="leave" value="YES"[% IF rpop.leave == "YES" %] checked=""[% END %] /></td>
+      <td colspan="2"></td>
+    </tr>
+    <tr>
+      <td align="right">[% locale.maketext("APOP") %]:</td>
+      <td><input type="checkbox" name="APOP" value="YES"[% IF rpop.APOP == "YES" %] checked=""[% END %] /></td>
+      <td colspan="2"></td>
+    </tr>
+    <tr>
+      <td align="right">[% locale.maketext("TLS") %]:</td>
+      <td><input type="checkbox" name="TLS" value="YES"[% IF rpop.TLS == "YES" %] checked=""[% END %] /></td>
+      <td colspan="2"></td>
+    </tr>
+    <tr>
+      <td align="right">[% locale.maketext("CGPPullEvery") %]:</td>
+      <td>
+	<select name="period">
+	  [% filter_option( rpop.period || "600s", "120s" , "2m") %]
+	  [% filter_option( rpop.period || "600s", "180s" , "3m") %]
+	  [% filter_option( rpop.period || "600s", "300s" , "5m") %]
+	  [% filter_option( rpop.period || "600s", "600s" , "10m") %]
+	  [% filter_option( rpop.period || "600s", "750s" , "15m") %]
+	  [% filter_option( rpop.period || "600s", "1200s" , "20m") %]
+	  [% filter_option( rpop.period || "600s", "1800s" , "30m") %]
+	  [% filter_option( rpop.period || "600s", "3600s" , "60m") %]
+	  [% filter_option( rpop.period || "600s", "7200s" , "2h") %]
+	  [% filter_option( rpop.period || "600s", "10800s" , "3h") %]
+	  [% filter_option( rpop.period || "600s", "18000s" , "5h") %]
+	  [% filter_option( rpop.period || "600s", "21600s" , "6h") %]
+	  [% filter_option( rpop.period || "600s", "22800s" , "8h") %]
+	  [% filter_option( rpop.period || "600s", "86400s" , "24h") %]
+	  [% filter_option( rpop.period || "600s", "1000000000s" , "CGPDisabled") %]
+	</select>
+      </td>
+      <td colspan="2"></td>
+    </tr>
+  </table>
+</div>
+<div class="highlight">
+  <table border="0" style="margin-left: 20px">
+    </tr>
+    <td>
+      <input type="hidden" name="oldMessageID" value="[% vcard.UID.VALUE.item('Message-ID') %]" />
+      <input type="hidden" name="oldUID" value="[% FORM.contact %]" />
+      <input id="new_email_submit" class="input-button" type="submit" value="[% locale.maketext("CGPSave") %]" name="save" />
+    </td>
+    <td></td>
+    <td></td>
+    </tr>
+ </table>
+</div>
+</form>

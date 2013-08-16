@@ -4274,6 +4274,115 @@ sub api2_GetAccountTypes {
     return $result;
 }
 
+sub api2_ListRPOP {
+    my %OPTS = @_;
+    my $account = $OPTS{'account'};
+    my (undef,$dom) = split "@", $account;
+
+    my @domains = Cpanel::Email::listmaildomains();
+    my $cli = getCLI();
+
+    my $result = {};
+    for my $domain (@domains) {
+	if ($domain eq $dom) {
+	    my $settings = $cli->GetAccountRPOPs($account);
+	    $result->{'rpop'} = $settings;
+	    last;
+	}
+    }
+    $cli->Logout();
+    return $result;
+}
+
+sub api2_EditRPOP {
+    my %OPTS = @_;
+    my $account = $OPTS{'account'};
+    my $rpop = $OPTS{'rpop'};
+    my (undef,$dom) = split "@", $account;
+
+    my @domains = Cpanel::Email::listmaildomains();
+    my $cli = getCLI();
+
+    my $result = {};
+    for my $domain (@domains) {
+	if ($domain eq $dom) {
+	    my $settings = $cli->GetAccountRPOPs($account);
+	    $result->{'rpop'} = $settings->{$rpop};
+	    last;
+	}
+    }
+    $cli->Logout();
+    return $result;
+}
+
+sub api2_DoEditRPOP {
+    my %OPTS = @_;
+    my $account = $OPTS{'account'};
+    my (undef,$dom) = split "@", $account;
+
+    my @domains = Cpanel::Email::listmaildomains();
+    my $cli = getCLI();
+
+    my $result = {};
+    for my $domain (@domains) {
+	if ($domain eq $dom) {
+	    my $settings = $cli->GetAccountRPOPs($account);
+	    $OPTS{'name'} =~ s/\W//g;
+	    $settings->{$OPTS{'name'}} = {
+		authName => $OPTS{'authName'},
+		domain => $OPTS{'domain'},
+		password => $OPTS{'password'},
+		period => $OPTS{'period'},
+	    };
+	    if ($OPTS{'mailbox'}) {
+		$settings->{$OPTS{'name'}}->{'mailbox'} = $OPTS{'mailbox'};
+	    } else {
+		delete $settings->{$OPTS{'name'}}->{'mailbox'} if $settings->{$OPTS{'name'}}->{'mailbox'};
+	    }
+	    if ($OPTS{'leave'}) {
+		$settings->{$OPTS{'name'}}->{'leave'} = "YES";
+	    } else {
+		delete $settings->{$OPTS{'name'}}->{'leave'} if $settings->{$OPTS{'name'}}->{'leave'};
+	    }
+	    if ($OPTS{'APOP'}) {
+		$settings->{$OPTS{'name'}}->{'APOP'} = "YES";
+	    } else {
+		delete $settings->{$OPTS{'name'}}->{'APOP'} if $settings->{$OPTS{'name'}}->{'APOP'};
+	    }
+	    if ($OPTS{'TLS'}) {
+		$settings->{$OPTS{'name'}}->{'TLS'} = "YES";
+	    } else {
+		delete $settings->{$OPTS{'name'}}->{'TLS'} if $settings->{$OPTS{'name'}}->{'TLS'};
+	    }
+	    $cli->SetAccountRPOPs($account, $settings);
+	    last;
+	}
+    }
+    $cli->Logout();
+    return $result;
+}
+
+sub api2_DeleteRPOP {
+    my %OPTS = @_;
+    my $account = $OPTS{'account'};
+    my (undef,$dom) = split "@", $account;
+
+    my @domains = Cpanel::Email::listmaildomains();
+    my $cli = getCLI();
+
+    my $result = {};
+    for my $domain (@domains) {
+	if ($domain eq $dom) {
+	    my $settings = $cli->GetAccountRPOPs($account);
+	    delete $settings->{$OPTS{'rpop'}};
+	    $cli->SetAccountRPOPs($account, $settings);
+	    last;
+	}
+    }
+    $cli->Logout();
+    return $result;
+}
+
 sub IsGroupInternal {
   	my $groupwithdomain = shift;
 	my @values = split("@",$groupwithdomain);
