@@ -6,23 +6,23 @@
   <table border="0" style="margin-left: 20px">
     <tr>
       <td align="right">[% locale.maketext("CGPDisplayName") %]:</td>
-      <td><input type="text" name="name" style="width: 150px" value="[% FORM.rpop %]"[% IF FORM.rpop %] readonly=""[% END %] /></td>
-      <td colspan="2"></td>
+      <td><input type="text" name="name" id="name" style="width: 150px" value="[% FORM.rpop %]"[% IF FORM.rpop %] readonly=""[% END %] /></td>
+      <td colspan="2">	<span id="name_error" class="cjt_validation_error"></span></td>
     </tr>
     <tr>
       <td align="right">[% locale.maketext("CGPAccount") %]:</td>
-      <td><input type="text" name="authName" style="width: 150px" value="[% rpop.authName %]" /></td>
-      <td colspan="2"></td>
+      <td><input type="text" name="authName" id="authName" style="width: 150px" value="[% rpop.authName %]" /></td>
+      <td colspan="2">	<span id="authName_error" class="cjt_validation_error"></span></td>
     </tr>
     <tr>
       <td align="right">[% locale.maketext("CGPHost") %]:</td>
-      <td><input type="text" name="domain" style="width: 150px" value="[% rpop.domain %]" /></td>
-      <td colspan="2"></td>
+      <td><input type="text" name="domain" id="domain" style="width: 150px" value="[% rpop.domain %]" /></td>
+      <td colspan="2"><span id="domain_error" class="cjt_validation_error"></span></td>
     </tr>
     <tr>
       <td align="right">[% locale.maketext("CGPPassword") %]:</td>
-      <td><input type="password" name="password" style="width: 150px" value="[% rpop.password %]" /></td>
-      <td colspan="2"></td>
+      <td><input type="password" name="password" id="password" style="width: 150px" value="[% rpop.password %]" /></td>
+      <td colspan="2"><span id="password_error" class="cjt_validation_error"></span></td>
     </tr>
     <tr>
       <td align="right">[% locale.maketext("CGPMailbox") %]:</td>
@@ -75,7 +75,7 @@
     <td>
       <input type="hidden" name="oldMessageID" value="[% vcard.UID.VALUE.item('Message-ID') %]" />
       <input type="hidden" name="oldUID" value="[% FORM.contact %]" />
-      <input id="new_email_submit" class="input-button" type="submit" value="[% locale.maketext("CGPSave") %]" name="save" />
+      <input id="submit" class="input-button" type="submit" value="[% locale.maketext("CGPSave") %]" name="save" />
     </td>
     <td></td>
     <td></td>
@@ -83,3 +83,31 @@
  </table>
 </div>
 </form>
+<script type="text/javascript">
+  var LANG = {};
+   LANG.name_input = '[% locale.maketext("CGPDisplayName") %]';
+   LANG.authname_input = '[% locale.maketext("CGPAccount") %]';
+   LANG.domain_input = '[% locale.maketext("CGPHost") %]';
+   LANG.password_input = '[% locale.maketext("CGPPassword") %]';
+    LANG.name_input_invalid = '[% locale.maketext("CGPThisFieldIsRequired") %]!';
+      YAHOO.util.Event.onDOMReady(function () {
+      var VAL_NAME = new CPANEL.validate.validator(LANG.name_input);
+      VAL_NAME.add("name", 'min_length(%input%,1)', LANG.name_input_invalid);
+      VAL_NAME.attach();
+
+      var VAL_AUTHNAME = new CPANEL.validate.validator(LANG.authname_input);
+      VAL_AUTHNAME.add("authName", 'min_length(%input%,1)', LANG.name_input_invalid);
+      VAL_AUTHNAME.attach();
+
+      var VAL_DOMAIN = new CPANEL.validate.validator(LANG.domain_input);
+      VAL_DOMAIN.add("domain", 'min_length(%input%,1)', LANG.name_input_invalid);
+      VAL_DOMAIN.attach();
+
+      var VAL_PASSWORD = new CPANEL.validate.validator(LANG.password_input);
+      VAL_PASSWORD.add("password", 'min_length(%input%,1)', LANG.name_input_invalid);
+      VAL_PASSWORD.attach();
+
+
+      CPANEL.validate.attach_to_form("submit", [VAL_NAME, VAL_AUTHNAME, VAL_DOMAIN, VAL_PASSWORD]);
+      });
+</script>
