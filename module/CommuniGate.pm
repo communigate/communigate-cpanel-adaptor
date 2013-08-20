@@ -39,8 +39,24 @@ sub getCLI {
     if ($CLI && $CLI->{isConnected}) {
 	return $CLI;
     } else {
-	my $loginData = Cpanel::AdminBin::adminrun('cca', 'GETLOGIN');
-	$loginData =~ s/^\.\n//;
+	my $loginData;
+	my $version = `$^X -V`;
+	$version =~ s/^\D*(\d+\.\d+).*?$/$1/;
+	if ($version < 11.38) {
+	    $loginData = Cpanel::AdminBin::adminrun('cca', 'GETLOGIN');
+	    $loginData =~ s/^\.\n//;
+	} else {
+	    my $result = Cpanel::Wrap::send_cpwrapd_request(
+		'namespace' => 'CGPro',
+		'module'    => 'cca',
+		'function'  => 'GETLOGIN'
+		);
+	    if ( defined( $result->{'data'} ) ) {
+		$loginData = $result->{'data'};
+	    } else {
+		$logger->warn("Can't login to CGPro: " . $result->{'error'});
+	    }
+	}
 	my @loginData = split "::", $loginData;
  	my $cli = new CGP::CLI( { PeerAddr => $loginData[0],
 				  PeerPort => $loginData[1],
@@ -57,8 +73,24 @@ sub getCLI {
 
 sub getXIMSS {
     my ($authData, $password) = @_;
-    my $loginData = Cpanel::AdminBin::adminrun('cca', 'GETLOGIN');
-    $loginData =~ s/^\.\n//;
+    my $loginData;
+    my $version = `$^X -V`;
+    $version =~ s/^\D*(\d+\.\d+).*?$/$1/;
+    if ($version < 11.38) {
+	$loginData = Cpanel::AdminBin::adminrun('cca', 'GETLOGIN');
+	$loginData =~ s/^\.\n//;
+    } else {
+	my $result = Cpanel::Wrap::send_cpwrapd_request(
+	    'namespace' => 'CGPro',
+	    'module'    => 'cca',
+	    'function'  => 'GETLOGIN'
+	    );
+	if ( defined( $result->{'data'} ) ) {
+	    $loginData = $result->{'data'};
+	} else {
+	    $logger->warn("Can't login to CGPro: " . $result->{'error'});
+	}
+    }
     my @loginData = split "::", $loginData;
     my $ximss = new XIMSS({
     	PeerAddr => $loginData[0],
@@ -2053,9 +2085,26 @@ sub api2_UninstallSRVXMPP {
     my @domains = Cpanel::Email::listmaildomains();
     my $locale = Cpanel::Locale->get_handle();
     my @results;
-     for my $domain (@domains) {
-	my $result = Cpanel::AdminBin::adminrun( 'cca', "UNINSTALLSRVXMPP", $domain);
-	chomp $result;
+    my $version = `$^X -V`;
+    $version =~ s/^\D*(\d+\.\d+).*?$/$1/;
+    for my $domain (@domains) {
+	my $result;
+	if ($version < 11.38) {
+	    $result = Cpanel::AdminBin::adminrun( 'cca', "UNINSTALLSRVXMPP", $domain);
+	    chomp $result;
+	} else {
+	    my $response = Cpanel::Wrap::send_cpwrapd_request(
+		'namespace' => 'CGPro',
+		'module'    => 'cca',
+		'function'  => 'UNINSTALLSRVXMPP',
+		'data'      => $domain
+		);
+	    if ( defined( $response->{'data'} ) ) {
+		$result = $response->{'data'};
+	    } else {
+		$logger->warn("Error: " . $response->{'error'});
+	    }
+	}
 	if ( $result eq '.' ) {
 	    push @results, { 'uninstalled' => $locale->maketext('XMPP records disabled.') };
 	} else {
@@ -2070,9 +2119,25 @@ sub api2_InstallSRVXMPP {
     my @domains = Cpanel::Email::listmaildomains();
     my $locale = Cpanel::Locale->get_handle();
     my @results;
-     for my $domain (@domains) {
-	my $result = Cpanel::AdminBin::adminrun( 'cca', "INSTALLSRVXMPP", $domain);
-	chomp $result;
+    my $version = `$^X -V`;
+    $version =~ s/^\D*(\d+\.\d+).*?$/$1/;
+    for my $domain (@domains) {
+	if ($version < 11.38) {
+	    $result = Cpanel::AdminBin::adminrun( 'cca', "INSTALLSRVXMPP", $domain);
+	    chomp $result;
+	} else {
+	    my $response = Cpanel::Wrap::send_cpwrapd_request(
+		'namespace' => 'CGPro',
+		'module'    => 'cca',
+		'function'  => 'INSTALLSRVXMPP',
+		'data'      => $domain
+		);
+	    if ( defined( $response->{'data'} ) ) {
+		$result = $response->{'data'};
+	    } else {
+		$logger->warn("Error: " . $response->{'error'});
+	    }
+	}
 	if ( $result eq '.' ) {
 	    push @results, { 'installed' => $locale->maketext('XMPP records enabled.') };
 	} else {
@@ -2087,9 +2152,25 @@ sub api2_UninstallSRVSIP {
     my @domains = Cpanel::Email::listmaildomains();
     my $locale = Cpanel::Locale->get_handle();
     my @results;
-     for my $domain (@domains) {
-	my $result = Cpanel::AdminBin::adminrun( 'cca', "UNINSTALLSRVSIP", $domain);
-	chomp $result;
+    my $version = `$^X -V`;
+    $version =~ s/^\D*(\d+\.\d+).*?$/$1/;
+    for my $domain (@domains) {
+	if ($version < 11.38) {
+	    $result = Cpanel::AdminBin::adminrun( 'cca', "UNINSTALLSRVSIP", $domain);
+	    chomp $result;
+	} else {
+	    my $response = Cpanel::Wrap::send_cpwrapd_request(
+		'namespace' => 'CGPro',
+		'module'    => 'cca',
+		'function'  => 'UNINSTALLSRVSIP',
+		'data'      => $domain
+		);
+	    if ( defined( $response->{'data'} ) ) {
+		$result = $response->{'data'};
+	    } else {
+		$logger->warn("Error: " . $response->{'error'});
+	    }
+	}
 	if ( $result eq '.' ) {
 	    push @results, { 'uninstalled' => $locale->maketext('SIP records disabled.') };
 	} else {
@@ -2104,9 +2185,25 @@ sub api2_InstallSRVSIP {
     my @domains = Cpanel::Email::listmaildomains();
     my $locale = Cpanel::Locale->get_handle();
     my @results;
-     for my $domain (@domains) {
-	my $result = Cpanel::AdminBin::adminrun( 'cca', "INSTALLSRVSIP", $domain);
-	chomp $result;
+    my $version = `$^X -V`;
+    $version =~ s/^\D*(\d+\.\d+).*?$/$1/;
+    for my $domain (@domains) {
+	if ($version < 11.38) {
+	    $result = Cpanel::AdminBin::adminrun( 'cca', "INSTALLSRVSIP", $domain);
+	    chomp $result;
+	} else {
+	    my $response = Cpanel::Wrap::send_cpwrapd_request(
+		'namespace' => 'CGPro',
+		'module'    => 'cca',
+		'function'  => 'INSTALLSRVSIP',
+		'data'      => $domain
+		);
+	    if ( defined( $response->{'data'} ) ) {
+		$result = $response->{'data'};
+	    } else {
+		$logger->warn("Error: " . $response->{'error'});
+	    }
+	}
 	if ( $result eq '.' ) {
 	    push @results, { 'installed' => $locale->maketext('SIP records enabled.') };
 	} else {
@@ -2121,9 +2218,25 @@ sub api2_UninstallSRVCALDAV {
     my @domains = Cpanel::Email::listmaildomains();
     my $locale = Cpanel::Locale->get_handle();
     my @results;
-     for my $domain (@domains) {
-	my $result = Cpanel::AdminBin::adminrun( 'cca', "UNINSTALLSRVCALDAV", $domain);
-	chomp $result;
+    my $version = `$^X -V`;
+    $version =~ s/^\D*(\d+\.\d+).*?$/$1/;
+    for my $domain (@domains) {
+	if ($version < 11.38) {
+	    $result = Cpanel::AdminBin::adminrun( 'cca', "UNINSTALLSRVCALDAV", $domain);
+	    chomp $result;
+	} else {
+	    my $response = Cpanel::Wrap::send_cpwrapd_request(
+		'namespace' => 'CGPro',
+		'module'    => 'cca',
+		'function'  => 'UNINSTALLSRVCALDAV',
+		'data'      => $domain
+		);
+	    if ( defined( $response->{'data'} ) ) {
+		$result = $response->{'data'};
+	    } else {
+		$logger->warn("Error: " . $response->{'error'});
+	    }
+	}
 	if ( $result eq '.' ) {
 	    push @results, { 'uninstalled' => $locale->maketext('CALDAV records disabled.') };
 	} else {
@@ -2138,9 +2251,25 @@ sub api2_InstallSRVCALDAV {
     my @domains = Cpanel::Email::listmaildomains();
     my $locale = Cpanel::Locale->get_handle();
     my @results;
-     for my $domain (@domains) {
-	my $result = Cpanel::AdminBin::adminrun( 'cca', "INSTALLSRVCALDAV", $domain);
-	chomp $result;
+    my $version = `$^X -V`;
+    $version =~ s/^\D*(\d+\.\d+).*?$/$1/;
+    for my $domain (@domains) {
+	if ($version < 11.38) {
+	    $result = Cpanel::AdminBin::adminrun( 'cca', "INSTALLSRVCALDAV", $domain);
+	    chomp $result;
+	} else {
+	    my $response = Cpanel::Wrap::send_cpwrapd_request(
+		'namespace' => 'CGPro',
+		'module'    => 'cca',
+		'function'  => 'INSTALLSRVCALDAV',
+		'data'      => $domain
+		);
+	    if ( defined( $response->{'data'} ) ) {
+		$result = $response->{'data'};
+	    } else {
+		$logger->warn("Error: " . $response->{'error'});
+	    }
+	}
 	if ( $result eq '.' ) {
 	    push @results, { 'installed' => $locale->maketext('CALDAV records enabled.') };
 	} else {
@@ -2155,9 +2284,25 @@ sub api2_UninstallSRVCARDDAV {
     my @domains = Cpanel::Email::listmaildomains();
     my $locale = Cpanel::Locale->get_handle();
     my @results;
-     for my $domain (@domains) {
-	my $result = Cpanel::AdminBin::adminrun( 'cca', "UNINSTALLSRVCARDDAV", $domain);
-	chomp $result;
+    my $version = `$^X -V`;
+    $version =~ s/^\D*(\d+\.\d+).*?$/$1/;
+    for my $domain (@domains) {
+	if ($version < 11.38) {
+	    $result = Cpanel::AdminBin::adminrun( 'cca', "UNINSTALLSRVCARDDAV", $domain);
+	    chomp $result;
+	} else {
+	    my $response = Cpanel::Wrap::send_cpwrapd_request(
+		'namespace' => 'CGPro',
+		'module'    => 'cca',
+		'function'  => 'UNINSTALLSRVCARDDAV',
+		'data'      => $domain
+		);
+	    if ( defined( $response->{'data'} ) ) {
+		$result = $response->{'data'};
+	    } else {
+		$logger->warn("Error: " . $response->{'error'});
+	    }
+	}
 	if ( $result eq '.' ) {
 	    push @results, { 'uninstalled' => $locale->maketext('CARDDAV records disabled.') };
 	} else {
@@ -2172,9 +2317,25 @@ sub api2_InstallSRVCARDDAV {
     my @domains = Cpanel::Email::listmaildomains();
     my $locale = Cpanel::Locale->get_handle();
     my @results;
-     for my $domain (@domains) {
-	my $result = Cpanel::AdminBin::adminrun( 'cca', "INSTALLSRVCARDDAV", $domain);
-	chomp $result;
+    my $version = `$^X -V`;
+    $version =~ s/^\D*(\d+\.\d+).*?$/$1/;
+    for my $domain (@domains) {
+	if ($version < 11.38) {
+	    $result = Cpanel::AdminBin::adminrun( 'cca', "INSTALLSRVCARDDAV", $domain);
+	    chomp $result;
+	} else {
+	    my $response = Cpanel::Wrap::send_cpwrapd_request(
+		'namespace' => 'CGPro',
+		'module'    => 'cca',
+		'function'  => 'INSTALLSRVCARDDAV',
+		'data'      => $domain
+		);
+	    if ( defined( $response->{'data'} ) ) {
+		$result = $response->{'data'};
+	    } else {
+		$logger->warn("Error: " . $response->{'error'});
+	    }
+	}
 	if ( $result eq '.' ) {
 	    push @results, { 'installed' => $locale->maketext('CARDDAV records enabled.') };
 	} else {
@@ -2189,9 +2350,25 @@ sub api2_GetSRV {
     my @domains = Cpanel::Email::listmaildomains();
     my $locale = Cpanel::Locale->get_handle();
     my @results;
-     for my $domain (@domains) {
-	my $result = Cpanel::AdminBin::adminrun( 'cca', "GETSRV", $domain);
-	chomp $result;
+    my $version = `$^X -V`;
+    $version =~ s/^\D*(\d+\.\d+).*?$/$1/;
+    for my $domain (@domains) {
+	if ($version < 11.38) {
+	    $result = Cpanel::AdminBin::adminrun( 'cca', "GETSRV", $domain);
+	    chomp $result;
+	} else {
+	    my $response = Cpanel::Wrap::send_cpwrapd_request(
+		'namespace' => 'CGPro',
+		'module'    => 'cca',
+		'function'  => 'GETSRV',
+		'data'      => $domain
+		);
+	    if ( defined( $response->{'data'} ) ) {
+		$result = $response->{'data'};
+	    } else {
+		$logger->warn("Error: " . $response->{'error'});
+	    }
+	}
 	if ( $result =~ /^\./ ) {
 	    push @results, { 'data' => 'OK' };
 	    $Cpanel::CPVAR{"xmpp_enabled"} = 0;

@@ -1,0 +1,234 @@
+#!/usr/local/cpanel/3rdparty/bin/perl
+
+use strict;
+use Cpanel::AdminBin::Serializer ();
+use Cpanel::Logger               ();
+use Cpanel::PwCache              ();
+use Cpanel::CachedDataStore      ();
+
+my $stdin = <STDIN>;
+chomp $stdin;
+my ( $uid, $function, $data ) = split( / /, $stdin, 3 );
+
+# sanitize the input; in this case, only alphanumeric, underscore, space, period, and exclamation are allowed
+$data =~ s/![\w \.\!]//g;
+
+# make a note in the logs!
+my $user   = ( Cpanel::PwCache::getpwuid($uid) )[0];
+my $logger = Cpanel::Logger->new();
+
+if ( $function eq 'GETLOGIN' ) {
+    my $conf = Cpanel::CachedDataStore::fetch_ref( '/var/cpanel/communigate.yaml' ) || {};
+    print $conf->{cgprohost} , "::" , $conf->{cgproport} , "::" , $conf->{cgprouser} , "::" , $conf->{cgpropass};
+    exit(0);
+}
+
+elsif ( $function eq 'READFILE' ) {
+    my $filename = $data;
+    if ( -f $filename) {
+	open(FILE, "<", $filename) or die "Failed: $!";
+	while (<FILE>) {
+	    print $_;
+	}
+	close(FILE);
+    }
+    exit(0);
+}
+elsif ( $function eq 'UNINSTALLSRVXMPP' ) {
+    my $domain = $data;
+    if (-f "/var/named/$domain.db") {
+	open(IN, "<", "/var/named/$domain.db") or die "Cannot open zone file ($!)";
+	my $out = "";
+	for my $row (<IN>) {
+	    $out .= $row unless $row =~ m/^_(xmpp|jabber)/;
+	}
+	close(IN);
+	open(OUT, ">", "/var/named/$domain.db") or die "Cannot open zone file ($!)";
+	print OUT $out;
+	close(OUT);
+	print ".";
+    } else {
+	print "No zone file for domain $domain";
+	exit;
+    }
+    exit(0);
+}
+
+elsif ( $function eq 'INSTALLSRVXMPP' ) {
+    my $domain = $data;
+    if (-f "/var/named/$domain.db") {
+	open(IN, "<", "/var/named/$domain.db") or die "Cannot open zone file ($!)";
+	my $xmpp_client = 0;
+	my $xmpp_server = 0;
+	my $jabber = 0;
+	for my $row (<IN>) {
+	    $xmpp_server = 1 if $row =~ m/^_xmpp\-server/;
+	    $xmpp_client = 1 if $row =~ m/^_xmpp\-client/;
+	    $xmpp_client = 1 if $row =~ m/^_jabber/;
+	}
+	close(IN);
+	open(OUT, ">>", "/var/named/$domain.db") or die "Cannot open zone file ($!)";
+	print OUT "_xmpp-server._tcp\t14400\tIN\tSRV\t1\t5\t5269\tmail.$domain.\n" unless $xmpp_server;
+	print OUT "_xmpp-client._tcp\t14400\tIN\tSRV\t1\t5\t5222\tmail.$domain.\n" unless $xmpp_client;
+	print OUT "_jabber._tcp\t14400\tIN\tSRV\t1\t5\t5269\tmail.$domain.\n" unless $jabber;
+	print OUT $out;
+	close(OUT);
+	print ".";
+    } else {
+	print "No zone file for domain $domain";
+	exit;
+    }
+    exit(0);
+}
+
+elsif ( $function eq 'UNINSTALLSRVSIP' ) {
+    my $domain = $data;
+    if (-f "/var/named/$domain.db") {
+	open(IN, "<", "/var/named/$domain.db") or die "Cannot open zone file ($!)";
+	my $out = "";
+	for my $row (<IN>) {
+	    $out .= $row unless $row =~ m/^_sip/;
+	}
+	close(IN);
+	open(OUT, ">", "/var/named/$domain.db") or die "Cannot open zone file ($!)";
+	print OUT $out;
+	close(OUT);
+	print ".";
+    } else {
+	print "No zone file for domain $domain";
+	exit;
+    }
+    exit(0);
+}
+
+elsif ( $function eq 'INSTALLSRVSIP' ) {
+    my $domain = $data;
+    if (-f "/var/named/$domain.db") {
+	open(IN, "<", "/var/named/$domain.db") or die "Cannot open zone file ($!)";
+	my $sip = 0;
+	for my $row (<IN>) {
+	    $sip = 1 if $row =~ m/^_sip/;
+	}
+	close(IN);
+	open(OUT, ">>", "/var/named/$domain.db") or die "Cannot open zone file ($!)";
+	print OUT "_sip._udp\t14400\tIN\tSRV\t1\t5\t5060\tmail.$domain.\n" unless $sip;
+	print OUT $out;
+	close(OUT);
+	print ".";
+    } else {
+	print "No zone file for domain $domain";
+	exit;
+    }
+    exit(0);
+}
+
+elsif ( $function eq 'UNINSTALLSRVCALDAV' ) {
+    my $domain = $data;
+    if (-f "/var/named/$domain.db") {
+	open(IN, "<", "/var/named/$domain.db") or die "Cannot open zone file ($!)";
+	my $out = "";
+	for my $row (<IN>) {
+	    $out .= $row unless $row =~ m/^_caldav/;
+	}
+	close(IN);
+	open(OUT, ">", "/var/named/$domain.db") or die "Cannot open zone file ($!)";
+	print OUT $out;
+	close(OUT);
+	print ".";
+    } else {
+	print "No zone file for domain $domain";
+	exit;
+    }
+    exit(0);
+}
+
+elsif ( $function eq 'INSTALLSRVCALDAV' ) {
+    my $domain = $data;
+    if (-f "/var/named/$domain.db") {
+	open(IN, "<", "/var/named/$domain.db") or die "Cannot open zone file ($!)";
+	my $caldav = 0;
+	my $caldavs = 0;
+	for my $row (<IN>) {
+	    $caldav = 1 if $row =~ m/^_caldav/;
+	    $caldavs = 1 if $row =~ m/^_caldavs/;
+	}
+	close(IN);
+	open(OUT, ">>", "/var/named/$domain.db") or die "Cannot open zone file ($!)";
+	print OUT "_caldav._tcp\t14400\tIN\tSRV\t1\t5\t80\tmail.$domain.\n" unless $caldav;
+	print OUT "_caldavs._tcp\t14400\tIN\tSRV\t1\t5\t443\tmail.$domain.\n" unless $caldavs;
+	print OUT $out;
+	close(OUT);
+	print ".";
+    } else {
+	print "No zone file for domain $domain";
+	exit;
+    }
+    exit(0);
+}
+
+elsif ( $function eq 'UNINSTALLSRVCARDDAV' ) {
+    my $domain = $data;
+    if (-f "/var/named/$domain.db") {
+	open(IN, "<", "/var/named/$domain.db") or die "Cannot open zone file ($!)";
+	my $out = "";
+	for my $row (<IN>) {
+	    $out .= $row unless $row =~ m/^_carddav/;
+	}
+	close(IN);
+	open(OUT, ">", "/var/named/$domain.db") or die "Cannot open zone file ($!)";
+	print OUT $out;
+	close(OUT);
+	print ".";
+    } else {
+	print "No zone file for domain $domain";
+	exit;
+    }
+    exit(0);
+}
+
+elsif ( $function eq 'INSTALLSRVCARDDAV' ) {
+    my $data = $data;
+    if (-f "/var/named/$domain.db") {
+	open(IN, "<", "/var/named/$domain.db") or die "Cannot open zone file ($!)";
+	my $carddav = 0;
+	my $carddavs = 0;
+	for my $row (<IN>) {
+	    $carddav = 1 if $row =~ m/^_carddav/;
+	    $carddavs = 1 if $row =~ m/^_carddavs/;
+	}
+	close(IN);
+	open(OUT, ">>", "/var/named/$domain.db") or die "Cannot open zone file ($!)";
+	print OUT "_carddav._tcp\t14400\tIN\tSRV\t1\t5\t80\tmail.$domain.\n" unless $carddav;
+	print OUT "_carddavs._tcp\t14400\tIN\tSRV\t1\t5\t443\tmail.$domain.\n" unless $carddavs;
+	print OUT $out;
+	close(OUT);
+	print ".";
+    } else {
+	print "No zone file for domain $domain";
+	exit;
+    }
+    exit(0);
+}
+
+elsif ( $function eq 'GETSRV' ) {
+    my $domain = $data;
+    if (-f "/var/named/$domain.db") {
+	open(IN, "<", "/var/named/$domain.db") or die "Cannot open zone file ($!)";
+	for my $row (<IN>) {
+	    print $row if $row =~ m/SRV/;
+	}
+	close(IN);
+    } else {
+	print "No zone file for domain $domain";
+	exit;
+    }
+    exit(0);
+}
+
+else {
+    print "Invalid function specified to CCA adminbin function";
+    exit(1);
+}
+
+1;
+

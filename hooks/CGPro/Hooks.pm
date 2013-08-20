@@ -113,15 +113,32 @@ sub getCLI {
 	return $CLI;
     } else {
 	my $loginData = $conf;
-	$loginData = Cpanel::AdminBin::adminrun('cca', 'GETLOGIN') unless $loginData;
-	$loginData =~ s/^\.\n//;
+	my $logger = Cpanel::Logger->new();
+	unless $logindata {
+	    my $version = `$^X -V`;
+	    $version =~ s/^\D*(\d+\.\d+).*?$/$1/;
+	    if ($version < 11.38) {
+		$loginData = Cpanel::AdminBin::adminrun('cca', 'GETLOGIN') unless $loginData;
+		$loginData =~ s/^\.\n//;
+	    } else {
+		my $result = Cpanel::Wrap::send_cpwrapd_request(
+		    'namespace' => 'CGPro',
+		    'module'    => 'cca',
+		    'function'  => 'GETLOGIN'
+		    );
+		if ( defined( $result->{'data'} ) ) {
+		    $loginData = $result->{'data'};
+		} else {
+		    $logger->warn("Can't login to CGPro: " . $result->{'error'});
+
+	    }
+	}
 	my @loginData = split "::", $loginData;
  	my $cli = new CGP::CLI( { PeerAddr => $loginData[0],
 				  PeerPort => $loginData[1],
 				  login => $loginData[2],
 				  password => $loginData[3]
 				});
-	my $logger = Cpanel::Logger->new();
 	unless($cli) {
 	    $logger->warn("Can't login to CGPro: ".$CGP::ERR_STRING);
 	    exit(0);
@@ -389,8 +406,25 @@ sub dkim_install {
     my $user = $params->{'user'};
     my $cli = getCLI();
     my @domains = Cpanel::Email::listmaildomains();
+    my $version = `$^X -V`;
+    $version =~ s/^\D*(\d+\.\d+).*?$/$1/;
     for my $domain (@domains) {
-	my $key = Cpanel::AdminBin::adminrun('cca', 'READFILE', "/var/cpanel/domain_keys/private/" . $domain);
+	my $key;
+	if ($version < 11.38) {
+	    $key = Cpanel::AdminBin::adminrun('cca', 'READFILE', "/var/cpanel/domain_keys/private/" . $domain);
+	} else {
+	    my $result = Cpanel::Wrap::send_cpwrapd_request(
+		'namespace' => 'CGPro',
+		'module'    => 'cca',
+		'function'  => 'READFILE',
+		'data'      => "/var/cpanel/domain_keys/private/" . $domain
+		);
+	    if ( defined( $result->{'data'} ) ) {
+		$key = $result->{'data'};
+	    } else {
+		$logger->warn("Error: " . $result->{'error'});
+	    }
+	}
 	$key =~ s/(\-{5}.*?\-{5}|^\.|\n|\r)//g;
 	$cli->UpdateDomainSettings(domain => $domain,settings => {
 	    DKIM => {

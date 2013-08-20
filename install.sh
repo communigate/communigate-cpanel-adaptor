@@ -100,6 +100,7 @@ cp ${PACKSRC}/library/XIMSS.pm /usr/local/cpanel/
 # CGPro cPanel Wrapper
 cp ${PACKSRC}/cpwrap/ccaadmin /usr/local/cpanel/bin/
 cp ${PACKSRC}/cpwrap/ccawrap /usr/local/cpanel/bin/
+cp -r ${PACKSRC}/cpwrap/CGPro /usr/local/cpanel/bin/admin/
 
 # install Perl dependencies
 if [ `perldoc -l YAML::Syck | wc -l` == 0 ]
@@ -148,6 +149,7 @@ chmod +x /usr/local/cpanel/whostmgr/docroot/cgi/addon_cgpro*
 chmod +x /var/CommuniGate/cgi/login.pl
 chmod +x /usr/local/cpanel/Cpanel/CommuniGate.pm
 chmod +x /usr/local/cpanel/bin/ccaadmin
+chmod +x /usr/local/cpanel/bin/admin/CGPro/cca
 chmod +s+x /usr/local/cpanel/bin/ccawrap
 chmod u+s /opt/CommuniGate/mail
 
