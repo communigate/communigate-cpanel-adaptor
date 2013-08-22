@@ -15,7 +15,8 @@ my $cpanel = Cpanel::LiveAPI->new();
 my $domain = $q->param('domain');
 my $lang = $q->param('lang');
 my $file = $q->param('file');
-my $filedata = $cpanel->api2( 'CommuniGate', 'GetSound', {domain => $domain, lang => $lang, file => $file} )->{cpanelresult}->{data}->[0];
+my $type = $q->param('type');
+my $filedata = $cpanel->api2( 'CommuniGate', 'GetSound', {domain => $domain, lang => $lang, file => $file, type => $type} )->{cpanelresult}->{data}->[0];
 
 
 print "Content-type: audio/x-wav\r\n";

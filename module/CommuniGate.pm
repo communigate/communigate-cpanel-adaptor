@@ -4031,6 +4031,7 @@ sub api2_ListSounds {
     $result->{langs}->{'english'} = "stock";
     $result->{langs}->{'english'} = "domain" if keys %$domainSounds;
     $result->{languages} = [sort keys %{$result->{languages}}];
+    $result->{allsounds} = versioncmp($cli->getversion(), '6.0.6');
     $cli->Logout();
     return $result;
 }
@@ -4045,7 +4046,11 @@ sub api2_GetSound {
 	if ($dom eq $domain) {
 	    my $file = $OPTS{'file'};
 	    $file = $OPTS{'lang'} . "/$file" if $OPTS{'lang'} ne 'english';
-	    $result = $cli->ReadDomainPBXFile($domain, $file);
+	    if ($OPTS{'type'} eq 'stock') {
+		$result = $cli->ReadStockPBXFile($file);
+	    } else {
+		$result = $cli->ReadDomainPBXFile($domain, $file);
+	    }
 	    $result =~ s/(^\[|\]$)//g;
 	    last;
 	}
@@ -4342,6 +4347,41 @@ sub api2_DeleteRPOP {
     }
     $cli->Logout();
     return $result;
+}
+
+sub versioncmp( $$ ) {
+    my @A = ($_[0] =~ /([-.]|\d+|[^-.\d]+)/g);
+    my @B = ($_[1] =~ /([-.]|\d+|[^-.\d]+)/g);
+
+    my ($A, $B);
+    while (@A and @B) {
+	$A = shift @A;
+	$B = shift @B;
+	if ($A eq '-' and $B eq '-') {
+	    next;
+	} elsif ( $A eq '-' ) {
+	    return -1;
+	} elsif ( $B eq '-') {
+	    return 1;
+	} elsif ($A eq '.' and $B eq '.') {
+	    next;
+	} elsif ( $A eq '.' ) {
+	    return -1;
+	} elsif ( $B eq '.' ) {
+	    return 1;
+	} elsif ($A =~ /^\d+$/ and $B =~ /^\d+$/) {
+	    if ($A =~ /^0/ || $B =~ /^0/) {
+		return $A cmp $B if $A cmp $B;
+	    } else {
+		return $A <=> $B if $A <=> $B;
+	    }
+	} else {
+	    $A = uc $A;
+	    $B = uc $B;
+	    return $A cmp $B if $A cmp $B;
+	}
+    }
+    @A <=> @B;
 }
 
 sub IsGroupInternal {

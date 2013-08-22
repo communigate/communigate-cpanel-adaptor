@@ -45,10 +45,12 @@
       <a href="deletewav.html?domain=[% domain %]&amp;lang=[% language %]&amp;file=[% file %]">
 	<img src="[% CPBranding.image('cgpro_mini_remove') %]" alt="[% locale.maketext("CGPDelete") %]" title="[% locale.maketext("CGPDelete") %]" />
       </a>
-      <a href="getwav.live.cgi?domain=[% domain %]&amp;lang=[% language %]&amp;file=[% file %]">
+      [% END -%]
+      [% IF sounds.$language.$file != 'stock' || allsounds >= 0 -%]
+      <a href="getwav.live.cgi?domain=[% domain %]&amp;lang=[% language %]&amp;file=[% file %]&amp;type=[% sounds.$language.$file %]">
 	<img src="[% CPBranding.image('cgpro_mini_download') %]" alt="[% locale.maketext("CGPDownload") %]" title="[% locale.maketext("CGPDownload") %]" />
       </a>
-      <a class="play" href="playwav.live.cgi?domain=[% domain %]&amp;lang=[% language %]&amp;file=[% file %]">
+      <a class="play" href="playwav.live.cgi?domain=[% domain %]&amp;lang=[% language %]&amp;file=[% file %]&amp;type=[% sounds.$language.$file %]">
 	<img src="[% CPBranding.image('cgpro_mini_play') %]" alt="[% locale.maketext("CGPPlaySound") %]" title="[% locale.maketext("CGPPlaySound") %]" />
       </a>
       [% END -%]
