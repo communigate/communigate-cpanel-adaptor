@@ -11,14 +11,14 @@
 <h2><cpanel langprint="CGPCARDDAV"></h2>
 
 <cpanelif $FORM{'action'}==install>
-<?cp CommuniGate::InstallSRVCARDDAV(%,installed) ?>
+  <?cp CommuniGate::InstallSRV(%[br],installed) domain=$FORM{'domain'}, proto=CARDDAV >
 </cpanelif>
 
 <cpanelif $FORM{'action'}==uninstall>
-<?cp CommuniGate::UninstallSRVCARDDAV(%,uninstalled) ?>
+  <?cp CommuniGate::UninstallSRV(%[br],uninstalled) domain=$FORM{'domain'}, proto=CARDDAV ?>
 </cpanelif>
 
-<div class="return-link"><a href="srv.html">&larr; <cptext "Go Back"></a></div>
+<div class="return-link"><a href="srv.html?domain=<cpanel print="$FORM{'domain'}">">&larr; <cptext "Go Back"></a></div>
 </div>
 </cpanelfeature>
 <cpanel Branding="include(stdfooter.html)">

@@ -11,6 +11,7 @@ BEGIN {
 }
 
 use Cpanel::CachedDataStore ();
+use Cpanel::DnsUtils;
 
 my $theargs = <STDIN>;
 unless ( $theargs =~ /^(\d+) ([A-Z]+)/ ) {
@@ -23,91 +24,65 @@ my ( $uid, $action, @args ) = split( / /, $theargs );
 
 my %commands = (
     'UNINSTALLSRVXMPP' => sub {
-	my ($domain) = @_;
-	if (-f "/var/named/$domain.db") {
-	    open(IN, "<", "/var/named/$domain.db") or die "Cannot open zone file ($!)";
-	    my $out = "";
-	    for my $row (<IN>) {
-		$out .= $row unless $row =~ m/^_(xmpp|jabber)/;
+	my ($domain, $zone) = @_;
+	if (-f "/var/named/$zone.db") {
+		open(IN, "<", "/var/named/$zone.db") or die "Cannot open zone file ($!)";
+		my $out = "";
+		for my $row (<IN>) {
+		    unless ($row =~ m/^_(xmpp\-(server|client)|jabber)\._tcp\.?$domain\.?\s/) {
+			$out .= $row; 
+		    }
+		}
+		close(IN);
+		open(OUT, ">", "/var/named/$zone.db") or die "Cannot open zone file ($!)";
+		print OUT $out;
+		close(OUT);
+	    } else {
+		print "No zone file for domain $domain";
+		exit;
 	    }
-	    close(IN);
-	    open(OUT, ">", "/var/named/$domain.db") or die "Cannot open zone file ($!)";
-	    print OUT $out;
-	    close(OUT);
-	} else {
-	    print "No zone file for domain $domain";
-	    exit;
-	}
     },
     'INSTALLSRVXMPP' => sub {
-	my ($domain) = @_;
-	if (-f "/var/named/$domain.db") {
-	    open(IN, "<", "/var/named/$domain.db") or die "Cannot open zone file ($!)";
-	    my $xmpp_client = 0;
-	    my $xmpp_server = 0;
-	    my $jabber = 0;
-	    for my $row (<IN>) {
-		$xmpp_server = 1 if $row =~ m/^_xmpp\-server/;
-		$xmpp_client = 1 if $row =~ m/^_xmpp\-client/;
-		$xmpp_client = 1 if $row =~ m/^_jabber/;
-	    }
-	    close(IN);
-	    open(OUT, ">>", "/var/named/$domain.db") or die "Cannot open zone file ($!)";
-	    print OUT "_xmpp-server._tcp\t14400\tIN\tSRV\t1\t5\t5269\tmail.$domain.\n" unless $xmpp_server;
-	    print OUT "_xmpp-client._tcp\t14400\tIN\tSRV\t1\t5\t5222\tmail.$domain.\n" unless $xmpp_client;
-	    print OUT "_jabber._tcp\t14400\tIN\tSRV\t1\t5\t5269\tmail.$domain.\n" unless $jabber;
-	    print OUT $out;
-	    close(OUT);
-	} else {
-	    print "No zone file for domain $domain";
-	    exit;
-	}
+	my ($domain, $zone) = @_;
+	Cpanel::DnsUtils::install_srv_records( [{'domain' => "$zone",'record' => "_xmpp-server._tcp.$domain", 'value'=> "0 0 5269 mail.$zone."}], [$zone] );
+	Cpanel::DnsUtils::install_srv_records( [{'domain' => "$zone",'record' => "_xmpp-client._tcp.$domain", 'value'=> "0 0 5222 mail.$zone."}], [$zone] );
+	Cpanel::DnsUtils::install_srv_records( [{'domain' => "$zone",'record' => "_jabber._tcp.$domain", 'value'=> "0 0 5269 mail.$zone."}], [$zone] );
     },
     'UNINSTALLSRVSIP' => sub {
-	my ($domain) = @_;
-	if (-f "/var/named/$domain.db") {
-	    open(IN, "<", "/var/named/$domain.db") or die "Cannot open zone file ($!)";
-	    my $out = "";
-	    for my $row (<IN>) {
-		$out .= $row unless $row =~ m/^_sip/;
+	my ($domain, $zone) = @_;
+    if (-f "/var/named/$zone.db") {
+	open(IN, "<", "/var/named/$zone.db") or die "Cannot open zone file ($!)";
+	my $out = "";
+	for my $row (<IN>) {
+	    unless ($row =~ m/^_sip\._udp.?$domain\.?\s/) {
+		$out .= $row; 
 	    }
-	    close(IN);
-	    open(OUT, ">", "/var/named/$domain.db") or die "Cannot open zone file ($!)";
-	    print OUT $out;
-	    close(OUT);
-	} else {
-	    print "No zone file for domain $domain";
-	    exit;
 	}
+	close(IN);
+	open(OUT, ">", "/var/named/$zone.db") or die "Cannot open zone file ($!)";
+	print OUT $out;
+	close(OUT);
+    } else {
+	print "No zone file for domain $domain";
+	exit;
+    }
     },
     'INSTALLSRVSIP' => sub {
-	my ($domain) = @_;
-	if (-f "/var/named/$domain.db") {
-	    open(IN, "<", "/var/named/$domain.db") or die "Cannot open zone file ($!)";
-	    my $sip = 0;
-	    for my $row (<IN>) {
-		$sip = 1 if $row =~ m/^_sip/;
-	    }
-	    close(IN);
-	    open(OUT, ">>", "/var/named/$domain.db") or die "Cannot open zone file ($!)";
-	    print OUT "_sip._udp\t14400\tIN\tSRV\t1\t5\t5060\tmail.$domain.\n" unless $sip;
-	    print OUT $out;
-	    close(OUT);
-	} else {
-	    print "No zone file for domain $domain";
-	    exit;
-	}
+	my ($domain, $zone) = @_;
+	Cpanel::DnsUtils::install_srv_records( [{'domain' => "$zone",'record' => "_sip._udp.$domain", 'value'=> "0 0 5060 mail.$zone."}], [$zone] );
     },
     'UNINSTALLSRVCALDAV' => sub {
-	my ($domain) = @_;
-	if (-f "/var/named/$domain.db") {
-	    open(IN, "<", "/var/named/$domain.db") or die "Cannot open zone file ($!)";
+	my ($domain, $zone) = @_;
+	if (-f "/var/named/$zone.db") {
+	    open(IN, "<", "/var/named/$zone.db") or die "Cannot open zone file ($!)";
 	    my $out = "";
 	    for my $row (<IN>) {
-		$out .= $row unless $row =~ m/^_caldav/;
+		unless ($row =~ m/^_caldavs?\._tcp.?$domain\.?\s/) {
+		    $out .= $row; 
+		}
 	    }
 	    close(IN);
-	    open(OUT, ">", "/var/named/$domain.db") or die "Cannot open zone file ($!)";
+	    open(OUT, ">", "/var/named/$zone.db") or die "Cannot open zone file ($!)";
 	    print OUT $out;
 	    close(OUT);
 	} else {
@@ -116,36 +91,22 @@ my %commands = (
 	}
     },
     'INSTALLSRVCALDAV' => sub {
-	my ($domain) = @_;
-	if (-f "/var/named/$domain.db") {
-	    open(IN, "<", "/var/named/$domain.db") or die "Cannot open zone file ($!)";
-	    my $caldav = 0;
-	    my $caldavs = 0;
-	    for my $row (<IN>) {
-		$caldav = 1 if $row =~ m/^_caldav/;
-		$caldavs = 1 if $row =~ m/^_caldavs/;
-	    }
-	    close(IN);
-	    open(OUT, ">>", "/var/named/$domain.db") or die "Cannot open zone file ($!)";
-	    print OUT "_caldav._tcp\t14400\tIN\tSRV\t1\t5\t80\tmail.$domain.\n" unless $caldav;
-	    print OUT "_caldavs._tcp\t14400\tIN\tSRV\t1\t5\t443\tmail.$domain.\n" unless $caldavs;
-	    print OUT $out;
-	    close(OUT);
-	} else {
-	    print "No zone file for domain $domain";
-	    exit;
-	}
+	my ($domain, $zone) = @_;
+	Cpanel::DnsUtils::install_srv_records( [{'domain' => "$zone",'record' => "_caldav._tcp.$domain", 'value'=> "0 0 80 mail.$zone."}], [$zone] );
+	Cpanel::DnsUtils::install_srv_records( [{'domain' => "$zone",'record' => "_caldavs._tcp.$domain", 'value'=> "0 0 443 mail.$zone."}], [$zone] );
     },
     'UNINSTALLSRVCARDDAV' => sub {
-	my ($domain) = @_;
-	if (-f "/var/named/$domain.db") {
-	    open(IN, "<", "/var/named/$domain.db") or die "Cannot open zone file ($!)";
+	my ($domain, $zone) = @_;
+	if (-f "/var/named/$zone.db") {
+	    open(IN, "<", "/var/named/$zone.db") or die "Cannot open zone file ($!)";
 	    my $out = "";
 	    for my $row (<IN>) {
-		$out .= $row unless $row =~ m/^_carddav/;
+		unless ($row =~ m/^_carddavs?\._tcp.?$domain\.?\s/) {
+		    $out .= $row; 
+		}
 	    }
 	    close(IN);
-	    open(OUT, ">", "/var/named/$domain.db") or die "Cannot open zone file ($!)";
+	    open(OUT, ">", "/var/named/$zone.db") or die "Cannot open zone file ($!)";
 	    print OUT $out;
 	    close(OUT);
 	} else {
@@ -154,55 +115,9 @@ my %commands = (
 	}
     },
     'INSTALLSRVCARDDAV' => sub {
-	my ($domain) = @_;
-	if (-f "/var/named/$domain.db") {
-	    open(IN, "<", "/var/named/$domain.db") or die "Cannot open zone file ($!)";
-	    my $carddav = 0;
-	    my $carddavs = 0;
-	    for my $row (<IN>) {
-		$carddav = 1 if $row =~ m/^_carddav/;
-		$carddavs = 1 if $row =~ m/^_carddavs/;
-	    }
-	    close(IN);
-	    open(OUT, ">>", "/var/named/$domain.db") or die "Cannot open zone file ($!)";
-	    print OUT "_carddav._tcp\t14400\tIN\tSRV\t1\t5\t80\tmail.$domain.\n" unless $carddav;
-	    print OUT "_carddavs._tcp\t14400\tIN\tSRV\t1\t5\t443\tmail.$domain.\n" unless $carddavs;
-	    print OUT $out;
-	    close(OUT);
-	} else {
-	    print "No zone file for domain $domain";
-	    exit;
-	}
-    },
-    'GETSRV' => sub {
-	my ($domain) = @_;
-	if (-f "/var/named/$domain.db") {
-	    open(IN, "<", "/var/named/$domain.db") or die "Cannot open zone file ($!)";
-	    for my $row (<IN>) {
-		print $row if $row =~ m/SRV/;
-	    }
-	    close(IN);
-	} else {
-	    print "No zone file for domain $domain";
-	    exit;
-	}
-    },
-    'GETPASS' => sub {
-	my $file = "/var/CommuniGate/Accounts/postmaster.macnt/account.settings";
-	my %hash;
-	open (MYFILE, "$file");
-	while (<MYFILE>) {
-	    chomp;
-	    my @line = split("=",$_);
-	    $hash{@line[0]} = @line[1];
-	}
-	my $pass;
-	if ($hash{' Password '} =~ /^ ".*";$/) {
-	    $pass = substr $hash{' Password '}, 2, length($hash{' Password '})-4;
-	} else {
-	    $pass =  substr $hash{' Password '}, 1, length($hash{' Password '})-2;
-	}
-	print $pass;
+	my ($domain, $zone) = @_;
+	Cpanel::DnsUtils::install_srv_records( [{'domain' => "$zone",'record' => "_carddav._tcp.$domain", 'value'=> "0 0 80 mail.$zone."}], [$zone] );
+	Cpanel::DnsUtils::install_srv_records( [{'domain' => "$zone",'record' => "_carddavs._tcp.$domain", 'value'=> "0 0 443 mail.$zone."}], [$zone] );
     },
     'GETLOGIN' => sub {
 	my $conf = Cpanel::CachedDataStore::fetch_ref( '/var/cpanel/communigate.yaml' ) || {};

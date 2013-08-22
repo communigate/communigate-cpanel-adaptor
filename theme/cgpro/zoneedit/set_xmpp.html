@@ -11,14 +11,14 @@
 <h2><cpanel langprint="CGPJabberXMPP"></h2>
 
 <cpanelif $FORM{'action'}==install>
-<?cp CommuniGate::InstallSRVXMPP(%,installed) ?>
+  <?cp CommuniGate::InstallSRV(%[br],installed) domain=$FORM{'domain'}, proto=XMPP >
 </cpanelif>
 
 <cpanelif $FORM{'action'}==uninstall>
-<?cp CommuniGate::UninstallSRVXMPP(%,uninstalled) ?>
+  <?cp CommuniGate::UninstallSRV(%[br],uninstalled) domain=$FORM{'domain'}, proto=XMPP ?>
 </cpanelif>
 
-<div class="return-link"><a href="srv.html">&larr; <cptext "Go Back"></a></div>
+<div class="return-link"><a href="srv.html?domain=<cpanel print="$FORM{'domain'}">">&larr; <cptext "Go Back"></a></div>
 </div>
 </cpanelfeature>
 <cpanel Branding="include(stdfooter.html)">
