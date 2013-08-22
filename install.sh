@@ -22,17 +22,17 @@ fi
 
 # Installing CGPro 6.0.2
 if [ ! -d "$SERVERFOLDER" ]; then
-wget -P${PACKSRC} http://www.communigate.com/pub/CommuniGatePro/CGatePro-Linux.x86_64.rpm
-rpm -Uvh ${PACKSRC}/CGatePro-Linux.x86_64.rpm
-rm -rf ${PACKSRC}/CGatePro-Linux.x86_64.rpm
-chkconfig CommuniGate on
-service CommuniGate start
-service CommuniGate stop
-mkdir -p ${BASEFOLDER}/cPanel/
-mkdir -p ${BASEFOLDER}/spamassassin/
-rsync -az ${PACKSRC}/CGP/Settings/* ${BASEFOLDER}/Settings/
-rsync -az ${PACKSRC}/CGP/Accounts/postmaster.macnt/postmaster.macnt ${BASEFOLDER}/Accounts/postmaster.macnt/account.settings
-rsync -az ${PACKSRC}/sso/scanspam.sh ${BASEFOLDER}/spamassassin/
+    wget -P${PACKSRC} http://www.communigate.com/pub/CommuniGatePro/CGatePro-Linux.x86_64.rpm
+    rpm -Uvh ${PACKSRC}/CGatePro-Linux.x86_64.rpm
+    rm -rf ${PACKSRC}/CGatePro-Linux.x86_64.rpm
+    chkconfig CommuniGate on
+    service CommuniGate start
+    service CommuniGate stop
+    mkdir -p ${BASEFOLDER}/cPanel/
+    mkdir -p ${BASEFOLDER}/spamassassin/
+    rsync -az ${PACKSRC}/CGP/Settings/* ${BASEFOLDER}/Settings/
+    rsync -az ${PACKSRC}/CGP/Accounts/postmaster.macnt/postmaster.macnt ${BASEFOLDER}/Accounts/postmaster.macnt/account.settings
+    rsync -az ${PACKSRC}/sso/scanspam.sh ${BASEFOLDER}/spamassassin/
 fi
 
 # Configure Airsync and Spamd

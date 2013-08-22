@@ -10,8 +10,8 @@ rm -rf /usr/local/apache/htdocs/iOS
 rm -rf /var/CommuniGate/apple
 
 # Uninstall the WHM plugins (administration and groupware control)
-rm -rf /usr/local/cpanel/whostmgr/docroot/cgi/cgpro*
-rm -f /usr/local/cpanel/whostmgr/docroot/templates/cgpro_*
+rm -rf /usr/local/cpanel/whostmgr/docroot/cgi/addon_cgpro*
+rm -f /usr/local/cpanel/whostmgr/docroot/templates/addon_cgpro_*
 
 # Uninstall CGP Logo
 rm -f /usr/local/cpanel/whostmgr/docroot/images/communigate.gif
@@ -25,16 +25,33 @@ fi
 # Uninstall cPanel CommuniGate Custom Module
 rm -f /usr/local/cpanel/Cpanel/CommuniGate.pm
 
-# Lets remove CGPro perl lib
-if [ ! -L /usr/local/lib/perl5/5.8.8/CLI.pm ]
-then
-    rm -f /usr/local/lib/perl5/5.8.8/CLI.pm
-fi
+
 rm -f /usr/local/cpanel/perl/CLI.pm
+rm -f /usr/local/cpanel/CLI.pm
+PERL_VERSION=`perl -v | grep 'This is perl' | perl -pe 's/^.*?v(\d+\.\d+\.\d+).*?$/$1/g'`
+MY_PERL_PATHS="/usr/local/lib/perl5/$PERL_VERSION /usr/local/lib/perl/$PERL_VERSION /usr/local/share/perl/$PERL_VERSION /usr/local/share/perl5"
+DEFAULT_PERL_PATHS=`perl -e "print join ' ', @INC"`
+PERL_PATH=""
+found=
+for i in ${MY_PERL_PATHS[@]}; do
+    for j in ${DEFAULT_PERL_PATHS[@]}; do
+	[[ $i == $j ]] && { PERL_PATH=$i; found=1; break; }
+    done
+    [[ -n $skip ]] && { break; }
+done
+if [ ! -d $PERL_PATH ]
+then
+    mkdir -p $PERL_PATH
+fi
+rm -f /usr/local/cpanel/perl/CLI.pm $PERL_PATH/
+
+rm -f /usr/local/cpanel/XIMSS.pm
+
 
 # CGPro cPanel Wrapper
 rm -f /usr/local/cpanel/bin/ccaadmin
 rm -f /usr/local/cpanel/bin/ccawrap
+rm -rf /usr/local/cpanel/bin/admin/CGPro
 
 # Register installed hooks
 /usr/local/cpanel/bin/manage_hooks delete module CGPro::Hooks
@@ -43,6 +60,7 @@ rm -rf /var/cpanel/perl5/lib/CGPro/
 
 #Uninstall config file
 rm -f /var/cpanel/communigate.yaml
+rm -f /var/cpanel/cgpro/classes.yaml
 
 # Uninstall CommuniGate Webmail in cPanel
 rm -f /var/cpanel/webmail/webmail_communigate.yaml
