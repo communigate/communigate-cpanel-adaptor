@@ -1,0 +1,16 @@
+<cpanel setvar="headerimg=../images/mailmenu.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+<div class="body-content">
+  <h1><cpanel langprint="CGPDeleteRemoteSIP"></h1>
+
+  <p><?cp CommuniGate::DeleteRSIP() account=$FORM{'account'},rsip=$FORM{'rsip'} || 'maketext('The Remote SIP could not be removed.')' ?></p>
+  <cpanelif $CPERROR{'CommuniGate'}>
+    <p><cpanel print="$CPERROR{'CommuniGate'}"></p>
+  </cpanelif>
+  <cpanelif !$CPERROR{'CommuniGate'}>
+    <p><b><cpanel print="$FORM{'name'}"></b> <cpanel langprint="CGPDeleted">.
+  </cpanelif>  
+  <div class="return-link"><a href="rsip.html?account=<cpanel formprint="$FORM{'account'}">">&larr; <cptext "Go Back"></a></div>
+</div>
+<cpanel Branding="include(stdfooter.html)">

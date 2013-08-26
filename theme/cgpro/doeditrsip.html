@@ -1,0 +1,22 @@
+<cpanel setvar="headerimg=../images/mailmenu.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+  <div class="body-content">
+  <cpanelif !$FORM{'rsip'}>
+    <h1><cpanel langprint="CGPAddRemoteSIP"></h1>
+  </cpanelif>
+  <cpanelif $FORM{'rsip'}>
+    <h1><cpanel langprint="CGPEditRemoteSIP"></h1>
+  </cpanelif>
+    <!-- <?cp CommuniGate::DoEditRSIP() account=$FORM{'account'},name=$FORM{'name'},authName=$FORM{'authName'},fromName=$FORM{'fromName'},domain=$FORM{'domain'},password=$FORM{'password'},targetName=$FORM{'targetName'},period=$FORM{'period'} ?> -->
+    <cpanelif $CPERROR{'CommuniGate'}>
+      <p><cpanel langprint="CGPError">: <em><cpanel print="$CPERROR{'CommuniGate'}">!</em></p>
+    </cpanelif>
+    <cpanelif !$CPERROR{'CommuniGate'}>
+      <p><cpanel langprint="CGPRemoteSIPUpdated">!</p>
+    </cpanelif>
+    <div class="return-link"><a href="rsip.html?account=<cpanel formprint="$FORM{account'}">">&larr; <cptext "Go Back"></a></div>
+  </div><!-- end body-content div -->
+
+<cpanel Branding="include(stdfooter.html)">
+

@@ -4349,6 +4349,101 @@ sub api2_DeleteRPOP {
     return $result;
 }
 
+sub api2_ListRSIP {
+    my %OPTS = @_;
+    my $account = $OPTS{'account'};
+    my (undef,$dom) = split "@", $account;
+
+    my @domains = Cpanel::Email::listmaildomains();
+    my $cli = getCLI();
+
+    my $result = {};
+    for my $domain (@domains) {
+	if ($domain eq $dom) {
+	    my $settings = $cli->GetAccountRSIPs($account);
+	    $result->{'rsip'} = $settings;
+	    last;
+	}
+    }
+    $cli->Logout();
+    return $result;
+}
+
+sub api2_EditRSIP {
+    my %OPTS = @_;
+    my $account = $OPTS{'account'};
+    my $rsip = $OPTS{'rsip'};
+    my (undef,$dom) = split "@", $account;
+
+    my @domains = Cpanel::Email::listmaildomains();
+    my $cli = getCLI();
+
+    my $result = {};
+    for my $domain (@domains) {
+	if ($domain eq $dom) {
+	    my $settings = $cli->GetAccountRSIPs($account);
+	    $result->{'rsip'} = $settings->{$rsip};
+	    last;
+	}
+    }
+    $cli->Logout();
+    return $result;
+}
+
+sub api2_DoEditRSIP {
+    my %OPTS = @_;
+    my $account = $OPTS{'account'};
+    my (undef,$dom) = split "@", $account;
+
+    my @domains = Cpanel::Email::listmaildomains();
+    my $cli = getCLI();
+
+    my $result = {};
+    for my $domain (@domains) {
+	if ($domain eq $dom) {
+	    my $settings = $cli->GetAccountRSIPs($account);
+	    $OPTS{'name'} =~ s/\W//g;
+	    $settings->{$OPTS{'name'}} = {
+		authName => $OPTS{'authName'},
+		fromName => $OPTS{'fromName'},
+		domain => $OPTS{'domain'},
+		password => $OPTS{'password'},
+		period => $OPTS{'period'},
+	    };
+	    if ($OPTS{'targetName'}) {
+		$settings->{$OPTS{'name'}}->{'targetName'} = $OPTS{'targetName'};
+	    } else {
+		delete $settings->{$OPTS{'name'}}->{'targetName'} if $settings->{$OPTS{'name'}}->{'targetName'};
+	    }
+	    $cli->SetAccountRSIPs($account, $settings);
+	    last;
+	}
+    }
+    $cli->Logout();
+    return $result;
+}
+
+sub api2_DeleteRSIP {
+    my %OPTS = @_;
+    my $account = $OPTS{'account'};
+    my (undef,$dom) = split "@", $account;
+
+    my @domains = Cpanel::Email::listmaildomains();
+    my $cli = getCLI();
+
+    my $result = {};
+    for my $domain (@domains) {
+	if ($domain eq $dom) {
+	    my $settings = $cli->GetAccountRSIPs($account);
+	    delete $settings->{$OPTS{'rsip'}};
+	    $cli->SetAccountRSIPs($account, $settings);
+	    last;
+	}
+    }
+    $cli->Logout();
+    return $result;
+}
+
 sub versioncmp( $$ ) {
     my @A = ($_[0] =~ /([-.]|\d+|[^-.\d]+)/g);
     my @B = ($_[1] =~ /([-.]|\d+|[^-.\d]+)/g);

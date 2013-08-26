@@ -1,0 +1,23 @@
+<p>
+  <a class="create-button" href="editrsip.html?account=[% FORM.account %]">[% locale.maketext("CGPAddRemoteSIP") %]</a>
+</p>
+<table border="0" cellpadding="5" cellspacing="0" id="mailtbl" class="sortable" width="650">
+  <tr>
+    <th class="cell">[% locale.maketext("CGPRemoteSIP") %]</th>
+    <th class="cell-end sorttable_nosort">[% locale.maketext("AHFucn") %]</th>
+  </tr>
+  [% FOR sip IN rsip.keys -%]
+  <tr>
+    <td class="truncate">[% sip %]</td>
+    <td>
+      <a href="editrsip.html?account=[% FORM.account %]&amp;rsip=[% sip %]">[% locale.maketext('CGPViewEdit') %]</a>,
+      <a href="deletersip.html?account=[% FORM.account %]&amp;rsip=[% sip %]">[% locale.maketext('BrandingDPackage') %]</a>
+    </td>
+  </tr>
+  [% END -%]
+  [% UNLESS rsip.keys.size -%]
+  <tr>
+    <td class="truncate" colspan="4">[% locale.maketext("No Remote SIPs.") %]</td>
+  </tr>
+  [% END -%]
+</table>

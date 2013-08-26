@@ -1,0 +1,13 @@
+<cpanel setvar="headerimg=../images/mailmenu.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+<div class="body-content">
+  <h1><cpanel langprint="CGPRemoteSIP"><cpanelif $FORM{'account'}>: <cpanel print="$FORM{'account'}"></cpanelif></h1>
+  <?cptt CommuniGate::AccountsOverview(cgpro/mail/contacts_accounts.tmpl) ?>
+  <cpanelif $FORM{'account'}>
+    <?cptt CommuniGate::ListRSIP(cgpro/rsip.tmpl) account=$FORM{'account'} ?>
+  </cpanelif>
+</div><!-- end body-content div -->
+
+<cpanel Branding="include(stdfooter.html)">
+

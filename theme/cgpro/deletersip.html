@@ -1,0 +1,16 @@
+<cpanel setvar="headerimg=../images/mailmenu.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+<div class="body-content">
+  <h1><cpanel langprint="CGPDeleteRemoteSIP"></h1>
+  <p><cpanel Locale="maketext('Are you sure you want to delete Remote SIP "[_1]" ?',$FORM{'rsip'})"></p>
+  <p> 
+    <a class="create-button" href="dodeletersip.html?rsip=<cpanel formprint="$FORM{'rsip'}">&account=<cpanel formprint="$FORM{'account'}">"><cpanel Locale="maketext('CGPDelete')"></a> 
+    <a class="cancel_link" href="rsip.html?account=<cpanel formprint="$FORM{account'}">"><cpanel Locale="maketext('CGPcancel')"></a>
+  </p>
+  <div class="return-link"><a href="rsip.html?account=<cpanel formprint="$FORM{account'}">">&larr; <cptext "Go Back"></a></div>
+</div>
+</div><!-- end body-content div -->
+
+<cpanel Branding="include(stdfooter.html)">
+
