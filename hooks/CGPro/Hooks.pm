@@ -114,7 +114,7 @@ sub getCLI {
     } else {
 	my $loginData = $conf;
 	my $logger = Cpanel::Logger->new();
-	unless $logindata {
+	unless ($logindata) {
 	    my $version = `$^X -V`;
 	    $version =~ s/^\D*(\d+\.\d+).*?$/$1/;
 	    if ($version < 11.38) {
@@ -130,7 +130,7 @@ sub getCLI {
 		    $loginData = $result->{'data'};
 		} else {
 		    $logger->warn("Can't login to CGPro: " . $result->{'error'});
-
+		}
 	    }
 	}
 	my @loginData = split "::", $loginData;
