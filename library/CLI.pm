@@ -4015,12 +4015,19 @@ sub SetTempBlacklistedIPs  {
   $this->_parseResponse();
 }
 sub getversion {
-  my ($this, $level, $msg) = @_;
+  my ($this) = @_;
   $this->send('GETVERSION');
   return 'Unknown' unless $this->_parseResponse();
   $this->parseWords($this->getWords);
 }
 
+sub UpdateAirSyncInfo  {
+  my ( $this, $account, $settings ) = @_;
+  croak 'usage CGP::CLI->UpdateAirSyncInfo($account, {$newsettings})'
+      unless defined $settings && defined $account;
+  $this->send ("UPDATEAIRSYNCINFO $account " .$this->printWords($settings));
+  $this->_parseResponse();
+}
 
 #########################################################################
 #########################################################################

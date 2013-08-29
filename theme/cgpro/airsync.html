@@ -1,0 +1,30 @@
+<cpanel setvar="headerimg=../images/mailmenu.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+<style type="text/css">
+table.settings {
+width: 45%;
+float: left;
+margin: 0 2% 20px 2%;
+}
+table.settings_ssl {
+background: #dddddd;
+border: 1px solid #cccccc;
+}
+.clear {
+display: block;
+clear: both;
+}
+</style>
+
+<div class="body-content">
+<cpanelfeature cgpro_airsync>
+  <h1><cpanel langprint="CGPAirSyncDevices"><cpanelif $FORM{'account'}>: <cpanel print="$FORM{'account'}"></cpanelif></h1>
+  <?cptt CommuniGate::AccountsOverview(cgpro/mail/contacts_accounts.tmpl) ?>
+  <cpanelif $FORM{'account'}>
+    <?cptt CommuniGate::ListAirSyncs(cgpro/airsync.tmpl) account=$FORM{'account'},AirSyncAllowed=$FORM{'AirSyncAllowed'},save=$FORM{'save'} ?>
+  </cpanelif>
+</div><!-- end body-content div -->
+</cpanelfeature>
+<cpanel Branding="include(stdfooter.html)">
+

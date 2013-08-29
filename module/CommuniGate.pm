@@ -4443,6 +4443,59 @@ sub api2_DeleteRSIP {
     $cli->Logout();
     return $result;
 }
+sub api2_ListAirSyncs {
+    my %OPTS = @_;
+    my $account = $OPTS{'account'};
+    my (undef,$dom) = split "@", $account;
+
+    my @domains = Cpanel::Email::listmaildomains();
+    my $cli = getCLI();
+
+    my $result = {};
+    for my $domain (@domains) {
+	if ($domain eq $dom) {
+	    $result->{'airSyncs'} = $cli->GetAccountInfo($account, 'AirSyncs');
+	    $result->{'AirSyncAllowed'} = $cli->GetAccountEffectiveSettings($account)->{'AirSyncAllowed'};
+	    if ($OPTS{'save'}) {
+		$OPTS{'AirSyncAllowed'} =~ s/(\s+|\*)//g;
+		my @devices = split ',', $OPTS{'AirSyncAllowed'};
+		$devices[0] = '*' unless $devices[0];
+ 		$cli->UpdateAccountSettings($account, {AirSyncAllowed => \@devices});
+		$result->{'AirSyncAllowed'} = $cli->GetAccountEffectiveSettings($account)->{'AirSyncAllowed'};
+	    }
+	    last;
+	}
+    }
+    $cli->Logout();
+    return $result;
+}
+
+sub api2_UpdateAirSync {
+    my %OPTS = @_;
+    my $account = $OPTS{'account'};
+    my (undef,$dom) = split "@", $account;
+
+    my @domains = Cpanel::Email::listmaildomains();
+    my $cli = getCLI();
+
+    my $result = {};
+    for my $domain (@domains) {
+	if ($domain eq $dom) {
+	    my $syncs = $cli->GetAccountInfo($account, 'AirSyncs');
+	    if ($syncs->{$OPTS{'device'}}) {
+	    	if ($OPTS{'type'} eq 'wipe') {
+		    $cli->UpdateAirSyncInfo($account, {"" => $OPTS{'device'}, op => 'doWipe'});
+	    	} elsif ($OPTS{'type'} eq 'cancel') {
+		    $cli->UpdateAirSyncInfo($account, {"" => $OPTS{'device'}, op => 'unWipe'});
+		}
+	    }
+	    last;
+	}
+    }
+    $cli->Logout();
+    return $result;
+}
+
 
 sub versioncmp( $$ ) {
     my @A = ($_[0] =~ /([-.]|\d+|[^-.\d]+)/g);

@@ -1,0 +1,124 @@
+<div class="clear"></div>
+<h2>[% locale.maketext("CGPAllowedMobileDevices") %]</h2>
+<div class="highlight2">
+  <form action="" method="POST" id="selectAccount">
+    <p>
+    <label>[% locale.maketext("CGPAllowedMobileDevices") %]:</label>
+    <input type="text" name="AirSyncAllowed" value="[% AirSyncAllowed.join(', ') %]" style="width: 50%;" />
+    <input type="hidden" name="account" value="[% FORM.account %]" />
+    <input id="submit" class="input-button" type="submit" value="[% locale.maketext("CGPSave") %]" name="save" />
+    </p>
+    
+    <p>[% cptext("Comma (',') separated device IDs or asterisk ('*') for any.") %]</p>
+  </form>
+</div>
+<h2>[% locale.maketext("CGPDeviceList") %]</h2>
+<table border="0" cellpadding="5" cellspacing="0" id="mailtbl" class="sortable" width="650">
+  <tr>
+    <th class="cell">[% locale.maketext("CGPDeviceID") %]</th>
+    <th class="cell">[% locale.maketext("CGPDeviceType") %]</th>
+    <th class="cell">[% locale.maketext("CGPLastAccess") %]</th>
+    <th class="cell">[% locale.maketext("CGPWiped") %]</th>
+    <th class="cell-end sorttable_nosort">[% locale.maketext("AHFucn") %]</th>
+  </tr>
+  [% FOR sync IN airSyncs.keys -%]
+  <tr>
+    <td class="truncate">[% sync %]</td>
+    <td class="truncate">[% airSyncs.$sync.item('User-Agent') %]</td>
+    <td class="truncate">[% airSyncs.$sync.Date.remove('[#T]').replace('_', '/') %]</td>
+    <td class="truncate">[% IF airSyncs.$sync.doWipe == "YES" -%][% locale.maketext("CGPPending") %][% ELSE %][% airSyncs.$sync.wiped.remove('[#T]').replace('_', '/') %][% END %]</td>
+    <td>
+      [% IF airSyncs.$sync.doWipe == "YES" -%]
+      <a href="airsyncsupdate.html?account=[% FORM.account %]&amp;device=[% sync %]&amp;type=cancel">[% locale.maketext('CGPCancelWipeOut') %]</a>
+      [% ELSE -%]
+      <a href="airsyncsupdate.html?account=[% FORM.account %]&amp;device=[% sync %]&amp;type=wipe">[% locale.maketext('CGPWipeOut') %]</a>
+      [% END -%]
+    </td>
+  </tr>
+  [% END -%]
+  [% UNLESS airSyncs.keys.size -%]
+  <tr>
+    <td class="truncate" colspan="4">[% locale.maketext("No Remote SIPs.") %]</td>
+  </tr>
+  [% END -%]
+</table>
+<h2>[% locale.maketext('CGPSetup') %]</h2>
+<table class="settings settings_ssl">
+  <tbody>
+    <tr>
+      <th colspan="2">[% locale.maketext("CGPSecureSSL/TLSSettings") %] <br />
+	([% locale.maketext("CGPRecommended") %])
+      </th>
+    </tr>
+    <tr>
+      <td>[% locale.maketext('CGPUsername') %]:</td>
+      <td class="data"><strong>[% FORM.account.split('@').0 %]</strong></td>
+    </tr>
+    <tr>
+      <td>[% locale.maketext("CGPPassword") %]:</td>
+      <td class="escape-note"><em>( [% cptext("Use the email account’s password.") %] )</em></td>
+    </tr>
+    <tr>
+      <td>[% locale.maketext("CGPDomain") %]:</td>
+      <td class="data">
+	<strong>[% FORM.account.split('@').1 %]</strong>
+      </td>
+    </tr>
+    <tr>
+      <td>[% locale.maketext("CGPServer") %]:</td>
+      <td class="data">
+	<strong>[% FORM.account.split('@').1 %]</strong>
+      </td>
+    </tr>
+    <tr>
+      <td>[% locale.maketext("CGPPort") %]:</td>
+      <td class="data">
+	<strong>443</strong>
+      </td>
+    </tr>
+    <tr>
+      <td>[% locale.maketext("CGPuseSSL") %]:</td>
+      <td><strong>[% locale.maketext("CGPleaveTicked") %]</strong></td>
+    </tr>
+  </tbody>
+</table>
+
+<table class="settings">
+  <tbody>
+    <tr>
+      <th colspan="2">[% locale.maketext("CGPNonSecureSettings") %] <br />
+	([% locale.maketext("CGPNOTRecommended") %])
+      </th>
+    <tr>
+      <td>[% locale.maketext("CGPUsername") %]:</td>
+      <td class="data"><strong>[% FORM.account.split('@').0 %]</strong></td>
+    </tr>
+    <tr>
+      <td>[% locale.maketext("CGPPassword") %]:</td>
+      <td class="escape-note"><em>( [% cptext("Use the email account’s password.") %] )</em></td>
+    </tr>
+    <tr>
+      <td>[% locale.maketext("CGPDomain") %]:</td>
+      <td class="data">
+	<strong>[% FORM.account.split('@').1 %]</strong>
+      </td>
+    </tr>
+    <tr>
+      <td>[% locale.maketext("CGPServer") %]:</td>
+      <td class="data">
+	<strong>[% FORM.account.split('@').1 %]</strong>
+      </td>
+    </tr>
+    <tr>
+      <td>[% locale.maketext("CGPPort") %]:</td>
+      <td class="data">
+	<strong>80</strong>
+      </td>
+    </tr>
+    <tr>
+      <td>[% locale.maketext("CGPuseSSL") %]:</td>
+      <td><strong>[% locale.maketext("CGPleaveUnticked") %]</strong></td>
+    </tr>
+    </tr>
+  </tbody>
+</table>

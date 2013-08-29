@@ -30,4 +30,4 @@ cgpro_xmpp_roster: XMPP Roster (CGPro)
 cgpro_account_types: Account Types (CGPro)
 cgpro_rpop: Remote POP (CGPro)
 cgpro_rsip: Remote SIP (CGPro)
-
+cgpro_airsync: AirSync (CGPro)

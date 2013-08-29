@@ -1,0 +1,18 @@
+<cpanel setvar="headerimg=../images/mailmenu.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+  <div class="body-content">
+<cpanelfeature cgpro_airsync>
+    <h1><cpanel langprint="CGPAirSyncDevices"></h1>
+    <!-- <?cp CommuniGate::UpdateAirSync() account=$FORM{'account'},device=$FORM{'device'},type=$FORM{'type'} ?> -->
+    <cpanelif $CPERROR{'CommuniGate'}>
+      <p><cpanel langprint="CGPError">: <em><cpanel print="$CPERROR{'CommuniGate'}">!</em></p>
+    </cpanelif>
+    <cpanelif !$CPERROR{'CommuniGate'}>
+      <p><cpanel langprint="CGPAirSyncUpdated">!</p>
+    </cpanelif>
+    <div class="return-link"><a href="airsync.html?account=<cpanel formprint="$FORM{account'}">">&larr; <cptext "Go Back"></a></div>
+  </div><!-- end body-content div -->
+</cpanelfeature>
+<cpanel Branding="include(stdfooter.html)">
+
