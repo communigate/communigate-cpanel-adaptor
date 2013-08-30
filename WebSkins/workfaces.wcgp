@@ -1,0 +1,210 @@
+// ============================================= //
+//                   WorkFaces API               //
+//                                               //
+// Version 1.0                                   //
+// Anton Katsarov <anton@webface.bg>             //
+// ============================================= //
+//
+// Description:
+//  Prints accounts contacts in JSON format for WorkFaces
+//
+
+function parse(vcardXML) forward;
+
+entry main is
+  MyAccountName = MyEmail();
+  if IsString(MyAccountName) then
+    theSet = NewDictionary();
+    theSet.Data = NewArray();
+    mailboxes = ListMailboxes("*");
+    for i = 0  while i < Length(mailboxes) by i+= 1 loop
+      if IsString(mailboxes.(mailboxes[i]).Class) && mailboxes.(mailboxes[i]).Class == "IPF.Contact" then
+        box = OpenMailbox(mailboxes[i]);
+          UIDs = MailboxUIDs(box,"Undeleted");
+          for j = 0  while j < Length(UIDs) by j+= 1 loop
+            msg = OpenMessage(box,UIDs[j]);
+            body = ObjectToString(MessageBody(msg, null));
+            vcard = AppToXML(MessageBody(msg, null), "vCard");
+            parsed = parse(vcard);
+            result = NewDictionary();
+
+            // Id
+            result.Id = parsed.uid;
+            result.Manager = parsed.uid;
+
+            // Name
+            result.Name = parsed.c.fn.v.value;
+
+            // Email
+            if IsArray(parsed.c.email) then
+              result.Email = parsed.c.email[0].v.value;
+              if !IsArray(result.Metadata) then
+                result.Metadata = NewArray();
+              end if;
+              for k = 1 while k < Length(parsed.c.email) by k+= 1 loop
+                meta = NewDictionary();
+                meta.Type = "Email";
+                meta.Key = parsed.c.email[k].ft;
+                meta.Value = parsed.c.email[k].v.value;
+                result.Metadata.addElement(meta);
+              end loop;
+            elif IsDictionary(parsed.c.email) then
+              result.Email = parsed.c.email.v.value;
+            end if;
+
+            // Phones
+            if IsArray(parsed.c.tel) then
+              result.Phones = "";
+              for k = 0 while k < Length(parsed.c.tel) by k+= 1 loop
+                result.Phones += parsed.c.tel[k].ft;
+                result.Phones += ":";
+                result.Phones += parsed.c.tel[k].v.value;
+                result.Phones += ";";
+              end loop;
+              result.Phones = Substring(result.Phones,0, Length(result.Phones) - 1);
+            elif IsDictionary(parsed.c.tel) then
+              result.Phones = "";
+              result.Phones += parsed.c.tel.ft;
+              result.Phones += ":";
+              result.Phones += parsed.c.tel.v.value;
+            end if;
+
+            // Company
+            if IsDictionary(parsed.c.org) && IsString(parsed.c.org.v.orgname) then
+              result.Company = parsed.c.org.v.orgname;
+            end if;
+
+            // Department
+            if IsDictionary(parsed.c.org) && IsString(parsed.c.org.v.orgunit) then
+              result.Department = parsed.c.org.v.orgunit;
+            end if;
+
+            // Position
+            if IsDictionary(parsed.c.title) then
+              result.Position = parsed.c.title.v.value;
+            end if;
+
+            // Birthday
+            if IsDictionary(parsed.c.bday) then
+              result.Birthday = parsed.c.bday.v.value;
+            end if;
+
+            // About
+            if IsDictionary(parsed.c.note) then
+              result.About = parsed.c.note.v.value;
+            end if;
+
+            // FULLLL To nbe deleted; This is just for Debugging
+            // result.FULLLL = parsed;
+
+            // Pushing to results
+            theSet.Data.addElement(result);
+          end loop;
+      end if;
+    end loop;
+    theSet.Success = true;
+    theSet.HasMorePages = "false";
+    SetHTTPResponseData(ObjectToJSON(theSet));
+  else
+    dummySet = NewDictionary();
+    dummySet.ErrorMessage = "Not Authenticated or wrong URL";
+    dummySet.Success = "false";
+    SetHTTPResponseData(ObjectToJSON(dummySet));
+  end if;
+end entry;
+
+procedure addProp(vcard, propName, propVal, propTypes) forward;
+
+function parse(vcardXML) is
+    if not IsXML(vcardXML) then return null; end if;
+
+    rootNode = vcardXML.XMLType().ToLowerCase();
+    if rootNode != "vcard" then return null; end if;
+
+    skipTags = ToObject("(userid,number)");
+    specTags = ToObject("(value,family,given,middle,prefix,suffix,orgname,orgunit,pobox,extadd,street,locality,region,pcode,ctry)");
+
+    vcard = NewDictionary();
+    vcard.c = NewDictionary();
+    i=0; loop
+        node = vcardXML.XMLBody(null, null, i);
+        exitif node == null;
+        propName = node.XMLType().ToLowerCase();
+        propVal = NewDictionary();
+        propTypes = NewArray();
+        j=0; loop
+            subnode = node.XMLBody(null, null, j);
+            exitif subnode == null;
+            n = subnode.XMLType();
+            nlc = n.ToLowerCase();
+            if skipTags.Find(nlc) < 0 then
+                if specTags.Find(nlc) >= 0 then
+                    propVal.(nlc) = String(subnode);
+                elif nlc == "binval" then
+                    bv = Base64Decode(String(subnode));
+                    if IsData(bv) then
+                        propVal.binval = bv;
+                    else
+                        propVal.value = String(subnode);
+                    end if;
+                else
+                    propTypes.AddElement(n);
+                end if;
+            end if;
+        j+=1; end loop;
+        addProp(vcard, propName, propVal, propTypes);
+    i+=1; end loop;
+
+    return vcard;
+end function;
+
+procedure addProperty(vcard, propName, propVal, propTypes) forward;
+
+procedure addProp(vcard, propName, propVal, propTypes) is
+    if propName == "uid" and then IsDictionary(propVal) then
+        vcard.uid = propVal.value;
+    elif propName == "version" and then IsDictionary(propVal) then
+        vcard.version = propVal.value;
+    end if;
+    addProperty(vcard, propName, propVal, propTypes);
+end procedure;
+
+procedure addProperty(vcard, propName, propVal, propTypes) is
+    val = newDictionary();
+    if IsArray(propTypes) and then Length(propTypes) > 0 then
+        val.t = propTypes;
+        i=0; while i<Length(propTypes) loop
+            if  propTypes[i] != "INTERNET" and then propTypes[i] != "PREF" then
+                val.ft = propTypes[i];
+            end if;
+            exitif val.ft != null;
+        i+=1; end loop;
+    end if;
+    if IsDictionary(propVal) and then IsData(propVal.binval) then
+        if vcard.binval == "skip" then
+            return; // skip binary encoded attribute
+        elif vcard.binval == "binary" then
+            val.v = propVal;
+        elif vcard.binval == "uri" then
+            if propName == "photo" then
+                propVal.binval = "MessagePart/Contacts/"+String(vcard.f)+"-V/PHOTO";
+            end if;
+            val.v = propVal;
+        else
+            val.v = propVal;
+        end if;
+    else
+        val.v = propVal;
+    end if;
+
+    if vcard.c.(propName) == null then
+       vcard.c.(propName) = val;
+    elif IsDictionary(vcard.c.(propName)) then
+       arr = newArray();
+       arr.addElement(vcard.c.(propName));
+       arr.addElement(val);
+       vcard.c.(propName) = arr;
+    elif IsArray(vcard.c.(propName)) then
+       vcard.c.(propName).addElement(val);
+    end if;
+end procedure;
