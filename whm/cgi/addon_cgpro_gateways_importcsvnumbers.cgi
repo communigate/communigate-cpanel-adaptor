@@ -95,7 +95,7 @@ if (-f $file && $FORM{provider}) {
 	    $rsips->{'rsip-' . $id . '-' . $uin } = {
 		domain => $host || '',
 		fromName => $username || '',
-		telnum => $telnum || '',
+		targetName => $telnum || '',
 		gwid => $id,
 		period => $expires || '30m',
 		authName => $authname || '',

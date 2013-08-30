@@ -146,7 +146,7 @@ if ($FORM{submitdialin} && $FORM{provider}) {
 		    fromName => $tel,
 		    gwid => $id,
 		    period => '30m',
-		    telnum => $tel,
+		    targetName => $tel,
 		}
 	    }
 	    if ($FORM{proxyType} eq "director" && $FORM{proxyTypeOld} ne "director") {

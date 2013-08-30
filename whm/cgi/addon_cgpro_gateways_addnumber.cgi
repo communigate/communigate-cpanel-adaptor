@@ -81,7 +81,7 @@ if ($FORM{submitedit} && $FORM{telnum}) {
 	$rsips->{'rsip-' . $id . '-' . $uin } = {
 	    domain => $FORM{host},
 	    fromName => $FORM{username},
-	    telnum => $FORM{telnum},
+	    targetName => $FORM{telnum},
 	    gwid => $id,
 	    period => $FORM{expires},
 	    authName => $FORM{authname},
