@@ -103,12 +103,12 @@ cp ${PACKSRC}/cpwrap/ccawrap /usr/local/cpanel/bin/
 cp -r ${PACKSRC}/cpwrap/CGPro /usr/local/cpanel/bin/admin/
 
 # install Perl dependencies
-if [ -d '/var/CommuniGate/' && `perldoc -l Mail::DKIM::Verifier | wc -l` == 0 ]
+if [ -d '/var/CommuniGate/' -a `perldoc -l Mail::DKIM::Verifier | wc -l` == 0 ]
 then
     perl -MCPAN -e 'install Mail::DKIM::Verifier'
 fi
 
-if [ -d '/var/CommuniGate/' && `perldoc -l Mail::DKIM::Signer | wc -l` == 0 ]
+if [ -d '/var/CommuniGate/' -a `perldoc -l Mail::DKIM::Signer | wc -l` == 0 ]
 then
     perl -MCPAN -e 'install Mail::DKIM::Signer'
 fi
