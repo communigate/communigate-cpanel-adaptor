@@ -1,0 +1,9 @@
+{
+  LogoutJumpRef = "/?skin=ProntoDrive";
+  LogoutJumpDelay = 1;
+  LogoutJumpName = "Pronto!Drive";
+  Charset = "utf-8";
+  StartPage = "ProntoDrive.wcgp";
+  LanguageCode = "en";
+  Language = "english";
+}

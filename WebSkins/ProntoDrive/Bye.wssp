@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="bg">
+  <head>
+    <title>Pronto!Drive</title>
+    <meta charset="utf-8" />
+    <meta http-equiv="Refresh" content="%%STRING("LogoutJumpDelay")%%; url=%%STRING("LogoutJumpRef")%%" />
+    <link rel="icon" href="%%filesRef%%favicon.ico" />
+    <link rel="stylesheet" href="%%filesRef%%screen.css" type="text/css" media="screen" />
+    <!--[if IE]>
+	<script language="javascript"  type="text/javascript" src="%%filesRef%%modernizr.js" ></script>
+	<![endif]-->
+    <meta name="HandheldFriendly" content="true"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2, user-scalable=yes"/>
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+	<h1>Pronto!Drive</h1>
+      </header>
+      <section class="main">
+	<p>%%HTMLSUBST(SESSION(FullAccountName)):STRING("LogoutTitle")%%</p>
+	<p><a href="%%STRING("LogoutJumpRef")%%" target="_top">%%HTMLSUBST(STRING("LogoutJumpName")):STRING("LogoutJumpButton")%%</a>
+<!--%%INCLUDE "footer.wssi"-->

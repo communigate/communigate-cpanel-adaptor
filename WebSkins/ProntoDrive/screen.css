@@ -1,0 +1,711 @@
+/* http://meyerweb.com/eric/tools/css/reset/
+   v2.0 | 20110126
+   License: none (public domain)
+   */
+
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, embed,
+figure, figcaption, footer, header, hgroup,
+menu, nav, output, ruby, section, summary,
+time, mark, audio, video {
+                           margin: 0;
+                           padding: 0;
+                           border: 0;
+                           font-size: 100%;
+                           font: inherit;
+                           vertical-align: baseline;
+                           }
+/* HTML5 display-role reset for older browsers */
+article, aside, details, figcaption, figure,
+footer, header, hgroup, menu, nav, section {
+                                             display: block;
+                                             }
+body {
+       line-height: 1;
+       }
+ol, ul {
+         list-style: none;
+         }
+blockquote, q {
+                quotes: none;
+                }
+blockquote:before, blockquote:after,
+q:before, q:after {
+                    content: '';
+                    content: none;
+                    }
+table {
+        border-collapse: collapse;
+        border-spacing: 0;
+        }
+/* END reset */
+
+html, body {
+             height: 100%;
+             -webkit-touch-callout: none;
+             -webkit-user-select: none;
+             -khtml-user-select: none;
+             -moz-user-select: none;
+             -ms-user-select: none;
+             user-select: none;
+             }
+body {
+       font-family: "Arial", "Liberation Sans", "Helvetica Neue", "Helvetica", sans-serif;
+       color: #4d4d4d;
+       font-size: 100%;
+       }
+p {
+    margin: 0.5em 0;
+    }
+p.text {
+         overflow: hidden;
+         margin: 0.5em 0;
+         }
+
+div.wrapper {
+              min-height: 100%;
+              height: auto !important;
+              height: 100%;
+              max-width: 960px;
+              margin: 0 auto -40px;
+              padding: 0 10px;
+              font-size: 0.875em;
+              overflow: hidden;
+              }
+.push {
+        height: 40px;
+        }
+.footer {
+          height: 40px;
+          background: #cccccc;
+          -webkit-box-shadow: 0px 0px 8px #bbbbbb;
+          -moz-box-shadow: 0px 0px 8px #bbbbbb;
+          box-shadow: inset 0px 15px 15px -10px #999999;
+          overflow: hidden;
+          }
+.footer .inner {
+                 width: 94%;
+                 max-width: 960px;
+                 margin: 0 auto;
+                 line-height: 32px;
+                 font-size: 0.85em;
+                 color: #666666;
+                 text-shadow: 1px 1px 0px #eeeeee;
+                 font-style: italic;
+                 }
+div.wrapper a {
+                color: #222222;
+                text-shadow: 1px 1px 0px #ffffff;
+                text-decoration: none;
+                }
+div.wrapper a:hover {
+                      text-decoration: underline;
+                      }
+header {
+         margin-bottom: 20px;
+         margin-top: 10px;
+         border-bottom: 1px solid #cccccc;
+         overflow: hidden;
+         padding-bottom: 5px;
+
+         }
+header h1 {
+            float: left;
+            display: block;
+            width: 243px;
+            height: 40px;
+            background: url(logo.png) 0 0 no-repeat;
+            overflow: hidden;
+            text-indent: -3000px;
+            }
+header .logout {
+                 margin-top: 10px;
+                 margin-right: 5px;
+                 float: right;
+                 }
+section.main {
+               overflow: hidden;
+               }
+section.main fieldset ol {
+                           display: block;
+                           left: -34px;
+                           margin-bottom: 20px;
+                           position: relative;
+                           padding: 10px;
+                           width: 102%;
+                           }
+section.main fieldset .header {
+                                display: block;
+                                left: -29px;
+                                position: relative;
+                                width: 100%;
+                                text-align: center;
+                                overflow: hidden;
+                                padding: 0 0 0 30px;
+                                }
+#dragndrop {
+             background: #F2F2F2 url(dragndrop.png) center 20px no-repeat;
+             padding: 130px 20px 20px 20px;
+             text-align: center;
+             border: 2px dashed #cccccc;
+             color: #999999;
+             text-shadow: 1px 1px 0px #ffffff;
+             margin-top: 0;
+             }
+body.hover #dragndrop {
+                        border-color: #7be3ff;
+                        }
+section.main ol li {
+                     overflow: hidden;
+                     padding: 7px 5px 3px 40px;
+                     }
+section.main ol li {
+                     min-height: 32px;
+                     line-height: 32px;
+                     background-image: url(text-x-generic-template.png);
+                     background-repeat: no-repeat;
+                     background-position: 5px 5px;
+                     border-style: solid;
+                     border-width: 0 0 1px 0;
+                     border-color: #eeeeee;
+                     }
+section.main ol li:hover {
+                           background-color: #f1ffff;
+                           border-color: #DEF8FF;
+                           }
+section.main ol li.selected {
+                              background-color: #ceeBFF !important;
+                              border-color: #7BE3FF !important;
+                              }
+section.main ol li.folder {
+                            background-image: url(folder.png);
+                            }
+section.main ol li.up {
+                        background-image: url(go-up.png);
+                        font-size: 0.928571429em;
+                        }
+section.main ol li.up em {
+                           color: #666666;
+                           }
+section.main ol li.file-bmp,
+section.main ol li.file-svg,
+section.main ol li.file-psd,
+section.main ol li.file-tiff,
+section.main ol li.file-tif,
+section.main ol li.file-gif,
+section.main ol li.file-png,
+section.main ol li.file-jpeg,
+section.main ol li.file-jpg {
+                            background-image: url(image-x-generic.png);
+                            }
+section.main ol li.file-sxw,
+section.main ol li.file-odt,
+section.main ol li.file-docx,
+section.main ol li.file-doc {
+                              background-image: url(x-office-document.png);
+                            }
+section.main ol li.file-rpm,
+section.main ol li.file-deb,
+section.main ol li.file-tgz,
+section.main ol li.file-arj,
+section.main ol li.file-7z,
+section.main ol li.file-bz,
+section.main ol li.file-gz,
+section.main ol li.file-tar,
+section.main ol li.file-jar,
+section.main ol li.file-rar,
+section.main ol li.file-zip {
+                              background-image: url(archve.png);
+                            }
+p.header {
+           margin: 0;
+           }
+p.header span,
+section.main ol li span {
+                          display: block;
+                          float: left;
+                          margin-left: 1%;
+                          overflow: hidden;
+                          }
+p.header span.check,
+section.main ol li span.check {
+                                width: 3%;
+                                }
+body.js span.check {
+                     display: none;
+                     }
+
+p.header span.share,
+section.main ol li span.share {
+                                width: 3%;
+                                min-width: 20px;
+                                float: right;
+                                }
+section.main ol li span.share a {
+                                  display: block;
+                                  float: right;
+                                  width: 18px;
+                                  height: 18px;
+                                  background: url(share.png) 1px 1px no-repeat;
+                                  overflow: hidden;
+                                  text-indent: -3000px;
+                                  border: 1px solid #ffffff;
+                                  margin-top: 6px;
+                                  }
+section.main ol li.selected span.share a {
+                                           border-color: #ceeBFF;
+                                           }
+section.main ol li span.share a:hover {
+                                        background-color: #ffffff;
+                                        border-color: #cccccc;
+                                        }
+p.header span.modified,
+section.main ol li span.modified {
+                                   width: 18%;
+                                   float: right;
+                                   }
+p.header span.size,
+section.main ol li span.size {
+                               width: 5%;
+                               float: right;
+                               }
+section.main ol li span.modified,
+section.main ol li span.size {
+                               font-size: 0.928571429em;
+                               }
+p.header {
+           border-bottom: 1px solid #bbbbbb;
+           }
+p.header span {
+                font-weight: bold;
+                padding: 10px 0;
+                }
+#progressbox {
+               display: none;
+               font-size: 0.875em;
+               position: fixed;
+               bottom: 0;
+               left: 25%;
+               width: 50%;
+               padding: 10px;
+               background: #ffffff;
+               border: 1px solid #cccccc;
+               -webkit-border-radius: 5px 5px 0 0;
+               -moz-border-radius: 5px 5px 0 0;
+               border-radius: 5px 5px 0 0;
+               -webkit-box-shadow: 0px 0px 8px #bbbbbb;
+               -moz-box-shadow: 0px 0px 8px #bbbbbb;
+               box-shadow: 0px 0px 8px #bbbbbb;
+               }
+#progressbox-wrap {
+                    display: block;
+                    height: 10px;
+                    background: #ffffff;
+                    width: 99%;
+                    border: 1px solid #cccccc;
+                    margin-top: 10px;
+                    position: relative;
+                    overflow: hidden;
+                    padding: 1px;
+                    }
+#progressbox-progress {
+                        display: block;
+                        height: 10px;
+                        background: #28ABD6;
+                        }
+#toast {
+         position: fixed;
+         display: none;
+         width: 15%;
+         right: 15px;
+         top: 15px;
+         font-size: 0.75em;
+         }
+.toast {
+         background-color: #000000;
+         background-color: rgba(0, 0, 0, 0.7);
+         text-shadow: 1px 1px 0px #000000;
+         padding: 8px;
+         color: #ffffff;
+         text-align: center;
+         margin-bottom: 5px;
+         -webkit-border-radius: 5px;
+         -moz-border-radius: 5px;
+         border-radius: 5px;
+         }
+.toast-failure {
+                 background: #bb3333;
+                 }
+
+p#buttons {
+            height: 30px;
+            margin: 0;
+            }
+body.js p#buttons .share-button,
+body.js p#buttons .create,
+body.js p#buttons .rename-clone,
+body.js p#buttons .rename,
+body.js p#buttons input.delete {
+                         display: none;
+                         }
+/* context menu specific */
+#contextmenu {
+               border: 1px solid #cccccc;
+               padding: 0;
+               background: #ffffff;
+               width: 150px;
+               list-style-type: none;
+               display: none;
+               }
+#contextmenu .separator	{
+                          border-top: 1px solid #cccccc;
+                          }
+#contextmenu li	{
+                  margin: 0;
+                  padding: 0;
+                  }
+#contextmenu li a {
+                    display: block;
+                    padding: 8px 10px 8px 35px;
+                    width: 105px;
+                    font-size: 12px;
+                    text-decoration: none;
+                    font-family: tahoma,arial,sans-serif;
+                    color: #000000;
+                    background-position: 8px center;
+                    background-repeat: no-repeat;
+                    }
+#contextmenu li a:hover {
+                          background-color: #dddddd;
+                          }
+#contextmenu li a.disabled {
+                             color: #cccccc;
+                             font-style: italic;
+                             }
+#contextmenu li a.disabled:hover {
+                                    background-color: #f9f9f9;
+                                    }
+
+/* context menu items */
+#contextmenu li a.delete {
+                           background-image: url(delete.png);
+                           }
+#contextmenu li a.sharelink {
+                              background-image: url(share.png);
+                              }
+#contextmenu li a.rename {
+                           background-image: url(edit.png);
+                           }
+#contextmenu li a.createfolder {
+                                 background-image: url(folder-new.png);
+                                 }
+.popuper-frame {
+                 display: none;
+                 }
+#uploadP {
+           width: 24px;
+           height: 24px;
+           float: left;
+           overflow: hidden;
+           position: relative;
+           margin-right: 5px;
+           margin-top: 0;
+           margin-bottom: 0;
+           }
+#uploadField {
+               position: absolute;
+               top: 2px;
+               right: 0;
+               cursor: pointer;
+               opacity: 0;
+               /* zoom: 1; */
+               filter: alpha(opacity=0);
+               }
+#rename-clone,
+#delete,
+.share-button,
+#CreateDir-clone,
+#CreateDir-clone,
+#uploadButton {
+                display: block;
+                border: none;
+                float: left;
+                width: 24px;
+                height: 24px;
+                overflow: hidden;
+                text-indent: -3000px;
+                margin-right: 5px;
+                cursor: pointer;
+                }
+#uploadButton {
+                background: url(upload.png) 0 0 no-repeat;
+                }
+#CreateDir-clone {
+                   background: url(folder-new24.png) 0 0 no-repeat;
+                   }
+#rename-clone {
+                background: url(edit24.png) 0 0 no-repeat;
+                }
+#delete {
+          background: url(delete24.png) 0 0 no-repeat;
+          }
+.share-button {
+                background: url(share24.png) 0 0 no-repeat;
+                }
+form {
+       display: inline;
+       }
+input.text {
+             border: 1px solid #bbbbbb;
+             -webkit-border-radius: 3px;
+             -moz-border-radius: 3px;
+             border-radius: 3px;
+             -webkit-box-shadow: inset 0px 0px 3px #bbbbbb;
+             -moz-box-shadow: inset 0px 0px 3px #bbbbbb;
+             box-shadow: inset 0px 0px 3px #bbbbbb;
+             background: #ffffff;
+             margin: 0 5px;
+             height: 24px;
+             text-indent: 5px;
+             width: 200px;
+             float: left;
+             }
+input#search {
+               float: right;
+               background: url(search.png) top right no-repeat;
+               color: #666666;
+               }
+input.rename-button,
+input.create-button {
+                      border: none;
+                      padding: 5px 15px;
+                      height: 28px;
+                      line-height: 25px;
+                      -webkit-border-radius: 3px;
+                      -moz-border-radius: 3px;
+                      border-radius: 3px;
+                      background-color: #F26222;
+                      background-image: -webkit-gradient(linear, left top, left bottom, from(#F26222), to(#F58220)); /* Chrome, Safari 4+ */
+                      background-image: -webkit-linear-gradient(top, #F26222, #F58220); /* Chrome 10-25, iOS 5+, Safari 5.1+ */
+                      background-image:    -moz-linear-gradient(top, #F26222, #F58220); /* Firefox 3.6-15 */
+                      background-image:      -o-linear-gradient(top, #F26222, #F58220); /* Opera 11.10-12.00 */
+                      background-image:         linear-gradient(to bottom, #F26222, #F58220); /* Chrome 26, Firefox 16+, IE 10+, Opera 12.10+ */
+                      color: #ffffff;
+                      text-shadow: 1px 1px 0px #c26222;
+                      border: 1px solid;
+                      float: left;
+                      border-color: #ff994a #f26222 #c26222 #f26222;
+                      cursor: pointer;
+                      margin: 0 5px;
+                      }
+.popuper-close {
+                 display: block;
+                 float: left;
+                 height: 26px;
+                 width: 26px;
+                 background: url(close.png) center center no-repeat;
+                 overflow: hidden;
+                 text-indent: -3000px;
+                 margin: 0 5px;
+                 }
+p.text label {
+               width: 80px;
+               height: 24px;
+               line-height: 24px;
+               float: left;
+               }
+p.shareLink textarea {
+                       width: 100%;
+                       }
+p.submit {
+           overflow: hidden;
+           padding-left: 85px;
+           }
+p.submit input {
+                 border: none;
+                 padding: 5px 15px;
+                 height: 28px;
+                 line-height: 25px;
+                 -webkit-border-radius: 3px;
+                 -moz-border-radius: 3px;
+                 border-radius: 3px;
+                 background-color: #F26222;
+                 background-image: -webkit-gradient(linear, left top, left bottom, from(#F26222), to(#F58220)); /* Chrome, Safari 4+ */
+                 background-image: -webkit-linear-gradient(top, #F26222, #F58220); /* Chrome 10-25, iOS 5+, Safari 5.1+ */
+                 background-image:    -moz-linear-gradient(top, #F26222, #F58220); /* Firefox 3.6-15 */
+                 background-image:      -o-linear-gradient(top, #F26222, #F58220); /* Opera 11.10-12.00 */
+                 background-image:         linear-gradient(to bottom, #F26222, #F58220); /* Chrome 26, Firefox 16+, IE 10+, Opera 12.10+ */
+                 color: #ffffff;
+                 text-shadow: 1px 1px 0px #c26222;
+                 border: 1px solid;
+                 border-color: #ff994a #f26222 #c26222 #f26222;
+                 cursor: pointer;
+                 }
+h2 {
+     font-size: 1.75em;
+     color: #15A9D6;
+     margin-bottom: 1em;
+     }
+.shareLink textarea {
+                      width: 100%;
+                      border-bottom: solid #F26122;
+                      border-width: 0 0 1px 0;
+                      background: #ffffff;
+                      color: #15A9D6;
+                      }
+p.downloadButton a {
+                     width: 35%;
+                     padding: 20px 0;
+                     margin: 1em auto;
+                     display: block;
+                     text-align: center;
+                     background-color: #F26222;
+                     background-image: -webkit-gradient(linear, left top, left bottom, from(#F26222), to(#F58220)); /* Chrome, Safari 4+ */
+                     background-image: -webkit-linear-gradient(top, #F26222, #F58220); /* Chrome 10-25, iOS 5+, Safari 5.1+ */
+                     background-image:    -moz-linear-gradient(top, #F26222, #F58220); /* Firefox 3.6-15 */
+                     background-image:      -o-linear-gradient(top, #F26222, #F58220); /* Opera 11.10-12.00 */
+                     background-image:         linear-gradient(to bottom, #F26222, #F58220); /* Chrome 26, Firefox 16+, IE 10+, Opera 12.10+ */
+                     color: #ffffff;
+                     text-shadow: 1px 1px 0px #c26222;
+                     border: 1px solid;
+                     border-color: #ff994a #f26222 #c26222 #f26222;
+                     font-size: 1.25em;
+                     }
+p.submit {
+           padding: 0;
+           }
+.login p.submit input {
+                        width: 288px;
+                        height: 40px;
+                        }
+.login {
+         width: 300px;
+         margin: 0 auto;
+         padding-top: 280px;
+         background: url(drive.png) 20px 0 no-repeat;
+         }
+.login p {
+           margin: 0.75em 0;
+           }
+text-area {
+            max-width: 100%;
+            }
+@media screen and (max-width: 800px) {
+  section.main ol {
+                    padding: 0 !important;
+                    }
+  section.main ol li {
+                       position: relative;
+                       line-height: 1.25em;
+                       width: auto;
+                       padding-left: 20px;
+                       padding-right: 5px;
+                       width: 100%;
+                       left: 0;
+                       }
+  section.main ol li span.name {
+                                 display: block;
+                                 float: none;
+                                 padding-left: 25px;
+                                 }
+  section.main ol li span.name a {
+                                   display: block;
+                                   float: left;
+                                   padding: 2px;
+                                   }
+  section.main ol li span.name em {
+                                    display: block;
+                                    float: left;
+                                    padding: 2px;
+                                   }
+  p.header span.modified,
+  section.main ol li span.modified {
+                                     width: 50%;
+                                     float: right;
+                                     text-align: right;
+                                     }
+  section.main ol li span.modified {
+                                     color: #666666;
+                                     font-size: 0.8725em;
+                                     }
+  p.header span.size,
+  section.main ol li span.size {
+                                 width: 25%;
+                                 float: right;
+                                 text-align: right;
+                                 padding-right: 10px;
+                                 }
+  section.main ol li span.size {
+                                 color: #666666;
+                                 font-size: 0.8725em;
+                                 border-right: 1px solid #cccccc;
+                                 }
+  section.main ol li span.share a {
+                                    position: absolute;
+                                    top: 0px;
+                                    right: 5px;
+                                    margin: 0;
+                                    }
+  section.main ol li span.share {
+                                  position: absolute;
+                                  top: 3px;
+                                  right: 0;
+                                  width: 22px;
+                                  height: 22px;
+                                  }
+  p.header span.share {
+                        display: none;
+                        }
+  p.downloadButton a {
+                       width: 75%;
+                       }
+  section.main ol li:hover {
+                             background-color: #ffffff;
+                             border-color: #ffffff;
+                             }
+  #toast {
+           position: fixed;
+           display: none;
+           width: 50%;
+           right: 2%;
+           top: 52px;
+           font-size: 0.725em;
+           }
+  #progressbox {
+                 width: auto;
+                 left: 5%;
+                 font-size: 0.725em;
+                 padding: 2%;
+                 right: 5%;
+                 }
+ol li input.text {
+                   margin: 0 2px 2px 25px;
+                   width: 80%;
+                   }
+ol li input.button {
+                     width: 35%;
+                     margin: 0 2px 0 25px;
+                     padding: 0 2px;
+                     }
+.popuper-close {
+                 margin: 0 2px;
+                 }
+
+input#search {
+               width: 50%;
+               }
+p.shareLink textarea {
+                       height: 5em;
+                       word-wrap: break-word;
+                       text-wrap: unrestricted;
+                       width: 97%;
+                       }
+}

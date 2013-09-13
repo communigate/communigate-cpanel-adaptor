@@ -1,0 +1,9 @@
+<cpanelfeature cgpro_pronto_html5>
+<!-- <?cp CommuniGate::checkSSLlinks() ?> -->
+<script type="text/javascript">
+  document.location.href = "http<cpanelif $CPVAR{'ssllinks'}>s</cpanelif>://<cpanel print="$CPVAR{'CGPServer'}">:<cpanelif $CPVAR{'ssllinks'}>9100</cpanelif><cpanelif !$CPVAR{'ssllinks'}>8100</cpanelif>/?Skin=ProntoDrive"; 
+</script>
+<noscript>
+<a href="http<cpanelif $CPVAR{'ssllinks'}>s</cpanelif>://<cpanel print="$ENV{'HTTP_HOST'}">:<cpanelif $CPVAR{'ssllinks'}>9100</cpanelif><cpanelif !$CPVAR{'ssllinks'}>8100</cpanelif>/?Skin=ProntoDrive">Click here if not redirected.</a>
+</noscript>
+</cpanelfeature>

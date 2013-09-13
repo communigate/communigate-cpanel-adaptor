@@ -112,6 +112,11 @@ if [ -d '/var/CommuniGate/' -a `perldoc -l Mail::DKIM::Signer | wc -l` == 0 ]
 then
     perl -MCPAN -e 'install Mail::DKIM::Signer'
 fi
+if [ -d '/var/CommuniGate/' -a `perldoc -l Archive::Zip | wc -l` == 0 ]
+then
+    perl -MCPAN -e 'install Archive::Zip'
+fi
+
 if [ `perldoc -l YAML::Syck | wc -l` == 0 ]
 then
     /usr/local/cpanel/bin/cpanm -f -q YAML::Syck

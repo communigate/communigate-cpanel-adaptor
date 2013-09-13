@@ -1,0 +1,21 @@
+// ============================================= //
+//                   List files                  //
+//                                               //
+// Version 1.0                                   //
+// Anton Katsarov <anton@webface.bg>             //
+// ============================================= //
+//
+// Description:
+//  Lists Accounts files and folders
+//
+
+function list() external;
+
+entry main is
+  MyAccountName = MyEmail();
+  if IsString(MyAccountName) then
+    fileList = list();
+    ProcessWSSP("ProntoDrive",fileList);
+    //SetHTTPResponseData(ObjectToJSON(fileList));
+  end if;
+end entry;

@@ -1,0 +1,57 @@
+<!--%%INCLUDE "header.wssi"-->
+<script language="javascript"  type="text/javascript" src="%%filesRef%%drive.js" ></script>
+<form method="POST" action="website.wssp" enctype="multipart/form-data" id="uploadForm">
+  <p id="uploadP">
+    <input type="file" name="Upload" multiple="" id="uploadField" title="Upload" />
+    <input type="hidden" name="SubDir" value="ProntoDrive/%%HTML:path%%"  class="subdir" />
+    <input type="hidden" name="Create" value="1" />
+    <input type="submit" name="BtnSubmit" value="Upload" id="uploadButton" />
+  </p>
+</form>
+<form method="POST" id="updateForm" action="website.wssp">
+  <fieldset>
+    <p id="buttons" class="buttons">
+      <input type="text" name="RenameName" id="RenameName" value="" class="rename" />
+      <input type="submit" id="CreateDir" name="CreateDir" value="Create Folder" class="create" />
+      <input type="text" name="NewName" id="NewName" value="" class="create" />
+      <input type="submit" id="delete" name="Remove" value="Delete" class="delete" title="Delete" />
+      <input type="submit" id="rename" name="rename" value="Rename" class="rename" />
+    </p>
+    <input type="hidden" name="SubDir" value="ProntoDrive/%%HTML:path%%" class="subdir" />
+    <p class="header" id="header">
+      <span class="check">&nbsp;</span>
+      <span class="name">Name</span>
+      <span class="share">&nbsp;</span>
+      <span class="modified">Modified</span>
+      <span class="size">Size</span>
+    </p>
+    <ol id="fileList">
+      <!--%%IF Upper-->
+      <li class="up" id="up">
+	<span class="name"><a href="?path=%%HTML:Upper%%">..</a></span>
+      </li>
+      <!--%%ENDIF-->
+      <!--%%FOREACH folder in Folders-->
+      <li class="folder">
+	<span class="check"><input type="checkbox" name="folder" value="%%HTML:folder[].Name%%" /></span>
+	<span class="name"><a href="?path=%%HTML:path%%/%%HTML:folder[].Name%%">%%HTML:folder[].Name%%</a></span>
+	<span class="share">
+	  <a href="ShareFile.wcgp?file=%%HTML:path%%/%%HTML:folder[].Name%%">Share</a>
+	</span>
+	<span class="modified">%%HTML:folder[].Modified%%</span>
+      </li>
+      <!--%%ENDFOR folder-->
+      <!--%%FOREACH file in Files-->
+      <li class="file file-%%HTML:file[].Ext%%">
+	<span class="check"><input type="checkbox" name="file" value="%%HTML:file[].Name%%" /></span>
+	<span class="name"><a href="WebFile/ProntoDrive/%%HTML:path%%/%%HTML:file[].Name%%">%%HTML:file[].Name%%</a></span>
+	<span class="share"><a href="ShareFile.wcgp?file=%%HTML:path%%/%%HTML:file[].Name%%">Share</a></span>
+	<span class="modified">%%HTML:file[].Modified%%</span>
+	<span class="size">%%HTML:file[].Size%%</span>
+      </li>
+      <!--%%ENDFOR file-->
+    </ol>
+    <input type="hidden" name="path" value="" />
+  </fieldset>
+</form>
+<!--%%INCLUDE "footer.wssi"-->
