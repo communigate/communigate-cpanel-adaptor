@@ -50,13 +50,22 @@ if ($account && $fileKey) {
       $url =~ s/%40/@/;
       my $files = $prefs->{"SharedFiles"}->{$fileKey}->{file};
       my $filesOutput = [];
-
+      my $shared = 0;
+      if ($files->[0] =~ /^\~([A-Z0-9._%+-]+\@[A-Z0-9.-]+\.[A-Z]{2,4})\//i) {
+	($username, $domain) = split "@", $1;
+	$shared = 1;
+      }
       for my $fileN (@$files) {
 	my $file = $fileN;
 	my $path = $file;
 	$file =~ s/^.*\/(.*?)$/$1/;
 	$path =~ s/^(.*)\/?$file$/$1/;
-	my $storedFiles = $cli->ListStorageFiles($account, "ProntoDrive/" . $path);
+	my $fullpath = "private/" . $path;
+	if ($shared) {
+	  $fullpath = $path;
+	  $fullpath =~ s/^\~.*?\/private/private/;
+	}
+	my $storedFiles = $cli->ListStorageFiles("$username\@$domain", $fullpath);
 	my $fileFound = 0;
 	for my $storedFile (keys %$storedFiles) {
 	  if ($storedFile eq $file) {
@@ -67,7 +76,7 @@ if ($account && $fileKey) {
 	if ($fileFound) {
 	  push @$filesOutput, {file => $file, path => $path};
 	} else {
-	  delete $prefs->{"SharedFiles"}->{$fileKey};
+	  # delete $prefs->{"SharedFiles"}->{$fileKey};
 	}
       }
 
@@ -75,7 +84,14 @@ if ($account && $fileKey) {
       if ($#$filesOutput == -1) {
 	print $q->redirect('/notfound.wssp?Skin=ProntoDrive');
       } elsif ($#$filesOutput == 0) {
-	my $filePath  = "/var/CommuniGate/Domains/$domain/$username.macnt/account.web/ProntoDrive" . $filesOutput->[0]->{path} . "/" . $filesOutput->[0]->{file};
+	my $rootPath  = "/var/CommuniGate/Domains/$domain/$username.macnt/account.web/private" . $filesOutput->[0]->{path};
+	my $filePath  = $rootPath . "/" . $filesOutput->[0]->{file};
+	if ($shared) {
+	  my $localpath = $filesOutput->[0]->{path};
+	  $localpath =~ s/^\~.*?\/private//;
+	  $rootPath  = "/var/CommuniGate/Domains/$domain/$username.macnt/account.web/private" . $localpath;
+	  $filePath  = $rootPath . "/" . $filesOutput->[0]->{file};
+	}
 	$filePath =~ s#/+#/#g;
 	if (-d $filePath) {
 	  $filename = $filesOutput->[0]->{file} . ".zip";
@@ -89,31 +105,37 @@ if ($account && $fileKey) {
       if ($getFile) {
 	# Just for debugging
 	# print "Content-type: text/html\n\n";
-	my $rootPath  = "/var/CommuniGate/Domains/$domain/$username.macnt/account.web/ProntoDrive" . $filesOutput->[0]->{path};
+	if ($shared) {
+	  $filesOutput->[0]->{path} =~ s/^\~.*?\/private//;
+	}
+	my $rootPath  = "/var/CommuniGate/Domains/$domain/$username.macnt/account.web/private" . $filesOutput->[0]->{path};
 	my $filePath  = $rootPath . "/" . $filesOutput->[0]->{file};
 	$filePath =~ s#/+#/#g;
 	if ($#$filesOutput > 0 || -d $filePath) {
 	  my $dest = "";
-	    if ($#$filesOutput > 0) {
-	      $fileKey =~ m/(\w{5})$/;
-	      $dest = "ProntoDrive-$1";
-	      $rootPath = "/var/CommuniGate/Domains/$domain/$username.macnt/account.web/ProntoDrive";
-	    }
+	  if ($#$filesOutput > 0) {
+	    $fileKey =~ m/(\w{5})$/;
+	    $dest = "ProntoDrive-$1";
+	    $rootPath = "/var/CommuniGate/Domains/$domain/$username.macnt/account.web/private";
+	  }
 	  my $zip = Archive::Zip->new();
 	  for my $item (@$filesOutput) {
-	    my $check = "ProntoDrive/" . $item->{path} . "/" . $item->{file};
+	    if ($shared) {
+	      $item->{path} =~ s/^\~.*?\/private//;
+	    }
+	    my $check = "private/" . $item->{path} . "/" . $item->{file};
 	    $check =~ s#/+#/#g;
-	    $zip->updateTree($rootPath, $dest, sub {/$check/});
+	    $zip->updateTree($rootPath, $dest, sub {/$check/ && !/\.meta$/});
 	  }
 	  print "Content-type: application/zip\n\n";
 	  $zip->writeToFileHandle(STDOUT);
 	} else {
-	  my $mimeType = `file --mime-type $filePath`;
+	  my $mimeType = `file --mime-type "$filePath"`;
 	  $mimeType =~ s/^$filePath\:\s+//;
 	  chomp $mimeType;
 	  $mimeType = "application/x-download" unless $mimeType;
 	  print "Content-type: $mimeType\n\n";
-	  open(FI, "<", $filePath) or print "Cannot Open File";
+	  open(FI, "<", $filePath) or die "Cannot Open File";
 	  my ($fl, $buff);
 	  while (read FI, $buff, 1024) {
 	      $fl .= $buff;

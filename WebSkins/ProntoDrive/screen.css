@@ -75,28 +75,29 @@ div.wrapper {
               height: auto !important;
               height: 100%;
               max-width: 960px;
-              margin: 0 auto -40px;
+              margin: 0 auto -30px;
               padding: 0 10px;
               font-size: 0.875em;
               overflow: hidden;
+              position: relative;
               }
 .push {
-        height: 40px;
+        height: 30px;
         }
 .footer {
-          height: 40px;
-          background: #cccccc;
-          -webkit-box-shadow: 0px 0px 8px #bbbbbb;
-          -moz-box-shadow: 0px 0px 8px #bbbbbb;
-          box-shadow: inset 0px 15px 15px -10px #999999;
+          height: 30px;
+          background: #eeeeee;
+          -webkit-box-shadow: inset 0px 15px 15px -10px #dddddd;
+          -moz-box-shadow: inset 0px 15px 15px -10px #dddddd;
+          box-shadow: inset 0px 15px 15px -10px #bbbbbb;
           overflow: hidden;
           }
 .footer .inner {
                  width: 94%;
                  max-width: 960px;
                  margin: 0 auto;
-                 line-height: 32px;
-                 font-size: 0.85em;
+                 line-height: 18px;
+                 font-size: 0.785em;
                  color: #666666;
                  text-shadow: 1px 1px 0px #eeeeee;
                  font-style: italic;
@@ -133,6 +134,7 @@ header .logout {
                  }
 section.main {
                overflow: hidden;
+               position: relative;
                }
 section.main fieldset ol {
                            display: block;
@@ -188,6 +190,9 @@ section.main ol li.selected {
 section.main ol li.folder {
                             background-image: url(folder.png);
                             }
+section.main ol li.folder-shared {
+                                   background-image: url(folder-shared.png);
+                                   }
 section.main ol li.up {
                         background-image: url(go-up.png);
                         font-size: 0.928571429em;
@@ -244,11 +249,13 @@ body.js span.check {
                      }
 
 p.header span.share,
+section.main ol li span.remove,
 section.main ol li span.share {
                                 width: 3%;
                                 min-width: 20px;
                                 float: right;
                                 }
+section.main ol li span.remove a,
 section.main ol li span.share a {
                                   display: block;
                                   float: right;
@@ -260,9 +267,32 @@ section.main ol li span.share a {
                                   border: 1px solid #ffffff;
                                   margin-top: 6px;
                                   }
+section.main ol li span.remove a {
+                                   background: url(remove.png) 1px 1px no-repeat;
+                                   }
+p.header span.usershare,
+section.main ol li span.usershare {
+                                width: 3%;
+                                min-width: 20px;
+                                float: right;
+                                }
+section.main ol li span.usershare a {
+                                  display: block;
+                                  float: right;
+                                  width: 18px;
+                                  height: 18px;
+                                  background: url(usershare.png) 1px 1px no-repeat;
+                                  overflow: hidden;
+                                  text-indent: -3000px;
+                                  border: 1px solid #ffffff;
+                                  margin-top: 6px;
+                                  }
+
+section.main ol li.selected span.usershare a,
 section.main ol li.selected span.share a {
                                            border-color: #ceeBFF;
                                            }
+section.main ol li span.usershare a:hover,
 section.main ol li span.share a:hover {
                                         background-color: #ffffff;
                                         border-color: #cccccc;
@@ -281,6 +311,9 @@ section.main ol li span.modified,
 section.main ol li span.size {
                                font-size: 0.928571429em;
                                }
+body.js section.main ol#fileList {
+                                   opacity: 0;
+                                   }
 p.header {
            border-bottom: 1px solid #bbbbbb;
            }
@@ -343,6 +376,7 @@ p.header span {
          }
 .toast-failure {
                  background: #bb3333;
+                 text-shadow: 1px 1px 0px #440000;
                  }
 
 p#buttons {
@@ -410,7 +444,7 @@ body.js p#buttons input.delete {
 .popuper-frame {
                  display: none;
                  }
-#uploadP {
+body.js #uploadP {
            width: 24px;
            height: 24px;
            float: left;
@@ -420,7 +454,7 @@ body.js p#buttons input.delete {
            margin-top: 0;
            margin-bottom: 0;
            }
-#uploadField {
+body.js #uploadField {
                position: absolute;
                top: 2px;
                right: 0;
@@ -483,6 +517,28 @@ input#search {
                background: url(search.png) top right no-repeat;
                color: #666666;
                }
+input.search-active {
+                      background-image: none !important;
+                      }
+span#searchClear {
+                   position: absolute;
+                   width: 30px;
+                   height: 30px;
+                   right: 0;
+                   top: 0;
+                   cursor: pointer;
+                   overflow: hidden;
+                   text-indent: -3000px;
+                   display: none;
+                   background: url(clear.png) 0px 2px no-repeat;
+                   }
+input.checkbox {
+                 float: left;
+                 }
+p.checks label {
+                 width: auto !important;
+                 padding-right: 0.5em;
+                 }
 input.rename-button,
 input.create-button {
                       border: none;
@@ -598,6 +654,61 @@ p.submit {
 text-area {
             max-width: 100%;
             }
+ul#alerts {
+            margin-left:-29px;
+            }
+ul#alerts li {
+               padding: 10px;
+               border: 1px solid #dddd00;
+               background: #ffffcc;
+               margin: 0.5em 0;
+               }
+ul#alerts li p.actions {
+                         text-align: right;
+                         }
+strong {
+         font-weight: bold;
+         }
+#overlay {
+           position: absolute;
+           top: 70px;
+           left: 0;
+           bottom: 30px;
+           width: 96%;
+           padding: 0 2%;
+           background-color: #ffffff;
+           background-color: rgba(255,255,255,0.9);
+           z-index: 2000;
+           display: none;
+           overflow: auto;
+           }
+#overlay label,
+#overlay input {
+                 float: none;
+                 }
+h3.helps {
+           cursor: pointer;
+           width: 24px;
+           height: 24px;
+           overflow: hidden;
+           background: url(help.png) 0 0 no-repeat;
+           text-indent: -3000px;
+           }
+div.helps {
+            line-height: 1.35em;
+            font-size: 0.8725em;
+            margin: 0 0 1em 0;
+            overflow: hidden;
+            background: #f9f9ff;
+            }
+div.helps ul {
+               list-style: disc;
+               padding-left: 2em;
+               margin: 10px;
+               }
+div.helps p {
+              margin: 10px;
+               }
 @media screen and (max-width: 800px) {
   section.main ol {
                     padding: 0 !important;
@@ -708,4 +819,17 @@ p.shareLink textarea {
                        text-wrap: unrestricted;
                        width: 97%;
                        }
+#overlay {
+           width: 98%;
+           padding: 0 1%;
+           }
+#overlay input.text {
+                      width: 55%;
+
+                      }
+#overlay label {
+                 margin: 0;
+                 padding: 0 !important;
+                 font-size: 0.928571429em;
+                 }
 }

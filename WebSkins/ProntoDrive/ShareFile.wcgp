@@ -42,6 +42,6 @@ entry main is
     status = SetAccountPreferences(sharedFiles,"SharedFiles");
     SetHTTPResponseCode(301);
     AddHTTPResponseField("Location","/cgi-bin/ProntoDriveDownload.pl/" + account + "/" + downloadHash);
-    //SetHTTPResponseData(ObjectToJSON(downloadHash));
+    // SetHTTPResponseData(ObjectToJSON(sharedfiles));
   end if;
 end entry;

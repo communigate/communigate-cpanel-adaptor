@@ -94,6 +94,14 @@ entry main is
               result.About = parsed.c.note.v.value;
             end if;
 
+            // role
+            if IsDictionary(parsed.c.role) then
+              result.BusinessCategory = parsed.c.role.v.value;
+            end if;
+
+            // group
+            result.Group = mailboxes[i];
+
             // FULLLL To nbe deleted; This is just for Debugging
             // result.FULLLL = parsed;
 

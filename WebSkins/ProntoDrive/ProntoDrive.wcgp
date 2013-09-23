@@ -15,6 +15,11 @@ entry main is
   MyAccountName = MyEmail();
   if IsString(MyAccountName) then
     fileList = list();
+    fileList.Alerts = NewArray();
+    alerts = GetAccountPreferences("ProntoDriveAlerts");
+    for i = 0  while i < Length(alerts) by i+= 1 loop
+      fileList.Alerts.addElement(alerts[i]);
+    end loop;
     ProcessWSSP("ProntoDrive",fileList);
     //SetHTTPResponseData(ObjectToJSON(fileList));
   end if;

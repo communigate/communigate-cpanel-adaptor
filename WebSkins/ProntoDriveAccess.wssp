@@ -1,0 +1,82 @@
+<!--%%IF static-->
+<!DOCTYPE html>
+<html lang="bg">
+  <head>
+    <title>Pronto!Drive</title>
+    <meta charset="utf-8" />
+    <link rel="icon" href="%%SESSION.filesRef%%favicon.ico" />
+    <link rel="stylesheet" href="%%SESSION.filesRef%%screen.css" type="text/css" media="screen" />
+    <!--[if IE]>
+	<script language="javascript"  type="text/javascript" src="%%filesRef%%modernizr.js" ></script>
+	<![endif]-->
+    <meta name="HandheldFriendly" content="true"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2, user-scalable=yes"/>
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+	<h1>Pronto!Drive</h1>
+	<a href="/Session/%%SESSION.ID%%/Bye.wssp" class="logout">Logout</a>
+      </header>
+      <section class="main">
+	<!--%%ENDIF-->
+	<h2>Access rights for %%folder%%</h2>
+	<h3 class="helps">Help</h3>
+	<div class="helps">
+	  <p>
+	    An ACL element name can be:
+	  </p>
+	  <ul>
+	    <li><strong>anyone</strong> - This ACL element specifies the access rights granted to everybody (all authenticated accounts).</li>
+	    <li><strong>anyone@</strong> - This ACL element specifies the access rights granted to all Accounts in the same CommuniGate Pro Domain.</li>
+	    <li><strong>anyone@domainName</strong> - This ACL element specifies the access rights granted to all Accounts in the CommuniGate Pro domainName Domain. The domainName should be the real Domain name, and not a Domain Alias name.</li>
+	    <li><strong>accountName</strong> - This ACL element specifies the access rights granted to the accountName Account user in the same CommuniGate Pro Domain. The accountName should be a real Account name, and not an Account Alias or a Forwarder.</li>
+	    <li><strong>accountName@domainName</strong> - This ACL element specifies the access rights granted to an Account user in a different CommuniGate Pro Domain. The domainName should be the real Domain name, and not a Domain Alias name.</li>
+	    <li><strong>#groupName</strong> - This ACL element specifies the access rights granted to all members of the groupName Group (in the same Domain).</li>
+	    <li><strong>#groupName@domainName</strong> - This ACL element specifies the access rights granted to all members of the groupName Group in a different CommuniGate Pro Domain. The domainName should be the real Domain name, and not a Domain Alias name.</li>
+	  </ul>
+	</div>
+	<form action="" method="post">
+	  <fieldset>
+	    <!--%%FOREACH rule in ACL-->
+	    <p class="text checks">
+	      <input type="text" name="Z%%rule[].id%%" value="%%rule[].To%%" class="text" />
+	      <input type="hidden" name="index%%rule[].id%%" value="1" />
+	      <select name="rights%%rule[].id%%">
+		<option value="">Undefined</option>
+		<option <!--%%IF CONTAINS("l" IN rule[].ACL) & CONTAINS("r" IN rule[].ACL) & NOT(CONTAINS("w" IN rule[].ACL)) & NOT(CONTAINS("d" IN rule[].ACL))-->selected<!--%%ENDIF--> value="lr">Read Only</option>
+		<option <!--%%IF CONTAINS("l" IN rule[].ACL) & CONTAINS("r" IN rule[].ACL) & CONTAINS("w" IN rule[].ACL) & CONTAINS("d" IN rule[].ACL)-->selected<!--%%ENDIF--> value="ldrw">Read/Write</option>
+	      </select>
+	      <input type="checkbox" class="checkbox" name="n%%rule[].id%%" id="n%%rule[].id%%" value="1" />
+	      <label for="n%%rule[].id%%">Notify User(s)</label>
+	    </p>
+	    <!--%%ENDFOR rule-->
+	    <p>Add new:</p>
+	    <p class="text checks">
+	      <input type="text" name="Z-1" value="" class="text" />
+	      <input type="hidden" name="index-1" value="1" />
+	      <select name="rights-1">
+		<option value="">Undefined</option>
+		<option value="lr">Read Only</option>
+		<option value="ldrw">Read/Write</option>
+	      </select>
+	      <input type="checkbox" class="checkbox" name="n-1" id="n-1" value="1" />
+	      <label for="n-1">Notify User(s)</label>
+	    </p>
+	    <p class="submit">
+	      <input type="submit" name="send" value="Save" name="Submit" class="submit" />
+	    </p>
+	  </fieldset>
+	</form>
+	<!--%%IF static-->
+      </section>
+      <div class="push"></div>
+    </div>
+    <footer class="footer">
+      <div class="inner">
+	<p>Pronto!Drive v1.0</p>
+      </div>
+    </footer>
+  </body>
+</html>
+<!--%%ENDIF-->

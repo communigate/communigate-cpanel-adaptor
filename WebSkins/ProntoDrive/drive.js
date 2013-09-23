@@ -2,6 +2,7 @@ var LAST_SELECTED = null;
 var TIMEOUT = 840000; // 14m
 var TIMEOUT_ID;
 var context;
+var HOTKEYS_ENABLED = true;
 window.addEvent('domready', function () {
     $$("body")[0].addClass("js");
     var progress = new Progress();
@@ -64,7 +65,8 @@ window.addEvent('domready', function () {
     $('uploadForm').addEvent("submit", function (e) {
 	if ('FormData' in window) {
 	    // e.preventDefault();
-	    rowReq.appendFiles(inputFiles.getFiles(), String($$("input.subdir")[0].get("value")).replace("ProntoDrive/", ""));
+	    // rowReq.appendFiles(inputFiles.getFiles(), String($$("input.subdir")[0].get("value")).replace("private/", ""));
+	    rowReq.appendFiles(inputFiles.getFiles(), String($$("input.subdir")[0].get("value")));
  	    inputFiles._files = [];
 	} else {
 	    new Toast("Upload started!");
@@ -76,8 +78,11 @@ window.addEvent('domready', function () {
     });
     var dummyEl = new Element("div");
     var formReq = new Form.Request("updateForm", dummyEl, {
-	onSuccess: function () {
-	    reloadContent();
+	onSuccess: function (something, text) {
+		reloadContent();
+	    if (text[0].data.clean() != "OK") {
+		new Toast("Action failed: " + text[0].data.clean(), { customClass: "failure"});
+	    }
 	    dummyEl.empty();
 	}
     });
@@ -110,27 +115,49 @@ window.addEvent('domready', function () {
     });
     // Search field
     var searchBox = new Element("input", {"type": "text", "name": "search", "id": "search", "class": "text"}).inject($("buttons"));
+    var searchClear = new Element("span", {"id": "searchClear", title: "clear"}).set("text","clear").inject($("buttons"));
     searchBox.addEvent("keyup", function (e) {
 	if (e.key == "enter") e.preventDefault();
 	if (this.get("value")) {
 	    reloadContent("search.wcgp", this.get("value"));
+	    searchClear.setStyle("display", "block");
+	    searchBox.addClass("search-active");
 	} else {
 	    reloadContent();
+	    searchBox.removeClass("search-active");
+	    searchClear.setStyle("display", "none");
 	}
+    });
+    searchClear.addEvent("click", function () {
+	searchBox.set("value", "");
+	searchBox.removeClass("search-active");
+	searchClear.setStyle("display", "none");
+	reloadContent();
     });
     // Golobal keybindings
     $(document.body).addEvent("keydown", function (e) {
-	if (e.control == true && e.shift == true && e.key == "a") {
-	    e.preventDefault();
-	    $$("#fileList li.folder, #fileList li.file").removeClass("selected");
-	    $$("#fileList li.folder .check input, #fileList li.file .check input").set("checked", false);
-	} else if (e.control == true && e.key == "a") {
-	    e.preventDefault();
-	    $$("#fileList li.folder, #fileList li.file").addClass("selected");
-	    $$("#fileList li.folder .check input, #fileList li.file .check input").set("checked", true);
-	} else if (e.key == "delete") {
-	    $("delete").click();
-	}
+	    if (e.control == true && e.shift == true && e.key == "a") {
+		e.preventDefault();
+		if (HOTKEYS_ENABLED) {
+		    $$("#fileList li.folder, #fileList li.file").removeClass("selected");
+		    $$("#fileList li.folder .check input, #fileList li.file .check input").set("checked", false);
+		    toggleButtons();
+		}
+	    } else if (e.control == true && e.key == "a") {
+		e.preventDefault();
+		if (HOTKEYS_ENABLED) {
+		    $$("#fileList li.folder, #fileList li.file").addClass("selected");
+		    $$("#fileList li.folder .check input, #fileList li.file .check input").set("checked", true);
+		    toggleButtons();
+		}
+	    } else if (e.key == "delete") {
+		if (HOTKEYS_ENABLED) {
+		    $("delete").click();
+		}
+	    } else if (e.key == "f5") {
+		// e.preventDefault();
+		// reloadContent();
+	    }
     });
 });
 
@@ -147,20 +174,31 @@ var buildFileList = function (object, container, preservePath) {
 	var li = new Element("li", {"class": "up"});
 	var name = new Element("span", {"class": "name"}).inject(li);
 	var subfolders = object.path.split("/");
+	if (object.path.match(/^~/)) subfolders.unshift("");
 	var total_path = [];
 	for (var i = 0; i < subfolders.length; i++ ) {
-	    if (i == subfolders.length - 1) {
- 		new Element("em", {"class": "nolink"}).set("text", subfolders[i]).inject(name);
-	    } else {
+	    if (i == subfolders.length - 1 || (subfolders[i].match(/\~/) && subfolders[i].match(/\@/) && i == 1) || (i == 2 && subfolders[i] == "private")) {
+		var subfoldersName = subfolders[i];
+		if (i == 2 && subfolders[i] == "private") subfoldersName = "ProntoDrive";
+ 		new Element("em", {"class": "nolink"}).set("text", subfoldersName).inject(name);
+		if (i != subfolders.length - 1) {
+		    total_path.push(subfolders[i]);
+		    new Element("em", {"class": "crumbs-separator"}).set("text", " > ").inject(name);
+		}
+ 	    } else {
 		total_path.push(subfolders[i]);
- 		new Element("a", {"class": "crumb","href": "ProntoDrive.wcgp?path=" + total_path.join("/")}).set("text", subfolders[i] || "Pronto!Drive").inject(name);
+		var totalString = total_path.join("/");
+		if (object.path.match(/^~/)) {
+		    totalString = totalString.replace(/^\//,"");
+		}
+ 		new Element("a", {"class": "crumb","href": "ProntoDrive.wcgp?path=" + totalString}).set("text", subfolders[i] || "Pronto!Drive").inject(name);
  		new Element("em", {"class": "crumbs-separator"}).set("text", " > ").inject(name);
 	    }
 	}
 	li.inject(container);
 	li.getElements("a.crumb").addEvent("click", function (e) {
 	    e.preventDefault();
-	    $$("input.subdir").set("value", "ProntoDrive/" + unescape(this.href.split("path=")[1]));
+	    $$("input.subdir").set("value", "private/" + unescape(this.href.split("path=")[1]));
 	    reloadContent();
 	});
     }
@@ -169,22 +207,38 @@ var buildFileList = function (object, container, preservePath) {
 	    var li = new Element("li", {"class": "folder"});
 	    var check = new Element("span", {"class": "check"}).inject(li);
  	    new Element("input", {"type": "checkbox", "name" : "folder", "value" : folder.Name}).inject(check);
+	    folder.Path = folder.Path.replace(/^private/, "");
+	    folder.Path = folder.Path.replace(/^\s+/, "");
 	    var name = new Element("span", {"class": "name"}).inject(li);
  	    var link = new Element("a", {"href": "ProntoDrive.wcgp?path=" + folder.Path + "/" + folder.Name});
-	    folder.Path = folder.Path.replace(/^\s+/, "");
-	    folder.Path = folder.Path.replace(/^ProntoDrive/, "");
-	    var share = new Element("span", {"class": "share"}).set("html", "&nbsp;").inject(li);
+	    var share = new Element("span", {"class": "share"}).inject(li);
  	    var shareLink = new Element("a", {"href": "ShareFile.wcgp?file=" + folder.Path + "/" + folder.Name, "title": "Share Link"}).set("text", "Share").inject(share);
-	    if (preservePath) {
-		folder.Name = folder.Path + " > " + folder.Name;
-		folder.Name = folder.Name.replace(/^\//, "").replace(/\//g, " > ");
+	    if (!object.Shared) {
+		var usershare = new Element("span", {"class": "usershare"}).inject(li);
+ 		var usershareLink = new Element("a", {"href": "/sys/ProntoDriveAccess.wcgp?s=" + SESSION_ID + "&folder=" + folder.Path + "/" + folder.Name, "title": "Usershare Link"}).set("text", "Usershare").inject(usershare);
 	    }
-	    link.set("text", folder.Name).inject(name);
+	    var fullpath;
+	    if (object.Shared) {
+		fullpath = folder.Path + "/" + folder.Name;
+	    } else {
+		fullpath = "private/" + folder.Path + "/" + folder.Name;
+	    }
 	    link.addEvent("click", function (e) {
 		e.preventDefault();
-		$$("input.subdir").set("value", "ProntoDrive/" + object.path + "/" + folder.Name);
+		$$("input.subdir").set("value", fullpath);
 		reloadContent();
 	    });
+	    if (!object.Shared) {
+		usershareLink.addEvent("click", function (e) {
+		    e.preventDefault();
+		    new Framer(folder.Path + "/" + folder.Name);
+		});
+	    }
+	    if (preservePath) {
+		if (folder.Path) folder.Name = folder.Path + " > " + folder.Name;
+		folder.Name = folder.Name.replace(/^\/+/, "").replace(/\//g, " > ");
+	    }
+	    link.set("text", folder.Name).inject(name);
 	    shareLink.addEvent("click", function (e) {
 	    	e.preventDefault();
 	    	window.open(shareLink.get('href'));
@@ -197,11 +251,20 @@ var buildFileList = function (object, container, preservePath) {
 	    var check = new Element("span", {"class": "check"}).inject(li);
  	    new Element("input", {"type": "checkbox", "name" : "file", "value" : file.Name}).inject(check);
 	    var name = new Element("span", {"class": "name"}).inject(li);
+	    file.Path = file.Path.replace(/^private/, "");
 	    file.Path = file.Path.replace(/^\s+/, "");
-	    file.Path = file.Path.replace(/^ProntoDrive/, "");
- 	    var link = new Element("a", {"href": "WebFile/ProntoDrive/" + file.Path + "/" + file.Name}).inject(name);
+	    var fullpath;
+	    if (object.Shared) {
+		fullpath = file.Path + "/" + file.Name;
+	    } else {
+		fullpath = "private/" + file.Path + "/" + file.Name;
+	    }
+ 	    var link = new Element("a", {"href": "WebFile/" + fullpath}).inject(name);
 	    var share = new Element("span", {"class": "share"}).inject(li);
  	    var shareLink = new Element("a", {"href": "ShareFile.wcgp?file=" + file.Path + "/" + file.Name, "title": "Share Link"}).set("text", "Share").inject(share);
+	    if (!object.Shared) {
+		var usershare = new Element("span", {"class": "usershare"}).set("html", "&nbsp;").inject(li);
+	    }
 	    if (preservePath) {
 		file.Name = file.Path + "/" + file.Name;
 		file.Name = file.Name.replace(/^\//, "").replace(/\//g, " > ");
@@ -219,10 +282,30 @@ var buildFileList = function (object, container, preservePath) {
 	    new Element("span", {"class": "size"}).set("text", file.Size).inject(li);
 	    li.inject(container);
 	});
- 	if (!preservePath)
-	    $$("input.subdir").each(function (field) {
-		field.set("value", "ProntoDrive/" + object.path );
+	if (object.Subscriptions) {
+	    object.Subscriptions.each(function (folder, id) {
+		var li = new Element("li", {"class": "folder-shared"});
+		var check = new Element("span", {"class": "check"}).inject(li);
+		var name = new Element("span", {"class": "name"}).inject(li);
+ 		var link = new Element("a", {"href": "ProntoDrive.wcgp?=" + folder});
+		link.addEvent("click", function (e) {
+		    e.preventDefault();
+		    $$("input.subdir").set("value", folder);
+		    reloadContent();
+		});
+		var remove = new Element("span", {"class": "remove"}).inject(li);
+ 		var removeLink = new Element("a", {"href": "updateSubscription.wcgp?action=remove&folder=" + folder, "title": "Remove"}).set("text", "Remove").inject(remove);
+
+		linkText = folder;
+		linkText = linkText.replace(/^.*\//, "");
+		link.set("text", linkText).inject(name);
+		li.inject(container);
 	    });
+	}
+ 	// if (!preservePath)
+	//     $$("input.subdir").each(function (field) {
+	// 	field.set("value", "private/" + object.path );
+	//     });
     }
 }
 
@@ -230,7 +313,7 @@ var reloadContent = function (url, search) {
     if (!url) url = 'list.wcgp';
     $('fileList').fade(0.3);
     var path =  String($$("input.subdir")[0].get("value"));
-    path = path.replace("ProntoDrive/", "");
+    if (!path.match(/^~/)) path = path.replace("private/", "");
     new Request.JSON({url: url,
     		      onSuccess: function(list){
 			  resetTimeout();
@@ -241,8 +324,11 @@ var reloadContent = function (url, search) {
     			      buildFileList(list, $('fileList'), false);
 			  }
 			  if ($('dragndrop')) $('dragndrop').destroy();
-			  if (list.Folders.length + list.Files.length == 0 && 'FormData' in window && !Browser.isMobile && !search) {
+			  if (list.Folders.length + list.Files.length == 0 && 'FormData' in window && !Browser.isMobile && !search && !list.notFound) {
 			      new Element("p", {"id" : "dragndrop"}).set("text", "Drag and drop files from your desktop or use the upload icon above.").inject($('mainSection'));
+			  }
+			  if (list.notFound) {
+			      new Toast("No access to folder: " + list.notFound, { customClass: "failure"});
 			  }
     			  $('fileList').fade(1);
 			  // Reattach events for selection
@@ -286,7 +372,7 @@ var reloadContent = function (url, search) {
 			  });
 			  //create a context menu
 			  context = new ContextMenu({
-			      targets: 'body, #fileList li',
+			      targets: 'body, #fileList li.file, #fileList li.folder',
 			      menu: 'contextmenu',
 			      actions: {
 				  "delete": function(element,ref) {
@@ -398,7 +484,11 @@ RowRequest = new Class ({
 	    		that.progress.removeUploadingFile(file.name);
 	    		that.uploadFiles();
 			reloadContent();
-			new Toast( file.name + " uploaded!");
+			if ( "OK" == data.clean()) {
+			    new Toast( file.name + " uploaded!");
+			} else {
+			    new Toast("Failed to upload " + file.name + ": " + data.clean(), {customClass : "failure"});
+			}
 	    	    },
 		    onFailure: function(xhr) {
 	    		that.progress.removeUploadingFile(file.name);
@@ -415,7 +505,7 @@ RowRequest = new Class ({
 		if (!file.destPath) file.destPath = "";
 		request.append('Upload' , file);
 		request.append('Create',1);
-		request.append('SubDir',"ProntoDrive/" + file.destPath );
+		request.append('SubDir', file.destPath );
 		request.send();
 	} else {
 	    this.uploading = false;
@@ -726,6 +816,7 @@ var PopUper = new Class({
     show: function () {
 	this.fireEvent("show");
 	this.frame.setStyle("display", this.options.display);
+	this.newField.focus();
     },
     hide: function () {
 	this.fireEvent("hide");
@@ -752,3 +843,84 @@ var PopUper = new Class({
 	Browser.hasHighResolution = true;
     Browser.isMobile = !['mac', 'linux', 'win'].contains(Browser.Platform.name);
 }).call(this);
+
+var Framer = new Class({
+    Implements: [Options,Events],
+    options: {
+	display: "block"
+    },
+    initialize: function(folder, options) {
+	//set options
+	this.setOptions(options)
+	this.frame = $("overlay");
+	this.folder = folder;
+	this.isVisible = false;
+	this.close = new Element("a", {
+	    "href": "#",
+	    "class": "framer-close"
+	}).set("text", "cancel");
+	this.close.addEvent("click", function (e) {
+	    e.preventDefault();
+	    this.hide();
+	}.bind(this));
+	this.fx = new Fx.Tween(this.frame, {
+	    'unit': "%",
+	    "property": "left"
+	});
+	this.frame.setStyle("left", "-100%");
+	new Request.HTML({
+	    url: '/sys/ProntoDriveAccess.wcgp',
+	    update: this.frame,
+	    onSuccess: function () {
+		this.close.inject(this.frame.getElement("p.submit"));
+		activateHelps(this.frame);
+		this.show();
+		var form = this.frame.getElement("form");
+		form.addEvent("submit", function (e) {
+		    e.preventDefault();
+		    new Request.HTML({
+			url: '/sys/ProntoDriveAccess.wcgp?' + Object.toQueryString({'s': SESSION_ID, 'folder': this.folder, 'dynamic': 1}),
+			onSuccess: function () {
+			    this.hide();
+			}.bind(this)
+		    }).post(form.toQueryString());
+		}.bind(this));
+	    }.bind(this)
+	}).get({'s': SESSION_ID, 'folder': this.folder, 'dynamic': 1});
+	return this;
+    },
+    show: function () {
+	this.fireEvent("show");
+	HOTKEYS_ENABLED = false;
+	this.frame.setStyle("display", this.options.display);
+	this.fx.start(-100, 0);
+    },
+    hide: function () {
+	this.fireEvent("hide");
+	HOTKEYS_ENABLED = true;
+	this.fx.start(0, -100);
+	(function(){ this.frame.setStyle("display", "none"); }).delay(1000, this);
+    },
+    done: function () {
+	this.fireEvent("done");
+	HOTKEYS_ENABLED = true;
+	this.field.set("value", this.newField.get("value"));
+	this.button.click();
+    }
+
+});
+
+var activateHelps = function (parent) {
+    parent = $(parent);
+    parent.getElements("h3.helps").each(function (h3, id) {
+	this.body = parent.getElements("div.helps")[id];
+	h3.addEvent("click", function () {
+	    if (this.body.getSize().y == 0) {
+		this.body.setStyle("height", "auto");
+	    } else {
+		this.body.setStyle("height", 0);
+	    }
+	}.bind(this));
+	this.body.setStyle("height", 0);
+    });
+}

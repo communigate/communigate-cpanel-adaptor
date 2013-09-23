@@ -1,0 +1,58 @@
+// ============================================= //
+//                   Just update subscriptions   //
+//                                               //
+// Version 1.0                                   //
+// Anton Katsarov <anton@webface.bg>             //
+// ============================================= //
+//
+
+function list() external;
+function getSubscriptions() forward;
+function setSubscriptions(s) forward;
+
+entry main is
+  MyAccountName = MyEmail();
+  if IsString(MyAccountName) then
+    fileList = list();
+    fileList.Alerts = NewArray();
+    alerts = GetAccountPreferences("ProntoDriveAlerts");
+    folder = GetHTTPParameter("folder",0);
+    action = GetHTTPParameter("action",0);
+    newAlerts = NewDictionary();
+    for i = 0  while i < Length(alerts) by i+= 1 loop
+      if (folder != alerts[i]) then
+        newAlerts.(alerts[i]) = alerts.(alerts[i]);
+      end if;
+    end loop;
+    subscriptions = getSubscriptions();
+    found = Find(subscriptions, folder);
+    if (action == "accept" && found < 0) then
+      subscriptions.addElement(folder);
+    elif (action == "remove" && found >= 0) then
+      RemoveElement(subscriptions, found);
+    end if;
+     result = setSubscriptions(subscriptions);
+     if result == null then
+       result = SetAccountPreferences(newAlerts, "ProntoDriveAlerts");
+     end if;
+     SetHTTPResponseCode(301);
+     AddHTTPResponseField("Location", GetHTTPField("Referer"));
+     // SetHTTPResponseData("");
+  end if;
+end entry;
+
+function getSubscriptions() is
+    s = null;
+    cmd = "GETFILESUBSCRIPTION *";
+    rc = ExecuteCLI(cmd);
+    if not IsString(rc) then
+        s = Vars().executeCLIResult;
+    end if;
+    return s;
+end function;
+
+function setSubscriptions(s) is
+    cmd = "SETFILESUBSCRIPTION * " + ObjectToString(s);
+    return ExecuteCLI(cmd);
+end function;
+

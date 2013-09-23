@@ -22,24 +22,24 @@ entry main is
 end entry;
 
 function search(searchString) is
-    // Check if ProntoDrive Folder exists
+    // Check if private Folder exists
     rootFolder = ListStorageFiles("");
     baseFound = false;
     for i = 0  while i < Length(rootFolder) by i+= 1 loop
-      if !IsNumber(rootFolder.(rootFolder[i]).STFileSize) && rootFolder[i] == "ProntoDrive" then
+      if !IsNumber(rootFolder.(rootFolder[i]).STFileSize) && rootFolder[i] == "private" then
         baseFound = true;
       end if;
       exitif baseFound;
     end loop;
     if !baseFound then
-      creationResult = CreateStorageDirectory("ProntoDrive");
+      creationResult = CreateStorageDirectory("private");
     end if;
     path = GetHTTPParameter("path",0);
     theSet = NewDictionary();
     theSet.Folders = NewArray();
     theSet.Files = NewArray();
     //List Folders
-    folder = "ProntoDrive";
+    folder = "private";
     if IsString(path) && path != "" && path != " " then
       folder = folder + "/" + path;
       theSet.path = path;
@@ -70,10 +70,12 @@ function findFiles(searchString, path, theSet) is
           theSet.Files.addElement(theElement);
         end if;
       else
-        if IsNumber(found) && found > -1 then
-          theSet.Folders.addElement(theElement);
-        end if;
-        theSet = findFiles(searchString, path + "/" + listedFolder[i], theSet);
+        if listedFolder[i] != "IM" && listedFolder[i] != "_upload" && listedFolder[i] != "settings" && listedFolder[i] != "logs" || path !="private" then
+          if IsNumber(found) && found > -1 then
+            theSet.Folders.addElement(theElement);
+          end if;
+          theSet = findFiles(searchString, path + "/" + listedFolder[i], theSet);
+      end if;
       end if;
     end loop;
     return theSet;

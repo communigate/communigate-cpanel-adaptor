@@ -1,4 +1,5 @@
       </section>
+       <div id="overlay"></div>
       <div class="push"></div>
     </div>
     <footer class="footer">

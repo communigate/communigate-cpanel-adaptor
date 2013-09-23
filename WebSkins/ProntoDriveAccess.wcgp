@@ -1,0 +1,114 @@
+// ============================================= //
+//                   User Access                 //
+//                                               //
+// Version 1.0                                   //
+// Anton Katsarov <anton@webface.bg>             //
+// ============================================= //
+//
+// Description:
+//  Grants user access to folder
+//
+
+function parse(xml) forward;
+function sessionExists(s) forward;
+function getSessionById(s) forward;
+function updateStorageFileAttr(account, filename, rules) forward;
+
+entry sysEntry is
+   s = GetHTTPParameter("s",0);
+   if sessionExists(s) then
+     fileName = GetHTTPParameter("folder",0);
+     shortName = fileName;
+     SESSION = getSessionById(s);
+     fileName = "~" + SESSION.fullAccountName + "/private" + fileName;
+     if GetHTTPMethod() == "POST" then
+       newRules = "";
+       i = -1; loop;
+       indexExists = GetHTTPParameter("index" + String(i),0);
+       exitif indexExists == null;
+       target = GetHTTPParameter("Z" + String(i),0);
+         if IsString(target) && target != "" then
+           localString = GetHTTPParameter("rights" + String(i), 0);
+           localString = "<subKey key=\"" + target + "\">" + localString + "</subKey>";
+           newRules += localString;
+           if IsString(GetHTTPParameter("n" + String(i),0)) then
+             if FindSubstring(target, "@") < 0 then
+               target += "@" + SESSION.domainName;
+             end if;
+             alerts = GetAccountPreferences("~" + target + "/ProntoDriveAlerts");
+             if !IsDictionary(alerts) then
+               alerts = NewDictionary();
+             end if;
+             alerts.(fileName) = "Subscription";
+             result = SetAccountPreferences(alerts, "~" + target + "/ProntoDriveAlerts");
+           end if;
+         end if;
+       i += 1; end loop;
+       newRules = "<ACL>" + newRules + "</ACL>";
+       result = updateStorageFileAttr(SESSION.fullAccountName, shortName, newRules);
+     end if;
+     attrs = ReadStorageFileAttr(fileName, "ACL");
+     theSet = NewDictionary();
+     theSet.SESSION = SESSION;
+     ACL = parse(attrs[0]);
+     theSet.ACL = ACL;
+     theSet.static = true;
+     if IsString(GetHTTPParameter("dynamic",0)) then
+       theSet.static = false;
+     end if;
+     theSet.folder = GetHTTPParameter("folder",0);
+     ProcessWSSP("ProntoDriveAccess",theSet);
+     // SetHTTPResponseData(ObjectToJSON(theSet));
+   end if;
+end entry;
+
+function parse(xml) is
+    if not IsXML(xml) then return null; end if;
+    acls = NewArray();
+    i=0; loop
+      node = XMLBody(xml, subkey, null, i);
+      exitif node == null;
+      acl = NewDictionary();
+      acl.To = GetAttribute(node, "key");
+      acl.ACL = NewArray();
+      j=0; loop
+        letter = Substring(String(node),j,1);
+        exitif letter == "" || !IsString(letter);
+        acl.ACL.addElement(letter);
+      j+=1; end loop;
+      acl.id = i;
+      acls.addElement(acl);
+    i+=1; end loop;
+    return acls;
+end function;
+
+function sessionExists(s) is
+    cmd = "GETSESSION "+ObjectToString(s);
+    rc = ExecuteCLI(cmd);
+    if not IsString(rc) then
+        s = Vars().executeCLIResult;
+    end if;
+
+    return IsDictionary(s);
+end function;
+
+function getSessionById(s) is
+    cmd = "GETSESSION "+ObjectToString(s);
+    rc = ExecuteCLI(cmd);
+    if not IsString(rc) then
+        s = Vars().executeCLIResult;
+    end if;
+
+    return s;
+end function;
+
+function updateStorageFileAttr(account, filename, rules) is
+    cmd = "UPDATESTORAGEFILEATTR " + account + " FILE \"private" + filename + "\" (" + rules + ")";
+    rc = ExecuteCLI(cmd);
+    if not IsString(rc) then
+       account = Vars().executeCLIResult;
+    else
+       account = null;
+    end if;
+    return account;
+end function;
