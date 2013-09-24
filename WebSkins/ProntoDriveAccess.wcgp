@@ -13,6 +13,8 @@ function parse(xml) forward;
 function sessionExists(s) forward;
 function getSessionById(s) forward;
 function updateStorageFileAttr(account, filename, rules) forward;
+function listAccounts(s) forward;
+function getSubscriptions(s) forward;
 
 entry sysEntry is
    s = GetHTTPParameter("s",0);
@@ -32,15 +34,45 @@ entry sysEntry is
            localString = "<subKey key=\"" + target + "\">" + localString + "</subKey>";
            newRules += localString;
            if IsString(GetHTTPParameter("n" + String(i),0)) then
-             if FindSubstring(target, "@") < 0 then
-               target += "@" + SESSION.domainName;
-             end if;
-             alerts = GetAccountPreferences("~" + target + "/ProntoDriveAlerts");
-             if !IsDictionary(alerts) then
-               alerts = NewDictionary();
-             end if;
-             alerts.(fileName) = "Subscription";
-             result = SetAccountPreferences(alerts, "~" + target + "/ProntoDriveAlerts");
+              if target != "anyone" then
+                if FindSubstring(target, "@") < 0 then
+                  target += "@" + SESSION.domainName;
+                end if;
+                targets = NewArray();
+                if FindSubstring(target, "anyone@") == 0 || FindSubstring(target, "#") == 0 then
+                  if target == "anyone@" then
+                    target += SESSION.domainName;
+                  end if;
+                  if FindSubstring(target, "anyone@") == 0 then // If all Accounts
+                    theDomain = Substring(target, FindSubstring(target, "@") + 1, Length(target));
+                    accounts = listAccounts(theDomain);
+                    for j = 0  while j < Length(accounts) by j+= 1 loop
+                      targets.addElement(accounts[j] + "@" + theDomain);
+                    end loop;
+                  else // If group
+                    group = Substring(target, 1, Length(target));
+                    targets = ReadGroupMembers(group);
+                  end if;
+                else // If single user
+                  targets.addElement(target);
+                end if;
+
+                for j = 0  while j < Length(targets) by j+= 1 loop
+                  if targets[j] != SESSION.fullAccountName then
+                    subscriptions = getSubscriptions(targets[j]);
+                    SetHTTPResponseData(ObjectToJSON(subscriptions));
+                    if subscriptions != null && Find(subscriptions, fileName) < 0 then
+                      alerts = GetAccountPreferences("~" + targets[j] + "/ProntoDriveAlerts");
+                      if !IsDictionary(alerts) then
+                        alerts = NewDictionary();
+                      end if;
+                      alerts.(fileName) = "Subscription";
+                      result = SetAccountPreferences(alerts, "~" + targets[j] + "/ProntoDriveAlerts");
+                    end if;
+                  end if;
+                end loop;
+
+              end if;
            end if;
          end if;
        i += 1; end loop;
@@ -58,7 +90,6 @@ entry sysEntry is
      end if;
      theSet.folder = GetHTTPParameter("folder",0);
      ProcessWSSP("ProntoDriveAccess",theSet);
-     // SetHTTPResponseData(ObjectToJSON(theSet));
    end if;
 end entry;
 
@@ -111,4 +142,22 @@ function updateStorageFileAttr(account, filename, rules) is
        account = null;
     end if;
     return account;
+end function;
+
+function listAccounts(s) is
+    cmd = "LISTACCOUNTS "+ObjectToString(s);
+    rc = ExecuteCLI(cmd);
+    if not IsString(rc) then
+        s = Vars().executeCLIResult;
+    end if;
+    return s;
+end function;
+
+function getSubscriptions(s) is
+    cmd = "GETFILESUBSCRIPTION " + ObjectToString(s);
+    rc = ExecuteCLI(cmd);
+    if not IsString(rc) then
+        s = Vars().executeCLIResult;
+    end if;
+    return s;
 end function;
