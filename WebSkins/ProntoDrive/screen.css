@@ -765,6 +765,7 @@ div.helps p {
                                     right: 5px;
                                     margin: 0;
                                     }
+  section.main ol li span.remove,
   section.main ol li span.share {
                                   position: absolute;
                                   top: 3px;
