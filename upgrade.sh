@@ -209,6 +209,8 @@ then
     cp -r ${PACKSRC}/WebSkins/* /var/CommuniGate/WebSkins/
     chmod +x ${PACKSRC}/cgi/*
     cp ${PACKSRC}/cgi/* /var/CommuniGate/cgi/
+    /etc/init.d/CommuniGate stop
+    /etc/init.d/CommuniGate start
 fi
 # Install the WHM plugins (administration and groupware control)
 rm -f /usr/local/cpanel/whostmgr/docroot/templates/cgpro_*
