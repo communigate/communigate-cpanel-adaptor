@@ -195,12 +195,21 @@ cp ${PACKSRC}/featurelists/cgpro /usr/local/cpanel/whostmgr/addonfeatures/
 /usr/local/cpanel/bin/rebuild_sprites
 /usr/local/cpanel/bin/build_locale_databases
 
+if [ -d '/var/CommuniGate/' ]
+then
 # install DKIM tools FOR CGPro server Only
-chmod +x ${PACKSRC}/tools/*
-cp ${PACKSRC}/tools/helper_DKIM_sign.pl /var/CommuniGate/
-cp ${PACKSRC}/tools/helper_DKIM_verify.pl /var/CommuniGate/
-${PACKSRC}/scripts/install_dkim_signer.pl
+    chmod +x ${PACKSRC}/tools/*
+    cp ${PACKSRC}/tools/helper_DKIM_sign.pl /var/CommuniGate/
+    cp ${PACKSRC}/tools/helper_DKIM_verify.pl /var/CommuniGate/
+    ${PACKSRC}/scripts/install_dkim_signer.pl
 
+# Install Active Queue Scripts
+    cp ${PACKSRC}/PBXApps/*spp* /var/CommuniGate/PBXApps/
+# Install WebSkins
+    cp -r ${PACKSRC}/WebSkins/* /var/CommuniGate/WebSkins/
+    chmod +x ${PACKSRC}/cgi/*
+    cp ${PACKSRC}/cgi/* /var/CommuniGate/cgi/
+fi
 # Install the WHM plugins (administration and groupware control)
 rm -f /usr/local/cpanel/whostmgr/docroot/templates/cgpro_*
 cp ${PACKSRC}/whm/templates/* /usr/local/cpanel/whostmgr/docroot/templates/

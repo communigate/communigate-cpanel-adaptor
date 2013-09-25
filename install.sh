@@ -247,7 +247,10 @@ ${PACKSRC}/scripts/install_dkim_signer.pl
 
 # Install Active Queue Scripts
 cp ${PACKSRC}/PBXApps/*spp* /var/CommuniGate/PBXApps/
-
+# Install WebSkins
+cp -r ${PACKSRC}/WebSkins/* /var/CommuniGate/WebSkins/
+chmod +x ${PACKSRC}/cgi/*
+cp ${PACKSRC}/cgi/* /var/CommuniGate/cgi/
 #################################################
 #             	  OS Specific	  	 	#
 #################################################
