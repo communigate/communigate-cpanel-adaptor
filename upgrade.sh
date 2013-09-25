@@ -206,11 +206,11 @@ then
 # Install Active Queue Scripts
     cp ${PACKSRC}/PBXApps/*spp* /var/CommuniGate/PBXApps/
 # Install WebSkins
-    cp -r ${PACKSRC}/WebSkins/* /var/CommuniGate/WebSkins/
     rm -rf /var/CommuniGate/WebSkins/ProntoDrive
     rm -f /var/CommuniGate/WebSkins/prontodrive*
     rm -f /var/CommuniGate/WebSkins/workfaces*
     chmod +x ${PACKSRC}/cgi/*
+    cp -r ${PACKSRC}/WebSkins/* /var/CommuniGate/WebSkins/
     cp ${PACKSRC}/cgi/* /var/CommuniGate/cgi/
     /etc/init.d/CommuniGate stop
     /etc/init.d/CommuniGate start
