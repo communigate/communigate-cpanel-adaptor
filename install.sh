@@ -112,6 +112,10 @@ if [ -d '/var/CommuniGate/' -a `perldoc -l Mail::DKIM::Signer | wc -l` == 0 ]
 then
     perl -MCPAN -e 'install Mail::DKIM::Signer'
 fi
+if [ -d '/var/CommuniGate/' -a `perldoc -l IO::Scalar | wc -l` == 0 ]
+then
+    perl -MCPAN -e 'install IO::Scalar'
+fi
 if [ -d '/var/CommuniGate/' -a `perldoc -l Archive::Zip | wc -l` == 0 ]
 then
     perl -MCPAN -e 'install Archive::Zip'

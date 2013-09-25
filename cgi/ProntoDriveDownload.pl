@@ -4,6 +4,7 @@ use CLI;
 use CGI;
 use POSIX;
 use Archive::Zip;
+use IO::Scalar;
 my $q = new CGI();
 
 use Data::Dumper;
@@ -127,14 +128,22 @@ if ($account && $fileKey) {
 	    $check =~ s#/+#/#g;
 	    $zip->updateTree($rootPath, $dest, sub {/$check/ && !/\.meta$/});
 	  }
-	  print "Content-type: application/zip\n\n";
-	  $zip->writeToFileHandle(STDOUT);
+	  my $zipContents = '';
+	  my $SH = IO::Scalar->new( \$zipContents );
+	  binmode(STDOUT);
+	  $zip->writeToFileHandle($SH);
+	  $SH->close();
+	  my $totalSize = length($zipContents);
+	  print "Content-Length: $totalSize\nContent-type: application/zip\n\n";
+	  print $zipContents;
 	} else {
+	  $filePath =~ s/~/&AH4-/g;
 	  my $mimeType = `file --mime-type "$filePath"`;
 	  $mimeType =~ s/^$filePath\:\s+//;
 	  chomp $mimeType;
-	  $mimeType = "application/x-download" unless $mimeType;
-	  print "Content-type: $mimeType\n\n";
+	  $mimeType = "application/x-download" if !$mimeType || $mimeType =~ /cannot open/i;
+	  my $totalSize = -s $filePath;
+	  print "Content-Length: $totalSize\nContent-type: $mimeType\n\n";
 	  open(FI, "<", $filePath) or die "Cannot Open File";
 	  my ($fl, $buff);
 	  while (read FI, $buff, 1024) {
