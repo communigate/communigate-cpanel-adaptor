@@ -3,9 +3,12 @@ package XIMSS;
 use strict;
 use Carp;
 BEGIN {
-    # TODO: Fix XML::SAX instalation or paths
-    push @INC, '/usr/local/lib/perl5/site_perl/5.8.8/';
-} 
+    # push 3rdparty Perl PATHs;
+    my $addonPaths = `/usr/local/cpanel/3rdparty/bin/perl -V`;
+    $addonPaths =~ s/^.*\@INC\:\s+(.*?)\s+\.$/$1/s;
+    my @addonPaths = split '\s+', $addonPaths;
+    @INC = (@INC, @addonPaths);
+}
 use XML::Simple;
 # You may need to change this to "use IO::Socket::INET;" if you have INET.pm
 use IO::Socket;
@@ -34,8 +37,8 @@ sub new {
 
 sub connect {
   my ($this) = @_;
-  $this->{isConnected} = 0;  
-  
+  $this->{isConnected} = 0;
+
   delete $this->{theSocket} if exists $this->{theSocket};
 
   $this->{theSocket} = new IO::Socket::INET( %{$this->{connParams}} );
@@ -59,7 +62,7 @@ sub connect {
   if (defined $loginResult->{response}->{errorNum}) {
       croak 'You must pass correct authData and password parameter to XIMSS::new: ' . $loginResult->{response}->{errorText};
   }
-  $this->{isConnected} = 1;  
+  $this->{isConnected} = 1;
   1;
 }
 

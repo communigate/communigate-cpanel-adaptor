@@ -1,4 +1,4 @@
-#!/bin/sh                                                                                                                                                                                               
+#!/bin/sh
  eval 'if [ -x /usr/local/cpanel/3rdparty/bin/perl ]; then exec /usr/local/cpanel/3rdparty/bin/perl -x -- $0 ${1+"$@"}; else exec /usr/bin/perl -x $0 ${1+"$@"}; fi;'
     if 0;
 #!/usr/bin/perl
@@ -98,7 +98,7 @@ if ($FORM{submitdialin} && $FORM{provider}) {
 	}
 
 	$prefs->{Gateways}->{$FORM{provider}}->{callInGw}->{proxyType} = $FORM{proxyType};
-	
+
 	if ($FORM{proxyType} eq "trunk") {
 	    $prefs->{Gateways}->{$FORM{provider}}->{callInGw}->{calledIDMethod} = "uri";
 	    $prefs->{Gateways}->{$FORM{provider}}->{callInGw}->{destination} = $FORM{localIP};
@@ -219,7 +219,7 @@ if ($FORM{submitdialin} && $FORM{provider}) {
 		    $rsips->{'rsip-' . $id . '-' . $tel->{reguid}} = {
 			domain => $FORM{'host-' . $tel->{telnum}},
 			fromName => $FORM{'username-' . $tel->{telnum}},
-			telnum => $tel->{telnum},
+			targetName => $tel->{telnum},
 			gwid => $id,
 			period => $FORM{'expires-' . $tel->{telnum}},
 			authName => $FORM{'authname-' . $tel->{telnum}},
@@ -242,13 +242,13 @@ if ($FORM{submitdialin} && $FORM{provider}) {
 		    $cli->DeleteForwarder("i-" . $tel . '@' . $assigned);
 		}
 	    } else {
+		 my $fwd = $cli->GetForwarder("tn-" . $tel . '@' . $FORM{'assigned-' . $tel});
 		 $cli->DeleteForwarder("i-" . $tel . '@' . $domain);
 		 $cli->DeleteForwarder("tn-" . $tel . '@' . $domain);
 		 $cli->DeleteForwarder("tn-" . $tel . '@' . $FORM{'assigned-' . $tel});
 		 $cli->DeleteForwarder("i-" . $tel . '@' . $FORM{'assigned-' . $tel});
 		 $cli->CreateForwarder("i-" . $tel . '@' . $domain, $FORM{provider} . '@' . ( $FORM{'assigned-' . $tel} ? $FORM{'assigned-' . $tel} : 'null' ) . '.local' );
 		 $cli->CreateForwarder("tn-" . $tel . '@' . $domain, ($FORM{'assigned-' . $tel} ? "tn-" . $tel . '@' . $FORM{'assigned-' . $tel} : 'null' ) );
-		 my $fwd = $cli->GetForwarder("tn-" . $tel . '@' . $FORM{'assigned-' . $tel});
 		 warn $cli->CreateForwarder("tn-" . $tel . '@' . $FORM{'assigned-' . $tel}, $fwd || 'null' ) if $FORM{'assigned-' . $tel};
 		 warn $cli->CreateForwarder("i-" . $tel . '@' . $FORM{'assigned-' . $tel}, $FORM{'provider'} . "+" . $domain . "@" . $FORM{'assigned-' . $tel} . '.local' ) if $FORM{'assigned-' . $tel};
 	    }
@@ -353,7 +353,7 @@ if ($FORM{submitdialout} && $FORM{provider}) {
 	} else {
 	    delete $prefs->{Gateways}->{$FORM{provider}}->{callOutGw}->{forceRelay};
 	    delete $prefs->{Gateways}->{$FORM{provider}}->{callOutGw}->{forceMediaProcessing};
-	}	
+	}
 	if ($FORM{forceMediaProcessing}) {
 	    $prefs->{Gateways}->{$FORM{provider}}->{callOutGw}->{forceRelay} = "YES";
 	    $prefs->{Gateways}->{$FORM{provider}}->{callOutGw}->{forceMediaProcessing} = "YES";
@@ -459,12 +459,12 @@ if ($prefs->{Gateways}->{$FORM{provider}}->{callInGw} && $prefs->{Gateways}->{$F
     for $num (@{$prefs->{Gateways}->{$FORM{provider}}->{callInGw}->{telnums}}) {
 	$telnumDetails->{$num->{telnum}} = $num;
     }
-    
+
     my $methods = {};
     my $i = 0;
     for $method (@{$prefs->{Gateways}->{$FORM{provider}}->{callInGw}->{CLIDMethods}}) {
 	$methods->{$method} = ++$i;
-    }   
+    }
 }
 sub rulesToText {
     my $rules = shift;
