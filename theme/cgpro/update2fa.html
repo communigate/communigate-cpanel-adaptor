@@ -1,0 +1,11 @@
+<cpanel setvar="headerimg=../images/mailmenu.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+
+  <div class="body-content">
+    <div class="h1Title"> <cpanel langprint="CGP2FA"></div>
+    <?cp CommuniGate::update2fa(%,msg) email=$FORM{'email'},domain=$FORM{'domain'},enabled=$FORM{'enabled'},mobile=$FORM{'mobile'} ?>
+
+    <div class="return-link"><a href="2fa.html">&larr; <cptext "Go Back"></a></div>
+  </div>
+<cpanel Branding="include(stdfooter.html)">

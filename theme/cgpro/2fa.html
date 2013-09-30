@@ -1,0 +1,61 @@
+<cpanel setvar="headerimg=../images/mailmenu.gif">
+<cpanel setvar="dprefix=../">
+<cpanel setvar="headerinclude=mail/pops_head.html">
+<cpanel Branding="include(stdheader.html)">
+<style type="text/css"> 
+div.table_progress_bar {
+    border: 1px solid #cccccc;
+    height: 6px;
+    margin: 0 auto;
+    width: 70px;
+}
+div.cpanel_widget_progress_bar {
+ background: #999999;
+}
+td.actions,
+td.col2 {
+text-align: center;
+}
+tr, td {
+border: none !important;
+}
+#mailtbl td {
+  padding: 2px 5px;
+}
+td.actions table tr td {
+padding: 2px;
+}
+</style>    
+<script type="text/javascript" src="<cpanel MagicRevision="uri("/yui/menu/menu-min.js")">"></script>
+<script type="text/javascript">
+//<![CDATA[
+var ACCOUNTS = [];
+//]]>
+</script>
+<div class="body-content">
+<h1><cpanel langprint="CGP2FA"></h1>
+
+<table border="0" cellpadding="0" width="98%" cellspacing="0" id="mailtbl" class="table_email_accts nonsortable">
+  <thead>
+    <tr>
+      <th><cpanel langprint="CGPAccount"></th>
+      <th><cpanel langprint="CGPEnabled"></th>
+      <th><cpanel langprint="CGPActions"></th>
+    </tr>
+  </thead>
+  <tbody>
+    <?cptt CommuniGate::2fa(cgpro/2fa.tmpl) ?>
+  </tbody>
+</table>
+
+</div><!-- end body-content div -->
+
+<div id="menus_div"></div>
+
+<cpanel Branding="include(stdfooter.html)">
+
+  <script type="text/javascript">
+    //<![CDATA[
+<cpanel relrawinclude="cgpro/mail/overview_accounts.js">
+  //]]>
+  </script>

@@ -1,0 +1,65 @@
+[% MACRO filter_option(pval, val, text) BLOCK -%]
+<option value="[% val %]"[% val == pval and " selected" %]>[% cptext(text) %]</option>
+[% END -%]
+[% USE dumper %]
+[% FOREACH account IN accounts.keys.sort -%]
+<tr class="info-[% loop.count % 2 ? 'even' : 'odd' %]">
+  <td class="cell truncate" truncate="80">[% account %]</td>
+  <td>
+    <span onclick="toggle_action_div(null, {id:'classes_module_[% loop.count - 1 %]', index:[% loop.count - 1 %], action:'classes'})" [% IF accounts.$account.prefs.item('2FA').defined %]style="cursor: pointer; color: green">[% locale.maketext('CGPEnabled') %][% ELSE -%]style="cursor: pointer; color: gray">[% locale.maketext('CGPDisabled') %][% END %]</span> </td>
+  <td class="actions">
+    <table summary="">
+      <tr>
+	<td><span class="action_link" onclick="toggle_action_div(null, {id:'classes_module_[% loop.count - 1 %]', index:[% loop.count - 1 %], action:'classes'})">[% locale.maketext('CGPEdit') %]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+<!-- Hidden Row -->
+<tr class="rowA" id="dt_module_row_[% loop.count - 1 %]">
+  <td colspan="5">
+    <!-- classes -->
+    <div style="display: none" class="dt_module" id="classes_module_[% loop.count - 1 %]">
+      <form action="update2fa.html" method="post">
+	<table style="width: 500px; margin: 0px auto">
+	  <tbody>
+	    <tr>
+	      <td width="45%" style="text-align: right"><lablel for="enabled-[% loop.count %]">[% locale.maketext("CGPEnabled") %]</lablel>: </td>
+	      <td width="55%" style="text-align: left">
+		<input type="checkbox" name="enabled" id="enabled-[% loop.count %]" value="1"[% IF accounts.$account.prefs.item('2FA').defined %] checked="checked"[% END %]  />
+	      </td>
+	    </tr>
+	    <tr>
+	      <td width="45%" style="text-align: right"><lablel  for="mobile-[% loop.count %]">[% locale.maketext("CGPMobilePhoneNumber") %]</lablel>: </td>
+	      <td width="55%" style="text-align: left">
+		<input type="text" name="mobile" value="[% accounts.$account.settings.mobile %]"  id="mobile-[% loop.count %]" />
+	      </td>
+	    </tr>
+	    <tr>
+	      <td style="text-align: center" colspan="2">
+		<div style="height: 4px">&nbsp;</div>
+		<div id="change_quota_input_[% loop.count - 1 %]">
+		  <input type="hidden" name="email" value="[% account.split('@').0 %]" />
+		  <input type="hidden" name="domain" value="[% account.split('@').1 %]" />
+		  <a href="javascript:toggle_action_div(null, {id:'claesses_module_[% loop.count - 1 %]', index:[% loop.count - 1 %], action:'classes'})">[% locale.maketext("CGPcancel") %]</a> [% locale.maketext("CGPor") %]
+		  <input type="submit" id="change_quota_confirm_[% loop.count - 1 %]" value="[% locale.maketext("CGPSave") %]" class="input-button">
+		</div>
+	      </td>
+	    </tr>
+	  </tbody>
+	</table>
+      </form>
+    </div>
+    <!-- END classess -->
+  </td>
+</tr>
+
+[% END -%]
+[%  UNLESS accounts.keys.size -%]
+<tr class="info-even">
+  <td>
+    Please create accounts first.
+  </td>
+</tr>
+[% END -%]
+

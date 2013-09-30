@@ -4496,6 +4496,60 @@ sub api2_UpdateAirSync {
     return $result;
 }
 
+sub api2_2fa {
+    my @domains = Cpanel::Email::listmaildomains();
+    my $cli = getCLI();
+    my @result;
+    my $return_accounts = {};
+    foreach my $domain (@domains) {
+	my $accounts=$cli->ListAccounts($domain);
+	foreach my $userName (sort keys %$accounts) {
+	    next if $userName eq 'pbx' || $userName eq 'ivr';
+	    my $accountData = $cli->GetAccountPrefs("$userName\@$domain");
+	    my $settings = $cli->GetAccountSettings("$userName\@$domain");
+	    $return_accounts->{$userName . "@" . $domain} = {
+		domain => $domain,
+		prefs => $accountData,
+		settings => $settings
+	    };
+	}
+    }
+    $cli->Logout();
+    return { accounts => $return_accounts };
+}
+
+sub api2_update2fa {
+    my %OPTS = @_;
+    my $email = $OPTS{'email'} . '@' . $OPTS{'domain'};
+    my @domains = Cpanel::Email::listmaildomains();
+    my $cli = getCLI();
+    my $msg = "Unknown error!";
+    my $found = 1;
+    foreach my $domain (@domains) {
+	my $accounts=$cli->ListAccounts($domain);
+	foreach my $userName (sort keys %$accounts) {
+	    if ($email eq "$userName\@$domain") {
+		my $accountData = $cli->GetAccountPrefs($email);
+		my $mobile = "";
+		if ($OPTS{'enabled'}) {
+		    $accountData->{'2FA'} = {} unless defined $accountData->{'2FA'};
+		    $mobile = $OPTS{'mobile'} if $OPTS{'mobile'};
+		} else {
+		    delete $accountData->{'2FA'} if $accountData->{'2FA'};
+		}
+		$cli->SetAccountPrefs($email, $accountData);
+		$cli->UpdateAccountSettings($email, {mobile => $mobile});
+		$found = 1;
+		$msg = "Updated Successfuly.";
+		last;
+	    }
+	}
+	last if $found;
+    }
+    $msg = "Account not Found" unless $found;
+    $cli->Logout();
+    return { msg => $msg };
+}
 
 sub versioncmp( $$ ) {
     my @A = ($_[0] =~ /([-.]|\d+|[^-.\d]+)/g);
