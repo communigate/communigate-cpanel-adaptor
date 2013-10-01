@@ -21,7 +21,7 @@ use Time::Local  'timelocal_nocheck';
 use Digest::MD5 qw(md5_hex);
 use XIMSS;
 use Cpanel::CPAN::MIME::Base64::Perl qw(decode_base64 encode_base64);
-use Cpanel::CSVImport;
+use URI::Escape;
 
 require Exporter;
 @ISA    = qw(Exporter);
@@ -3224,25 +3224,11 @@ sub api2_exportContacts {
     return $return;
 }
 
-sub api2_UploadFile {
-    local $Cpanel::IxHash::Modify = 'none';
-  FILE:
-    foreach my $file ( keys %Cpanel::FORM ) {
-        next FILE if $file =~ m/^file-(.*)-key$/;
-        next FILE if $file !~ m/^file-(.*)/;
-	$Cpanel::CPVAR{"filename"} = $file;
-	$Cpanel::CPVAR{"filename"} =~ s/^file-//;
-	$Cpanel::CPVAR{"filepath"} = $Cpanel::FORM{$file};
-        last;
-    }
-    return 1;
-}
-
 sub api2_ImportContacts {
     my %OPTS = @_;
     my @domains = Cpanel::Email::listmaildomains();
-    my $account = $OPTS{'account'};
-    $account =~ s/%40/@/g;
+    my $account = uri_unescape($OPTS{'account'});
+    $OPTS{'box'} = uri_unescape($OPTS{'box'});
     my (undef,$domain) = split "@", $account;
     my $cli = getCLI();
     my $result;

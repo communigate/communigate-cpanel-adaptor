@@ -4,7 +4,7 @@
 <cpanel Branding="include(stdheader.html)">
 <div class="body-content">
   <h1><cpanel langprint="CGPImportContacts"></h1>
-  <form action="doimportcontacts.html?account=<cpanel formprint="$FORM{'account'}">&box=<cpanel formprint="$FORM{'box'}">" method="post" enctype="multipart/form-data">
+  <form action="contactsimport.live.cgi" method="post" enctype="multipart/form-data">
 <div class="highlight">
   <table border="0" style="margin-left: 20px">
     <tr>
@@ -17,6 +17,8 @@
     </tr>
     </tr>
     <td>
+	   <input type="hidden" name="account" value="<cpanel formprint="$FORM{'account'}">"  />
+	   <input type="hidden" name="box" value="<cpanel formprint="$FORM{'box'}">"  />
       <input id="activate-button" class="input-button" type="submit" value="<cpanel langprint="CGPAdd">" name="save" />
     </td>
     <td></td>

@@ -1,7 +1,6 @@
 [% MACRO filter_option(pval, val, text) BLOCK -%]
 <option value="[% val %]"[% val == pval and " selected" %]>[% cptext(text) %]</option>
 [% END -%]
-[% USE dumper %]
 [% FOREACH account IN accounts.keys.sort -%]
 <tr class="info-[% loop.count % 2 ? 'even' : 'odd' %]">
   <td class="cell truncate" truncate="80">[% account %]</td>
