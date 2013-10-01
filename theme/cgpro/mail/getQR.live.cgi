@@ -125,7 +125,7 @@ my $version = 1;
 }
 binmode(STDOUT);
 print "Content-Type: image/png\n\n";
-print GD::Barcode::QRcode->new($vcard, { Ecc => 'L', Version=> $version, ModuleSize => 3})->plot->png or print "oops";
+print GD::Barcode::QRcode->new($vcard, { Ecc => 'L', Version=> $version, ModuleSize => 4})->plot->png;
 sub forceArray {
     my $data = shift;
     return undef unless $data;

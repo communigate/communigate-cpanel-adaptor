@@ -5,8 +5,6 @@ use GD::Barcode::QRcode;
 
 my $q = CGI->new;
 
-use Data::Dumper;
-
 my $versions = {
     1 => 152,
     2 => 272,

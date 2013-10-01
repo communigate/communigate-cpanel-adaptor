@@ -191,7 +191,7 @@ if ($account && $fileKey) {
 	<p class="downloadButton">
 	  <a href="$url/$filename">Download</a>
 	</p>
-	<img src="/cgi-bin/QRreferer.cgi" class="qrcode" alt="qrcode" />
+	<img src="/cgi-bin/QRreferer.cgi" class="qrcode" alt="" />
       </section>
       <div class="push"></div>
     </div>
