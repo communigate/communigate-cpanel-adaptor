@@ -1,3 +1,54 @@
+<script>
+      var show_qr = function(title, src) {
+      // Remove the panel if it already exists
+        if (YAHOO.util.Dom.inDocument("validation_errors_modal_box") === true) {
+            var remove_me = YAHOO.util.Dom.get("validation_errors_modal_box");
+            remove_me.parentNode.removeChild(remove_me);
+        }
+
+        // create the panel
+        var panel_options = {
+                    width: "350px",
+                    fixedcenter: true,
+                    close: true,
+                    draggable: false,
+                    zindex: 1000,
+                    modal: true,
+                    visible: false
+                };
+        var panel = new YAHOO.widget.Panel("validation_errors_modal_box", panel_options);
+
+        // header
+        var header = '<div class="lt"></div>';
+        header += '<span>' + title + '</span>';
+        header += '<div class="rt"></div>';
+        panel.setHeader(header);
+
+        // body
+        panel.setBody("<img src='" + src + "' style='display: block; margin: 0 auto;' />");
+
+        // footer
+        var footer = '<div class="lb"></div>' +
+                     '<div class="validation_errors_modal_box_actions">' +
+                     '<input id="validation_errors_modal_panel_close_button" type="button" class="input-button primary" value="' + CPANEL.lang.Close + '" />' +
+                     '</actions>' +
+                     '<div class="rb"></div>';
+
+        panel.setFooter(footer);
+
+        // add the event handler and put the focus on the close button after the panel renders
+        var after_show = function() {
+            YAHOO.util.Event.on("validation_errors_modal_panel_close_button", "click", function() { panel.hide(); });
+            YAHOO.util.Dom.get("validation_errors_modal_panel_close_button").focus();
+        };
+        panel.showEvent.subscribe(after_show);
+
+        // show the panel
+        panel.render(document.body);
+        panel.show();
+        return false;
+    };
+</script>
 <p>
   <a class="create-button" href="addbox.html?account=[% account %]">[% locale.maketext("CGPAddContactBox") %]</a>
 </p>
@@ -42,7 +93,8 @@
     <td>
       <a href="editcontact[% IF contact.group %]sgroup[% END %].html?account=[% account %]&amp;contact=[% contact.uid %]&amp;box=[% box %]">[% locale.maketext('CGPViewEdit') %]</a>,
       <a href="deletecontact.html?account=[% account %]&amp;contact=[% contact.uid %]&amp;name=[% contact.name %]&amp;box=[% box %]">[% locale.maketext('BrandingDPackage') %]</a>,
-      <a href="getVCARD.live.cgi?account=[% account %]&amp;contact=[% contact.uid %]&amp;box=[% box %]&amp;name=[% contact.name %]">vCard</a>
+      <a href="getVCARD.live.cgi?account=[% account %]&amp;contact=[% contact.uid %]&amp;box=[% box %]&amp;name=[% contact.name %]">vCard</a>,
+      <a href="getQR.live.cgi?account=[% account %]&amp;contact=[% contact.uid %]&amp;box=[% box %]&amp;name=[% contact.name %]" onclick="return show_qr('VCARD - [% contact.name %]','getQR.live.cgi?account=[% account %]&amp;contact=[% contact.uid %]&amp;box=[% box %]&amp;name=[% contact.name %]');">QRcode</a>
     </td>
   </tr>
   [% END -%]

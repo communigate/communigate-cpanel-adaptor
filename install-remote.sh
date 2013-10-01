@@ -62,7 +62,8 @@ then
 fi
 chmod +x ${PACKSRC}/scripts/install_cpanel_module.pl
 ${PACKSRC}/scripts/install_cpanel_module.pl MIME::QuotedPrint::Perl
-
+${PACKSRC}/scripts/install_cpanel_module.pl XML::SAX
+${PACKSRC}/scripts/install_cpanel_module.pl GD::Barcode::QRcode
 
 # Install cPanel Function hooks
 if [ ! -d /var/cpanel/perl5/lib/ ]
