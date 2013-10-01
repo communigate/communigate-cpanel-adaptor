@@ -147,6 +147,7 @@ do
     chmod +x ${THEMES[$i]}/cgpro/mail/checkDomainSettings.live.cgi
     chmod +x ${THEMES[$i]}/cgpro/mail/getDomainAccounts.live.cgi
     chmod +x ${THEMES[$i]}/cgpro/mail/getVCARD.live.cgi
+    chmod +x ${THEMES[$i]}/cgpro/mail/getQR.live.cgi
     chmod +x ${THEMES[$i]}/cgpro/mail/contactsimport.live.cgi
     chmod +x ${THEMES[$i]}/cgpro/getXmppHistory.live.cgi
     chmod +x ${THEMES[$i]}/cgpro/playwav.live.cgi
