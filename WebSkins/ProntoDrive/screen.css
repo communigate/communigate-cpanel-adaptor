@@ -709,6 +709,10 @@ div.helps ul {
 div.helps p {
               margin: 10px;
                }
+img.qrcode {
+             display: block;
+             margin: 0 auto;
+             }
 @media screen and (max-width: 800px) {
   section.main ol {
                     padding: 0 !important;

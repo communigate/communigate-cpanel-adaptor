@@ -120,6 +120,10 @@ if [ -d '/var/CommuniGate/' -a `perldoc -l Archive::Zip | wc -l` == 0 ]
 then
     perl -MCPAN -e 'install Archive::Zip'
 fi
+if [ -d '/var/CommuniGate/' -a `perldoc -l GD::Barcode::QRcode | wc -l` == 0 ]
+then
+    perl -MCPAN -e 'install GD::Barcode::QRcode'
+fi
 
 if [ `perldoc -l YAML::Syck | wc -l` == 0 ]
 then
