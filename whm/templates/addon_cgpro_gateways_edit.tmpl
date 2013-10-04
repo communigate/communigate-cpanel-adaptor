@@ -264,6 +264,12 @@
 			    <td>
 			      <input type="text" value="[% telnums.$telnum == 'null' ? "" : telnums.$telnum %]" name="assigned-[% telnum %]" style="width: 100px;"  />
 			    </td>
+			    [% IF prefs.Gateways.$provider.callInGw.proxyType == "registrar" -%]
+			    <td>
+			      [% rsipStatus.item('rsip-' _ providerID _ '-' _ telnumDetails.$telnum.reguid).completed %]
+			      [% rsipStatus.item('rsip-' _ providerID _ '-' _ telnumDetails.$telnum.reguid).errorCode %]
+			    </td>
+			    [% END -%]
 			    <td style="width: 30%;">
 			      <input type="checkbox" name="delete-[% telnum %]" id="delete-[% telnum %]" value="1" /> <label for="delete-[% telnum %]">Delete</label>
 			    </td>
@@ -286,7 +292,10 @@
 			    <td>Password</td>
 			    <td>Register every</td>
 			    [% END -%]
-			    <td>Assigned to</td>
+			    <td>Assigned to</td>	
+			    [% IF prefs.Gateways.$provider.callInGw.proxyType == "registrar" -%]
+			    <td>Status</td>
+			    [% END -%]
 			    <td>Tools</td>
 			  </tr>
 			</thead>

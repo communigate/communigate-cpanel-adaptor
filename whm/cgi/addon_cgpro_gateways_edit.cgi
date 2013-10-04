@@ -215,7 +215,6 @@ if ($FORM{submitdialin} && $FORM{provider}) {
 			'server' => $tel->{server},
 			'expires' => ($FORM{'expires-' . $tel->{telnum}} || undef)
 		    };
-		    warn $FORM{'host-' . $tel->{telnum}}, "\n";
 		    $rsips->{'rsip-' . $id . '-' . $tel->{reguid}} = {
 			domain => $FORM{'host-' . $tel->{telnum}},
 			fromName => $FORM{'username-' . $tel->{telnum}},
@@ -521,6 +520,11 @@ sub textToRules {
     return $rules;
 }
 
+my $rsipstatus;
+if ($prefs->{Gateways}->{$FORM{provider}}->{callInGw}->{proxyType} eq "registrar") {
+    $rsipstatus = $cli->GetAccountInfo('pbx@' . $domain, "RSIP");
+}
+
 print "Content-type: text/html\r\n\r\n";
 Whostmgr::HTMLInterface::defheader( "CGPro Edit Gateways",'', '/cgi/addon_cgpro_gateways_edit.cgi' );
 Cpanel::Template::process_template(
@@ -529,10 +533,12 @@ Cpanel::Template::process_template(
 				    'template_file' => 'addon_cgpro_gateways_edit.tmpl',
 				    prefs => $prefs,
 				    provider => $FORM{provider},
+				    providerID => $id,
 				    FORM => \%FORM,
 				    telnums => $tels,
 				    telnumDetails => $telnumDetails,
 				    methods => $methods,
+				    rsipStatus => $rsipstatus,
 				    callerIdReRules => rulesToText( defined ($prefs->{Gateways}->{$FORM{provider}}->{callInGw}) ? $prefs->{Gateways}->{$FORM{provider}}->{callInGw}->{callerIdReRules} : [] ),
 				    calledIdReRules => rulesToText( defined ($prefs->{Gateways}->{$FORM{provider}}->{callOutGw}) ? $prefs->{Gateways}->{$FORM{provider}}->{callOutGw}->{calledIdReRules} : [] ),
 				    callerIdReRulesOut => rulesToText( defined ($prefs->{Gateways}->{$FORM{provider}}->{callOutGw}) ? $prefs->{Gateways}->{$FORM{provider}}->{callOutGw}->{callerIdReRules} : [] ),
