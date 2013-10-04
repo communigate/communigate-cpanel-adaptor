@@ -25,14 +25,14 @@ sub describe {
     my $mail_passwdpop = {
         'category' => 'Cpanel',
         'event'    => 'Api2::Email::passwdpop',
-        'stage'    => 'pre',
+        'stage'    => 'post',
         'hook'     => 'CGPro::Hooks::passwdpop',
         'exectype' => 'module',
     };
     my $mail_passwdpop1 = {
         'category' => 'Cpanel',
         'event'    => 'Api1::Email::passwdpop',
-        'stage'    => 'pre',
+        'stage'    => 'post',
         'hook'     => 'CGPro::Hooks::passwdpop1',
         'exectype' => 'module',
     };
@@ -172,23 +172,32 @@ sub delpop {
 sub passwdpop {
     my (undef, $params) = @_;
     my $args = $params->{args};
-    my $cli = getCLI();
-
     my $domain = $args->{'domain'};
     my $user= $args->{'email'};
     my $pass= $args->{'password'};
-    my $response = $cli->SetAccountPassword("$user\@$domain","$pass",0);
-    $Cpanel::CPERROR{'email'} = $response unless $response == 1;
-    $cli->Logout();
+    do_passwdpop($user, $domain, $password, $args->{'quota'}, $args->{'reset'});
 }
 
 sub passwdpop1 {
     my (undef, $params) = @_;
     my $args = $params->{args};
+    my ($user, $pass, $quota, $domain) = @$args;
+    do_passwdpop($user, $domain, $password, $quota);
+}
+
+sub do_passwdpop {
+    my ($user, $domain, $password, $quota, $reset) = @_;
     my $cli = getCLI();
-    my ($user, $pass, undef, $domain) = @$args;
+    my $oldPass = $cli->GetAccountPlainPassword("$user\@$domain");
     my $response = $cli->SetAccountPassword("$user\@$domain","$pass",0);
-    $Cpanel::CPERROR{'email'} = $response unless $response == 1;
+    if ($response != 1 && !$reset) {
+	$Cpanel::CPERROR{'email'} = $response;
+	my $apiref = Cpanel::Api2::Exec::api2_preexec( 'Email', 'passwdpop' );
+    	my ( $data, $status ) = Cpanel::Api2::Exec::api2_exec( 'Email', 'passwdpop', $apiref, {email => $user, domain => $domain, quota => $quota,password => $oldPass, reset => $response} );
+    }
+    if ($reset) {
+	$Cpanel::CPERROR{'email'} = $reset;
+    }
     $cli->Logout();
 }
 
