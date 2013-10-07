@@ -1,0 +1,63 @@
+[% MACRO filter_option(pval, val, text) BLOCK -%]
+<option value="[% val %]"[% val == pval ? " selected='selected'" : "" %]>[% cptext(text) %]</option>
+[% END -%]
+[% IF CPANEL.CPVAR.maildomainscount > 1 -%]
+<div class="highlight2">
+  <form action="" method="GET" id="selectDomain">
+    <p>
+      [% locale.maketext("LP-Domain") %]:&nbsp;
+      <select id="domain" onchange="toggle_domain()" name="domain">
+	[% FOR dom IN domains -%]
+	[% filter_option(domain, dom, dom) %]
+	[% END -%]
+      </select>
+    </p>
+  </form>
+  <script type="text/javascript">
+    function toggle_domain () {
+    document.getElementById("selectDomain").submit();
+    }
+  </script>
+</div>
+[% END -%]
+<form action="update_prontodrive_settings.html?domain=[% domain %]" method="post">
+<div class="highlight">
+  <table border="0" style="margin-left: 20px">
+    <tr>
+      <td align="right">[% locale.maketext("CGPFileShareLinkExpireTime") %]:</td>
+      <td>
+	<select name="expires">
+	  [% filter_option(prefs.SharedFilesExpire || 2592000, '3600', '1h') %]
+	  [% filter_option(prefs.SharedFilesExpire || 2592000, '7200', '2h') %]
+	  [% filter_option(prefs.SharedFilesExpire || 2592000, '10800', '3h') %]
+	  [% filter_option(prefs.SharedFilesExpire || 2592000, '21600', '6h') %]
+	  [% filter_option(prefs.SharedFilesExpire || 2592000, '43200', '12h') %]
+	  [% filter_option(prefs.SharedFilesExpire || 2592000, '86400', '24h') %]
+	  [% filter_option(prefs.SharedFilesExpire || 2592000, '129600', '36h') %]
+	  [% filter_option(prefs.SharedFilesExpire || 2592000, '259200', '72h') %]
+	  [% filter_option(prefs.SharedFilesExpire || 2592000, '604800', '1 week') %]
+	  [% filter_option(prefs.SharedFilesExpire || 2592000, '1209600', '2 weeks') %]
+	  [% filter_option(prefs.SharedFilesExpire || 2592000, '2592000', '1 month (default)') %]
+	  [% filter_option(prefs.SharedFilesExpire || 2592000, '5184000', '2 months') %]
+	  [% filter_option(prefs.SharedFilesExpire || 2592000, '7776000', '3 months') %]
+	  [% filter_option(prefs.SharedFilesExpire || 2592000, '15552000', '6 months') %]
+	  [% filter_option(prefs.SharedFilesExpire || 2592000, '31104000', '1 year') %]
+	  [% filter_option(prefs.SharedFilesExpire || 2592000, '62208000', '2 years') %]
+	</select>
+      </td>
+      <td colspan="2"><span id="name_error" class="cjt_validation_error"></td>
+    </tr>
+    <tr>
+      <td colspan="3">
+	&nbsp;
+      </td>
+    </tr>
+    <tr>
+    <td>
+      <input id="ivr_submit" class="input-button" type="submit" value="[% locale.maketext("CGPSave") %]" name="save" />
+    </td>
+    <td></td>
+    <td></td>
+    </tr>
+   </table>
+</div>

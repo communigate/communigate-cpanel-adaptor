@@ -1,0 +1,12 @@
+<cpanel setvar="headerimg=../images/mailmenu.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+<div class="body-content">
+  <cpanelfeature cgpro_prontodrive_settings>
+  <!-- <?cp Email::listmaildomains(,) ?> -->
+  <h1><cpanel langprint="CGPProntoDriveSettings"></h1>
+  <?cptt CommuniGate::ProntoDriveSettings(cgpro/prontodrive_settings.tmpl) domain=$FORM{'domain'} ?>
+  </cpanelfeature>
+</div><!-- end body-content div -->
+<cpanel Branding="include(stdfooter.html)">
+

@@ -4537,6 +4537,35 @@ sub api2_update2fa {
     return { msg => $msg };
 }
 
+sub api2_ProntoDriveSettings {
+    my %OPTS = @_;
+    my @domains = Cpanel::Email::listmaildomains();
+    my $domain = $domains[0];
+    $domain = $OPTS{'domain'} if $OPTS{'domain'};
+    my $cli = getCLI();
+    my $result;
+    my $prefs = $cli->GetAccountDefaultPrefs($domain);
+    $result->{prefs} = $prefs;
+    $result->{domain} = $domain;
+    $result->{domains} = \@domains;
+    $cli->Logout();
+    return $result;
+}
+
+sub api2_UpdateProntoDriveSettings {
+    my %OPTS = @_;
+    my @domains = Cpanel::Email::listmaildomains();
+    my $cli = getCLI();
+    my $found = 1;
+    foreach my $domain (@domains) {
+	if ($domain eq $OPTS{"domain"}) {
+	    $cli->UpdateAccountDefaultPrefs(domain => $domain, settings => {SharedFilesExpire => $OPTS{'expires'}});
+	    last;
+	}
+    }
+    $cli->Logout();
+}
+
 sub versioncmp( $$ ) {
     my @A = ($_[0] =~ /([-.]|\d+|[^-.\d]+)/g);
     my @B = ($_[1] =~ /([-.]|\d+|[^-.\d]+)/g);
