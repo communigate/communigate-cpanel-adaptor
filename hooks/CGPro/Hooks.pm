@@ -356,7 +356,7 @@ sub doaddpop {
     @$UserData{'Password'}=$password;
     @$UserData{'MaxAccountSize'}=$quota;
     my $response = $cli->CreateAccount(accountName => "$user\@$domain", settings => $UserData);
-    if ($response) {
+    if ($response == 1) {
     	$cli->CreateMailbox("$user\@$domain", "Calendar");
     	$cli->CreateMailbox("$user\@$domain", "Spam");
 	my $settings = {};
