@@ -175,18 +175,19 @@ sub passwdpop {
     my $domain = $args->{'domain'};
     my $user= $args->{'email'};
     my $pass= $args->{'password'};
-    do_passwdpop($user, $domain, $password, $args->{'quota'}, $args->{'reset'});
+    do_passwdpop($user, $domain, $pass, $args->{'quota'}, $args->{'reset'});
 }
 
 sub passwdpop1 {
     my (undef, $params) = @_;
     my $args = $params->{args};
     my ($user, $pass, $quota, $domain) = @$args;
-    do_passwdpop($user, $domain, $password, $quota);
+    do_passwdpop($user, $domain, $pass, $quota);
 }
 
 sub do_passwdpop {
-    my ($user, $domain, $password, $quota, $reset) = @_;
+    my ($user, $domain, $pass, $quota, $reset) = @_;
+    
     my $cli = getCLI();
     my $oldPass = $cli->GetAccountPlainPassword("$user\@$domain");
     my $response = $cli->SetAccountPassword("$user\@$domain","$pass",0);
@@ -356,7 +357,7 @@ sub doaddpop {
     @$UserData{'Password'}=$password;
     @$UserData{'MaxAccountSize'}=$quota;
     my $response = $cli->CreateAccount(accountName => "$user\@$domain", settings => $UserData);
-    if ($response == 1) {
+    if ($response) {
     	$cli->CreateMailbox("$user\@$domain", "Calendar");
     	$cli->CreateMailbox("$user\@$domain", "Spam");
 	my $settings = {};
