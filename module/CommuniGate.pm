@@ -4566,6 +4566,42 @@ sub api2_UpdateProntoDriveSettings {
     $cli->Logout();
 }
 
+sub api2_MigrateAccount {
+    my %OPTS = @_;
+    my @cpanel_accounts = Cpanel::Email::listpops();
+    my @domains = Cpanel::Email::listmaildomains();
+    my $result;
+    my $cli = getCLI();
+    my @remote_accounts = ();
+    for my $domain (@domains) {
+	my $accounts = $cli->ListAccounts($domain);
+	@remote_accounts = (@remote_accounts, map {"$_\@$domain"} keys %$accounts);
+    }
+    @remote_accounts = sort grep {!/^(ivr|pbx)\@/} @remote_accounts;
+    $result->{'remote_accounts'} = \@remote_accounts;
+    my %remote_accounts = map {$_=>1} @remote_accounts;
+    my @diff_accounts = sort grep { !$remote_accounts{$_} } @cpanel_accounts;
+    if ($diff_accounts[0]) {
+	$result->{'account'} = shift @diff_accounts;
+    } else {
+	open(FO, ">", $Cpanel::homedir . "/.cpanel/nvdata/cgpro_migrated");
+	print FO "1";
+	close(FO);
+    }
+    $result->{diff_accounts} = \@diff_accounts;
+    $cli->Logout();
+    return $result;
+}
+sub api2_createAccount {
+    my %OPTS = @_;
+    AddCGPAccount($OPTS{'email'},$OPTS{'password'},$OPTS{'quota'});
+ }
+sub api2_deleteAccount {
+    my %OPTS = @_;
+    my $cli = getCLI();
+    $cli->DeleteAccount($OPTS{'email'});
+    $cli->Logout();
+}
 sub versioncmp( $$ ) {
     my @A = ($_[0] =~ /([-.]|\d+|[^-.\d]+)/g);
     my @B = ($_[1] =~ /([-.]|\d+|[^-.\d]+)/g);

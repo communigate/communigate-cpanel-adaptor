@@ -1,0 +1,45 @@
+<cpanel setvar="headerimg=../images/mailmenu.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+<style>
+  table table td {
+  border: none !important;
+  }
+</style>
+<div class="body-content">
+  <cpanelfeature cgpro_migration_wizard>
+  <h1><cpanel langprint="CGPAccountsMigrationWizard"></h1>
+  <script>
+var REQUIRED_PASSWORD_STRENGTH = parseInt('<?cp PasswdStrength::get_required_strength(%,strength) app=pop ?>') || 0;
+var LANG = {};
+LANG.unlimited = "<cpanel langprint="email_unlimited">";
+
+LANG.new_email_input = "<cpanel langprint="email_email_input">";
+LANG.password_input = "<cpanel langprint="email_password_input">";
+LANG.quota_input = "<cpanel langprint="email_quota_input">";
+
+LANG.not_valid_email = "<cpanel langprint="email_not_valid_email">";
+LANG.email_max_128_char = "<cpanel langprint="email_email_max_128_char">";
+LANG.quota_number_or_unlimited = "<cpanel langprint="email_quota_number_or_unlimited">" + ' "' + LANG.unlimited + '".';
+LANG.quota_max_16_char = "<cpanel langprint="email_quota_max_16_char">";
+LANG.password_strength_error = "<cpanel langprint="email_password_strength_error">";
+LANG.passwords_not_match = "<cpanel langprint="email_passwords_not_match">";
+LANG.quota_2gig = "<cpanel langprint="email_quota_2gig">";
+LANG.password_spaces = "<cpanel langprint="email_password_spaces">";
+LANG.password_strength_must_be = "<cptext 'Password strength must be at least “[_1]”.','{min_passwd_strength}'>";
+
+LANG.local_extension_input = "<cpanel langprint="CGPLocalExtension">";
+LANG.local_extension_input_invalid = "<cptext 'CGPLocalExtensionInvalid','{min}', '{max}'>";
+  </script>
+  <cpanelif $FORM{'submit'}>
+    <?cp CommuniGate::createAccount() email=$FORM{'account'},quota=$FORM{'quota'},password=$FORM{'password'} ?>
+    <?cp Email::passwdpop() email=$FORM{'email'},domain=$FORM{'domain'},quota=$FORM{'quota'},password=$FORM{'password'} ?>
+  </cpanelif>
+    <cpanelif $CPERROR{'email'}>
+      <?cp CommuniGate::deleteAccount() email=$FORM{'account'} ?>
+    </cpanelif>
+  <?cptt CommuniGate::MigrateAccount(cgpro/mail/accounts_migration_wizard_migrate.tmpl) ?>
+  </cpanelfeature>
+</div><!-- end body-content div -->
+
+<cpanel Branding="include(stdfooter.html)">
