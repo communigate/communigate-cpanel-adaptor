@@ -4595,6 +4595,20 @@ sub api2_MigrateAccount {
 sub api2_createAccount {
     my %OPTS = @_;
     AddCGPAccount($OPTS{'email'},$OPTS{'password'},$OPTS{'quota'});
+    my $cli = getCLI();
+    $cli->UpdateAccountSettings($OPTS{'email'}, {RealName => $OPTS{'realname'}}) if $OPTS{'realname'};
+    if ($OPTS{'autorpop'}) {
+	my $settings = $cli->GetAccountRPOPs($OPTS{'email'});
+	$OPTS{'name'} =~ s/\W//g;
+	$settings->{"cPanelRPOP"} = {
+	    authName => $OPTS{'email'},
+	    domain => Cpanel::Sys::gethostname(),
+	    password => $OPTS{'password'},
+	    period => '600s',
+	};
+	$cli->SetAccountRPOPs($OPTS{'email'}, $settings);
+    }
+    $cli->Logout();
  }
 sub api2_deleteAccount {
     my %OPTS = @_;

@@ -32,7 +32,7 @@ LANG.local_extension_input = "<cpanel langprint="CGPLocalExtension">";
 LANG.local_extension_input_invalid = "<cptext 'CGPLocalExtensionInvalid','{min}', '{max}'>";
   </script>
   <cpanelif $FORM{'submit'}>
-    <?cp CommuniGate::createAccount() email=$FORM{'account'},quota=$FORM{'quota'},password=$FORM{'password'} ?>
+    <?cp CommuniGate::createAccount() email=$FORM{'account'},quota=$FORM{'quota'},password=$FORM{'password'},realname=$FORM{'realname'},autorpop=$FORM{'autorpop'} ?>
     <?cp Email::passwdpop() email=$FORM{'email'},domain=$FORM{'domain'},quota=$FORM{'quota'},password=$FORM{'password'} ?>
   </cpanelif>
     <cpanelif $CPERROR{'email'}>

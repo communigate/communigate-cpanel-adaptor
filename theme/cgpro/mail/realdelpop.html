@@ -13,7 +13,7 @@
 </em> <cpanel langprint="EADelsuccess"></p>
 <?cp Email::delpop() email=$FORM{'email'},domain=$FORM{'domain'},flag=0 ?>
  
-<div class="return-link"><a href="overview_accounts.html">&larr; <cptext "Go Back"></a></div>
+<div class="return-link"><a href="<cpanelif !$FORM{'referer'}>overview_accounts.html</cpanelif><cpanelif $FORM{'referer'}><cpanel print="$FORM{'referer'}"></cpanelif>">&larr; <cptext "Go Back"></a></div>
 </cpanelfeature>
 </div>
 <cpanel Branding="include(stdfooter.html)">
