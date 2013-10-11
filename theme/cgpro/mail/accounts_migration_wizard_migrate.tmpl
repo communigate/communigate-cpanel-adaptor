@@ -83,7 +83,7 @@
 		    <input type="hidden" name="domain" value="[% account.split('@').1 %]" />
 		    <input type="hidden" name="account" value="[% account %]" />
 		    <input type="submit" name="submit" id="email_table_change_password_confirm" value="[% locale.maketext("GSWContinue") %]" class="input-button">
-		    or <a href="realdelpop.html?domain=[% account.split('@').1 %]&amp;email=[% account.split('@').0 %]&amp;referer=accounts_migration_wizard_migrate.html" onclick="return confirm('[% locale.maketext("CGPDeleteAccount") %] [% account %]?')">delete</a> local account
+		    or <a href="realdelpop.html?domain=[% account.split('@').1 %]&amp;email=[% account.split('@').0 %]&amp;referer=accounts_migration_wizard_migrate.html" onclick="return confirm('[% locale.maketext("CGPDeleteAccount") %] [% account %]?')"  class="create-button">Delete account</a> 
 		  </div>
 		  <div id="change_password_status">
 		  </div>
