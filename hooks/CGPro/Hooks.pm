@@ -160,6 +160,7 @@ sub addpop {
 
 sub delpop {
     my (undef, $params) = @_;
+    return unless check_hooked_account();
     my $args = $params->{args};
     my $cli = getCLI();
     my $domain = $args->{'domain'};
@@ -187,7 +188,7 @@ sub passwdpop1 {
 
 sub do_passwdpop {
     my ($user, $domain, $pass, $quota, $reset) = @_;
-    
+    return unless check_hooked_account();
     my $cli = getCLI();
     my $oldPass = $cli->GetAccountPlainPassword("$user\@$domain");
     my $response = $cli->SetAccountPassword("$user\@$domain","$pass",0);
@@ -204,6 +205,7 @@ sub do_passwdpop {
 
 sub editquota {
     my (undef, $params) = @_;
+    return unless check_hooked_account();
     my $args = $params->{args};
     my $cli = getCLI();
 
@@ -288,6 +290,7 @@ sub editquota {
 
 sub deletefilter {
     my (undef, $params) = @_;
+    return unless check_hooked_account();
     my $args = $params->{args};
     my $cli = getCLI();
 
@@ -309,6 +312,7 @@ sub deletefilter {
 
 sub reorderfilters {
     my (undef, $params) = @_;
+    return unless check_hooked_account();
     my $args = $params->{args};
     my $cli = getCLI();
 
@@ -342,6 +346,7 @@ sub addpop1 {
 
 sub doaddpop {
     my ($user, $password, $quota, $domain, $realname, $type, $workDays, $unit, $mobilePhone, $workPhone) = @_;
+    return unless check_hooked_account();
     @$workDays = grep(/\w/, @$workDays); # remove empty entries
     my $cli = getCLI();
     if ($quota == 0) {
@@ -413,6 +418,7 @@ sub AccountsRemove {
 
 sub dkim_install {
     my (undef, $params) = @_;
+    return unless check_hooked_account();
     my $user = $params->{'user'};
     my $cli = getCLI();
     my @domains = Cpanel::Email::listmaildomains();
@@ -449,6 +455,7 @@ sub dkim_install {
 
 sub dkim_uninstall {
     my (undef, $params) = @_;
+    return unless check_hooked_account();
     my $user = $params->{'user'};
     my $cli = getCLI();
     my @domains = Cpanel::Email::listmaildomains();
@@ -458,5 +465,19 @@ sub dkim_uninstall {
     $cli->Logout();
 }
 
+sub check_hooked_account {
+    my $account = $Cpanel::CPDATA{'USER'};
+    if (-f '/var/cpanel/communigate_hooked_accounts') {
+	open(FI, "<", '/var/cpanel/communigate_hooked_accounts');
+	my @accounts = <FI>;
+	close(FI);
+	@accounts = grep {$_ eq $account} map {$_ =~ s/(\n|\r)//g; $_} @accounts;
+	use Data::Dumper;
+	return 1 if defined $accounts[0];
+	return 0;
+    } else {
+	return 1;
+    }
+}
 
 1;
