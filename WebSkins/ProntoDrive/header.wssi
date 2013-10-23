@@ -4,6 +4,7 @@
     <title>Pronto!Drive</title>
     <meta charset="utf-8" />
     <link rel="stylesheet" href="%%filesRef%%screen.css" type="text/css" media="screen" />
+    <link rel="stylesheet" href="%%filesRef%%cerabox.packed.css" type="text/css" media="screen" />
     <link rel="icon" href="%%filesRef%%favicon.ico" />
     <!--[if IE]>
 	<script language="javascript"  type="text/javascript" src="%%filesRef%%modernizr.js" ></script>
@@ -12,6 +13,7 @@
     <script language="javascript"  type="text/javascript" src="%%filesRef%%mootools-more.js" ></script>
     <script language="javascript"  type="text/javascript" src="%%filesRef%%Request.File.js" ></script>
     <script language="javascript"  type="text/javascript" src="%%filesRef%%Form.MultipleFileInput.js" ></script>
+    <script language="javascript"  type="text/javascript" src="%%filesRef%%cerabox.min.js" ></script>
     <meta name="HandheldFriendly" content="true"/>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2, user-scalable=yes"/>
   </head>

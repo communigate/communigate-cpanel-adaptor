@@ -151,9 +151,9 @@ window.addEvent('domready', function () {
 		    toggleButtons();
 		}
 	    } else if (e.key == "delete") {
-		if (HOTKEYS_ENABLED) {
-		    $("delete").click();
-		}
+		// if (HOTKEYS_ENABLED) {
+		//     $("delete").click();
+		// }
 	    } else if (e.key == "f5") {
 		// e.preventDefault();
 		// reloadContent();
@@ -262,6 +262,8 @@ var buildFileList = function (object, container, preservePath) {
  	    var link = new Element("a", {"href": "WebFile/" + fullpath}).inject(name);
 	    var share = new Element("span", {"class": "share"}).inject(li);
  	    var shareLink = new Element("a", {"href": "ShareFile.wcgp?file=" + file.Path + "/" + file.Name, "title": "Share Link"}).set("text", "Share").inject(share);
+	    var usershare = new Element("span", {"class": "usershare"}).inject(li);
+ 	    var downloadLink = new Element("a", {"href": "WebFile/" + fullpath, "class": "download"}).inject(usershare).set('text','Download');
 	    if (!object.Shared) {
 		var usershare = new Element("span", {"class": "usershare"}).set("html", "&nbsp;").inject(li);
 	    }
@@ -270,7 +272,15 @@ var buildFileList = function (object, container, preservePath) {
 		file.Name = file.Name.replace(/^\//, "").replace(/\//g, " > ");
 	    }
 	    link.set("text", file.Name);
-	    link.addEvent("click", function (e) {
+	    if (file.Name.match(/\.(jpg|png|gif|jpeg)$/i)) {
+		link.addClass('lightbox');
+	    } else {
+		link.addEvent("click", function (e) {
+		    e.preventDefault();
+		    window.open(link.get('href'));
+		});
+	    }
+	    downloadLink.addEvent("click", function (e) {
 		e.preventDefault();
 		window.open(link.get('href'));
 	    });
@@ -302,11 +312,8 @@ var buildFileList = function (object, container, preservePath) {
 		li.inject(container);
 	    });
 	}
- 	// if (!preservePath)
-	//     $$("input.subdir").each(function (field) {
-	// 	field.set("value", "private/" + object.path );
-	//     });
     }
+    $$('a.lightbox').cerabox();
 }
 
 var reloadContent = function (url, search) {

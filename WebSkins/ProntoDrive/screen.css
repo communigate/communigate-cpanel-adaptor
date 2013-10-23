@@ -311,6 +311,9 @@ section.main ol li span.modified,
 section.main ol li span.size {
                                font-size: 0.928571429em;
                                }
+section.main ol li span.usershare a.download {
+                          background: url(download.png) center center no-repeat;
+                          }
 body.js section.main ol#fileList {
                                    opacity: 0;
                                    }
