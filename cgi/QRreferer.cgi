@@ -64,4 +64,3 @@ binmode(STDOUT);
 # print "Content-Type: text/html\n\n";
 print "Content-Type: image/png\n\n";
 print GD::Barcode::QRcode->new($text, { Ecc => 'L', Version=> $version, ModuleSize => 5})->plot->png or print "oops";
-#die Dumper \%ENV;

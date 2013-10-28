@@ -472,7 +472,6 @@ sub check_hooked_account {
 	my @accounts = <FI>;
 	close(FI);
 	@accounts = grep {$_ eq $account} map {$_ =~ s/(\n|\r)//g; $_} @accounts;
-	use Data::Dumper;
 	return 1 if defined $accounts[0];
 	return 0;
     } else {

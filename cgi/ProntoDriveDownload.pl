@@ -7,8 +7,6 @@ use Archive::Zip;
 use IO::Scalar;
 my $q = new CGI();
 
-use Data::Dumper;
-
 unless (open(CONF, "<", "/var/cpanel/communigate.yaml")) {
   warn "* Error opening config file: $! \n";
   exit 0;
