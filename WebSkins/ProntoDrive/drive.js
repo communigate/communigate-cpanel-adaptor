@@ -216,6 +216,9 @@ var buildFileList = function (object, container, preservePath) {
 	    if (!object.Shared) {
 		var usershare = new Element("span", {"class": "usershare"}).inject(li);
  		var usershareLink = new Element("a", {"href": "/sys/ProntoDriveAccess.wcgp?s=" + SESSION_ID + "&folder=" + folder.Path + "/" + folder.Name, "title": "Usershare Link"}).set("text", "Usershare").inject(usershare);
+ 	    }
+ 	    if (object.Shared) {
+	    	var usershare = new Element("span", {"class": "usershare"}).set("html", "&nbsp;").inject(li);
 	    }
 	    var fullpath;
 	    if (object.Shared) {
@@ -264,9 +267,6 @@ var buildFileList = function (object, container, preservePath) {
  	    var shareLink = new Element("a", {"href": "ShareFile.wcgp?file=" + file.Path + "/" + file.Name, "title": "Share Link"}).set("text", "Share").inject(share);
 	    var usershare = new Element("span", {"class": "usershare"}).inject(li);
  	    var downloadLink = new Element("a", {"href": "WebFile/" + fullpath, "class": "download"}).inject(usershare).set('text','Download');
-	    if (!object.Shared) {
-		var usershare = new Element("span", {"class": "usershare"}).set("html", "&nbsp;").inject(li);
-	    }
 	    if (preservePath) {
 		file.Name = file.Path + "/" + file.Name;
 		file.Name = file.Name.replace(/^\//, "").replace(/\//g, " > ");
@@ -297,7 +297,7 @@ var buildFileList = function (object, container, preservePath) {
 		var li = new Element("li", {"class": "folder-shared"});
 		var check = new Element("span", {"class": "check"}).inject(li);
 		var name = new Element("span", {"class": "name"}).inject(li);
- 		var link = new Element("a", {"href": "ProntoDrive.wcgp?=" + folder});
+ 		var link = new Element("a", {"href": "ProntoDrive.wcgp?path=" + folder});
 		link.addEvent("click", function (e) {
 		    e.preventDefault();
 		    $$("input.subdir").set("value", folder);
@@ -311,6 +311,20 @@ var buildFileList = function (object, container, preservePath) {
 		link.set("text", linkText).inject(name);
 		li.inject(container);
 	    });
+	    var li = new Element("li", {"class": "folder-shared-add"});
+	    var check = new Element("span", {"class": "check"}).inject(li);
+	    var name = new Element("span", {"class": "name"}).inject(li);
+ 	    var link = new Element("a", {"href": "importSubscription.wcgp"});
+	    link.addEvent("click", function (e) {
+		// e.preventDefault();
+		// reloadContent();
+	    });
+	    var add = new Element("span", {"class": "add"}).inject(li);
+
+	    linkText = "Add Subscription";
+	    linkText = linkText.replace(/^.*\//, "");
+	    link.set("text", linkText).inject(name);
+	    li.inject(container);
 	}
     }
     $$('a.lightbox').cerabox();

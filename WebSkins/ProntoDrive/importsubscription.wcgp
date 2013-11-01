@@ -1,0 +1,54 @@
+// ============================================= //
+//                   List files                  //
+//                                               //
+// Version 1.0                                   //
+// Anton Katsarov <anton@webface.bg>             //
+// ============================================= //
+//
+// Description:
+//  Lists Accounts files and folders
+//
+
+function getSubscriptions() forward;
+function setSubscriptions(s) forward;
+
+entry main is
+  MyAccountName = MyEmail();
+  if IsString(MyAccountName) then
+    Response = NewDictionary();
+    if GetHTTPMethod() == "POST" then
+      uploadedFile = GetHTTPBinaryParameter("Upload", 0);
+      if uploadedFile != null then
+        xml = ToObject(uploadedFile);
+        URL = String(XMLBody(xml, "params"));
+        if IsString(URL) then
+          subscriptions = getSubscriptions();
+          found = Find(subscriptions, URL);
+          if found < 0 then
+            subscriptions.addElement(URL);
+            result = setSubscriptions(subscriptions);
+            SetHTTPResponseCode(301);
+            AddHTTPResponseField("Location", "ProntoDrive.wcgp");
+          end if;
+        end if;
+      end if;
+    end if;
+    ProcessWSSP("importSubscription",Response);
+    //SetHTTPResponseData(ObjectToJSON(URL));
+  end if;
+end entry;
+
+function getSubscriptions() is
+    s = null;
+    cmd = "GETFILESUBSCRIPTION *";
+    rc = ExecuteCLI(cmd);
+    if not IsString(rc) then
+        s = Vars().executeCLIResult;
+    end if;
+    return s;
+end function;
+
+function setSubscriptions(s) is
+    cmd = "SETFILESUBSCRIPTION * " + ObjectToString(s);
+    return ExecuteCLI(cmd);
+end function;

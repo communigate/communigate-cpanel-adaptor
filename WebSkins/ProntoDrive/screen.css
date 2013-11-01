@@ -193,6 +193,13 @@ section.main ol li.folder {
 section.main ol li.folder-shared {
                                    background-image: url(folder-shared.png);
                                    }
+section.main ol li.folder-shared-add {
+                                       background-image: url(add.png);
+                                       background-position: 15px center;
+                                       font-size: 0.875em;
+                                       border-bottom: none;
+                                       line-height: 28px;
+                                       }
 section.main ol li.up {
                         background-image: url(go-up.png);
                         font-size: 0.928571429em;

@@ -40,10 +40,10 @@ function list() is
       path = String(FindRegEx(path,"^.+/"));
       path = Substring(path, 2, Length(path) - 5);
       theSet.Upper = path;
-      if (FindSubstring(theSet.path, "/private") < 0) then
-        folder = "private";
-        theSet.Upper = null;
-      end if;
+      // if (FindSubstring(theSet.path, "/private") < 0) then
+      //   folder = "private";
+      //   theSet.Upper = null;
+      // end if;
     elif IsString(path) && path != "" && path != " " then
       folder = folder + "/" + path;
       theSet.path = path;
