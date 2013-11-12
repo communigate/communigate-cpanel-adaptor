@@ -18,6 +18,8 @@
     <ul id="contextmenu">
       <li><a href="#sharelink" class="sharelink">Share link</a></li>
       <li><a href="#createfolder" class="createfolder">Create folder</a></li>
+      <li><a href="#copy" class="copy">Copy</a></li>
+      <li><a href="#move" class="move">Move</a></li>
       <li><a href="#rename" class="rename">Rename</a></li>
       <li><a href="#delete" class="delete">Delete</a></li>
     </ul>

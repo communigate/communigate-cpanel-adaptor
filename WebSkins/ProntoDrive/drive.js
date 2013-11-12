@@ -113,6 +113,27 @@ window.addEvent('domready', function () {
 	e.preventDefault();
 	shareThemAll();
     });
+    // enable Copy buttons
+    var copyButton = new Element("input", {
+	"type": "button",
+	"value": "Copy",
+	"title": "Copy Selection",
+	"class": "button copy-button"
+    }).inject($("buttons"));
+    copyButton.addEvent("click", function(e) {
+	e.preventDefault();
+	new Mover("copy");
+    });
+    var moveButton = new Element("input", {
+	"type": "button",
+	"value": "Move",
+	"title": "Move Selection",
+	"class": "button move-button"
+    }).inject($("buttons"));
+    moveButton.addEvent("click", function(e) {
+	e.preventDefault();
+	new Mover("move");
+    });
     // Search field
     var searchBox = new Element("input", {"type": "text", "name": "search", "id": "search", "class": "text"}).inject($("buttons"));
     var searchClear = new Element("span", {"id": "searchClear", title: "clear"}).set("text","clear").inject($("buttons"));
@@ -408,6 +429,18 @@ var reloadContent = function (url, search) {
 					  $("rename-clone").click();
 				      }
 				  },
+				  "copy": function(element,ref) {
+				      if (context.once) {
+					  context.once = false;
+					  new Mover('copy');
+				      }
+				  },
+				  "move": function(element,ref) {
+				      if (context.once) {
+					  context.once = false;
+					  new Mover('move');
+ 				      }
+				  },
 				  "createfolder": function(element,ref) {
 				      if (context.once) {
 					  context.once = false;
@@ -448,6 +481,8 @@ var toggleButtons = function () {
  	$$(".buttons input.rename-clone").setStyle("display", "inline-block");
  	$$(".buttons input.delete").setStyle("display", "inline-block");
  	$$(".buttons input.share-button").setStyle("display", "inline-block");
+ 	$$(".buttons input.copy-button").setStyle("display", "inline-block");
+ 	$$(".buttons input.move-button").setStyle("display", "inline-block");
 	context.enableItem('rename');
 	context.enableItem('download');
 	context.enableItem('sharelink');
@@ -930,6 +965,138 @@ var Framer = new Class({
     }
 
 });
+
+var Mover = new Class({
+    Implements: [Options,Events],
+    options: {
+	display: "block"
+    },
+    initialize: function(context, options) {
+	//set options
+	this.setOptions(options)
+	this.frame = $("overlay");
+	this.context = context;
+	this.isVisible = false;
+	this.close = new Element("a", {
+	    "href": "#",
+	    "class": "framer-close"
+	}).set("text", "cancel");
+	this.close.addEvent("click", function (e) {
+	    e.preventDefault();
+	    this.hide();
+	}.bind(this));
+	this.fx = new Fx.Tween(this.frame, {
+	    'unit': "%",
+	    "property": "left"
+	});
+	this.frame.setStyle("left", "-100%");
+	this.buildFolderList("", this.frame);
+	return this;
+    },
+    buildFolderList: function (path, parent) {
+	if (path == "") {
+	    var ul = new Element("ul", {"class": "folderlist"}).inject(parent);
+	    this.buildFoldersDom([{"Name": "/"}], ul, path);
+	    parent = ul.getElement("li");
+	    parent.getElement(".expand").addClass("expanded");
+	}
+	new Request.JSON({
+	    url: 'list.wcgp',
+	    onSuccess: function (list) {
+		var ul = new Element("ul", {"class": "folderlist"}).inject(parent);
+		if (list.Folders) {
+		    this.buildFoldersDom(list.Folders, ul, path);
+		}
+		if (list.Subscriptions) {
+		    this.buildFoldersDom(list.Subscriptions, ul, path, 1);
+		}
+		if (path == "") {
+		    var p = new Element("p", {"class": "submit"}).inject(this.frame);
+		    new Element("h2").set("text", this.context + " selection to").inject(this.frame, "top");
+		    var submit = new Element("input", {"type": "submit", "value" : this.context}).inject(p);
+		    p.appendText(" or ");
+		    this.close.inject(p);
+		    submit.addEvent("click", function (e) {
+			e.preventDefault();
+			if (this.destination) {
+			    var str = Object.toQueryString({'destination': this.destination, 'context': this.context, 'dynamic': 1}) + "&" + $("updateForm").toQueryString();
+			    str = str.replace("private%2F~", "~");
+			    new Toast(this.context + " started!");
+			    new Request.JSON({
+				url: 'copymove.wcgp',
+				onSuccess: function (errors) {
+				    errors.each(function (error) {
+					new Toast(error, { customClass: "failure"});
+				    });
+				    if (! errors.length) new Toast("All files copied successfully!");
+				    reloadContent();
+				    this.hide();
+				}.bind(this)
+			    }).get(str);
+			} else {
+			    alert("Please select destination folder!");
+			}
+		    }.bind(this));
+
+		    this.show();
+		}
+		parent.loaded = true;
+	    }.bind(this)
+	}).get({'path': path});
+    },
+    buildFoldersDom: function (object, ul, path, shared) {
+	object.each(function (folder) {
+	    var folderName = folder.Name;
+	    if (shared) {
+		folderName = folder;
+	    }
+	    var li = new Element("li").inject(ul);
+	    if (shared) li.addClass("shared");
+	    var wrap = new Element("span", {"class": "spanwrap"}).inject(li);
+	    var expand = new Element("span", {"class" : "expand"}).inject(wrap);
+	    var name = new Element("span", {"class" : "name"}).set('text', folderName).inject(wrap);
+	    var pth = path + "/" + folderName;
+	    pth = pth.replace("\/~", "~");
+	    expand.addEvent("click", function () {
+		if (! li.loaded) {
+		    this.buildFolderList(pth , li);
+		}
+		if (expand.hasClass('expanded')) {
+		    li.getChildren("ul").setStyle('display',"none");
+		    expand.removeClass('expanded');
+		} else {
+		    li.getChildren("ul").setStyle('display',"block");
+		    expand.addClass('expanded');
+		}
+	    }.bind(this));
+	    wrap.addEvent("click", function () {
+		$$("#overlay .folderlist li").removeClass("selected");
+		li.addClass("selected");
+		this.destination = pth;
+	    }.bind(this));
+	}.bind(this));
+    },
+    show: function () {
+	this.fireEvent("show");
+	HOTKEYS_ENABLED = false;
+	this.frame.setStyle("display", this.options.display);
+	this.fx.start(-100, 0);
+    },
+    hide: function () {
+	this.fireEvent("hide");
+	HOTKEYS_ENABLED = true;
+	this.fx.start(0, -100);
+	(function(){ this.frame.setStyle("display", "none"); this.frame.empty(); }).delay(1000, this);
+    },
+    done: function () {
+	this.fireEvent("done");
+	HOTKEYS_ENABLED = true;
+	this.field.set("value", this.newField.get("value"));
+	this.button.click();
+    }
+
+});
+
 
 var activateHelps = function (parent) {
     parent = $(parent);

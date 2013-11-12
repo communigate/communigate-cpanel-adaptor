@@ -393,6 +393,8 @@ p#buttons {
             height: 30px;
             margin: 0;
             }
+body.js p#buttons .move-button,
+body.js p#buttons .copy-button,
 body.js p#buttons .share-button,
 body.js p#buttons .create,
 body.js p#buttons .rename-clone,
@@ -451,6 +453,55 @@ body.js p#buttons input.delete {
 #contextmenu li a.createfolder {
                                  background-image: url(folder-new.png);
                                  }
+#contextmenu li a.copy {
+                         background-image: url(copy.png);
+                         }
+#contextmenu li a.move {
+                         background-image: url(move.png);
+                         }
+/* Folderlist */
+
+ul.folderlist {
+                overflow: hidden;
+                clear: both;
+                }
+ul.folderlist li {
+                   overflow: hidden;
+                   padding-left: 1em;
+                   }
+ul.folderlist li .spanwrap {
+                             display: block;
+                             overflow: hidden;
+                             float: none;
+                             }
+ul.folderlist li span {
+                        float: left;
+                        display: block;
+                        height: 24px;
+                        line-height: 24px;
+                        font-size: 13px;
+                        }
+ul.folderlist li span.expand {
+                               height: 24px;
+                               width: 24px;
+                               background: url(expand.png) center center no-repeat;
+                               margin-right: 7px;
+                               cursor: pointer;
+                               }
+ul.folderlist li span.expanded {
+                                 background: url(colapse.png) center center no-repeat;
+                                 }
+ul.folderlist li span.name {
+                             padding-left: 20px;
+                             background: url(folder16.png) 0 center no-repeat;
+                             cursor: default;
+                             }
+ul.folderlist li.shared span.name {
+                                    background-image: url(folder-shared16.png);
+                                    }
+ul.folderlist li.selected > span {
+                                   background-color: #ceeBFF;
+                                   }
 .popuper-frame {
                  display: none;
                  }
@@ -476,6 +527,8 @@ body.js #uploadField {
 #rename-clone,
 #delete,
 .share-button,
+.copy-button,
+.move-button,
 #CreateDir-clone,
 #CreateDir-clone,
 #uploadButton {
@@ -504,6 +557,12 @@ body.js #uploadField {
 .share-button {
                 background: url(share24.png) 0 0 no-repeat;
                 }
+.copy-button {
+               background: url(copy24.png) 0 0 no-repeat;
+               }
+.move-button {
+               background: url(move24.png) 0 0 no-repeat;
+               }
 form {
        display: inline;
        }
@@ -696,6 +755,9 @@ strong {
 #overlay input {
                  float: none;
                  }
+#overlay p.submit {
+                    margin-top: 2em;
+                    }
 h3.helps {
            cursor: pointer;
            width: 24px;
