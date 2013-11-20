@@ -1,0 +1,170 @@
+[% PROCESS _ajaxapp_header.tmpl %]
+<link rel="stylesheet" type="text/css" href="[% MagicRevision('/yui/tabview/assets/skins/sam/tabview.css') %]" />
+<script type='text/javascript' src="[% MagicRevision('/yui/tabview/tabview.js') %]"></script>
+<script type="text/javascript">
+  var tweakTabs = new YAHOO.widget.TabView('tweaktabs');
+</script>
+<style type="text/css">
+  #find_container {
+  float: right;
+  margin-left: 6px;
+  margin-right: 6px;
+  }
+
+  .yui-navset {
+  position: static;  /* override tabview.css */
+  }
+</style>
+
+<style type="text/css">
+  div.yui_tabview_scroll_tabs {
+  position: relative;  /* IE7 */
+  overflow: hidden;
+  white-space: nowrap;
+  }
+  div.yui_tabview_scroll_tabs ul.yui-nav {
+  position: relative;
+  border-bottom-width: 0 ! important;
+  }
+  .scroll_button {
+  background-color: #7697f0;
+  display: inline-block;
+  vertical-align: bottom;
+  font-size: 11px;
+  padding: 0.35em 0.5em;
+  height: auto;
+  color: #ffffff;
+  cursor: pointer;
+  }
+  .scroll_button:hover {
+  background-color: #5677d0;
+  }
+  div.scroll_button.scrolling,
+  .scroll_button.scrolling:hover {
+  background-color: #3657b0;
+  }
+  div.scroll_button.inactive {
+  background-color: buttonface;
+  color: graytext;
+  cursor: default;
+  }
+  div.scroll_button.inactive:hover {
+  background-color: buttonface;
+  }
+  div.scroll_button.hidden {
+  visibility: hidden;
+  }
+
+  #left_scroll_button {
+  float: left;
+  margin: 1px 0.16em 0 0;
+  height:18px;
+  border-top-left-radius: 6px;
+  border-bottom-left-radius: 6px;
+  -moz-border-radius-topleft: 6px;
+  -moz-border-radius-bottomleft: 6px;
+  -webkit-border-top-left-radius: 6px;
+  -webkit-border-bottom-left-radius: 6px;
+  }
+  #right_scroll_button {
+  float: right;    
+  height:18px;
+  margin: 1px 0 0 0.16em;
+  border-top-right-radius: 6px;
+  border-bottom-right-radius: 6px;
+  -moz-border-radius-topright: 6px;
+  -moz-border-radius-bottomright: 6px;
+  -webkit-border-top-right-radius: 6px;
+  -webkit-border-bottom-right-radius: 6px;
+  }
+
+  #scrolling_tabs li.last {
+  margin-right: 0 ! important;
+  }
+
+  #alltweaks {
+  clear:both;
+  padding: 0;
+  }
+
+  div.help {
+  margin: 12px 40px;
+  float: none;
+  }
+  tr.special {
+  background-color: #ddffdd;
+  }
+</style>
+<h2>[% domain%]</h2>
+
+<form action="" method="post">
+  <table class="datatable brick" cellspacing="0" cellpadding="5" width="100%" border="0" align="center">
+    <thead>
+      <tr class="tdshade1_noborder">
+	<td nowrap="nowrap" align="RIGHT" style="width: 30%;">
+	  Server host:
+	</td>
+	<td nowrap="nowrap">
+	  <input type="text" name="host" value="[% conf.cgprohost %]" id="host" />
+	  <span id="host_error"></span>
+	</td>
+      </tr>
+      <tr class="tdshade1_noborder">
+	<td nowrap="nowrap" align="RIGHT" style="width: 30%;">
+	  Server port:
+	</td>
+	<td nowrap="nowrap">
+	  <input type="text" name="port" value="[% conf.cgproport %]" id="port" />
+	  <span id="port_error"></span>
+	</td>
+      </tr>
+      <tr class="tdshade1_noborder">
+	<td nowrap="nowrap" align="RIGHT" style="width: 30%;">
+	  Server username:
+	</td>
+	<td nowrap="nowrap">
+	  <input type="text" name="user" value="[% conf.cgprouser %]" id="user" />
+	  <span id="user_error"></span>
+	</td>
+      </tr>
+      <tr class="tdshade1_noborder">
+	<td nowrap="nowrap" align="RIGHT" style="width: 30%;">
+	  Server password:
+	</td>
+	<td nowrap="nowrap">
+	  <input type="password" name="pass" value="" id="pass" />
+	</td>
+      </tr>
+      <tr class="tdshade1_noborder">
+	<td nowrap="nowrap" align="RIGHT" style="width: 30%;">
+	  Repeat Server password:
+	</td>
+	<td nowrap="nowrap">
+	  <input type="password" name="repass" value="" id="repass" />
+	  <span id="repass_error"></span>
+	</td>
+      </tr>
+    </thead>
+    <tbody id="listedAccounts">
+    </tbody>
+  </table>
+  <p>
+    <input type="submit" name="save" value="Save" class="input-button" id="activate-button" />
+    <a href="addon_cgpro_servers.cgi">Back</a>
+  </p>
+</form>
+
+<script type="text/javascript">
+// Page initialization script
+var init = function() {
+    var validation = new CPANEL.validate.validator(LOCALE.maketext("Gateways"));
+    validation.add("host", "min_length(%input%, 1)", LOCALE.maketext("The host cannot be empty."));
+    validation.add("port", "min_length(%input%, 1)", LOCALE.maketext("The port cannot be empty."));
+    validation.add("user", "min_length(%input%, 1)", LOCALE.maketext("The username cannot be empty."));
+    validation.add("repass", "equals('repass','pass')", LOCALE.maketext("The passwords must match."));
+    validation.attach();
+    CPANEL.validate.attach_to_form("activate-button", validation);
+};
+
+EVENT.onDOMReady(init);
+</script>

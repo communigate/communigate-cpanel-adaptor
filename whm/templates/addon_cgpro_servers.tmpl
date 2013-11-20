@@ -1,0 +1,188 @@
+[% PROCESS _ajaxapp_header.tmpl %]
+<link rel="stylesheet" type="text/css" href="[% MagicRevision('/yui/tabview/assets/skins/sam/tabview.css') %]" />
+<script type='text/javascript' src="[% MagicRevision('/yui/tabview/tabview.js') %]"></script>
+<script type="text/javascript">
+  var tweakTabs = new YAHOO.widget.TabView('tweaktabs');
+</script>
+<style type="text/css">
+  #find_container {
+  float: right;
+  margin-left: 6px;
+  margin-right: 6px;
+  }
+
+  .yui-navset {
+  position: static;  /* override tabview.css */
+  }
+</style>
+
+<style type="text/css">
+  div.yui_tabview_scroll_tabs {
+  position: relative;  /* IE7 */
+  overflow: hidden;
+  white-space: nowrap;
+  }
+  div.yui_tabview_scroll_tabs ul.yui-nav {
+  position: relative;
+  border-bottom-width: 0 ! important;
+  }
+  .scroll_button {
+  background-color: #7697f0;
+  display: inline-block;
+  vertical-align: bottom;
+  font-size: 11px;
+  padding: 0.35em 0.5em;
+  height: auto;
+  color: #ffffff;
+  cursor: pointer;
+  }
+  .scroll_button:hover {
+  background-color: #5677d0;
+  }
+  div.scroll_button.scrolling,
+  .scroll_button.scrolling:hover {
+  background-color: #3657b0;
+  }
+  div.scroll_button.inactive {
+  background-color: buttonface;
+  color: graytext;
+  cursor: default;
+  }
+  div.scroll_button.inactive:hover {
+  background-color: buttonface;
+  }
+  div.scroll_button.hidden {
+  visibility: hidden;
+  }
+
+  #left_scroll_button {
+  float: left;
+  margin: 1px 0.16em 0 0;
+  height:18px;
+  border-top-left-radius: 6px;
+  border-bottom-left-radius: 6px;
+  -moz-border-radius-topleft: 6px;
+  -moz-border-radius-bottomleft: 6px;
+  -webkit-border-top-left-radius: 6px;
+  -webkit-border-bottom-left-radius: 6px;
+  }
+  #right_scroll_button {
+  float: right;    
+  height:18px;
+  margin: 1px 0 0 0.16em;
+  border-top-right-radius: 6px;
+  border-bottom-right-radius: 6px;
+  -moz-border-radius-topright: 6px;
+  -moz-border-radius-bottomright: 6px;
+  -webkit-border-top-right-radius: 6px;
+  -webkit-border-bottom-right-radius: 6px;
+  }
+
+  #scrolling_tabs li.last {
+  margin-right: 0 ! important;
+  }
+
+  #alltweaks {
+  clear:both;
+  padding: 0;
+  }
+
+  div.help {
+  margin: 12px 40px;
+  float: none;
+  }
+  tr.special {
+  background-color: #ddffdd;
+  }
+</style>
+<h2>[% domain%]</h2>
+
+<table class="datatable brick" cellspacing="0" cellpadding="5" width="100%" border="0" align="center">
+  <tbody>
+    <tr class="tdshade[% (loop.count % 2 - 1) * -1 + 1 %]_noborder">
+      <td>
+	default
+      </td>
+      <td>
+	<a href="addon_cgpro_servers_edit.cgi" class="input-button" >View/Edit</a>
+      </td>
+    </tr>
+    [% FOREACH user IN conf.users.keys.sort %]
+    <tr class="tdshade[% (loop.count % 2 - 1) * -1 + 1 %]_noborder">
+      <td>
+	[% user %]
+      </td>
+      <td>
+	<a href="addon_cgpro_servers_edit.cgi?account=[% user %]" class="input-button" >View/Edit</a>
+	<a href="addon_cgpro_servers_delete.cgi?account=[% user %]" class="input-button" >Delete</a>
+      </td>
+    </tr>
+    [% END %]
+  </tbody>
+</table>
+
+<form action="" method="post">
+  <table class="datatable brick" cellspacing="0" cellpadding="5" width="100%" border="0" align="center">
+    <thead>
+      <tr class="tdshade1_noborder">
+	<td nowrap="nowrap" align="RIGHT" style="width: 30%;">
+	  Search an existing account username: <br />
+	</td>
+	<td nowrap="nowrap">
+	  <input type="text" name="domain" value="" id="searchfield" autocomplete="off" />
+	</td>
+      </tr>
+    </thead>
+    <tbody id="listedAccounts">
+    </tbody>
+  </table>
+</form>
+
+<!-- END Assing -->
+
+[% PROCESS _ajaxapp_footer.tmpl %]
+<script type="text/javascript">
+      //
+function build_accounts_table_markup(resp) {
+      var text = "";
+      var i = 0;
+      for ( i = 0; i < resp.acct.length; i++) {
+	  text = text + '<tr  class="tdshade' + ( i % 2 ? 1 : 2 ) + '_noborder">';
+	  text = text + '<td>';
+	  text = text + resp.acct[i].user;
+	  text = text + '</td>';
+	  text = text + '<td>';
+	  text = text + '<a href="addon_cgpro_servers_edit.cgi?account=' + resp.acct[i].user + '" class="input-button" >Add</a>';
+	  text = text + '</td>';
+	  text = text + '</tr>';
+      }
+      return text;
+};
+//  sending request
+YAHOO.util.Event.addListener("searchfield", "keyup", function () {
+	var text = YAHOO.util.Dom.get("searchfield").value;
+	if (text.length > 2) {
+	    var url2 = CPANEL.security_token + ("/json-api/listaccts?searchtype=user&search=" + text);
+	    var callback2 = {
+		success : function(o) {
+		    var resp = null, data = null, err;
+		    try {
+			resp = YAHOO.lang.JSON.parse(o.responseText);
+		    }
+		    catch(e) {
+			try { console.warn(o.responseText,e) } catch(e) {}
+			err = LOCALE.maketext("The API response could not be parsed.");
+		    }
+		    if (resp) {
+			YAHOO.util.Dom.get("listedAccounts").innerHTML = build_accounts_table_markup(resp);
+		    }
+		},
+		failure : function(o) { }
+	    };
+	    YAHOO.util.Connect.asyncRequest("GET", url2, callback2, "");
+	} else {
+	    YAHOO.util.Dom.get("listedAccounts").innerHTML = "";
+	}
+    });
+  
+</script>
