@@ -6,6 +6,9 @@ PACKSRC=`pwd`
 #		cPanel Specific			#
 #################################################
 
+# Register installed hooks
+/usr/local/cpanel/bin/manage_hooks delete module CGPro::Hooks
+
 # iPhone provisioning using default httpd
 cp ${PACKSRC}/iphone/iphonetemplate.mobileconfig /var/CommuniGate/apple/
 
@@ -82,7 +85,6 @@ if [ ! -d /var/cpanel/perl5/lib/ ]
 then
     mkdir -p /var/cpanel/perl5/lib/
 fi
-/usr/local/cpanel/bin/manage_hooks delete module CGPro::Hooks
 cp -rf ${PACKSRC}/hooks/CGPro /var/cpanel/perl5/lib/
 # Register installed hooks
 /usr/local/cpanel/bin/manage_hooks add module CGPro::Hooks

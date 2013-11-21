@@ -5,6 +5,9 @@ PACKSRC=`pwd`
 #		cPanel Specific			#
 #################################################
 
+# Register installed hooks
+/usr/local/cpanel/bin/manage_hooks delete module CGPro::Hooks
+
 # iPhone provisioning using default httpd
 rm -rf /usr/local/apache/htdocs/iOS
 rm -rf /var/CommuniGate/apple
@@ -53,8 +56,6 @@ rm -f /usr/local/cpanel/bin/ccaadmin
 rm -f /usr/local/cpanel/bin/ccawrap
 rm -rf /usr/local/cpanel/bin/admin/CGPro
 
-# Register installed hooks
-/usr/local/cpanel/bin/manage_hooks delete module CGPro::Hooks
 # Uninstall cPanel Function hooks
 rm -rf /var/cpanel/perl5/lib/CGPro/
 

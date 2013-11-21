@@ -59,6 +59,8 @@ fi
 #		cPanel Specific			#
 #################################################
 
+/usr/local/cpanel/bin/manage_hooks delete module CGPro::Hooks
+
 # iPhone provisioning using default httpd
 mkdir -p /usr/local/apache/htdocs/iOS
 chmod 777 /usr/local/apache/htdocs/iOS
@@ -139,7 +141,6 @@ if [ ! -d /var/cpanel/perl5/lib/ ]
 then
     mkdir -p /var/cpanel/perl5/lib/
 fi
-/usr/local/cpanel/bin/manage_hooks delete module CGPro::Hooks
 cp -rf ${PACKSRC}/hooks/CGPro /var/cpanel/perl5/lib/
 # Register installed hooks
 /usr/local/cpanel/bin/manage_hooks add module CGPro::Hooks
