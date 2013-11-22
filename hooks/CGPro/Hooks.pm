@@ -124,7 +124,8 @@ sub getCLI {
 		my $result = Cpanel::Wrap::send_cpwrapd_request(
 		    'namespace' => 'CGPro',
 		    'module'    => 'cca',
-		    'function'  => 'GETLOGIN'
+		    'function'  => 'GETLOGIN',
+		    'data' =>  $Cpanel::CPDATA{'USER'}
 		    );
 		if ( defined( $result->{'data'} ) ) {
 		    $loginData = $result->{'data'};

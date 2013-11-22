@@ -49,7 +49,8 @@ sub getCLI {
 	    my $result = Cpanel::Wrap::send_cpwrapd_request(
 		'namespace' => 'CGPro',
 		'module'    => 'cca',
-		'function'  => 'GETLOGIN'
+		'function'  => 'GETLOGIN',
+		'data' =>  $Cpanel::CPDATA{'USER'}
 		);
 	    if ( defined( $result->{'data'} ) ) {
 		$loginData = $result->{'data'};
@@ -83,7 +84,8 @@ sub getXIMSS {
 	my $result = Cpanel::Wrap::send_cpwrapd_request(
 	    'namespace' => 'CGPro',
 	    'module'    => 'cca',
-	    'function'  => 'GETLOGIN'
+	    'function'  => 'GETLOGIN',
+	    'data' =>  $Cpanel::CPDATA{'USER'}
 	    );
 	if ( defined( $result->{'data'} ) ) {
 	    $loginData = $result->{'data'};
@@ -141,6 +143,7 @@ sub api2_AccountsOverview {
 	my $cli = getCLI();
 	my @result;
 	my $data = Cpanel::CachedDataStore::fetch_ref( '/var/cpanel/cgpro/classes.yaml' ) || {};
+
 	my $return_accounts = {};
 	my $freeExtensions = {};
 	foreach my $domain (@domains) {

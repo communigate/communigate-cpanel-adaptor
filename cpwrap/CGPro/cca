@@ -20,6 +20,7 @@ my $logger = Cpanel::Logger->new();
 
 if ( $function eq 'GETLOGIN' ) {
     my $conf = Cpanel::CachedDataStore::fetch_ref( '/var/cpanel/communigate.yaml' ) || {};
+    $conf = $conf->{"users"}->{$data} if $conf->{"users"}->{$data};
     print $conf->{cgprohost} , "::" , $conf->{cgproport} , "::" , $conf->{cgprouser} , "::" , $conf->{cgpropass};
     exit(0);
 }
