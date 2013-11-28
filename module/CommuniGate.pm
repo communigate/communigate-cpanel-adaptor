@@ -4120,6 +4120,12 @@ sub api2_UpdateWav {
 		close FI;
 		my $filename = $OPTS{'file'} || $Cpanel::CPVAR{"filename"};
 		$filename = $OPTS{'lang'} . "/" .  $filename if $OPTS{'lang'} && $OPTS{'lang'} ne 'english';
+		my $data = $cli->GetDomainSettings("$domain");
+		if (!$data) {
+		    $cli->CreateDomain("$domain");
+		}
+		$cli->CreateDomainPBX($domain);
+		$cli->CreateDomainPBX($domain, lc $OPTS{'lang'});
 		$cli->StoreDomainPBXFile($domain, $filename, encode_base64($filedata, ""));
 		$Cpanel::CPERROR{'CommuniGate'} = $cli->getErrMessage unless ($cli->getErrMessage eq "OK");
 	    } else {
@@ -4142,6 +4148,12 @@ sub api2_UpdateWavs {
     my $result;
     foreach my $dom (@domains) {
 	if ($dom eq $domain) {
+	    my $data = $cli->GetDomainSettings("$domain");
+	    if (!$data) {
+		$cli->CreateDomain("$domain");
+	    }
+	    $cli->CreateDomainPBX($domain);
+	    $cli->CreateDomainPBX($domain, lc $OPTS{'lang'});
 	    for (my $i = 0; $i <= $#{$Cpanel::CPVAR{"filepaths"}}; $i++) {
 		if ($Cpanel::CPVAR{"filepaths"}->[$i] && $Cpanel::CPVAR{"filenames"}->[$i] =~ m/\.wav/i ) {
 		    my $buffer;
@@ -4205,6 +4217,11 @@ sub api2_AddLanguage {
     foreach my $dom (@domains) {
 	if ($dom eq $domain && $OPTS{'lang'}) {
 	    $OPTS{'lang'} =~ s/\W//g;
+	    my $data = $cli->GetDomainSettings("$domain");
+	    if (!$data) {
+        	$cli->CreateDomain("$domain");
+	    }
+	    $cli->CreateDomainPBX($domain);
 	    $cli->CreateDomainPBX($domain, lc $OPTS{'lang'});
 	    $Cpanel::CPERROR{'CommuniGate'} = $cli->getErrMessage unless ($cli->getErrMessage eq "OK");
 	    last;
