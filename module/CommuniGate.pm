@@ -4259,6 +4259,7 @@ sub api2_ListRPOP {
 	if ($domain eq $dom) {
 	    my $settings = $cli->GetAccountRPOPs($account);
 	    $result->{'rpop'} = $settings;
+	    $result->{'rpopInfo'} = $cli->GetAccountInfo($account, "RPOP");
 	    last;
 	}
     }
@@ -4368,6 +4369,7 @@ sub api2_ListRSIP {
 	if ($domain eq $dom) {
 	    my $settings = $cli->GetAccountRSIPs($account);
 	    $result->{'rsip'} = $settings;
+	    $result->{'rsipInfo'} = $cli->GetAccountInfo($account, "RSIP");
 	    last;
 	}
     }

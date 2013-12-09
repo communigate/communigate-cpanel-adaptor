@@ -4,11 +4,16 @@
 <table border="0" cellpadding="5" cellspacing="0" id="mailtbl" class="sortable" width="650">
   <tr>
     <th class="cell">[% locale.maketext("CGPRemotePOP") %]</th>
+    <th class="cell">[% locale.maketext("CGPStatus") %]</th>
     <th class="cell-end sorttable_nosort">[% locale.maketext("AHFucn") %]</th>
   </tr>
   [% FOR pop IN rpop.keys -%]
   <tr>
     <td class="truncate">[% pop %]</td>
+    <td class="truncate">
+      [% rpopInfo.$pop.completed.replace("(\#T|\_)"," ") %]
+      [% rpopInfo.$pop.errorCode %]
+    </td>
     <td>
       <a href="editrpop.html?account=[% FORM.account %]&amp;rpop=[% pop %]">[% locale.maketext('CGPViewEdit') %]</a>,
       <a href="deleterpop.html?account=[% FORM.account %]&amp;rpop=[% pop %]">[% locale.maketext('BrandingDPackage') %]</a>
