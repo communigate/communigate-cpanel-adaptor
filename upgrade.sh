@@ -229,9 +229,19 @@ then
     /etc/init.d/CommuniGate start
 fi
 # Install the WHM plugins (administration and groupware control)
+if [ `ls /var/cpanel/apps/addon_cgpro*.conf | wc -l` -gt 0 ]
+then
+    chmod +x ${PACKSRC}/scripts/unregister_apps.sh
+    ${PACKSRC}/scripts/unregister_apps.sh
+fi
 rm -f /usr/local/cpanel/whostmgr/docroot/templates/cgpro_*
-cp ${PACKSRC}/whm/templates/* /usr/local/cpanel/whostmgr/docroot/templates/
 rm -rf /usr/local/cpanel/whostmgr/docroot/cgi/cgpro*
+cp ${PACKSRC}/whm/templates/* /usr/local/cpanel/whostmgr/docroot/templates/
 cp -rf ${PACKSRC}/whm/cgi/* /usr/local/cpanel/whostmgr/docroot/cgi/
+if [ -f /usr/local/cpanel/bin/register_appconfig ]
+then
+    chmod +x ${PACKSRC}/scripts/register_apps.sh
+    ${PACKSRC}/scripts/register_apps.sh
+fi
 
 echo "Upgrade Finished!"

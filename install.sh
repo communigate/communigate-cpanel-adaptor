@@ -71,6 +71,12 @@ cp ${PACKSRC}/iphone/iphonetemplate.mobileconfig /var/CommuniGate/apple/
 cp -rf ${PACKSRC}/whm/cgi/* /usr/local/cpanel/whostmgr/docroot/cgi/
 cp ${PACKSRC}/whm/templates/* /usr/local/cpanel/whostmgr/docroot/templates/
 
+if [ -f /usr/local/cpanel/bin/register_appconfig ]
+then
+    chmod +x ${PACKSRC}/scripts/register_apps.sh
+    ${PACKSRC}/scripts/register_apps.sh
+fi
+
 # Install CGP Logo
 cp ${PACKSRC}/whm/communigate.gif /usr/local/cpanel/whostmgr/docroot/images/communigate.gif
 

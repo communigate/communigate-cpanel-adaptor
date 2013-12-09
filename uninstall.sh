@@ -13,6 +13,12 @@ rm -rf /usr/local/apache/htdocs/iOS
 rm -rf /var/CommuniGate/apple
 
 # Uninstall the WHM plugins (administration and groupware control)
+if [ `ls /var/cpanel/apps/addon_cgpro*.conf | wc -l` -gt 0 ]
+then
+    chmod +x ${PACKSRC}/scripts/unregister_apps.sh
+    ${PACKSRC}/scripts/unregister_apps.sh
+fi
+
 rm -rf /usr/local/cpanel/whostmgr/docroot/cgi/addon_cgpro*
 rm -f /usr/local/cpanel/whostmgr/docroot/templates/addon_cgpro_*
 
