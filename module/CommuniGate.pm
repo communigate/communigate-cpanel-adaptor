@@ -4625,6 +4625,7 @@ sub api2_createAccount {
 	    domain => Cpanel::Sys::gethostname(),
 	    password => $OPTS{'password'},
 	    period => '600s',
+	    leave => "YES"
 	};
 	$cli->SetAccountRPOPs($OPTS{'email'}, $settings);
     }
