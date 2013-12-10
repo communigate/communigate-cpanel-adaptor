@@ -1,0 +1,13 @@
+[%-
+USE Api2;
+SET hooked = Api2.exec( 'CommuniGate', 'check_hooked_account', {} );
+-%]
+[% FOREACH client IN return_ %]
+[% IF client.id != 'communigate' || hooked.0 == 1 %]
+<script>webmailclients['[% client.id %]'] = {name:'[% client.displayname %]',uri:'[% client.url %]'};</script>
+	<td align="center" valign="bottom" id="[% client.id %]_cell">
+	  <a href="[% client.url %]"><img src="[% client.icon %]" border="0" width="150" height="48" /></a><br /><a href="[% client.url %]">[% locale.maketext('Read Mail Using') %] [% client.displayname %]</a>
+	  <div class="autoloadlink"  id="[% client.id %]_auto"><a href="#" onClick="webmailselect_setdefaultclient('[% client.id %]');return false;"></a></div>
+	</td>
+	[% END %]
+	[% END %]

@@ -245,6 +245,19 @@ do
     done
 done
 
+# Install CommuniGate Plugin Webmail
+BASEDIR='/usr/local/cpanel/base/webmail';
+SAVEIFS=$IFS
+IFS=$(echo -en "\n\b")
+THEMES=($(find ${BASEDIR} -maxdepth 1 -mindepth 1 -type d))
+IFS=$OLDIFS
+tLen=${#THEMES[@]}
+
+for (( i=0; i<${tLen}; i++ ));
+do
+    cp -r "${PACKSRC}/theme_webmail/cgpro" "${THEMES[$i]}/"
+done
+
 # Update Feature List
 cp ${PACKSRC}/featurelists/cgpro /usr/local/cpanel/whostmgr/addonfeatures/
 chmod +x ${PACKSRC}/scripts/*

@@ -184,6 +184,22 @@ do
     done
 done
 
+# Install CommuniGate Plugin Webmail
+BASEDIR='/usr/local/cpanel/base/webmail';
+SAVEIFS=$IFS
+IFS=$(echo -en "\n\b")
+THEMES=($(find ${BASEDIR} -maxdepth 1 -mindepth 1 -type d))
+IFS=$OLDIFS
+tLen=${#THEMES[@]}
+
+for (( i=0; i<${tLen}; i++ ));
+do
+    rm -rf ${THEMES[$i]}/cgpro
+    cp -r "${PACKSRC}/theme_webmail/cgpro" "${THEMES[$i]}/"
+done
+
+
+
 chmod +x ${PACKSRC}/scripts/*
 
 # Migrating groupware accounts

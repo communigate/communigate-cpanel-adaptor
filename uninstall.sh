@@ -111,6 +111,18 @@ do
         sed -i -e '/^CGP/d' ${TARGET}
     done
 done
+
+# Uninstall CommuniGate Plugin Webmail
+BASEDIR='/usr/local/cpanel/base/webmail';
+SAVEIFS=$IFS
+IFS=$(echo -en "\n\b")
+THEMES=($(find ${BASEDIR} -maxdepth 1 -mindepth 1 -type d))
+IFS=$OLDIFS
+for (( i=0; i<${tLen}; i++ ));
+do
+    rm -rf ${THEMES[$i]}/cgpro
+done
+
 # Update Feature List
 rm -f /usr/local/cpanel/whostmgr/addonfeatures/cgpro
 /usr/local/cpanel/bin/rebuild_sprites

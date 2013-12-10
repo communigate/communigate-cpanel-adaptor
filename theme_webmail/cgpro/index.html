@@ -1,0 +1,79 @@
+<cpanel Branding="include(stdheader.html)">
+<cpanel Email="check_roundcube()">
+<style>
+.disable_autoload {
+    color: #C43234;
+}
+.autoload {
+    border: 1px dotted #777;
+}
+.autoloadlink {
+    padding-top: 5px;
+}
+</style>
+<script>
+var thisTheme = "<cpanel print="$CPDATA{'RS'}">";
+var NVData={};
+<?cp NVData::get(NVData.%=unescape\{leftparenthesis}'%'\{rightparenthesis};,name,^value) encoded=1,names=webmail_autoload_numseconds|webmailclient ?>
+isWebMail = 1;
+var webmailclients = {};    
+</script>
+
+
+<div align="center">
+<p><cpanel langprint="cpanel-loggedin"> <span class="status"><cpanel print="$authuser"></span></p>
+</div>
+<br><br>
+
+<div align="center">
+<table align=center width="700" border="0">
+<tr align="center">
+<cpanelfeature webmail>
+<?cptt WebmailApps::listwebmailapps(cgpro/index.tmpl) ?>
+</cpanelfeature>
+
+</tr>
+
+</table>
+<br />
+<div id="no_auto"></div>
+<br />
+<table align="center" width="80%" cellspacing="3" cellpadding="5" border="0">
+
+
+
+<!-- has_delegated_mailman_lists: <?cp Email::has_delegated_mailman_lists(%,has_delegated_mailman_lists) ?> -->
+
+<cpanelif !$isarchiveuser && $CPVAR{'has_delegated_mailman_lists'}>
+<cpanelfeature lists>
+  <td>
+		<div valign="top" align="center">
+			<a href="mail/delegated_lists.html"><img src="<cpanel Branding="image(maillist)">" border="0" /></a><br /><a href="mail/delegated_lists.html"><cpanel langprint="MENULists"></a>
+		</div>
+	</td>
+
+</cpanelfeature>
+</cpanelif>
+
+<cpanelif $CONF{'SecurityPolicy::SourceIPCheck'}>
+	<td>
+		<div valign="top" align="center">
+			<a href="security/index.html"><img src="<cpanel Branding="image(sec_policy)">" border="0" /></a><br /><a href="security/index.html"><cpanel langprint="SecurityPolicy"></a>
+		</div>
+	</td>
+</cpanelif>
+ </tr>
+</table>
+</div>
+<cpanelif $authuser==$user || $ENV{'CPRESELLER'} || $isarchiveuser>
+<br />
+<br />
+<div align="center" style="margin: 0 auto;">
+  [ <a href="<cpanel print="$ENV{'cp_security_token'}">/xfercpanel/"><cpanel langprint="ReturncPanel"></a> ]
+</div>
+</cpanelif>
+<br />
+<script type="text/javascript">window.__cp__x3_PageTitle='<cptext 'Webmail Main'>';</script>
+<cpanel Branding="include(webmailselect-pop.html)">
+<cpanel Branding="include(stdfooter.html)">
+
