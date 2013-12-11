@@ -169,31 +169,11 @@
 		    </td>
 		  </tr>
 		  [% IF prefs.Gateways.$provider.callInGw -%]
- 		  <tr class="tdshade2_noborder">
-		    <td nowrap="nowrap" align="RIGHT" style="width: 25%;"><label for="dialInDisable">Disabled temporary</label>:</td>
-		    <td nowrap="nowrap">
-		      <input type="checkbox" name="dialInDisable" id="dialInDisable" value="1"[% IF prefs.Gateways.$provider.callInGw.disabled == "YES"; ' checked="checked"'; END %] />
-		    </td>
-		  </tr>
- 		  <tr class="tdshade1_noborder">
-		    <td nowrap="nowrap" align="RIGHT" style="width: 25%;"><label for="forceRelay">Force media relay</label>:</td>
-		    <td nowrap="nowrap">
-		      <input type="checkbox" name="forceRelay" id="forceRelay" value="1"[% IF prefs.Gateways.$provider.callInGw.forceRelay == "YES"; ' checked="checked"'; END %] />
-		    </td>
-		  </tr>
- 		  <tr class="tdshade2_noborder">
-		    <td nowrap="nowrap" align="RIGHT" style="width: 25%;"><label for="forceMediaProcessing">Force media transcoding</label>:</td>
-		    <td nowrap="nowrap">
-		      <input type="checkbox" name="forceMediaProcessing" id="forceMediaProcessing" value="1"[% IF prefs.Gateways.$provider.callInGw.forceMediaProcessing == "YES"; ' checked="checked"'; END %] />
-		    </td>
-		  </tr>
  		  <tr class="tdshade1_noborder">
 		    <td nowrap="nowrap" align="RIGHT" style="width: 25%;"><label for="dialInEnabled">Register</label>:</td>
 		    <td nowrap="nowrap">
 		      <input type="radio" name="proxyType" id="register1" value="registrar"[% prefs.Gateways.$provider.callInGw.proxyType == "registrar" ? 'checked="checked"' : '' -%] /><label for="register1">Register at the gateway with username and password</label> <br />
-		      Do not register at the gateway. Gateway directs calls to: <br  />
-		      <input type="radio" name="proxyType" id="register2" value="trunk"[% prefs.Gateways.$provider.callInGw.proxyType == "trunk" ? 'checked="checked"' : '' -%] /><label for="register2">Server IP Address or local Domain:</label> <input type="text" name="localIP" value="[% prefs.Gateways.$provider.callInGw.destination %]"  /> <br />
-		      <input type="radio" name="proxyType" id="register3" value="director"[% prefs.Gateways.$provider.callInGw.proxyType == "director" ? 'checked="checked"' : '' -%] /><label for="register3">Default server domain</label>
+		      <input type="radio" name="proxyType" id="register3" value="director"[% prefs.Gateways.$provider.callInGw.proxyType == "director" ? 'checked="checked"' : '' -%] /><label for="register3">Do not register at the gateway. Gateway directs calls.</label>
 		      <input type="hidden" id="lastValue" value="[% prefs.Gateways.$provider.callInGw.proxyType %]"  />
 		      <input type="hidden" name="proxyTypeOld" value="[% prefs.Gateways.$provider.callInGw.proxyType %]"  />
 		      <script type="text/javascript">
@@ -208,14 +188,6 @@
 		      </script>
 		    </td>
 		  </tr>
-		  [% IF prefs.Gateways.$provider.callInGw.proxyType != 'registrar' -%]
- 		  <tr class="tdshade1_noborder">
-		    <td nowrap="nowrap" align="RIGHT" style="width: 25%; vertical-align: top;">Gateways IP addresses or networks:<br/> <em>One per row!</em><br/>(Example: 192.168.0.1 or 192.168.0.0:16 )</td>
-		    <td nowrap="nowrap">
-		      <textarea name="gateways" rows="5" cols="40">[% FOR gw IN prefs.Gateways.$provider.callInGw.trunk; gw.source _ "\n" | remove('[\#I\[\]]') | replace('\:\*', '') ; END %]</textarea>
-		    </td>
-		  </tr>
-		  [% END -%]
  		  <tr class="tdshade2_noborder">
 		    <td nowrap="nowrap" align="RIGHT" style="width: 25%; vertical-align: top;">Telephone Numbers:</td>
 		    <td nowrap="nowrap">
@@ -241,6 +213,7 @@
 			    </td>
 			    <td>
 			      <select name="expires-[% telnum %]">
+ 				[% filter_option( telnumDetails.$telnum.expires, "0", "") %]
  				[% filter_option( telnumDetails.$telnum.expires, "2m", "2 min") %]
  				[% filter_option( telnumDetails.$telnum.expires, "3m", "3 min") %]
  				[% filter_option( telnumDetails.$telnum.expires, "5m", "5 min") %]
@@ -262,7 +235,7 @@
 			    </td>
 			    [% END -%]
 			    <td>
-			      <input type="text" value="[% telnums.$telnum == 'null' ? "" : telnums.$telnum %]" name="assigned-[% telnum %]" style="width: 100px;"  />
+			      <input type="text" value="[% telnumDetails.$telnum.assigned == '#NULL#' ? "" : telnumDetails.$telnum.assigned %]" name="assigned-[% telnum %]" style="width: 100px;"  />
 			    </td>
 			    [% IF prefs.Gateways.$provider.callInGw.proxyType == "registrar" -%]
 			    <td>
@@ -302,82 +275,6 @@
 		      </table>
 		    </td>
 		  </tr>
- 		  <tr class="tdshade1_noborder">
-		    <td nowrap="nowrap" align="RIGHT" style="width: 25%;"><label for="CLIDEnabled">This gateway sends caller ID</label>:</td>
-		    <td nowrap="nowrap">
-		      <input type="checkbox" name="CLIDEnabled" id="CLIDEnabled" value="1"[% IF prefs.Gateways.$provider.callInGw.CLIDEnabled == "YES"; ' checked="checked"'; END %] />
-		    </td>
-		  </tr>
-		  [% IF prefs.Gateways.$provider.callInGw.CLIDEnabled == "YES" -%]
- 		  <tr class="tdshade2_noborder">
-		    <td nowrap="nowrap" align="RIGHT" style="width: 25%;"><label for="CLIDTrusted">Caller ID is trusted</label>:</td>
-		    <td nowrap="nowrap">
-		      <input type="checkbox" name="CLIDTrusted" id="CLIDTrusted" value="1"[% IF prefs.Gateways.$provider.callInGw.CLIDTrusted == "YES"; ' checked="checked"'; END %] />
-		    </td>
-		  </tr>
- 		  <tr class="tdshade1_noborder">
-		    <td nowrap="nowrap" align="RIGHT" style="width: 25%; vertical-align: top;">Method:</td>
-		    <td nowrap="nowrap">
-		      [% allMethods = prefs.Gateways.$provider.callInGw.CLIDMethods.join(",") %]
-		      <table summary="">
-			<tbody>
-			  <tr>
-			    <th>Method</th>
-			    <th>Active</th>
-			    <th>Priority</th>
-			  </tr>
-			  <tr>
-			    <td>
-			      <label for="CLIDMethods1">From</label>
-			    </td>
-			    <td>
-			      <input type="checkbox" name="CLIDMethods-dis" id="CLIDMethods1" value="dis"[% IF allMethods.search("dis"); ' checked="checked"'; END %] />
-			    </td>
-			    <td>
-			      <input type="text" name="CLIDMethods-dis-order" style="width: 50px" value="[% methods.dis %]" />
-			    </td>
-			  </tr>
-			  <tr>
-			    <td>
-			      <label for="CLIDMethods2">Remote-Party-Id</label>
-			    </td>
-			    <td>
-			      <input type="checkbox" name="CLIDMethods-rpi" id="CLIDMethods2" value="rpi"[% IF allMethods.search("rpi"); ' checked="checked"'; END %] />
-			    </td>
-			    <td>
-			      <input type="text" name="CLIDMethods-rpi-order" style="width:50px" value="[% methods.rpi %]"  />
-			    </td>
-			  </tr>
-			  <tr>
-			    <td>
-			      <label for="CLIDMethods3">P-Asserted-Identity</label>
-			    </td>
-			    <td>
-			      <input type="checkbox" name="CLIDMethods-pai" id="CLIDMethods3" value="pai"[% IF allMethods.search("pai"); ' checked="checked"'; END %] />
-			    </td>
-			    <td>
-			      <input type="text" name="CLIDMethods-pai-order" style="width:50px" value="[% methods.pai %]" />
-			    </td>
-			  </tr>
-			</tbody>
-		      </table>
-		    </td>
-		  </tr>
- 		  <tr class="tdshade2_noborder">
-		    <td nowrap="nowrap" style="width: 25%; vertical-align: top;">
-		      <label style="text-align: right; display: block;">Translation rules:</label> <br />
-		      <em style="text-align: left;">
-			Examples: <br  />
-			0(12-20) -> +44* <br  />
-			00* -> +* <br  />
-			+359(10) -> 0*
-		      </em>
-		    </td>
-		    <td nowrap="nowrap">
-		      <textarea name="callerIdReRules" rows="5" cols="40">[% callerIdReRules %]</textarea>
-		    </td>
-		  </tr>
-		  [% END -%]
 		  [% END -%]
 		</tbody>
 	      </table>

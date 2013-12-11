@@ -39,28 +39,9 @@ if ($FORM{submitedit} && $FORM{telnum}) {
     my $gateways = $prefs->{Gateways};
     my $id = $prefs->{Gateways}->{$FORM{provider}}->{shortId};
     $id =~ s/\D//g;
-    # Creating Forwarders
-    my $assigned = $cli->GetForwarder("i-" . $FORM{telnum} . '@' . $domain);
-    # in central.telnum 35930198900 -> tn-35930198900@ucc.surfstream.net
-    $cli->DeleteForwarder("tn-" . $FORM{telnum} . '@central.telnum');
-    $cli->CreateForwarder("tn-" . $FORM{telnum} . '@central.telnum', 'tn-' . $FORM{telnum} . '@' . $domain );
-    # i-35930198900 -> antonkatsarov@anton.bg.local
-    $cli->DeleteForwarder("gwin-$id-" . $FROM{telnum} . '@' . $domain);
-    $cli->DeleteForwarder("i-" . $FORM{telnum} . '@' . $domain);
-    $cli->CreateForwarder("i-" . $FORM{telnum} . '@' . $domain, $FORM{provider} . '@' . ( $FORM{assigned} ? $FORM{assigned} : 'null' ) . '.local' );
-    # tn-35930198900 -> null/tn-35930198900@anton.bg
-    $cli->DeleteForwarder("tn-" . $FORM{telnum} . '@' . $domain);
-    $cli->CreateForwarder("tn-" . $FORM{telnum} . '@' . $domain, ($FORM{assigned} ? "tn-" . $FORM{telnum} . '@' . $FORM{assigned} : 'null' ) );
-    # anton.bg: tn-35930198900 ->  null
-    if ($FORM{assigned}) {
-	$cli->DeleteForwarder("tn-" . $FORM{telnum} . '@' . $FORM{assigned});
-	$cli->CreateForwarder("tn-" . $FORM{telnum} . '@' . $FORM{assigned}, 'null' );
-	$cli->DeleteForwarder("i-" . $FORM{telnum} . '@' . $FORM{assigned});
-	$cli->CreateForwarder("i-" . $FORM{telnum} . '@' . $FORM{assigned}, $FORM{'provider'} . "+" . $domain . "@" . $FORM{assigned} . '.local' );
-    }
     if ($gateways->{$FORM{provider}}->{callInGw}->{proxyType} eq 'director' && ! $assigned) {
 	$gateways->{$FORM{provider}}->{callInGw}->{telnums} = [] unless $gateways->{$FORM{provider}}->{callInGw}->{telnums};
-	push @{$gateways->{$FORM{provider}}->{callInGw}->{telnums}}, {'telnum' => $FORM->{telnum}};
+	push @{$gateways->{$FORM{provider}}->{callInGw}->{telnums}}, {'telnum' => $FORM{telnum}};
     }
     if ($gateways->{$FORM{provider}}->{callInGw}->{proxyType} eq 'registrar' && ! $assigned) {
 	$gateways->{$FORM{provider}}->{callInGw}->{telnums} = [] unless $gateways->{$FORM{provider}}->{callInGw}->{telnums};
@@ -76,7 +57,6 @@ if ($FORM{submitedit} && $FORM{telnum}) {
 	    'server' => undef,
 	    'expires' => ($FORM{expires} || undef)
 	};
-	$cli->UpdateAccountPrefs('pbx@' . $domain, {Gateways => $gateways});
 	my $rsips = $cli->GetAccountRSIPs('pbx@' . $domain);
 	$rsips->{'rsip-' . $id . '-' . $uin } = {
 	    domain => $FORM{host},
@@ -89,6 +69,7 @@ if ($FORM{submitedit} && $FORM{telnum}) {
 	};
 	$cli->SetAccountRSIPs('pbx@' . $domain, $rsips);
     }
+    $cli->UpdateAccountPrefs('pbx@' . $domain, {Gateways => $gateways});
 
     print "HTTP/1.1 303 See Other\r\nLocation: addon_cgpro_gateways_edit.cgi?provider=" . $FORM{provider} . "\r\n\r\n";
 }
