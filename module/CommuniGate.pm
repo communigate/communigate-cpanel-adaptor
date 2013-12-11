@@ -4639,6 +4639,21 @@ sub api2_deleteAccount {
     $cli->DeleteAccount($OPTS{'email'});
     $cli->Logout();
 }
+
+sub api2_check_hooked_account {
+    my $account = $Cpanel::CPDATA{'USER'};
+    if (-f '/var/cpanel/communigate_hooked_accounts') {
+	open(FI, "<", '/var/cpanel/communigate_hooked_accounts');
+	my @accounts = <FI>;
+	close(FI);
+	@accounts = grep {$_ eq $account} map {$_ =~ s/(\n|\r)//g; $_} @accounts;
+	return 1 if defined $accounts[0];
+	return 0;
+    } else {
+	return 1;
+    }
+}
+
 sub versioncmp( $$ ) {
     my @A = ($_[0] =~ /([-.]|\d+|[^-.\d]+)/g);
     my @B = ($_[1] =~ /([-.]|\d+|[^-.\d]+)/g);
