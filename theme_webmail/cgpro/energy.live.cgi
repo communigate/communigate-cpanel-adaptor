@@ -11,7 +11,6 @@ my $q = CGI->new;
 
 my $cpanel = Cpanel::LiveAPI->new();
 print "Content-type: text/html\r\n\r\n";
-use Data::Dumper;
 my $result = Cpanel::Wrap::send_cpwrapd_request(
     'namespace' => 'CGPro',
     'module'    => 'cca',
