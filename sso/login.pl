@@ -17,6 +17,29 @@ use HTTP::Request::Common;
 use URI::Escape;
 use Cpanel::CachedDataStore;
 
+sub postmaster_pass {
+    my $file = "/var/CommuniGate/Accounts/postmaster.macnt/account.settings";
+    my %hash;
+    open (MYFILE, "$file");
+    while (<MYFILE>) {
+        chomp;
+        my @line = split("=",$_);
+        $hash{@line[0]} = @line[1];
+    }
+    if ($hash{' Password '} =~ /^ ".*";$/) {
+	return  substr $hash{' Password '}, 2, length($hash{' Password '})-4;
+    } else {
+	return  substr $hash{' Password '}, 1, length($hash{' Password '})-2;
+    }
+}
+
+
+
+
+my $CGServerAddress = "127.0.0.1";
+my $PostmasterLogin = 'postmaster';
+my $PostmasterPassword = postmaster_pass();
+
 my $account = param("user");
 my $password = param("pass");
 my $cgpurl= param("cgpurl");
@@ -25,12 +48,10 @@ if ($domain) {
 	$account=$account."@".$domain;
 }
 
-
-my $conf = Cpanel::CachedDataStore::fetch_ref( '/var/cpanel/communigate.yaml' ) || {};
-my $cli = new CGP::CLI( { PeerAddr => $conf->{cgprohost},
-                            PeerPort => $conf->{cgproport},
-                            login => $conf->{cgprouser},
-                            password => $conf->{cgpropass} } );
+my $cli = new CGP::CLI( { PeerAddr => $CGServerAddress,
+                            PeerPort => '106',
+                            login => $PostmasterLogin,
+                            password => $PostmasterPassword } );
   unless($cli) {
    print header;
    print "Can't login to CGPro: ".$CGP::ERR_STRING,"\n";
