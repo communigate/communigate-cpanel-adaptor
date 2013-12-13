@@ -258,6 +258,7 @@ tLen=${#THEMES[@]}
 for (( i=0; i<${tLen}; i++ ));
 do
     cp -r "${PACKSRC}/theme_webmail/cgpro" "${THEMES[$i]}/"
+    chmod +x ${THEMES[$i]}/cgpro/getwav.live.cgi
 done
 
 # Update Feature List
