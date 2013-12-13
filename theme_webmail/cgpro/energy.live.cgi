@@ -37,7 +37,7 @@ if ($ENV{HTTPS} eq 'on') {
     $url = "http://$host:8100/cgi-bin/login.pl";
     $cgpurl = "http://$host:8100/";
 }
-use Data::Dumper;
+
 print <<EOF
 	  <html>
 	    <head>
