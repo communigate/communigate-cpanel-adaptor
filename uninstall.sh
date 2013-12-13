@@ -70,8 +70,8 @@ rm -f /var/cpanel/communigate.yaml
 rm -f /var/cpanel/cgpro/classes.yaml
 
 # Uninstall CommuniGate Webmail in cPanel
-rm -f /var/cpanel/webmail/webmail_communigate.yaml
-rm -rf /usr/local/cpanel/base/3rdparty/CommuniGate/
+rm -f /var/cpanel/webmail/webmail_communigate*
+rm -rf /usr/local/cpanel/base/3rdparty/CommuniGate*
 
 # Uninstall SSO for Webmail
 rm -f /var/CommuniGate/cgi/login.pl
