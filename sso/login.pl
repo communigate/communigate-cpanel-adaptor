@@ -43,7 +43,7 @@ if (!$passwdok) {
 	print start_html("Invalid Username Password\n");
 	print "
 	<script type=\"text/javascript\">
-		history.go(-1);
+		history.go(-2);
 	</script>
 	";
 	print end_html();
