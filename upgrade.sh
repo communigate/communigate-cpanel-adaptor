@@ -198,7 +198,7 @@ for (( i=0; i<${tLen}; i++ ));
 do
     rm -rf ${THEMES[$i]}/cgpro
     cp -r "${PACKSRC}/theme_webmail/cgpro" "${THEMES[$i]}/"
-    chmod +x ${THEMES[$i]}/cgpro/getwav.live.cgi
+    chmod +x ${THEMES[$i]}/cgpro/energy.live.cgi
 done
 
 
