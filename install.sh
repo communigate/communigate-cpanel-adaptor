@@ -259,6 +259,7 @@ for (( i=0; i<${tLen}; i++ ));
 do
     cp -r "${PACKSRC}/theme_webmail/cgpro" "${THEMES[$i]}/"
     chmod +x ${THEMES[$i]}/cgpro/energy.live.cgi
+    chmod +x ${THEMES[$i]}/cgpro/pronto.live.cgi
 done
 
 # Update Feature List

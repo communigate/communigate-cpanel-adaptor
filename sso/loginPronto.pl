@@ -30,9 +30,6 @@ sub postmaster_pass {
     }
 }
 
-
-
-
 my $CGServerAddress = "127.0.0.1";
 my $PostmasterLogin = 'postmaster';
 my $PostmasterPassword = postmaster_pass();
@@ -70,31 +67,14 @@ if (!$passwdok) {
 $ENV{'REMOTE_ADDR'} =~ /\[(.*)\]/;
 my $userIP=$1;
 $CGPSessionID=$cli->CreateWebUserSession($account,$userIP,0,"XChange");
-$myurl=$cgpurl."Session\/$CGPSessionID\/frameset.wssp";
-my $domain = $cli->MainDomainName();
-my $uuid = (join "-", map{ join "", map { unpack "H*", chr(rand(256)) } 1..$_} (4,2,2,2,6)) . "@" . $domain;
-my $itl =  $account . ":" . $uuid;
-my $cookie = `echo $itl | base64 -w 0`;
-$cookie = substr($cookie, 0 ,length($cookie) - 4);
-
-my $prefs = $cli->GetAccountPrefs($account);
-my ($sec,$min,$hour,$mday,$mon,$year,undef,undef,undef) = localtime(time);
-$prefs->{'WebAuthCookie'}->{$uuid} = {
-    'LastCheck' => "#TTT$mday-" . ($mon + 1 ). "-" . (1900 + $year) . "_$hour:$min:$sec",
-    'Apps' => {
-	webmail => $CGPSessionID
-    },
-	    'IP' => "#I[$userIP]"
-};
-$cli->UpdateAccountPrefs($account, {"WebAuthCookie" => $prefs->{'WebAuthCookie'}});
+$myurl=$cgpurl."hPronto/?username=$account&sid=$CGPSessionID";
 $cli->Logout();
 
-my $cookie = cookie(-name=>'ITLA', -value=>$cookie);
-print header(-cookie=>$cookie);
+print header();
 print start_html("Welcome");
 print "
 <script type=\"text/javascript\">
- document.location.href = \"/\";
+ document.location.href = \"$myurl\";
 </script>
 ";
 print end_html();
