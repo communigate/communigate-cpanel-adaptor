@@ -4534,7 +4534,7 @@ sub api2_update2fa {
     my @domains = Cpanel::Email::listmaildomains();
     my $cli = getCLI();
     my $msg = "Unknown error!";
-    my $found = 1;
+    my $found = 0;
     foreach my $domain (@domains) {
 	my $accounts=$cli->ListAccounts($domain);
 	foreach my $userName (sort keys %$accounts) {
