@@ -14,8 +14,6 @@ source ${PACKSRC}/config.ini
 # iPhone provisioning using default httpd
 mkdir -p /usr/local/apache/htdocs/iOS
 chmod 777 /usr/local/apache/htdocs/iOS
-mkdir -p /var/CommuniGate/apple
-cp ${PACKSRC}/iphone/iphonetemplate.mobileconfig /var/CommuniGate/apple/
 
 # Install the WHM plugins
 cp -rf ${PACKSRC}/whm/cgi/* /usr/local/cpanel/whostmgr/docroot/cgi/
@@ -99,18 +97,12 @@ cp ${PACKSRC}/cgpro-webmail/webmail_communigatepronto.yaml /var/cpanel/webmail/
 cp -r ${PACKSRC}/cgpro-webmail/CommuniGate /usr/local/cpanel/base/3rdparty/
 cp -r ${PACKSRC}/cgpro-webmail/CommuniGatePronto /usr/local/cpanel/base/3rdparty/
 
-# Install SSO for Webmail
-mkdir -p /var/CommuniGate/cgi
-cp ${PACKSRC}/sso/login.pl /var/CommuniGate/cgi/
-
 # Check the scripts have executable flag
 chmod +x /usr/local/cpanel/whostmgr/docroot/cgi/addon_cgpro*
-chmod +x /var/CommuniGate/cgi/login.pl
 chmod +x /usr/local/cpanel/Cpanel/CommuniGate.pm
 chmod +x /usr/local/cpanel/bin/ccaadmin
 chmod +s+x /usr/local/cpanel/bin/ccawrap
 chmod +x /usr/local/cpanel/bin/admin/CGPro/cca
-chmod u+s /opt/CommuniGate/mail
 
 # Install CommuniGate Plugin
 BASEDIR='/usr/local/cpanel/base/frontend';
