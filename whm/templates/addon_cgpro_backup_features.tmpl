@@ -1,0 +1,42 @@
+  <div class="form_action">
+    <fieldset>
+      <h3>Backup Feature Lists</h3>
+      <table>
+	<tbody>
+	  <tr>
+            <td style="vertical-align: top;">
+	      <label for="ssllinks">Download Feature Lists Backup:</label>
+	    </td>
+            <td>
+	      <a href="?get=featurelists.backup">featurelists.backup</a>
+            </td>
+          </tr>
+	</tbody>
+      </table>
+    </fieldset>
+  </div>
+  <div class="form_action">
+    <fieldset>
+      <h3>Restore Feature List</h3>
+      [% IF restored -%]
+      <p>Features restored!</p>
+      [% ELSE -%]
+      <p> Please upload only <em>featurelists.backup</em> file.</p>
+      [% END -%]
+      <table>
+	<tbody>
+	  <tr>
+            <td style="vertical-align: top;">
+	    </td>
+            <td>
+	      <form action="addon_cgpro_backup_features.cgi" enctype="multipart/form-data" method="post">
+		<input type="file" name="file" value="" />
+		<input type="submit" value="Upload" class="input-button" name="submit" />
+	      </form>
+            </td>
+          </tr>
+	</tbody>
+      </table>
+    </fieldset>
+  </div>
+[% PROCESS addon_cgpro_footer.tmpl %]
