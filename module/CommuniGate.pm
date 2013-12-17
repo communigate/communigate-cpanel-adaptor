@@ -4240,9 +4240,11 @@ sub api2_GetAccountTypes {
     $result->{'account'} = $data->{$Cpanel::CPDATA{'USER'}};
     my $cli = getCLI();
     my $defaults = $cli->GetServerAccountDefaults();
+    my $prefs = $cli->GetServerAccountPrefs();
     $cli->Logout();
     $result->{'classes'} = $defaults->{"ServiceClasses"};
     $result->{'defaults'} = $data->{"default"};
+    $result->{'description'} = $prefs->{"serviceClassDescription"};
     return $result;
 }
 
