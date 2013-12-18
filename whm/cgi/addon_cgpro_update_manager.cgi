@@ -19,7 +19,7 @@ Whostmgr::HTMLInterface::defheader( "CGPro Update Manager",'', '/cgi/addon_cgpro
 my $ua = LWP::UserAgent->new;
 $ua->timeout(10);
 
-my $response = $ua->get('https://raw.github.com/webfacebg/communigate-cpanel-adaptor/master/LatestVersion');
+my $response = $ua->get('https://raw.github.com/communigate/communigate-cpanel-adaptor/master/LatestVersion');
 
 if ($response->is_success) {
     my $newversion = $response->decoded_content;  # or whatever
@@ -33,7 +33,7 @@ if ($response->is_success) {
 	if ($FORM{'upgrade'}) {
 	    print "<h2>Downloading files</h2>";
 	    print "<pre>\n";
-	    $response = $ua->get("https://github.com/webfacebg/communigate-cpanel-adaptor/archive/v$newversion.tar.gz", ':content_file' => "/usr/src/CommuniGate-cPanel-adaptor-$newversion.tar.gz");
+	    $response = $ua->get("https://github.com/communigate/communigate-cpanel-adaptor/archive/v$newversion.tar.gz", ':content_file' => "/usr/src/CommuniGate-cPanel-adaptor-$newversion.tar.gz");
 	    if ($response->is_success) {
 		print "Download successful. '/usr/src/CommuniGate-cPanel-adaptor-$newversion.tar.gz' \n";
 		if ( -d '/usr/src/communigate-cpanel-adaptor' ) {
