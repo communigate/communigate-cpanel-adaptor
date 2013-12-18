@@ -10,7 +10,10 @@ PACKSRC=`pwd`
 /usr/local/cpanel/bin/manage_hooks delete module CGPro::Hooks
 
 # iPhone provisioning using default httpd
-cp ${PACKSRC}/iphone/iphonetemplate.mobileconfig /var/CommuniGate/apple/
+if [ -d '/var/CommuniGate/' ]
+then
+    cp ${PACKSRC}/iphone/iphonetemplate.mobileconfig /var/CommuniGate/apple/
+fi
 
 # Install CGP Logo
 cp ${PACKSRC}/whm/communigate.gif /usr/local/cpanel/whostmgr/docroot/images/communigate.gif
@@ -96,11 +99,16 @@ cp -r ${PACKSRC}/cgpro-webmail/CommuniGate /usr/local/cpanel/base/3rdparty/
 cp -r ${PACKSRC}/cgpro-webmail/CommuniGatePronto /usr/local/cpanel/base/3rdparty/
 
 # Install SSO for Webmail
-if [ ! -d /var/CommuniGate/cgi ]
+if [ -d '/var/CommuniGate/' ]
 then
-    mkdir -p /var/CommuniGate/cgi
+    if [ ! -d /var/CommuniGate/cgi ]
+    then
+	mkdir -p /var/CommuniGate/cgi
+    fi
+    cp ${PACKSRC}/sso/login.pl /var/CommuniGate/cgi/
+    chmod +x /var/CommuniGate/cgi/login.pl
+    chmod u+s /opt/CommuniGate/mail
 fi
-cp ${PACKSRC}/sso/login.pl /var/CommuniGate/cgi/
 
 # chkservd for CGServer & spamd
 cp ${PACKSRC}/chkservd/CommuniGate /etc/chkserv.d/
@@ -108,12 +116,10 @@ cp ${PACKSRC}/chkservd/CommuniGate_spamd /etc/chkserv.d/
 
 # Check the scripts have executable flag
 chmod +x /usr/local/cpanel/whostmgr/docroot/cgi/addon_cgpro*
-chmod +x /var/CommuniGate/cgi/login.pl
 chmod +x /usr/local/cpanel/Cpanel/CommuniGate.pm
 chmod +x /usr/local/cpanel/bin/ccaadmin
 chmod +s+x /usr/local/cpanel/bin/ccawrap
 chmod +x /usr/local/cpanel/bin/admin/CGPro/cca
-chmod u+s /opt/CommuniGate/mail
 
 # Install CommuniGate Plugin
 BASEDIR='/usr/local/cpanel/base/frontend';
@@ -202,11 +208,14 @@ done
 
 chmod +x ${PACKSRC}/scripts/*
 
-# Migrating groupware accounts
-if [ -f /var/CommuniGate/cPanel/limits ]
+if [ -d '/var/CommuniGate/' ]
 then
-    ${PACKSRC}/scripts/migrate_groupware.pl
-    echo "!!! Please delete /var/CommuniGate/cPanel/limits by hand if seetings are OK !!!"
+# Migrating groupware accounts
+    if [ -f /var/CommuniGate/cPanel/limits ]
+    then
+	${PACKSRC}/scripts/migrate_groupware.pl
+	echo "!!! Please delete /var/CommuniGate/cPanel/limits by hand if seetings are OK !!!"
+    fi
 fi
 
 # Purge unneeded files
