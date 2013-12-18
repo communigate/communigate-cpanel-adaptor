@@ -21,7 +21,11 @@ my $cgproversion = $cli->getversion();
 print "HTTP/1.0\r\nStatus: 200 OK\r\nContext-type: text/html\r\n\r\n";
 
 sub platform_owner {
- my $host=$ENV{'HTTP_HOST'};
+    my $host = $ENV{'HTTP_HOST'};
+    if ($conf->{cgprohost} !~ m/^(localhost|127\.0\.0)/) {
+	$host = $conf->{cgprohost};
+    }
+
  my $myurl="http://$host:8010";
  Whostmgr::HTMLInterface::defheader( '<br><br><br><H1>CommuniGate Pro cPanel Plugin<H1>', '/images/communigate.gif', '/cgi/addon_cgs.cgi' );
 Cpanel::Template::process_template(
