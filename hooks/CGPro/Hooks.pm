@@ -386,8 +386,12 @@ sub doaddpop {
 	}
 	$cli->UpdateAccountPrefs("$user\@$domain", $prefs);
     } else {
-    	my $apiref = Cpanel::Api2::Exec::api2_preexec( 'Email', 'delpop' );
-    	my ( $data, $status ) = Cpanel::Api2::Exec::api2_exec( 'Email', 'delpop', $apiref, {domain => $domain, email=> $user} );
+	my $error = $cli->getErrMessage;
+	unless ($error eq "account with this name already exists") {
+	    my $apiref = Cpanel::Api2::Exec::api2_preexec( 'Email', 'delpop' );
+	    my ( $data, $status ) = Cpanel::Api2::Exec::api2_exec( 'Email', 'delpop', $apiref, {domain => $domain, email=> $user} );
+	}
+	$Cpanel::CPERROR{'cgpro'} = $error;
     }
     $cli->Logout();
 }
