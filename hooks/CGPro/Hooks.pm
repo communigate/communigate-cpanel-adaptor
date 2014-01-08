@@ -64,20 +64,20 @@ sub describe {
         'hook'     => 'CGPro::Hooks::addpop1',
         'exectype' => 'module',
     };
-    my $AccountsCreate = {
-        'category' => 'Whostmgr',
-        'event'    => 'Accounts::Create',
-        'stage'    => 'post',
-        'hook'     => 'CGPro::Hooks::AccountsCreate',
-        'exectype' => 'module',
-    };
-    my $AccountsRemove = {
-        'category' => 'Whostmgr',
-        'event'    => 'Accounts::Remove',
-        'stage'    => 'pre',
-        'hook'     => 'CGPro::Hooks::AccountsRemove',
-        'exectype' => 'module',
-    };
+    # my $AccountsCreate = {
+    #     'category' => 'Whostmgr',
+    #     'event'    => 'Accounts::Create',
+    #     'stage'    => 'post',
+    #     'hook'     => 'CGPro::Hooks::AccountsCreate',
+    #     'exectype' => 'module',
+    # };
+    # my $AccountsRemove = {
+    #     'category' => 'Whostmgr',
+    #     'event'    => 'Accounts::Remove',
+    #     'stage'    => 'pre',
+    #     'hook'     => 'CGPro::Hooks::AccountsRemove',
+    #     'exectype' => 'module',
+    # };
     my $dkim_install = {
         'category' => 'Cpanel',
         'event'    => 'Api2::DKIMUI::install',
@@ -100,8 +100,8 @@ sub describe {
 	    $mail_deletefilter,
 	    $mail_reorderfilters,
 	    $mail_addpop1,
-	    $AccountsCreate,
-	    $AccountsRemove,
+	    # $AccountsCreate,
+	    # $AccountsRemove,
 	    $dkim_install,
 	    $dkim_uninstall
 	];
@@ -396,30 +396,30 @@ sub doaddpop {
     $cli->Logout();
 }
 
-sub AccountsCreate {
-    my (undef, $params) = @_;
-    my $domain = $params->{'domain'};
-    if ($domain) {
-	my $cli = getCLI(getConf());
-	$cli->CreateDomain("$domain");
-	$cli->Logout();
-    }
-    return 1;
-}
+# sub AccountsCreate {
+#     my (undef, $params) = @_;
+#     my $domain = $params->{'domain'};
+#     if ($domain) {
+# 	my $cli = getCLI(getConf());
+# 	$cli->CreateDomain("$domain");
+# 	$cli->Logout();
+#     }
+#     return 1;
+# }
 
-sub AccountsRemove {
-    my (undef, $params) = @_;
-    my $user = $params->{'user'};
-    if ($user) {
-	my $cli = getCLI(getConf());
-	my $users = Cpanel::Config::LoadUserDomains::loaduserdomains( undef, 0, 1 );
-	for my $domain (@{$users->{$user}}) {
-	    $cli->DeleteDomain($domain, 1);
-	}
-	$cli->Logout();
-    }
-    return 1;
-}
+# sub AccountsRemove {
+#     my (undef, $params) = @_;
+#     my $user = $params->{'user'};
+#     if ($user) {
+# 	my $cli = getCLI(getConf());
+# 	my $users = Cpanel::Config::LoadUserDomains::loaduserdomains( undef, 0, 1 );
+# 	for my $domain (@{$users->{$user}}) {
+# 	    $cli->DeleteDomain($domain, 1);
+# 	}
+# 	$cli->Logout();
+#     }
+#     return 1;
+# }
 
 sub dkim_install {
     my (undef, $params) = @_;
