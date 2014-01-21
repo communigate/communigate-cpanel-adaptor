@@ -227,6 +227,9 @@ then
     rm -f /usr/local/cpanel/scripts/postwwwacct
 fi
 
+
+${PACKSRC}/scripts/init_pbx.pl
+
 # Update Feature List
 cp ${PACKSRC}/featurelists/cgpro /usr/local/cpanel/whostmgr/addonfeatures/
 /usr/local/cpanel/bin/rebuild_sprites
