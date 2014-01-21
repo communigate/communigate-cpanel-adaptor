@@ -158,7 +158,7 @@ do
         then
             echo "---" > ${TARGET}
         else
-            sed -i -e '/^CGP/d' ${TARGET}
+	    sed -i -e '/^"*CGP/d' ${TARGET}
         fi
         cat ${LOCALES[$j]} >> ${TARGET}
     done

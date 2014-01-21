@@ -107,7 +107,7 @@ do
     rmdir ${THEMES[$i]}/css2-min/cgpro
     for ((j=0; j<${lLen}; j++)); do
         TARGET=${THEMES[$i]}/locale/`basename ${LOCALES[$j]} '{}'`.yaml.local
-        sed -i -e '/^CGP/d' ${TARGET}
+	sed -i -e '/^"*CGP/d' ${TARGET}
     done
 done
 
