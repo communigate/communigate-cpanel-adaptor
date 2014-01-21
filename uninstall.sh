@@ -86,11 +86,10 @@ BASEDIR='/usr/local/cpanel/base/frontend';
 SAVEIFS=$IFS
 IFS=$(echo -en "\n\b")
 THEMES=($(find ${BASEDIR} -maxdepth 1 -mindepth 1 -type d))
+LOCALES=($(find ${PACKSRC}/locale -maxdepth 1 -mindepth 1))
 IFS=$OLDIFS
 
 tLen=${#THEMES[@]}
-
-LOCALES=($(find ${PACKSRC}/locale -maxdepth 1 -mindepth 1))
 lLen=${#LOCALES[@]}
 
 for (( i=0; i<${tLen}; i++ ));
