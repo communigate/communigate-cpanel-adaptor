@@ -1,0 +1,10 @@
+[% FOR domain IN domains -%]
+<tr>
+  <td>
+    [% domain %]
+  </td>
+  <td>
+    <input type="text" name="server-[% domain %]" value="[% servers.$domain %]"  />
+  </td>
+</tr>
+[% END -%]

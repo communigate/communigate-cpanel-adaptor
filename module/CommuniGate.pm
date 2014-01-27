@@ -4656,6 +4656,44 @@ sub api2_check_hooked_account {
     }
 }
 
+sub api2_MigrationServers {
+    my %OPTS = @_;
+    my @domains = Cpanel::Email::listmaildomains();
+    my $result = {};
+    $result->{'domains'} = \@domains;
+    my $formdump = $OPTS{'formdump'};
+    my $params = {};
+    for my $row (split "\n", $formdump) {
+	if ($row =~ m/^(\S+)\s\=\s(.*?)$/) {
+	    my $key =$1;
+	    my $value = $2;
+	    $params->{$key} = $value;
+	}
+    }
+    my $cli = getCLI();
+    if ($params->{'submit'}) {
+	for my $domain (@domains) {
+	    if ($params->{'server-' . $domain}) {
+		if ($params->{'server-' . $domain} =~ s/^.*?(\d+\.\d+\.\d+\.\d+).*?$/$1/) {
+		    my $exists = $cli->GetDomainSettings("$domain");
+		    if (!$exists) {
+			$cli->CreateDomain("$domain");
+		    }
+		    $cli->UpdateAccountDefaultPrefs(domain => $domain, settings => {MailMigrationServerIP => $params->{'server-' . $domain}});
+		}
+	    }
+	}
+    }
+    for my $domain (@domains) {
+	my $prefs = $cli->GetAccountDefaultPrefs($domain);
+	if ($prefs->{"MailMigrationServerIP"}) {
+	    $result->{"servers"}->{$domain} = $prefs->{"MailMigrationServerIP"};
+	}
+    }
+    $cli->Logout();
+    return $result;
+}
+
 sub versioncmp( $$ ) {
     my @A = ($_[0] =~ /([-.]|\d+|[^-.\d]+)/g);
     my @B = ($_[1] =~ /([-.]|\d+|[^-.\d]+)/g);
