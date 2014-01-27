@@ -275,9 +275,13 @@ replace "cpanel.communigate.com" "${HOSTNAME}" -- /var/CommuniGate/Settings/Main
 
 # install DKIM tools FOR CGPro server Only
 chmod +x ${PACKSRC}/tools/*
+chmod +x ${PACKSRC}/corn_scripts/*
 cp ${PACKSRC}/tools/helper_DKIM_sign.pl /var/CommuniGate/
 cp ${PACKSRC}/tools/helper_DKIM_verify.pl /var/CommuniGate/
 ${PACKSRC}/scripts/install_dkim_signer.pl
+cp ${PACKSRC}/tools/authMigrate.pl /var/CommuniGate/
+cp ${PACKSRC}/corn_scripts/migrateMail.sh /var/CommuniGate/
+${PACKSRC}/scripts/install_migration.pl
 
 # Install Active Queue Scripts
 cp ${PACKSRC}/PBXApps/*spp* /var/CommuniGate/PBXApps/
@@ -303,5 +307,5 @@ service CommuniGate start
 
 # Installing iTool Labs webmail
 sh ${PACKSRC}/webmail-install.sh
-
+echo "!!! Please put '/var/CommuniGate/PBXApps/migrateMail.sh' in your crontab -e configuration in order to be able to migrate external accounts' mail. Otherwise only account will be created if it does not exist. !!!"
 echo "Dont forget to run disable-services.pl script to stop cPanel's native mail software"
