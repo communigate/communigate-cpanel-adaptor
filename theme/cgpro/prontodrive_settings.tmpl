@@ -21,43 +21,92 @@
 </div>
 [% END -%]
 <form action="update_prontodrive_settings.html?domain=[% domain %]" method="post">
-<div class="highlight">
-  <table border="0" style="margin-left: 20px">
-    <tr>
-      <td align="right">[% locale.maketext("CGPFileShareLinkExpireTime") %]:</td>
-      <td>
-	<select name="expires">
-	  [% filter_option(prefs.SharedFilesExpire || 2592000, '3600', '1h') %]
-	  [% filter_option(prefs.SharedFilesExpire || 2592000, '7200', '2h') %]
-	  [% filter_option(prefs.SharedFilesExpire || 2592000, '10800', '3h') %]
-	  [% filter_option(prefs.SharedFilesExpire || 2592000, '21600', '6h') %]
-	  [% filter_option(prefs.SharedFilesExpire || 2592000, '43200', '12h') %]
-	  [% filter_option(prefs.SharedFilesExpire || 2592000, '86400', '24h') %]
-	  [% filter_option(prefs.SharedFilesExpire || 2592000, '129600', '36h') %]
-	  [% filter_option(prefs.SharedFilesExpire || 2592000, '259200', '72h') %]
-	  [% filter_option(prefs.SharedFilesExpire || 2592000, '604800', '1 week') %]
-	  [% filter_option(prefs.SharedFilesExpire || 2592000, '1209600', '2 weeks') %]
-	  [% filter_option(prefs.SharedFilesExpire || 2592000, '2592000', '1 month (default)') %]
-	  [% filter_option(prefs.SharedFilesExpire || 2592000, '5184000', '2 months') %]
-	  [% filter_option(prefs.SharedFilesExpire || 2592000, '7776000', '3 months') %]
-	  [% filter_option(prefs.SharedFilesExpire || 2592000, '15552000', '6 months') %]
-	  [% filter_option(prefs.SharedFilesExpire || 2592000, '31104000', '1 year') %]
-	  [% filter_option(prefs.SharedFilesExpire || 2592000, '62208000', '2 years') %]
-	</select>
-      </td>
-      <td colspan="2"><span id="name_error" class="cjt_validation_error"></td>
-    </tr>
-    <tr>
-      <td colspan="3">
-	&nbsp;
-      </td>
-    </tr>
-    <tr>
-    <td>
-      <input id="ivr_submit" class="input-button" type="submit" value="[% locale.maketext("CGPSave") %]" name="save" />
-    </td>
-    <td></td>
-    <td></td>
-    </tr>
-   </table>
-</div>
+  <h2>Link expire time</h2>
+  <div class="highlight">
+    <table border="0" style="margin-left: 20px">
+      <tr>
+	<td align="right">[% locale.maketext("CGPFileShareLinkExpireTime") %]:</td>
+	<td>
+	  <select name="expires">
+	    [% filter_option(prefs.SharedFilesExpire || 2592000, '3600', '1h') %]
+	    [% filter_option(prefs.SharedFilesExpire || 2592000, '7200', '2h') %]
+	    [% filter_option(prefs.SharedFilesExpire || 2592000, '10800', '3h') %]
+	    [% filter_option(prefs.SharedFilesExpire || 2592000, '21600', '6h') %]
+	    [% filter_option(prefs.SharedFilesExpire || 2592000, '43200', '12h') %]
+	    [% filter_option(prefs.SharedFilesExpire || 2592000, '86400', '24h') %]
+	    [% filter_option(prefs.SharedFilesExpire || 2592000, '129600', '36h') %]
+	    [% filter_option(prefs.SharedFilesExpire || 2592000, '259200', '72h') %]
+	    [% filter_option(prefs.SharedFilesExpire || 2592000, '604800', '1 week') %]
+	    [% filter_option(prefs.SharedFilesExpire || 2592000, '1209600', '2 weeks') %]
+	    [% filter_option(prefs.SharedFilesExpire || 2592000, '2592000', '1 month (default)') %]
+	    [% filter_option(prefs.SharedFilesExpire || 2592000, '5184000', '2 months') %]
+	    [% filter_option(prefs.SharedFilesExpire || 2592000, '7776000', '3 months') %]
+	    [% filter_option(prefs.SharedFilesExpire || 2592000, '15552000', '6 months') %]
+	    [% filter_option(prefs.SharedFilesExpire || 2592000, '31104000', '1 year') %]
+	    [% filter_option(prefs.SharedFilesExpire || 2592000, '62208000', '2 years') %]
+	  </select>
+	</td>
+	<td colspan="2"><span id="name_error" class="cjt_validation_error"></td>
+      </tr>
+      <tr>
+	<td colspan="3">
+	  &nbsp;
+	</td>
+      </tr>
+    </table>
+  </div>
+  <h2>Duo Security two factor autentication</h2>
+  <div class="highlight">
+    <table border="0" style="margin-left: 20px">
+      <tr>
+	<td align="right"><label for="duoenabled">[% locale.maketext("CGPEnabled") %]</label>:</td>
+	<td>
+	  <input type="checkbox" name="duoenabled" value="1" id="duoenabled"[% IF prefs.DUOSecurity.enabled == "YES" %] checked="checked"[% END %] />
+	</td>
+	<td colspan="2"><span id="name_error" class="cjt_validation_error"></td>
+      </tr>
+      <tr>
+	<td align="right">[% locale.maketext("CGPIntegrationKey") %]:</td>
+	<td>
+	  <input type="text" name="ikey" value="[% prefs.DUOSecurity.ikey %]" id="ikey" />
+	</td>
+	<td colspan="2"></td>
+      </tr>
+      <tr>
+	<td align="right">[% locale.maketext("CGPSecretKey") %]:</td>
+	<td>
+	  <input type="text" name="skey" value="[% prefs.DUOSecurity.skey %]" id="skey" />
+	</td>
+	<td colspan="2"></td>
+      </tr>
+      <tr>
+	<td align="right">[% locale.maketext("CGPAPIHostname") %]:</td>
+	<td>
+	  <input type="text" name="apihost" value="[% prefs.DUOSecurity.apihost %]" id="apihost" />
+	</td>
+	<td colspan="2"></td>
+      </tr>
+      <tr>
+	<td colspan="3">
+	  &nbsp;
+	</td>
+      </tr>
+      <tr>
+	<td colspan="3">
+	  More info on <a href="https://www.duosecurity.com/">https://www.duosecurity.com/</a>
+	</td>
+      </tr>
+    </table>
+  </div>
+  <div class="highlight">
+    <table border="0" style="margin-left: 20px">
+      <tr>
+	<td>
+	  <input id="ivr_submit" class="input-button" type="submit" value="[% locale.maketext("CGPSave") %]" name="save" />
+	</td>
+	<td></td>
+	<td></td>
+      </tr>
+    </table>
+  </div>
+</form>

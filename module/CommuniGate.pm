@@ -4582,10 +4582,24 @@ sub api2_UpdateProntoDriveSettings {
     my $cli = getCLI();
     my $found = 1;
     foreach my $domain (@domains) {
-	if ($domain eq $OPTS{"domain"}) {
-	    $cli->UpdateAccountDefaultPrefs(domain => $domain, settings => {SharedFilesExpire => $OPTS{'expires'}});
-	    last;
-	}
+        if ($domain eq $OPTS{"domain"}) {
+            my $prefs = $cli->GetAccountDefaultPrefs($domain);
+            my $settings = {SharedFilesExpire => $OPTS{'expires'}};
+            if ($OPTS{'duoenabled'}) {
+                $settings->{'DUOSecurity'} = {
+                    enabled => "YES",
+                    ikey => $OPTS{'ikey'},
+                    skey => $OPTS{'skey'},
+                    apihost => $OPTS{'apihost'},
+                    akey => $prefs->{'DUOSecurity'}->{'akey'} || join "", map { unpack "H*", chr(rand(256)) } 1..20
+                };
+            } else {
+                $settings->{'DUOSecurity'} = $prefs->{'DUOSecurity'} || {};
+                $settings->{'DUOSecurity'}->{'enabled'} = "NO";
+            }
+            $cli->UpdateAccountDefaultPrefs(domain => $domain, settings => $settings);
+            last;
+        }
     }
     $cli->Logout();
 }

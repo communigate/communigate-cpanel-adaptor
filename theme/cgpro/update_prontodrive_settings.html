@@ -1,0 +1,11 @@
+<cpanel setvar="headerimg=../images/mailmenu.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+  <div class="body-content">
+    <h1><cpanel langprint="CGPProntoDriveSettings"></h1>
+    <p><?cp CommuniGate::UpdateProntoDriveSettings(%,msg) domain=$FORM{'domain'},expires=$FORM{'expires'},duoenabled=$FORM{'duoenabled'},ikey=$FORM{'ikey'},skey=$FORM{'skey'},apihost=$FORM{'apihost'} ?></p>
+    <div class="return-link">
+      <a href="prontodrive_settings.html?domain=<cpanel print="$FORM{'domain'}">">&larr; <cptext "Go Back"></a>
+    </div>
+  </div> <!-- END body-content -->
+<cpanel Branding="include(stdfooter.html)">
