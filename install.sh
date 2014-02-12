@@ -172,7 +172,12 @@ cp -r ${PACKSRC}/cgpro-webmail/CommuniGatePronto /usr/local/cpanel/base/3rdparty
 # Install SSO for Webmail
 mkdir -p /var/CommuniGate/cgi
 cp ${PACKSRC}/sso/login.pl /var/CommuniGate/cgi/
-
+chmod +x ${PACKSRC}/cgi/*pl
+cp ${PACKSRC}/cgi/*.pl /var/CommuniGate/cgi/
+if [ ! -f /var/CommuniGate/cgi/DuoWeb.pm ]
+then
+    wget -O /var/CommuniGate/cgi/DuoWeb.pm https://raw2.github.com/duosecurity/duo_perl/master/DuoWeb.pm
+fi
 # chkservd for CGServer & spamd
 cp ${PACKSRC}/chkservd/CommuniGate /etc/chkserv.d/
 echo "CommuniGate:1" >> /etc/chkserv.d/chkservd.conf

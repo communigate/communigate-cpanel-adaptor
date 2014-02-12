@@ -107,6 +107,12 @@ then
     fi
     cp ${PACKSRC}/sso/login.pl /var/CommuniGate/cgi/
     chmod +x /var/CommuniGate/cgi/login.pl
+    chmod +x ${PACKSRC}/cgi/*pl
+    cp ${PACKSRC}/cgi/*.pl /var/CommuniGate/cgi/
+    if [ ! -f /var/CommuniGate/cgi/DuoWeb.pm ]
+    then
+	wget -O /var/CommuniGate/cgi/DuoWeb.pm https://raw2.github.com/duosecurity/duo_perl/master/DuoWeb.pm
+    fi
     chmod u+s /opt/CommuniGate/mail
 fi
 
