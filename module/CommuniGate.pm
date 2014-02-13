@@ -4240,9 +4240,11 @@ sub api2_GetAccountTypes {
     $result->{'account'} = $data->{$Cpanel::CPDATA{'USER'}};
     my $cli = getCLI();
     my $defaults = $cli->GetServerAccountDefaults();
+    my $prefs = $cli->GetServerAccountPrefs();
     $cli->Logout();
     $result->{'classes'} = $defaults->{"ServiceClasses"};
     $result->{'defaults'} = $data->{"default"};
+    $result->{'description'} = $prefs->{"serviceClassDescription"};
     return $result;
 }
 
@@ -4532,7 +4534,7 @@ sub api2_update2fa {
     my @domains = Cpanel::Email::listmaildomains();
     my $cli = getCLI();
     my $msg = "Unknown error!";
-    my $found = 1;
+    my $found = 0;
     foreach my $domain (@domains) {
 	my $accounts=$cli->ListAccounts($domain);
 	foreach my $userName (sort keys %$accounts) {
@@ -4580,10 +4582,24 @@ sub api2_UpdateProntoDriveSettings {
     my $cli = getCLI();
     my $found = 1;
     foreach my $domain (@domains) {
-	if ($domain eq $OPTS{"domain"}) {
-	    $cli->UpdateAccountDefaultPrefs(domain => $domain, settings => {SharedFilesExpire => $OPTS{'expires'}});
-	    last;
-	}
+        if ($domain eq $OPTS{"domain"}) {
+            my $prefs = $cli->GetAccountDefaultPrefs($domain);
+            my $settings = {SharedFilesExpire => $OPTS{'expires'}};
+            if ($OPTS{'duoenabled'}) {
+                $settings->{'DUOSecurity'} = {
+                    enabled => "YES",
+                    ikey => $OPTS{'ikey'},
+                    skey => $OPTS{'skey'},
+                    apihost => $OPTS{'apihost'},
+                    akey => $prefs->{'DUOSecurity'}->{'akey'} || join "", map { unpack "H*", chr(rand(256)) } 1..20
+                };
+            } else {
+                $settings->{'DUOSecurity'} = $prefs->{'DUOSecurity'} || {};
+                $settings->{'DUOSecurity'}->{'enabled'} = "NO";
+            }
+            $cli->UpdateAccountDefaultPrefs(domain => $domain, settings => $settings);
+            last;
+        }
     }
     $cli->Logout();
 }
@@ -4639,6 +4655,59 @@ sub api2_deleteAccount {
     $cli->DeleteAccount($OPTS{'email'});
     $cli->Logout();
 }
+
+sub api2_check_hooked_account {
+    my $account = $Cpanel::CPDATA{'USER'};
+    if (-f '/var/cpanel/communigate_hooked_accounts') {
+	open(FI, "<", '/var/cpanel/communigate_hooked_accounts');
+	my @accounts = <FI>;
+	close(FI);
+	@accounts = grep {$_ eq $account} map {$_ =~ s/(\n|\r)//g; $_} @accounts;
+	return 1 if defined $accounts[0];
+	return 0;
+    } else {
+	return 1;
+    }
+}
+
+sub api2_MigrationServers {
+    my %OPTS = @_;
+    my @domains = Cpanel::Email::listmaildomains();
+    my $result = {};
+    $result->{'domains'} = \@domains;
+    my $formdump = $OPTS{'formdump'};
+    my $params = {};
+    for my $row (split "\n", $formdump) {
+	if ($row =~ m/^(\S+)\s\=\s(.*?)$/) {
+	    my $key =$1;
+	    my $value = $2;
+	    $params->{$key} = $value;
+	}
+    }
+    my $cli = getCLI();
+    if ($params->{'submit'}) {
+	for my $domain (@domains) {
+	    if ($params->{'server-' . $domain}) {
+		if ($params->{'server-' . $domain} =~ s/^.*?(\d+\.\d+\.\d+\.\d+).*?$/$1/) {
+		    my $exists = $cli->GetDomainSettings("$domain");
+		    if (!$exists) {
+			$cli->CreateDomain("$domain");
+		    }
+		    $cli->UpdateAccountDefaultPrefs(domain => $domain, settings => {MailMigrationServerIP => $params->{'server-' . $domain}});
+		}
+	    }
+	}
+    }
+    for my $domain (@domains) {
+	my $prefs = $cli->GetAccountDefaultPrefs($domain);
+	if ($prefs->{"MailMigrationServerIP"}) {
+	    $result->{"servers"}->{$domain} = $prefs->{"MailMigrationServerIP"};
+	}
+    }
+    $cli->Logout();
+    return $result;
+}
+
 sub versioncmp( $$ ) {
     my @A = ($_[0] =~ /([-.]|\d+|[^-.\d]+)/g);
     my @B = ($_[1] =~ /([-.]|\d+|[^-.\d]+)/g);

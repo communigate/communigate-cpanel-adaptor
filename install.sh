@@ -165,12 +165,19 @@ fi
 
 # Install CommuniGate Webmail in cPanel
 cp ${PACKSRC}/cgpro-webmail/webmail_communigate.yaml /var/cpanel/webmail/
+cp ${PACKSRC}/cgpro-webmail/webmail_communigatepronto.yaml /var/cpanel/webmail/
 cp -r ${PACKSRC}/cgpro-webmail/CommuniGate /usr/local/cpanel/base/3rdparty/
+cp -r ${PACKSRC}/cgpro-webmail/CommuniGatePronto /usr/local/cpanel/base/3rdparty/
 
 # Install SSO for Webmail
 mkdir -p /var/CommuniGate/cgi
 cp ${PACKSRC}/sso/login.pl /var/CommuniGate/cgi/
-
+chmod +x ${PACKSRC}/cgi/*pl
+cp ${PACKSRC}/cgi/*.pl /var/CommuniGate/cgi/
+if [ ! -f /var/CommuniGate/cgi/DuoWeb.pm ]
+then
+    wget -O /var/CommuniGate/cgi/DuoWeb.pm https://raw2.github.com/duosecurity/duo_perl/master/DuoWeb.pm
+fi
 # chkservd for CGServer & spamd
 cp ${PACKSRC}/chkservd/CommuniGate /etc/chkserv.d/
 echo "CommuniGate:1" >> /etc/chkserv.d/chkservd.conf
@@ -189,11 +196,10 @@ BASEDIR='/usr/local/cpanel/base/frontend';
 SAVEIFS=$IFS
 IFS=$(echo -en "\n\b")
 THEMES=($(find ${BASEDIR} -maxdepth 1 -mindepth 1 -type d))
+LOCALES=($(find ${PACKSRC}/locale -maxdepth 1 -mindepth 1))
 IFS=$OLDIFS
 
 tLen=${#THEMES[@]}
-
-LOCALES=($(find ${PACKSRC}/locale -maxdepth 1 -mindepth 1))
 lLen=${#LOCALES[@]}
 
 for (( i=0; i<${tLen}; i++ ));
@@ -239,7 +245,7 @@ do
         then
             echo "---" > ${TARGET}
         else
-            sed -i -e '/^CGP/d' ${TARGET}
+	    sed -i -e '/^"*CGP/d' ${TARGET}
         fi
         cat ${LOCALES[$j]} >> ${TARGET}
     done
@@ -256,6 +262,8 @@ tLen=${#THEMES[@]}
 for (( i=0; i<${tLen}; i++ ));
 do
     cp -r "${PACKSRC}/theme_webmail/cgpro" "${THEMES[$i]}/"
+    chmod +x ${THEMES[$i]}/cgpro/energy.live.cgi
+    chmod +x ${THEMES[$i]}/cgpro/pronto.live.cgi
 done
 
 # Update Feature List
@@ -272,9 +280,13 @@ replace "cpanel.communigate.com" "${HOSTNAME}" -- /var/CommuniGate/Settings/Main
 
 # install DKIM tools FOR CGPro server Only
 chmod +x ${PACKSRC}/tools/*
+chmod +x ${PACKSRC}/corn_scripts/*
 cp ${PACKSRC}/tools/helper_DKIM_sign.pl /var/CommuniGate/
 cp ${PACKSRC}/tools/helper_DKIM_verify.pl /var/CommuniGate/
 ${PACKSRC}/scripts/install_dkim_signer.pl
+cp ${PACKSRC}/tools/authMigrate.pl /var/CommuniGate/
+cp ${PACKSRC}/corn_scripts/migrateMail.sh /var/CommuniGate/
+${PACKSRC}/scripts/install_migration.pl
 
 # Install Active Queue Scripts
 cp ${PACKSRC}/PBXApps/*spp* /var/CommuniGate/PBXApps/
@@ -300,5 +312,5 @@ service CommuniGate start
 
 # Installing iTool Labs webmail
 sh ${PACKSRC}/webmail-install.sh
-
+echo "!!! Please put '/var/CommuniGate/PBXApps/migrateMail.sh' in your crontab -e configuration in order to be able to migrate external accounts' mail. Otherwise only account will be created if it does not exist. !!!"
 echo "Dont forget to run disable-services.pl script to stop cPanel's native mail software"

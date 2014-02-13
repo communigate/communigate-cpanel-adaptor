@@ -13,18 +13,15 @@ my $cli = new CGP::CLI( { PeerAddr => $conf->{cgprohost},
                             login => $conf->{cgprouser},
                             password => $conf->{cgpropass} } );
 unless($cli) {
-    print STDERR "Can't login to CGPro: ".$CGP::ERR_STRING,"\n";
-    exit(0);
+  print STDERR "Can't login to CGPro: ".$CGP::ERR_STRING,"\n";
+   exit(0);
 }
 
-my $domain = $cli->MainDomainName();
-unless ($cli->GetAccountSettings("pbx\@$domain")) {
-    $cli->CreateAccount(accountName => "pbx\@$domain");
-}
-my $rights = $cli->GetAccountRights("pbx\@$domain");
-my @found = grep {$_ eq "UserAccounts"} @$rights;
-unless (scalar @found) {
-    push @$rights, "UserAccounts";
-    $cli->SetAccountRights("pbx\@$domain", $rights);
-}
-$cli->Logout();
+my $settings = $cli->GetServerSettings();
+$settings->{ExternalAUTH} = {
+    Enabled => 'YES',
+    LogLevel =>  2,
+    ProgramName =>  "/var/CommuniGate/authMigrate.pl"
+};
+$cli->UpdateServerSettings($settings);
+$cli->UpdateDomainDefaults({ExternalOnUnknown => 'YES'});

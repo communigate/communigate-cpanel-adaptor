@@ -32,6 +32,7 @@ my $cgproversion = $cli->getversion();
 my %FORM = Cpanel::Form::parseform();
 
 my $defaults = $cli->GetServerAccountDefaults();
+my $prefs = $cli->GetServerAccountPrefs();
 
 my $data = Cpanel::CachedDataStore::fetch_ref( '/var/cpanel/cgpro/classes.yaml' ) || {};
 if ($FORM{'classname'}) {
@@ -62,10 +63,14 @@ if ($FORM{'classname'}) {
 	    'all' => -1,
 	};
     }
-    $data->{'default'}->{$FORM{'classname'}}->{'description'} = $FORM{'description'};
-    $data->{'default'}->{$FORM{'classname'}}->{'price'} = $FORM{'price'};
-    $data->{'default'}->{$FORM{'classname'}}->{'currency'} = $FORM{'currency'};
+    # $data->{'default'}->{$FORM{'classname'}}->{'description'} = $FORM{'description'};
+    # $data->{'default'}->{$FORM{'classname'}}->{'price'} = $FORM{'price'};
+    # $data->{'default'}->{$FORM{'classname'}}->{'currency'} = $FORM{'currency'};
     Cpanel::CachedDataStore::store_ref( '/var/cpanel/cgpro/classes.yaml', $data );
+    $prefs->{'serviceClassDescription'}->{$FORM{'classname'}}->{'description'} = $FORM{'description'};
+    $prefs->{'serviceClassDescription'}->{$FORM{'classname'}}->{'price'} = $FORM{'price'};
+    $prefs->{'serviceClassDescription'}->{$FORM{'classname'}}->{'currency'} = $FORM{'currency'};
+    $cli->UpdateServerAccountPrefs({'serviceClassDescription' => $prefs->{'serviceClassDescription'}});
     print "HTTP/1.1 303 See Other\r\nLocation: addon_cgpro_manage_classes.cgi\r\n\r\n";
 } else {
     my $ServiceClasses = $defaults->{ServiceClasses};
@@ -79,9 +84,9 @@ if ($FORM{'classname'}) {
 	    ServiceClasses => $ServiceClasses,
 	    FORM => \%FORM,
 	    cgproversion => $cgproversion,
-	    description => $data->{'default'}->{$FORM{'class'}}->{'description'},
-	    price => $data->{'default'}->{$FORM{'class'}}->{'price'},
-	    currency => $data->{'default'}->{$FORM{'class'}}->{'currency'}
+	    description => $prefs->{'serviceClassDescription'}->{$FORM{'class'}}->{'description'},
+	    price => $prefs->{'serviceClassDescription'}->{$FORM{'class'}}->{'price'},
+	    currency => $prefs->{'serviceClassDescription'}->{$FORM{'class'}}->{'currency'}
 	},
 	);
 }

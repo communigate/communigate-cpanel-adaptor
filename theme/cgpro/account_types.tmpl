@@ -20,8 +20,8 @@
     </td>
     <td>[% plan.$class.all < 0 ? locale.maketext("CGPunlimited") : plan.$class.all %]</td>
     <td>[% plan.$class.all < 0 ? locale.maketext("CGPna") : account.$class.all || 0 %]</td>
-    <td>[% defaults.$class.price ? defaults.$class.currency _ " " _ defaults.$class.price : locale.maketext("CGPna")  %]</td>
-    <td>[% defaults.$class.description %]</td>
+    <td>[% description.$class.price ? description.$class.currency _ " " _ description.$class.price : locale.maketext("CGPna")  %]</td>
+    <td>[% description.$class.description %]</td>
   </tr>
   [% END -%]
   [% END -%]

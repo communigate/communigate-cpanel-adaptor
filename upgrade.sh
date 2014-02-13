@@ -10,7 +10,10 @@ PACKSRC=`pwd`
 /usr/local/cpanel/bin/manage_hooks delete module CGPro::Hooks
 
 # iPhone provisioning using default httpd
-cp ${PACKSRC}/iphone/iphonetemplate.mobileconfig /var/CommuniGate/apple/
+if [ -d '/var/CommuniGate/' ]
+then
+    cp ${PACKSRC}/iphone/iphonetemplate.mobileconfig /var/CommuniGate/apple/
+fi
 
 # Install CGP Logo
 cp ${PACKSRC}/whm/communigate.gif /usr/local/cpanel/whostmgr/docroot/images/communigate.gif
@@ -89,20 +92,29 @@ cp -rf ${PACKSRC}/hooks/CGPro /var/cpanel/perl5/lib/
 # Register installed hooks
 /usr/local/cpanel/bin/manage_hooks add module CGPro::Hooks
 
-#Install config file
-cp ${PACKSRC}/etc/cpanel_cgpro.conf /var/cpanel/communigate.yaml
-chmod 600 /var/cpanel/communigate.yaml
-
 # Install CommuniGate Webmail in cPanel
 cp ${PACKSRC}/cgpro-webmail/webmail_communigate.yaml /var/cpanel/webmail/
+cp ${PACKSRC}/cgpro-webmail/webmail_communigatepronto.yaml /var/cpanel/webmail/
 cp -r ${PACKSRC}/cgpro-webmail/CommuniGate /usr/local/cpanel/base/3rdparty/
+cp -r ${PACKSRC}/cgpro-webmail/CommuniGatePronto /usr/local/cpanel/base/3rdparty/
 
 # Install SSO for Webmail
-if [ ! -d /var/CommuniGate/cgi ]
+if [ -d '/var/CommuniGate/' ]
 then
-    mkdir -p /var/CommuniGate/cgi
+    if [ ! -d /var/CommuniGate/cgi ]
+    then
+	mkdir -p /var/CommuniGate/cgi
+    fi
+    cp ${PACKSRC}/sso/login.pl /var/CommuniGate/cgi/
+    chmod +x /var/CommuniGate/cgi/login.pl
+    chmod +x ${PACKSRC}/cgi/*pl
+    cp ${PACKSRC}/cgi/*.pl /var/CommuniGate/cgi/
+    if [ ! -f /var/CommuniGate/cgi/DuoWeb.pm ]
+    then
+	wget -O /var/CommuniGate/cgi/DuoWeb.pm https://raw2.github.com/duosecurity/duo_perl/master/DuoWeb.pm
+    fi
+    chmod u+s /opt/CommuniGate/mail
 fi
-cp ${PACKSRC}/sso/login.pl /var/CommuniGate/cgi/
 
 # chkservd for CGServer & spamd
 cp ${PACKSRC}/chkservd/CommuniGate /etc/chkserv.d/
@@ -110,23 +122,20 @@ cp ${PACKSRC}/chkservd/CommuniGate_spamd /etc/chkserv.d/
 
 # Check the scripts have executable flag
 chmod +x /usr/local/cpanel/whostmgr/docroot/cgi/addon_cgpro*
-chmod +x /var/CommuniGate/cgi/login.pl
 chmod +x /usr/local/cpanel/Cpanel/CommuniGate.pm
 chmod +x /usr/local/cpanel/bin/ccaadmin
 chmod +s+x /usr/local/cpanel/bin/ccawrap
 chmod +x /usr/local/cpanel/bin/admin/CGPro/cca
-chmod u+s /opt/CommuniGate/mail
 
 # Install CommuniGate Plugin
 BASEDIR='/usr/local/cpanel/base/frontend';
 SAVEIFS=$IFS
 IFS=$(echo -en "\n\b")
 THEMES=($(find ${BASEDIR} -maxdepth 1 -mindepth 1 -type d))
+LOCALES=($(find ${PACKSRC}/locale -maxdepth 1 -mindepth 1))
 IFS=$OLDIFS
 
 tLen=${#THEMES[@]}
-
-LOCALES=($(find ${PACKSRC}/locale -maxdepth 1 -mindepth 1))
 lLen=${#LOCALES[@]}
 
 for (( i=0; i<${tLen}; i++ ));
@@ -178,7 +187,7 @@ do
         then
             echo "---" > ${TARGET}
         else
-            sed -i -e '/^CGP/d' ${TARGET}
+	    sed -i -e '/^"*CGP/d' ${TARGET}
         fi
         cat ${LOCALES[$j]} >> ${TARGET}
     done
@@ -196,17 +205,22 @@ for (( i=0; i<${tLen}; i++ ));
 do
     rm -rf ${THEMES[$i]}/cgpro
     cp -r "${PACKSRC}/theme_webmail/cgpro" "${THEMES[$i]}/"
+    chmod +x ${THEMES[$i]}/cgpro/energy.live.cgi
+    chmod +x ${THEMES[$i]}/cgpro/pronto.live.cgi
 done
 
 
 
 chmod +x ${PACKSRC}/scripts/*
 
-# Migrating groupware accounts
-if [ -f /var/CommuniGate/cPanel/limits ]
+if [ -d '/var/CommuniGate/' ]
 then
-    ${PACKSRC}/scripts/migrate_groupware.pl
-    echo "!!! Please delete /var/CommuniGate/cPanel/limits by hand if seetings are OK !!!"
+# Migrating groupware accounts
+    if [ -f /var/CommuniGate/cPanel/limits ]
+    then
+	${PACKSRC}/scripts/migrate_groupware.pl
+	echo "!!! Please delete /var/CommuniGate/cPanel/limits by hand if seetings are OK !!!"
+    fi
 fi
 
 # Purge unneeded files
@@ -218,6 +232,9 @@ if [ -f /usr/local/cpanel/scripts/postwwwacct ]
 then
     rm -f /usr/local/cpanel/scripts/postwwwacct
 fi
+
+
+${PACKSRC}/scripts/init_pbx.pl
 
 # Update Feature List
 cp ${PACKSRC}/featurelists/cgpro /usr/local/cpanel/whostmgr/addonfeatures/
@@ -231,6 +248,10 @@ then
     cp ${PACKSRC}/tools/helper_DKIM_sign.pl /var/CommuniGate/
     cp ${PACKSRC}/tools/helper_DKIM_verify.pl /var/CommuniGate/
     ${PACKSRC}/scripts/install_dkim_signer.pl
+    chmod +x ${PACKSRC}/corn_scripts/*
+    cp ${PACKSRC}/tools/authMigrate.pl /var/CommuniGate/
+    cp ${PACKSRC}/corn_scripts/migrateMail.sh /var/CommuniGate/
+    ${PACKSRC}/scripts/install_migration.pl
 
 # Install Active Queue Scripts
     cp ${PACKSRC}/PBXApps/*spp* /var/CommuniGate/PBXApps/
@@ -260,4 +281,8 @@ then
     ${PACKSRC}/scripts/register_apps.sh
 fi
 
+if [ -d '/var/CommuniGate/' ]
+then
+    echo "!!! Please put '/var/CommuniGate/PBXApps/migrateMail.sh' in your crontab -e configuration in order to be able to migrate external accounts' mail. Otherwise only account will be created if it does not exist. !!!"
+fi
 echo "Upgrade Finished!"

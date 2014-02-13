@@ -1,0 +1,23 @@
+<cpanel setvar="headerimg=../images/mailmenu.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+<div class="body-content">
+  <cpanelfeature cgpro_migration_servers>
+  <h1><cpanel langprint="CGPMigrationServers"></h1>
+  <p><cptext "In order to be able to migrate accounts and mail from remote servers (i.e. previous hosting providers) please enter the IP address of the remote servers for each of the domains."></p>
+  <h2><cpanel langprint="CGPServers"></h2>
+  <form method="POST" action="">
+    <table border="0" cellpadding="5" cellspacing="0" id="mailtbl" class="sortable" width="650">
+      <tr >
+	<th class="cell"><cpanel langprint="CGPDomain"></th>
+	<th class="cell-end sorttable_nosort" colspan="4"><cpanel langprint="CGPIPAddress"></th>
+      </tr>
+      <?cptt CommuniGate::MigrationServers(cgpro/mail/migration_servers.tmpl) formdump=$formdump ?>
+    </table>
+    <p>
+      <input type="submit" id="activate-button" name="submit" value="<cpanel langprint="CGPSave">" class="input-button" />
+    </p>
+  </form>
+  </cpanelfeature>
+</div><!-- end body-content div -->
+<cpanel Branding="include(stdfooter.html)">

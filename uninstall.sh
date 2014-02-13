@@ -70,8 +70,8 @@ rm -f /var/cpanel/communigate.yaml
 rm -f /var/cpanel/cgpro/classes.yaml
 
 # Uninstall CommuniGate Webmail in cPanel
-rm -f /var/cpanel/webmail/webmail_communigate.yaml
-rm -rf /usr/local/cpanel/base/3rdparty/CommuniGate/
+rm -f /var/cpanel/webmail/webmail_communigate*
+rm -rf /usr/local/cpanel/base/3rdparty/CommuniGate*
 
 # Uninstall SSO for Webmail
 rm -f /var/CommuniGate/cgi/login.pl
@@ -86,11 +86,10 @@ BASEDIR='/usr/local/cpanel/base/frontend';
 SAVEIFS=$IFS
 IFS=$(echo -en "\n\b")
 THEMES=($(find ${BASEDIR} -maxdepth 1 -mindepth 1 -type d))
+LOCALES=($(find ${PACKSRC}/locale -maxdepth 1 -mindepth 1))
 IFS=$OLDIFS
 
 tLen=${#THEMES[@]}
-
-LOCALES=($(find ${PACKSRC}/locale -maxdepth 1 -mindepth 1))
 lLen=${#LOCALES[@]}
 
 for (( i=0; i<${tLen}; i++ ));
@@ -108,7 +107,7 @@ do
     rmdir ${THEMES[$i]}/css2-min/cgpro
     for ((j=0; j<${lLen}; j++)); do
         TARGET=${THEMES[$i]}/locale/`basename ${LOCALES[$j]} '{}'`.yaml.local
-        sed -i -e '/^CGP/d' ${TARGET}
+	sed -i -e '/^"*CGP/d' ${TARGET}
     done
 done
 

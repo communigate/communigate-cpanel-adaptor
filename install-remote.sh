@@ -14,12 +14,16 @@ source ${PACKSRC}/config.ini
 # iPhone provisioning using default httpd
 mkdir -p /usr/local/apache/htdocs/iOS
 chmod 777 /usr/local/apache/htdocs/iOS
-mkdir -p /var/CommuniGate/apple
-cp ${PACKSRC}/iphone/iphonetemplate.mobileconfig /var/CommuniGate/apple/
 
 # Install the WHM plugins
 cp -rf ${PACKSRC}/whm/cgi/* /usr/local/cpanel/whostmgr/docroot/cgi/
 cp ${PACKSRC}/whm/templates/* /usr/local/cpanel/whostmgr/docroot/templates/
+
+if [ -f /usr/local/cpanel/bin/register_appconfig ]
+then
+    chmod +x ${PACKSRC}/scripts/register_apps.sh
+    ${PACKSRC}/scripts/register_apps.sh
+fi
 
 # Install CGP Logo
 cp ${PACKSRC}/whm/communigate.gif /usr/local/cpanel/whostmgr/docroot/images/communigate.gif
@@ -89,31 +93,26 @@ fi
 
 # Install CommuniGate Webmail in cPanel
 cp ${PACKSRC}/cgpro-webmail/webmail_communigate.yaml /var/cpanel/webmail/
+cp ${PACKSRC}/cgpro-webmail/webmail_communigatepronto.yaml /var/cpanel/webmail/
 cp -r ${PACKSRC}/cgpro-webmail/CommuniGate /usr/local/cpanel/base/3rdparty/
-
-# Install SSO for Webmail
-mkdir -p /var/CommuniGate/cgi
-cp ${PACKSRC}/sso/login.pl /var/CommuniGate/cgi/
+cp -r ${PACKSRC}/cgpro-webmail/CommuniGatePronto /usr/local/cpanel/base/3rdparty/
 
 # Check the scripts have executable flag
 chmod +x /usr/local/cpanel/whostmgr/docroot/cgi/addon_cgpro*
-chmod +x /var/CommuniGate/cgi/login.pl
 chmod +x /usr/local/cpanel/Cpanel/CommuniGate.pm
 chmod +x /usr/local/cpanel/bin/ccaadmin
 chmod +s+x /usr/local/cpanel/bin/ccawrap
 chmod +x /usr/local/cpanel/bin/admin/CGPro/cca
-chmod u+s /opt/CommuniGate/mail
 
 # Install CommuniGate Plugin
 BASEDIR='/usr/local/cpanel/base/frontend';
 SAVEIFS=$IFS
 IFS=$(echo -en "\n\b")
 THEMES=($(find ${BASEDIR} -maxdepth 1 -mindepth 1 -type d))
+LOCALES=($(find ${PACKSRC}/locale -maxdepth 1 -mindepth 1))
 IFS=$OLDIFS
 
 tLen=${#THEMES[@]}
-
-LOCALES=($(find ${PACKSRC}/locale -maxdepth 1 -mindepth 1))
 lLen=${#LOCALES[@]}
 
 for (( i=0; i<${tLen}; i++ ));
@@ -159,11 +158,27 @@ do
         then
             echo "---" > ${TARGET}
         else
-            sed -i -e '/^CGP/d' ${TARGET}
+	    sed -i -e '/^"*CGP/d' ${TARGET}
         fi
         cat ${LOCALES[$j]} >> ${TARGET}
     done
 done
+
+# Install CommuniGate Plugin Webmail
+BASEDIR='/usr/local/cpanel/base/webmail';
+SAVEIFS=$IFS
+IFS=$(echo -en "\n\b")
+THEMES=($(find ${BASEDIR} -maxdepth 1 -mindepth 1 -type d))
+IFS=$OLDIFS
+tLen=${#THEMES[@]}
+
+for (( i=0; i<${tLen}; i++ ));
+do
+    cp -r "${PACKSRC}/theme_webmail/cgpro" "${THEMES[$i]}/"
+    chmod +x ${THEMES[$i]}/cgpro/energy.live.cgi
+    chmod +x ${THEMES[$i]}/cgpro/pronto.live.cgi
+done
+
 # Update Feature List
 cp ${PACKSRC}/featurelists/cgpro /usr/local/cpanel/whostmgr/addonfeatures/
 chmod +x ${PACKSRC}/scripts/*

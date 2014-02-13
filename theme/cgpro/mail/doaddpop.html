@@ -15,14 +15,26 @@
 	-->
 	<!-- <?cp CommuniGate::VerifyAccount() email=$RAW_FORM{'email'}, domain=$RAW_FORM{'domain'} ?> -->
 	<!-- If you make changes to following code you need to make the same changes in getstarted/newemail-a.html -->
-<cpanelif !$CPERROR{'email'}>
+<cpanelif !$CPERROR{'cgpro'}>
 	<h2><cpanel langprint="EAdocreated"></h2>
 	<p<cptext 'The email account “[output,class,_1,status]” was successfully [boolean,_2,created,modified,removed].',"$FORM{'email'}@$FORM{'domain'}",1></p>
 	<p><cpanel langprint="EAConfMailTxt"></p>
 	<a href="clientconf.html?redirectdomain=<cpanel print="$FORM{'domain'}">&acct=<cpanel print="$URI_ENCODED_FORM{'email'}">@<cpanel print="$URI_ENCODED_FORM{'domain'}">" class="create-button"><cpanel langprint="Yes"></a> <a href="overview_accounts.html" class="create-button"><cpanel langprint="No"></a>
 </cpanelif>
 
-<cpanelif $CPERROR{'email'}>
+<cpanelif $CPERROR{'cgpro'}>
+	<p class="errors">
+	<cptext 'There was a problem creating the email account “[output,class,_1,status]”.',"$FORM{'email'}@$FORM{'domain'}">.
+	<a href="#" onclick="document.getElementById('details').style.display='block'; return false;">
+	<cpanel langprint="AODShowDetails"></a> </p>
+
+	<div class="details" id="details"><cpanel print="$CPERROR{'cgpro'}"></div>
+
+	<noscript>
+		<div class="details-noscript" id="details"><cpanel print="$CPERROR{'cgpro'}"></div>
+	</noscript>
+</cpanelif>
+<cpanelif $CPERROR{'email'} && !$CPERROR{'cgpro'}>
 	<p class="errors">
 	<cptext 'There was a problem creating the email account “[output,class,_1,status]”.',"$FORM{'email'}@$FORM{'domain'}">.
 	<a href="#" onclick="document.getElementById('details').style.display='block'; return false;">
