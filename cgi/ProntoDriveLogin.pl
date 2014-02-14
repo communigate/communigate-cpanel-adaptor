@@ -10,18 +10,6 @@ use DuoWeb;
 
 my $q = new CGI();
 
-unless (open(CONF, "<", "/var/cpanel/communigate.yaml")) {
-  warn "* Error opening config file: $! \n";
-  exit 0;
-}
-my $conf = {};
-for my $row (<CONF>) {
-  if ($row =~ m/(\w+)\:\s+\'(.*?)\'/) {
-    $conf->{$1} = $2;
-  }
-}
-close(CONF);
-my $cli = undef;
 sub postmaster_pass {
     my $file = "/var/CommuniGate/Accounts/postmaster.macnt/account.settings";
     my %hash;
