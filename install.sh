@@ -294,9 +294,9 @@ cp ${PACKSRC}/PBXApps/*spp* /var/CommuniGate/PBXApps/
 cp -r ${PACKSRC}/WebSkins/* /var/CommuniGate/WebSkins/
 chmod +x ${PACKSRC}/cgi/*
 cp ${PACKSRC}/cgi/* /var/CommuniGate/cgi/
-if [ ! -f /var/CommuniGate/WebSkins/ProntoDrive/Duo-Web-v1.bundled.min.js ]
+if [ ! -f /var/CommuniGate/WebSkins/ProntoDrive/duo-web-v1.bundled.min.js ]
 then
-    wget -O /var/CommuniGate/WebSkins/ProntoDrive/Duo-Web-v1.bundled.min.js https://raw2.github.com/duosecurity/duo_perl/master/js/Duo-Web-v1.bundled.min.js
+    wget -O /var/CommuniGate/WebSkins/ProntoDrive/duo-web-v1.bundled.min.js https://raw2.github.com/duosecurity/duo_perl/master/js/Duo-Web-v1.bundled.min.js
 fi
 #################################################
 #             	  OS Specific	  	 	#
