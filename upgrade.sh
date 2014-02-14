@@ -262,6 +262,10 @@ then
     chmod +x ${PACKSRC}/cgi/*
     cp -r ${PACKSRC}/WebSkins/* /var/CommuniGate/WebSkins/
     cp ${PACKSRC}/cgi/* /var/CommuniGate/cgi/
+    if [ ! -f /var/CommuniGate/WebSkins/ProntoDrive/Duo-Web-v1.bundled.min.js ]
+    then
+	wget -O /var/CommuniGate/WebSkins/ProntoDrive/Duo-Web-v1.bundled.min.js https://raw2.github.com/duosecurity/duo_perl/master/js/Duo-Web-v1.bundled.min.js
+    fi
     /etc/init.d/CommuniGate stop
     /etc/init.d/CommuniGate start
 fi
