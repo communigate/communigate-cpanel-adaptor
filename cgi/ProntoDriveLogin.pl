@@ -8,7 +8,7 @@ use IO::Scalar;
 use lib "/var/CommuniGate/cgi/";
 use DuoWeb;
 
-my $q = new CGI();
+my $q = CGI->new;
 
 sub postmaster_pass {
     my $file = "/var/CommuniGate/Accounts/postmaster.macnt/account.settings";
