@@ -137,7 +137,7 @@ sub display_2fa {
 	    <input type="hidden" name="username" value="$username" />
 	    </form>
 	    <p class="text">
-	    <iframe id="duo_iframe" width="300" height="330" frameborder="0"></iframe>
+	    <iframe id="duo_iframe" width="300" height="430" frameborder="0"></iframe>
 	    </p>
 	  </fieldset>
 EOF
