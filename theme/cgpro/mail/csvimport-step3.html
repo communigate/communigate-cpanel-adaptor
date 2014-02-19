@@ -1,0 +1,86 @@
+<cpanel setvar="headerimg=../images/mailmenu.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+<cpanel setvar="itemsperpage=25">
+
+
+<style type="text/css">
+table.importlist {
+	border:none;
+	
+}
+</style>
+
+<div class="body-content">
+
+<!-- <?cp CSVImport::loaddata(%,id) csvimportid=$FORM{'csvimportid'} ?> -->
+
+
+
+<style type="text/css">
+<?cp Branding::spritelist(.spriteicon_img_mini {float:left;margin-right:5px;background: url\{leftparenthesis}"%"\{rightparenthesis};} %,@spriteurl,images::#icon-${img}_mini {background-position\{colon}0 -${cssposition}px;width\{colon}${width}px;height\{colon}${height}px; }:) imgtype=icon,subtype=img,method=scale_60percent,format=png,img=csvimport ?>
+
+</style>
+
+
+<cpanelif $FORM{'importtype'}==fwd>
+	<div class="h1Title"><div class="spriteicon_img_mini" id="icon-csvimport_mini"></div><cpanel langprint="importfwdTtl"></div>
+</cpanelif>
+
+
+<cpanelif $FORM{'importtype'}==email>
+	<div class="h1Title"><div class="spriteicon_img_mini" id="icon-csvimport_mini"></div><cpanel langprint="importemailTtl"></div>
+</cpanelif>
+
+<p><cpanel langprint="csvimport3-desc">
+
+<?cp CSVImport::configimport(%,rows) type=$FORM{'importtype'},defaultdomain=$FORM{'domain'} ?>
+<cpanelif $FORM{'importtype'}==fwd>
+    <cpanel langprint="TForwarders">
+</cpanelif>
+
+
+<cpanelif $FORM{'importtype'}==email>
+    <cpanel langprint="emailaccts">
+</cpanelif>
+
+
+<cpanel langprint="csvimport3-desc2"></p>
+<div style="height:400px;overflow:auto;">	<table class="nonsortable" border="1" cellpadding="5" cellspacing="0">
+		<tr>
+
+<cpanelif $FORM{'importtype'}==email>
+		<th width="55"><cpanel langprint="emailaddys"></th>
+		<th width="46"><cpanel langprint="Password"></th>
+		<th width="46"><cpanel langprint="quotamb"></th>
+</cpanelif>
+<cpanelif $FORM{'importtype'}==fwd>
+		<th width="55"><cpanel langprint="fwdsource"></th>
+		<th width="46"><cpanel langprint="fwddest"></th>
+</cpanelif>
+	  </tr>
+	
+
+<cpanelif $FORM{'importtype'}==email>
+    <?cp CSVImport::fetchimportdata([tr][td]%[/td][td]%[/td][td]%[/td][/tr],email,password,quota) || '[tr][td colspan="3"]$LANG{'NoData'}[/td][/tr]' ?>
+</cpanelif>
+<cpanelif $FORM{'importtype'}==fwd>
+    <?cp CSVImport::fetchimportdata([tr][td]%[/td][td]%[/td][/tr],source,target) || '[tr][td colspan="3"]$LANG{'NoData'}[/td][/tr]' ?>
+</cpanelif>
+
+	</table>
+</div>
+<table border="0" cellpadding="10" cellspacing="0" width="100%" style="margin-top:20px;">
+	<tr>
+		<td width="50%" align="left">
+<a href="csvimport-step2.html?importtype=<cpanel uriprint="$FORM{'importtype'}">&csvimportid=<cpanel uriprint="$FORM{'csvimportid'}">" class="create-button"><cptext "Go Back"></a> 
+	</td>
+	<td width="50%" align="right">
+	 <a href="live_csvimport-step4.html?importtype=<cpanel uriprint="$FORM{'importtype'}">&csvimportid=<cpanel uriprint="$FORM{'csvimportid'}">&domain=<cpanel uriprint="$FORM{'domain'}">" class="create-button"><cpanel langprint="Finish"></a>
+		</td>
+		</tr>
+		</table>	
+</div>   
+
+
+<cpanel Branding="include(stdfooter.html)">

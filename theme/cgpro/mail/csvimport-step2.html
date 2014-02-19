@@ -1,0 +1,164 @@
+<cpanel setvar="headerimg=../images/mailmenu.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+
+
+<div class="body-content">
+
+<!--<div id="pin2nav">
+            <a href="#" onclick="PinItemToNav(); return false;"><img src="../images/pin16.gif" width="16" height="16" border="0" /><cpanel langprint="MENUPinNav"></a>
+    </div>-->
+
+<style type="text/css">
+<?cp Branding::spritelist(.spriteicon_img_mini {float:left;margin-right:5px;background: url\{leftparenthesis}"%"\{rightparenthesis};} %,@spriteurl,images::#icon-${img}_mini {background-position\{colon}0 -${cssposition}px;width\{colon}${width}px;height\{colon}${height}px; }:) imgtype=icon,subtype=img,method=scale_60percent,format=png,img=csvimport ?>
+
+a .create-button .left {float:left;height:15px;}
+.right {float:right;}
+a .right,a .left {
+	margin:0;
+}
+</style>
+
+
+<cpanelif $FORM{'importtype'}==fwd>
+	<div class="h1Title"><div class="spriteicon_img_mini" id="icon-csvimport_mini"></div><cpanel langprint="importfwdTtl"></div>
+</cpanelif>
+
+
+<cpanelif $FORM{'importtype'}==email>
+	<div class="h1Title"><div class="spriteicon_img_mini" id="icon-csvimport_mini"></div><cpanel langprint="importemailTtl"></div>
+</cpanelif>
+
+
+
+
+<cpanelif $FORM{'csvimportid'}>
+    <cpanel setvar="csvimportid=$FORM{'csvimportid'}">
+</cpanelif>
+<cpanelif !$FORM{'csvimportid'}>
+    <!-- <?cp CSVImport::uploadimport(%,id) ?> -->
+    <!-- <?cp CSVImport::processdata(%,id) csvimportid=$CPVAR{'csvimportid'},otherdelimiter=$RAW_FORM{'other_delimiter'},delimiter=$RAW_FORM{'delimiter'},colheader=$RAW_FORM{'colheader'} ?> -->
+</cpanelif>
+
+<!-- <?cp CSVImport::loaddata(%,id) csvimportid=$CPVAR{'csvimportid'} ?> -->
+
+<Br />
+<form action="csvimport-step3.html" method="get">
+<input type="hidden" name="importtype" value="<cpanel print="$FORM{'importtype'}">">
+<input type="hidden" name="csvimportid" value="<cpanel print="$CPVAR{'csvimportid'}">">
+
+
+<div style="background:#f3f3f3; border:solid 1px #e4e4e4; margin:0 0 15px 0; padding:10px;">
+
+
+<div><div id="step1header" style="display:none;"><strong><cpanel langprint="csvimport2-Step1"></strong> </div><p><cpanel langprint="csvimport2-Step1Desc"></p>
+
+<div style="width:100%; height:400px;overflow:auto;margin:15px 0;">	<table id="ssimport" class="nonsortable" border="1" cellpadding="5" cellspacing="0">
+		<tr>
+
+    <?cp CSVImport::columnchoices([th][select onchange="checkcols[[this]];" name="header%"]%[/select][/th],num,options::[option value="${colshortname}" ${colselected}]${colname}[/option]:) type=$RAW_FORM{'importtype'} || '[th]$LANG{'NoData'}[/th]' ?>
+    <?cp CSVImport::data([tr id="row%"]%[/tr],num,row::[td]${value}[/td]:) type=$RAW_FORM{'importtype'} ?>
+	</table></div>
+
+
+	<div style="text-align:right; margin-top:20px;">
+</div>   
+
+
+</div>
+</div>
+
+
+<div id="step2" style="display:none; background:#f3f3f3; border:solid 1px #e4e4e4; margin:0 0 15px 0; padding:10px;">
+  <div><strong><cpanel langprint="csvimport2-Step2"></strong> <p><cpanel langprint="csvimport2-Step2Desc"></p></div>
+@
+<select id="domainSel" name="domain">
+      <cpanel Email="listmaildomainsoptndef()">
+</select>
+
+</div>
+
+<table border="0" cellpadding="10" cellspacing="0" width="100%">
+	<tr>
+		<td width="50%" align="left">		
+		<a href="csvimport.html?importtype=<cpanel uriprint="$FORM{'importtype'}">&csvimportid=<cpanel uriprint="$FORM{'csvimportid'}">" class="create-button left"><cptext "Go Back"></a></td>
+			<td align="right" width="50%" >
+<input type="submit" value="<cpanel langprint="Next">" class="input-button right" style="height:25px;" />
+	</td>
+	</tr>
+	</table>
+
+
+</form></div>
+
+<script type="text/javascript">
+var emailcol = 0;
+var domainlist = {};
+var domainlistLoaded = 0;
+YAHOO.util.Event.onAvailable('ssimport', checktbl);
+
+
+function loadDomainList() {
+    var selEl=document.getElementById('domainSel');
+    for(var i=0;i<selEl.options.length;i++) {
+        domainlist[selEl.options[i].value]=1;
+    }
+    domainlistLoaded = 1;
+}
+
+function checktbl() {
+    var tableEl = document.getElementById('ssimport');
+    var columnCells = tableEl.rows[0].cells;
+    
+    for(var i=0;i<columnCells.length;i++) {
+        var selectEls=columnCells[i].getElementsByTagName('select');
+        checkcols(selectEls[0]);
+    }
+}
+function checkcols(selectboxEl) {
+    
+    var headerTH = selectboxEl.parentNode;
+    var headerTBL = selectboxEl.parentNode;
+    var columnNum = headerTH.cellIndex;
+
+    if (selectboxEl.selectedIndex == -1) { 
+        if (columnNum == emailcol) { hideStep2(); }
+        return;
+    }
+    var selectVal = selectboxEl.options[selectboxEl.selectedIndex].value;
+
+    if (! domainlistLoaded) {loadDomainList();}
+
+    while(headerTBL && headerTBL.tagName != "TBODY") {
+        headerTBL=headerTBL.parentNode;
+    }
+    for(var i=1;i<headerTBL.rows.length;i++) {
+        var tblData = headerTBL.rows[i].cells[columnNum].innerHTML;
+        if (! tblData.match(/\@/)) {
+                emailcol = columnNum;
+                showStep2();
+                return; 
+        } else {
+            var emailParts = tblData.split('@');
+            if (!domainlist[emailParts[1]]) {
+                showStep2();
+                return;
+            }
+        }
+    }   
+    hideStep2(); 
+
+}
+function hideStep2() {
+    document.getElementById('step2').style.display='none';
+    document.getElementById('step1header').style.display='none';
+}
+
+
+function showStep2() {
+    document.getElementById('step2').style.display='';
+    document.getElementById('step1header').style.display='';
+}
+
+</script>
+<cpanel Branding="include(stdfooter.html)">

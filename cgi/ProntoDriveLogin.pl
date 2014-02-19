@@ -99,7 +99,7 @@ EOF
     if ($error) {
 	print "<p>Wrong username or password!</p>"
     }
-    print <<EOF	
+    print <<EOF
 	  <fieldset>
 	    <p class="text">
 	      <label>Username:</label>

@@ -4708,6 +4708,51 @@ sub api2_MigrationServers {
     return $result;
 }
 
+
+sub api2_CSVDoImport {
+    my %OPTS = @_;
+    # my ( $id, $type, $domain ) = @_;
+    my $id = $OPTS{'csvimportid'};
+    my $type = $OPTS{'importtype'};
+    my $domain = $OPTS{'domain'};
+    return if ( !Cpanel::hasfeature('csvimport') );
+
+    if ( !$domain ) {
+        $domain = $Cpanel::CPDATA{'DNS'};
+    }
+
+    $id =~ s/\///g;
+
+    my $file       = $Cpanel::homedir . '/tmp/cpcsvimport/' . $id;
+    my $importdata = Cpanel::SafeStorable::lock_retrieve( $file . '.import' );
+
+    my $domhash  = { map { $_ => 1 } @Cpanel::DOMAINS };
+    my $numrows  = scalar @$importdata;
+    my $rowcount = 0;
+    foreach my $row (@$importdata) {
+        $rowcount++;
+        my ( $status, $msg );
+        if ( $type eq 'fwd' ) {
+	my $cli = getCLI();
+	my ($user, $dom) = split "@", $row->{'source'};
+	addforward (
+	    domain => $dom,
+	    email => $user,
+	    fwdemail => $row->{'terget'}
+	    cli => $cli
+	    );
+	$cli->Logout();
+        }
+        else {
+	    my ($user, $dom) = split "@", $row->{'email'};
+	    my $apiref = Cpanel::Api2::Exec::api2_preexec( 'Email', 'addpop' );
+	    my ( $data, $status ) = Cpanel::Api2::Exec::api2_exec( 'Email', 'addpop', $apiref, {domain => $dom, email=> $user, password => $row->{'password'}, quota => $row->{'quota'}} );
+        }
+        print qq{<script>setcompletestatus($rowcount,$numrows)</script>\n\n};
+    }
+}
+
+
 sub versioncmp( $$ ) {
     my @A = ($_[0] =~ /([-.]|\d+|[^-.\d]+)/g);
     my @B = ($_[1] =~ /([-.]|\d+|[^-.\d]+)/g);
