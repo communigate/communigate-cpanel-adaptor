@@ -18,10 +18,13 @@ unless($cli) {
 }
 
 my $settings = $cli->GetServerSettings();
-$settings->{ExternalAUTH} = {
-    Enabled => 'YES',
-    LogLevel =>  2,
-    ProgramName =>  "/var/CommuniGate/authMigrate.pl"
-};
-$cli->UpdateServerSettings($settings);
-$cli->UpdateDomainDefaults({ExternalOnUnknown => 'YES'});
+unless ($settings->{ExternalAUTH} && $settings->{ExternalAUTH}->{'Enabled'} eq 'YES') {
+    $settings->{ExternalAUTH} = {
+	Enabled => 'YES',
+	LogLevel =>  2,
+	ProgramName =>  "/var/CommuniGate/authMigrate.pl"
+    };
+    $cli->UpdateServerSettings({ExternalAUTH => $settings->{ExternalAUTH}});
+    $cli->UpdateDomainDefaults({ExternalOnUnknown => 'YES'});
+}
+$cli->Logout();

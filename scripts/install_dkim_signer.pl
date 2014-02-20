@@ -39,7 +39,7 @@ unless ($found) {
 	RestartPause => '5m',
 	Timeout => '10s'
     };
-    $cli->UpdateServerSettings($settings);
+    $cli->UpdateServerSettings({ExternalFilters => $settings->{ExternalFilters}});
 }
 my $rules = $cli->GetServerMailRules();
 my $rfound = 0;
@@ -66,3 +66,4 @@ unless ($rfound) {
     ];
     $cli->SetServerMailRules($rules)
 }
+$cli->Logout();
