@@ -4738,7 +4738,7 @@ sub api2_CSVDoImport {
 	addforward (
 	    domain => $dom,
 	    email => $user,
-	    fwdemail => $row->{'terget'}
+	    fwdemail => $row->{'terget'},
 	    cli => $cli
 	    );
 	$cli->Logout();
