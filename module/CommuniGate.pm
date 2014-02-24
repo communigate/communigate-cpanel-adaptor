@@ -4372,6 +4372,7 @@ sub api2_ListRSIP {
 	    my $settings = $cli->GetAccountRSIPs($account);
 	    $result->{'rsip'} = $settings;
 	    $result->{'rsipInfo'} = $cli->GetAccountInfo($account, "RSIP");
+	    $result->{'settings'} = $cli->GetAccountSettings($account);
 	    last;
 	}
     }
@@ -4445,6 +4446,16 @@ sub api2_DeleteRSIP {
     for my $domain (@domains) {
 	if ($domain eq $dom) {
 	    my $settings = $cli->GetAccountRSIPs($account);
+	    my $accountSettings = $cli->GetAccountSettings($account);
+	    if ($settings->{$OPTS{'rsip'}}->{'fromName'} eq $accountSettings->{'PSTNFromName'} && $accountSettings->{'PSTNGatewayAuthName'} eq $settings->{$OPTS{'rsip'}}->{'authName'}) {
+		$cli->UpdateAccountSettings($account, {
+		    PSTNFromName => 'default',
+		    PSTNGatewayAuthName => 'default',
+		    PSTNGatewayDomain => 'default',
+		    PSTNGatewayPassword => 'default',
+		    PSTNGatewayVia => 'default'
+					    });
+			    }
 	    delete $settings->{$OPTS{'rsip'}};
 	    $cli->SetAccountRSIPs($account, $settings);
 	    last;
@@ -4702,6 +4713,77 @@ sub api2_MigrationServers {
 	my $prefs = $cli->GetAccountDefaultPrefs($domain);
 	if ($prefs->{"MailMigrationServerIP"}) {
 	    $result->{"servers"}->{$domain} = $prefs->{"MailMigrationServerIP"};
+	}
+    }
+    $cli->Logout();
+    return $result;
+}
+
+
+sub api2_CSVDoImport {
+    my %OPTS = @_;
+    # my ( $id, $type, $domain ) = @_;
+    my $id = $OPTS{'csvimportid'};
+    my $type = $OPTS{'importtype'};
+    my $domain = $OPTS{'domain'};
+    return if ( !Cpanel::hasfeature('csvimport') );
+
+    if ( !$domain ) {
+        $domain = $Cpanel::CPDATA{'DNS'};
+    }
+
+    $id =~ s/\///g;
+
+    my $file       = $Cpanel::homedir . '/tmp/cpcsvimport/' . $id;
+    my $importdata = Cpanel::SafeStorable::lock_retrieve( $file . '.import' );
+
+    my $domhash  = { map { $_ => 1 } @Cpanel::DOMAINS };
+    my $numrows  = scalar @$importdata;
+    my $rowcount = 0;
+    foreach my $row (@$importdata) {
+        $rowcount++;
+        my ( $status, $msg );
+        if ( $type eq 'fwd' ) {
+	my $cli = getCLI();
+	my ($user, $dom) = split "@", $row->{'source'};
+	addforward (
+	    domain => $dom,
+	    email => $user,
+	    fwdemail => $row->{'terget'},
+	    cli => $cli
+	    );
+	$cli->Logout();
+        }
+        else {
+	    my ($user, $dom) = split "@", $row->{'email'};
+	    my $apiref = Cpanel::Api2::Exec::api2_preexec( 'Email', 'addpop' );
+	    my ( $data, $status ) = Cpanel::Api2::Exec::api2_exec( 'Email', 'addpop', $apiref, {domain => $dom, email=> $user, password => $row->{'password'}, quota => $row->{'quota'}} );
+        }
+        print qq{<script>setcompletestatus($rowcount,$numrows)</script>\n\n};
+    }
+}
+
+sub api2_UpdatePSTN {
+    my %OPTS = @_;
+    my $account = $OPTS{'account'};
+    my (undef,$dom) = split "@", $account;
+
+    my @domains = Cpanel::Email::listmaildomains();
+    my $cli = getCLI();
+
+    my $result = {};
+    for my $domain (@domains) {
+	if ($domain eq $dom) {
+	    my $rsips = $cli->GetAccountRSIPs($account);
+	    $cli->UpdateAccountSettings($account, {
+		PSTNFromName => $rsips->{$OPTS{'rsip'}}->{'fromName'},
+		    PSTNGatewayAuthName => $rsips->{$OPTS{'rsip'}}->{'authName'},
+		    PSTNGatewayDomain => $rsips->{$OPTS{'rsip'}}->{'domain'},
+		    PSTNGatewayPassword => $rsips->{$OPTS{'rsip'}}->{'password'},
+		    PSTNGatewayVia => $rsips->{$OPTS{'rsip'}}->{'domain'}
+					});
+	    
+	    last;
 	}
     }
     $cli->Logout();

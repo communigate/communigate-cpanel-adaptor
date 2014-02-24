@@ -1,0 +1,99 @@
+<cpanel setvar="headerimg=../images/mailmenu.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+<cpanel setvar="itemsperpage=25">
+
+
+<style type="text/css">
+table.importlist {
+	border:none;
+}
+#progressbar {
+	padding:15px;
+	border:solid 1px #cbdbea;	
+	background:#f3f7fa;
+	width:531px;
+	margin:5px 0 20px 0;
+}
+span#total {
+	font-weight:bold;
+	color:#19191b;
+	display:block;
+	text-align:center;
+	margin:5px 0 0 0;
+}
+.statusline {
+	padding:5px 0;
+	border-bottom:1px dotted #cbdbea;
+}
+.statusitem {
+	font-weight:bold;
+}
+.green-status, .status-green {
+	margin:0 0 0 15px;
+	font-weight:normal;
+	background:url(../images/importok.gif) no-repeat left;
+	padding:5px 0 5px 25px;
+}
+.red-status, .status-red {
+	margin:0 0 0 15px;
+	font-weight:normal;
+	background:url(../images/importerror.png) no-repeat left;
+	padding:5px 0 5px 25px;
+}
+#importwrap {
+	width:100%; height:500px; overflow:auto;
+}
+#importwrap p {
+	margin:15px 0 0 0;
+	color:#00566a;
+	font-weight:bold;
+	background:#eee;
+	padding:10px;
+}
+</style>
+
+<script type="text/javascript">
+var fullbar = 530;
+
+function setcompletestatus(incount,totalcount) {
+    
+    document.getElementById('incount').innerHTML=incount;
+    document.getElementById('totalcount').innerHTML=totalcount;
+    document.getElementById('uploadbar').width = parseInt(incount/totalcount*fullbar);
+    document.getElementById('progressbar').style.display='';
+    
+}
+</script>
+
+<div class="body-content">
+
+<!-- <?cp CSVImport::loaddata(%,id) csvimportid=$RAW_FORM{'csvimportid'} ?> -->
+
+
+
+<style type="text/css">
+<?cp Branding::spritelist(.spriteicon_img_mini {float:left;margin-right:5px;background: url\{leftparenthesis}"%"\{rightparenthesis};} %,@spriteurl,images::#icon-${img}_mini {background-position\{colon}0 -${cssposition}px;width\{colon}${width}px;height\{colon}${height}px; }:) imgtype=icon,subtype=img,method=scale_60percent,format=png,img=csvimport ?>
+
+</style>
+
+<div class="h1Title"><div class="spriteicon_img_mini" id="icon-csvimport_mini"></div><cpanel langprint="importpgrsTtl"></div>
+
+<div id="progressbar" style="display:none;">
+<img src="../images/uploadbar.jpg" width="501" height="18" id="uploadbar" alt="<cpanel langprint="importpgrsTtl">" />
+<span id="total"><span id="incount" >&nbsp;</span> / <span id="totalcount" >&nbsp;</span></span>
+
+</div>
+
+<div id="importwrap">
+<!-- <?cp CommuniGate::CSVDoImport(%,id) csvimportid=$FORM{'csvimportid'},importtype=$RAW_FORM{'importtype'},domain=$RAW_FORM{'domain'} ?> -->
+	<p><cpanel langprint="importcomplete"></p>
+</div>	
+	
+<div style="text-align:right; margin-top:20px;">
+
+ <a href="csvimport.html?importtype=<cpanel uriprint="$FORM{'importtype'}">&csvimportid=<cpanel uriprint="$FORM{'csvimportid'}">" class="create-button"><cpanel langprint="importmore"></a>  </div>	
+</div>   
+
+
+<cpanel Branding="include(stdfooter.html)">

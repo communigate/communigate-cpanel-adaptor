@@ -7,16 +7,19 @@
     <th class="cell">[% locale.maketext("CGPStatus") %]</th>
     <th class="cell-end sorttable_nosort">[% locale.maketext("AHFucn") %]</th>
   </tr>
-  [% FOR sip IN rsip.keys -%]
+  [% FOR sip IN rsip.keys.sort -%]
   <tr>
-    <td class="truncate">[% sip %]</td>
+    <td class="truncate">[% sip %][% IF settings.PSTNFromName == rsip.$sip.fromName && settings.PSTNGatewayAuthName == rsip.$sip.authName %] ([% locale.maketext("CGPOutgoing") %])[% END %]</td>
     <td class="truncate">
       [% rsipInfo.$sip.completed.replace("(\#T|\_)"," ") %]
       [% rsipInfo.$sip.errorCode %]
     </td>
     <td>
-      <a href="editrsip.html?account=[% FORM.account %]&amp;rsip=[% sip %]">[% locale.maketext('CGPViewEdit') %]</a>,
+      <a href="editrsip.html?account=[% FORM.account %]&amp;rsip=[% sip %]">[% locale.maketext('CGPViewEdit') %]</a> ,
       <a href="deletersip.html?account=[% FORM.account %]&amp;rsip=[% sip %]">[% locale.maketext('BrandingDPackage') %]</a>
+      [% UNLESS settings.PSTNFromName == rsip.$sip.fromName && settings.PSTNGatewayAuthName == rsip.$sip.authName %]
+      , <a href="updatepstn.html?account=[% FORM.account %]&amp;rsip=[% sip %]">[% locale.maketext('CGPSetAsOutgoing') %]</a>
+      [% END -%]
     </td>
   </tr>
   [% END -%]

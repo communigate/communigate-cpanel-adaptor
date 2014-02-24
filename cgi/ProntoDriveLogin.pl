@@ -8,20 +8,8 @@ use IO::Scalar;
 use lib "/var/CommuniGate/cgi/";
 use DuoWeb;
 
-my $q = new CGI();
+my $q = CGI->new;
 
-unless (open(CONF, "<", "/var/cpanel/communigate.yaml")) {
-  warn "* Error opening config file: $! \n";
-  exit 0;
-}
-my $conf = {};
-for my $row (<CONF>) {
-  if ($row =~ m/(\w+)\:\s+\'(.*?)\'/) {
-    $conf->{$1} = $2;
-  }
-}
-close(CONF);
-my $cli = undef;
 sub postmaster_pass {
     my $file = "/var/CommuniGate/Accounts/postmaster.macnt/account.settings";
     my %hash;
@@ -111,7 +99,7 @@ EOF
     if ($error) {
 	print "<p>Wrong username or password!</p>"
     }
-    print <<EOF	
+    print <<EOF
 	  <fieldset>
 	    <p class="text">
 	      <label>Username:</label>
@@ -149,7 +137,7 @@ sub display_2fa {
 	    <input type="hidden" name="username" value="$username" />
 	    </form>
 	    <p class="text">
-	    <iframe id="duo_iframe" width="300" height="330" frameborder="0"></iframe>
+	    <iframe id="duo_iframe" width="300" height="430" frameborder="0"></iframe>
 	    </p>
 	  </fieldset>
 EOF

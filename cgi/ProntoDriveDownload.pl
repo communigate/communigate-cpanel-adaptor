@@ -7,29 +7,45 @@ use Archive::Zip;
 use IO::Scalar;
 my $q = new CGI();
 
-unless (open(CONF, "<", "/var/cpanel/communigate.yaml")) {
-  warn "* Error opening config file: $! \n";
-  exit 0;
+sub postmaster_pass {
+    my $file = "/var/CommuniGate/Accounts/postmaster.macnt/account.settings";
+    my %hash;
+    open (MYFILE, "$file");
+    while (<MYFILE>) {
+	chomp;
+	my @line = split("=",$_);
+	$hash{@line[0]} = @line[1];
+    }
+    if ($hash{' Password '} =~ /^ ".*";$/) {
+	return  substr $hash{' Password '}, 2, length($hash{' Password '})-4;
+    } else {
+	return  substr $hash{' Password '}, 1, length($hash{' Password '})-2;
+    }
 }
-my $conf = {};
-for my $row (<CONF>) {
-  if ($row =~ m/(\w+)\:\s+\'(.*?)\'/) {
-    $conf->{$1} = $2;
-  }
-}
-close(CONF);
-my $cli = undef;
+my $CLI = undef;
 sub getCLI {
-  my $c =  new CGP::CLI( { PeerAddr => $conf->{cgprohost},
-			   PeerPort => $conf->{cgproport},
-			   login => $conf->{cgprouser},
-			   password => $conf->{cgpropass}
-			 });
-  unless( $c ) {
-    warn ("* Can't login to CGPro.");
-    return undef;
-  }
-  return $c;
+    if ($CLI && $CLI->{isConnected}) {
+	return $CLI;
+    } else {
+	my $CGServerAddress = "127.0.0.1";
+	my $PostmasterLogin = 'postmaster';
+	my $PostmasterPassword = postmaster_pass();
+
+	if ($domain) {
+	    $account=$account."@".$domain;
+	}
+
+	my $cli = new CGP::CLI( { PeerAddr => $CGServerAddress,
+				  PeerPort => '106',
+				  login => $PostmasterLogin,
+				  password => $PostmasterPassword } );
+	unless($cli) {
+	    print header;
+	    print "Can't login to CGPro: ".$CGP::ERR_STRING,"\n";
+	    exit(0);
+	}
+	return $cli;
+    }
 }
 
 my (undef, $account, $fileKey, $getFile) = split "/", $q->path_info();

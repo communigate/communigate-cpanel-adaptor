@@ -1,14 +1,24 @@
-[%-
-USE Api2;
-SET hooked = Api2.exec( 'CommuniGate', 'check_hooked_account', {} );
--%]
+<script>webmailclients['communigaate'] = {name:'Energy Webmail',uri:'/webmail/x3/cgpro/energy.live.cgi'};</script>
+	<td align="center" valign="bottom" id="communigate_cell">
+	  <a href="[% client.url %]"><img src="/3rdparty/CommuniGate/icon.png" border="0" width="150" height="48" /></a><br /><a href="/webmail/x3/cgpro/energy.live.cgi">[% locale.maketext('Read Mail Using') %] Energy Webmail</a>
+	  <div class="autoloadlink"  id="communigate_auto"><a href="#" onClick="webmailselect_setdefaultclient('communigate');return false;"></a></div>
+	</td>
+<script>webmailclients['communigaate'] = {name:'Pronto Webmail',uri:'/webmail/x3/cgpro/pronto.live.cgi'};</script>
+	<td align="center" valign="bottom" id="communigatepronto_cell">
+	  <a href="[% client.url %]"><img src="/3rdparty/CommuniGatePronto/icon.png" border="0" width="150" height="48" /></a><br /><a href="/webmail/x3/cgpro/pronto.live.cgi">[% locale.maketext('Read Mail Using') %] Pronto Webmail</a>
+	  <div class="autoloadlink"  id="communigatepronto_auto"><a href="#" onClick="webmailselect_setdefaultclient('communigatepronto');return false;"></a></div>
+	</td>
+</tr>
+<tr>
+  <td colspan="3">
+    &nbsp;
+  </td>
+</tr>
+<tr>
 [% FOREACH client IN return_ %]
-[% IF loop.count == 3 %]</tr><tr>[% END -%]
-[% IF ! (matches = client.id.match('communigate'))  || hooked.0 == 1 %]
 <script>webmailclients['[% client.id %]'] = {name:'[% client.displayname %]',uri:'[% client.url %]'};</script>
 	<td align="center" valign="bottom" id="[% client.id %]_cell">
 	  <a href="[% client.url %]"><img src="[% client.icon %]" border="0" width="150" height="48" /></a><br /><a href="[% client.url %]">[% locale.maketext('Read Mail Using') %] [% client.displayname %]</a>
 	  <div class="autoloadlink"  id="[% client.id %]_auto"><a href="#" onClick="webmailselect_setdefaultclient('[% client.id %]');return false;"></a></div>
 	</td>
-	[% END %]
 	[% END %]

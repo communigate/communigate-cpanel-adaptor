@@ -93,8 +93,9 @@ cp -rf ${PACKSRC}/hooks/CGPro /var/cpanel/perl5/lib/
 /usr/local/cpanel/bin/manage_hooks add module CGPro::Hooks
 
 # Install CommuniGate Webmail in cPanel
-cp ${PACKSRC}/cgpro-webmail/webmail_communigate.yaml /var/cpanel/webmail/
-cp ${PACKSRC}/cgpro-webmail/webmail_communigatepronto.yaml /var/cpanel/webmail/
+rm -f /var/cpanel/webmail/webmail_communigate*
+# cp ${PACKSRC}/cgpro-webmail/webmail_communigate.yaml /var/cpanel/webmail/
+# cp ${PACKSRC}/cgpro-webmail/webmail_communigatepronto.yaml /var/cpanel/webmail/
 cp -r ${PACKSRC}/cgpro-webmail/CommuniGate /usr/local/cpanel/base/3rdparty/
 cp -r ${PACKSRC}/cgpro-webmail/CommuniGatePronto /usr/local/cpanel/base/3rdparty/
 
@@ -262,6 +263,10 @@ then
     chmod +x ${PACKSRC}/cgi/*
     cp -r ${PACKSRC}/WebSkins/* /var/CommuniGate/WebSkins/
     cp ${PACKSRC}/cgi/* /var/CommuniGate/cgi/
+    if [ ! -f /var/CommuniGate/WebSkins/ProntoDrive/duo-web-v1.bundled.min.js ]
+    then
+	wget -O /var/CommuniGate/WebSkins/ProntoDrive/duo-web-v1.bundled.min.js https://raw2.github.com/duosecurity/duo_perl/master/js/Duo-Web-v1.bundled.min.js
+    fi
     /etc/init.d/CommuniGate stop
     /etc/init.d/CommuniGate start
 fi
