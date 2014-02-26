@@ -4029,6 +4029,24 @@ sub UpdateAirSyncInfo  {
   $this->_parseResponse();
 }
 
+sub SetAccountTelnums  {
+  my ( $this, $account, $telnums ) = @_;
+  croak 'usage CGP::CLI->SetAccountTelnums($account, [$telnums])'
+      unless defined $telnums && defined $account;
+  $this->send ("SETACCOUNTTELNUMS $account " .$this->printWords($telnums));
+  $this->_parseResponse();
+}
+
+sub GetAccountTelnums {
+  my ($this, $account) = @_;
+  croak 'usage CGP::CLI->GetAccountTelnums($account)'
+      unless defined $account;
+  $this->send ("GETACCOUNTTELNUMS $account");
+  return undef unless $this->_parseResponse();
+  $this->parseWords($this->getWords);
+}
+
+
 #########################################################################
 #########################################################################
 ##  Internal routines
