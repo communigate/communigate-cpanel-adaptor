@@ -236,6 +236,7 @@
 			    [% END -%]
 			    <td>
 			      <input type="text" value="[% telnumDetails.$telnum.assigned == '#NULL#' ? "" : telnumDetails.$telnum.assigned %]" name="assigned-[% telnum %]" style="width: 100px;"  />
+			      <input type="hidden" value="[% telnumDetails.$telnum.assigned == '#NULL#' ? "" : telnumDetails.$telnum.assigned %]" name="oldassigned-[% telnum %]" />
 			    </td>
 			    [% IF prefs.Gateways.$provider.callInGw.proxyType == "registrar" -%]
 			    <td>

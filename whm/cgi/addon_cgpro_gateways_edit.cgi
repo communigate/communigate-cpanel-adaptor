@@ -57,12 +57,11 @@ if ($FORM{submitedit} && $FORM{provider} && $FORM{name}) {
     unless ($providerFount) {
 	$prefs->{LastProviderId} =~ s/\D//g;
 	my $provider = $FORM{provider};
-	$provider =~ s/\W//g;
-	$gateways->{lc $provider} = {
+	$gateways->{$provider} = {
 	    name => $FORM{name},
 	    desc => $FORM{description},
 	    shortId => '#' . ($prefs->{LastProviderId} + 1),
-	    id => lc $provider,
+	    id => $provider,
 	    key => join "-", map{ join "", map { unpack "H*", chr(rand(256)) } 1..$_} (4,2,2,2,6)
 	};
 	$update = {
@@ -135,13 +134,13 @@ if ($FORM{submitdialin} && $FORM{provider}) {
  	# if ($FORM{proxyType} eq "trunk" && $FORM{proxyTypeOld} ne "trunk") {
 	#     delete $prefs->{Gateways}->{$FORM{provider}}->{callInGw}->{telnums};
 	# }
-	if ($FORM{proxyType} ne "registrar" && $FORM{proxyTypeOld} eq "registrar") {
-	    my $newRsips = {};
-	    for my $rsip (keys $rsips) {
-		$newRsips->{$rsip} = $rsips->{$rsip} unless $rsip =~ m/^rsip-$id/;
-	    }
-	    $cli->SetAccountRSIPs('pbx@' . $domain, $newRsips);
-	}
+	# if ($FORM{proxyType} ne "registrar" && $FORM{proxyTypeOld} eq "registrar") {
+	#     my $newRsips = {};
+	#     for my $rsip (keys $rsips) {
+	# 	$newRsips->{$rsip} = $rsips->{$rsip} unless $rsip =~ m/^rsip-$id/;
+	#     }
+	#     $cli->SetAccountRSIPs('pbx@' . $domain, $newRsips);
+	# }
 
 	# Update telnums settings
 	# if ($FORM{proxyType} eq "registrar" && $FORM{proxyTypeOld} eq "registrar") {
@@ -159,22 +158,44 @@ if ($FORM{submitdialin} && $FORM{provider}) {
 			'reguid' => $tel->{reguid},
 			'server' => $tel->{server},
 			'expires' => ($FORM{'expires-' . $tel->{telnum}} || 0 || undef),
-			'assigned' => ($FORM{'assigned-' . $tel->{telnum}} || $tel->{"assigned"} || undef)
+			'assigned' => ($FORM{'assigned-' . $tel->{telnum}} || undef)
 		    };
-		    $rsips->{'rsip-' . $id . '-' . $tel->{reguid}} = {
-			domain =>  $tel->{"domain"} || "",
-			fromName => $tel->{"username"} || "",
-			targetName => $tel->{telnum} || "",
-			gwid => $id,
-			period => $tel->{"expires"} || "",
-			authName => $tel->{"authname"} || "",
-			password => $tel->{"authpass"} || ""
-		    } if $tel->{"authpass"} && $tel->{"authname"} && $tel->{"expires"} && $tel->{"domain"};
+		    if ($tel->{'assigned'} && $tel->{'assigned'} ne "#NULL#") {
+			    $rsips->{'rsip-' . $id . '-' . $tel->{reguid}} = {
+				domain =>  $tel->{"domain"} || "",
+				fromName => $tel->{"username"} || "",
+				targetName => $tel->{'telnum'} . "@" . $tel->{'assigned'},
+				gwid => $id,
+				period => $tel->{"expires"} || "",
+				authName => $tel->{"authname"} || "",
+				password => $tel->{"authpass"} || ""
+			    } if $tel->{"authpass"} && $tel->{"authname"} && $tel->{"expires"} && $tel->{"domain"};
+		    } else {
+			delete $rsips->{'rsip-' . $id . '-' . $tel->{reguid}} if $rsips->{'rsip-' . $id . '-' . $tel->{reguid}};
+		    }
+		}
+		$cli->SetAccountRSIPs('pbx@' . $domain, $rsips);
+	    }
+	} else {
+	    if ($prefs->{Gateways}->{$FORM{provider}}->{callInGw}->{telnums}) {
+		my $rsips = $cli->GetAccountRSIPs('pbx@' . $domain);
+		my $rids = [keys %$rsips];
+		my $tids = [map {'rsip-' . $id . '-' . $_->{reguid}} @{$prefs->{Gateways}->{$FORM{provider}}->{callInGw}->{telnums}}]; 
+		my $common = [];
+		# Find active RSIPs for this gateway
+		for my $rid (@$rids) {
+		    for my $tid (@$tids) {
+			push @$common, $rid if $rid eq $tid;
+		    }
+		}
+		# Stop active RSIPs
+		for my $rid (@$common) {
+		    delete $rsips->{$rid} if $rsips->{$rid};
 		}
 		$cli->SetAccountRSIPs('pbx@' . $domain, $rsips);
 	    }
 	}
-
+	
 	# Delete checked RSIPs
 	if ($prefs->{Gateways}->{$FORM{provider}}->{callInGw}->{telnums}) {
 	    my $rsips = $cli->GetAccountRSIPs('pbx@' . $domain);
