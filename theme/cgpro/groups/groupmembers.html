@@ -120,6 +120,7 @@ var init_lists = function() {
 		<form method="get" action="">
 			<cpanel langprint="PaginatorShowing"> <select name="itemsperpage" onchange="this.form.submit();">
 			<?cp UI::paginate_list([option value="%" %]%[/option],item,selected=1?selected:,item) itemsperpage=$CPVAR{'itemsperpage'},itemlist=10:25:50:100:250:500 ?>
+			<input type="hidden" name="listname" value="<cpanel print='$FORM{'listname'}'>"  />
 			</select><noscript><button id="my_button" onclick="" type="submit" Value=""><cpanel Locale="maketext('Change')"></button></noscript>  <cpanel langprint="PaginatorResults"> 
 		</form>
 	</div>
