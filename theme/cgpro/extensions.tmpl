@@ -10,17 +10,17 @@
 	    [% myclass = accounts.$account.details.ServiceClass -%]
 	    [% classstring = classes.$myclass.AccessModes.join(',') -%]
 	    [% IF classstring == 'All' || classstring.search("SIP") -%]
-	    <option value="[% account %]">[% account %] ([% locale.maketext("CGPAccount") %])</option>
+	    <option value="a:[% account %]">[% account %] ([% locale.maketext("CGPAccount") %])</option>
 	    [% END -%]
 	    [% END -%]
 	    [% FOR account = departments -%]
-	    <option value="[% account %]">[% account %] ([% locale.maketext("CGPDepartment") %])</option>
+	    <option value="g:[% account %]">[% account %] ([% locale.maketext("CGPDepartment") %])</option>
 	    [% END -%]
 	    [% FOR queue = queues -%]
-	    <option value="[% queue.value %]">[% queue.name %] ([% locale.maketext("CGPQueue") %])</option>
+	    <option value="q:[% queue.value %]">[% queue.name %] ([% locale.maketext("CGPQueue") %])</option>
 	    [% END -%]
 	    [% FOR ivr = ivrs -%]
-	    <option value="[% ivr.value %]">[% ivr.name %] ([% locale.maketext("CGPIVRMenu") %])</option>
+	    <option value="i:[% ivr.value %]">[% ivr.name %] ([% locale.maketext("CGPIVRMenu") %])</option>
 	    [% END -%]
 	  </select>
 	</td>

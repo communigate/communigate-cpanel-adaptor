@@ -1,0 +1,17 @@
+ <cpanel setvar="headerimg=../images/mailmenu.gif">
+<cpanel setvar="dprefix=../">
+<cpanel Branding="include(stdheader.html)">
+<div class="body-content">
+  <h1><cpanel langprint="CGPSetAsDefault"></h1>
+
+  <p><?cp CommuniGate::SetAccountPSTN() extension=$FORM{'extension'}  ?></p>
+  <cpanelif $CPERROR{'CommuniGate'}>
+    <p><cpanel print="$CPERROR{'CommuniGate'}"></p>
+  </cpanelif>
+  <cpanelif !$CPERROR{'CommuniGate'}>
+    <p><b><cpanel print="$FORM{'name'}"></b> <cpanel langprint="CGPUpdated">.
+  </cpanelif>  
+  <div class="return-link"><a href="extensions.html">&larr; <cptext "Go Back"></a></div>
+</div>
+<cpanel Branding="include(stdfooter.html)">
+

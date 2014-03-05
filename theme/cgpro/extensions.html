@@ -15,9 +15,9 @@
   <h2><cpanel langprint="CGPExtensions"></h2>
   <table border="0" cellpadding="5" width="550" cellspacing="0" id="mailtbl" class="sortable truncate-table">
     <colgroup>
+      <col width="10%" align="left" />
       <col width="35%" align="left" />
-      <col width="35%" align="left" />
-      <col width="15%" align="center" />
+      <col width="25%" align="center" />
     </colgroup>
     <tr>
       <th><cpanel langprint="CGPExtensions"></th>
@@ -25,6 +25,7 @@
       <th class="sorttable_nosort"><cpanel langprint="FTPFunctions"></th>
     </tr>
     
+    <?cptt CommuniGate::ListExtensions(cgpro/listExtensions.tmpl) ?>
     <?cp CommuniGate::ListExtensions(
 	 [tr class="row-%"]
 	 [td class="truncate nobrd-left"]%[/td]

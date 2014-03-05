@@ -170,8 +170,23 @@ if ($FORM{submitdialin} && $FORM{provider}) {
 				authName => $tel->{"authname"} || "",
 				password => $tel->{"authpass"} || ""
 			    } if $tel->{"authpass"} && $tel->{"authname"} && $tel->{"expires"} && $tel->{"domain"};
+			    my $domainPrefs = $cli->GetAccountDefaultPrefs($tel->{'assigned'});
+			    $domainPrefs->{"assignedTelnums"} = {} unless $domainPrefs->{"assignedTelnums"};
+			    $domainPrefs->{"assignedTelnums"}->{$tel->{telnum}} = {} unless $domainPrefs->{"assignedTelnums"}->{$tel->{telnum}};
+			    $domainPrefs->{"assignedTelnums"}->{$tel->{telnum}}->{"gateway"} = $FORM{'provider'};
+			    $domainPrefs->{"assignedTelnums"}->{$tel->{telnum}}->{"proxyType"} = "registrar";
+			    $cli->UpdateAccountDefaultPrefs(domain => $tel->{'assigned'}, settings => {
+				assignedTelnums => $domainPrefs->{"assignedTelnums"}
+							    });
 		    } else {
 			delete $rsips->{'rsip-' . $id . '-' . $tel->{reguid}} if $rsips->{'rsip-' . $id . '-' . $tel->{reguid}};
+			if ($FORM{'oldassigned-' . $tel->{telnum}}) {
+			    my $domainPrefs = $cli->GetAccountDefaultPrefs($FORM{'oldassigned-' . $tel->{telnum}});
+			    delete $domainPrefs->{"assignedTelnums"}->{$tel->{telnum}} if $domainPrefs->{"assignedTelnums"}->{$tel->{telnum}};
+			    $cli->UpdateAccountDefaultPrefs(domain => $FORM{'oldassigned-' . $tel->{telnum}}, settings => {
+				assignedTelnums => $domainPrefs->{"assignedTelnums"}
+							    });
+			}
 		    }
 		}
 		$cli->SetAccountRSIPs('pbx@' . $domain, $rsips);

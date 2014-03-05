@@ -569,13 +569,43 @@ sub api2_ListExtensions {
   my @domains = Cpanel::Email::listmaildomains($OPTS{'domain'});
   my $cli = getCLI();
   my @result;
+  my $pbxPrefs = $cli->GetAccountPrefs('pbx@' . $cli->MainDomainName);
   foreach my $domain (@domains) {
+      my $defaultPrefs = $cli->GetAccountDefaultPrefs($domain);
+      if ($defaultPrefs->{"assignedTelnums"}) {
+	  foreach my $number (sort keys %{$defaultPrefs->{"assignedTelnums"}}) {
+	      next unless $defaultPrefs->{"assignedTelnums"}->{$number}->{"assigned"};
+	      my ($type, $object) = split ":", $defaultPrefs->{"assignedTelnums"}->{$number}->{"assigned"};
+	      my $uri = $number . "\@$domain";
+	      $uri =~ s/\+/%2B/g;
+	      my $ext = { 
+	  	  uri_dest => $uri,
+	  	  html_dest => $number,
+	  	  dest => $number,
+	  	  uri_forward => $object,
+	  	  html_forward => $object,
+	  	  forward => $object,
+		  assignedType => $type,
+		  type => "number"
+	      };
+	      if ($type eq "a") {
+		  my $settings = $cli->GetAccountSettings($object);
+		  my $telnums = $pbxPrefs->{"Gateways"}->{$defaultPrefs->{"assignedTelnums"}->{$number}->{"gateway"}}->{"callInGw"}->{"telnums"};
+		  my @telnum = grep {$_->{'telnum'} eq $number} @$telnums;
+		  # use Data::Dumper;
+		  # die Dumper $number;
+ 		  if ($telnum[0] && $telnum[0]->{'authname'} eq $settings->{"PSTNGatewayAuthName"} && $telnum[0]->{'username'} eq $settings->{"PSTNFromName"}) {
+		      $ext->{'out'} = 1;
+		  }
+ 	      }
+	      push( @result, $ext);
+	  }
+      }
       my $forwarders = $cli->ListForwarders($domain);
       my $prefs = $cli->GetAccountPrefs("ivr\@$domain");
       foreach my $forwarder (@$forwarders) {
-	  next unless $forwarder =~ m/^(tn\-\d+|\d{3})$/i;
+	  next unless $forwarder =~ m/^\d{3}$/i;
 	  my $short = $forwarder;
-	  $short =~ s/^(i|tn)\-(\d+)$/$2/i;
 	  my $fwd = $cli->GetForwarder("$forwarder\@$domain");
 	  next if $fwd eq 'null';
 	  if ($fwd =~ /^activequeue(toggle)?\_/) {
@@ -608,7 +638,7 @@ sub api2_ListExtensions {
       }
   }
   $cli->Logout();
-  return @result;
+  return {extensions => \@result};
 }
 
 sub api2_AssignExtension {
@@ -619,30 +649,43 @@ sub api2_AssignExtension {
   if ($OPTS{'extension'} || $OPTS{'local_extension'}) {
       my (undef, $domain) = split '@', $OPTS{'account'};
       for my $dom (@domains) {
-	  if ($dom eq $domain) {
-	      my $userForwarders = $cli->FindForwarders($domain,$OPTS{'account'});
-	      if ($OPTS{'local_extension'}) {
-		  $cli->CreateForwarder($OPTS{'local_extension'} . "\@$domain", $OPTS{'account'});
-		  unless ($cli->getErrMessage eq "OK") {
-		      $Cpanel::CPERROR{'CommuniGate_local_extension'} = $cli->getErrMessage;
-		      last;
-		  }
-	      }
-	      for my $forwarder (@$userForwarders) {
-		  if ($forwarder =~ m/^tn\-\d+/ && $OPTS{'extension'}) {
-		      $cli->DeleteForwarder("$forwarder\@$domain");
-		      $cli->CreateForwarder("$forwarder\@$domain", "null");
-		  }
-		  if ($forwarder =~ m/^\d{3}$/ && $OPTS{'local_extension'} && $OPTS{'local_extension'} ne "$forwarder\@$domain") {
-		      $cli->DeleteForwarder("$forwarder\@$domain");
-		  }
-	      }
+  	  if ($dom eq $domain) {
+  	      my $userForwarders = $cli->FindForwarders($domain,$OPTS{'account'});
+  	      if ($OPTS{'local_extension'}) {
+  		  $cli->CreateForwarder($OPTS{'local_extension'} . "\@$domain", $OPTS{'account'});
+  		  unless ($cli->getErrMessage eq "OK") {
+  		      $Cpanel::CPERROR{'CommuniGate_local_extension'} = $cli->getErrMessage;
+  		      last;
+  		  }
+  	      }
+  	      # for my $forwarder (@$userForwarders) {
+  	      # 	  if ($forwarder =~ m/^tn\-\d+/ && $OPTS{'extension'}) {
+  	      # 	      $cli->DeleteForwarder("$forwarder\@$domain");
+  	      # 	      $cli->CreateForwarder("$forwarder\@$domain", "null");
+  	      # 	  }
+  	      # 	  if ($forwarder =~ m/^\d{3}$/ && $OPTS{'local_extension'} && $OPTS{'local_extension'} ne "$forwarder\@$domain") {
+  	      # 	      $cli->DeleteForwarder("$forwarder\@$domain");
+  	      # 	  }
+  	      # }
 	      if ($OPTS{'extension'}) {
-		  $cli->DeleteForwarder($OPTS{'extension'});
-		  $cli->CreateForwarder($OPTS{'extension'}, $OPTS{'account'});
+		  my ($objType, $objAddress) = split ":", $OPTS{'account'};
+		  if ($objType eq "a") {
+		      my $telnums = $cli->GetAccountTelnums($objAddress);
+		      push @$telnums, $OPTS{"extension"} unless grep {$_ == $OPTS{"extension"}} @$telnums;
+		      $cli->SetAccountTelnums($objAddress, $telnums);
+		      my $prefs = $cli->GetAccountDefaultPrefs($domain);
+		      $prefs->{'assignedTelnums'}->{$OPTS{"extension"}}->{"assigned"} = $OPTS{"account"};
+		      $cli->UpdateAccountDefaultPrefs(
+			  domain => $domain,
+			  settings => {
+			      assignedTelnums => $prefs->{'assignedTelnums'}
+			  });
+		  }
+  	      	  # $cli->DeleteForwarder($OPTS{'extension'});
+  	      	  # $cli->CreateForwarder($OPTS{'extension'}, $OPTS{'account'});
 	      }
-	      last;
-	  }
+  	      last;
+  	  }
       }
   }
 
@@ -652,35 +695,35 @@ sub api2_AssignExtension {
   foreach my $domain (@domains) {
       my $accounts = $cli->ListAccounts($domain);
       foreach my $userName (sort keys %$accounts) {
-	  my $account = $cli->GetAccountSettings("$userName\@$domain");
-	  $result->{"accounts"}->{"$userName\@$domain"}->{details} = $account;
+  	  my $account = $cli->GetAccountSettings("$userName\@$domain");
+  	  $result->{"accounts"}->{"$userName\@$domain"}->{details} = $account;
       }
       my $groups = $cli->ListGroups($domain);
       foreach $groupName (sort @$groups) {
-	  next if $groupName =~ m/^activequeuegroup\_/i;
-	  my $details = $cli->GetGroup("$groupName\@$domain");
-	  $result->{'departments'} = [] unless $result->{'departments'};
-	  push @{$result->{'departments'}}, "$groupName\@$domain" unless (defined($details->{SignalDisabled}) && $details->{SignalDisabled} eq "YES");
+  	  next if $groupName =~ m/^activequeuegroup\_/i;
+  	  my $details = $cli->GetGroup("$groupName\@$domain");
+  	  $result->{'departments'} = [] unless $result->{'departments'};
+  	  push @{$result->{'departments'}}, "$groupName\@$domain" unless (defined($details->{SignalDisabled}) && $details->{SignalDisabled} eq "YES");
 
       }
       my $forwarders = $cli->ListForwarders($domain);
       foreach my $forwarder (sort @$forwarders) {
-	  if ($forwarder =~ /^activequeue\_/) {
-	      my $name = "";
-	      my $to = $cli->GetForwarder("$forwarder\@$domain");
-	      $to =~ s/activequeue\{(.*?)\}\#.*?$/$1/;
-	      (undef, $name, undef) = split ",", $to;
-	      ($name, undef) = split '@', $to unless $name;
-	      my $toggle = $forwarder;
-	      $toggle =~ s/activequeue/activequeuetoggle/i;
-	      push @{$result->{'queues'}}, {value => "$forwarder\@$domain", toggle => "$toggle\@$domain", name => "$name\@$domain"};
-	  }
+  	  if ($forwarder =~ /^activequeue\_/) {
+  	      my $name = "";
+  	      my $to = $cli->GetForwarder("$forwarder\@$domain");
+  	      $to =~ s/activequeue\{(.*?)\}\#.*?$/$1/;
+  	      (undef, $name, undef) = split ",", $to;
+  	      ($name, undef) = split '@', $to unless $name;
+  	      my $toggle = $forwarder;
+  	      $toggle =~ s/activequeue/activequeuetoggle/i;
+  	      push @{$result->{'queues'}}, {value => "$forwarder\@$domain", toggle => "$toggle\@$domain", name => "$name\@$domain"};
+  	  }
       }
       my $prefs = $cli->GetAccountPrefs("ivr\@$domain");
       if ($prefs && $prefs->{IVRMenus}) {
-	  for my $ivr (sort keys %{$prefs->{IVRMenus}}) {
-	      push @{$result->{'ivrs'}}, {value => "ivrmenu{$ivr}#ivr\@$domain", name => $prefs->{IVRMenus}->{$ivr}->{NAME} . "\@$domain"};
-	  }
+  	  for my $ivr (sort keys %{$prefs->{IVRMenus}}) {
+  	      push @{$result->{'ivrs'}}, {value => "ivrmenu{$ivr}#ivr\@$domain", name => $prefs->{IVRMenus}->{$ivr}->{NAME} . "\@$domain"};
+  	  }
       }
   }
   $cli->Logout();
@@ -692,16 +735,31 @@ sub api2_DeleteExtension {
   my @domains = Cpanel::Email::listmaildomains();
   my $cli = getCLI();
   if ($OPTS{'extension'}) {
-      my (undef, $domain) = split '@', $OPTS{'extension'};
+      my ($number, $domain) = split '@', $OPTS{'extension'};
       for my $dom (@domains) {
 	  if ($dom eq $domain) {
-	      $cli->DeleteForwarder($OPTS{'extension'});
+	      if ($number =~ m/^\d{3}$/) {
+		  $cli->DeleteForwarder($OPTS{'extension'});
+	      } else {
+		  my $prefs = $cli->GetAccountDefaultPrefs($domain);
+		  my ($type, $account) = split ":", $prefs->{'assignedTelnums'}->{$number}->{"assigned"};
+		  if ($type eq "a") {
+		      # Remove account's telnum.
+		      my $telnums = $cli->GetAccountTelnums($account);
+		      @$telnums = grep { $_ ne $number } @$telnums;
+		      $cli->SetAccountTelnums($account, $telnums);
+		  } else {
+		      # Remove Server Rule.
+		  }
+		  delete $prefs->{'assignedTelnums'}->{$number}->{"assigned"};
+		  $cli->UpdateAccountDefaultPrefs(
+		  	  domain => $domain,
+		  	  settings => {
+		  	      assignedTelnums => $prefs->{'assignedTelnums'}
+		  	  });
+	      }
 	      unless ($cli->getErrMessage eq "OK") {
 		  $Cpanel::CPERROR{'CommuniGate'} = $cli->getErrMessage;
-		  last;
-	      }
-	      if ($OPTS{'extension'} =~ m/^tn\-\d+/) {
-		  $cli->CreateForwarder($OPTS{'extension'}, "null");
 	      }
 	      last;
 	  }
@@ -719,15 +777,21 @@ sub api2_GetExtensions {
   my @result;
   for my $dom (@domains) {
       if ($dom eq $domain) {
-	  my $forwarders = $cli->ListForwarders($domain);
-	  foreach my $forwarder (@$forwarders) {
-	      next unless $forwarder =~ m/^tn\-\d+$/i;
-	      my $fwd = $cli->GetForwarder("$forwarder\@$domain");
-	      next unless $fwd eq 'null';
-	      my $short = $forwarder;
-	      $short =~ s/^(i|tn)\-(\d+)$/$2/i;
-	      push @result, {extension => "$forwarder\@$domain", short => $short};
+	  my $domainPrefs = $cli->GetAccountDefaultPrefs($domain);
+	  if ($domainPrefs->{assignedTelnums}) {
+	      foreach my $number (keys %{$domainPrefs->{assignedTelnums}}) {
+		  push @result, {extension => $number, short => $number} unless $domainPrefs->{assignedTelnums}->{$number}->{'assigned'};
+	      }
 	  }
+	  # my $forwarders = $cli->ListForwarders($domain);
+	  # foreach my $forwarder (@$forwarders) {
+	  #     next unless $forwarder =~ m/^tn\-\d+$/i;
+	  #     my $fwd = $cli->GetForwarder("$forwarder\@$domain");
+	  #     next unless $fwd eq 'null';
+	  #     my $short = $forwarder;
+	  #     $short =~ s/^(i|tn)\-(\d+)$/$2/i;
+	  #     push @result, {extension => "$forwarder\@$domain", short => $short};
+	  # }
 	  last;
       }
   }
@@ -4783,6 +4847,70 @@ sub api2_UpdatePSTN {
 		    PSTNGatewayVia => $rsips->{$OPTS{'rsip'}}->{'domain'}
 					});
 	    
+	    last;
+	}
+    }
+    $cli->Logout();
+    return $result;
+}
+
+sub api2_SetAccountPSTN {
+    my %OPTS = @_;
+    my $extension = $OPTS{'extension'};
+    my ($number,$dom) = split "@", $extension;
+
+    my @domains = Cpanel::Email::listmaildomains();
+    my $cli = getCLI();
+
+    my $result = {};
+    for my $domain (@domains) {
+	if ($domain eq $dom) {
+	    my $defaultDomain = $cli->MainDomainName();
+	    my $myPrefs = $cli->GetAccountDefaultPrefs($domain);
+	    my $gateway = $myPrefs->{"assignedTelnums"}->{$number}->{"gateway"};
+	    my ($accType, $account) = split ":", $myPrefs->{"assignedTelnums"}->{$number}->{"assigned"};
+	    my $prefs = $cli->GetAccountPrefs("pbx\@$defaultDomain");
+	    # my $gatewayType = $prefs->{"Gateways"}->{$gateway}->{"callInGw"}->{"proxyType"};
+	    my @telnum = grep {$_->{"telnum"} eq $number} @{$prefs->{"Gateways"}->{$gateway}->{"callInGw"}->{"telnums"}};
+	    if ($accType eq "a" && $telnum[0]) {
+		$cli->UpdateAccountSettings($account, {
+		    PSTNFromName => $telnum[0]->{'username'},
+	    	    PSTNGatewayAuthName => $telnum[0]->{'authname'},
+	    	    PSTNGatewayDomain => $telnum[0]->{'domain'},
+	    	    PSTNGatewayPassword => $telnum[0]->{'authpass'},
+	    	    PSTNGatewayVia => $telnum[0]->{'domain'}
+					    });
+	    }
+	    last;
+	}
+    }
+    $cli->Logout();
+    return $result;
+}
+
+sub api2_UnsetAccountPSTN {
+    my %OPTS = @_;
+    my $extension = $OPTS{'extension'};
+    my ($number,$dom) = split "@", $extension;
+
+    my @domains = Cpanel::Email::listmaildomains();
+    my $cli = getCLI();
+
+    my $result = {};
+    for my $domain (@domains) {
+	if ($domain eq $dom) {
+	    my $defaultDomain = $cli->MainDomainName();
+	    my $myPrefs = $cli->GetAccountDefaultPrefs($domain);
+	    my ($accType, $account) = split ":", $myPrefs->{"assignedTelnums"}->{$number}->{"assigned"};
+	    if ($accType eq "a") {
+		$cli->UpdateAccountSettings($account, {
+		    PSTNFromName => "default",
+	    	    PSTNGatewayAuthName => "default",
+	    	    PSTNGatewayDomain => "default",
+	    	    PSTNGatewayPassword => "default",
+	    	    PSTNGatewayVia => "default"
+					    });
+	    }
 	    last;
 	}
     }

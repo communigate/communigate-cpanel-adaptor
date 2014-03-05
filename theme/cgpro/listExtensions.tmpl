@@ -1,0 +1,15 @@
+[% FOR extension IN extensions -%]
+<tr class="row-[% loop.count % 2 ? 'even' : 'odd' %]">
+  <td class="truncate">[% extension.html_dest %]</td>
+  <td class="truncate">[% extension.html_forward %]</td>
+  <td>
+    <a href="deleteextension.html?extension=[% extension.uri_dest %]&amp;display=[% extension.html_dest %]">[% locale.maketext('BrandingDPackage') %]</a>[% IF extension.type == "number" && extension.assignedType == "a" %], 
+    [% UNLESS extension.out -%]
+    <a href="setoutgoingnumber.html?extension=[% extension.uri_dest %]">[% locale.maketext('CGPSetAsOutgoing') %]</a>
+    [% ELSE %]
+    <a href="unsetoutgoingnumber.html?extension=[% extension.uri_dest %]">[% locale.maketext('CGPUnsetAsOutgoing') %]</a>
+    [% END -%]
+    [% END %]
+  </td>
+</tr>
+[% END -%]
