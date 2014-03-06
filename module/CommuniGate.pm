@@ -572,6 +572,7 @@ sub api2_ListExtensions {
   my $pbxPrefs = $cli->GetAccountPrefs('pbx@' . $cli->MainDomainName);
   foreach my $domain (@domains) {
       my $defaultPrefs = $cli->GetAccountDefaultPrefs($domain);
+      my $prefs = $cli->GetAccountPrefs("ivr\@$domain");
       if ($defaultPrefs->{"assignedTelnums"}) {
 	  foreach my $number (sort keys %{$defaultPrefs->{"assignedTelnums"}}) {
 	      next unless $defaultPrefs->{"assignedTelnums"}->{$number}->{"assigned"};
@@ -597,12 +598,24 @@ sub api2_ListExtensions {
  		  if ($telnum[0] && $telnum[0]->{'authname'} eq $settings->{"PSTNGatewayAuthName"} && $telnum[0]->{'username'} eq $settings->{"PSTNFromName"}) {
 		      $ext->{'out'} = 1;
 		  }
- 	      }
+ 	      } else {
+		  if ($object =~ /^ivrmenu\{(\w+)\}/) {
+		      if ($prefs && $prefs->{IVRMenus} && $1) {
+			  $ext->{'html_forward'} = $prefs->{IVRMenus}->{$1}->{NAME};
+			  $ext->{'html_forward'} .= "\@$domain (IVR Menu)";
+		      }
+		  } elsif ($object =~ /^activequeue\_/) {
+		      $ext->{'html_forward'} =~ s/^activequeue_//;
+		      $ext->{'html_forward'} .= " (Caller Queue)";
+		  } elsif ($type eq "g") {
+		      $ext->{'html_forward'} .= " (Department)";
+		  }
+
+	      }
 	      push( @result, $ext);
 	  }
       }
       my $forwarders = $cli->ListForwarders($domain);
-      my $prefs = $cli->GetAccountPrefs("ivr\@$domain");
       foreach my $forwarder (@$forwarders) {
 	  next unless $forwarder =~ m/^\d{3}$/i;
 	  my $short = $forwarder;
@@ -667,22 +680,29 @@ sub api2_AssignExtension {
   	      # 	      $cli->DeleteForwarder("$forwarder\@$domain");
   	      # 	  }
   	      # }
+	      my ($objType, $objAddress) = split ":", $OPTS{'account'};
 	      if ($OPTS{'extension'}) {
-		  my ($objType, $objAddress) = split ":", $OPTS{'account'};
 		  if ($objType eq "a") {
 		      my $telnums = $cli->GetAccountTelnums($objAddress);
 		      push @$telnums, $OPTS{"extension"} unless grep {$_ == $OPTS{"extension"}} @$telnums;
 		      $cli->SetAccountTelnums($objAddress, $telnums);
-		      my $prefs = $cli->GetAccountDefaultPrefs($domain);
-		      $prefs->{'assignedTelnums'}->{$OPTS{"extension"}}->{"assigned"} = $OPTS{"account"};
-		      $cli->UpdateAccountDefaultPrefs(
-			  domain => $domain,
-			  settings => {
-			      assignedTelnums => $prefs->{'assignedTelnums'}
-			  });
+		  } else {
+		      my $rules = $cli->GetServerSignalRules();
+		      push @$rules, [
+			  "100005",
+			  $OPTS{"extension"} . '@' . $domain,
+			  [["To","is",$OPTS{"extension"} . '@' . $domain],["Method","is","INVITE"]],
+			  [["Redirect to", $objAddress]]
+		      ] unless grep {$_->[1] eq $OPTS{"extension"} . '@' . $domain} @$rules; # LOAD possible
+		      $cli->SetServerSignalRules($rules);
 		  }
-  	      	  # $cli->DeleteForwarder($OPTS{'extension'});
-  	      	  # $cli->CreateForwarder($OPTS{'extension'}, $OPTS{'account'});
+		  my $prefs = $cli->GetAccountDefaultPrefs($domain);
+		  $prefs->{'assignedTelnums'}->{$OPTS{"extension"}}->{"assigned"} = $OPTS{"account"};
+		  $cli->UpdateAccountDefaultPrefs(
+		      domain => $domain,
+		      settings => {
+			  assignedTelnums => $prefs->{'assignedTelnums'}
+		      });
 	      }
   	      last;
   	  }
@@ -750,6 +770,9 @@ sub api2_DeleteExtension {
 		      $cli->SetAccountTelnums($account, $telnums);
 		  } else {
 		      # Remove Server Rule.
+		      my $rules = $cli->GetServerSignalRules();
+		      @$rules = grep {$_->[1] ne $OPTS{"extension"}} @$rules; # LOAD possible
+		      $cli->SetServerSignalRules($rules);
 		  }
 		  delete $prefs->{'assignedTelnums'}->{$number}->{"assigned"};
 		  $cli->UpdateAccountDefaultPrefs(
@@ -3748,20 +3771,10 @@ sub api2_AddQueue {
 		$department =~ s/^activequeuegroup_//;
 		($name,undef) = split "@", $department unless $name;
 	    }
-	    my $forwarders = $cli->ListForwarders($domain);
-	    foreach my $forwarder (@$forwarders) {
-		next unless $forwarder =~ m/^(tn\-\d+|\d{3})$/i;
-		my $fwd = $cli->GetForwarder("$forwarder\@$domain");
-		next if $fwd eq 'null';
-		if ($forwarder =~ /^\d{3}$/) {
-		    $localExtension = $forwarder if $fwd eq "activequeue_" . $department;
-		    $agentExtension = $forwarder if $fwd eq "activequeuetoggle_" . $department;
-		}
-	    }
 	}
     }
     $cli->Logout();
-    return {departments => $departments, name => $name, department => $department, localExtension => $localExtension, agentExtension => $agentExtension};
+    return {departments => $departments, name => $name, department => $department};
 }
 
 sub api2_DoAddQueue {
@@ -3787,12 +3800,6 @@ sub api2_DoAddQueue {
 	    }
 	    $cli->CreateForwarder("activequeue_" . $OPTS{'department'}, 'activequeue{' . $queuestring . '}#pbx@' . $domain);
 	    $cli->CreateForwarder("activequeuetoggle_" . $OPTS{'department'}, 'togglegroupmember{' . $OPTS{'department'} . ',' . "activequeuegroup_" . $OPTS{'department'} . '}#pbx@' . $domain);
-	    if ($OPTS{localExtension}) {
-		$cli->CreateForwarder($OPTS{'localExtension'} . "\@$domain", "activequeue_" . $OPTS{'department'});
-	    }
-	    if ($OPTS{agentExtension}) {
-		$cli->CreateForwarder($OPTS{'agentExtension'} . "\@$domain", "activequeuetoggle_" . $OPTS{'department'});
-	    }
 	    my $forwarders = $cli->ListForwarders($domain);
 	    foreach my $forwarder (@$forwarders) {
 		next unless $forwarder =~ m/^tn\-\d+$/i;
@@ -3801,10 +3808,6 @@ sub api2_DoAddQueue {
 		    $cli->DeleteForwarder("$forwarder\@$domain");
 		    $cli->CreateForwarder("$forwarder\@$domain", "null");
 		}
-	    }
-	    if ($OPTS{'extension'} && $OPTS{'extension'} =~ m/$domain$/ ) {
-		$cli->DeleteForwarder($OPTS{'extension'});
-		$cli->CreateForwarder($OPTS{'extension'}, "activequeue_" . $OPTS{'department'});
 	    }
 	}
     }

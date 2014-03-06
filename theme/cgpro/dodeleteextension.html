@@ -5,6 +5,7 @@
   <cpanelfeature cgpro_extensions>
   <h1><cpanel langprint="FWMaint"></h1>
 
+  <p><?cp CommuniGate::UnsetAccountPSTN() extension=$FORM{'extension'}  ?></p>
   <p><?cp CommuniGate::DeleteExtension() extension=$FORM{'extension'} || 'maketext('The extension could not be removed.')' ?></p>
   <cpanelif $CPERROR{'CommuniGate'}>
     <p><cpanel print="$CPERROR{'CommuniGate'}"></p>
