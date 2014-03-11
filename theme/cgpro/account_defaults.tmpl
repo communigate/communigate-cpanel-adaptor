@@ -153,6 +153,19 @@
 	  [% filter_check("WorkDays", accountDefaultPrefs.WorkDays || serverAccountPrefs.WorkDays, "Sat", locale.maketext("CGPSat")) %]
 	</td>
       </tr>    
+      [% IF CPANEL.feature("cgpro_extensions") -%]
+      <tr class="tdshade2_noborder">
+	<td nowrap="nowrap" align="RIGHT" style="width: 30%">Default outgoing telephone number:</td>
+	<td nowrap="nowrap">
+	  <select name="number" id="number">
+	    [% filter_option(accountDefaultPrefs.WeekStart, "", "CGPNone") %]
+	    [% FOR number IN outhoingNumbers.keys -%]
+	    [% filter_option(outhoingNumber, number, number) %]
+	    [% END -%]
+	  </select>
+	</td>
+      </tr>
+      [% END -%]
       <tr class="tdshade1_noborder">
 	<td nowrap="nowrap" align="RIGHT" style="width: 30%; vertical-align: top;">
 	  Client IP addresses: <br />

@@ -240,17 +240,57 @@ sub api2_AccountDefaults {
 			WorkDays => (join(",",@$workdays) eq join(",",@{$defaultServerAccountPrefs->{WorkDays}}) ? 'default' : $workdays),
 		    }
 		    );
+	    if ($OPTS{'number'}) {
+ 		my $defaultDomain = $cli->MainDomainName();
+		my $myPrefs = $cli->GetAccountDefaultPrefs($domain);
+		my $gateway = $myPrefs->{"assignedTelnums"}->{$OPTS{'number'}}->{"gateway"};
+		my $prefs = $cli->GetAccountPrefs("pbx\@$defaultDomain");
+		my @telnum = grep {$_->{"telnum"} eq $OPTS{'number'}} @{$prefs->{"Gateways"}->{$gateway}->{"callInGw"}->{"telnums"}};
+		$cli->UpdateAccountDefaults(domain => $domain,
+					    settings => {
+						PSTNFromName => $telnum[0]->{'username'},
+						PSTNGatewayAuthName => $telnum[0]->{'authname'},
+						PSTNGatewayDomain => $telnum[0]->{'domain'},
+						PSTNGatewayPassword => $telnum[0]->{'authpass'},
+						PSTNGatewayVia => $telnum[0]->{'domain'}
+					    });
+	    } else {
+		$cli->UpdateAccountDefaults(domain => $domain,
+					    settings => {
+						PSTNFromName => 'default',
+						PSTNGatewayAuthName => 'default',
+						PSTNGatewayDomain => 'default',
+						PSTNGatewayPassword => 'default',
+						PSTNGatewayVia => 'default'
+					    });
+	    }
 	}
 	my $serverDomainDefaults = $cli->GetDomainDefaults();
 	my $serverAccountPrefs = $cli->GetServerAccountPrefs();
 	my $domainSettings = $cli->GetDomainSettings($domain);
 	my $accountDefaultPrefs = $cli->GetAccountDefaultPrefs($domain);
+	my $accountDefaults = $cli->GetAccountDefaults($domain);
+	my $number;
+	my $numbers = $accountDefaultPrefs->{"assignedTelnums"};
+
+	my $defaultDomain = $cli->MainDomainName();
+	my $prefs = $cli->GetAccountPrefs("pbx\@$defaultDomain");
+	for my $num (keys %$numbers) {
+	    my $gateway = $accountDefaultPrefs->{"assignedTelnums"}->{$num}->{"gateway"};
+	    my @telnum = grep {$_->{"telnum"} eq $num} @{$prefs->{"Gateways"}->{$gateway}->{"callInGw"}->{"telnums"}};
+	    if ($telnum[0] && $telnum[0]->{'authname'} eq $accountDefaults->{"PSTNGatewayAuthName"} && $telnum[0]->{'username'} eq $accountDefaults->{"PSTNFromName"}) {
+		$number = $num;
+		last;
+	    }
+	}
 	$cli->Logout();
 	return { 
 	    serverDomainDefaults => $serverDomainDefaults,
 	    serverAccountPrefs => $serverAccountPrefs,
 	    domainSettings => $domainSettings,
 	    accountDefaultPrefs => $accountDefaultPrefs,
+	    outhoingNumber => $number,
+	    outhoingNumbers => $numbers,
 	    domain => $domain
 	};
 }
