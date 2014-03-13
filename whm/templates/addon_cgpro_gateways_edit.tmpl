@@ -157,14 +157,6 @@
 	      <table class="datatable brick" cellspacing="0" cellpadding="5" width="100%" border="0" align="center" style="border: 1px solid #808080;">
 		<tbody>
  		  <tr class="tdshade1_noborder">
-		    <td nowrap="nowrap" align="RIGHT" style="width: 25%;"><label for="dialInEnabled">Dial-in Enabled</label>:</td>
-		    <td nowrap="nowrap">
-		      <input type="checkbox" name="dialInEnabled" id="dialInEnabled" value="1"[% IF prefs.Gateways.$provider.callInGw; ' checked="checked"'; END %] />
-		      <input type="hidden" name="provider" id="provider" value="[% provider %]"  />
-		    </td>
-		  </tr>
-		  [% IF prefs.Gateways.$provider.callInGw -%]
- 		  <tr class="tdshade1_noborder">
 		    <td nowrap="nowrap" align="RIGHT" style="width: 25%;"><label for="dialInEnabled">Register</label>:</td>
 		    <td nowrap="nowrap">
 		      <input type="radio" name="proxyType" id="register1" value="registrar"[% prefs.Gateways.$provider.callInGw.proxyType == "registrar" ? 'checked="checked"' : '' -%] /><label for="register1">Register at the gateway with username and password</label> <br />
@@ -271,7 +263,6 @@
 		      </table>
 		    </td>
 		  </tr>
-		  [% END -%]
 		</tbody>
 	      </table>
 	      <p>

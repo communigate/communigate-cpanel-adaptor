@@ -711,15 +711,6 @@ sub api2_AssignExtension {
   		      last;
   		  }
   	      }
-  	      # for my $forwarder (@$userForwarders) {
-  	      # 	  if ($forwarder =~ m/^tn\-\d+/ && $OPTS{'extension'}) {
-  	      # 	      $cli->DeleteForwarder("$forwarder\@$domain");
-  	      # 	      $cli->CreateForwarder("$forwarder\@$domain", "null");
-  	      # 	  }
-  	      # 	  if ($forwarder =~ m/^\d{3}$/ && $OPTS{'local_extension'} && $OPTS{'local_extension'} ne "$forwarder\@$domain") {
-  	      # 	      $cli->DeleteForwarder("$forwarder\@$domain");
-  	      # 	  }
-  	      # }
 	      my ($objType, $objAddress) = split ":", $OPTS{'account'};
 	      if ($OPTS{'extension'}) {
 		  if ($objType eq "a") {
@@ -846,15 +837,6 @@ sub api2_GetExtensions {
 		  push @result, {extension => $number, short => $number} unless $domainPrefs->{assignedTelnums}->{$number}->{'assigned'};
 	      }
 	  }
-	  # my $forwarders = $cli->ListForwarders($domain);
-	  # foreach my $forwarder (@$forwarders) {
-	  #     next unless $forwarder =~ m/^tn\-\d+$/i;
-	  #     my $fwd = $cli->GetForwarder("$forwarder\@$domain");
-	  #     next unless $fwd eq 'null';
-	  #     my $short = $forwarder;
-	  #     $short =~ s/^(i|tn)\-(\d+)$/$2/i;
-	  #     push @result, {extension => "$forwarder\@$domain", short => $short};
-	  # }
 	  last;
       }
   }

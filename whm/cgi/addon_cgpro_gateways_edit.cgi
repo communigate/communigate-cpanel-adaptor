@@ -74,7 +74,6 @@ if ($FORM{submitedit} && $FORM{provider} && $FORM{name}) {
 }
 
 if ($FORM{submitdialin} && $FORM{provider}) {
-    if ($FORM{dialInEnabled} && $FORM{dialInEnabled} ne '#NULL#') {
 	$prefs->{Gateways}->{$FORM{provider}}->{callInGw} = {
 	    proxyType => "director",
 	    telnums => []
@@ -82,68 +81,8 @@ if ($FORM{submitdialin} && $FORM{provider}) {
 
 	$prefs->{Gateways}->{$FORM{provider}}->{callInGw}->{proxyType} = $FORM{proxyType} if $FORM{proxyType};
 
-	# Update Gateways trunk [KEEP]
-	# $prefs->{Gateways}->{$FORM{provider}}->{callInGw}->{trunk} = [];
-	# if ($FORM{proxyType} ne "registrar") {
-	#     for my $ip (split "\r?\n", $FORM{gateways}) {
-	# 	# #I[192.168.2.1]:*
-	# 	$ip =~ s/^(.*?)(\:\d+)?$/#I[$1]$2/;
-	# 	$ip .= ":*" unless $ip =~ /\:/;
-	# 	warn $ip;
-	# 	push @{$prefs->{Gateways}->{$FORM{provider}}->{callInGw}->{trunk}}, {
-	# 	    source => $ip,
-	# 	    descr => ""
-	# 	} if $ip =~ m/^\#I\[\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\]\:(\*|\d{1,2})$/;
-	#     }
-	# }
-
-	# Common GWin
 	my $rsips = $cli->GetAccountRSIPs('pbx@' . $domain);
-	# for my $tel (keys %$tels) {
-	#     # Modify telnums
-	#     if ($FORM{proxyType} eq "registrar" && $FORM{proxyTypeOld} ne "registrar") {
-	# 	my $uin = join "-", map{ join "", map { unpack "H*", chr(rand(256)) } 1..$_} (4,2,2,2,6);
-	# 	push @{$prefs->{Gateways}->{$FORM{provider}}->{callInGw}->{telnums}}, {
-	# 	    'authname' => undef,
-	# 	    'telnum' => $tel,
-	# 	    'contact' => 'gwin-' . $id . '-' . $tel . '@' . $domain ,
-	# 	    'authpass' => undef,
-	# 	    'username' => undef,
-	# 	    'domain' => '',
-	# 	    'reguid' => $uin,
-	# 	    'server' => undef,
-	# 	    'expires' => '30m'
-	# 	};
-	# 	# $rsips->{'rsip-' . $id . '-' . $uin } = {
-	# 	#     domain => "",
-	# 	#     fromName => $tel,
-	# 	#     gwid => $id,
-	# 	#     period => '30m',
-	# 	#     targetName => $tel,
-	# 	# }
-	#     }
-	#     if ($FORM{proxyType} eq "director" && $FORM{proxyTypeOld} ne "director") {
-	# 	push @{$prefs->{Gateways}->{$FORM{provider}}->{callInGw}->{telnums}}, {
-	# 	    telnum => $tel
-	# 	};
-	#     }
-	# }
-	# if ($FORM{proxyType} eq "registrar" && $FORM{proxyTypeOld} ne "registrar") {
-	#     $cli->SetAccountRSIPs('pbx@' . $domain, $rsips);
-	# }
- 	# if ($FORM{proxyType} eq "trunk" && $FORM{proxyTypeOld} ne "trunk") {
-	#     delete $prefs->{Gateways}->{$FORM{provider}}->{callInGw}->{telnums};
-	# }
-	# if ($FORM{proxyType} ne "registrar" && $FORM{proxyTypeOld} eq "registrar") {
-	#     my $newRsips = {};
-	#     for my $rsip (keys $rsips) {
-	# 	$newRsips->{$rsip} = $rsips->{$rsip} unless $rsip =~ m/^rsip-$id/;
-	#     }
-	#     $cli->SetAccountRSIPs('pbx@' . $domain, $newRsips);
-	# }
-
 	# Update telnums settings
-	# if ($FORM{proxyType} eq "registrar" && $FORM{proxyTypeOld} eq "registrar") {
 	if ($FORM{proxyType} eq "registrar") {
 	    if ($prefs->{Gateways}->{$FORM{provider}}->{callInGw}->{telnums}) {
 		my $rsips = $cli->GetAccountRSIPs('pbx@' . $domain);
@@ -156,8 +95,8 @@ if ($FORM{submitdialin} && $FORM{provider}) {
 			'username' => ($FORM{'username-' . $tel->{telnum}} || $tel->{"username"} || undef),
 			'domain' => ($FORM{'host-' . $tel->{telnum}} || $tel->{"domain"} || undef),
 			'reguid' => $tel->{reguid},
-			'server' => $tel->{server},
-			'expires' => ($FORM{'expires-' . $tel->{telnum}} || 0 || undef),
+			# 'server' => $tel->{server},
+			'expires' => ($FORM{'expires-' . $tel->{telnum}} || $tel->{telnum} || undef),
 			'assigned' => ($FORM{'assigned-' . $tel->{telnum}} || undef)
 		    };
 		    if ($tel->{'assigned'} && $tel->{'assigned'} ne "#NULL#") {
@@ -179,14 +118,8 @@ if ($FORM{submitdialin} && $FORM{provider}) {
 				assignedTelnums => $domainPrefs->{"assignedTelnums"}
 							    });
 		    } else {
+			unassignTelnum($cli, $FORM{'oldassigned-' . $tel->{telnum}}, $tel, $prefs);
 			delete $rsips->{'rsip-' . $id . '-' . $tel->{reguid}} if $rsips->{'rsip-' . $id . '-' . $tel->{reguid}};
-			if ($FORM{'oldassigned-' . $tel->{telnum}}) {
-			    my $domainPrefs = $cli->GetAccountDefaultPrefs($FORM{'oldassigned-' . $tel->{telnum}});
-			    delete $domainPrefs->{"assignedTelnums"}->{$tel->{telnum}} if $domainPrefs->{"assignedTelnums"}->{$tel->{telnum}};
-			    $cli->UpdateAccountDefaultPrefs(domain => $FORM{'oldassigned-' . $tel->{telnum}}, settings => {
-				assignedTelnums => $domainPrefs->{"assignedTelnums"}
-							    });
-			}
 		    }
 		}
 		$cli->SetAccountRSIPs('pbx@' . $domain, $rsips);
@@ -219,6 +152,7 @@ if ($FORM{submitdialin} && $FORM{provider}) {
 		if ($FORM{'delete-' . $tel->{telnum}}) {
 		    if ($tel->{reguid}) {
 			delete $rsips->{'rsip-' . $id . '-' . $tel->{reguid}};
+			unassignTelnum($cli, $FORM{'oldassigned-' . $tel->{telnum}}, $tel, $prefs);
 		    }
 		} else {
 		    push @$tels, $tel;
@@ -226,10 +160,8 @@ if ($FORM{submitdialin} && $FORM{provider}) {
 	    }
 	    $prefs->{Gateways}->{$FORM{provider}}->{callInGw}->{telnums} = $tels;
 	    $cli->SetAccountRSIPs('pbx@' . $domain, $rsips);
+
 	}
-    } else {
-	delete $prefs->{Gateways}->{$FORM{provider}}->{callInGw};
-    }
     $cli->UpdateAccountPrefs('pbx@' . $domain, {Gateways => $prefs->{Gateways}});
 }
 
@@ -250,60 +182,6 @@ if ($prefs->{Gateways}->{$FORM{provider}}->{callInGw} && $prefs->{Gateways}->{$F
     for $method (@{$prefs->{Gateways}->{$FORM{provider}}->{callInGw}->{CLIDMethods}}) {
 	$methods->{$method} = ++$i;
     }
-}
-sub rulesToText {
-    my $rules = shift;
-    my $callerIdReRules;
-    for my $rule (@$rules) {
-	my $condition = $rule->[0];
-	my $digits = $rule->[1];
-	my $action = $rule->[2];
-	if ($digits eq '#NULL#') {
-	    $digits = '*';
-	} else {
-	    $digits = $digits->[0];
-	    unless ($digits =~ s/^\#(\d+)$/$1/) {
-		$digits = join "-", map {$_ =~ s/^\#(\d+)$/$1/ ? $_ : ""} @$digits;
-	    }
-	    $digits = "($digits)";
-	}
-	$condition =~ s/^\^(.*?)\(.*\)\$$/$1/;
-	$condition =~ s/[\\\?]//g;
-	$callerIdReRules .= "$condition$digits -> $action*\n";
-    }
-    return $callerIdReRules;
-};
-
-sub textToRules {
-    my $param = shift;
-    my $rules = [];
-    for my $rul (split "\r?\n", $param) {
-	$rul =~ s/\s+//g;
-	my ($r,$a) = split "->", $rul;
-	if ($r && $a && $r =~ m/^(.*?)(\(.*?\)|\*)$/) {
-	    my $numbers = $1;
-	    my $wildcard = $2;
-	    my $range = "";
-	    if ($wildcard eq '*') {
-		$range = undef;
-		$r =~ s/\*/(.*)/;
-	    } else {
-		$r =~ s/(\(.*?\))/([0-9]+)/;
-		$wildcard =~ s/[\(\)]//g;
-		my ($from, $to) = split "-", $wildcard;
-		if ($to) {
-		    $range = [["#".$from, "#".$to]];
-		} else {
-		    $range = ["#".$from];
-		}
-	    }
-	    $r =~ s/^\+/\\\\+?/;
-	    $r =~ s/^(.*?)$/^$1\$/;
-	    $a =~ s/(\(.*?\)|\*)//;
-	    push @{$rules}, [$r, $range, $a, '#1'];
-	}
-    }
-    return $rules;
 }
 
 my $rsipstatus;
@@ -329,4 +207,40 @@ Cpanel::Template::process_template(
 				  );
 
 $cli->Logout();
+sub unassignTelnum () {
+    my ($cli, $domain, $tel, $prefs) = @_;
+    my $telnum = $tel->{"telnum"};
+    if ($domain) {
+        my $domainPrefs = $cli->GetAccountDefaultPrefs($domain);
+        if ($domainPrefs->{"assignedTelnums"}->{$telnum}) {
+    	if ($domainPrefs->{"assignedTelnums"}->{$telnum}->{"assigned"}) {
+    	    my ($type, $object) = split ":", $domainPrefs->{"assignedTelnums"}->{$telnum}->{"assigned"};
+    	    if ($type eq "a") {
+    		my $telnums = $cli->GetAccountTelnums($object);
+    		@$telnums = grep { $_ ne $telnum } @$telnums;
+    		$cli->SetAccountTelnums($object, $telnums);
+		my $accountSettings = $cli->GetAccountSettings($object);
+		if ($tel->{"authname"} eq $accountSettings->{"PSTNGatewayAuthName"} && $tel->{"username"} eq $accountSettings->{"PSTNFromName"}) {
+		    $cli->UpdateAccountSettings($object, {
+		    	PSTNFromName => "default",
+		    	PSTNGatewayAuthName => "default",
+		    	PSTNGatewayDomain => "default",
+		    	PSTNGatewayPassword => "default",
+		    	PSTNGatewayVia => "default"
+		    				});
+		}
+    	    } else {
+		# Remove Server Rule.
+    		my $rules = $cli->GetServerSignalRules();
+    		@$rules = grep {$_->[1] ne "$telnum\@$domain"} @$rules; # LOAD possible
+    		$cli->SetServerSignalRules($rules);
+    	    }
+    	}
+    	delete $domainPrefs->{"assignedTelnums"}->{$telnum};
+        }
+        $cli->UpdateAccountDefaultPrefs(domain => $domain, settings => {
+    	assignedTelnums => $domainPrefs->{"assignedTelnums"}
+    				    });
+    }
+}
 1;
