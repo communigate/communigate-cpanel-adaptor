@@ -35,7 +35,22 @@ if ($FORM{provider}) {
     my $prefs = $cli->GetAccountPrefs('pbx@' . $domain);
     my $id = $prefs->{Gateways}->{$FORM{provider}}->{shortId};
     $id =~ s/\D//g;
+    my $rsips = $cli->GetAccountRSIPs('pbx@' . $domain);
+
+
+    if ($prefs->{Gateways}->{$FORM{provider}}->{callInGw}->{telnums}) {
+	my $tels = [];
+	for my $tel (@{$prefs->{Gateways}->{$FORM{provider}}->{callInGw}->{telnums}}) {
+	    delete $rsips->{'rsip-' . $id . '-' . $tel->{reguid}} if $rsips->{'rsip-' . $id . '-' . $tel->{reguid}};
+	    unassignTelnum($cli, $tel->{"assigned"}, $tel) if $tel->{"assigned"};
+	}
+	$prefs->{Gateways}->{$FORM{provider}}->{callInGw}->{telnums} = $tels;
+    }
+    $cli->SetAccountRSIPs('pbx@' . $domain, $rsips);
+
+
     my $gateways;
+    # Remove the gateway.
     for my $pref (keys %{$prefs->{Gateways}}) {
     	unless ($pref eq $FORM{provider}) {
     	    $gateways->{$pref} = $prefs->{Gateways}->{$pref};
@@ -43,37 +58,44 @@ if ($FORM{provider}) {
     }
     my $update = {Gateways => $gateways};
     $cli->UpdateAccountPrefs('pbx@' . $domain, $update);
-
-    my $telnums = $cli->ListForwarders($domain);
-    my $tels = {};
-    for my $telnum (@$telnums) {
-	if ($telnum =~ m/^i\-(\d+)$/) {
-	    my $tel = $1;
-	    my $to = $cli->GetForwarder($telnum);
-	    $to =~ s/\.local//;
-	    if ($to =~ m/$FORM{provider}\@(.*?)$/) {
-		$tels->{$tel} = $1;
-	    }
-	}
-    }
-    for my $tel (sort keys %$tels) {
-    	$cli->DeleteForwarder("tn-" . $tel . '@central.telnum');
-    	$cli->DeleteForwarder("i-" . $tel . '@' . $domain);
-    	$cli->DeleteForwarder("tn-" . $tel . '@' . $domain);
-    	if ($tels->{$tel} ne 'null') {
-    	    $cli->DeleteForwarder("tn-" . $tel . '@' . $tels->{$tel});
-    	    $cli->DeleteForwarder("i-" . $tel . '@' . $tels->{$tel});
-    	}
-    }
-    my $rsips = $cli->GetAccountRSIPs('pbx@' . $domain);
-    for my $rsip (keys %$rsips) {
-	if ($rsip =~ m/^rsip\-$id/) {
-	    delete $rsips->{$rsip};
-	}
-    }
-    $cli->SetAccountRSIPs('pbx@' . $domain, $rsips);
 }
 
 print "HTTP/1.1 303 See Other\r\nLocation: addon_cgpro_gateways.cgi\r\n\r\n";
 $cli->Logout();
+sub unassignTelnum () {
+    my ($cli, $domain, $tel) = @_;
+    my $telnum = $tel->{"telnum"};
+    if ($domain) {
+        my $domainPrefs = $cli->GetAccountDefaultPrefs($domain);
+        if ($domainPrefs->{"assignedTelnums"}->{$telnum}) {
+    	if ($domainPrefs->{"assignedTelnums"}->{$telnum}->{"assigned"}) {
+    	    my ($type, $object) = split ":", $domainPrefs->{"assignedTelnums"}->{$telnum}->{"assigned"};
+    	    if ($type eq "a") {
+    		my $telnums = $cli->GetAccountTelnums($object);
+    		@$telnums = grep { $_ ne $telnum } @$telnums;
+    		$cli->SetAccountTelnums($object, $telnums);
+		my $accountSettings = $cli->GetAccountSettings($object);
+		if ($tel->{"authname"} eq $accountSettings->{"PSTNGatewayAuthName"} && $tel->{"username"} eq $accountSettings->{"PSTNFromName"}) {
+		    $cli->UpdateAccountSettings($object, {
+		    	PSTNFromName => "default",
+		    	PSTNGatewayAuthName => "default",
+		    	PSTNGatewayDomain => "default",
+		    	PSTNGatewayPassword => "default",
+		    	PSTNGatewayVia => "default"
+		    				});
+		}
+    	    } else {
+		# Remove Server Rule.
+    		my $rules = $cli->GetServerSignalRules();
+    		@$rules = grep {$_->[1] ne "$telnum\@$domain"} @$rules; # LOAD possible
+    		$cli->SetServerSignalRules($rules);
+    	    }
+    	}
+    	delete $domainPrefs->{"assignedTelnums"}->{$telnum};
+        }
+        $cli->UpdateAccountDefaultPrefs(domain => $domain, settings => {
+    	assignedTelnums => $domainPrefs->{"assignedTelnums"}
+    				    });
+    }
+}
 1;

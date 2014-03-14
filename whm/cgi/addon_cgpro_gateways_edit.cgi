@@ -118,7 +118,7 @@ if ($FORM{submitdialin} && $FORM{provider}) {
 				assignedTelnums => $domainPrefs->{"assignedTelnums"}
 							    });
 		    } else {
-			unassignTelnum($cli, $FORM{'oldassigned-' . $tel->{telnum}}, $tel, $prefs);
+			unassignTelnum($cli, $FORM{'oldassigned-' . $tel->{telnum}}, $tel);
 			delete $rsips->{'rsip-' . $id . '-' . $tel->{reguid}} if $rsips->{'rsip-' . $id . '-' . $tel->{reguid}};
 		    }
 		}
@@ -152,7 +152,7 @@ if ($FORM{submitdialin} && $FORM{provider}) {
 		if ($FORM{'delete-' . $tel->{telnum}}) {
 		    if ($tel->{reguid}) {
 			delete $rsips->{'rsip-' . $id . '-' . $tel->{reguid}};
-			unassignTelnum($cli, $FORM{'oldassigned-' . $tel->{telnum}}, $tel, $prefs);
+			unassignTelnum($cli, $FORM{'oldassigned-' . $tel->{telnum}}, $tel);
 		    }
 		} else {
 		    push @$tels, $tel;
@@ -208,7 +208,7 @@ Cpanel::Template::process_template(
 
 $cli->Logout();
 sub unassignTelnum () {
-    my ($cli, $domain, $tel, $prefs) = @_;
+    my ($cli, $domain, $tel) = @_;
     my $telnum = $tel->{"telnum"};
     if ($domain) {
         my $domainPrefs = $cli->GetAccountDefaultPrefs($domain);
