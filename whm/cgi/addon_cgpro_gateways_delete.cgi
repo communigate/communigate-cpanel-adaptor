@@ -91,6 +91,30 @@ sub unassignTelnum () {
     		$cli->SetServerSignalRules($rules);
     	    }
     	}
+	# Unassign default outgoing
+	my $accountDefaults = $cli->GetAccountDefaults($domain);
+	if ($tel->{"authname"} eq $accountDefaults->{"PSTNGatewayAuthName"} && $tel->{"username"} eq $accountDefaults->{"PSTNFromName"}) {
+	    my $serviceClasses = $accountDefaults->{"ServiceClasses"} || {};
+	    for my $class (keys %{$accountDefaults->{"ServiceClasses"}}) {
+		delete $serviceClasses->{$class}->{PSTNFromName};
+		delete $serviceClasses->{$class}->{PSTNGatewayAuthName};
+		delete $serviceClasses->{$class}->{PSTNGatewayDomain};
+		delete $serviceClasses->{$class}->{PSTNGatewayPassword};
+		delete $serviceClasses->{$class}->{PSTNGatewayVia};
+		delete $serviceClasses->{$class} unless keys %{$serviceClasses->{$class}};
+	    }
+	    $cli->UpdateAccountDefaults(
+		domain => $domain, 
+		settings => {
+		    PSTNFromName => $telnum[0]->{'username'},
+		    PSTNGatewayAuthName => $telnum[0]->{'authname'},
+		    PSTNGatewayDomain => $telnum[0]->{'domain'},
+		    PSTNGatewayPassword => $telnum[0]->{'authpass'},
+		    PSTNGatewayVia => $telnum[0]->{'domain'},
+		    ServiceClasses => $serviceClasses
+		}
+		);
+	}
     	delete $domainPrefs->{"assignedTelnums"}->{$telnum};
         }
         $cli->UpdateAccountDefaultPrefs(domain => $domain, settings => {

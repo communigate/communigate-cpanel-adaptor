@@ -240,28 +240,47 @@ sub api2_AccountDefaults {
 			WorkDays => (join(",",@$workdays) eq join(",",@{$defaultServerAccountPrefs->{WorkDays}}) ? 'default' : $workdays),
 		    }
 		    );
+	    my $myPrefs = $cli->GetAccountDefaultPrefs($domain);
+	    my $serviceClasses = $myPrefs->{"ServiceClasses"} || {};
+	    my $defaults = $cli->GetServerAccountDefaults();
 	    if ($OPTS{'number'}) {
  		my $defaultDomain = $cli->MainDomainName();
-		my $myPrefs = $cli->GetAccountDefaultPrefs($domain);
 		my $gateway = $myPrefs->{"assignedTelnums"}->{$OPTS{'number'}}->{"gateway"};
 		my $prefs = $cli->GetAccountPrefs("pbx\@$defaultDomain");
 		my @telnum = grep {$_->{"telnum"} eq $OPTS{'number'}} @{$prefs->{"Gateways"}->{$gateway}->{"callInGw"}->{"telnums"}};
+		for my $class (keys %{$defaults->{"ServiceClasses"}}) {
+		    $serviceClasses->{$class}->{PSTNFromName} = $telnum[0]->{'username'};
+		    $serviceClasses->{$class}->{PSTNGatewayAuthName} = $telnum[0]->{'authname'};
+		    $serviceClasses->{$class}->{PSTNGatewayDomain} = $telnum[0]->{'domain'};
+		    $serviceClasses->{$class}->{PSTNGatewayPassword} = $telnum[0]->{'authpass'};
+		    $serviceClasses->{$class}->{PSTNGatewayVia} = $telnum[0]->{'domain'};
+		}
 		$cli->UpdateAccountDefaults(domain => $domain,
 					    settings => {
 						PSTNFromName => $telnum[0]->{'username'},
 						PSTNGatewayAuthName => $telnum[0]->{'authname'},
 						PSTNGatewayDomain => $telnum[0]->{'domain'},
 						PSTNGatewayPassword => $telnum[0]->{'authpass'},
-						PSTNGatewayVia => $telnum[0]->{'domain'}
+						PSTNGatewayVia => $telnum[0]->{'domain'},
+						ServiceClasses => $serviceClasses
 					    });
 	    } else {
+		for my $class (keys %{$defaults->{"ServiceClasses"}}) {
+		    delete $serviceClasses->{$class}->{PSTNFromName};
+		    delete $serviceClasses->{$class}->{PSTNGatewayAuthName};
+		    delete $serviceClasses->{$class}->{PSTNGatewayDomain};
+		    delete $serviceClasses->{$class}->{PSTNGatewayPassword};
+		    delete $serviceClasses->{$class}->{PSTNGatewayVia};
+		    delete $serviceClasses->{$class} unless keys %{$serviceClasses->{$class}};
+		}
 		$cli->UpdateAccountDefaults(domain => $domain,
 					    settings => {
 						PSTNFromName => 'default',
 						PSTNGatewayAuthName => 'default',
 						PSTNGatewayDomain => 'default',
 						PSTNGatewayPassword => 'default',
-						PSTNGatewayVia => 'default'
+						PSTNGatewayVia => 'default',
+						ServiceClasses => $serviceClasses
 					    });
 	    }
 	}
