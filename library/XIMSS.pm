@@ -63,6 +63,7 @@ sub connect {
       croak 'You must pass correct authData and password parameter to XIMSS::new: ' . $loginResult->{response}->{errorText};
   }
   $this->{isConnected} = 1;
+  $this->{SID} = $loginResult->{session}->{urlID};
   1;
 }
 
@@ -89,7 +90,7 @@ sub _parseResponse {
     my $responseLine = $this->{theSocket}->getline();
     $/ = $prev;
     $responseLine =~ s/\000//g;
-    $responseLine .= $this->_parseResponse() unless $responseLine =~ m/^\<response\s/i;
+    $responseLine .= $this->_parseResponse() unless $responseLine =~ m/^\</i;
     print STDERR "XIMSS->_parseResponse::responseLine = $responseLine\n\n" if $this->{'debug'};
     $this->{'lastAccess'}=time();
     return $responseLine;
@@ -112,6 +113,11 @@ sub parseResponse {
     }
 
     return delete $this->{responses}->{$id};
+}
+sub getAnyResponse {
+  my $this = shift;
+  my $string = $this->_parseResponse();
+  return XMLin("<opt>" . $string  . "</opt>", KeyAttr => "IgnoreKeyAttr");
 }
 
 sub close {
