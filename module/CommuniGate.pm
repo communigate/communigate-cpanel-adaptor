@@ -122,10 +122,10 @@ sub max_class_accounts {
 sub current_class_accounts {
     my ($class, $cli) = @_;
     my $count = 0;
-    my @domains = Cpanel::Email::listmaildomains(); 
+    my @domains = Cpanel::Email::listmaildomains();
     foreach my $domain (@domains) {
 	my $accounts = $cli->ListAccounts($domain);
-	foreach my $userName (sort keys %$accounts) {      
+	foreach my $userName (sort keys %$accounts) {
 	    my $accountData = $cli->GetAccountEffectiveSettings("$userName\@$domain");
 	    my $service = $accountData->{'ServiceClass'} || '';
 	    if ($service eq $class) {
@@ -139,7 +139,7 @@ sub current_class_accounts {
 sub api2_AccountsOverview {
 	my %OPTS = @_;
 	my $invert = $OPTS{'invert'};
-	my @domains = Cpanel::Email::listmaildomains(); 
+	my @domains = Cpanel::Email::listmaildomains();
 	my $cli = getCLI();
 	my @result;
 	my $data = Cpanel::CachedDataStore::fetch_ref( '/var/cpanel/cgpro/classes.yaml' ) || {};
@@ -148,7 +148,7 @@ sub api2_AccountsOverview {
 	my $freeExtensions = {};
 	foreach my $domain (@domains) {
 	    my $accounts=$cli->ListAccounts($domain);
-	    foreach my $userName (sort keys %$accounts) {	
+	    foreach my $userName (sort keys %$accounts) {
 		next if $userName eq 'pbx' || $userName eq 'ivr';
 		my $accountData = $cli->GetAccountEffectiveSettings("$userName\@$domain");
 		my $accountStats = $cli->GetAccountStat("$userName\@$domain");
@@ -162,7 +162,11 @@ sub api2_AccountsOverview {
 		if ($diskquota eq "unlimited") {
 		    $diskusedpercent = 0;
 		} else {
+		  if ($diskquota) {
 		    $diskusedpercent = $diskused / $diskquota * 100;
+		  } else {
+		    $diskusedpercent = 100;
+		  }
 		}
 		$return_accounts->{$userName . "@" . $domain} = {
 		    domain => $domain,
@@ -210,7 +214,7 @@ sub api2_AccountsOverview {
 
 sub api2_AccountDefaults {
 	my %OPTS = @_;
-	my @domains = Cpanel::Email::listmaildomains(); 
+	my @domains = Cpanel::Email::listmaildomains();
 	my $cli = getCLI();
 	my $domain = $domains[0];
 	for my $dom (@domains) {
@@ -220,7 +224,7 @@ sub api2_AccountDefaults {
 	}
 	if ($OPTS{'save'}) {
 	    my $defaultServerAccountPrefs = $cli->GetServerAccountPrefs();
-	    $OPTS{'ips'} =~  s/(\r?\n)+/\\e/g;	
+	    $OPTS{'ips'} =~  s/(\r?\n)+/\\e/g;
 		$cli->UpdateDomainSettings(
 		    domain => $domain,
 		    settings => {
@@ -303,7 +307,7 @@ sub api2_AccountDefaults {
 	    }
 	}
 	$cli->Logout();
-	return { 
+	return {
 	    serverDomainDefaults => $serverDomainDefaults,
 	    serverAccountPrefs => $serverAccountPrefs,
 	    domainSettings => $domainSettings,
@@ -333,7 +337,7 @@ sub api2_ListWorkDays {
 	my $cli = getCLI();
 	my $defaults = $cli->GetServerAccountPrefs();
 	if ($domain) {
-	    my @domains = Cpanel::Email::listmaildomains(); 
+	    my @domains = Cpanel::Email::listmaildomains();
 	    for $dom (@domains) {
 		if ($dom eq $domain) {
 		    $prefs = $cli->GetAccountDefaultPrefs($domain);
@@ -351,7 +355,7 @@ sub api2_getDomainAccounts {
 	my $cli = getCLI();
 	my $accounts = undef;
 	if ($domain) {
-	    my @domains = Cpanel::Email::listmaildomains(); 
+	    my @domains = Cpanel::Email::listmaildomains();
 	    for $dom (@domains) {
 		if ($dom eq $domain) {
 		    $accounts = $cli->ListAccounts($domain);
@@ -448,7 +452,7 @@ sub api2_listpopswithdisk {
         foreach my $domain (@domains) {
                 my $accounts=$cli->ListAccounts($domain);
                 my $userName;
-                foreach $userName (sort keys %$accounts) {      
+                foreach $userName (sort keys %$accounts) {
 		    next if $userName eq 'pbx' ||  $userName eq 'ivr';
                         my $accountData = $cli->GetAccountEffectiveSettings("$userName\@$domain");
                         my $diskquota = @$accountData{'MaxAccountSize'} || '';
@@ -464,15 +468,15 @@ sub api2_listpopswithdisk {
 			}
 			(my $humandiskused) = split('\.',$diskused); $humandiskused .= "M";
 			my $humandiskquota = $diskquota."M";
-			push( @result, { 	email => "$userName\@$domain", 
-						humandiskused => "$humandiskused", 
-						humandiskquota => "$humandiskquota", 
-						diskusedpercent => "$diskusedpercent", 
-						diskused => "$diskused" ,  
-						diskquota => "$diskquota", 
-						user => "$userName", 
-						domain => "$domain", 
-						_diskquota => "$_diskquota", 
+			push( @result, { 	email => "$userName\@$domain",
+						humandiskused => "$humandiskused",
+						humandiskquota => "$humandiskquota",
+						diskusedpercent => "$diskusedpercent",
+						diskused => "$diskused" ,
+						diskquota => "$diskquota",
+						user => "$userName",
+						domain => "$domain",
+						_diskquota => "$_diskquota",
 						_diskused => "$_diskused" } );
 		}
 
@@ -484,7 +488,7 @@ sub api2_listpopswithdisk {
 sub api2_addforward {
         my %OPTS = @_;
  	my $domain = $OPTS{'domain'};
-        my $user = $OPTS{'email'}; 
+        my $user = $OPTS{'email'};
         my $fwdemail = $OPTS{'fwdemail'};
 	my $cli = getCLI();
 	my $return =  addforward (
@@ -495,12 +499,12 @@ sub api2_addforward {
 	    );
 	$cli->Logout();
 	return $return;
-}       
+}
 
 sub addforward {
         my %OPTS = @_;
  	my $domain = $OPTS{'domain'};
-        my $user = $OPTS{'email'}; 
+        my $user = $OPTS{'email'};
         my $fwdemail = $OPTS{'fwdemail'};
         my $cli = $OPTS{'cli'};
 	my @result;
@@ -523,13 +527,13 @@ sub addforward {
 			$rules{$fwdemail} = 1;
 			$Rule->[3]->[0]->[1] = join(',', keys(%rules));
 			$found=1;
-		    }       
+		    }
 		    push(@NewRules,$Rule);
 		}
 		if (!$found) {
 		    my $Rule= [1,'#Redirect',[],[['Mirror to',$fwdemail]]];
 		    push(@NewRules,$Rule);
-		}		
+		}
 		$cli->SetAccountMailRules("$user\@$domain",\@NewRules);
 		$error_msg = $cli->getErrMessage();
 		if ($error_msg eq "OK") {
@@ -638,7 +642,7 @@ sub api2_ListExtensions {
 	      my ($type, $object) = split ":", $defaultPrefs->{"assignedTelnums"}->{$number}->{"assigned"};
 	      my $uri = $number . "\@$domain";
 	      $uri =~ s/\+/%2B/g;
-	      my $ext = { 
+	      my $ext = {
 	  	  uri_dest => $uri,
 	  	  html_dest => $number,
 	  	  dest => $number,
@@ -890,10 +894,10 @@ sub api2_delforward {
 		    $Rule->[3]->[0]->[1]  .=	",".$value;
 		  } else {
 		    $Rule->[3]->[0]->[1]  =     $value;
-		  }	
+		  }
 		} else {
-		  $found = 1;	
-		} 
+		  $found = 1;
+		}
 	      }
 	    }
 	  }
@@ -951,7 +955,7 @@ sub api2_ListDefAddress {
 		if ($action eq "Rerouted to") { $entry->{'forward'} = "selected"; }
 		if ($action eq "Accepted and Bounced") { $entry-> {'acceptedandbounced'} = "selected"; }
 		push( @result, $entry );
-	}	
+	}
         $cli->Logout();
         return @result;
 }
@@ -1006,12 +1010,12 @@ sub api2_EnableSpamAssassin {
 	 my $sa_rulname = "scanspam-".$domain;
  	 my $NewRule =
   		[ 5, $sa_rulname ,
-    			[ 
+    			[
 				['Any Recipient', 'in', '*@'.$domain],
-				['Header Field', 'is not', 'X-Spam-Status*'] 
+				['Header Field', 'is not', 'X-Spam-Status*']
 			],
-    			[ 
-				['Execute', '[STDERR] [FILE] [RETPATH] [RCPT] /var/CommuniGate/spamassassin/scanspam.sh '.$account], 
+    			[
+				['Execute', '[STDERR] [FILE] [RETPATH] [RCPT] /var/CommuniGate/spamassassin/scanspam.sh '.$account],
 				['Discard']
 			]
   		];
@@ -1020,7 +1024,7 @@ sub api2_EnableSpamAssassin {
 	}
 	foreach my $Rule (@$ExistingRules) {
 		push(@NewRules,$Rule);
-        }      	
+        }
 
   	$cli->SetServerRules(\@NewRules) || die "Error: ".$cli->getErrMessage.", quitting";
         $cli->Logout();
@@ -1097,10 +1101,10 @@ sub api2_EnableSpamAssassinAutoDelete {
 	 my $sa_rulname = "deletespam-".$domain;
  	 my $NewRule =
   		[ 4, $sa_rulname ,
-    			[ 
-				['Header Field', 'is', 'X-Spam-Level: '.$score_string.'*'] 
+    			[
+				['Header Field', 'is', 'X-Spam-Level: '.$score_string.'*']
 			],
-    			[ 
+    			[
 				['Discard']
 			]
   		];
@@ -1109,7 +1113,7 @@ sub api2_EnableSpamAssassinAutoDelete {
 	}
 	foreach my $Rule (@$ExistingRules) {
 		push(@NewRules,$Rule);
-        }      	
+        }
 
   	$cli->SetServerRules(\@NewRules) || die "Error: ".$cli->getErrMessage.", quitting";
         $cli->Logout();
@@ -1176,11 +1180,11 @@ sub api2_EnableSpamAssassinSpamBox {
 	 my $sa_rulname = "spambox";
  	 my $NewRule =
   		[ 4, $sa_rulname ,
-    			[ 
-				['Header Field', 'is', 'X-Spam-Flag: YES'] 
+    			[
+				['Header Field', 'is', 'X-Spam-Flag: YES']
 			],
     			[
-				['Store in', 'Spam'], 
+				['Store in', 'Spam'],
 				['Discard']
 			]
   		];
@@ -1188,8 +1192,8 @@ sub api2_EnableSpamAssassinSpamBox {
          push( @result, { status => "domain: $domain ...done\n" } );
 	 foreach my $Rule (@$ExistingRules) {
 	 	push(@NewRules,$Rule);
-         }      	
-	 $cli->SetDomainMailRules($domain,\@NewRules) || die "Error: ".$cli->getErrMessage.", quitting";		
+         }
+	 $cli->SetDomainMailRules($domain,\@NewRules) || die "Error: ".$cli->getErrMessage.", quitting";
         }
         $cli->Logout();
         return @result;
@@ -1287,7 +1291,7 @@ sub CommuniGate_doimport {
         }
         else {
             ( $status, $msg ) = Cpanel::Email::addpop( $row->{'email'}, $row->{'password'}, $row->{'quota'}, '', 0, 1 );
-	    if ($status) { $status = AddCGPAccount($row->{'email'}, $row->{'password'}, $row->{'quota'})}; 
+	    if ($status) { $status = AddCGPAccount($row->{'email'}, $row->{'password'}, $row->{'quota'})};
             print '<div class="statusline"><div class="statusitem">' . Cpanel::Encoder::Tiny::safe_html_encode_str( $row->{'email'} ) . '</div><div class="status ' . ( $status ? 'green-status' : 'red-status' ) . '">' . $msg . '</div></div>' . "\n";
         }
         print qq{<script>setcompletestatus($rowcount,$numrows)</script>\n\n};
@@ -1341,7 +1345,7 @@ sub api2_DelMailingList {
                 push( @result, { email => "$listname" } );
         } else {
                 $Cpanel::CPERROR{'CommuniGate'} = $error_msg;
-        }       
+        }
 	$cli->Logout();
         return @result;
 }
@@ -1383,7 +1387,7 @@ sub MLSettingsSetIndexToValue {
 	@IndexesToValues_Subscribe = ("nobody","moderated","this domain only","locals only","anybody");
 	@IndexesToValues_SaveRequests= ("no","accepted","rejected","all");
 	@IndexesToValues_Distribution = ("feed","null","banned","digest","index");
-	@IndexesToValues_Postings = ("from owner only","moderated","from subscribers","moderate guests","from anybody"); 
+	@IndexesToValues_Postings = ("from owner only","moderated","from subscribers","moderate guests","from anybody");
 	@IndexesToValues_Format = ("plain text only","text only","text alternative","anything");
 	@IndexesToValues_SizeLimit = ("unlimited","0","1024","3K","10K","30K","100K","300K","1024K","3M","10M","300M");
 	@IndexesToValues_CoolOffPeriod= ("1h","2h","3h","6h","12h","1d","2d","3d","5d","7d","10d");
@@ -1400,7 +1404,7 @@ sub MLSettingsSetValueToIndex {
 	%ValuesToIndexes_Subscribe= ("nobody",0,"moderated",1,"this domain only",2,"locals only",3,"anybody",4);
 	%ValuesToIndexes_SaveRequests= ("no",0,"accepted",1,"rejected",2,"all",3);
 	%ValuesToIndexes_Distribution = ("feed",0,"null",1,"banned",2,"digest",3,"index",4);
-	%ValuesToIndexes_Postings = ("from owner only",0,"moderated",1,"from subscribers",2,"moderate guests",3,"from anybody",4); 
+	%ValuesToIndexes_Postings = ("from owner only",0,"moderated",1,"from subscribers",2,"moderate guests",3,"from anybody",4);
 	%ValuesToIndexes_Format = ("plain text only",0,"text only",1,"text alternative",2,"anything",3);
 	%ValuesToIndexes_SizeLimit = ("unlimited",0,"0",1,"1024",2,"3K",3,"10K",4,"30K",5,"100K",6,"300K",7,"1024K",8,"3M",9,"10M",10,"300M",11);
 	%ValuesToIndexes_CoolOffPeriod = ("1h",0,"2h",1,"3h",2,"6h",3,"12h",4,"1d",5,"2d",6,"3d",7,"5d",8,"7d",9,"10d",10);
@@ -1410,13 +1414,13 @@ sub MLSettingsSetValueToIndex {
 	%ValuesToIndexes_Reply=("to list",0,"to sender",1);
 	%ValuesToIndexes_ArchiveSizeLimit=("unlimited",0,"0",1,"1024",2,"3K",3,"10K",4,"30K",5,"100K",6,"300K",7,"1024K",8,"3M",9,"10M",10,"30M",11,"100M",12,"300M",13,"1024M",14,"3G",15,"10G",16,"30G",17);
 
-	
+
 }
 
 
 sub api2_GetListSettings {
 
-	# Select values : 
+	# Select values :
 	MLSettingsSetValueToIndex();
 
         my %OPTS = @_;
@@ -1430,7 +1434,7 @@ sub api2_GetListSettings {
 			my $key=$_;
 			my $value = @$listSettings{$key};
                 	push( @result, { "$key" => "$value" } );
-			if ($key eq "OwnerCheck") { 
+			if ($key eq "OwnerCheck") {
 				$Cpanel::CPDATA{"$key"} = $ValuesToIndexes_OwnerCheck{$value};
 			} elsif ($key eq "Charset") {
 				$Cpanel::CPDATA{"$key"} = $ValuesToIndexes_Charset{$value};
@@ -1479,7 +1483,7 @@ sub html_to_text {
  $text =~ s/&quot;/\\\"/g;
  $text =~ s/&lt;/</g;
  $text =~ s/&gt;/>/g;
- $text =~ s/&amp;/\&/g; 
+ $text =~ s/&amp;/\&/g;
  return($text);
 }
 
@@ -1496,7 +1500,7 @@ sub html_to_text_out {
 
 sub api2_SetListSettings {
 
-      # Select values : 
+      # Select values :
         MLSettingsSetIndexToValue();
 
         my %OPTS = @_;
@@ -1584,7 +1588,7 @@ sub api2_ListMailingListsSubs{
         my @result;
         my $subs_array=$cli->ListSubscribers($listname);
 	foreach my $sub (@$subs_array) {
-		my $SubInfos=$cli->GetSubscriberInfo($listname,$sub); 	
+		my $SubInfos=$cli->GetSubscriberInfo($listname,$sub);
 		my $postmode = @$SubInfos{'posts'};
 		my $numpost;
 		my ($mod1sel,$mod2sel,$mod3sel,$mod4sel,$mod5sel,$modallsel,$unmodsel,$nopostsel)=("","","","","","","","");
@@ -1617,7 +1621,7 @@ sub api2_ListMailingListsSubs{
 	}
 	$cli->Logout();
         return @result;
-}       
+}
 
 sub api2_SetSubSettings {
         my %OPTS = @_;
@@ -1640,10 +1644,10 @@ sub api2_SetSubSettings {
         if ($error_msg eq "OK") {
                 #noop
         } else {
-                $Cpanel::CPERROR{'CommuniGate'} = $error_msg; 
-        }               
+                $Cpanel::CPERROR{'CommuniGate'} = $error_msg;
+        }
 	$cli->Logout();
-        return @result; 
+        return @result;
 
 }
 
@@ -1773,8 +1777,8 @@ sub api2_AddGroup{
                 push( @result, { email => "$listname", domain => "$domain" } );
 		# set real name
 		$Settings=$cli->GetGroup("$listname\@$domain");
-		@$Settings{'RealName'}=$realname; 
-		@$Settings{'SignalDisabled'}= 'YES'; 
+		@$Settings{'RealName'}=$realname;
+		@$Settings{'SignalDisabled'}= 'YES';
 		$cli->SetGroup("$listname\@$domain",$Settings);
         } else {
                 $Cpanel::CPERROR{'CommuniGate'} = $error_msg;
@@ -1782,7 +1786,7 @@ sub api2_AddGroup{
 
 	# set real name
 	$Settings=$cli->GetGroup("$listname\@$domain");
-  	@$Settings{'RealName'}=$realname; 
+  	@$Settings{'RealName'}=$realname;
   	$cli->SetGroup("$listname\@$domain",$Settings);
 
 	# Create rule if posting is restricted to members : (spectre = 0)
@@ -1808,8 +1812,8 @@ sub api2_AddDepartment {
                 push( @result, { email => "$listname", domain => "$domain" } );
 		# set real name
 		$Settings=$cli->GetGroup("$listname\@$domain");
-		@$Settings{'RealName'}=$realname; 
-		@$Settings{'EmailDisabled'} = 'YES'; 
+		@$Settings{'RealName'}=$realname;
+		@$Settings{'EmailDisabled'} = 'YES';
 		$cli->SetGroup("$listname\@$domain",$Settings);
         } else {
                 $Cpanel::CPERROR{'CommuniGate'} = $error_msg;
@@ -1836,7 +1840,7 @@ sub api2_ListGroupMembers {
     	}
 	$cli->Logout();
         return @result;
-}      
+}
 
 
 sub api2_AddGroupMember {
@@ -1871,7 +1875,7 @@ sub api2_RemoveGroupMember {
         my $listname = $OPTS{'listname'};
         my $subemail = $OPTS{'subemail'};
 	my $cli = getCLI();
-        
+
         my $Settings=$cli->GetGroup($listname);
         @$Settings{'Members'}=[] unless(@$Settings{'Members'});
         my $Members=@$Settings{'Members'};
@@ -1888,7 +1892,7 @@ sub api2_RemoveGroupMember {
                 #noop
         } else {
                 $Cpanel::CPERROR{'CommuniGate'} = $error_msg;
-        }       
+        }
         if (IsGroupInternal($listname)) {
                 SetGroupExternal($listname);
                 SetGroupInternal($listname);
@@ -1983,7 +1987,7 @@ sub api2_ListAutoresponders {
         foreach my $domain (@domains) {
                 my $accounts=$cli->ListAccounts($domain);
                 my $userName;
-                foreach $userName (sort keys %$accounts) {      
+                foreach $userName (sort keys %$accounts) {
 		  my $account = "$userName\@$domain";
 		  if ($OPTS{regex}) {
 		    my $qstr = $OPTS{regex};
@@ -1994,9 +1998,9 @@ sub api2_ListAutoresponders {
 		    my $subject = $rule->[3]->[0]->[1];
 		    $subject =~ s/^\+Subject\: (.*?)\\e.*?$/$1/;
 		    push( @result, {
-				    email => $account, 
-				    subject => $subject, 
-				    domain => $domain, 
+				    email => $account,
+				    subject => $subject,
+				    domain => $domain,
 				   });
 		  }
 		}
@@ -2047,10 +2051,10 @@ sub api2_EditAutoresponder {
       }
     }
   }
-  
+
   $cli->Logout();
   return {
-	  subject => $subject, 
+	  subject => $subject,
 	  body => $body,
 	  start => $start,
 	  stop => $stop
@@ -2060,7 +2064,7 @@ sub api2_EditAutoresponder {
 
 sub api2_ListForwardersBackups {
     my %OPTS = @_;
-    
+
     my @domains = Cpanel::Email::listmaildomains();
 	my $cli = getCLI();
     my @result;
@@ -2124,7 +2128,7 @@ sub api2_RestoreForwarders {
 
 sub api2_RestoreFilters {
     my %OPTS = @_;
-    
+
     my @domains = Cpanel::Email::listmaildomains();
     my $cli = getCLI();
     my @result;
@@ -2173,7 +2177,7 @@ sub api2_RestoreFilters {
 
 sub api2_ListAccountsBackups {
     my %OPTS = @_;
-    
+
     my @domains = Cpanel::Email::listmaildomains();
 	my $cli = getCLI();
     my @result;
@@ -2196,14 +2200,14 @@ sub api2_GetAccountsBackups {
     my $domain = $OPTS{'domain'};
     my $accounts=$cli->ListAccounts($domain);
     my @result;
-    foreach my $userName (sort keys %$accounts) {      
+    foreach my $userName (sort keys %$accounts) {
 	my $accountData = $cli->GetAccountEffectiveSettings("$userName\@$domain");
 	my $pass = $cli->GetAccountPlainPassword("$userName\@$domain");
 	my $diskquota = @$accountData{'MaxAccountSize'} || '';
 	$diskquota =~ s/M//g;
 	push( @result, {
-	    email => "$userName\@$domain", 
-	    diskquota => "$diskquota", 
+	    email => "$userName\@$domain",
+	    diskquota => "$diskquota",
 	    pass => "$pass"
  	      } );
     }
@@ -2253,7 +2257,7 @@ sub api2_UninstallSRV {
     	    } else {
     		push @results, { 'uninstalled' => $locale->maketext( "Records for [_2] not disabled ([_1]).", $result, $zone ) };
     	    }
-	    
+
 	}
      }
     return @results;
@@ -2360,7 +2364,7 @@ sub api2_SetGroupSettings {
 	}
 	if (!$OPTS{'spectre'} && (!IsGroupInternal($email))) {
                 SetGroupInternal($email);
-        } 
+        }
 	$cli->Logout();
         return @result;
 }
@@ -2447,7 +2451,7 @@ sub api2_get_filter {
 		for my $action (@{$rule->[3]}) {
 		    push @{$filter->{data}->{actions}}, {action => $action->[0], dest => $action->[1]};
 		}
-		
+
 		$cli->Logout();
 		return {get_filter => $filter};
 	    }
@@ -2468,7 +2472,7 @@ sub api2_dumpfilters {
 	    my $rules = $cli->GetAccountMailRules("$account\@$domain");
 	    for my $rule (@$rules) {
 		push @{$filters->{"$account\@$domain"}}, $rule if $rule->[1] !~ m/^#/;
-	    } 
+	    }
 	}
     }
     $cli->Logout();
@@ -2570,7 +2574,7 @@ sub api2_VerifyAccount {
     my $domain = $OPTS{'domain'};
     my $cli = "";
     my $settings = "";
-    eval { 
+    eval {
 	$cli = getCLI();
 	$settings = $cli->GetAccountSettings("$user\@$domain");
     };
@@ -2882,7 +2886,7 @@ sub api2_DoEditContact {
 		    $message->{"TZ"}->{"VALUE"} = [$params->{TZ}] if $params->{TZ};
 		    $message->{"GEO"}->{"VALUE"} = [$params->{GEO}] if $params->{GEO};
 		    $message->{"NOTE"}->{"VALUE"} = [$params->{NOTE}] if $params->{NOTE};
-		        
+
 		    my $newUID = join ".", map{ join "", map { int rand(9) } 1..$_} (10,1);
 		    $newUID .= "." . $params->{account};
 		    $message->{"UID"}->{"VALUE"} = [$params->{oldMessageID} ? $params->{oldMessageID} : $newUID];
@@ -3900,7 +3904,7 @@ sub api2_DeleteQueue {
 			$cli->DeleteForwarder("$forwarder\@$domain");
 			if ($forwarder =~ m/^tn\-\d+/) {
 			    $cli->CreateForwarder("$forwarder\@$domain", "null");
-			}	
+			}
 		    }
 		}
 		$cli->DeleteGroup("activequeuegroup_$target\@$domain");
@@ -4110,8 +4114,8 @@ sub api2_ListSounds {
     %{$result->{sounds}->{english}} = (%{$result->{sounds}->{english}}, %$serverSounds, %$domainSounds);
 
     $result->{languages} = {map {$_ => 'stock'} grep {! (keys %{$files->{$_}})[0]} grep {!/\./} sort keys %$files};
-    my $domainLangs = {map {$_ => 'domain'} grep {! (keys %{$files->{$_}})[0]} grep {!/\./} sort keys %$domainFiles}; 
-    my $serverLangs = {map {$_ => 'server'} grep {! (keys %{$files->{$_}})[0]} grep {!/\./} sort keys %$serverFiles}; 
+    my $domainLangs = {map {$_ => 'domain'} grep {! (keys %{$files->{$_}})[0]} grep {!/\./} sort keys %$domainFiles};
+    my $serverLangs = {map {$_ => 'server'} grep {! (keys %{$files->{$_}})[0]} grep {!/\./} sort keys %$serverFiles};
     %{$result->{languages}} = (%{$result->{languages}}, %$serverLangs, %$domainLangs);
     for my $lang (keys %{$result->{languages}}) {
 	my $files = $cli->ListStockPBXFiles($lang);
@@ -4890,7 +4894,7 @@ sub api2_UpdatePSTN {
 		    PSTNGatewayPassword => $rsips->{$OPTS{'rsip'}}->{'password'},
 		    PSTNGatewayVia => $rsips->{$OPTS{'rsip'}}->{'domain'}
 					});
-	    
+
 	    last;
 	}
     }
@@ -5000,8 +5004,8 @@ sub versioncmp( $$ ) {
 sub IsGroupInternal {
   	my $groupwithdomain = shift;
 	my @values = split("@",$groupwithdomain);
-  	my $domain = @values[1]; 
-  	my $group = @values[0]; 
+  	my $domain = @values[1];
+  	my $group = @values[0];
 	my $cli = getCLI();
 	my $ExistingRules=$cli->GetServerRules() || die "Error: ".$cli->getErrMessage.", quitting";
         my $sa_rulname = $group."_posting_policy";
@@ -5025,13 +5029,13 @@ sub GroupMembersForRule{
                 my $data=@$Settings{$_};
                 if (ref ($data) eq 'ARRAY') {
                         foreach my $member (@$data) {
-					if (!$result) {$result = $member; }		
+					if (!$result) {$result = $member; }
 					else {$result .= ",".$member;}
                         }
                 }
-        }       
+        }
 	$cli->Logout();
-    
+
 }
 
 sub SetGroupInternal {
@@ -5041,11 +5045,11 @@ sub SetGroupInternal {
         my $group = @values[0];
 	my $cli = getCLI();
  	my @NewRules;
-        @NewRules=(); 
+        @NewRules=();
         my $ExistingRules=$cli->GetServerRules() || die "Error: ".$cli->getErrMessage.", quitting";
         my $sa_rulname = $group."_posting_policy";
 	my $rule_string = GroupMembersForRule($group,$domain);
-        my $NewRule =       
+        my $NewRule =
                 [ 5, $sa_rulname ,
                         [
                                 ['Any To or Cc', 'is', $group."@".$domain],
