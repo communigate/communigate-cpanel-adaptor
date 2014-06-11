@@ -491,14 +491,14 @@ sub api2_addforward {
         my $user = $OPTS{'email'};
         my $fwdemail = $OPTS{'fwdemail'};
 	my $cli = getCLI();
-	my $return =  addforward (
+	my @return =  addforward (
 	    domain => $domain,
 	    email => $user,
 	    fwdemail => $fwdemail,
 	    cli => $cli
 	    );
 	$cli->Logout();
-	return $return;
+	return @return;
 }
 
 sub addforward {
@@ -509,7 +509,7 @@ sub addforward {
         my $cli = $OPTS{'cli'};
 	my @result;
 	my $account = $cli->GetAccountSettings("$user\@$domain");
-	# IF forwarding existing account
+	# IF forwarding existing account (Forking)
 	if ($account) {
 	    my $Rules=$cli->GetAccountMailRules("$user\@$domain");
 	    my $error_msg = $cli->getErrMessage();
@@ -571,7 +571,6 @@ sub addforward {
 	    }
 	}
         return @result;
-
 }
 
 sub api2_listforwards {
