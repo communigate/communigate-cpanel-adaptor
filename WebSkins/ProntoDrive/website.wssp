@@ -1,1 +1,0 @@
-<!--%%IF EXISTS(errorCode)-->%%TRANSLATE(errorCode USING DICTIONARY("ErrorCodes"))%%<!--%%ELSE-->OK<!--%%ENDIF-->
