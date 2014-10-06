@@ -6,7 +6,7 @@
 <div class="body-content">
 
 <cpanelif !$CONF{'skipspamassassin'} $CPDATA{'FEATURE-SPAMASSASSIN'}>
-<cpanelfeature spamassassin>
+<cpanelfeature cgpro_spamassassin>
 
 
 
@@ -19,7 +19,7 @@
 </cpanelif>
 </div>
 </cpanelfeature>
-<cpanelfeature spamassassin>
+<cpanelfeature cgpro_spamassassin>
 <div id="hilight-box"><p><b><cpanel langprint="SPAStatusPre">&nbsp;<span class="status"><?cp CommuniGate::SpamAssassinStatus(%,status) domain=$CPDATA{'DOMAIN'}?></span></b>.</p>
 <cpanelif !$CPVAR{'spamstatusnotchangeable'}>
 <form action="delspam.html">
