@@ -286,7 +286,7 @@ cp ${PACKSRC}/tools/helper_DKIM_verify.pl /var/CommuniGate/
 ${PACKSRC}/scripts/install_dkim_signer.pl
 cp ${PACKSRC}/tools/authMigrate.pl /var/CommuniGate/
 cp ${PACKSRC}/corn_scripts/migrateMail.sh /var/CommuniGate/
-${PACKSRC}/scripts/install_migration.pl
+# ${PACKSRC}/scripts/install_migration.pl
 
 # Install Active Queue Scripts
 cp ${PACKSRC}/PBXApps/*spp* /var/CommuniGate/PBXApps/
