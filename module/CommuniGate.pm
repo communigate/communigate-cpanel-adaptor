@@ -340,7 +340,7 @@ sub api2_ListWorkDays {
 	    my @domains = Cpanel::Email::listmaildomains();
 	    for my $dom (@domains) {
 		if ($dom eq $domain) {
-		    $prefs = $cli->GetAccountDefaultPrefs($domain);
+		    my $prefs = $cli->GetAccountDefaultPrefs($domain);
 		    $defaults->{WorkDays} = $prefs->{WorkDays} if $prefs->{WorkDays};
 		    last;
 		}
@@ -356,7 +356,7 @@ sub api2_getDomainAccounts {
 	my $accounts = undef;
 	if ($domain) {
 	    my @domains = Cpanel::Email::listmaildomains();
-	    for $dom (@domains) {
+	    for my $dom (@domains) {
 		if ($dom eq $domain) {
 		    $accounts = $cli->ListAccounts($domain);
 		    last;
@@ -374,8 +374,8 @@ sub api2_UpdateAccountClass {
     my $max = max_class_accounts($domain, $OPTS{'class'});
     my $current = 0;
     $current = current_class_accounts($OPTS{'class'}, $cli) if $max > 0;
+    my $setting = { ServiceClass => $OPTS{'class'}, AccessModes => 'default' };
     if ($max > $current || $max == -1) {
-	my $setting = { ServiceClass => $OPTS{'class'}, AccessModes => 'default' };
 	$cli->UpdateAccountSettings($OPTS{'account'}, $setting);
 	if ($OPTS{'restrictAccess'}) {
 	    my $defaultSetting = $cli->GetAccountEffectiveSettings($OPTS{"account"});
@@ -383,7 +383,7 @@ sub api2_UpdateAccountClass {
 	    $setting->{'AccessModes'} = [27, "Mail","Relay","Signal","TLS","POP","IMAP","MAPI","AirSync","SIP","XMPP","WebMail","XIMSS","FTP","ACAP","PWD","LDAP","RADIUS","S/MIME","WebCAL","WebSite","PBX","HTTP","MobilePBX","XMedia","YMedia","MobilePronto"] if !$setting->{'AccessModes'} || $setting->{'AccessModes'} eq 'All';
 	    $setting->{'AccessModes'} = [grep {!/^Mobile$/i} @{$setting->{'AccessModes'}}];
 	} else {
-	    $settings->{'AccessModes'} = "default";
+	    $setting->{'AccessModes'} = "default";
 	}
 	$cli->UpdateAccountSettings($OPTS{'account'}, $setting);
 	$cli->Logout();
@@ -602,7 +602,7 @@ sub api2_listforwards {
 	  push( @result, { uri_dest => "$alias%40$domain",
 			   html_dest => "$alias\@$domain",
 			   dest => "$alias\@$domain",
-			   uri_forward => "$useName%40$domain",
+			   uri_forward => "$userName%40$domain",
 			   html_forward => "$userName\@$domain" ,
 			   forward => "$userName\@$domain" } );
 	}
@@ -772,7 +772,7 @@ sub api2_AssignExtension {
   	  $result->{"accounts"}->{"$userName\@$domain"}->{details} = $account;
       }
       my $groups = $cli->ListGroups($domain);
-      foreach $groupName (sort @$groups) {
+      foreach my $groupName (sort @$groups) {
   	  next if $groupName =~ m/^activequeuegroup\_/i;
   	  my $details = $cli->GetGroup("$groupName\@$domain");
   	  $result->{'departments'} = [] unless $result->{'departments'};
@@ -842,7 +842,7 @@ sub api2_DeleteExtension {
       }
   }
   $cli->Logout();
-  return $result;
+  return "";
 }
 
 sub api2_GetExtensions {
@@ -1318,12 +1318,12 @@ sub api2_AddMailingList {
 
 sub api2_ListMailingLists {
         my %OPTS = @_;
-	@domains = Cpanel::Email::listmaildomains();
+	my @domains = Cpanel::Email::listmaildomains();
 	my $cli = getCLI();
         my @result;
 	foreach my $domain (@domains) {
 		my $lists=$cli->GetDomainLists($domain);
-                foreach $listName (sort keys %$lists) {
+                foreach my $listName (sort keys %$lists) {
 		 push( @result, { list => "$listName\@$domain" , domain =>"$domain"} );
 		}
 	}
@@ -1379,6 +1379,15 @@ my %ValuesToIndexes_SaveRequests;
 my @IndexesToValues_SaveRequests;
 my %ValuesToIndexes_Distribution;
 my @IndexesToValues_Distribution;
+my @IndexesToValues_Postings;
+my @IndexesToValues_Format;
+my @IndexesToValues_SizeLimit;
+my @IndexesToValues_CoolOffPeriod;
+my @IndexesToValues_UnsubBouncedPeriod;
+my @IndexesToValues_CleanupPeriod;
+my @IndexesToValues_SaveReports;
+my @IndexesToValues_Reply;
+my @IndexesToValues_ArchiveSizeLimit;
 
 sub MLSettingsSetIndexToValue {
 	@IndexesToValues_OwnerCheck = ( "Return-Path", "IP Addresses", "Authentication" );
@@ -1396,6 +1405,21 @@ sub MLSettingsSetIndexToValue {
 	@IndexesToValues_Reply=("to list","to sender");
 	@IndexesToValues_ArchiveSizeLimit=("unlimited","0","1024","3K","10K","30K","100K","300K","1024K","3M","10M","30M","100M","300M","1024M","3G","10G","30G");
 }
+
+my %ValuesToIndexes_OwnerCheck;
+my %ValuesToIndexes_Charset;
+my %ValuesToIndexes_Subscribe;
+my %ValuesToIndexes_SaveRequests;
+my %ValuesToIndexes_Distribution;
+my %ValuesToIndexes_Postings;
+my %ValuesToIndexes_Format;
+my %ValuesToIndexes_SizeLimit;
+my %ValuesToIndexes_CoolOffPeriod;
+my %ValuesToIndexes_UnsubBouncedPeriod;
+my %ValuesToIndexes_CleanupPeriod;
+my %ValuesToIndexes_SaveReports;
+my %ValuesToIndexes_Reply;
+my %ValuesToIndexes_ArchiveSizeLimit;
 
 sub MLSettingsSetValueToIndex {
         %ValuesToIndexes_OwnerCheck = ( "Return-Path",0,"IP Addresses",1,"Authentication",2 );
@@ -1572,7 +1596,7 @@ sub api2_SetListSettings {
 
 sub CommuniGate_PrintTextArea_api1 {
  my ($text) = @_;
- @lines = split(/\\e/,$text);
+ my @lines = split(/\\e/,$text);
  foreach my $line (@lines) {
   $line = html_to_text_out($line);
   $line =~ s/\\"/&quot;/g;
@@ -1646,7 +1670,7 @@ sub api2_SetSubSettings {
                 $Cpanel::CPERROR{'CommuniGate'} = $error_msg;
         }
 	$cli->Logout();
-        return @result;
+        return ();
 
 }
 
@@ -1663,8 +1687,7 @@ sub api2_UnSub {
                 $Cpanel::CPERROR{'CommuniGate'} = $error_msg;
         }
 	$cli->Logout();
-        return @result;
-
+        return ();
 }
 
 sub api2_Sub {
@@ -1692,17 +1715,17 @@ sub api2_Sub {
                 $Cpanel::CPERROR{'CommuniGate'} = $error_msg;
         }
 	$cli->Logout();
-        return @result;
+        return ();
 }
 
 sub api2_ListGroups{
         my %OPTS = @_;
-        @domains = Cpanel::Email::listmaildomains();
+        my @domains = Cpanel::Email::listmaildomains();
 	my $cli = getCLI();
         my @result;
         foreach my $domain (@domains) {
                 my $groups=$cli->ListGroups($domain);
-                foreach $groupName (sort @$groups) {
+                foreach my $groupName (sort @$groups) {
 		    my $details = $cli->GetGroup("$groupName\@$domain");
 		    push( @result, { list => "$groupName\@$domain" , domain =>"$domain"} ) unless (defined($details->{EmailDisabled}) && $details->{EmailDisabled} eq "YES");
                 }
@@ -1712,12 +1735,12 @@ sub api2_ListGroups{
 }
 sub api2_ListDepartments {
         my %OPTS = @_;
-        @domains = Cpanel::Email::listmaildomains();
+        my @domains = Cpanel::Email::listmaildomains();
 	my $cli = getCLI();
         my @result;
         foreach my $domain (@domains) {
                 my $groups=$cli->ListGroups($domain);
-                foreach $groupName (sort @$groups) {
+                foreach my $groupName (sort @$groups) {
 		    next if $groupName =~ /^activequeuegroup_/;
 		    my $details = $cli->GetGroup("$groupName\@$domain");
 		    push( @result, { list => "$groupName\@$domain" , domain =>"$domain"} ) unless (defined($details->{SignalDisabled}) && $details->{SignalDisabled} eq "YES");
@@ -1775,7 +1798,7 @@ sub api2_AddGroup{
         if ($error_msg eq "OK") {
                 push( @result, { email => "$listname", domain => "$domain" } );
 		# set real name
-		$Settings=$cli->GetGroup("$listname\@$domain");
+		my $Settings=$cli->GetGroup("$listname\@$domain");
 		@$Settings{'RealName'}=$realname;
 		@$Settings{'SignalDisabled'}= 'YES';
 		$cli->SetGroup("$listname\@$domain",$Settings);
@@ -1784,7 +1807,7 @@ sub api2_AddGroup{
         }
 
 	# set real name
-	$Settings=$cli->GetGroup("$listname\@$domain");
+	my $Settings=$cli->GetGroup("$listname\@$domain");
   	@$Settings{'RealName'}=$realname;
   	$cli->SetGroup("$listname\@$domain",$Settings);
 
@@ -1810,7 +1833,7 @@ sub api2_AddDepartment {
         if ($error_msg eq "OK") {
                 push( @result, { email => "$listname", domain => "$domain" } );
 		# set real name
-		$Settings=$cli->GetGroup("$listname\@$domain");
+		my $Settings=$cli->GetGroup("$listname\@$domain");
 		@$Settings{'RealName'}=$realname;
 		@$Settings{'EmailDisabled'} = 'YES';
 		$cli->SetGroup("$listname\@$domain",$Settings);
@@ -1828,7 +1851,7 @@ sub api2_ListGroupMembers {
 	my $cli = getCLI();
         my @result;
 	my $Settings;
-	$Settings=$cli->GetGroup($listname);
+	my $Settings=$cli->GetGroup($listname);
         foreach (keys %$Settings) {
       		my $data=@$Settings{$_};
       		if (ref ($data) eq 'ARRAY') {
@@ -1866,7 +1889,7 @@ sub api2_AddGroupMember {
 		SetGroupInternal($listname);
 	}
 	$cli->Logout();
-        return @result;
+        return ();
 }
 
 sub api2_RemoveGroupMember {
@@ -1897,7 +1920,7 @@ sub api2_RemoveGroupMember {
                 SetGroupInternal($listname);
         }
 	$cli->Logout();
-        return @result;
+        return ();
 }
 
 sub api2_GetGroupSettings {
@@ -2101,7 +2124,7 @@ sub api2_RestoreForwarders {
     my $cli = getCLI();
     my @result;
     my $gzfile = $Cpanel::homedir . '/tmp/forwardersimport/' . $Cpanel::CPVAR{'forwardersimportid'};
-    open(IN, "gunzip -c $gzfile |") || die "can't open pipe to $file";
+    open(IN, "gunzip -c $gzfile |") || die "can't open pipe to $gzfile";
     my @input = <IN>;
     close IN;
     unlink $gzfile;
@@ -2165,7 +2188,7 @@ sub api2_RestoreFilters {
 			$cli->SetAccountMailRules("$userName\@$domain",$newrules);
 		    }
 		    # END import filters
-		    push @result, {row, "$userName\@$domain: " . $filter->[1] . "\n"};
+		    push @result, {"", "$userName\@$domain: " . $filter->[1] . "\n"};
 		}
 	    }
 	}
@@ -2235,6 +2258,7 @@ sub api2_UninstallSRV {
 	    }
 	    my $subdomain = $domain;
 	    $subdomain =~ s/\.?$zone$//;
+	    my $result;
     	    if ($version < 11.38) {
     		$result = Cpanel::AdminBin::adminrun( 'cca', "UNINSTALLSRV$OPTS{'proto'}", $subdomain, $zone);
     		chomp $result;
@@ -2281,6 +2305,7 @@ sub api2_InstallSRV {
 	    }
 	    my $subdomain = $domain;
 	    $subdomain =~ s/$zone$//;
+	    my $result;
 	    if ($version < 11.38) {
 		$result = Cpanel::AdminBin::adminrun( 'cca', "INSTALLSRV$OPTS{'proto'}", $subdomain, $zone);
 		chomp $result;
@@ -2342,7 +2367,7 @@ sub api2_SetGroupSettings {
         my $email = $OPTS{'email'};
 	my $cli = getCLI();
 
-        $Settings=$cli->GetGroup($email);
+        my $Settings=$cli->GetGroup($email);
         @$Settings{'RealName'}=$OPTS{'RealName'};
         @$Settings{'RemoveToAndCc'}=($OPTS{'RemoveToAndCc'}?'YES':'NO');;
         @$Settings{'Expand'}=($OPTS{'Expand'}?'YES':'NO');;
@@ -2372,7 +2397,7 @@ sub api2_SetDepartmentSettings {
         my $email = $OPTS{'email'};
 	my $cli = getCLI();
 
-        $Settings=$cli->GetGroup($email);
+        my $Settings=$cli->GetGroup($email);
         @$Settings{'RealName'}=$OPTS{'RealName'};
         @$Settings{'Expand'}=($OPTS{'Expand'}?'YES':'NO');;
         @$Settings{'EmailDisabled'}=($OPTS{'EmailDisabled'}?'NO':'YES');;
@@ -2597,7 +2622,8 @@ sub api2_checkSSLlinks {
 
 sub api2_DKIMVerification {
     my %OPTS = @_;
-    $cli = getCLI();
+    my $cli = getCLI();
+    my @domains = Cpanel::Email::listmaildomains();
     if ($OPTS{DKIMVerifyReject}) {
 	for my $domain (@domains) {
 	    my $settings = {
@@ -2701,7 +2727,7 @@ sub api2_ListContacts {
     my $contacts;
     for my $domain (@domains) {
 	if ($domain eq $dom) {
-	    $password = $cli->GetAccountPlainPassword($account);
+	    my $password = $cli->GetAccountPlainPassword($account);
 	    if ($password) {
 		my $boxes = $cli->ListMailboxes(accountName => $account);
 		for my $box (keys %$boxes) {
@@ -2781,7 +2807,7 @@ sub api2_EditContact {
     my @return;
     for my $domain (@domains) {
 	if ($domain eq $dom) {
-	    $password = $cli->GetAccountPlainPassword($account);
+	    my $password = $cli->GetAccountPlainPassword($account);
 	    if ($password) {
 		my $ximss = getXIMSS($account, $password);
 		my $time = time();
@@ -2856,7 +2882,7 @@ sub api2_DoEditContact {
 	my @return;
 	for my $domain (@domains) {
 	    if ($domain eq $dom) {
-		$password = $cli->GetAccountPlainPassword($params->{account});
+		my $password = $cli->GetAccountPlainPassword($params->{account});
 		if ($password) {
 		    my $boxes = $cli->ListMailboxes(accountName => $params->{account});
 		    for my $box (keys %$boxes) {
@@ -2982,7 +3008,7 @@ sub api2_DeleteContact {
     my @return;
     for my $domain (@domains) {
 	if ($domain eq $dom) {
-	    $password = $cli->GetAccountPlainPassword($account);
+	    my $password = $cli->GetAccountPlainPassword($account);
 	    if ($password) {
 		my $time = time();
 		my $ximss = getXIMSS($account, $password);
@@ -3060,7 +3086,7 @@ sub api2_EditContactsGroup {
     my $vcard;
     for my $domain (@domains) {
 	if ($domain eq $dom) {
-	    $password = $cli->GetAccountPlainPassword($account);
+	    my $password = $cli->GetAccountPlainPassword($account);
 	    if ($password) {
 		my $ximss = getXIMSS($account, $password);
 		my $time = time();
@@ -3142,7 +3168,7 @@ sub api2_DoEditContactsGroup {
 	my @return;
 	for my $domain (@domains) {
 	    if ($domain eq $dom) {
-		$password = $cli->GetAccountPlainPassword($params->{account});
+		my $password = $cli->GetAccountPlainPassword($params->{account});
 		if ($password) {
 		    my $boxes = $cli->ListMailboxes(accountName => $params->{account});
 		    for my $box (keys %$boxes) {
@@ -3245,7 +3271,7 @@ sub api2_EditContactsBox {
 	    $return->{accounts}->{"$userName\@$domain"} = 1;
 	}
 	my $groups = $cli->ListGroups($domain);
-	foreach $groupName (sort @$groups) {
+	foreach my $groupName (sort @$groups) {
 	    $return->{groups}->{"$groupName\@$domain"} = $cli->GetGroup("$groupName\@$domain");
 	}
 
@@ -3307,7 +3333,7 @@ sub api2_exportContacts {
     my $return = [];
     for my $domain (@domains) {
 	if ($domain eq $dom) {
-	    $password = $cli->GetAccountPlainPassword($account);
+	    my $password = $cli->GetAccountPlainPassword($account);
 	    if ($password) {
 		my $ximss = getXIMSS($account, $password);
 		my $time = time();
@@ -3436,7 +3462,7 @@ sub api2_ImportContacts {
 		    }
 		    # Insert the contact;
 		    my $time = time();
-		    $password = $cli->GetAccountPlainPassword($account);
+		    my $password = $cli->GetAccountPlainPassword($account);
 		    if ($password) {
 			my $ximss = getXIMSS($account, $password);
 			$ximss->send({folderOpen => {
@@ -3542,7 +3568,7 @@ sub api2_ImportContacts {
 		    $message->{"NOTE"}->{"VALUE"} = [$row->[41]] if $row->[41];
 		    # Insert the contact;
 		    my $time = time();
-		    $password = $cli->GetAccountPlainPassword($account);
+		    my $password = $cli->GetAccountPlainPassword($account);
 		    if ($password) {
 		    	my $ximss = getXIMSS($account, $password);
 		    	$ximss->send({folderOpen => {
@@ -3622,7 +3648,7 @@ sub api2_ListXmppRoster {
     foreach my $dom (@domains) {
 	if ($dom eq $domain) {
 	    my $time = time();
-	    $password = $cli->GetAccountPlainPassword($account);
+	    my $password = $cli->GetAccountPlainPassword($account);
 	    if ($password) {
 		my $ximss = getXIMSS($account, $password);
 		$ximss->send({rosterList => {
@@ -3650,7 +3676,7 @@ sub api2_AddBuddy {
     foreach my $dom (@domains) {
 	if ($dom eq $domain) {
 	    my $time = time();
-	    $password = $cli->GetAccountPlainPassword($account);
+	    my $password = $cli->GetAccountPlainPassword($account);
 	    if ($password) {
 		my $ximss = getXIMSS($account, $password);
 		my $params = {
@@ -3682,7 +3708,7 @@ sub api2_RemoveBuddy {
     foreach my $dom (@domains) {
 	if ($dom eq $domain) {
 	    my $time = time();
-	    $password = $cli->GetAccountPlainPassword($account);
+	    my $password = $cli->GetAccountPlainPassword($account);
 	    if ($password) {
 		my $ximss = getXIMSS($account, $password);
 		my $params = {
@@ -3721,7 +3747,7 @@ sub api2_ImportLocalRoster {
     foreach my $dom (@domains) {
 	if ($dom eq $domain) {
 	    my $time = time();
-	    $password = $cli->GetAccountPlainPassword($account);
+	    my $password = $cli->GetAccountPlainPassword($account);
 	    if ($password) {
 		my $buddies = [map {$params->{$_}} grep {/^buddy/} keys %$params];
 		my $ximss = getXIMSS($account, $password);
@@ -3797,12 +3823,12 @@ sub api2_AddQueue {
     my (undef,$dom2) = split '@', $OPTS{'department'};
     my $departments = [];
     my $name;
-    my $departments;
+    my $department;
     my $localExtension;
     my $agentExtension;
     for my $domain (@domains) {
 	my $groups = $cli->ListGroups($domain);
-	foreach $groupName (sort @$groups) {
+	foreach my $groupName (sort @$groups) {
 	    next if $groupName =~ /^activequeuegroup_/;
 	    my $details = $cli->GetGroup("$groupName\@$domain");
 	    push(@$departments, "$groupName\@$domain") unless (defined($details->{SignalDisabled}) && $details->{SignalDisabled} eq "YES");
@@ -3915,7 +3941,7 @@ sub api2_DeleteQueue {
 	}
     }
     $cli->Logout();
-    return $result;
+    return "";
 }
 
 sub api2_EditIVR {
@@ -3935,7 +3961,7 @@ sub api2_EditIVR {
 		$result->{"accounts"}->{"$userName\@$domain"}->{details} = $account;
 	    }
 	    my $groups = $cli->ListGroups($domain);
-	    foreach $groupName (sort @$groups) {
+	    foreach my $groupName (sort @$groups) {
 		next if $groupName =~ m/^activequeuegroup\_/i;
 		my $details = $cli->GetGroup("$groupName\@$domain");
 		$result->{'departments'} = [] unless $result->{'departments'};
@@ -4121,7 +4147,7 @@ sub api2_ListSounds {
 	$result->{sounds}->{$lang} = {map {$_ => 'stock'} grep {/\.wav$/} keys %$files};
 	my $domainFiles = $cli->ListDomainPBXFiles($domain, $lang);
 	my $domainSounds = {map {$_ => 'domain'} grep {/\.wav$/} keys %$domainFiles};
-	my $serverFiles = $cli->ListServerPBXFiles($server, $lang);
+	my $serverFiles = $cli->ListServerPBXFiles($domain, $lang);
 	my $serverSounds = {map {$_ => 'server'} grep {/\.wav$/} keys %$serverFiles};
 	%{$result->{sounds}->{$lang}} = (%{$result->{sounds}->{$lang}}, %$serverSounds, %$domainSounds);
     }
