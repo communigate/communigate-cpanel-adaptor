@@ -338,7 +338,7 @@ sub api2_ListWorkDays {
 	my $defaults = $cli->GetServerAccountPrefs();
 	if ($domain) {
 	    my @domains = Cpanel::Email::listmaildomains();
-	    for $dom (@domains) {
+	    for my $dom (@domains) {
 		if ($dom eq $domain) {
 		    $prefs = $cli->GetAccountDefaultPrefs($domain);
 		    $defaults->{WorkDays} = $prefs->{WorkDays} if $prefs->{WorkDays};
