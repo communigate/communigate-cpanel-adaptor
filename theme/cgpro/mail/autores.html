@@ -67,23 +67,9 @@
 		[a href="dodelautoresconfirm.html?email=%&redirectdomain=$FORM{'domain'}"]$LANG{'delete-BoxTrapper'}[/a]
 	[/td]
 [/tr]
-,*num,^email,^email,email,subject,^email,email,^email,email,email) domain=$FORM{'domain'},regex=$FORM{'searchregex'},api2_paginate=1,api2_paginate_start=$FORM{'api2_paginate_start'},api2_paginate_size=$CPVAR{'itemsperpage'} || '[tr][td class="errors" colspan="4"]$LANG{'NoAutoRes'}.[/td][/tr]' ?>
+,*num,^email,^email,email,subject,^email,email,^email,email,email) domain=$FORM{'domain'},regex=$FORM{'searchregex'} || '[tr][td class="errors" colspan="4"]$LANG{'NoAutoRes'}.[/td][/tr]' ?>
 
 </table>
-
-<?cp UI::paginate(%,paginator) currentpage=$CPVAR{'currentpage'},pages=$CPVAR{'pages'},itemsperpage=$CPVAR{'itemsperpage'} ?>
-<cpanelif $CPVAR{'pages'} && !$CPVAR{'pages'}==1>
-<div style="float:right">
-	<form method="get" action="">
-	<cpanel langprint="PaginatorShowing"> <select name="itemsperpage" onchange="this.form.submit();">
-	<?cp UI::paginate_list([option value="%" %]%[/option],item,selected=1?selected:,item) itemsperpage=$CPVAR{'itemsperpage'},itemlist=10:25:50:100:250:500 ?>
-	</select>
-	<noscript><input id="my_button" type="submit" Value="<cpanel Locale="maketext('Change')">" /></noscript> <cpanel langprint="PaginatorResults"> 
-	</form>
-</div>
-</cpanelif>
-
-<br />
 
 <p><cpanel langprint="EAAutoResHint"></p>
 

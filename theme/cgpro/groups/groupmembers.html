@@ -108,23 +108,11 @@ var init_lists = function() {
 		[/td]
 
 	[/tr]
-,*num,subemail,subemail,r_feedsel,r_digestsel,r_indexsel,r_nullsel,r_bannedsel,r_subscribesel,r_unsubscribesel,mod1sel,mod2sel,mod3sel,mod4sel,mod5sel,modallsel,unmodsel,nopostsel,numpost,subemail,subemail,subemail,subemail,subemail) listname=$FORM{'listname'},regex=$FORM{'searchregex'},api2_paginate=1,api2_paginate_start=$FORM{'api2_paginate_start'},api2_paginate_size=$CPVAR{'itemsperpage'} || '[tr][td colspan="4" class="errors"]$LANG{'CGPGroupNoSub'}[/td][/tr]' ?>
+,*num,subemail,subemail,r_feedsel,r_digestsel,r_indexsel,r_nullsel,r_bannedsel,r_subscribesel,r_unsubscribesel,mod1sel,mod2sel,mod3sel,mod4sel,mod5sel,modallsel,unmodsel,nopostsel,numpost,subemail,subemail,subemail,subemail,subemail) listname=$FORM{'listname'},regex=$FORM{'searchregex'} || '[tr][td colspan="4" class="errors"]$LANG{'CGPGroupNoSub'}[/td][/tr]' ?>
 
 
 
 </table>
-
-<?cp UI::paginate(%,paginator) currentpage=$CPVAR{'currentpage'},pages=$CPVAR{'pages'},itemsperpage=$CPVAR{'itemsperpage'} ?>
-<cpanelif $CPVAR{'pages'} && !$CPVAR{'pages'}==1>
-	<div style="float:right">
-		<form method="get" action="">
-			<cpanel langprint="PaginatorShowing"> <select name="itemsperpage" onchange="this.form.submit();">
-			<?cp UI::paginate_list([option value="%" %]%[/option],item,selected=1?selected:,item) itemsperpage=$CPVAR{'itemsperpage'},itemlist=10:25:50:100:250:500 ?>
-			<input type="hidden" name="listname" value="<cpanel print='$FORM{'listname'}'>"  />
-			</select><noscript><button id="my_button" onclick="" type="submit" Value=""><cpanel Locale="maketext('Change')"></button></noscript>  <cpanel langprint="PaginatorResults"> 
-		</form>
-	</div>
-</cpanelif>
 
 <div class="return-link"><a href="groups.html">&larr; <cptext "Go Back"></a></div>
 </cpanelfeature>

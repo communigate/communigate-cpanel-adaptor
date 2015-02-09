@@ -25,7 +25,7 @@
 	 [td class="truncate"]%[/td]
 	 [td][a href="addqueue.html?queue=%"]$LANG{'CGPViewEdit'}[/a]\, [a href="deletequeue.html?queue=%&amp;name=%"]$LANG{'BrandingDPackage'}[/a][/td]
 	 [/tr]
-	 ,*num,name,department,queue,queue,name) domain=$FORM{'domain'},regex=$FORM{'searchregex'},api2_paginate=1,api2_paginate_start=$FORM{'api2_paginate_start'},api2_paginate_size=$CPVAR{'itemsperpage'} || '[tr][td colspan="5" class="errors"]$LANG{'CGPNoQeueues'}.[/td][/tr]' ?>
+	 ,*num,name,department,queue,queue,name) domain=$FORM{'domain'},regex=$FORM{'searchregex'} || '[tr][td colspan="5" class="errors"]$LANG{'CGPNoQeueues'}.[/td][/tr]' ?>
 
   </table>
   </cpanelfeature>

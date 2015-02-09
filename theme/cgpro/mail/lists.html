@@ -110,22 +110,11 @@ YAHOO.util.Event.onDOMReady(init_lists);
                         [a href="listsubscribers.html?listname=%"]$LANG{'CGPMailListSubs'} [/a]
                 [/td]
 	[/tr]
-,*num,list,list,list,domain,list,list) domain=$FORM{'domain'},regex=$FORM{'searchregex'},api2_paginate=1,api2_paginate_start=$FORM{'api2_paginate_start'},api2_paginate_size=$CPVAR{'itemsperpage'} || '[tr][td colspan="4" class="errors"]$LANG{'NoLists'}[/td][/tr]' ?>
+,*num,list,list,list,domain,list,list) domain=$FORM{'domain'},regex=$FORM{'searchregex'} || '[tr][td colspan="4" class="errors"]$LANG{'NoLists'}[/td][/tr]' ?>
 
 
 
 </table>
-
-<?cp UI::paginate(%,paginator) currentpage=$CPVAR{'currentpage'},pages=$CPVAR{'pages'},itemsperpage=$CPVAR{'itemsperpage'} ?>
-<cpanelif $CPVAR{'pages'} && !$CPVAR{'pages'}==1>
-	<div style="float:right">
-		<form method="get" action="">
-			<cpanel langprint="PaginatorShowing"> <select name="itemsperpage" onchange="this.form.submit();">
-			<?cp UI::paginate_list([option value="%" %]%[/option],item,selected=1?selected:,item) itemsperpage=$CPVAR{'itemsperpage'},itemlist=10:25:50:100:250:500 ?>
-			</select><noscript><button id="my_button" onclick="" type="submit" Value=""><cpanel Locale="maketext('Change')"></button></noscript>  <cpanel langprint="PaginatorResults"> 
-		</form>
-	</div>
-</cpanelif>
 
 </cpanelfeature>
 </div><!-- end body-content -->

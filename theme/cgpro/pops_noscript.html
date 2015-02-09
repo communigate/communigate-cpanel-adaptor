@@ -138,7 +138,7 @@ domain=$FORM{'domain'},infinitylang=true || '[tr][td colspan="8" class="errors"]
 		[/td]		
 	[/tr]
 ,*num,email,email,domain,humandiskused,humandiskquota,user,domain,user,domain,user,domain,email,email)
-domain=$FORM{'domain'},regex=$FORM{'searchregex'},api2_paginate=1,api2_paginate_start=$FORM{'api2_paginate_start'},api2_paginate_size=$CPVAR{'itemsperpage'},infinitylang=true || '[tr][td colspan="8" class="errors"]$LANG{'NoAccounts'}($FORM{'domain'}).[/td][/tr]' ?>  
+domain=$FORM{'domain'},regex=$FORM{'searchregex'} || '[tr][td colspan="8" class="errors"]$LANG{'NoAccounts'}($FORM{'domain'}).[/td][/tr]' ?>  
 </cpanelif>
 
 <cpanelif !$CPVAR{'mobile'} && !$CONF{'SecurityPolicy::SourceIPCheck'}>
@@ -164,31 +164,12 @@ domain=$FORM{'domain'},regex=$FORM{'searchregex'},api2_paginate=1,api2_paginate_
 		[/td]
 	[/tr]
 ,*num,email,email,domain,humandiskused,humandiskquota,user,domain,user,domain,user,domain,email)
-domain=$FORM{'domain'},regex=$FORM{'searchregex'},api2_paginate=1,api2_paginate_start=$FORM{'api2_paginate_start'},api2_paginate_size=$CPVAR{'itemsperpage'},infinitylang=true || '[tr][td colspan="8" class="errors"]$LANG{'NoAccounts'}($FORM{'domain'}).[/td][/tr]' ?>  
+domain=$FORM{'domain'},regex=$FORM{'searchregex'} || '[tr][td colspan="8" class="errors"]$LANG{'NoAccounts'}($FORM{'domain'}).[/td][/tr]' ?>  
 </cpanelif>
 
 	</tbody> 
     </table>
 
-    <?cp UI::paginate(%,paginator) currentpage=$CPVAR{'currentpage'},pages=$CPVAR{'pages'},itemsperpage=$CPVAR{'itemsperpage'} ?>
-    <cpanelif $CPVAR{'pages'} && !$CPVAR{'pages'}==1>
-	<div style="float:right">
-	    <form method="get" action="">
-			<cpanel langprint="PaginatorShowing">
-			<select name="itemsperpage">
-			<?cp UI::paginate_list(
-				[option value="%" %]%[/option]
-				,item,selected=1?selected="selected" :,item) itemsperpage=$CPVAR{'itemsperpage'},itemlist=10:25:50:100:250:500
-			?>
-			</select>
-			<noscript><button id="my_button" type="submit" value="<cpanel langprint="Change">" /></noscript>
-			<cpanel langprint="PaginatorResults">
-	    </form>
-	</div>
-    </cpanelif>
-
-    <br />
-    <br />
     <p class="clearit"></p>
 <cpanelif $CONF{'maildir'}>
 	<cpanel langprint="PopDiskUsageNoteMainAcct">
