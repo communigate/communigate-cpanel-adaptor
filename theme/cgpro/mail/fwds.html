@@ -55,21 +55,9 @@
 		[td class="truncate"]%[/td]
 		[td][a href="dodelfwdconfirm.html?domain=$FORM{'domain'}&amp;email=%&amp;emaildest=%"]$LANG{'BrandingDPackage'}[/a][/td]
 	[/tr]
-	,*num,html_dest,html_forward,uri_dest,^forward,uri_dest,^forward) domain=$FORM{'domain'},regex=$FORM{'searchregex'},api2_paginate=1,api2_paginate_start=$FORM{'api2_paginate_start'},api2_paginate_size=$CPVAR{'itemsperpage'} || '[tr][td colspan="5" class="errors"]$LANG{'NoFwds'}.[/td][/tr]' ?>
+	,*num,html_dest,html_forward,uri_dest,^forward,uri_dest,^forward) domain=$FORM{'domain'},regex=$FORM{'searchregex'} || '[tr][td colspan="5" class="errors"]$LANG{'NoFwds'}.[/td][/tr]' ?>
 
 </table>
-
-<?cp UI::paginate(%,paginator) currentpage=$CPVAR{'currentpage'},pages=$CPVAR{'pages'},itemsperpage=$CPVAR{'itemsperpage'} ?>
-<cpanelif $CPVAR{'pages'} && !$CPVAR{'pages'}==1>
-	<div style="float:right">
-		<form method="get" action="">
-		<input type="hidden" name="domain" value="<cpanel print="$FORM{'domain'}">" />
-		Showing <select name="itemsperpage" onchange="this.form.submit();">
-		<?cp UI::paginate_list([option value="%" %]%[/option],item,selected=1?selected:,item) itemsperpage=$CPVAR{'itemsperpage'},itemlist=10:25:50:100:250:500 ?>
-	</select><noscript><button id="my_button" onClick="" type="submit" Value="">Change</button></noscript>  Results per page 
-	</form></div>
-	<div style="clear:both;"></div>
-</cpanelif>
 
 <div align="center"><a class="create-button" href="addfwd.html"><cpanel langprint="FWAddHead"></a></div>	
 <br />
