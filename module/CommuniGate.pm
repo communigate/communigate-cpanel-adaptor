@@ -582,10 +582,12 @@ sub api2_listforwards {
   foreach my $domain (@domains) {
     if (($specified_domain eq "") || ($specified_domain eq $domain)) {
       my $accounts=$cli->ListAccounts($domain);
+      next unless $accounts;
       foreach my $userName (sort keys %$accounts) {
         my $Rules=$cli->GetAccountMailRules("$userName\@$domain") || die "Error: ".$cli->getErrMessage.", quitting";
         next unless $Rules;
         foreach my $Rule (@$Rules) {
+	  next unless $Rule;
           if ($Rule->[1] eq "#Redirect") {
             my @dest = split(",",$Rule->[3]->[0]->[1]);
             foreach my $value (@dest) {
