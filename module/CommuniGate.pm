@@ -583,42 +583,47 @@ sub api2_listforwards {
     if (($specified_domain eq "") || ($specified_domain eq $domain)) {
       my $accounts=$cli->ListAccounts($domain);
       foreach my $userName (sort keys %$accounts) {
-	my $Rules=$cli->GetAccountMailRules("$userName\@$domain") || die "Error: ".$cli->getErrMessage.", quitting";
-	foreach my $Rule (@$Rules) {
-	  if ($Rule->[1] eq "#Redirect") {
-	    my @dest = split(",",$Rule->[3]->[0]->[1]);
-	    foreach my $value (@dest) {
-	      push( @result, {       uri_dest => "$userName%40$domain",
-				     html_dest => "$userName\@$domain",
-				     dest => "$userName\@$domain",
-				     uri_forward => "$value",
-				     html_forward => "$value" ,
-				     forward => "$value" } );
-	    }
-	  }
-	}
-	my $aliases = $cli->GetAccountAliases("$userName\@$domain");
-	for my $alias (@$aliases) {
-	  push( @result, { uri_dest => "$alias%40$domain",
-			   html_dest => "$alias\@$domain",
-			   dest => "$alias\@$domain",
-			   uri_forward => "$userName%40$domain",
-			   html_forward => "$userName\@$domain" ,
-			   forward => "$userName\@$domain" } );
-	}
+        my $Rules=$cli->GetAccountMailRules("$userName\@$domain") || die "Error: ".$cli->getErrMessage.", quitting";
+        next inless $Rules;
+        foreach my $Rule (@$Rules) {
+          if ($Rule->[1] eq "#Redirect") {
+            my @dest = split(",",$Rule->[3]->[0]->[1]);
+            foreach my $value (@dest) {
+              push( @result, {       uri_dest => "$userName%40$domain",
+                                     html_dest => "$userName\@$domain",
+                                     dest => "$userName\@$domain",
+                                     uri_forward => "$value",
+                                     html_forward => "$value" ,
+                                     forward => "$value" } );
+            }
+          }
+        }
+        my $aliases = $cli->GetAccountAliases("$userName\@$domain");
+        if ($aliases) {
+            for my $alias (@$aliases) {
+                push( @result, { uri_dest => "$alias%40$domain",
+                                 html_dest => "$alias\@$domain",
+                                 dest => "$alias\@$domain",
+                                 uri_forward => "$userName%40$domain",
+                                 html_forward => "$userName\@$domain" ,
+                                 forward => "$userName\@$domain" } );
+            }
+        }
       }
       my $forwarders = $cli->ListForwarders($domain);
-      foreach my $forwarder (@$forwarders) {
-	  next if $forwarder =~ m/^(i|tn)\-\d+$/i;
-	  next if $forwarder =~ m/^activequeue(toggle)?_/i;
-	  my $fwd = $cli->GetForwarder("$forwarder\@$domain");
-	  next if $fwd =~ m/^(ivrmenu|activequeue(toggle)?_)/i;
-	  push( @result, { uri_dest => "$forwarder%40$domain",
-			   html_dest => "$forwarder\@$domain",
-			   dest => "$forwarder\@$domain",
-			   uri_forward => "$fwd",
-			   html_forward => "$fwd" ,
-			   forward => "$fwd" } );
+      if ($forwarders) {
+          foreach my $forwarder (@$forwarders) {
+              next if $forwarder =~ m/^(i|tn)\-\d+$/i;
+              next if $forwarder =~ m/^activequeue(toggle)?_/i;
+              my $fwd = $cli->GetForwarder("$forwarder\@$domain");
+              next if $fwd =~ m/^(ivrmenu|activequeue(toggle)?_)/i;
+              push( @result, { uri_dest => "$forwarder%40$domain",
+                               html_dest => "$forwarder\@$domain",
+                               dest => "$forwarder\@$domain",
+                               uri_forward => "$fwd",
+                               html_forward => "$fwd" ,
+                               forward => "$fwd" } );
+          }
       }
     }
   }
