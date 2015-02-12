@@ -587,7 +587,7 @@ sub api2_listforwards {
         my $Rules=$cli->GetAccountMailRules("$userName\@$domain") || die "Error: ".$cli->getErrMessage.", quitting";
         next unless $Rules;
         foreach my $Rule (@$Rules) {
-	  next unless $Rule;
+	  next unless ref($Rules) eq "ARRAY";
           if ($Rule->[1] eq "#Redirect") {
             my @dest = split(",",$Rule->[3]->[0]->[1]);
             foreach my $value (@dest) {
