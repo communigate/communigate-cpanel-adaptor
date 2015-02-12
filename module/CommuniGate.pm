@@ -1725,6 +1725,7 @@ sub api2_ListGroups{
         my @result;
         foreach my $domain (@domains) {
                 my $groups=$cli->ListGroups($domain);
+		next unless $groups;
                 foreach my $groupName (sort @$groups) {
 		    my $details = $cli->GetGroup("$groupName\@$domain");
 		    push( @result, { list => "$groupName\@$domain" , domain =>"$domain"} ) unless (defined($details->{EmailDisabled}) && $details->{EmailDisabled} eq "YES");
@@ -1740,6 +1741,7 @@ sub api2_ListDepartments {
         my @result;
         foreach my $domain (@domains) {
                 my $groups=$cli->ListGroups($domain);
+		next unless $groups;
                 foreach my $groupName (sort @$groups) {
 		    next if $groupName =~ /^activequeuegroup_/;
 		    my $details = $cli->GetGroup("$groupName\@$domain");
