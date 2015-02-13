@@ -257,16 +257,9 @@ then
 # Install Active Queue Scripts
     cp ${PACKSRC}/PBXApps/*spp* /var/CommuniGate/PBXApps/
 # Install WebSkins
-    rm -rf /var/CommuniGate/WebSkins/ProntoDrive
-    rm -f /var/CommuniGate/WebSkins/prontodrive*
-    rm -f /var/CommuniGate/WebSkins/workfaces*
     chmod +x ${PACKSRC}/cgi/*
     cp -r ${PACKSRC}/WebSkins/* /var/CommuniGate/WebSkins/
     cp ${PACKSRC}/cgi/* /var/CommuniGate/cgi/
-    if [ ! -f /var/CommuniGate/WebSkins/ProntoDrive/duo-web-v1.bundled.min.js ]
-    then
-	wget -O /var/CommuniGate/WebSkins/ProntoDrive/duo-web-v1.bundled.min.js https://raw2.github.com/duosecurity/duo_perl/master/js/Duo-Web-v1.bundled.min.js
-    fi
     /etc/init.d/CommuniGate stop
     /etc/init.d/CommuniGate start
 fi
