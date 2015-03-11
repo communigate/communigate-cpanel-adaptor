@@ -546,18 +546,29 @@ sub addforward {
 	} else {
 	    # IF forwarding TO local account
 	    if ($cli->GetAccountSettings("$fwdemail")) {
-		my $aliases = $cli->GetAccountAliases("$fwdemail");
-		my $found = 0;
-		for my $alias (@$aliases) {
-		    $found = 1 if "$alias" eq "$user";
-		}
-		push @$aliases, "$user" unless $found;
-		my $aliases = $cli->SetAccountAliases($fwdemail, $aliases);
-		my $error_msg = $cli->getErrMessage();
-		if ($error_msg eq "OK") {
-		    push( @result, { email => "$user\@$domain", forward => "$fwdemail", domain => "$domain" } );
+		my (undef, $fwdDomain) = split "@", $fwdemail;
+		if ($fwdDomain eq $domain) {
+		    my $aliases = $cli->GetAccountAliases("$fwdemail");
+		    my $found = 0;
+		    for my $alias (@$aliases) {
+			$found = 1 if "$alias" eq "$user";
+		    }
+		    push @$aliases, "$user" unless $found;
+		    my $aliases = $cli->SetAccountAliases($fwdemail, $aliases);
+		    my $error_msg = $cli->getErrMessage();
+		    if ($error_msg eq "OK") {
+			push( @result, { email => "$user\@$domain", forward => "$fwdemail", domain => "$domain" } );
+		    } else {
+			$Cpanel::CPERROR{'CommuniGate'} = $error_msg;
+		    }
 		} else {
-		    $Cpanel::CPERROR{'CommuniGate'} = $error_msg;
+		    $cli->CreateForwarder("$user\@$domain", "$fwdemail");
+		    my $error_msg = $cli->getErrMessage();
+		    if ($error_msg eq "OK") {
+			push( @result, { email => "$user\@$domain", forward => "$fwdemail", domain => "$domain" } );
+		    } else {
+			$Cpanel::CPERROR{'CommuniGate'} = $error_msg;
+		    }
 		}
             # IF forwarding to NON local acount
 	    } else {
@@ -915,21 +926,32 @@ sub api2_delforward {
 	    $Cpanel::CPERROR{'CommuniGate'} = $error_msg;
 	  }
 	} else {
-	  # IF forwarding TO local account
-	  if ($cli->GetAccountSettings("$fwdemail")) {
-	    my $aliases = $cli->GetAccountAliases("$fwdemail");
-	    my $newaliases = [];
-	    my ($thealias, undef) = split "@", $user;
-	    for my $alias (@$aliases) {
-	      push @$newaliases, $alias unless $alias eq $thealias;
-	    }
-	    $cli->SetAccountAliases("$fwdemail", $newaliases);
-	    my $error_msg = $cli->getErrMessage();
-	    if ($error_msg eq "OK") {
-	      push( @result, { email => "$user", forward => "$fwdemail"} );
-	    } else {
-	      $Cpanel::CPERROR{'CommuniGate'} = $error_msg;
-	    }
+	    # IF forwarding TO local account
+	    if ($cli->GetAccountSettings("$fwdemail")) {
+		my (undef, $fwdDomain) = split "@", $fwdemail;
+		if ($fwdDomain eq $domain) {
+		    my $aliases = $cli->GetAccountAliases("$fwdemail");
+		    my $newaliases = [];
+		    my ($thealias, undef) = split "@", $user;
+		    for my $alias (@$aliases) {
+			push @$newaliases, $alias unless $alias eq $thealias;
+		    }
+		    $cli->SetAccountAliases("$fwdemail", $newaliases);
+		    my $error_msg = $cli->getErrMessage();
+		    if ($error_msg eq "OK") {
+			push( @result, { email => "$user", forward => "$fwdemail"} );
+		    } else {
+			$Cpanel::CPERROR{'CommuniGate'} = $error_msg;
+		    }
+		} else {
+		    $cli->DeleteForwarder("$user");
+		    my $error_msg = $cli->getErrMessage();
+		    if ($error_msg eq "OK") {
+			push( @result, { email => "$user", forward => "$fwdemail" } );
+		    } else {
+			$Cpanel::CPERROR{'CommuniGate'} = $error_msg;
+		    }
+		}
             # IF forwarding to NON local acount
 	  } else {
 	    $cli->DeleteForwarder("$user");
@@ -1242,7 +1264,7 @@ sub AddCGPAccount {
         	$quota .= "M";
 	}
 
-	my $data=$cli->GetDomainSettings("$domain");
+	my $data = $cli->GetDomainSettings("$domain");
 
 	if (!$data) {
         	$cli->CreateDomain("$domain");

@@ -33,7 +33,7 @@ my %FORM = Cpanel::Form::parseform();
 Whostmgr::HTMLInterface::defheader( "CGPro Hookable Accounts",'', '/cgi/addon_cgpro_hookable_accounts.cgi' );
 
 if ($FORM{'save'}) {
-    if ($FORM{'accounts'}) {
+    if ($FORM{'accounts'} =~ /\w/) {
 	open(FO, ">", '/var/cpanel/communigate_hooked_accounts');
 	print FO $FORM{'accounts'};
 	close(FO);
