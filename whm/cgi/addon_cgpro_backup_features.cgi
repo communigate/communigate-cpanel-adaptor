@@ -9,6 +9,7 @@ use Whostmgr::HTMLInterface ();
 use Whostmgr::ACLS          ();
 use CLI;
 use Cpanel::CachedDataStore;
+use Cpanel::SafeDir;
 
 Whostmgr::ACLS::init_acls();
 if ( !Whostmgr::ACLS::hasroot() ) {

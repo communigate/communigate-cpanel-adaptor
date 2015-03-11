@@ -1,5 +1,5 @@
 [% MACRO filter_option(pval, val, text) BLOCK -%]
-<option value="[% val %]" id="[% val %]"[% val == pval ? " selected='selected'" : "" %]>[% cptext(text) %]</option>
+<option value="[% val %]" id="[% val %]"[% val == pval ? " selected='selected'" : "" %]>[% locale.maketext(text) %]</option>
 [% END -%]
 <form action="doeditcontactsgroup.html?account=[% FORM.account %]&amp;box=[% FORM.box %]" method="post" id="form">
 <div class="highlight">

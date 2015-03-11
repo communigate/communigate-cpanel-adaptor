@@ -2,9 +2,10 @@
  eval 'if [ -x /usr/local/cpanel/3rdparty/bin/perl ]; then exec /usr/local/cpanel/3rdparty/bin/perl -x -- $0 ${1+"$@"}; else exec /usr/bin/perl -x $0 ${1+"$@"}; fi;'
     if 0;
 #!/usr/bin/perl
-#WHMADDON:communigatepro:CGPro <strong>Administration</strong>
+# WHMADDON:communigatepro:CGPro <strong>Administration</strong>
 # (c) 2011 CommuniGate Systems
 use CLI;
+use Cpanel::CachedDataStore;
 
 my $conf = Cpanel::CachedDataStore::fetch_ref( '/var/cpanel/communigate.yaml' ) || {};
 my $cli = new CGP::CLI( { PeerAddr => $conf->{cgprohost},

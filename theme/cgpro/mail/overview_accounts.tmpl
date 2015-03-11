@@ -1,6 +1,6 @@
 [% USE CPBranding -%]
 [% MACRO filter_options(pval, val, text) BLOCK -%]
-<option value="[% val %]"[% val == pval ? " selected='selected'" : "" %]>[% cptext(text) %]</option>
+<option value="[% val %]"[% val == pval ? " selected='selected'" : "" %]>[% locale.maketext(text) %]</option>
 [% END -%]
 [% MACRO features(feature, icon, text, nolink) BLOCK -%]
 [% UNLESS nolink -%]
@@ -23,7 +23,7 @@
 [% features('XMPP', 'cgpro_mini_xmpp', 'Chat/Jabber/XMPP', 1) %]
 [% features('SIP', 'cgpro_mini_sip', 'SIP (Internet calls)', 1) %]
 [% features('WebCAL', 'cgpro_mini_cal', 'Calendar', 1) %]
-<span>[% cptext(text) %]</span>
+<span>[% locale.maketext(text) %]</span>
 </label>
 </p>
 [% END -%]

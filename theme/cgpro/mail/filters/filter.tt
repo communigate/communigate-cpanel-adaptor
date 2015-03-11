@@ -1,37 +1,37 @@
 [% account_name = execute('Email', 'account_name', { display=1, account=FORM.account }) %]
 
 [% MACRO filter_option(pval, val, text) BLOCK -%]
-<option value="[% val %]"[% val == pval and " selected" %]>[% cptext(text) %]</option>
+<option value="[% val %]"[% val == pval and " selected" %]>[% locale.maketext(text) %]</option>
 [% END -%]
 
 <div class="h1Title"><div class="spriteicon_img_mini" id="icon-ufiltering_mini"></div>
 <span id="header"></span>
 [% IF ExpVar.expand('$appname') == 'webmail' %]
 	[% IF RAW_FORM('filtername') %]
-		[% cptext('Edit a Filter') %]
+		[% locale.maketext('Edit a Filter') %]
 	[% ELSE %]
-		[% cptext('Create a New Filter') %]
+		[% locale.maketext('Create a New Filter') %]
 	[% END %]
 [% ELSE %]
 	[% IF RAW_FORM('filtername') && RAW_FORM('account') %]
-		[% cptext('Edit a Filter for [_1]', FORM.account) %]
+		[% locale.maketext('Edit a Filter for [_1]', FORM.account) %]
 	[% ELSIF RAW_FORM('filtername') && !RAW_FORM('account') %]
-		[% cptext('Edit a Filter for All Mail on Your Account') %]
+		[% locale.maketext('Edit a Filter for All Mail on Your Account') %]
 	[% ELSIF !RAW_FORM('filtername') && RAW_FORM('account') %]
-		[% cptext('Create a New Filter for [_1]', FORM.account) %]
+		[% locale.maketext('Create a New Filter for [_1]', FORM.account) %]
 	[% ELSIF !RAW_FORM('filtername') && !RAW_FORM('account') %]
-		[% cptext('Create a New Filter for All Mail on Your Account') %]
+		[% locale.maketext('Create a New Filter for All Mail on Your Account') %]
 	[% END %]
 [% END %]
 </div>
 
 <p class="description">
 [% IF RAW_FORM('filtername') %]
-	[% cptext('Please edit the filter below.') %]
+	[% locale.maketext('Please edit the filter below.') %]
 [% ELSE %]
-	[% cptext('Please create a filter below.') %]
+	[% locale.maketext('Please create a filter below.') %]
 [% END %]
-[% cptext('You can add multiple rules to match subjects, addresses, or other parts of the message. You can then add multiple actions to take on a message such as to deliver the message to a different address and then discard it.') %]
+[% locale.maketext('You can add multiple rules to match subjects, addresses, or other parts of the message. You can then add multiple actions to take on a message such as to deliver the message to a different address and then discard it.') %]
 </p>
 
 <div id="cjt_pagenotice_container"></div>
@@ -40,13 +40,13 @@
 <input name="account" type="hidden" value="[% FORM.account %]">
 <input type="hidden" name="oldfiltername" value="[% get_filter.data.filtername %]">
 [%# note: former site of a serious conflict; still working? %]
-<div style="float: left"><b>[% cptext("filter_name") %]</b>: 
+<div style="float: left"><b>[% locale.maketext("filter_name") %]</b>: 
 	 <input id="filtername" type="text" name="filtername" size="30" value="[% get_filter.data.filtername %]"></div>
          <div id="filtername_error" style="float: left; margin-left: 10px"></div>
 <br clear="all"/>
-<p class="description">[% cptext("filter_name_unique") %]</p>
+<p class="description">[% locale.maketext("filter_name_unique") %]</p>
 <br />
-<b>[% cptext("filter_rules") %]</b>
+<b>[% locale.maketext("filter_rules") %]</b>
 <table cellspacing="0" id="ruletbl" border="0" width=100% class="highlight">
 <tbody>
 
@@ -142,7 +142,7 @@
   [% filter_option(q.action, "FingerNotify", locale.maketext("CGPFingerNotify")) %]
 </select>
 <input type="text" name="dest[% loop.index+1 %]" size="38" value="[% q.dest FILTER html %]" style="display: none;" style="width:309px;">
-<input type="button" onclick="handlebrowser(this);" name="changedest[% loop.index+1 %]" style="display: none;" value="[% cptext('Browse') %]">
+<input type="button" onclick="handlebrowser(this);" name="changedest[% loop.index+1 %]" style="display: none;" value="[% locale.maketext('Browse') %]">
 </div>
 <div style="float: right; display:inline;">
 <input type="button" value="-" name="actionremove[% loop.index+1 %]" disabled="disabled" onclick="removeaction(this);">
@@ -159,9 +159,9 @@
 <div align="center">
 
 [% IF RAW_FORM('filtername') %]
-	<input type="submit" id="activate-button" class="input-button" value="[% cptext('Save') %]" />
+	<input type="submit" id="activate-button" class="input-button" value="[% locale.maketext('Save') %]" />
 [% ELSE %]
-	<input type="submit" id="activate-button" class="input-button" value="[% cptext('Create') %]" />
+	<input type="submit" id="activate-button" class="input-button" value="[% locale.maketext('Create') %]" />
 [% END %]
 
 </div>

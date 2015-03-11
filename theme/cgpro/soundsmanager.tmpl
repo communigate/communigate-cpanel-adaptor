@@ -1,6 +1,6 @@
 [% USE CPBranding -%]
 [% MACRO filter_option(pval, val, text) BLOCK -%]
-<option value="[% val %]"[% val == pval ? " selected='selected'" : "" %]>[% cptext(text) %]</option>
+<option value="[% val %]"[% val == pval ? " selected='selected'" : "" %]>[% locale.maketext(text) %]</option>
 [% END -%]
 [% IF CPANEL.CPVAR.maildomainscount > 1 -%]
 <div class="highlight2">

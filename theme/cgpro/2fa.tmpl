@@ -1,5 +1,5 @@
 [% MACRO filter_option(pval, val, text) BLOCK -%]
-<option value="[% val %]"[% val == pval and " selected" %]>[% cptext(text) %]</option>
+<option value="[% val %]"[% val == pval and " selected" %]>[% locale.maketext(text) %]</option>
 [% END -%]
 [% FOREACH account IN accounts.keys.sort -%]
 <tr class="info-[% loop.count % 2 ? 'even' : 'odd' %]">

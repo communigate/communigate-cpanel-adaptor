@@ -16,10 +16,10 @@ print "Content-type: text/html\r\n\r\n";
 
 Whostmgr::HTMLInterface::defheader( "CGPro Update Manager",'', '/cgi/addon_cgpro_update_manager.cgi' );
 
-my $ua = LWP::UserAgent->new;
+my $ua = LWP::UserAgent->new(ssl_opts => { verify_hostname => 0 });
 $ua->timeout(10);
 
-my $response = $ua->get('https://raw.github.com/communigate/communigate-cpanel-adaptor/master/LatestVersion');
+my $response = $ua->get('https://raw.githubusercontent.com/communigate/communigate-cpanel-adaptor/master/LatestVersion');
 
 if ($response->is_success) {
     my $newversion = $response->decoded_content;  # or whatever

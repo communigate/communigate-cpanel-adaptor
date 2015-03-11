@@ -8,7 +8,7 @@ USE VarCache;
 USE Encoder;
 %]
 [% MACRO filter_option(pval, val, text) BLOCK -%]
-<option value="[% val %]"[% val == pval and " selected" %]>[% cptext(text) %]</option>
+<option value="[% val %]"[% val == pval and " selected" %]>[% locale.maketext(text) %]</option>
 [% END -%]
 [%
  SET api_response = Api2.exec( 'CommuniGate', 'get_archiving_configuration', {});

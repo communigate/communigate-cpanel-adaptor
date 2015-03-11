@@ -1,5 +1,5 @@
 [% MACRO filter_option(pval, val, text) BLOCK -%]
-<option value="[% val %]"[% val == pval ? " selected='selected'" : "" %]>[% cptext(text) %]</option>
+<option value="[% val %]"[% val == pval ? " selected='selected'" : "" %]>[% locale.maketext(text) %]</option>
 [% END -%]
 <div class="highlight2">
   <table border="0">
