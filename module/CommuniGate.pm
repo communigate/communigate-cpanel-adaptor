@@ -976,8 +976,8 @@ sub api2_ListDefAddress {
 	foreach my $domain (@domains) {
 		my $domaindata = $cli->GetDomainEffectiveSettings("$domain");
                 my $action = @$domaindata{'MailToUnknown'} || '';
-		my $forwardaddress = @$domaindata{'MailRerouteAddress'} || '';
 		my $entry = { domain => "$domain",reject => "",discard =>"",forward=>"",acceptedandbounced =>"" };
+		$entry->{MailRerouteAddress} = @$domaindata{'MailRerouteAddress'} || '';
 		if ($action eq "Rejected") { $entry->{'reject'} = "selected"; }
 		if ($action eq "Discarded") { $entry->{'discard'} = "selected"; }
 		if ($action eq "Rerouted to") { $entry->{'forward'} = "selected"; }
@@ -997,8 +997,8 @@ sub api2_SetDefAddress {
 	my $data = $cli->GetDomainSettings("$domain");
 	$cli->CreateDomain("$domain") unless $data;
 	my $domainData;
-	if ($action eq "CGPDefDiscard") { @$domainData{'MailToUnknown'} = "Discarded"; }
-	if ($action eq "CGPDefReject") { @$domainData{'MailToUnknown'} = "Rejected"; }
+	if ($action eq "CGPDefDiscard") { @$domainData{'MailToUnknown'} = "Discarded"; @$domainData{'MailRerouteAddress'} = "";}
+	if ($action eq "CGPDefReject") { @$domainData{'MailToUnknown'} = "Rejected"; @$domainData{'MailRerouteAddress'} = "";}
 	if ($action eq "CGPDefForward") { @$domainData{'MailToUnknown'} = "Rerouted to"; @$domainData{'MailRerouteAddress'} = "$fwdmail"; }
 	if ($action eq "CGPDefAcceptedAndBounced") { @$domainData{'MailToUnknown'} = "Accepted and Bounced"; }
         $cli->UpdateDomainSettings(domain => $domain,settings => $domainData);
