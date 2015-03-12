@@ -731,7 +731,7 @@ sub api2_ListExtensions {
       }
   }
   $cli->Logout();
-  return {extensions => \@result};
+  return @result;
 }
 
 sub api2_AssignExtension {
