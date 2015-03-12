@@ -2835,7 +2835,8 @@ sub api2_EditContact {
     my @domains = Cpanel::Email::listmaildomains();
     my $cli = getCLI();
     my $locale = Cpanel::Locale->get_handle();
-    my @return;
+    my @localtime = localtime(time);
+    my $return = {YEAR => ($localtime[5] + 1900)};
     for my $domain (@domains) {
 	if ($domain eq $dom) {
 	    my $password = $cli->GetAccountPlainPassword($account);
@@ -2872,7 +2873,6 @@ sub api2_EditContact {
 			    if ($contact->{'folderMessage'}) {
 				$ximss->send({folderClose => {id => "$time-close", folder=>$OPTS{'box'}}});
 				$ximss->close();
-				my @localtime = localtime(time);
 				$cli->Logout();
 				return {
 				    vcard => $contact->{folderMessage}->{EMail}->{MIME}->{vCard},
@@ -2890,7 +2890,7 @@ sub api2_EditContact {
 	}
     }
     $cli->Logout();
-    return @return;
+    return $return;
 }
 
 sub api2_DoEditContact {
