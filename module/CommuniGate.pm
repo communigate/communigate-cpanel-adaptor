@@ -785,30 +785,36 @@ sub api2_AssignExtension {
   $result->{"classes"} = $defaults->{"ServiceClasses"};
   foreach my $domain (@domains) {
       my $accounts = $cli->ListAccounts($domain);
-      foreach my $userName (sort keys %$accounts) {
-  	  my $account = $cli->GetAccountSettings("$userName\@$domain");
-  	  $result->{"accounts"}->{"$userName\@$domain"}->{details} = $account;
+      if ($accounts) {
+	  foreach my $userName (sort keys %$accounts) {
+	      my $account = $cli->GetAccountSettings("$userName\@$domain");
+	      $result->{"accounts"}->{"$userName\@$domain"}->{details} = $account;
+	  }
       }
       my $groups = $cli->ListGroups($domain);
-      foreach my $groupName (sort @$groups) {
-  	  next if $groupName =~ m/^activequeuegroup\_/i;
-  	  my $details = $cli->GetGroup("$groupName\@$domain");
-  	  $result->{'departments'} = [] unless $result->{'departments'};
-  	  push @{$result->{'departments'}}, "$groupName\@$domain" unless (defined($details->{SignalDisabled}) && $details->{SignalDisabled} eq "YES");
+      if ($groups) {
+	  foreach my $groupName (sort @$groups) {
+	      next if $groupName =~ m/^activequeuegroup\_/i;
+	      my $details = $cli->GetGroup("$groupName\@$domain");
+	      $result->{'departments'} = [] unless $result->{'departments'};
+	      push @{$result->{'departments'}}, "$groupName\@$domain" unless (defined($details->{SignalDisabled}) && $details->{SignalDisabled} eq "YES");
 
+	  }
       }
       my $forwarders = $cli->ListForwarders($domain);
-      foreach my $forwarder (sort @$forwarders) {
-  	  if ($forwarder =~ /^activequeue\_/) {
-  	      my $name = "";
-  	      my $to = $cli->GetForwarder("$forwarder\@$domain");
-  	      $to =~ s/activequeue\{(.*?)\}\#.*?$/$1/;
-  	      (undef, $name, undef) = split ",", $to;
-  	      ($name, undef) = split '@', $to unless $name;
-  	      my $toggle = $forwarder;
-  	      $toggle =~ s/activequeue/activequeuetoggle/i;
-  	      push @{$result->{'queues'}}, {value => "$forwarder\@$domain", toggle => "$toggle\@$domain", name => "$name\@$domain"};
-  	  }
+      if ($forwarders) {
+	  foreach my $forwarder (sort @$forwarders) {
+	      if ($forwarder =~ /^activequeue\_/) {
+		  my $name = "";
+		  my $to = $cli->GetForwarder("$forwarder\@$domain");
+		  $to =~ s/activequeue\{(.*?)\}\#.*?$/$1/;
+		  (undef, $name, undef) = split ",", $to;
+		  ($name, undef) = split '@', $to unless $name;
+		  my $toggle = $forwarder;
+		  $toggle =~ s/activequeue/activequeuetoggle/i;
+		  push @{$result->{'queues'}}, {value => "$forwarder\@$domain", toggle => "$toggle\@$domain", name => "$name\@$domain"};
+	      }
+	  }
       }
       my $prefs = $cli->GetAccountPrefs("ivr\@$domain");
       if ($prefs && $prefs->{IVRMenus}) {
