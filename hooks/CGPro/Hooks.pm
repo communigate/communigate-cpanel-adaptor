@@ -115,24 +115,17 @@ sub getCLI {
 	my $loginData = $conf;
 	my $logger = Cpanel::Logger->new();
 	unless ($logindata) {
-	    my $version = `$^X -V`;
-	    $version =~ s/^\D*(\d+\.\d+).*?$/$1/;
-	    if ($version < 11.38) {
-		$loginData = Cpanel::AdminBin::adminrun('cca', 'GETLOGIN') unless $loginData;
-		$loginData =~ s/^\.\n//;
-	    } else {
-		my $result = Cpanel::Wrap::send_cpwrapd_request(
-		    'namespace' => 'CGPro',
-		    'module'    => 'cca',
-		    'function'  => 'GETLOGIN',
-		    'data' =>  $Cpanel::CPDATA{'USER'}
-		    );
-		if ( defined( $result->{'data'} ) ) {
-		    $loginData = $result->{'data'};
-		} else {
-		    $logger->warn("Can't login to CGPro: " . $result->{'error'});
-		}
-	    }
+	  my $result = Cpanel::Wrap::send_cpwrapd_request(
+							  'namespace' => 'CGPro',
+							  'module'    => 'cca',
+							  'function'  => 'GETLOGIN',
+							  'data' =>  $Cpanel::CPDATA{'USER'}
+							 );
+	  if ( defined( $result->{'data'} ) ) {
+	    $loginData = $result->{'data'};
+	  } else {
+	    $logger->warn("Can't login to CGPro: " . $result->{'error'});
+	  }
 	}
 	my @loginData = split "::", $loginData;
  	my $cli = new CGP::CLI( { PeerAddr => $loginData[0],

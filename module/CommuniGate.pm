@@ -21,6 +21,7 @@ use Time::Local  'timelocal_nocheck';
 use Digest::MD5 qw(md5_hex);
 use XIMSS;
 use Cpanel::CPAN::MIME::Base64::Perl qw(decode_base64 encode_base64);
+use Cpanel::Version;
 use URI::Escape;
 
 require Exporter;
@@ -40,23 +41,16 @@ sub getCLI {
 	return $CLI;
     } else {
 	my $loginData;
-	my $version = `$^X -V`;
-	$version =~ s/^\D*(\d+\.\d+).*?$/$1/;
-	if ($version < 11.38) {
-	    $loginData = Cpanel::AdminBin::adminrun('cca', 'GETLOGIN');
-	    $loginData =~ s/^\.\n//;
+	my $result = Cpanel::Wrap::send_cpwrapd_request(
+	    'namespace' => 'CGPro',
+	    'module'    => 'cca',
+	    'function'  => 'GETLOGIN',
+	    'data' =>  $Cpanel::CPDATA{'USER'}
+	    );
+	if ( defined( $result->{'data'} ) ) {
+	    $loginData = $result->{'data'};
 	} else {
-	    my $result = Cpanel::Wrap::send_cpwrapd_request(
-		'namespace' => 'CGPro',
-		'module'    => 'cca',
-		'function'  => 'GETLOGIN',
-		'data' =>  $Cpanel::CPDATA{'USER'}
-		);
-	    if ( defined( $result->{'data'} ) ) {
-		$loginData = $result->{'data'};
-	    } else {
-		$logger->warn("Can't login to CGPro: " . $result->{'error'});
-	    }
+	    $logger->warn("Can't login to CGPro: " . $result->{'error'});
 	}
 	my @loginData = split "::", $loginData;
  	my $cli = new CGP::CLI( { PeerAddr => $loginData[0],
