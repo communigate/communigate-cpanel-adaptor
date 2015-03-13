@@ -3865,10 +3865,12 @@ sub api2_AddQueue {
     my $agentExtension;
     for my $domain (@domains) {
 	my $groups = $cli->ListGroups($domain);
-	foreach my $groupName (sort @$groups) {
-	    next if $groupName =~ /^activequeuegroup_/;
-	    my $details = $cli->GetGroup("$groupName\@$domain");
-	    push(@$departments, "$groupName\@$domain") unless (defined($details->{SignalDisabled}) && $details->{SignalDisabled} eq "YES");
+	if ($groups) {
+	    foreach my $groupName (sort @$groups) {
+		next if $groupName =~ /^activequeuegroup_/;
+		my $details = $cli->GetGroup("$groupName\@$domain");
+		push(@$departments, "$groupName\@$domain") unless (defined($details->{SignalDisabled}) && $details->{SignalDisabled} eq "YES");
+	    }
 	}
 	if ($domain eq $dom) {
 	    my $queue = $cli->GetForwarder($OPTS{'queue'});
