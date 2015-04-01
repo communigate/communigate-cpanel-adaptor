@@ -61,6 +61,7 @@ sub getCLI {
 	unless($cli) {
 	    $logger->warn("Can't login to CGPro: ".$CGP::ERR_STRING);
 	}
+	$cli->{loginData} = \@loginData;
 	$CLI = $cli;
 	return $cli;
     }
@@ -204,6 +205,22 @@ sub api2_AccountsOverview {
 		     return sort { $hash->{$a}->{$sort_field} cmp $hash->{$b}->{$sort_field} || $hash->{$a}->{'username'} cmp $hash->{$b}->{'username'} || $hash->{$a}->{'domain'} cmp $hash->{$b}->{'domain'}} keys %$hash;
 		 }
 	};
+}
+
+sub api2_ListAccounts {
+    my %OPTS = @_;
+    my $invert = $OPTS{'invert'};
+    my @domains = Cpanel::Email::listmaildomains();
+    my $cli = getCLI();
+    my $return_accounts = [];
+    foreach my $domain (@domains) {
+	my $accounts=$cli->ListAccounts($domain);
+	foreach my $userName (sort keys %$accounts) {
+	    next if $userName eq 'pbx' || $userName eq 'ivr';
+	    push @$return_accounts, $userName . "@" . $domain;
+	}
+    }
+    return $return_accounts;
 }
 
 sub api2_AccountDefaults {
@@ -1645,21 +1662,16 @@ sub api2_ListMailingListsSubs{
 		my $numpost;
 		my ($mod1sel,$mod2sel,$mod3sel,$mod4sel,$mod5sel,$modallsel,$unmodsel,$nopostsel)=("","","","","","","","");
 		my ($r_feedsel,$r_indexsel,$r_digestsel,$r_nullsel,$r_bannedsel,$r_subscribesel,$r_unsubscribesel) = ("","","","","","","");
-		if ($postmode eq "moderateAll") {$modallsel="selected=\"selected\"";}
-                elsif ($postmode eq "prohibited") {$nopostsel="selected=\"selected\"";}
+		if ($postmode eq "moderateAll") {$postmode="MODERATEALL"}
+                elsif ($postmode eq "prohibited") {$postmode="PROHIBITED";}
 		elsif (($postmode =~ /#[0-9]+/) || ($postmode eq "")) {
 			$numpost = $postmode;
 			$numpost =~ s/#//g;
 			if ($postmode eq "") {$numpost = 0;};
-                        $unmodsel="selected=\"selected\"";
+                        $postmode="UNMODERATED";
                 }
 		elsif (@$SubInfos{'posts'}->[0]) {
-		 	$postmode = "next @$SubInfos{'posts'}->[0] moderated";
-			if (@$SubInfos{'posts'}->[0] == 1) { $mod1sel="selected=\"selected\"";}
-			if (@$SubInfos{'posts'}->[0] == 2) { $mod2sel="selected=\"selected\"";}
-			if (@$SubInfos{'posts'}->[0] == 3) { $mod3sel="selected=\"selected\"";}
-			if (@$SubInfos{'posts'}->[0] == 4) { $mod4sel="selected=\"selected\"";}
-			if (@$SubInfos{'posts'}->[0] == 5) { $mod5sel="selected=\"selected\"";}
+		    $postmode=@$SubInfos{'posts'}->[0] == 1;
                 }
 		if (@$SubInfos{'mode'} eq "feed") { $r_feedsel="selected=\"selected\"";}
 		if (@$SubInfos{'mode'} eq "index") { $r_indexsel="selected=\"selected\"";}
@@ -2026,7 +2038,6 @@ sub api2_DeleteAutoresponder {
         my %OPTS = @_;
 	my $cli = getCLI();
 	my $rule = undef;
-
         $cli->UpdateAutoresponder(email => $OPTS{'email'}, rule => $rule );
         $cli->Logout();
 }
@@ -5022,6 +5033,13 @@ sub api2_UnsetAccountPSTN {
     }
     $cli->Logout();
     return $result;
+}
+
+sub api2_getCGProServer {
+    my $cli = getCLI();
+    my $loginData = $cli->{loginData};
+    $cli->Logout();
+    return $loginData->[0];
 }
 
 sub versioncmp( $$ ) {
