@@ -1,0 +1,45 @@
+[% MACRO filter_option(pval, val, text) BLOCK -%]
+<option value="[% val %]"[% val == pval ? " selected='selected'" : "" %]>[% locale.maketext(text) %]</option>
+[% END -%]
+[% IF FORM.id.defined -%]
+[% id = FORM.id -%]
+[% ELSE -%]
+[% id = CPANEL.CPVAR.id -%]
+[% END -%]
+<tr>
+  <td>
+    [% type = adr.keys.grep('(HOME|WORK|DOM|POSTAL|PARCEL|OTHER)').0 -%]
+    <select name="addresstype-[% id %]" class="form-control">
+      [% filter_option(type, "OTHER", locale.maketext("CGPOTHER")) %]
+      [% filter_option(type, "HOME", locale.maketext("CGPHOME")) %]
+      [% filter_option(type, "WORK", locale.maketext("CGPWORK")) %]
+      [% filter_option(type, "DOM", locale.maketext("CGPDOM")) %]
+      [% filter_option(type, "POSTAL", locale.maketext("CGPPOSTAL")) %]
+      [% filter_option(type, "PARCEL", locale.maketext("CGPPARCEL")) %]
+    </select>
+  </td>
+  <td>
+    <input type="text" name="POBOX-[% id %]" class="form-control" value="[% adr.POBOX %]" />
+  </td>
+  <td>
+    <input type="text" name="CTRY-[% id %]" class="form-control" value="[% adr.CTRY %]" />
+  </td>
+  <td>
+    <input type="text" name="STREET-[% id %]" class="form-control" value="[% adr.STREET %]" />
+  </td>
+  <td>
+    <input type="text" name="LOCALITY-[% id %]" class="form-control" value="[% adr.LOCALITY %]" />
+  </td>
+  <td>
+    <input type="text" name="REGION-[% id %]" class="form-control" value="[% adr.REGION %]" />
+  </td>
+  <td>
+    <input type="text" name="PCODE-[% id %]" class="form-control" value="[% adr.PCODE %]" />
+  </td>
+  <td style="white-space: nowrap;">
+    <a href="#" class="removerow">
+      <span class="glyphicon glyphicon-trash"></span>
+      Remove
+    </a>
+  </td>
+</tr>

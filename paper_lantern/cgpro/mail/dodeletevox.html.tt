@@ -1,0 +1,34 @@
+[%
+SET CPANEL.CPVAR.dprefix = "../../";
+SET mail_delete_box = Api2.exec("CommuniGate", "DeleteContactsBox", { account=RAW_FORM.item("account"), box=RAW_FORM.item("box") });
+%]
+
+[% WRAPPER '_assets/master.html.tt'
+    app_key = 'mailing_lists'
+-%]
+<div class="body-content">
+
+    <div class="section">
+        <h2 id="hdrMailingList">[% locale.maketext("Delete contact") %]</h2>
+
+        [% UNLESS CPANEL.CPERROR.CommuniGate %]
+            <div id="mailingListSuccess" class="alert alert-success">
+                <span id="mailingListSuccessImg" class="glyphicon glyphicon-ok-sign"></span>
+                <div id="mailingListSuccessMsg" class="alert-message">
+                [% locale.maketext("Address book “[_1]” was successfully deleted.", FORM.box) %]
+                </div>
+            </div>
+        [% ELSE %]
+            <div id="mailingListError" class="alert alert-danger">
+                <span id="mailingListErrorImg" class="glyphicon glyphicon-remove-sign"></span>
+                <div id="mailingListErrorMsg" class="alert-message">
+                [% locale.maketext("Failed to delete the address book “[_1]”: [_2]", FORM.box, CPANEL.CPERROR.CommuniGate) %]
+                </div>
+            </div>
+        [% END %]
+    </div>
+
+    [% INCLUDE _assets/return_link.html.tt return_location='contacts.html?account=' _ FORM.account return_link_text=locale.maketext('Go Back') %]
+
+</div>
+[% END #wrapper %]

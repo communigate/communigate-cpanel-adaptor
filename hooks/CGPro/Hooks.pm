@@ -43,20 +43,20 @@ sub describe {
         'hook'     => 'CGPro::Hooks::editquota',
         'exectype' => 'module',
     };
-    my $mail_deletefilter = {
-        'category' => 'Cpanel',
-        'event'    => 'Api2::Email::deletefilter',
-        'stage'    => 'pre',
-        'hook'     => 'CGPro::Hooks::deletefilter',
-        'exectype' => 'module',
-    };
-    my $mail_reorderfilters = {
-        'category' => 'Cpanel',
-        'event'    => 'Api2::Email::reorderfilters',
-        'stage'    => 'pre',
-        'hook'     => 'CGPro::Hooks::reorderfilters',
-        'exectype' => 'module',
-    };
+    # my $mail_deletefilter = {
+    #     'category' => 'Cpanel',
+    #     'event'    => 'Api2::Email::deletefilter',
+    #     'stage'    => 'pre',
+    #     'hook'     => 'CGPro::Hooks::deletefilter',
+    #     'exectype' => 'module',
+    # };
+    # my $mail_reorderfilters = {
+    #     'category' => 'Cpanel',
+    #     'event'    => 'Api2::Email::reorderfilters',
+    #     'stage'    => 'pre',
+    #     'hook'     => 'CGPro::Hooks::reorderfilters',
+    #     'exectype' => 'module',
+    # };
     my $mail_addpop1 = {
         'category' => 'Cpanel',
         'event'    => 'Api1::Email::addpop',
@@ -97,8 +97,8 @@ sub describe {
 	    $mail_passwdpop,
 	    $mail_passwdpop1,
 	    $mail_editquota,
-	    $mail_deletefilter,
-	    $mail_reorderfilters,
+	    # $mail_deletefilter,
+	    # $mail_reorderfilters,
 	    $mail_addpop1,
 	    # $AccountsCreate,
 	    # $AccountsRemove,
@@ -282,55 +282,55 @@ sub editquota {
     $cli->Logout();
 }
 
-sub deletefilter {
-    my (undef, $params) = @_;
-    return unless check_hooked_account();
-    my $args = $params->{args};
-    my $cli = getCLI();
+# sub deletefilter {
+#     my (undef, $params) = @_;
+#     return unless check_hooked_account();
+#     my $args = $params->{args};
+#     my $cli = getCLI();
 
-    my $account = $args->{'account'};
-    my $filtername = $args->{'filtername'};
+#     my $account = $args->{'account'};
+#     my $filtername = $args->{'filtername'};
 
-    my $rules = $cli->GetAccountMailRules($account);
-    if ($rules) {
-	my $newrules = [];
-	for my $rule (@$rules) {
-	    if ($rule->[1] ne $filtername) {
-		push @$newrules, $rule;
-	    }
-	}
-	$cli->SetAccountMailRules($account,$newrules);
-    }
-    $cli->Logout();
-}
+#     my $rules = $cli->GetAccountMailRules($account);
+#     if ($rules) {
+# 	my $newrules = [];
+# 	for my $rule (@$rules) {
+# 	    if ($rule->[1] ne $filtername) {
+# 		push @$newrules, $rule;
+# 	    }
+# 	}
+# 	$cli->SetAccountMailRules($account,$newrules);
+#     }
+#     $cli->Logout();
+# }
 
-sub reorderfilters {
-    my (undef, $params) = @_;
-    return unless check_hooked_account();
-    my $args = $params->{args};
-    my $cli = getCLI();
+# sub reorderfilters {
+#     my (undef, $params) = @_;
+#     return unless check_hooked_account();
+#     my $args = $params->{args};
+#     my $cli = getCLI();
 
-    my $account = $args->{'mailbox'};
-    my $order = {};
-    for my $filter (keys %$args) {
-	if ($filter =~ m/^filter(\d+)$/) {
-	    $order->{$args->{$filter}} = $1;
-	}
-    }
-    my $rules = $cli->GetAccountMailRules($account);
-    if ($rules) {
-    	my $newrules = [];
-    	for my $rule (@$rules) {
-    	    if (defined $order->{$rule->[1]}) {
-		$rule->[0] = 9 - $order->{$rule->[1]};
-		$rule->[0] = 1 if $rule->[0] < 1;
-    	    }
-	    push @$newrules, $rule;
-    	}
-    	$cli->SetAccountMailRules($account,$newrules);
-    }
-    $cli->Logout();
-}
+#     my $account = $args->{'mailbox'};
+#     my $order = {};
+#     for my $filter (keys %$args) {
+# 	if ($filter =~ m/^filter(\d+)$/) {
+# 	    $order->{$args->{$filter}} = $1;
+# 	}
+#     }
+#     my $rules = $cli->GetAccountMailRules($account);
+#     if ($rules) {
+#     	my $newrules = [];
+#     	for my $rule (@$rules) {
+#     	    if (defined $order->{$rule->[1]}) {
+# 		$rule->[0] = 9 - $order->{$rule->[1]};
+# 		$rule->[0] = 1 if $rule->[0] < 1;
+#     	    }
+# 	    push @$newrules, $rule;
+#     	}
+#     	$cli->SetAccountMailRules($account,$newrules);
+#     }
+#     $cli->Logout();
+# }
 
 sub addpop1 {
     my (undef, $params) = @_;

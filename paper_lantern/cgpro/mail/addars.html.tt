@@ -1,0 +1,400 @@
+[% SET CPANEL.CPVAR.dprefix = "../../" %]
+
+[% js_code = PROCESS js_block %]
+[% css_code = PROCESS css_block %]
+[% WRAPPER '_assets/master.html.tt'
+    app_key = 'autoresponders'
+    page_js = js_code
+    page_scripts = ['/yui/calendar/calendar.js', '/cjt/calendar.js']
+    page_stylesheets = ['/yui/assets/skins/sam/calendar.css', 'css/calendar.css']
+    page_styles = css_code
+ -%]
+
+<div class="body-content">
+    [% INCLUDE cgpro/mail/auto_responder.html.tt %]
+
+    <div id="start_calendar" style="display:none;"></div>
+    <div id="stop_calendar" style="display:none;"></div>
+
+    [% INCLUDE _assets/_calendar.html.tt %]
+
+    [% INCLUDE _assets/return_link.html.tt return_location='autores.html' return_link_text=locale.maketext('Go Back') %]
+
+</div><!-- end body-content -->
+
+[% END %]
+
+[% BLOCK js_block %]
+
+    <script type="text/javascript">
+
+    var waitpanel;
+
+    function stop_is_after_start() {
+        var stop_text = DOM.get("stop_ts").value;
+        if ( !stop_text ) return true;
+
+        var start_text = DOM.get("start_ts").value;
+        if ( !start_text ) {
+            return ( (new Date()).getTime() < (parseInt(stop_text) * 1000) );
+        }
+
+        return parseInt(start_text) < parseInt(stop_text);
+    }
+
+    function interval_under_max() {
+        var interval_text = DOM.get("interval").value;
+        if ( !interval_text ) return true;
+        return parseInt(interval_text) <= 720; // 720 hour (30 day) maximum
+    }
+
+    var VALIDATORS = [];
+    var init = function() {
+
+        var validator,
+            VALIDATION = CPANEL.validate;
+
+        validator = new CPANEL.validate.validator("Stop Time");
+        validator.add("stop_ts", stop_is_after_start, "[% locale.maketext("The stop time must be later than the start time.")  %]");
+        VALIDATORS.push(validator);
+
+        validator = new VALIDATION.validator(LOCALE.maketext("City"));
+        VALIDATORS.push(validator);
+
+        if (YAHOO.util.Dom.inDocument("email") == true) {
+            validator = new VALIDATION.validator(LOCALE.maketext("Email"));
+            validator.add("email", "min_length(%input%, 1)", "[% locale.maketext("The Email field cannot be empty.")  %]");
+            validator.add("email", "no_chars(%input%,'@')", "[% locale.maketext("Cannot use a domain in this field.")  %]");
+            validator.add("email", "local_part_email(%input%,'cpanel')", "[% locale.maketext("The Email field has an invalid local part.")  %]");
+            VALIDATORS.push(validator);
+        }
+
+
+        validator = new VALIDATION.validator(LOCALE.maketext("Subject"));
+        validator.add("subject", "min_length(%input%, 1)", "[% locale.maketext("The Subject field cannot be empty.")  %]");
+        VALIDATORS.push(validator);
+
+        validator = new VALIDATION.validator(LOCALE.maketext("Body"));
+        validator.add("arbody", "min_length(%input%, 1)", "[% locale.maketext("The Body field cannot be empty.")  %]");
+        VALIDATORS.push(validator);
+
+        // Attach the validators.
+        for (i = 0, l = VALIDATORS.length; i < l; i++) {
+            VALIDATORS[i].attach();
+        }
+
+        CPANEL.validate.attach_to_form("submit-button", VALIDATORS);
+
+        // TODO: add a description for interval
+        //CPANEL.panels.create_help("interval_help_toggle", "interval_help_description");
+
+        YAHOO.util.Dom.get("charset").focus();
+    };
+
+    YAHOO.util.Event.onDOMReady(init);
+
+    var kill_utfmsg = function() {
+        if (!FORM['autoload']) { checkcharset(); }
+        if (document.getElementById('utfmsg')) {
+            document.getElementById('utfmsg').style.display='none';
+        }
+    };
+
+    YAHOO.util.Event.onDOMReady(kill_utfmsg);
+
+
+    function checkcharset() {
+        var current_encoding = '[%  Api1.exec("getcharset", [undef]) %]';
+        var charEl = document.getElementById('charset');
+        var req_encoding = charEl.options[charEl.selectedIndex].value;
+
+        if (current_encoding === req_encoding) return;
+
+        // Template Toolkit considers attributes that start with underscore as private; the
+        //   '__cpanel__temp__charset__' is processed by cpanel.pl
+        FORM['__cpanel__temp__charset__'] = req_encoding;
+        FORM['user_charset'] = req_encoding;
+        FORM['autoload'] = 1;
+        var QueryString = [];
+        for(var i in FORM) {
+            QueryString.push(i + '=' + FORM[i]);
+        }
+
+        show_loading("[% locale.maketext("Switching Character Set Encoding")  %]");
+        window.location.href = 'addars.html?' + QueryString.join('&');
+    }
+
+    var show_loading = function(action, body) {
+        if (!waitpanel) {
+            var panel_options = {
+                width: "252px",
+                fixedcenter: true,
+                close: false,
+                draggable: false,
+                modal: true,
+                visible: false
+            };
+            waitpanel = new YAHOO.widget.Panel("waitpanel", panel_options);
+        }
+        waitpanel.setHeader("<div class='lt'></div><span>" + action + "</span><div class='rt'></div>");
+        var loadingimg = '<img src="img/yui/rel_interstitial_loading.gif" />';
+        if (body) {
+            waitpanel.setBody(body + '<br />' + loadingimg);
+        }
+        else {
+            waitpanel.setBody(loadingimg);
+        }
+
+        waitpanel.render(document.body);
+        waitpanel.show();
+    };
+
+    var FORM = {};
+    parseForm();
+
+    function parseForm() {
+        var query = window.location.search.substring(1);
+        var parms = query.split('&');
+        for (var i=0; i<parms.length; i++) {
+            var pos = parms[i].indexOf('=');
+            if (pos > 0) {
+                var key = parms[i].substring(0,pos);
+                var val = parms[i].substring(pos+1);
+                FORM[key] = val;
+            }
+        }
+    }
+
+    </script>
+
+    <script>
+        var now = new Date();
+        var calendar_options = {
+            mindate: now,
+            default_hours: now.getHours(),
+            default_minutes: now.getMinutes(),
+            selected: [now.getMonth()+1, now.getDate(), now.getFullYear()].join("/"),
+            locale_weekdays: "1char",
+            close: true,
+            draggable: true,
+            navigator: true,
+            iframe: false  //since Overlay does this already
+        };
+
+        var start = DOM.get("mainform").start.value.trim();
+        var stop = DOM.get("mainform").stop.value.trim();
+
+        var customized_dates = { start:start, stop:stop };
+
+        var start_options = {
+            title: "[% locale.maketext("Start[boolean,_1,:]", "0") %]"
+        };
+        if (start) {
+            start = new Date( start * 1000 );
+            CPANEL.util.set_text_content( "start_link", start.toCpLocaleString() );
+            DOM.get("mainform")["start_control"][1].checked = true;
+            start_options.default_hours = start.getHours();
+            start_options.default_minutes = start.getMinutes();
+            start_options.selected = [start.getMonth()+1, start.getDate(), start.getFullYear()].join("/");
+        }
+        YAHOO.lang.augmentObject( start_options, calendar_options );
+        var stop_options = {
+            title: "[% locale.maketext("Stop[boolean,_1,:]", "0") %]"
+        };
+        if (stop) {
+            stop = new Date( stop * 1000 );
+            CPANEL.util.set_text_content( "stop_link", stop.toCpLocaleString() );
+            DOM.get("mainform")["stop_control"][1].checked = true;
+            stop_options.default_hours = stop.getHours();
+            stop_options.default_minutes = stop.getMinutes();
+            stop_options.selected = [stop.getMonth()+1, stop.getDate(), stop.getFullYear()].join("/");
+        }
+        YAHOO.lang.augmentObject( stop_options, calendar_options );
+
+        DOM.get("start_link").style.visibility = "";
+        DOM.get("stop_link").style.visibility = "";
+
+        var start_cal = new CPANEL.widgets.Calendar_With_Time( "start_calendar", start_options );
+        var stop_cal  = new CPANEL.widgets.Calendar_With_Time( "stop_calendar", stop_options );
+
+        var cals = { start:start_cal, stop:stop_cal };
+
+        //YUI Calendar's custom events don't set context to the Calendar object (grr..)
+        var update_form = function(type, selected, cal) {
+            var the_date = cals[cal].getSelectedDates()[0];
+            if ( the_date ) {
+                DOM.get("mainform")[cal].value = Math.floor(the_date.getTime() / 1000);
+                CPANEL.util.set_text_content( cal+"_link", the_date.toCpLocaleString() );
+            }
+            customized_dates[cal] = true;
+
+            for (var i = 0, l = VALIDATORS.length; i < l; i++) {
+                VALIDATORS[i].verify();
+            }
+        };
+
+        start_cal.selectEvent.subscribe(update_form, "start");
+        start_cal.hours_change_event.subscribe(update_form, "start");
+        start_cal.minutes_change_event.subscribe(update_form, "start");
+        start_cal.ampm_change_event.subscribe(update_form, "start");
+
+        stop_cal.selectEvent.subscribe(update_form, "stop");
+        stop_cal.hours_change_event.subscribe(update_form, "stop");
+        stop_cal.minutes_change_event.subscribe(update_form, "stop");
+        stop_cal.ampm_change_event.subscribe(update_form, "stop");
+
+        start_cal.render();
+        stop_cal.render();
+
+        EVENT.throwErrors = true;
+        CPANEL.util.catch_enter( [start_cal.hours_input,start_cal.minutes_input], function(e) {
+            EVENT.stopPropagation(e);
+            start_cal.hide();
+        } );
+        CPANEL.util.catch_enter( [stop_cal.hours_input,stop_cal.minutes_input], function(e) {
+            EVENT.stopPropagation(e);
+            stop_cal.hide();
+        } );
+
+        (function() {
+        var _contains = YAHOO.util.Region.prototype.contains;
+        var Region = YAHOO.util.Region;
+        Region.prototype.contains = function(region_or_point) {
+            if ( region_or_point instanceof Region ) {
+                return _contains.apply(this,arguments);
+            }
+            else return
+                this.left < region_or_point[0]
+                && region_or_point[0] < this.right
+                && this.top < region_or_point[1]
+                && region_or_point[1] < this.bottom
+            ;
+        };
+        })();
+
+        //YUI accommodates a bug in old Mac Gecko versions that no longer
+        //appears to be a problem, but it does make the tab loop focus the
+        //overlay's container pointlessly. So, we prevent this here.
+        YAHOO.widget.Overlay.prototype.showMacGeckoScrollbars
+            = YAHOO.widget.Overlay.prototype.hideMacGeckoScrollbars
+            = function() {}
+        ;
+
+        function custom_start(link_el, stop_instead) {
+            var the_cal = stop_instead ? stop_cal : start_cal;
+
+            var the_radio = DOM.get("mainform")[stop_instead ? "stop_control" : "start_control"][1];
+            the_radio.checked = true;
+
+            if (!the_cal._overlay) {
+                var the_div = the_cal.oDomContainer;
+
+                var insertion_point = link_el;
+                if (link_el.parentNode.tagName.toLowerCase() === "label") {
+                    insertion_point = link_el.parentNode;
+                }
+
+                var overlay = the_cal._overlay = new YAHOO.widget.Overlay( DOM.generateId(), {
+                    visible : false,
+                    zIndex  : 1005,  //so the overlay will sit above validation errors
+                    context : [ link_el, "bl", "tl" ]
+                } );
+                overlay.setBody(the_div);
+                overlay.render(document.body);
+                insertion_point.parentNode.insertBefore( overlay.element, insertion_point.nextSibling );
+
+
+                //The callback has to be defined as a local variable or else
+                //IE will not recognize "clicker" as a reference within removeListener.
+                var clicker = function (e) {
+                    var target = YAHOO.util.Event.getTarget(e) || this;
+
+                    if (target === the_div) return;
+                    if (target === link_el) return;
+                    if (target === the_radio) return;
+                    if (DOM.isAncestor(the_div,target)) return;
+
+                    //in case we drag
+                    var xy = YAHOO.util.Event.getXY(e);
+                    if ( !DOM.getRegion(the_div).contains(xy) ) {
+                        the_cal.hide();
+                    }
+                };
+
+                overlay.beforeShowEvent.subscribe( function() {
+                    update_form(null, null, stop_instead ? "stop" : "start");
+                    this.align();
+                    EVENT.on( document.body, "click", clicker );
+                } );
+                overlay.hideEvent.subscribe( function() {
+                    update_form(null, null, stop_instead ? "stop" : "start");
+                    EVENT.removeListener( document.body, "click", clicker );
+                } );
+
+
+                //Calendar rewrites all of its HTML when you change the month,
+                //so we need to refresh the drag/drop listeners whenever that happens.
+                var attach_drag_drop = function() {
+                    if ( the_cal._dd ) {
+                        the_cal._dd.unreg();
+                    }
+
+                    var title_el = DOM.getElementsByClassName("title","div",the_div)[0];
+                    if ( !title_el.id ) title_el.id = DOM.generateId();
+                    the_cal._dd = new YAHOO.util.DD(overlay.element, {
+                        dragOnly: true
+                    } );
+                    if ( overlay.cfg.getProperty("iframe") ) {
+                        the_cal._dd.onDrag = function() {
+                            overlay.syncPosition();
+                            overlay.syncIframe();
+                        };
+                    }
+                    the_cal._dd.setHandleElId( title_el.id );
+                };
+
+                attach_drag_drop();
+                the_cal.renderEvent.subscribe( attach_drag_drop );
+                the_cal.hideEvent.subscribe( overlay.hide, overlay, true );
+                the_cal.showEvent.subscribe( overlay.show, overlay, true );
+            }
+
+            the_cal.show();
+        }
+
+        function custom_stop(link_el) {
+            return custom_start(link_el, true);
+        }
+    </script>
+[% END %]
+
+[% BLOCK css_block %]
+<!--[if IE 6]>
+<link rel="stylesheet" type="text/css" href="../css/calendar_ie6.css" />
+<![endif]-->
+<!--[if lt IE 9]>
+<link rel="stylesheet" type="text/css" href="../css/calendar_ie678.css" />
+<![endif]-->
+<!--[if IE 9]>
+<link rel="stylesheet" type="text/css" href="../css/calendar_ie9.css" />
+<![endif]-->
+
+<style type="text/css">
+    .yui-skin-sam .yui-calendar {
+        margin: 0 auto;
+    }
+    .yui-calcontainer .title {
+        cursor: move;
+    }
+</style>
+<!--[if lt IE 8]>
+<style type="text/css">
+    /* IE6 and IE7 will take margin:auto and expand the margins.
+       The downside of this fix is that the calendar isn't centered in IE6/IE7. :(
+    */
+    .yui-skin-sam .yui-calendar {
+        margin: 0;
+    }
+</style>
+<![endif]-->
+[% END %]

@@ -1,0 +1,179 @@
+[% USE ExpVar; %]
+[% get_filter = Api2.exec('CommuniGate', 'get_filter', { account=FORM.account, filtername=FORM.filtername }); get_filter = get_filter.0.get_filter %]
+[% account_name = execute('Email', 'account_name', { display=1, account=FORM.account }) %]
+
+[% MACRO filter_option(pval, val, text) BLOCK -%]
+<option value="[% val %]"[% val == pval and " selected" %]>[% text %]</option>
+[% END -%]
+<h2 id="header">
+    [% IF RAW_FORM('filtername') && RAW_FORM('account') %]
+        [% locale.maketext('Edit a Filter for “[_1]”.', FORM.account) %]
+    [% ELSIF RAW_FORM('filtername') && !RAW_FORM('account') %]
+        [% locale.maketext('Edit a Filter for All Mail on Your Account.') %]
+    [% ELSIF !RAW_FORM('filtername') && RAW_FORM('account') %]
+        [% locale.maketext('Create a New Filter for “[_1]”.', FORM.account) %]
+    [% ELSIF !RAW_FORM('filtername') && !RAW_FORM('account') %]
+        [% locale.maketext('Create a New Filter for All Mail on Your Account.') %]
+    [% END %]
+</h2>
+
+<p id="descEditCreate" class="description">
+[% IF RAW_FORM('filtername') %]
+    [% locale.maketext('Please edit the filter below.') %]
+[% ELSE %]
+    [% locale.maketext('Please create a filter below.') %]
+[% END %]
+[% locale.maketext('You can add multiple rules to match subjects, addresses, or other parts of the message. You can then add multiple actions to take on a message such as to deliver the message to a different address and then discard it.') %]
+</p>
+
+<div id="cjt_pagenotice_container"></div>
+
+<div class="section">
+<form name="filterform" id="filterform" action="doeditfilter.html">
+<input id="hidAccount" name="account" type="hidden" value="[% FORM.account %]">
+<input id="hidOldFilterName" name="oldfiltername" type="hidden" value="[% get_filter.data.filtername.html %]">
+[%# note: former site of a serious conflict; still working? %]
+
+<div class="form-group">
+    <label id="lblFilterName" for="filtername">
+        [% locale.maketext("Filter Name") %]
+    </label>
+    <div class="row">
+        <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+            [% IF !RAW_FORM('filtername') %]
+            <input id="filtername" type="text" class="form-control" name="filtername">
+            [% ELSE %]
+            <input id="filtername" type="text" class="form-control" name="filtername" value="[% get_filter.data.filtername.html %]">
+            [% END %]
+            <span class="help-block">[% locale.maketext("The filter name must be unique. If you give the filter the same name as another filter, the previous filter will be overwritten.") %]</span>
+        </div>
+        <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6" id="filtername_error"></div>
+    </div>
+</div>
+
+<strong id="hdrRules">[% locale.maketext("Rules") %]</strong>
+<table cellspacing="0" id="ruletbl" border="0" width="100%" >
+<tbody>
+
+[% FOR q = get_filter.data.rules %]
+<tr id="rule[% loop.index+1 %]">
+<td valign="middle" class="acltd" width="20"><img onclick="moveup(this); this.src='icon_arrow_up_disabled.gif';" id="[% loop.index+1 %]-moveup" src="icon_arrow_up_disabled.gif" onmouseover="this.src='icon_arrow_up.gif';" onmouseout="this.src='icon_arrow_up_disabled.gif';" class="moveact"><br /><img onclick="movedown(this); this.src='icon_arrow_down_disabled.gif';" id="[% loop.index+1 %]-movedown" src="icon_arrow_down_disabled.gif"  onmouseover="this.src='icon_arrow_down.gif';" onmouseout="this.src='icon_arrow_down_disabled.gif';" class="moveact"></td>
+<td class="frow">
+<div style="float: left; display:inline; width: 510px;">
+<select name="part[% loop.index+1 %]" onchange="handlepart(this)" style="width:250px;" autocomplete="off" autofill="off">
+  [% filter_option(q.part, "From", locale.maketext("CGPFrom")) %]
+  [% filter_option(q.part, "Sender", locale.maketext("CGPSender")) %]
+  [% filter_option(q.part, "Return-Path", locale.maketext("CGPReturnPath")) %]
+  [% filter_option(q.part, "To", locale.maketext("CGPTo")) %]
+  [% filter_option(q.part, "Cc", locale.maketext("CGPCc")) %]
+  [% filter_option(q.part, "Any To or Cc", locale.maketext("CGPAnyToorCc")) %]
+  [% filter_option(q.part, "Each To or Cc", locale.maketext("CGPEachToorCc")) %]
+  [% filter_option(q.part, "Reply-To", locale.maketext("CGPReplyTo")) %]
+  [% filter_option(q.part, "'From' Name", locale.maketext("CGPFromName")) %]
+  [% filter_option(q.part, "Subjects", locale.maketext("CGPSubject")) %]
+  [% filter_option(q.part, "Message-ID", locale.maketext("CGPMessageID")) %]
+  [% filter_option(q.part, "Message Size", locale.maketext("CGPMessageSize")) %]
+  [% filter_option(q.part, "Time Of Day", locale.maketext("CGPTimeOfDay")) %]
+  [% filter_option(q.part, "Current Date", locale.maketext("CGPCurrentDate")) %]
+  [% filter_option(q.part, "Current Day", locale.maketext("CGPCurrentDay")) %]
+  [% filter_option(q.part, "Preference", locale.maketext("CGPPreference")) %]
+  [% filter_option(q.part, "FreeBusy", locale.maketext("CGPFreeBusy")) %]
+  [% filter_option(q.part, "Human Generated", locale.maketext("CGPHumanGenerated")) %]
+  [% filter_option(q.part, "Header Field", locale.maketext("CGPHeaderField")) %]
+  [% filter_option(q.part, "Any Recipient", locale.maketext("CGPAnyRecipient")) %]
+  [% filter_option(q.part, "Each Recipient", locale.maketext("CGPEachRecipient")) %]
+  [% filter_option(q.part, "Existing Mailbox", locale.maketext("CGPExistingMailbox")) %]
+  [% filter_option(q.part, "Security", locale.maketext("CGPSecurity")) %]
+  [% filter_option(q.part, "Source", locale.maketext("CGPSource")) %]
+  [% filter_option(q.part, "Submit Address", locale.maketext("CGPSubmitAddress")) %]
+</select>
+<select name="match[% loop.index+1 %]" style="width:250px;" autocomplete="off" autofill="off">
+[% filter_option(q.match, "is", locale.maketext("CGPis")) %]
+[% filter_option(q.match, "is not", locale.maketext("CGPisNot")) %]
+[% filter_option(q.match, "in", locale.maketext("CGPin")) %]
+[% filter_option(q.match, "not in", locale.maketext("CGPnotIn")) %]
+[% filter_option(q.match, "greater than", locale.maketext("CGPgreaterThan")) %]
+[% filter_option(q.match, "less than", locale.maketext("CGPlessThan")) %]
+</select>
+<input type="text" class="form-control" name="val[% loop.index+1 %]" size="60" style="width:498px" value="[% q.val FILTER html %]">
+</div>
+<div style="float: right; display:inline; padding-top: 11px; ">
+<input type="button" value="-" name="ruleremove[% loop.index+1 %]" class="btn btn-default" disabled="disabled" onclick="removerule(this);">
+<input type="button" value="+" name="ruleadd[% loop.index+1 %]" class="btn btn-default" onclick="addrule(this);">
+</div>
+
+</td>
+</tr>
+
+[% END %]
+
+
+</tbody>
+</table>
+<script type="text/javascript">
+    window.onload = function() { checkaddrembuttons('rule'); };
+</script>
+<br />
+
+<b id="hdrActions">[% locale.maketext("Actions") %]</b>
+
+<table cellspacing="0" id="actiontbl" border="0" width="100%" >
+<tbody>
+
+[% FOR q = get_filter.data.actions %]
+<tr id="action[% loop.index+1 %]">
+<td class="frow">
+    <div class="pull-left">
+        <div class="form-group">
+            <select name="action[% loop.index+1 %]" id="action_menu" onchange="handleaction(this);" style="width:220px;" autocomplete="off" autofill="off">
+	      [% filter_option(q.action, "Store in", locale.maketext("CGPStorein")) %]
+	      [% filter_option(q.action, "Mark", locale.maketext("CGPMark")) %]
+	      [% filter_option(q.action, "Add Header", locale.maketext("CGPAddHeader")) %]
+	      [% filter_option(q.action, "Tag Submit", locale.maketext("CGPTagSubject")) %]
+	      [% filter_option(q.action, "Reject with", locale.maketext("CGPRejectwith")) %]
+	      [% filter_option(q.action, "Discard", locale.maketext("CGPDiscard")) %]
+	      [% filter_option(q.action, "Stop Processing", locale.maketext("CGPStopProcessing")) %]
+	      [% filter_option(q.action, "Remember 'From' in", locale.maketext("CGPRememberFromin")) %]
+	      [% filter_option(q.action, "Accept Request", locale.maketext("CGPAcceptRequest")) %]
+	      [% filter_option(q.action, "Store Encrypted in", locale.maketext("CGPStoreEncryptedin")) %]
+	      [% filter_option(q.action, "Copy Attachments into", locale.maketext("CGPCopyAttachmentsinto")) %]
+	      [% filter_option(q.action, "Redirect To", locale.maketext("CGPRedirectTo")) %]
+	      [% filter_option(q.action, "Forward to", locale.maketext("CGPForwardTo")) %]
+	      [% filter_option(q.action, "Mirror to", locale.maketext("CGPMirrorTo")) %]
+	      [% filter_option(q.action, "Replay with", locale.maketext("CGPReplyWith")) %]
+	      [% filter_option(q.action, "Replay to All with", locale.maketext("CGPReplytoAllwith")) %]
+	      [% filter_option(q.action, "React with", locale.maketext("CGPReactwith")) %]
+	      [% filter_option(q.action, "Send IM", locale.maketext("CGPSendIM")) %]
+	      [% filter_option(q.action, "Execute URL", locale.maketext("CGPExecuteURL")) %]
+	      [% filter_option(q.action, "FingerNotify", locale.maketext("CGPFingerNotify")) %]
+            </select>
+        </div>
+        <div class="form-group">
+            <input type="text" class="form-control" name="dest[% loop.index+1 %]" size="38" value="[% q.dest FILTER html %]" style="display: none;" style="width:309px;">
+            <input type="button" onclick="handlebrowser(this);" name="changedest[% loop.index+1 %]" class="btn btn-default" style="display: none;" value="[% locale.maketext('Browse') %]">
+        </div>
+    </div>
+    <div class="pull-right">
+        <input type="button" value="-" name="actionremove[% loop.index+1 %]" class="btn btn-default" disabled="disabled" onclick="removeaction(this);">
+        <input type="button" value="+" name="actionadd[% loop.index+1 %]" class="btn btn-default" onclick="addaction(this);">
+    </div>
+</td>
+</tr>
+[% END %]
+
+</tbody>
+</table>
+
+
+<div class="form-group">
+
+[% IF RAW_FORM('filtername') %]
+    <input type="submit" id="activate-button" class="btn btn-primary" name="save" value="[% locale.maketext('Save') %]" />
+[% ELSE %]
+    <input type="submit" id="activate-button" class="btn btn-primary" name="save" value="[% locale.maketext('Create') %]" />
+[% END %]
+
+</div>
+</form>
+</div>
+

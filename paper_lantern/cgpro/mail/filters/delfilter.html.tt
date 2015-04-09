@@ -1,0 +1,25 @@
+[%
+SET CPANEL.CPVAR.dprefix = "../../../";
+%]
+
+[% WRAPPER '_assets/master.html.tt'
+    app_key = 'user_filters'
+ -%]
+
+<div class="body-content">
+  <div class="section">
+    <h2 id="hdrForwardingMaintenance">[% locale.maketext("Email Forwarding Maintenance") %]</h2>
+
+    <p id="deleteEmailForwardingConfirmMsg">
+      [% locale.maketext("Are you sure you want to delete the filter “[_1]” of account “[_2]”?", FORM.filtername, FORM.account) %]
+    </p>
+
+    <div class="form-group">
+      <a class="btn btn-primary" id="btn_delete" href="dodelfilter.html?account=[% FORM.account %]&amp;filtername=[% FORM.filtername | url %]">[% locale.maketext("Delete Filter") %]</a>
+      <a class="btn btn-link" id="btn_cancel" href="userfilters.html?account=[% FORM.account %]">[% locale.maketext("Cancel") %]</a>
+    </div>
+  </div>
+  [% INCLUDE _assets/return_link.html.tt return_location='userfilters.html?account=' _ FORM.account return_link_text=locale.maketext('Go Back') %]
+</div>
+
+[% END %]

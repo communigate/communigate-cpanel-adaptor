@@ -1,0 +1,26 @@
+[%
+SET CPANEL.CPVAR.dprefix = "../../";
+%]
+
+[% WRAPPER '_assets/master.html.tt'
+    app_key = 'contacts'
+ -%]
+
+<div class="body-content">
+  <div class="section">
+    <h2 id="hdrForwardingMaintenance">[% locale.maketext("Delete address book") %]</h2>
+
+    <p id="deleteEmailForwardingConfirmMsg">
+      [% locale.maketext("Are you sure you want to delete address book “[_1]”?", FORM.box) %]
+    </p>
+
+    <div class="form-group">
+      <a class="btn btn-primary" id="btn_delete" href="dodeletevox.html?account=[% FORM.account %]&amp;box=[% FORM.box %]">[% locale.maketext("Delete address book") %]</a>
+      <a class="btn btn-link" id="btn_cancel" href="contacts.html?account=[% FORM.account %]">[% locale.maketext("Cancel") %]</a>
+    </div>
+  </div>
+  [% INCLUDE _assets/return_link.html.tt return_location='contacts.html?account=' _ FORM.account return_link_text=locale.maketext('Go Back') %]
+</div>
+
+[% END %]
+

@@ -1,0 +1,887 @@
+[% MACRO filter_option(pval, val, text, disabled) BLOCK -%]
+<option value="[% val %]"[% val == pval ? " selected='selected'" : "" %][% disabled ? " disabled='disabled'" : "" %]>[% locale.maketext(text) %]</option>
+[% END -%]
+[%
+SET CPANEL.CPVAR.dprefix = "../../";
+IF FORM.savesettings;
+SET save_results = Api2.exec("CommuniGate", "SetListSettings", { email=RAW_FORM.item("email"), OwnerCheck=RAW_FORM.item("OwnerCheck"), Charset=RAW_FORM.item("Charset"), Subscribe=RAW_FORM.item("Subscribe"), SaveRequests=RAW_FORM.item("SaveRequests"), Distribution=RAW_FORM.item("Distribution"), Confirmation=RAW_FORM.item("Confirmation"), ConfirmationSubject=RAW_FORM.item("ConfirmationSubject"), ConfirmationText=RAW_FORM.item("ConfirmationText"), Postings=RAW_FORM.item("Postings"), FirstModerated=RAW_FORM.item("FirstModerated"), Format=RAW_FORM.item("Format"), SizeLimit=RAW_FORM.item("SizeLimit"), CheckCharset=RAW_FORM.item("CheckCharset"), CheckDigestSubject=RAW_FORM.item("CheckDigestSubject"), HideFromAddress=RAW_FORM.item("HideFromAddress"), ListFields=RAW_FORM.item("ListFields"), TillConfirmed=RAW_FORM.item("TillConfirmed"), CoolOffPeriod=RAW_FORM.item("CoolOffPeriod"), MaxBounces=RAW_FORM.item("MaxBounces"), UnsubBouncedPeriod=RAW_FORM.item("UnsubBouncedPeriod"), FatalWeight=RAW_FORM.item("FatalWeight") ,FailureNotification=RAW_FORM.item("FailureNotification"), CleanupPeriod=RAW_FORM.item("CleanupPeriod"), SaveReports=RAW_FORM.item("SaveReports"), WarningText=RAW_FORM.item("WarningText"), WarningSubject=RAW_FORM.item("WarningSubject"), FeedSubject=RAW_FORM.item("FeedSubject"), Reply=RAW_FORM.item("Reply"), FeedPrefixMode=RAW_FORM.item("FeedPrefixMode"), FeedTrailer=RAW_FORM.item("FeedTrailer"), FeedHeader=RAW_FORM.item("FeedHeader"), PolicySubject=RAW_FORM.item("PolicySubject"), PolicyText=RAW_FORM.item("PolicyText"), ByeSubject=RAW_FORM.item("ByeSubject"), ByeText=RAW_FORM.item("ByeText"), Store=RAW_FORM.item("Store"), ArchiveSizeLimit=RAW_FORM.item("ArchiveSizeLimit"), ArchiveMessageLimit=RAW_FORM.item("ArchiveMessageLimit"), ArchiveSwapPeriod=RAW_FORM.item("ArchiveSwapPeriod"), Browse=RAW_FORM.item("Browse"), DigestPeriod=RAW_FORM.item("DigestPeriod"), DigestSizeLimit=RAW_FORM.item("DigestSizeLimit"), DigestMessageLimit=RAW_FORM.item("DigestMessageLimit"), DigestTimeOfDay=RAW_FORM.item("DigestTimeOfDay"), DigestSubject=RAW_FORM.item("DigestSubject"), DigestFormat=RAW_FORM.item("DigestFormat"), DigestHeader=RAW_FORM.item("DigestHeader"), TOCLine=RAW_FORM.item("TOCLine"), TOCTrailer=RAW_FORM.item("TOCTrailer"), DigestTrailer=RAW_FORM.item("DigestTrailer")  });
+END;
+SET mail_rename_list = Api2.exec("CommuniGate", "GetListSettings", { email=RAW_FORM.item("email") });
+%]
+[% js_code = PROCESS js_block %]
+[% WRAPPER '_assets/master.html.tt'
+app_key = 'mailing_lists'
+page_js = js_code
+-%]
+<h2>[% locale.maketext("Mailing list settings") %]</h2>
+<form method="post" action="" id="userform" name="userform">
+
+  <h3>[% locale.maketext("General") %]</h3>
+  <div class="form-group">
+    <label>
+      [% locale.maketext("Owner") %]
+    </label>
+    <div class="row">
+      <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+        <input type="text" readonly="readonly" class="form-control" name="owner" id="owner" value="[% CPANEL.CPDATA.Owner %]@[% FORM.domain %]" />
+      </div>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label>
+      [% locale.maketext("Preferred Character Set") %]
+    </label>
+    <div class="row">
+      <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	<select name="Charset" class="form-control">
+	  [% filter_option(CPANEL.CPDATA.Charset, "0", "Western European (ISO)") %]
+	  [% filter_option(CPANEL.CPDATA.Charset, "1", "Western European (Windows)") %]
+	  [% filter_option(CPANEL.CPDATA.Charset, "2", "Japanese (ISO)") %]
+	  [% filter_option(CPANEL.CPDATA.Charset, "3", "Japanese (EUC)") %]
+	  [% filter_option(CPANEL.CPDATA.Charset, "4", "Japanese (Shift-JIS") %])
+	  [% filter_option(CPANEL.CPDATA.Charset, "5", "Cyrillic (KOI)") %]
+	  [% filter_option(CPANEL.CPDATA.Charset, "6", "Cyrillic (ISO)") %]
+	  [% filter_option(CPANEL.CPDATA.Charset, "7", "Cyrillic (Windows)") %]
+	  [% filter_option(CPANEL.CPDATA.Charset, "8", "Cyrillic (Alt-DOS)") %]
+	  [% filter_option(CPANEL.CPDATA.Charset, "9", "Ukrainian (KOI)") %]
+	  [% filter_option(CPANEL.CPDATA.Charset, "10", "Central European (ISO)") %]
+	  [% filter_option(CPANEL.CPDATA.Charset, "11", "Central European (Windows)") %]
+	  [% filter_option(CPANEL.CPDATA.Charset, "12", "Greek (ISO)") %]
+	  [% filter_option(CPANEL.CPDATA.Charset, "13", "Greek (Windows)") %]
+	  [% filter_option(CPANEL.CPDATA.Charset, "14", "Hebrew (ISO)") %]
+	  [% filter_option(CPANEL.CPDATA.Charset, "15", "Hebrew (Windows)") %]
+	  [% filter_option(CPANEL.CPDATA.Charset, "16", "Turkish (ISO)") %]
+	  [% filter_option(CPANEL.CPDATA.Charset, "17", "Turkish (Windows)") %]
+	  [% filter_option(CPANEL.CPDATA.Charset, "18", "Baltic (ISO)") %]
+	  [% filter_option(CPANEL.CPDATA.Charset, "19", "Baltic (Windows)") %]
+	  [% filter_option(CPANEL.CPDATA.Charset, "20", "Chinese (Big5)") %]
+	  [% filter_option(CPANEL.CPDATA.Charset, "21", "Chinese (Simplified)") %]
+	  [% filter_option(CPANEL.CPDATA.Charset, "22", "Chinese (Standard)") %]
+	  [% filter_option(CPANEL.CPDATA.Charset, "23", "Chinese (GBK)") %]
+	  [% filter_option(CPANEL.CPDATA.Charset, "24", "Chinese (EUC)") %]
+	  [% filter_option(CPANEL.CPDATA.Charset, "25", "Korean (ISO)") %]
+	  [% filter_option(CPANEL.CPDATA.Charset, "26", "Korean (EUC)") %]
+	  [% filter_option(CPANEL.CPDATA.Charset, "27", "Korean (Windows)") %]
+	  [% filter_option(CPANEL.CPDATA.Charset, "28", "Arabic (ISO)") %]
+	  [% filter_option(CPANEL.CPDATA.Charset, "29", "Arabic (Windows)") %]
+	  [% filter_option(CPANEL.CPDATA.Charset, "30", "Thai (ISO)") %]
+	  [% filter_option(CPANEL.CPDATA.Charset, "31", "Thai (Windows)") %]
+	  [% filter_option(CPANEL.CPDATA.Charset, "32", "Southern European (ISO)") %]
+	  [% filter_option(CPANEL.CPDATA.Charset, "33", "Nordic (ISO)") %]
+	  [% filter_option(CPANEL.CPDATA.Charset, "34", "New Baltic (ISO)") %]
+	  [% filter_option(CPANEL.CPDATA.Charset, "35", "Celtic (ISO)") %]
+	  [% filter_option(CPANEL.CPDATA.Charset, "36", "New European (ISO)") %]
+	  [% filter_option(CPANEL.CPDATA.Charset, "37", "East European (ISO)") %]
+	  [% filter_option(CPANEL.CPDATA.Charset, "38", "Vietnamese (Windows)") %]
+	  [% filter_option(CPANEL.CPDATA.Charset, "39", "Unicode (UTF8)") %]
+	</select>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label>
+      [% locale.maketext("Verify Owner Using") %]
+    </label>
+    <div class="row">
+      <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	<select name="OwnerCheck" class="form-control">
+	  [% filter_option(CPANEL.CPDATA.OwnerCheck, "0", "Return-Path") %]
+	  [% filter_option(CPANEL.CPDATA.OwnerCheck, "1", "IP Addresses") %]
+	  [% filter_option(CPANEL.CPDATA.OwnerCheck, "2", "Authentication") %]
+	</select>
+      </div>
+    </div>
+  </div>
+  <h3>[% locale.maketext("Subscription Policy") %]</h3>
+  <div class="form-group">
+    <label>
+      [% locale.maketext("Subscribe") %]
+    </label>
+    <div class="row">
+      <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	<select name="Subscribe" class="form-control">
+	  [% filter_option(CPANEL.CPDATA.Subscribe, "0", "Nobody") %]
+	  [% filter_option(CPANEL.CPDATA.Subscribe, "1", "Moderated") %]
+	  [% filter_option(CPANEL.CPDATA.Subscribe, "2", "This domain only") %]
+	  [% filter_option(CPANEL.CPDATA.Subscribe, "3", "Locals only") %]
+	  [% filter_option(CPANEL.CPDATA.Subscribe, "4", "Anybody") %]
+	</select>
+      </div>
+    </div>
+  </div>
+  <div class="form-group">
+    <label>
+      [% locale.maketext("Requests to Save") %]
+    </label>
+    <div class="row">
+      <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	<select name="SaveRequests" class="form-control">
+	  [% filter_option(CPANEL.CPDATA.SaveRequests, "0", "no") %]
+	  [% filter_option(CPANEL.CPDATA.SaveRequests, "1", "accepted") %]
+	  [% filter_option(CPANEL.CPDATA.SaveRequests, "2", "rejected") %]
+	  [% filter_option(CPANEL.CPDATA.SaveRequests, "3", "all") %]
+	</select>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label>
+      [% locale.maketext("Default Mode") %]
+    </label>
+    <div class="row">
+      <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	<select name="Distribution" class="form-control">
+	  [% filter_option(CPANEL.CPDATA.Distribution, "0", "feed") %]
+	  [% filter_option(CPANEL.CPDATA.Distribution, "1", "null") %]
+	  [% filter_option(CPANEL.CPDATA.Distribution, "2", "banned") %]
+	  [% filter_option(CPANEL.CPDATA.Distribution, "3", "digest", CPANEL.CPDATA.Store == "NO") %]
+	  [% filter_option(CPANEL.CPDATA.Distribution, "4", "index", CPANEL.CPDATA.Store == "NO") %]
+	</select>
+      </div>
+    </div>
+  </div>
+  
+  <div class="form-group">
+    <label>
+      [% locale.maketext("Request Confirmation") %]
+    </label>
+    <div class="row">
+      <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	<input type="checkbox" name="Confirmation" value="1"[% CPANEL.CPDATA.Confirmation == "YES" ? " checked='checked'" : "" %] />
+      </div>
+    </div>
+  </div>
+  <h3>Confirmation Request Message</h3>
+
+  <div class="form-group">
+    <label>
+      [% locale.maketext("Subject") %]
+    </label>
+    <div class="row">
+      <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	<input type="text" name="ConfirmationSubject" size="40" maxlength="200" value="[% CPANEL.CPDATA.ConfirmationSubject %]" class="form-control" />
+      </div>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label>
+      [% locale.maketext("Text") %]
+    </label>
+    <div class="row">
+      <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	<textarea class="form-control" name="ConfirmationText" cols="50" rows="5">[% CPANEL.CPDATA.ConfirmationText.replace('\\\e', "\n") %]</textarea>
+      </div>
+    </div>
+  </div>
+
+  <h3>Posting Policy</h3>
+  <div class="form-group">
+    <label>
+      [% locale.maketext("Accept Postings") %]
+    </label>
+    <div class="row">
+      <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	<select name="Postings" class="form-control">
+	  [% filter_option(CPANEL.CPDATA.Postings, "0", "From owner only") %]
+	  [% filter_option(CPANEL.CPDATA.Postings, "1", "Moderated") %]
+	  [% filter_option(CPANEL.CPDATA.Postings, "2", "From subscribers") %]
+	  [% filter_option(CPANEL.CPDATA.Postings, "3", "Moderate guests") %]
+	  [% filter_option(CPANEL.CPDATA.Postings, "4", "From anybody") %]
+	</select>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label>
+      [% locale.maketext("New Subscribers") %]
+    </label>
+    <div class="row">
+      <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	<select class="form-control" name="FirstModerated">
+	  [% filter_option(CPANEL.CPDATA.FirstModerated, "0", "Unmoderated") %]
+	  [% filter_option(CPANEL.CPDATA.FirstModerated, "1", "Moderate first") %]
+	  [% filter_option(CPANEL.CPDATA.FirstModerated, "2", "Moderate first 2") %]
+	  [% filter_option(CPANEL.CPDATA.FirstModerated, "3", "Moderate first 3") %]
+	  [% filter_option(CPANEL.CPDATA.FirstModerated, "5", "Moderate first 5") %]
+	  [% filter_option(CPANEL.CPDATA.FirstModerated, "10000", "Moderate All") %]
+	  [% filter_option(CPANEL.CPDATA.FirstModerated, "10001", "Prohibit") %]
+	</select>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label>
+      [% locale.maketext("Allowed Format") %]
+    </label>
+    <div class="row">
+      <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	<select name="Format" class="form-control">
+	  [% filter_option(CPANEL.CPDATA.Format, "0", "Plain text only") %]
+	  [% filter_option(CPANEL.CPDATA.Format, "1", "Text only") %]
+	  [% filter_option(CPANEL.CPDATA.Format, "2", "Text alternative") %]
+	  [% filter_option(CPANEL.CPDATA.Format, "3", "Anything") %]
+	</select>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label>
+      [% locale.maketext("Maximum size") %]
+    </label>
+    <div class="row">
+      <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	<select class="form-control" name="SizeLimit">
+	  [% filter_option(CPANEL.CPDATA.SizeLimit, "0", "Unlimited") %]
+	  [% filter_option(CPANEL.CPDATA.SizeLimit, "1", "0") %]
+	  [% filter_option(CPANEL.CPDATA.SizeLimit, "2", "1024") %]
+	  [% filter_option(CPANEL.CPDATA.SizeLimit, "3", "3K") %]
+	  [% filter_option(CPANEL.CPDATA.SizeLimit, "4", "10K") %]
+	  [% filter_option(CPANEL.CPDATA.SizeLimit, "5", "30K") %]
+	  [% filter_option(CPANEL.CPDATA.SizeLimit, "6", "100K") %]
+	  [% filter_option(CPANEL.CPDATA.SizeLimit, "7", "300K") %]
+	  [% filter_option(CPANEL.CPDATA.SizeLimit, "8", "1024K") %]
+	  [% filter_option(CPANEL.CPDATA.SizeLimit, "9", "3M") %]
+	  [% filter_option(CPANEL.CPDATA.SizeLimit, "10", "10M") %]
+	  [% filter_option(CPANEL.CPDATA.SizeLimit, "11", "300M") %]
+	</select>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label>
+      [% locale.maketext("Prohibit") %]
+    </label>
+  </div>
+  <div class="form-group">
+    <label style="font-weight: normal;">
+      <input type="checkbox" name="CheckCharset" value="1" [% CPANEL.CPDATA.CheckCharset == "YES" ? " checked='checked'" : "" %] />
+      Non-matching Character Set
+    </label>
+  </div>
+  <div class="form-group">
+    <label style="font-weight: normal;">
+      <input type="checkbox" name="CheckDigestSubject" value="1" [% CPANEL.CPDATA.CheckDigestSubject == "YES" ? " checked='checked'" : "" %] />
+      Unmodified Digest Subjects
+    </label>
+  </div>
+
+
+  <div class="form-group">
+    <label>
+      [% locale.maketext("Service Fields") %]
+    </label>
+    <div class="row">
+      <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	<textarea name="ListFields" rows="3" cols="50" class="form-control">[% CPANEL.CPDATA.ListFields.replace('\\\e', "\n") %]</textarea>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label style="font-weight: normal;">
+      <input type="checkbox" name="HideFromAddress" value="1"[% CPANEL.CPDATA.HideFromAddress == "YES" ? " checked='checked'" : "" %] />
+      Hide &#39;From&#39; Addresses
+    </label>
+  </div>
+
+  <h3>Bounced Messages Processor</h3>
+
+  <h4>On a Non-Fatal Bounce:</h4>
+
+  <div class="form-group">
+    <label>
+      <input type="radio" name="TillConfirmed" value="0"[% CPANEL.CPDATA.TillConfirmed == "NO" ? " checked='checked'" : "" %]  />
+      [% locale.maketext("Suspend subscription for") %]
+    </label>
+    <div class="row">
+      <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	<select class="form-control" name="CoolOffPeriod">
+	  [% filter_option(CPANEL.CPDATA.CoolOffPeriod, "0", "60 min") %]
+	  [% filter_option(CPANEL.CPDATA.CoolOffPeriod, "1", "2 hour(s)") %]
+	  [% filter_option(CPANEL.CPDATA.CoolOffPeriod, "2", "3 hour(s)") %]
+	  [% filter_option(CPANEL.CPDATA.CoolOffPeriod, "3", "6 hour(s)") %]
+	  [% filter_option(CPANEL.CPDATA.CoolOffPeriod, "4", "12 hour(s)") %]
+	  [% filter_option(CPANEL.CPDATA.CoolOffPeriod, "5", "24 hour(s)") %]
+	  [% filter_option(CPANEL.CPDATA.CoolOffPeriod, "6", "2 day(s)") %]
+	  [% filter_option(CPANEL.CPDATA.CoolOffPeriod, "7", "3 day(s)") %]
+	  [% filter_option(CPANEL.CPDATA.CoolOffPeriod, "8", "5 day(s)") %]
+	  [% filter_option(CPANEL.CPDATA.CoolOffPeriod, "9", "7 day(s)") %]
+	  [% filter_option(CPANEL.CPDATA.CoolOffPeriod, "10", "10 day(s)") %]
+	</select>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label style="font-weight: normal; text-indent: 1.25em;">
+      [% locale.maketext("Unsubscribe after") %]
+    </label>
+    <div class="row">
+      <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	<select class="form-control" name="MaxBounces">
+	  [% filter_option(CPANEL.CPDATA.MaxBounces, "0", "0") %]
+	  [% filter_option(CPANEL.CPDATA.MaxBounces, "1", "1") %]
+	  [% filter_option(CPANEL.CPDATA.MaxBounces, "2", "2") %]
+	  [% filter_option(CPANEL.CPDATA.MaxBounces, "3", "3") %]
+	  [% filter_option(CPANEL.CPDATA.MaxBounces, "5", "5") %]
+	  [% filter_option(CPANEL.CPDATA.MaxBounces, "10", "10") %]
+	  [% filter_option(CPANEL.CPDATA.MaxBounces, "20", "20") %]
+	  [% filter_option(CPANEL.CPDATA.MaxBounces, "50", "50") %]
+	  [% filter_option(CPANEL.CPDATA.MaxBounces, "100", "100") %]
+	  [% filter_option(CPANEL.CPDATA.MaxBounces, "200", "200") %]
+	</select>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label>
+      <input type="radio" name="TillConfirmed" value="1"[% CPANEL.CPDATA.TillConfirmed == "YES" ? " checked='checked'" : "" %] />
+      [% locale.maketext("Suspend till confirmation") %]
+    </label>
+  </div>
+  <div class="form-group">
+    <label style="font-weight: normal; text-indent: 1.25em;">
+      [% locale.maketext("Unsubscribe after") %]
+    </label>
+    <div class="row">
+      <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	<select class="form-control" name="UnsubBouncedPeriod">
+	  [% filter_option(CPANEL.CPDATA.UnsubBouncedPeriod, "0", "60 min") %]
+	  [% filter_option(CPANEL.CPDATA.UnsubBouncedPeriod, "1", "2 hour(s)") %]
+	  [% filter_option(CPANEL.CPDATA.UnsubBouncedPeriod, "2", "3 hour(s)") %]
+	  [% filter_option(CPANEL.CPDATA.UnsubBouncedPeriod, "3", "6 hour(s)") %]
+	  [% filter_option(CPANEL.CPDATA.UnsubBouncedPeriod, "4", "12 hour(s)") %]
+	  [% filter_option(CPANEL.CPDATA.UnsubBouncedPeriod, "5", "24 hour(s)") %]
+	  [% filter_option(CPANEL.CPDATA.UnsubBouncedPeriod, "6", "2 day(s)") %]
+	  [% filter_option(CPANEL.CPDATA.UnsubBouncedPeriod, "7", "3 day(s)") %]
+	  [% filter_option(CPANEL.CPDATA.UnsubBouncedPeriod, "8", "5 day(s)") %]
+	  [% filter_option(CPANEL.CPDATA.UnsubBouncedPeriod, "9", "7 day(s)") %]
+	  [% filter_option(CPANEL.CPDATA.UnsubBouncedPeriod, "10", "10 day(s)") %]
+	</select>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label>
+      [% locale.maketext("Process a Fatal Bounce as") %]
+    </label>
+    <div class="row">
+      <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	<select class="form-control" name="FatalWeight">
+	  [% filter_option(CPANEL.CPDATA.FatalWeight, "1", "Non-Fatal") %]
+	  [% filter_option(CPANEL.CPDATA.FatalWeight, "3", "3 Non-Fatal") %]
+	  [% filter_option(CPANEL.CPDATA.FatalWeight, "10", "10 Non-Fatal") %]
+	  [% filter_option(CPANEL.CPDATA.FatalWeight, "10000", "Fatal") %]
+	</select>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label style="font-weight: normal;">
+      <input type="checkbox" name="FailureNotification" value="1"[% CPANEL.CPDATA.FailureNotification == "YES" ? " checked='checked'" : "" %]/>
+      Notify Owner when Unsubscribing
+    </label>
+  </div>
+
+  <div class="form-group">
+    <label>
+      [% locale.maketext("Cleanup List every") %]
+    </label>
+    <div class="row">
+      <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	<select class="form-control" name="CleanupPeriod">
+	  [% filter_option(CPANEL.CPDATA.CleanupPeriod, "0", "60 min") %]
+	  [% filter_option(CPANEL.CPDATA.CleanupPeriod, "1", "2 hour(s)") %]
+	  [% filter_option(CPANEL.CPDATA.CleanupPeriod, "2", "3 hour(s)") %]
+	  [% filter_option(CPANEL.CPDATA.CleanupPeriod, "3", "6 hour(s)") %]
+	  [% filter_option(CPANEL.CPDATA.CleanupPeriod, "4", "12 hour(s)") %]
+	  [% filter_option(CPANEL.CPDATA.CleanupPeriod, "5", "24 hour(s)") %]
+	  [% filter_option(CPANEL.CPDATA.CleanupPeriod, "6", "2 day(s)") %]
+	  [% filter_option(CPANEL.CPDATA.CleanupPeriod, "7", "3 day(s)") %]
+	  [% filter_option(CPANEL.CPDATA.CleanupPeriod, "8", "5 day(s)") %]
+	  [% filter_option(CPANEL.CPDATA.CleanupPeriod, "9", "7 day(s)") %]
+	  [% filter_option(CPANEL.CPDATA.CleanupPeriod, "10", "10 day(s)") %]
+	</select>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label>
+      [% locale.maketext("Bounce Reports to Save") %]
+    </label>
+    <div class="row">
+      <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	<select name="SaveReports" class="form-control">
+	  [% filter_option(CPANEL.CPDATA.SaveReports, "0", "No") %]
+	  [% filter_option(CPANEL.CPDATA.SaveReports, "1", "Unprocessed") %]
+	  [% filter_option(CPANEL.CPDATA.SaveReports, "2", "All") %]
+	</select>
+      </div>
+    </div>
+  </div>
+
+  <h3>Warning Message</h3> 
+
+  <div class="form-group">
+    <label>
+      [% locale.maketext("Subject") %]
+    </label>
+    <div class="row">
+      <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	<input type="text" class="form-control" name="WarningSubject" maxlength="200" value="[% CPANEL.CPDATA.WarningSubject %]" />
+      </div>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label>
+      [% locale.maketext("Text") %]
+    </label>
+    <div class="row">
+      <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	<textarea name="WarningText" class="form-control" cols="50" rows="3">[% CPANEL.CPDATA.WarningText.replace('\\\e', "\n") %]</textarea>
+      </div>
+    </div>
+  </div>
+
+  <h3>Feed Mode Format</h3>
+  
+  <div class="form-group">
+    <label>
+      [% locale.maketext("Subject Prefix") %]
+    </label>
+    <div class="row">
+      <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	<input type="text" class="form-control" name="FeedSubject" maxlength="100" value="[% CPANEL.CPDATA.FeedSubject %]" />
+      </div>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label>
+      [% locale.maketext("Direct Replies") %]
+    </label>
+    <div class="row">
+      <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	<select name="Reply" class="form-control">
+	  [% filter_option(CPANEL.CPDATA.Reply, "0", "To List") %]
+	  [% filter_option(CPANEL.CPDATA.Reply, "1", "To Sender") %]
+	</select>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label style="font-weight: normal;">
+      <input type="checkbox" name="FeedPrefixMode" value="1"[% CPANEL.CPDATA.FeedPrefixMode == "YES" ? " checked='checked'" : "" %] />
+      Insert after Reply Prefix
+    </label>
+  </div>
+
+  <div class="form-group">
+    <label>
+      [% locale.maketext("Header") %]
+    </label>
+    <div class="row">
+      <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	<textarea name="FeedHeader" cols="50" rows="3" class="form-control">[% CPANEL.CPDATA.FeedHeader.replace('\\\e', "\n") %]</textarea>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label>
+      [% locale.maketext("Trailer") %]
+    </label>
+    <div class="row">
+      <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	<textarea name="FeedTrailer" cols="50" rows="3" class="form-control">[% CPANEL.CPDATA.FeedTrailer.replace('\\\e', "\n") %]</textarea>
+      </div>
+    </div>
+  </div>
+
+  <h3>Welcome/Policy Message</h3>
+
+  <div class="form-group">
+    <label>
+      [% locale.maketext("Subject") %]
+    </label>
+    <div class="row">
+      <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	<input type="text" name="PolicySubject" size="40" maxlength="200" value="[% CPANEL.CPDATA.PolicySubject %]" class="form-control" />
+      </div>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label>
+      [% locale.maketext("Text") %]
+    </label>
+    <div class="row">
+      <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	<textarea name="PolicyText" cols="50" rows="3" class="form-control">[% CPANEL.CPDATA.PolicyText.replace('\\\e',"\n") %]</textarea>
+      </div>
+    </div>
+  </div>
+
+  <h3>Good Bye Message</h3>
+  <div class="form-group">
+    <label>
+      [% locale.maketext("Subject") %]
+    </label>
+    <div class="row">
+      <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	<input type="text" name="ByeSubject" class="form-control" maxlength="200" value="[% CPANEL.CPDATA.ByeSubject %]" />
+      </div>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label>
+      [% locale.maketext("Text") %]
+    </label>
+    <div class="row">
+      <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	<textarea name="ByeText" cols="50" rows="3" class="form-control">[% CPANEL.CPDATA.ByeText.replace('\\\e',"\n") %]</textarea>
+      </div>
+    </div>
+  </div>
+
+  <h3>Archiving</h3>
+  <div class="form-group">
+    <label>
+      [% locale.maketext("Enabled") %]
+    </label>
+    <div class="row">
+      <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	<select name="Store" class=" form-control">
+	  [% filter_option(CPANEL.CPDATA.Store, "NO", "Disabled") %]
+	  [% filter_option(CPANEL.CPDATA.Store, "YES", "Enabled") %]
+	</select>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label>
+      [% locale.maketext("Maximum Archive Size") %]
+    </label>
+    <div class="row">
+      <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	<select class="form-control" name="ArchiveSizeLimit">
+	  [% filter_option(CPANEL.CPDATA.ArchiveSizeLimit, "0", "Unlimited") %]
+	  [% filter_option(CPANEL.CPDATA.ArchiveSizeLimit, "1", "0") %]
+	  [% filter_option(CPANEL.CPDATA.ArchiveSizeLimit, "2", "1024") %]
+	  [% filter_option(CPANEL.CPDATA.ArchiveSizeLimit, "3", "3K") %]
+	  [% filter_option(CPANEL.CPDATA.ArchiveSizeLimit, "4", "10K") %]
+	  [% filter_option(CPANEL.CPDATA.ArchiveSizeLimit, "5", "30K") %]
+	  [% filter_option(CPANEL.CPDATA.ArchiveSizeLimit, "6", "100K") %]
+	  [% filter_option(CPANEL.CPDATA.ArchiveSizeLimit, "7", "300K") %]
+	  [% filter_option(CPANEL.CPDATA.ArchiveSizeLimit, "8", "1024K") %]
+	  [% filter_option(CPANEL.CPDATA.ArchiveSizeLimit, "9", "3M") %]
+	  [% filter_option(CPANEL.CPDATA.ArchiveSizeLimit, "10", "10M") %]
+	  [% filter_option(CPANEL.CPDATA.ArchiveSizeLimit, "11", "30M") %]
+	  [% filter_option(CPANEL.CPDATA.ArchiveSizeLimit, "12", "100M") %]
+	  [% filter_option(CPANEL.CPDATA.ArchiveSizeLimit, "13", "300M") %]
+	  [% filter_option(CPANEL.CPDATA.ArchiveSizeLimit, "14", "1024M") %]
+	  [% filter_option(CPANEL.CPDATA.ArchiveSizeLimit, "15", "3G") %]
+	  [% filter_option(CPANEL.CPDATA.ArchiveSizeLimit, "16", "10G") %]
+	  [% filter_option(CPANEL.CPDATA.ArchiveSizeLimit, "17", "30G") %]
+	</select>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label>
+      [% locale.maketext("Messages to Keep") %]
+    </label>
+    <div class="row">
+      <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	<select class="form-control" name="ArchiveMessageLimit">
+	  [% filter_option(CPANEL.CPDATA.ArchiveMessageLimit, "0", "0") %]
+	  [% filter_option(CPANEL.CPDATA.ArchiveMessageLimit, "1", "1") %]
+	  [% filter_option(CPANEL.CPDATA.ArchiveMessageLimit, "2", "2") %]
+	  [% filter_option(CPANEL.CPDATA.ArchiveMessageLimit, "3", "3") %]
+	  [% filter_option(CPANEL.CPDATA.ArchiveMessageLimit, "5", "5") %]
+	  [% filter_option(CPANEL.CPDATA.ArchiveMessageLimit, "10", "10") %]
+	  [% filter_option(CPANEL.CPDATA.ArchiveMessageLimit, "20", "20") %]
+	  [% filter_option(CPANEL.CPDATA.ArchiveMessageLimit, "50", "50") %]
+	  [% filter_option(CPANEL.CPDATA.ArchiveMessageLimit, "100", "100") %]
+	  [% filter_option(CPANEL.CPDATA.ArchiveMessageLimit, "200", "200") %]
+	  [% filter_option(CPANEL.CPDATA.ArchiveMessageLimit, "1000", "1000") %]
+	  [% filter_option(CPANEL.CPDATA.ArchiveMessageLimit, "3000", "3000") %]
+	  [% filter_option(CPANEL.CPDATA.ArchiveMessageLimit, "100000", "10000") %]
+	  [% filter_option(CPANEL.CPDATA.ArchiveMessageLimit, "300000", "30000") %]
+	  [% filter_option(CPANEL.CPDATA.ArchiveMessageLimit, "1000000", "100000") %]
+	</select>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label>
+      [% locale.maketext("Start new Archive every") %]
+    </label>
+    <div class="row">
+      <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	<select class="form-control" name="ArchiveSwapPeriod">
+	  [% filter_option(CPANEL.CPDATA.ArchiveSwapPeriod, "-1", "never") %]
+	  [% filter_option(CPANEL.CPDATA.ArchiveSwapPeriod, "1", "month") %]
+	  [% filter_option(CPANEL.CPDATA.ArchiveSwapPeriod, "2", "2 months") %]
+	  [% filter_option(CPANEL.CPDATA.ArchiveSwapPeriod, "3", "3 months") %]
+	  [% filter_option(CPANEL.CPDATA.ArchiveSwapPeriod, "6", "6 months") %]
+	  [% filter_option(CPANEL.CPDATA.ArchiveSwapPeriod, "12", "year") %]
+	  [% filter_option(CPANEL.CPDATA.ArchiveSwapPeriod, "24", "2 years") %]
+	  [% filter_option(CPANEL.CPDATA.ArchiveSwapPeriod, "36", "3 years") %]
+	  [% filter_option(CPANEL.CPDATA.ArchiveSwapPeriod, "60", "5 years") %]
+	</select>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label>
+      [% locale.maketext("Browse Access") %]
+    </label>
+    <div class="row">
+      <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	<select name="Browse" class="form-control">
+	  [% filter_option(CPANEL.CPDATA.Browse, "nobody", "Nobody") %]
+	  [% filter_option(CPANEL.CPDATA.Browse, "subscribers", "Subscribers") %]
+	  [% filter_option(CPANEL.CPDATA.Browse, "clients", "Clients") %]
+	  [% filter_option(CPANEL.CPDATA.Browse, "anybody", "Anybody") %]
+	</select>
+      </div>
+    </div>
+  </div>
+
+  <h3>Digest Generator</h3>
+
+  <div class="form-group">
+    <label>
+      [% locale.maketext("Generate every") %]
+    </label>
+    <div class="row">
+      <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	<select class="form-control" name="DigestPeriod">
+	  [% filter_option(CPANEL.CPDATA.DigestPeriod, "1m", "60 sec") %]
+	  [% filter_option(CPANEL.CPDATA.DigestPeriod, "10m", "10 min") %]
+	  [% filter_option(CPANEL.CPDATA.DigestPeriod, "30m", "30 min") %]
+	  [% filter_option(CPANEL.CPDATA.DigestPeriod, "1h", "60 min") %]
+	  [% filter_option(CPANEL.CPDATA.DigestPeriod, "3h", "3 hour(s)") %]
+	  [% filter_option(CPANEL.CPDATA.DigestPeriod, "6h", "6 hour(s)") %]
+	  [% filter_option(CPANEL.CPDATA.DigestPeriod, "1d", "24 hour(s)") %]
+	  [% filter_option(CPANEL.CPDATA.DigestPeriod, "3d", "3 day(s)") %]
+	  [% filter_option(CPANEL.CPDATA.DigestPeriod, "7d", "7 day(s)") %]
+	  [% filter_option(CPANEL.CPDATA.DigestPeriod, "10d", "10 day(s)") %]
+	  [% filter_option(CPANEL.CPDATA.DigestPeriod, "20d", "20 day(s)") %]
+	  [% filter_option(CPANEL.CPDATA.DigestPeriod, "100d", "100 day(s)") %]
+	</select>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label>
+      [% locale.maketext("or if Larger than") %]
+    </label>
+    <div class="row">
+      <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	<select class="form-control" name="DigestSizeLimit">
+	  [% filter_option(CPANEL.CPDATA.DigestSizeLimit, "unlimited", "Unlimited") %]
+	  [% filter_option(CPANEL.CPDATA.DigestSizeLimit, "0", "0") %]
+	  [% filter_option(CPANEL.CPDATA.DigestSizeLimit, "1024", "1024") %]
+	  [% filter_option(CPANEL.CPDATA.DigestSizeLimit, "3K", "3K") %]
+	  [% filter_option(CPANEL.CPDATA.DigestSizeLimit, "10K", "10K") %]
+	  [% filter_option(CPANEL.CPDATA.DigestSizeLimit, "30K", "30K") %]
+	  [% filter_option(CPANEL.CPDATA.DigestSizeLimit, "100K", "100K") %]
+	  [% filter_option(CPANEL.CPDATA.DigestSizeLimit, "300K", "300K") %]
+	  [% filter_option(CPANEL.CPDATA.DigestSizeLimit, "1024K", "1024K") %]
+	  [% filter_option(CPANEL.CPDATA.DigestSizeLimit, "1M", "3M") %]
+	  [% filter_option(CPANEL.CPDATA.DigestSizeLimit, "10M", "10M") %]
+	  [% filter_option(CPANEL.CPDATA.DigestSizeLimit, "30M", "30M") %]
+	  [% filter_option(CPANEL.CPDATA.DigestSizeLimit, "100M", "100M") %]
+	  [% filter_option(CPANEL.CPDATA.DigestSizeLimit, "300M", "300M") %]
+	  [% filter_option(CPANEL.CPDATA.DigestSizeLimit, "1024M", "1024M") %]
+	  [% filter_option(CPANEL.CPDATA.DigestSizeLimit, "3G", "3G") %]
+	  [% filter_option(CPANEL.CPDATA.DigestSizeLimit, "10G", "10G") %]
+	  [% filter_option(CPANEL.CPDATA.DigestSizeLimit, "30G", "30G") %]
+	</select>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label>
+      [% locale.maketext("Messages to Keep") %]
+    </label>
+    <div class="row">
+      <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	<select class="form-control" name="DigestMessageLimit">
+	  [% filter_option(CPANEL.CPDATA.DigestMessageLimit, "0", "0") %]
+	  [% filter_option(CPANEL.CPDATA.DigestMessageLimit, "1", "1") %]
+	  [% filter_option(CPANEL.CPDATA.DigestMessageLimit, "2", "2") %]
+	  [% filter_option(CPANEL.CPDATA.DigestMessageLimit, "3", "3") %]
+	  [% filter_option(CPANEL.CPDATA.DigestMessageLimit, "5", "5") %]
+	  [% filter_option(CPANEL.CPDATA.DigestMessageLimit, "10", "10") %]
+	  [% filter_option(CPANEL.CPDATA.DigestMessageLimit, "20", "20") %]
+	  [% filter_option(CPANEL.CPDATA.DigestMessageLimit, "50", "50") %]
+	  [% filter_option(CPANEL.CPDATA.DigestMessageLimit, "100", "100") %]
+	  [% filter_option(CPANEL.CPDATA.DigestMessageLimit, "200", "200") %]
+	  [% filter_option(CPANEL.CPDATA.DigestMessageLimit, "1000", "1000") %]
+	  [% filter_option(CPANEL.CPDATA.DigestMessageLimit, "3000", "3000") %]
+	  [% filter_option(CPANEL.CPDATA.DigestMessageLimit, "10000", "10000") %]
+	  [% filter_option(CPANEL.CPDATA.DigestMessageLimit, "30000", "30000") %]
+	  [% filter_option(CPANEL.CPDATA.DigestMessageLimit, "100000", "100000") %]
+	</select> 
+      </div>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label>
+      [% locale.maketext("First Digest at") %]
+    </label>
+    <div class="row">
+      <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	<select name="DigestTimeOfDay" class="form-control">
+	  [% filter_option(CPANEL.CPDATA.DigestTimeOfDay, "0", "12 AM") %]
+	  [% filter_option(CPANEL.CPDATA.DigestTimeOfDay, "1h", "1 AM") %]
+	  [% filter_option(CPANEL.CPDATA.DigestTimeOfDay, "2h", "2 AM") %]
+	  [% filter_option(CPANEL.CPDATA.DigestTimeOfDay, "3h", "3 AM") %]
+	  [% filter_option(CPANEL.CPDATA.DigestTimeOfDay, "4h", "4 AM") %]
+	  [% filter_option(CPANEL.CPDATA.DigestTimeOfDay, "5h", "5 AM") %]
+	  [% filter_option(CPANEL.CPDATA.DigestTimeOfDay, "6h", "6 AM") %]
+	  [% filter_option(CPANEL.CPDATA.DigestTimeOfDay, "7h", "7 AM") %]
+	  [% filter_option(CPANEL.CPDATA.DigestTimeOfDay, "8h", "8 AM") %]
+	  [% filter_option(CPANEL.CPDATA.DigestTimeOfDay, "9h", "9 AM") %]
+	  [% filter_option(CPANEL.CPDATA.DigestTimeOfDay, "10h", "10 AM") %]
+	  [% filter_option(CPANEL.CPDATA.DigestTimeOfDay, "11h", "11 AM") %]
+	  [% filter_option(CPANEL.CPDATA.DigestTimeOfDay, "12h", "12 PM") %]
+	  [% filter_option(CPANEL.CPDATA.DigestTimeOfDay, "13h", "1 PM") %]
+	  [% filter_option(CPANEL.CPDATA.DigestTimeOfDay, "14h", "2 PM") %]
+	  [% filter_option(CPANEL.CPDATA.DigestTimeOfDay, "15h", "3 PM") %]
+	  [% filter_option(CPANEL.CPDATA.DigestTimeOfDay, "16h", "4 PM") %]
+	  [% filter_option(CPANEL.CPDATA.DigestTimeOfDay, "17h", "5 PM") %]
+	  [% filter_option(CPANEL.CPDATA.DigestTimeOfDay, "18h", "6 PM") %]
+	  [% filter_option(CPANEL.CPDATA.DigestTimeOfDay, "19h", "7 PM") %]
+	  [% filter_option(CPANEL.CPDATA.DigestTimeOfDay, "20h", "8 PM") %]
+	  [% filter_option(CPANEL.CPDATA.DigestTimeOfDay, "21h", "9 PM") %]
+	  [% filter_option(CPANEL.CPDATA.DigestTimeOfDay, "22h", "10 PM") %]
+	  [% filter_option(CPANEL.CPDATA.DigestTimeOfDay, "23h", "11 PM") %]
+	</select>
+      </div>
+    </div>
+  </div>
+
+  <h3>Digest Format</h3>
+  <div class="form-group">
+    <label>
+      [% locale.maketext("Subject") %]
+    </label>
+    <div class="row">
+      <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	<input type="text" name="DigestSubject" value="[% CPANEL.CPDATA.DigestSubject %]" class="form-control" maxlength="100" />
+      </div>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label>
+      [% locale.maketext("Body Format") %]
+    </label>
+    <div class="row">
+      <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	<select name="DigestFormat" class="form-control">
+	  [% filter_option(CPANEL.CPDATA.DigestFormat, "plain text", "Plain text") %]
+	  [% filter_option(CPANEL.CPDATA.DigestFormat, "Standard MIME", "Standard MIME") %]
+	  [% filter_option(CPANEL.CPDATA.DigestFormat, "Embedded MIME", "Embedded MIME") %]
+	</select>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label>
+      [% locale.maketext("Header") %]
+    </label>
+    <div class="row">
+      <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	<textarea name="DigestHeader" cols="70" rows="3" class="form-control">[% CPANEL.CPDATA.DigestHeader.replace('\\\e',"\n") %]</textarea>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label>
+      [% locale.maketext("Index Line") %]
+    </label>
+    <div class="row">
+      <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	<textarea name="TOCLine" cols="70" rows="3" class="form-control">[% CPANEL.CPDATA.TOCLine.replace('\\\e', "\n") %]</textarea>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label>
+      [% locale.maketext("Index Trailer") %]
+    </label>
+    <div class="row">
+      <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	<textarea name="TOCTrailer" cols="70" rows="3" class="form-control">[% CPANEL.CPDATA.TOCTrailer.replace('\\\e', "\n") %]</textarea>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label>
+      [% locale.maketext("Trailer") %]
+    </label>
+    <div class="row">
+      <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	<textarea name="DigestTrailer" cols="70" rows="3" class="form-control">[% CPANEL.CPDATA.DigestTrailer.replace('\\\e', "\n") %]</textarea>
+      </div>
+    </div>
+  </div>
+  <div class="form-group">
+    <input type="submit" id="submit" value="[% locale.maketext("Save") %]" name="savesettings" class="btn btn-primary" />
+  </div>
+</form>
+[% INCLUDE _assets/return_link.html.tt return_location='lists.html' return_link_text=locale.maketext('Go Back') %]
+[% END #wrapper %]
+
+[% BLOCK js_block -%]
+<script type="text/javascript">
+
+  var init_lists = function() {
+  // var lname_validator = new CPANEL.validate.validator("List Name");
+  // lname_validator.add("email", "min_length(%input%, 1)", "[% locale.maketext("Sorry the “List Name” field cannot be left blank.")  %]");
+  // lname_validator.add("email", function() {
+  //     return !/[^a-zA-Z0-9\.\_]/.test(DOM.get("email").value)
+  // }, "[% locale.maketext("Mailing list names may contain only these characters: [join, ,_*]", 'a-z', '0-9', '_', '.') %]");
+  // lname_validator.attach();
+  // 
+  // CPANEL.validate.attach_to_form("submit", [
+  //     lname_validator
+  // ]);
+  // 
+  // YAHOO.util.Dom.get("email").focus();
+  };
+
+  YAHOO.util.Event.onDOMReady(init_lists);
+</script>
+[% END -%]

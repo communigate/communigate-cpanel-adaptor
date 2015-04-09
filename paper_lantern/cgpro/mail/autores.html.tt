@@ -1,0 +1,106 @@
+[% SET CPANEL.CPVAR.dprefix = "../../" %]
+
+[% WRAPPER '_assets/master.html.tt'
+    app_key = 'autoresponders'
+ -%]
+<div class="body-content">
+
+[% IF CPANEL.feature('autoresponders') %]
+
+    <div class="section">
+        [% IF !(ExpVar.expand('$appname') == "webmail") %]
+            [%
+                Api2.pre_exec("StatsBar", "stat");
+                SET responders_stats = Api2.exec("StatsBar" , "stat" , {"warnings" =>"1" , "infinitylang" =>"true" , "warninglevel" =>"80" , "display" =>"autoresponders" });
+                Api2.post_exec("StatsBar", "stat");
+            %]
+
+            [% IF api2_result_StatsBar_stat.size; %]
+            <p id="lblCaution" class="caution">
+                [% locale.maketext("[output,strong,Warning]: You currently use [numf,_1] out of [numf,_2]", responders_stats.0.count, responders_stats.0.max) %]
+            </p>
+            [% END %]
+
+        [% END %]
+
+        <a id="btnAddAutoResponder" class="btn btn-primary" href="addars.html">[% locale.maketext("Add Auto Responder") %]</a>
+    </div>
+
+    <div class="section">
+        [% IF FORM.itemsperpage %]
+            [% SET CPANEL.CPVAR.itemsperpage = FORM.itemsperpage %]
+        [% END %]
+        [% IF (!FORM.itemsperpage || !CPANEL.CPVAR.itemsperpage) %]
+            [% SET CPANEL.CPVAR.itemsperpage = "10" %]
+        [% END %]
+        <h2 id="hdrCurrentAutoResponders">[% locale.maketext("Current Autoresponders") %]</h2>
+            <p id="descIfYouDoNotCreateAForwarder">
+            <!-- [% locale.maketext("If you do not create a forwarder or email account with the same address as each auto responder, mail sent to the auto responder will only be handled by the auto responder before it is discarded.") %] -->
+        </p>
+
+        <!-- <div id="search-panel_autoresponders"> -->
+        <!--     <form id="frmSearch" method="get" action="" class="form-inline"> -->
+        <!--         <div class="form-group"> -->
+        <!--             <input id="txtSearchRegex" type="text" class="form-control" size="15" name="searchregex" value="[% FORM.searchregex %]" placeholder="[% locale.maketext("Search") %]" /> -->
+        <!--         </div> -->
+        <!--         <div class="form-group"> -->
+        <!--             <input id="btnSearchGo" type="submit" class="btn btn-primary" value="[% locale.maketext("Go") %]" /> -->
+        <!--             <input id="hidSearchItemsPerPage" type="hidden" name="itemsperpage" value="[% CPANEL.CPVAR.itemsperpage.html %]" /> -->
+        <!--         </div> -->
+        <!--     </form> -->
+        <!-- </div> -->
+
+        <table id="mailtbl" class="table table-striped sortable">
+            <thead>
+                <tr>
+                    <th id="lblMailEmail">[% locale.maketext("Email") %]</th>
+                    <th id="lblMailSubject">[% locale.maketext("Subject") %]</th>
+                    <th id="lblMailFunctions" class="sorttable_nosort">
+                        [% locale.maketext("Actions") %]
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+            [%
+                Api2.pre_exec("CommuniGate", "ListAutoresponders");
+                SET auto_responders = Api2.exec("CommuniGate" , "ListAutoresponders" , {});
+                Api2.post_exec("CommuniGate", "ListAutoresponders");
+            %]
+            [% IF auto_responders.size; %]
+                [% FOREACH hashref IN auto_responders; %]
+                <tr class="row-[% loop.index % 2 == 0 ? "even" : "odd" %]">
+                    <td class="nobrd-center-t" id="[% hashref.email.uri() %]">[% hashref.email.html() %]</td>
+                    <td>&nbsp;[% hashref.subject.html() %]</td>
+                    <td class="nobrd">
+                        <a class="btn btn-link" href="addars.html?email=[% hashref.email.uri() %]&amp;redirectdomain=[% RAW_FORM.domain.uri %]">
+                            <span class="glyphicon glyphicon-pencil"></span> [% locale.maketext("Edit") %]
+                        </a>
+                        <a class="btn btn-link" href="dodelautoresconfirm.html?email=[% hashref.email.uri() %]&amp;redirectdomain=[% RAW_FORM.domain.uri  %]">
+                            <span class="glyphicon glyphicon-trash"></span> [% locale.maketext("Delete") %]
+                        </a>
+                    </td>
+                </tr>
+                [% END %]
+            [% ELSE %]
+                <tr>
+                    <td class="errors" colspan="3">
+                        [% locale.maketext("There are no autoresponders setup.") %]
+                    </td>
+                </tr>
+            [% END %]
+            </tbody>
+        </table>
+
+        [%# INCLUDE _assets/paginate.html.tt %]
+
+
+    </div>
+
+    [% INCLUDE _assets/return_link.html.tt return_location='../index.html' return_link_text=locale.maketext('Go Back') %]
+
+[% END %]<!-- end cpanelfeature autoresponders -->
+
+</div><!-- end body-content -->
+[% END %]
+
+

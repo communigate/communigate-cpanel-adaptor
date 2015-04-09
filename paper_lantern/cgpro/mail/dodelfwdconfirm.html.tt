@@ -1,0 +1,25 @@
+[%
+SET CPANEL.CPVAR.dprefix = "../../";
+%]
+
+[% WRAPPER '_assets/master.html.tt'
+    app_key = 'forwarders'
+ -%]
+
+<div class="body-content">
+  <div class="section">
+    <h2 id="hdrForwardingMaintenance">[% locale.maketext("Email Forwarding Maintenance") %]</h2>
+
+    <p id="deleteEmailForwardingConfirmMsg">
+      [% locale.maketext("Are you sure you want to delete the [boolean,_3, domain, email,] forwarder “[_1]” to “[_2]”?", FORM.email, FORM.emaildest, "0") %]
+    </p>
+
+    <div class="form-group">
+      <a class="btn btn-primary" id="btn_delete" href="dodelfwd.html?email=[% FORM.email %]&amp;emaildest=[% FORM.emaildest | url %]">[% locale.maketext("Delete Forwarder") %]</a>
+      <a class="btn btn-link" id="btn_cancel" href="fwds.html">[% locale.maketext("Cancel") %]</a>
+    </div>
+  </div>
+  [% INCLUDE _assets/return_link.html.tt return_location='fwds.html' return_link_text=locale.maketext('Go Back') %]
+</div>
+
+[% END %]

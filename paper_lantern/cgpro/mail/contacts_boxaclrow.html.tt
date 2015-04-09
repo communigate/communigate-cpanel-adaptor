@@ -1,0 +1,54 @@
+[% MACRO filter_option(pval, val, text) BLOCK -%]
+<option value="[% val %]"[% val == pval ? " selected='selected'" : "" %]>[% locale.maketext(text) %]</option>
+[% END -%]
+[% IF FORM.id.defined -%]
+[% id = FORM.id -%]
+[% SET addressbook = Api2.exec("CommuniGate", "EditContactsBox", {account=RAW_FORM.item("account"), box=RAW_FORM.item("box") }); -%]
+[% ELSE -%]
+[% id = CPANEL.CPVAR.id -%]
+[% END -%]
+<tr>
+  <td>
+    <select name="aclto-[% id %]" class="form-control">
+      [% filter_option(acl, "anyone@", "CGPAnyoneInDomain" ) %]
+      [% FOR account IN addressbook.0.accounts.keys.grep(CPANEL.CPVAR.domain _ '$').sort %]
+      [% filter_option(acl, account.split("@").0, account _ (domain ? '@' _ domain : '') _ " (" _ locale.maketext("CGPAccount") _ ")" ) %]
+      [% END %]
+      [% FOR account IN addressbook.0.groups.keys.grep(CPANEL.CPVAR.domain _ '$').sort %]
+      [% IF !groups.$account.EmailDisabled || groups.$account.EmailDisabled == 'NO' -%]
+      [% filter_option(acl, '#' _ account.split("@").0, account _ (domain ? '@' _ domain : '') _ " (" _ locale.maketext("CGPGroup") _ ")" ) %]
+      [% END -%]
+      [% END -%]
+    </select>
+  </td>
+  <td>
+    <input type="checkbox" name="acl-[% id %]" value="l"[% IF addressbook.0.acls.$acl.search('l') %] checked="checked"[% END %] />
+  </td>
+  <td>
+    <input type="checkbox" name="acl-[% id %]" value="r"[% IF addressbook.0.acls.$acl.search('r') %] checked="checked"[% END %] />
+  </td>
+  <td>
+    <input type="checkbox" name="acl-[% id %]" value="s"[% IF addressbook.0.acls.$acl.search('s') %] checked="checked"[% END %] />
+  </td>
+  <td>
+    <input type="checkbox" name="acl-[% id %]" value="w"[% IF addressbook.0.acls.$acl.search('w') %] checked="checked"[% END %] />
+  </td>
+  <td>
+    <input type="checkbox" name="acl-[% id %]" value="d"[% IF addressbook.0.acls.$acl.search('d') %] checked="checked"[% END %] />
+  </td>
+  <td>
+    <input type="checkbox" name="acl-[% id %]" value="i"[% IF addressbook.0.acls.$acl.search('i') %] checked="checked"[% END %] />
+  </td>
+  <td>
+    <input type="checkbox" name="acl-[% id %]" value="c"[% IF addressbook.0.acls.$acl.search('c') %] checked="checked"[% END %] />
+  </td>
+  <td>
+    <input type="checkbox" name="acl-[% id %]" value="a"[% IF addressbook.0.acls.$acl.search('a') %] checked="checked"[% END %] />
+  </td>
+  <td style="white-space: nowrap;">
+    <a href="#" class="removerow">
+      <span class="glyphicon glyphicon-trash"></span>
+      Remove
+    </a>
+  </td>
+</tr>

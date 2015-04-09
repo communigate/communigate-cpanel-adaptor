@@ -1,0 +1,68 @@
+[%
+USE Api2;
+SET CPANEL.CPVAR.dprefix = "../../";
+
+IF CPANEL.feature('forwarders');
+SET api2_result_Email_listforwards = Api2.exec("CommuniGate", "listforwards", {});
+END;
+%]
+[% WRAPPER '_assets/master.html.tt'
+    app_key = 'forwarders'
+ -%]
+
+<div class="body-content">
+  [% IF CPANEL.feature('forwarders') %]
+
+  <div id="hdrForwarder" class="section">
+    <h2>[% locale.maketext("Create an Email Account Forwarder") %]</h2>
+    <a class="btn btn-primary" id="btn_AddForwarder" href="addfwd.html">[% locale.maketext("Add Forwarder") %]</a>
+  </div>
+
+  <div class="section">
+    <h2>[% locale.maketext("Email Account Forwarders") %]</h2>
+
+    <div class="table-responsive">
+      <table id="mailtbl" class="sortable truncate-table table table-striped">
+        <colgroup>
+          <col width="40%" />
+          <col width="40%" />
+          <col width="20%" />
+        </colgroup>
+        <tr>
+          <th id="tblHead_EmailAddress">[% locale.maketext("Email Address")  %]</th>
+          <th id="tblHead_ForwardTo">[% locale.maketext("Forward To")  %]</th>
+          <th id="tblHead_ForwarderFunctions" class="sorttable_nosort">[% locale.maketext("Actions")  %]</th>
+        </tr>
+        [% IF api2_result_Email_listforwards.size(); %]
+        [% FOREACH hashref IN api2_result_Email_listforwards; %]
+        <tr>
+          <td class="truncate nobrd-left">
+            [% hashref.item('html_dest').html() %]
+          </td>
+          <td class="truncate">
+            [% hashref.item('html_forward').html() %]
+          </td>
+          <td class="nobrd">
+            <a class="btn btn-link" href="dodelfwdconfirm.html?domain=[% FORM.item('domain') %]&amp;email=[% hashref.item('uri_dest') %]&amp;emaildest=[% hashref.forward | url %]">
+              <span class="glyphicon glyphicon-trash"></span> [% locale.maketext("Delete") %]
+            </a>
+          </td>
+        </tr>
+        [% END %]
+        [% ELSE %]
+        <tr>
+          <td colspan="5" class="errors">
+            [% locale.maketext("There are no forwarders configured for the current domain.") %]
+          </td>
+        </tr>
+        [% END %]
+      </table>
+    </div>
+
+  </div>
+  [% END %]<!-- end cpanelfeature forwarders -->
+
+  [% INCLUDE _assets/return_link.html.tt return_location='../index.html' return_link_text=locale.maketext('Go Back') %]
+</div>
+[% END %]
+

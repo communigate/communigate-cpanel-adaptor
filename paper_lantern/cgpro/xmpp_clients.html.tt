@@ -1,0 +1,180 @@
+[% MACRO filter_option(pval, val, text) BLOCK -%]
+<option value="[% val %]"[% val == pval ? " selected='selected'" : "" %]>[% locale.maketext(text) %]</option>
+[% END -%]
+[% SET CPANEL.CPVAR.dprefix = "../" %]
+[% WRAPPER '_assets/master.html.tt'
+app_key = 'xmpp_clients'
+-%]
+<div class="body-content">
+  [% IF CPANEL.feature('cgpro_xmpp_clients') %]
+  <div class="pull-right">
+    <div id="manage-list">
+      <form method="get" action="" id="manage_list_form" class="form-inline">
+        <div class="form-group">
+          <label for="manage_list_select" id="txt_Managing" class="col-xs-12 control-label">[% locale.maketext("Managing:") %]</label>
+        </div>
+        <div class="form-group">
+          [% SET accounts = Api2.exec("CommuniGate", "AccountsOverview", {}) %]
+          <select name="account" id="manage_list_select" class="col-xs-12 form-control">
+            <option value="">[% locale.maketext("Select account.") %]</option>
+	    [% FOR account IN accounts.0.accounts.keys -%]
+	    [% myclass = accounts.0.accounts.$account.class -%]
+	    [% classstring = accounts.0.classes.$myclass.AccessModes.join(',') -%]
+	    [% IF classstring.search("XMPP") || classstring == "All" -%]
+	    [% filter_option(FORM.account, account,account) %]
+	    [% END -%]
+	    [% END -%]
+          </select>
+        </div>
+        <noscript>
+          <div class="form-group">
+            <input type="submit" class="btn btn-primary" id="btn_domainSelect_go" value="[% locale.maketext("Go") %]" />
+          </div>
+        </noscript>
+      </form>
+    </div>
+    <script type="text/javascript">
+      YAHOO.util.Event.onDOMReady(function() {
+      YAHOO.util.Event.on("manage_list_select", "change", function() { YAHOO.util.Dom.get("manage_list_form").submit(); });
+      });
+    </script>
+  </div><br /></br />
+
+  [% IF RAW_FORM.item('account') -%]
+
+  <div class="section">
+    <h2>[% locale.maketext("XMPP settings for") %] [% FORM.account %]</h2>
+
+    [%
+    USE Api2;
+    SET account = CPANEL.get_raw_form('account');
+    SET host = Api2.exec('CommuniGate','getCGProServer', {} ).0;
+
+    %]
+    <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+      <table class="truncate-table table table-striped">
+	<thead>
+	  <tr>
+	    <th colspan="2">Secure SSL/TLS Settings (Recommended)</th>
+	  </tr>
+	</thead>
+	<tbody>
+	  <tr>
+	    <td>Username/JabberID:</td>
+	    <td class="data"><strong>[% account || '&lt;your.email@address&gt;' %]</strong></td>
+          </tr>
+          <tr>
+	    <td>Password:</td>
+	    <td class="escape-note"><em>( Use the email account’s password. )</em></td>
+          </tr>
+          <tr>
+            <td>Server:</td>
+            <td class="data">
+	      <strong>[% host %]</strong>
+            </td>
+          </tr>
+	  <tr>
+	    <td>Port:</td>
+	    <td><strong>5223</strong></td>
+	  </tr>        
+	</tbody>
+      </table>
+    </div>
+
+    <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+      <table class="truncate-table table table-striped">
+	<thead>
+	  <tr>
+	    <th colspan="2">Non-SSL Settings (NOT Recommended)</th>
+	  </tr>
+	</thead>
+	<tbody>
+	  <tr>
+	    <td>Username/JabberID:</td>
+	    <td class="data"><strong>[% account || '&lt;your.email@address&gt;' %]</strong></td>
+          </tr>
+          <tr>
+	    <td>Password:</td>
+	    <td class="escape-note"><em>( Use the email account’s password. )</em></td>
+          </tr>
+          <tr>
+            <td>Server:</td>
+            <td class="data">
+	      <strong>[% host %]</strong>
+            </td>
+          </tr>
+	  <tr>
+	    <td>Port:</td>
+	    <td><strong>5222</strong></td>
+	  </tr>        
+	</tbody>
+      </table>
+    </div>
+
+  </div>
+
+  [% END -%]
+
+  <div class="section">
+    <h2>[% locale.maketext("XMPP Clients") %]</h2>
+    [% locale.maketext("An XMPP client is any software or application that enables you to connect to an XMPP for instant messaging with other people over the Internet. There are many free clients you can use to do this, for many different devices and operating systems.") %]
+    <table class="sortable truncate-table table table-striped">
+      <tbody>
+	<tr class="row-1">
+	  <th class="column-1">Name</th><th class="column-2">Platform(s)</th><th class="column-4">Details</th>
+	</tr>
+	<tr class="row-17">
+	  <td class="column-1">Coccinella</td><td class="column-2">GNU/Linux, Mac OS X, Windows</td><td class="column-4"><a href="http://coccinella.im/" target="_blank">coccinella.im</a></td>
+	</tr>
+	<tr class="row-59">
+	  <td class="column-1">Mozilla Thunderbird</td><td class="column-2">GNU/Linux, Mac OS X, Windows</td><td class="column-4"><a href="http://www.mozilla.org/thunderbird/" target="_blank">mozilla.org/thunderbird</a></td>
+	</tr>
+	<tr class="row-65">
+	  <td class="column-1">Pidgin</td><td class="column-2">GNU/Linux, Mac OS X, Windows</td><td class="column-4"><a href="http://pidgin.im/" target="_blank">pidgin.im</a></td>
+	</tr>
+	<tr class="row-68">
+	  <td class="column-1">Psi</td><td class="column-2">GNU/Linux, Mac OS X, Windows</td><td class="column-4"><a href="http://psi-im.org/" target="_blank">psi-im.org</a></td>
+	</tr>
+	<tr class="row-28">
+	  <td class="column-1">Gajim</td><td class="column-2">GNU/Linux, Windows</td><td class="column-4"><a href="http://gajim.org/" target="_blank">gajim.org</a></td>
+	</tr>
+	<tr class="row-25">
+	  <td class="column-1">Empathy</td><td class="column-2">GNU/Linux</td><td class="column-4"><a href="http://live.gnome.org/Empathy" target="_blank">live.gnome.org</a></td>
+	</tr>
+	<tr class="row-52">
+	  <td class="column-1">Kopete</td><td class="column-2">GNU/Linux</td><td class="column-4"><a href="http://kopete.kde.org/" target="_blank">kopete.kde.org</a></td>
+	</tr>
+	<tr class="row-2">
+	  <td class="column-1">Adium</td><td class="column-2">Mac OS X</td><td class="column-4"><a href="http://adium.im/" target="_blank">adium.im</a></td>
+	</tr>
+	<tr class="row-34">
+	  <td class="column-1">iChat</td><td class="column-2">Mac OS X</td><td class="column-4"><a href="http://www.apple.com/macosx/features/ichat.html" target="_blank">apple.com</a></td>
+	</tr>
+	<tr class="row-12">
+	  <td class="column-1">ChatSecure</td><td class="column-2">Mobile (iOS)</td><td class="column-4"><a href='http://chrisballinger.info/apps/chatsecure/'>chrisballinger.info</a></td>
+	</tr>
+	<tr class="row-7">
+	  <td class="column-1">Beem</td><td class="column-2">Mobile (Android)</td><td class="column-4"><a href="http://www.beem-project.com/" target="_blank">beem-project.com</a></td>
+	</tr>
+	<tr class="row-30">
+	  <td class="column-1">Gibberbot</td><td class="column-2">Mobile (Android)</td><td class="column-4"><a href='https://guardianproject.info/apps/gibber/'>guardianproject.info</a></td>
+	</tr>
+	<tr class="row-94">
+	  <td class="column-1">Xabber</td><td class="column-2">Mobile (Android)</td><td class="column-4"><a href="http://www.xabber.com/" target="_blank">xabber.com</a></td>
+	</tr>
+	<tr class="row-97">
+	  <td class="column-1">Yaxim</td><td class="column-2">Mobile (Android)</td><td class="column-4"><a href="http://slideme.org/application/yaxim" target="_blank">slideme.org</a></td>
+	</tr>
+	<tr class="row-50">
+	  <td class="column-1">JWChat</td><td class="column-2">Browser</td><td class="column-4"><a href="http://stefan-strigler.de/jwchat/" target="_blank">stefan-strigler.de/jwchat</a></td>
+	</tr>
+      </tbody>
+    </table>
+
+  </div>
+  [% END -%] <!-- END feature -->
+  [% INCLUDE _assets/return_link.html.tt return_location='../index.html' return_link_text=locale.maketext('Go Back') %]
+
+</div><!-- end body-content -->
+[% END %]
+

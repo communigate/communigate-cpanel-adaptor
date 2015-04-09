@@ -1,0 +1,41 @@
+[%
+SET CPANEL.CPVAR.dprefix = "../../";
+IF FORM.contact;
+END;
+%]
+
+[% js_code = PROCESS js_block %]
+[% WRAPPER '_assets/master.html.tt'
+    page_js = js_code,
+    app_key = 'contacts'
+ -%]
+<div class="body-content">
+    <div class="section">
+      <h2>Add address book</h2>
+    </div>
+	<form action="doaddbox.html?account=[% FORM.account %]" method="post">
+            <div class="form-group">
+              <label for="boxname">
+		[% locale.maketext("Name") %]
+              </label>
+              <div class="row">
+                <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+		  <input type="text" name="boxname" id="boxname" class="form-control" value="" />
+		</div>
+	      </div>
+	    </div>
+	    <div class="form-group">
+	      <input class="btn btn-primary" type="submit" id="submit" name="save" value="[% locale.maketext("Add address book") %]" />
+	    </div>
+	</form>
+	[% INCLUDE _assets/return_link.html.tt return_location='contacts.html?account=' _ FORM.account return_link_text=locale.maketext('Go Back') %]
+
+</div>
+[% END %]
+
+[% BLOCK js_block %]
+<script type="text/javascript">
+</script>
+
+[% END %]
+

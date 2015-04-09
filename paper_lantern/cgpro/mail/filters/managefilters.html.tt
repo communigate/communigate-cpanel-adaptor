@@ -1,0 +1,40 @@
+[%
+SET CPANEL.CPVAR.dprefix = "../../../";
+SET api2_result_Email_listpops =  Api2.exec("CommuniGate", "ListAccounts", {} );
+%]
+
+
+[% WRAPPER '_assets/master.html.tt'
+app_key = 'user_filters'
+%]
+
+<div class="body-content">
+  <div class="section">
+    <h2 id="hdrByUsers">[% locale.maketext("Filters by Users") %]</h2>
+    <table id="actiontbl" class="sortable table table-striped">
+      <thead>
+        <tr>
+          <th>[% locale.maketext("Account") %]</th>
+          <th>[% locale.maketext("Actions") %]</th>
+        </tr>
+      </thead>
+      <tbody>
+        [% IF api2_result_Email_listpops.size %]
+        [% FOREACH account IN api2_result_Email_listpops %]
+        <tr>
+          <td>[% account %]</td>
+          <td><div>
+              <a class="btn btn-link" href="userfilters.html?account=[% account %]">
+                <span class="fa fa-wrench fa-lg"></span>
+                [% locale.maketext("Manage Filters") %]</a>
+          </div></td>
+        </tr>
+        [% END %]
+        [% END %]
+      </tbody>
+    </table>
+  </div>
+  [% INCLUDE _assets/return_link.html.tt return_location='../../../index.html' return_link_text=locale.maketext('Go Back') %]
+</div><!-- end body-content -->
+
+[% END %]

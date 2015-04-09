@@ -1,0 +1,23 @@
+<div id="manage-list">
+    <form method="get" action="" id="manage_list_form" class="form-inline">
+        <div class="form-group">
+            <label for="manage_list_select" id="txt_Managing" class="col-xs-12 control-label">[% locale.maketext("Managing:") %]</label>
+        </div>
+        <div class="form-group">
+            <select name="domain" id="manage_list_select" class="col-xs-12 form-control">
+                <option value="">[% locale.maketext("All Domains") %]</option>
+                [% Api1.pre_exec("Email", "listmaildomainsoptndef") ;   Api1.exec("Email", "listmaildomainsoptndef", [RAW_FORM.item('domain')]) ;  Api1.post_exec("Email", "listmaildomainsoptndef") %]
+            </select>
+        </div>
+        <noscript>
+            <div class="form-group">
+                <input type="submit" class="btn btn-primary" id="btn_domainSelect_go" value="[% locale.maketext("Go") %]" />
+            </div>
+        </noscript>
+    </form>
+</div>
+<script type="text/javascript">
+YAHOO.util.Event.onDOMReady(function() {
+    YAHOO.util.Event.on("manage_list_select", "change", function() { YAHOO.util.Dom.get("manage_list_form").submit(); });
+});
+</script>

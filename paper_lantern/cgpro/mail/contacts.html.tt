@@ -1,0 +1,185 @@
+[% MACRO filter_option(pval, val, text) BLOCK -%]
+<option value="[% val %]"[% val == pval ? " selected='selected'" : "" %]>[% locale.maketext(text) %]</option>
+[% END -%]
+[% SET CPANEL.CPVAR.dprefix = "../../" %]
+[% js_code = PROCESS js_block %]
+[% WRAPPER '_assets/master.html.tt'
+    page_js = js_code,
+    app_key = 'contacts'
+-%]
+<div class="body-content">
+
+  <div class="pull-right">
+    <div id="manage-list">
+      <form method="get" action="" id="manage_list_form" class="form-inline">
+        <div class="form-group">
+          <label for="manage_list_select" id="txt_Managing" class="col-xs-12 control-label">[% locale.maketext("Managing:") %]</label>
+        </div>
+        <div class="form-group">
+          [% SET accounts = Api2.exec("CommuniGate", "ListAccounts", {}) %]
+          <select name="account" id="manage_list_select" class="col-xs-12 form-control">
+            <option value="">[% locale.maketext("Select account.") %]</option>
+	    [% FOR account IN accounts.sort -%]
+	    [% filter_option(FORM.account, account,account) %]
+	    [% END -%]
+          </select>
+        </div>
+        <noscript>
+          <div class="form-group">
+            <input type="submit" class="btn btn-primary" id="btn_domainSelect_go" value="[% locale.maketext("Go") %]" />
+          </div>
+        </noscript>
+      </form>
+    </div>
+    <script type="text/javascript">
+      YAHOO.util.Event.onDOMReady(function() {
+      YAHOO.util.Event.on("manage_list_select", "change", function() { YAHOO.util.Dom.get("manage_list_form").submit(); });
+      });
+    </script>
+  </div><br /></br />
+  [% IF FORM.account -%]
+  [% SET contacts = Api2.exec("CommuniGate", "ListContacts", { account=RAW_FORM.item("account") }) -%]
+  <h2>[% locale.maketext("Contacts of") %] [% FORM.account %]</h2>
+  <div class="section">
+    <p>
+      <a class="btn btn-primary" href="addbox.html?account=[% FORM.account %]">[% locale.maketext("New address book") %]</a>
+    </p>
+  </div>
+  [% FOR box IN contacts.0.boxes.keys.sort -%]
+  [% PROCESS contacts_listing %]
+  [% END -%]
+
+  [% UNLESS contacts.0.boxes.keys.size; PROCESS contacts_listing box='Contacts'; END %]
+
+  [% BLOCK contacts_listing -%]
+  <div class="section">
+    <h3>[% box %][% IF contacts.0.prefs.ContactsBox == box %] ([% locale.maketext("default") %])[% END %]</h3>
+    <p>
+      <a class="btn btn-primary" href="editcontact.html?account=[% FORM.account %]&amp;box=[% box %]">[% locale.maketext("New contact") %]</a>
+      <a class="btn btn-primary" href="editcontactsgroup.html?account=[% FORM.account %]&amp;box=[% box %]">[% locale.maketext("New contacts list") %]</a>
+      <a class="btn btn-default" href="editbox.html?account=[% FORM.account %]&amp;box=[% box %]">[% locale.maketext("Address book ACL") %]</a>
+      [% IF contacts.0.prefs.ContactsBox != box && contacts.0.boxes.keys.size > 1 -%]
+      <a class="btn btn-default" href="deletebox.html?account=[% FORM.account %]&amp;box=[% box %]">[% locale.maketext("Delete address book") %]</a>
+      <a class="btn btn-default" href="setdefaultbox.html?account=[% FORM.account %]&amp;box=[% box %]">[% locale.maketext("Set default address book") %]</a>
+      [% END -%]
+      <a class="btn btn-default" href="getVCARD.live.cgi?account=[% FORM.account %]&amp;box=[% box %]&amp;name=[% box %]">[% locale.maketext("Download as vCard") %]</a>
+      <a class="btn btn-default" href="contactsimport.html?account=[% FORM.account %]&amp;box=[% box %]">[% locale.maketext("CGPImportContacts") %]</a>
+    </p>
+    
+    <table class="sortable truncate-table table table-striped">
+      <tr>
+	<th class="cell" colspan="3">[% locale.maketext("CGPContact") %]</th>
+	<th class="cell-end sorttable_nosort" colspan="4">[% locale.maketext("Actions") %]</th>
+      </tr>
+      [% FOR contact IN contacts.0.contacts.$box -%]
+      <tr>
+	<td class="truncate"><a href="editcontact[% IF contact.group %]sgroup[% END %].html?account=[% FORM.account %]&amp;contact=[% contact.uid %]&amp;box=[% box %]">[% contact.name %]</a></td>
+	<td class="truncate nobrd-left"  style="vertical-align: top;">
+	  [% IF contact.group -%]
+	  ([% locale.maketext('CGPContactsGroup') %])
+	  [% END -%]
+	  [% FOR mail IN contact.email; mail.t = mail.type.grep('(HOME|WORK|OTHER)').0; -%]
+	  <a href="mailto:[% mail.value %]">[% mail.value %]</a> [% IF mail.t %]([% locale.maketext('CGP' _ mail.t) %])[% END -%] <br/>
+	  [% END -%]
+	</td>
+	<td class="truncate" style="vertical-align: top;">
+	  [% FOR tel IN contact.tel; tel.t = tel.type.grep('(HOME|WORK|CELL|FAX|VIDEO|AGENT|PAGER|OTHER)').0; -%]
+	  <a href="tel:[% tel.value %]">[% tel.value %]</a> [% IF tel.t %]([% locale.maketext('CGP' _ tel.t) %])[% END -%] <br/>
+	  [% END -%]
+	</td>
+	<td>
+	  <a href="editcontact[% IF contact.group %]sgroup[% END %].html?account=[% FORM.account %]&amp;contact=[% contact.uid %]&amp;box=[% box %]">
+              <span class="glyphicon glyphicon-edit"></span>
+	    [% locale.maketext("View/Edit") %]
+	  </a>
+	</td>
+	<td>
+	  <a href="deletecontact.html?account=[% FORM.account %]&amp;contact=[% contact.uid %]&amp;name=[% contact.name %]&amp;box=[% box %]">
+              <span class="glyphicon glyphicon-trash"></span>
+	    [% locale.maketext("Delete") %]
+	  </a>
+	</td>
+	<td>
+	  <a href="getVCARD.live.cgi?account=[% FORM.account %]&amp;contact=[% contact.uid %]&amp;box=[% box %]&amp;name=[% contact.name %]">
+            <span class="glyphicon glyphicon-credit-card"></span>
+	    [% locale.maketext("vCard") %]
+	  </a>
+	</td>
+	<td>
+	  <a href="getQR.live.cgi?account=[% FORM.account %]&amp;contact=[% contact.uid %]&amp;box=[% box %]&amp;name=[% contact.name %]" onclick="return show_qr('VCARD - [% contact.name %]','getQR.live.cgi?account=[% FORM.account %]&amp;contact=[% contact.uid %]&amp;box=[% box %]&amp;name=[% contact.name %]');">
+            <span class="glyphicon glyphicon-qrcode"></span>
+	    QRcode
+	  </a>
+	</td>
+      </tr>
+      [% END -%]
+      [% UNLESS contacts.0.contacts.$box.size -%]
+      <tr>
+	<td class="truncate" colspan="4">[% locale.maketext("No contacts in this address book.") %]</td>
+      </tr>
+      [% END -%]
+    </table>
+  </div>
+  [% END -%]
+
+
+
+  [% END -%]
+  [% INCLUDE _assets/return_link.html.tt return_location='../../index.html' return_link_text=locale.maketext('Go Back') %]
+
+</div><!-- end body-content -->
+[% END %]
+
+[% BLOCK js_block %]
+<script type="text/javascript">
+      var show_qr = function(title, src) {
+      // Remove the panel if it already exists
+        if (YAHOO.util.Dom.inDocument("validation_errors_modal_box") === true) {
+            var remove_me = YAHOO.util.Dom.get("validation_errors_modal_box");
+            remove_me.parentNode.removeChild(remove_me);
+        }
+
+        // create the panel
+        var panel_options = {
+                    width: "350px",
+                    fixedcenter: true,
+                    close: true,
+                    draggable: false,
+                    zindex: 1000,
+                    modal: true,
+                    visible: false
+                };
+        var panel = new YAHOO.widget.Panel("validation_errors_modal_box", panel_options);
+
+        // header
+        var header = '<div class="lt"></div>';
+        header += '<span>' + title + '</span>';
+        header += '<div class="rt"></div>';
+        panel.setHeader(header);
+
+        // body
+        panel.setBody("<img src='" + src + "' style='display: block; margin: 0 auto;' alt='[% locale.maketext("Loading") %]...' />");
+
+        // footer
+        var footer = '<div class="lb"></div>' +
+                     '<div class="validation_errors_modal_box_actions">' +
+                     '<input id="validation_errors_modal_panel_close_button" type="button" class="btn btn-primary" value="[% locale.maketext("Close") %]" />' +
+                     '</actions>' +
+                     '<div class="rb"></div>';
+
+        panel.setFooter(footer);
+
+        // add the event handler and put the focus on the close button after the panel renders
+        var after_show = function() {
+            YAHOO.util.Event.on("validation_errors_modal_panel_close_button", "click", function() { panel.hide(); });
+        };
+        panel.showEvent.subscribe(after_show);
+
+        // show the panel
+        panel.render(document.body);
+        panel.show();
+        return false;
+    };
+
+</script>
+[% END %]

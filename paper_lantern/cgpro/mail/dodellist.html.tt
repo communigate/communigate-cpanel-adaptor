@@ -1,0 +1,22 @@
+[% SET CPANEL.CPVAR.dprefix="../../"  %]
+
+[% WRAPPER '_assets/master.html.tt'
+    app_key = 'mailing_lists'
+-%]
+<div class="body-content">
+
+    <div class="section">
+        <h2>[% locale.maketext("Account Deletion") %]</h2>
+        <p id="listConfirmText">
+           [% locale.maketext("Are you sure you wish to delete the list “[_1]”?", FORM.email) %]
+        </p>
+        <p>
+            <a class="btn btn-primary" id="btn_delete" href="realdodellist.html?email=[% RAW_FORM.email | url %]">[% locale.maketext("Delete Mailing List") %]</a>
+            <a class="btn btn-link" id="btn_cancel" href="lists.html">[% locale.maketext("Cancel") %]</a>
+        </p>
+    </div>
+
+    [% INCLUDE _assets/return_link.html.tt return_location='lists.html' return_link_text=locale.maketext('Go Back') %]
+
+</div>
+[% END #wrapper %]

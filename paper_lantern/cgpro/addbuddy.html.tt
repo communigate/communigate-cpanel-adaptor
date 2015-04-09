@@ -1,0 +1,37 @@
+[%
+SET CPANEL.CPVAR.dprefix = "../../";
+SET email_add_forward = Api2.exec("CommuniGate", "AddBuddy", {
+    "account" = RAW_FORM.item("account"),
+    "jid" = RAW_FORM.item("jid"),
+    "name" = RAW_FORM.item("name"),
+    "group" = RAW_FORM.item("group")
+});
+%]
+
+[% WRAPPER '_assets/master.html.tt'
+    app_key = 'xmpp_roster'
+ -%]
+
+<div class="body-content">
+  <div class="section">
+    [% IF CPANEL.CPERROR.item('CommuniGate') %]
+    <div id="fwdCperror" class="alert alert-danger">
+      <span id="fwdCperrorImg" class="glyphicon glyphicon-remove-sign"></span>
+      <div id="fwdCperrorMsg" class="alert-message">
+        [% CPANEL.CPERROR.item('CommuniGate') %]
+      </div>
+    </div>
+    [% ELSE -%]
+    <div id="fwdSuccess" class="alert alert-success">
+      <span id="fwdSuccessImg" class="glyphicon glyphicon-ok-sign"></span>
+      <div id="fwdSuccessMsg" class="alert-message">
+        [% locale.maketext("Contact ”[_1]” added.", FORM.jid)%]
+      </div>
+    </div>
+    [% END %]
+
+    [% INCLUDE _assets/return_link.html.tt return_location='xmpp_roster.html?account=' _ FORM.account return_link_text=locale.maketext('Go Back') %]
+
+  </div>
+
+[% END %]

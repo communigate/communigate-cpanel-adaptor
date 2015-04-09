@@ -1,0 +1,261 @@
+[% SET CPANEL.CPVAR.dprefix = "../" %]
+
+[%
+    SET settings = Api2.exec("CommuniGate", "AccountDefaults", {save=RAW_FORM.item("save"), MailToUnknown=RAW_FORM.item("MailToUnknown"), MailToAllAction=RAW_FORM.item("MailToAllAction"), TimeZone=RAW_FORM.item("TimeZone"), WorkDayStart=RAW_FORM.item("WorkDayStart"), WorkDayEnd=RAW_FORM.item("WorkDayEnd"), WeekStart=RAW_FORM.item("WeekStart"), WorkDays=RAW_FORM.item("WorkDays"), "WorkDays-0"=RAW_FORM.item("WorkDays-0"), "WorkDays-1"=RAW_FORM.item("WorkDays-1"), "WorkDays-2"=RAW_FORM.item("WorkDays-2"), "WorkDays-3"=RAW_FORM.item("WorkDays-3"), "WorkDays-4"=RAW_FORM.item("WorkDays-4"), "WorkDays-5"=RAW_FORM.item("WorkDays-5"), domain=RAW_FORM.item("domain"), ips=RAW_FORM.item("ips"), number=RAW_FORM.item("number")});
+%]
+[% domainSettings = settings.0.domainSettings %]
+[% accountDefaultPrefs = settings.0.accountDefaultPrefs %]
+[% serverDomainDefaults => settings.0.serverDomainDefaults %]
+[% serverAccountPrefs => settings.0.serverAccountPrefs %]
+[% outhoingNumber => settings.0.number %]
+[% outhoingNumbers => settings.0.numbers %]
+[% domain => settings.0.domain %]
+
+[% WRAPPER '_assets/master.html.tt'
+app_key = 'domain_settings'
+-%]
+<div class="body-content">
+  [% IF CPANEL.feature('autoresponders') %]
+  [% IF !(ExpVar.expand('$appname') == "webmail") %]
+  <div class="pull-right">
+    <div id="manage-list">
+      <form method="get" action="" id="manage_list_form" class="form-inline">
+        <div class="form-group">
+          <label for="manage_list_select" id="txt_Managing" class="col-xs-12 control-label">[% locale.maketext("Managing:") %]</label>
+        </div>
+        <div class="form-group">
+          <select name="domain" id="manage_list_select" class="col-xs-12 form-control">
+            <option value="">[% locale.maketext("Select a domain.") %]</option>
+            [% Api1.pre_exec("Email", "listmaildomainsoptndef") ;   Api1.exec("Email", "listmaildomainsoptndef", [RAW_FORM.item('domain')]) ;  Api1.post_exec("Email", "listmaildomainsoptndef") %]
+          </select>
+        </div>
+        <noscript>
+          <div class="form-group">
+            <input type="submit" class="btn btn-primary" id="btn_domainSelect_go" value="[% locale.maketext("Go") %]" />
+          </div>
+        </noscript>
+      </form>
+    </div>
+    <script type="text/javascript">
+      YAHOO.util.Event.onDOMReady(function() {
+      YAHOO.util.Event.on("manage_list_select", "change", function() { YAHOO.util.Dom.get("manage_list_form").submit(); });
+      });
+    </script>
+  </div><br /></br />
+  [% END %]
+
+[% IF RAW_FORM.item('domain') -%]
+  <div class="section">
+    <!-- BEGIN the form -->
+    <h2>[% locale.maketext("Default account settings") %]</h2>
+    [% MACRO filter_option(pval, val, text) BLOCK -%]
+    <option value="[% val %]"[% val == pval ? " selected='selected'" : "" %]>[% locale.maketext(text) %]</option>
+    [% END -%]
+    [% MACRO filter_check(name, pval, val, text) BLOCK -%]
+    <input type="checkbox" name="[% name %]" value="[% val %]" id="[% name %]-[% val %]"[% IF pval.join("").search(val); " checked='checked'"; END %] />
+    <label for="[% name %]-[% val %]">[% text %]</label>
+    [% END -%]
+
+    <form action="" method="post">
+
+      <div class="form-group">
+        <label for="MailToAllAction">
+          [% locale.maketext("Mail to All is distributed for") %] (all@[% domain %]):
+        </label>
+        <div class="row">
+          <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	    <select name="MailToAllAction" id="MailToAllAction"  class="form-control">
+	      [% filter_option("", "default", locale.maketext("CGPdefault") _ " (" _ locale.maketext("CGP" _ serverDomainDefaults.MailToAllAction) _ ")") %]
+	      [% filter_option(domainSettings.MailToAllAction, "anybody",locale.maketext("CGPanybody")) %]
+	      [% filter_option(domainSettings.MailToAllAction, "clients", locale.maketext("CGPclients")) %]
+	      [% filter_option(domainSettings.MailToAllAction, "Authenticated Users", locale.maketext("CGPAuthenticated Users")) %]
+	      [% filter_option(domainSettings.MailToAllAction, "Authenticated Domain Users", locale.maketext("CGPAuthenticated Domain Users")) %]
+	      [% filter_option(domainSettings.MailToAllAction, "Authenticated Administrator", locale.maketext("CGPAuthenticated Administrator")) %]
+	      [% filter_option(domainSettings.MailToAllAction, "nobody", locale.maketext("CGPnobody")) %]
+	    </select>
+	  </div>
+	</div>
+      </div>
+      <div class="form-group">
+        <label for="TimeZone">
+          [% locale.maketext("Time Zone:") %]
+        </label>
+        <div class="row">
+          <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	      <select name="TimeZone" id="TimeZone" class="form-control">
+		[% filter_option("", "default", locale.maketext("CGPdefault") _ " (" _ locale.maketext("CGP" _ (serverAccountPrefs.TimeZone == "HostOS" ? "Fictitious Server Zone" : serverAccountPrefs.TimeZone )) _ ")") %]
+		[% filter_option(accountDefaultPrefs.TimeZone, "HostOS", locale.maketext("CGPFictitious Server Zone")) %]
+		[% filter_option(accountDefaultPrefs.TimeZone, "Europe/Eastern", locale.maketext("CGPEurope/Eastern")) %]
+		[% filter_option(accountDefaultPrefs.TimeZone, "Europe/Central", locale.maketext("CGPEurope/Central")) %]
+		[% filter_option(accountDefaultPrefs.TimeZone, "Europe/Western", locale.maketext("CGPEurope/Western")) %]
+		[% filter_option(accountDefaultPrefs.TimeZone, "Europe/Moscow", locale.maketext("CGPEurope/Moscow")) %]
+		[% filter_option(accountDefaultPrefs.TimeZone, "NorthAmerica/Alaska", locale.maketext("CGPNorthAmerica/Alaska")) %]
+		[% filter_option(accountDefaultPrefs.TimeZone, "NorthAmerica/Pacific", locale.maketext("CGPNorthAmerica/Pacific")) %]
+		[% filter_option(accountDefaultPrefs.TimeZone, "NorthAmerica/Mountain", locale.maketext("CGPNorthAmerica/Mountain")) %]
+		[% filter_option(accountDefaultPrefs.TimeZone, "NorthAmerica/Eastern", locale.maketext("CGPNorthAmerica/Eastern")) %]
+		[% filter_option(accountDefaultPrefs.TimeZone, "NorthAmerica/Atlantic", locale.maketext("CGPNorthAmerica/Atlantic")) %]
+		[% filter_option(accountDefaultPrefs.TimeZone, "Newfoundland", locale.maketext("CGPNewfoundland")) %]
+		[% filter_option(accountDefaultPrefs.TimeZone, "Russia/Ekaterinburg", locale.maketext("CGPRussia/Ekaterinburg")) %]
+		[% filter_option(accountDefaultPrefs.TimeZone, "Russia/Novosibirsk", locale.maketext("CGPRussia/Novosibirsk")) %]
+		[% filter_option(accountDefaultPrefs.TimeZone, "Russia/Krasnoyarsk", locale.maketext("CGPRussia/Krasnoyarsk")) %]
+		[% filter_option(accountDefaultPrefs.TimeZone, "Russia/Irkutsk", locale.maketext("CGPRussia/Irkutsk")) %]
+		[% filter_option(accountDefaultPrefs.TimeZone, "Russia/Yakutsk", locale.maketext("CGPRussia/Yakutsk")) %]
+		[% filter_option(accountDefaultPrefs.TimeZone, "Russia/Vladivostok", locale.maketext("CGPRussia/Vladivostok")) %]
+		[% filter_option(accountDefaultPrefs.TimeZone, "Russia/Magadan", locale.maketext("CGPRussia/Magadan")) %]
+		[% filter_option(accountDefaultPrefs.TimeZone, "Russia/Kamchatka", locale.maketext("CGPRussia/Kamchatka")) %]
+		[% filter_option(accountDefaultPrefs.TimeZone, "SouthAmerica/Chile", locale.maketext("CGPSouthAmerica/Chile")) %]
+		[% filter_option(accountDefaultPrefs.TimeZone, "SouthAmerica/Brasil", locale.maketext("CGPSouthAmerica/Brasil")) %]
+		[% filter_option(accountDefaultPrefs.TimeZone, "SouthAmerica/Paraguay", locale.maketext("CGPSouthAmerica/Paraguay")) %]
+		[% filter_option(accountDefaultPrefs.TimeZone, "Australia/Adelaide", locale.maketext("CGPAustralia/Adelaide")) %]
+		[% filter_option(accountDefaultPrefs.TimeZone, "Australia/NorthernTerritory", locale.maketext("CGPAustralia/NorthernTerritory")) %]
+		[% filter_option(accountDefaultPrefs.TimeZone, "Australia/East", locale.maketext("CGPAustralia/East")) %]
+		[% filter_option(accountDefaultPrefs.TimeZone, "NewZealand/Auckland", locale.maketext("CGPNewZealand/Auckland")) %]
+		[% filter_option(accountDefaultPrefs.TimeZone, "Asia/Lebanon", locale.maketext("CGPAsia/Lebanon")) %]
+		[% filter_option(accountDefaultPrefs.TimeZone, "Asia/Jordan", locale.maketext("CGPAsia/Jordan")) %]
+		[% filter_option(accountDefaultPrefs.TimeZone, "Asia/Syria", locale.maketext("CGPAsia/Syria")) %]
+		[% filter_option(accountDefaultPrefs.TimeZone, "Asia/Israel", locale.maketext("CGPAsia/Israel")) %]
+		[% filter_option(accountDefaultPrefs.TimeZone, "Asia/Iraq", locale.maketext("CGPAsia/Iraq")) %]
+		[% filter_option(accountDefaultPrefs.TimeZone, "Asia/Iran", locale.maketext("CGPAsia/Iran")) %]
+		[% filter_option(accountDefaultPrefs.TimeZone, "Asia/Afghanistan", locale.maketext("CGPAsia/Afghanistan")) %]
+		[% filter_option(accountDefaultPrefs.TimeZone, "Asia/India", locale.maketext("CGPAsia/India")) %]
+		[% filter_option(accountDefaultPrefs.TimeZone, "(-1100) Samoa", locale.maketext("CGP(-1100) Samoa")) %]
+		[% filter_option(accountDefaultPrefs.TimeZone, "(-1000) Hawaii/Tahiti", locale.maketext("CGP(-1000) Hawaii/Tahiti")) %]
+		[% filter_option(accountDefaultPrefs.TimeZone, "(-0900) Marquesas Islands", locale.maketext("CGP(-0900) Marquesas Islands")) %]
+		[% filter_option(accountDefaultPrefs.TimeZone, "(-0700) Arizona", locale.maketext("CGP(-0700) Arizona")) %]
+		[% filter_option(accountDefaultPrefs.TimeZone, "(-0600) Central America", locale.maketext("CGP(-0600) Central America")) %]
+		[% filter_option(accountDefaultPrefs.TimeZone, "(-0500) Haiti/Peru", locale.maketext("CGP(-0500) Haiti/Peru")) %]
+		[% filter_option(accountDefaultPrefs.TimeZone, "(-0400) Venezuela/Guyana", locale.maketext("CGP(-0400) Venezuela/Guyana")) %]
+		[% filter_option(accountDefaultPrefs.TimeZone, "(-0300) Argentina/Uruguay", locale.maketext("CGP(-0300) Argentina/Uruguay")) %]
+		[% filter_option(accountDefaultPrefs.TimeZone, "GMT (+0000)", locale.maketext("CGPGMT (+0000)")) %]
+		[% filter_option(accountDefaultPrefs.TimeZone, "(+0100) Algeria/Congo", locale.maketext("CGP(+0100) Algeria/Congo")) %]
+		[% filter_option(accountDefaultPrefs.TimeZone, "(+0200) Egypt/South Africa", locale.maketext("CGP(+0200) Egypt/South Africa")) %]
+		[% filter_option(accountDefaultPrefs.TimeZone, "(+0300) Saudi Arabia", locale.maketext("CGP(+0300) Saudi Arabia")) %]
+		[% filter_option(accountDefaultPrefs.TimeZone, "(+0400) Oman", locale.maketext("CGP(+0400) Oman")) %]
+		[% filter_option(accountDefaultPrefs.TimeZone, "(+0500) Pakistan", locale.maketext("CGP(+0500) Pakistan")) %]
+		[% filter_option(accountDefaultPrefs.TimeZone, "(+0600) Bangladesh", locale.maketext("CGP(+0600) Bangladesh")) %]
+		[% filter_option(accountDefaultPrefs.TimeZone, "(+0700) Thailand/Vietnam", locale.maketext("CGP(+0700) Thailand/Vietnam")) %]
+		[% filter_option(accountDefaultPrefs.TimeZone, "(+0800) China/Malaysia", locale.maketext("CGP(+0800) China/Malaysia")) %]
+		[% filter_option(accountDefaultPrefs.TimeZone, "(+0900) Japan/Korea", locale.maketext("CGP(+0900) Japan/Korea")) %]
+		[% filter_option(accountDefaultPrefs.TimeZone, "(+1000) Queensland", locale.maketext("CGP(+1000) Queensland")) %]
+		[% filter_option(accountDefaultPrefs.TimeZone, "(+1100) Micronesia", locale.maketext("CGP(+1100) Micronesia")) %]
+		[% filter_option(accountDefaultPrefs.TimeZone, "(+1200) Fiji", locale.maketext("CGP(+1200) Fiji")) %]
+	      </select>
+	  </div>
+	</div>
+      </div>
+      <div class="form-group">
+        <label for="WorkDayStart">
+          [% locale.maketext("Working Hours (start):") %]
+        </label>
+        <div class="row">
+          <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	      <select name="WorkDayStart" id="WorkDayStart" class="form-control">
+		[% filter_option("", "default", locale.maketext("CGPdefault") _ " (" _ (serverAccountPrefs.WorkDayStart div 3600) _ ((serverAccountPrefs.WorkDayStart % 3600) ? ":30" : ":00") _ ")") %]
+		[% FOR hour IN [ 0..23 ] -%]
+		[% filter_option(accountDefaultPrefs.WorkDayStart, hour * 3600, hour _ ":00") %]
+		[% filter_option(accountDefaultPrefs.WorkDayStart, (hour + 0.5) * 3600, hour _ ":30") %]
+		[% END %]
+	      </select>
+	  </div>
+	</div>
+      </div>
+      <div class="form-group">
+        <label for="WorkDayEnd">
+          [% locale.maketext("Working Hours (end):") %]
+        </label>
+        <div class="row">
+          <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	      <select name="WorkDayEnd" id="WorkDayEnd" class="form-control">
+		[% filter_option("", "default", locale.maketext("CGPdefault") _ " (" _ (serverAccountPrefs.WorkDayEnd div 3600) _ ((serverAccountPrefs.WorkDayEnd % 3600) ? ":30" : ":00") _ ")") %]
+		[% FOR hour IN [ 0..23 ] -%]
+		[% filter_option(accountDefaultPrefs.WorkDayEnd, hour * 3600, hour _ ":00") %]
+		[% filter_option(accountDefaultPrefs.WorkDayEnd, (hour + 0.5) * 3600, hour _ ":30") %]
+		[% END %]
+	      </select>
+	  </div>
+	</div>
+      </div>
+
+      <div class="form-group">
+        <label for="WeekStart">
+          [% locale.maketext("Week start:") %]
+        </label>
+        <div class="row">
+          <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	      <select name="WeekStart" id="WeekStart" class="form-control">
+		[% filter_option("", "default", locale.maketext("CGPdefault") _ " (" _ locale.maketext( "CGP" _ serverAccountPrefs.WeekStart) _ ")") %]
+		[% filter_option(accountDefaultPrefs.WeekStart, "Sun", locale.maketext("CGPSun")) %]
+		[% filter_option(accountDefaultPrefs.WeekStart, "Mon", locale.maketext("CGPMon")) %]
+		[% filter_option(accountDefaultPrefs.WeekStart, "Tue", locale.maketext("CGPTue")) %]
+		[% filter_option(accountDefaultPrefs.WeekStart, "Wed", locale.maketext("CGPWed")) %]
+		[% filter_option(accountDefaultPrefs.WeekStart, "Thu", locale.maketext("CGPThu")) %]
+		[% filter_option(accountDefaultPrefs.WeekStart, "Fri", locale.maketext("CGPFri")) %]
+		[% filter_option(accountDefaultPrefs.WeekStart, "Sat", locale.maketext("CGPSat")) %]
+	      </select>
+	  </div>
+	</div>
+      </div>
+
+      <div class="form-group">
+        <label>
+          [% locale.maketext("Work Days:") %]
+        </label>
+        <div class="row">
+          <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	      [% filter_check("WorkDays", accountDefaultPrefs.WorkDays || serverAccountPrefs.WorkDays, "Sun", locale.maketext("CGPSun")) %]
+	      [% filter_check("WorkDays", accountDefaultPrefs.WorkDays || serverAccountPrefs.WorkDays, "Mon", locale.maketext("CGPMon")) %]
+	      [% filter_check("WorkDays", accountDefaultPrefs.WorkDays || serverAccountPrefs.WorkDays, "Tue", locale.maketext("CGPTue")) %]
+	      [% filter_check("WorkDays", accountDefaultPrefs.WorkDays || serverAccountPrefs.WorkDays, "Wed", locale.maketext("CGPWed")) %]
+	      [% filter_check("WorkDays", accountDefaultPrefs.WorkDays || serverAccountPrefs.WorkDays, "Thu", locale.maketext("CGPThu")) %]
+	      [% filter_check("WorkDays", accountDefaultPrefs.WorkDays || serverAccountPrefs.WorkDays, "Fri", locale.maketext("CGPFri")) %]
+	      [% filter_check("WorkDays", accountDefaultPrefs.WorkDays || serverAccountPrefs.WorkDays, "Sat", locale.maketext("CGPSat")) %]
+	  </div>
+	</div>
+      </div>
+      [% IF CPANEL.feature("cgpro_extensions") -%]
+      <div class="form-group">
+        <label for="number">
+          [% locale.maketext("Default outgoing telephone number:") %]
+        </label>
+        <div class="row">
+          <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	    <select name="number" id="number" class="form-control">
+	      [% filter_option(accountDefaultPrefs.WeekStart, "", "CGPNone") %]
+	      [% FOR number IN outhoingNumbers.keys -%]
+	      [% filter_option(outhoingNumber, number, number) %]
+	      [% END -%]
+	    </select>
+	  </div>
+	</div>
+      </div>
+      [% END -%]
+      <div class="form-group">
+        <label for="ips">
+          [% locale.maketext("Client IP addresses:") %]
+        </label>
+        <div class="row">
+          <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+		<!-- <em>Example:</em> -->
+		<!-- <pre> -->
+		<!--   10.10.12.24               ; our back-up -->
+		<!--   10.10.13.32-10.10.13.191  ; our dial-ups -->
+		<!--   64.173.55.169             ; our other office -->
+		<!-- </pre> -->
+	      <textarea name="ips" id="ips" class="form-control" rows="8" cols="45">[% domainSettings.ClientIPs.replace('\\\e', "\n") %]</textarea>
+	  </div>
+	</div>
+      </div>
+      <div class="form-group">
+        <input type="submit" value="[% locale.maketext("CGPSave") %]" class="btn btn-primary"  name="save" />
+      </div>
+</form>
+<!-- END the form -->
+</div>
+[%END -%]
+[% INCLUDE _assets/return_link.html.tt return_location='../index.html' return_link_text=locale.maketext('Go Back') %]
+
+[% END %]<!-- end cpanelfeature autoresponders -->
+
+</div><!-- end body-content -->
+[% END %]
+

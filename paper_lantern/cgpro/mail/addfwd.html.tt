@@ -1,0 +1,111 @@
+[%
+SET CPANEL.CPVAR.dprefix = "../../";
+SET mail_domains = execute("Email", "list_mail_domains", {});
+%]
+
+[% js_code = PROCESS js_block %]
+[% WRAPPER '_assets/master.html.tt'
+    page_js = js_code,
+    app_key = 'forwarders'
+ -%]
+
+<div class="body-content">
+    <div class="section">
+        <h2>[% locale.maketext("Add a New Forwarder") %]</h2>
+        <h3>[% locale.maketext("Address") %]</h3>
+
+        <form method="post" name="fwdf" id="fwdf" action="doaddfwd.html">
+            <div class="form-group">
+              <label for="email">
+                [% locale.maketext("Address to Forward:") %]
+              </label>
+              <div class="row">
+                <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+                  <div class="input-group">
+                    <input type="text" class="form-control col-xs-2" autofill="off" autocomplete="off" id="email" name="email" />
+                    <span class="input-group-addon">@</span>
+                  </div>
+                </div>
+                <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6" id="email_error"></div>
+              </div>
+
+              <label for="domain">
+                [% locale.maketext("Domain")  %]
+              </label>
+              <div class="row">
+                <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+                  <select id="ddlDomain" name="domain" class="form-control">
+                    [% FOREACH hashref IN mail_domains.data %]
+                    <option value="[% hashref.domain.html() %]">[% hashref.domain.html() %]</option>
+                    [% END %]
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <h3>[% locale.maketext("Destination") %]</h3>
+
+                <div class="form-group">
+                    <label>
+                      [% locale.maketext("Forward to Email Address") %]
+                    </label>
+                    <div class="row">
+                        <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+                            <input name="fwdemail" id="fwdemail"  type="text" class="form-control" />
+                        </div>
+                        <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6" id="fwdemail_error"></div>
+                    </div>
+                </div>
+
+
+            <div class="form-group">
+                <input class="btn btn-primary" type="submit" id="submit" value="[% locale.maketext("Add Forwarder") %]" />
+            </div>
+        </form>
+    </div>
+
+    [% INCLUDE _assets/return_link.html.tt return_location='fwds.html' return_link_text=locale.maketext('Go Back') %]
+
+</div>
+[% END %]
+
+[% BLOCK js_block %]
+<script type="text/javascript">
+
+
+//a bit more complicated than other validators because the criteria
+//can be altered in WHM
+var validate_system_user = function() {
+    var value = YAHOO.util.Dom.get("fwdsystem").value;
+
+    return CPANEL.validate.alphanumeric( value )
+        && CPANEL.validate.no_chars( value, ' ' )
+    ;
+}
+
+var validate_destination = function() {
+        var email_list = YAHOO.util.Dom.get("fwdemail").value.trim();
+        var emails = email_list.split(/\s*,\s*/);
+        return emails.every(CPANEL.validate.email);
+};
+var forward_validator = new CPANEL.validate.validator("[% locale.maketext("Forward Address") %]");
+var fwd_validator = new CPANEL.validate.validator("[% locale.maketext("Destination Address") %]");
+
+function init_page() {
+
+    forward_validator.add("email", "local_part_email(%input%, 'cpanel')", "[% locale.maketext("That is not a valid email address.")  %]");
+    forward_validator.attach();
+
+    fwd_validator.add("fwdemail", validate_destination, "[% locale.maketext("That is not a valid email address.")  %]");
+    fwd_validator.attach();
+
+    CPANEL.validate.attach_to_form("submit", [
+        forward_validator,
+        fwd_validator
+    ]);
+
+    YAHOO.util.Dom.get("email").focus();
+}
+YAHOO.util.Event.onDOMReady(init_page);
+</script>
+[% END %]

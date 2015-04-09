@@ -1,0 +1,310 @@
+[% MACRO filter_option(pval, val, text) BLOCK -%]
+<option value="[% val %]"[% val == pval ? " selected='selected'" : "" %]>[% locale.maketext(text) %]</option>
+[% END -%]
+[%
+SET CPANEL.CPVAR.dprefix = "../../";
+IF FORM.contact;
+SET ref = Api2.exec("CommuniGate", "EditContact", {account=RAW_FORM.item("account"), UID=RAW_FORM.item("contact"), box=RAW_FORM.item("box") });
+SET vcard = ref.0.vcard;
+SET contact = ref.0.contact;
+SET YEAR = ref.0.YEAR;
+forceArray = ref.0.forceArray;
+END;
+%]
+
+[% js_code = PROCESS js_block %]
+[% WRAPPER '_assets/master.html.tt'
+    page_js = js_code,
+    app_key = 'contacts'
+ -%]
+<div class="body-content">
+    <div class="section">
+      [% IF FORM.contact -%]
+        <h2>[% locale.maketext("Edit contact") %]</h2>
+	[% ELSE -%]
+        <h2>[% locale.maketext("Add a New contact") %]</h2>
+	[% END -%]
+	<form action="doeditcontact.html?account=[% FORM.account %]&amp;box=[% FORM.box %]" method="post">
+            <div class="form-group">
+              <label for="GIVEN">
+		[% locale.maketext("First name") %]
+              </label>
+              <div class="row">
+                <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+		  <input type="text" name="GIVEN" id="GIVEN" class="form-control" value="[% vcard.N.GIVEN %]" />
+		</div>
+	      </div>
+	    </div>
+
+            <div class="form-group">
+              <label for="MIDDLE">
+		[% locale.maketext("Middle name") %]
+              </label>
+              <div class="row">
+                <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+		  <input type="text" name="MIDDLE" class="form-control" value="[% vcard.N.MIDDLE %]" />
+		</div>
+	      </div>
+	    </div>
+
+            <div class="form-group">
+              <label for="FAMILY">
+		[% locale.maketext("Family name") %]
+              </label>
+              <div class="row">
+                <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+		  <input type="text" name="FAMILY" class="form-control" value="[% vcard.N.FAMILY %]" />
+		</div>
+	      </div>
+	    </div>
+
+            <div class="form-group">
+              <label for="ORGNAME">
+		[% locale.maketext("Company") %]
+              </label>
+              <div class="row">
+                <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+		  <input type="text" name="ORGNAME" class="form-control" value="[% vcard.ORG.ORGNAME %]" />
+		</div>
+	      </div>
+	    </div>
+
+            <div class="form-group">
+              <label for="ORGUNIT">
+		[% locale.maketext("Department") %]
+              </label>
+              <div class="row">
+                <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+		  <input type="text" name="ORGUNIT" class="form-control" value="[% vcard.ORG.ORGUNIT %]" />
+		</div>
+	      </div>
+	    </div>
+
+            <div class="form-group">
+              <label for="TITLE">
+		[% locale.maketext("Job title") %]
+              </label>
+              <div class="row">
+                <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+		  <input type="text" name="TITLE" class="form-control" value="[% vcard.TITLE.VALUE %]" />
+		</div>
+	      </div>
+	    </div>
+
+            <div class="form-group">
+              <label for="TITLE">
+		[% locale.maketext("Birthday") %]
+              </label>
+              <div class="row">
+                <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+		  <select name="BDAY">
+		    <option value=""></option>
+		    [% BDAY = vcard.BDAY.VALUE.split('-') %]
+		    [% FOR i IN [1 .. 31] -%]
+		    [% if = FILTER format('%02d'); i; END %]
+		    [% filter_option(BDAY.2, if , if) %]
+		    [% END -%]
+		  </select>
+		  <select name="BMONTH">
+		    <option value=""></option>
+		    [% months = ['', 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'Ocober', 'November', 'December'] -%]
+		    [% FOR i IN [1 .. 12] -%]
+		    [% if = FILTER format('%02d'); i; END %]
+		    [% filter_option(BDAY.1, if, locale.maketext( "CGP" _ months.$i)) %]
+		    [% END -%]
+		  </select>
+		  <select name="BYEAR">
+		    <option value=""></option>
+		    [% FOR i IN [1900 .. YEAR] -%]
+		    [% filter_option(BDAY.0, i, i) %]
+		    [% END -%]
+		  </select>
+		</div>
+	      </div>
+	    </div>
+
+	    <h3>[% locale.maketext('Emails') %]</h3>
+
+	    <table class="truncate-table table table-striped">
+	      <thead>
+		<tr>
+		  <th>[% locale.maketext("Type") %]</th>
+		  <th>[% locale.maketext("Email") %]</th>
+		  <th>[% locale.maketext("Actions") %]</th>
+		</tr>
+	      </thead>
+	      <tbody id="emailstable">
+		[% CPANEL.CPVAR.id = 0 -%]
+		[% FOR mail IN ref.0.forceArray(vcard.EMAIL) -%]
+		[% PROCESS cgpro/mail/contacts_emailrow.html.tt -%]
+		[% CPANEL.CPVAR.id = loop.count %]
+		[% END -%]
+	      </tbody>
+	    </table>
+	    <p><a href="#" class="btn btn-default" id="emailsclick">[% locale.maketext("New email") %]</a><input type="hidden" name="emailcount" id="emailcount" value="[% CPANEL.CPVAR.id %]" /></p>
+
+	    <h3>[% locale.maketext('Phone numbers') %]</h3>
+	    <table class="truncate-table table table-striped">
+	      <thead>
+		<tr>
+		  <th>[% locale.maketext("Type") %]</th>
+		  <th>[% locale.maketext("Phone number") %]</th>
+		  <th>[% locale.maketext("Actions") %]</th>
+		</tr>
+	      </thead>
+	      <tbody id="telstable">
+		[% CPANEL.CPVAR.id = 0 -%]
+		[% FOR tel IN ref.0.forceArray(vcard.TEL) -%]
+		[% PROCESS cgpro/mail/contacts_telrow.html.tt -%]
+		[% CPANEL.CPVAR.id = loop.count -%]
+		[% END %]
+	      </tbody>
+	    </table>
+	    <p><a href="#" id="telsclick" class="btn btn-default">[% locale.maketext("New phone number") %]</a><input type="hidden" name="telcount" id="telcount" value="[% CPANEL.CPVAR.id %]" /></p>
+	    
+	    <h3>[% locale.maketext('Addresses') %]</h3>
+
+	    <table class="truncate-table table table-striped">
+	      <thead>
+		<tr>
+		  <th>[% locale.maketext("Type") %]</th>
+		  <th>[% locale.maketext("Post Box") %]</th>
+		  <th>[% locale.maketext("Country") %]</th>
+		  <th>[% locale.maketext("Street Address") %]</th>
+		  <th>[% locale.maketext("Town / City ") %]</th>
+		  <th>[% locale.maketext("State / Region") %]</th>
+		  <th>[% locale.maketext("ZIP Code") %]</th>
+		  <th>[% locale.maketext("Actions") %]</th>
+		</tr>
+	      </thead>
+	      <tbody id="addresstable">
+		[% CPANEL.CPVAR.id = 0 -%]
+		[% FOR adr IN ref.0.forceArray(vcard.ADR) %]
+		[% PROCESS cgpro/mail/contacts_addressrow.html.tt -%]
+		[% CPANEL.CPVAR.id = loop.count -%]
+		[% END %]
+	      </tbody>
+	    </table>
+	    <p><a href="#" id="addresssclick" class="btn btn-default">[% locale.maketext("New address") %]</a><input type="hidden" name="addresscount" id="addresscount" value="[% CPANEL.CPVAR.id %]" /></p>
+
+<h3>[% locale.maketext("Web pages") %]</h3> 
+	    <table class="truncate-table table table-striped">
+	      <thead>
+		<tr>
+		  <th>[% locale.maketext("Type") %]</th>
+		  <th>[% locale.maketext("URL") %]</th>
+		  <th>[% locale.maketext("Actions") %]</th>
+		</tr>
+	      </thead>
+	      <tbody id="wwwtable">
+		[% CPANEL.CPVAR.id = 0 -%]
+		[% FOR page IN ref.0.forceArray(vcard.URL) %]
+		[% PROCESS cgpro/mail/contacts_wwwrow.html.tt -%]
+		[% CPANEL.CPVAR.id = loop.count -%]
+		[% END %]
+	      </tbody>
+	    </table>
+	    <p><a href="#" id="wwwsclick" class="btn btn-default">[% locale.maketext("New web page") %]</a><input type="hidden" name="wwwcount" id="wwwcount" value="[% CPANEL.CPVAR.id %]" /></p>
+
+	    <h3>[% locale.maketext('CGPAdditionalInfo') %]</h3>
+
+            <div class="form-group">
+              <label for="NICKNAME">
+		[% locale.maketext("Nickname") %]
+              </label>
+              <div class="row">
+                <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+		  <input type="text" name="NICKNAME" class="form-control" value="[% vcard.NICKNAME.VALUE %]" />
+		</div>
+	      </div>
+	    </div>
+
+            <div class="form-group">
+              <label for="ROLE">
+		[% locale.maketext("Business category") %]
+              </label>
+              <div class="row">
+                <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+		  <input type="text" name="ROLE" class="form-control" value="[% vcard.ROLE.VALUE %]" />
+		</div>
+	      </div>
+	    </div>
+
+            <div class="form-group">
+              <label for="TZ">
+		[% locale.maketext("Time Zone") %]
+              </label>
+              <div class="row">
+                <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+		  <input type="text" name="TZ" class="form-control" value="[% vcard.TZ.VALUE %]" />
+		</div>
+	      </div>
+	    </div>
+
+            <div class="form-group">
+              <label for="GEO">
+		[% locale.maketext("Geographic position") %]
+              </label>
+              <div class="row">
+                <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+		  <input type="text" name="GEO" class="form-control" value="[% vcard.GEO.VALUE %]" />
+		</div>
+	      </div>
+	    </div>
+
+            <div class="form-group">
+              <label for="NOTE">
+		[% locale.maketext("Notes") %]
+              </label>
+              <div class="row">
+                <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+		  <input type="text" name="NOTE" class="form-control" value="[% vcard.NOTE.VALUE %]" />
+		</div>
+	      </div>
+	    </div>
+
+	    <div class="form-group">
+	      <input type="hidden" name="oldMessageID" value="[% vcard.UID.VALUE.item('Message-ID') %]" />
+	      <input type="hidden" name="oldUID" value="[% FORM.contact %]" />
+	      <input class="btn btn-primary" type="submit" id="submit" name="save" value="[% locale.maketext("Save contact") %]" />
+	    </div>
+        </form>
+    </div>
+
+    [% INCLUDE _assets/return_link.html.tt return_location='contacts.html?account=' _ FORM.account return_link_text=locale.maketext('Go Back') %]
+
+</div>
+[% END %]
+
+[% BLOCK js_block %]
+<script type="text/javascript">
+var getRow = function (e, data) {
+    YAHOO.util.Event.preventDefault(e); 
+    var wrap = YAHOO.util.Dom.get(data.wrap);
+    var index = YAHOO.util.Dom.get(data.index);
+    YAHOO.util.Connect.asyncRequest('GET', data.url + '?id=' + index.value, {
+	    success: function(o) {
+                wrap.innerHTML = wrap.innerHTML + o.responseText;
+                var removers = YAHOO.util.Dom.getElementsByClassName('removerow');
+ 	        YAHOO.util.Event.addListener(removers, "click", removeRow);
+	    },
+		}, null);
+    index.value = parseInt(index.value) + 1;
+};
+var removeRow = function (e) {
+    YAHOO.util.Event.preventDefault(e);
+    var row = this.parentNode.parentNode;
+    var table = row.parentNode;
+    table.removeChild(row);
+};
+YAHOO.util.Event.onDOMReady(function () {
+ 	YAHOO.util.Event.addListener("emailsclick", "click", getRow, {url: 'contacts_emailrow.html', wrap: 'emailstable', index: 'emailcount'});
+ 	YAHOO.util.Event.addListener("telsclick", "click", getRow, {url: 'contacts_telrow.html', wrap: 'telstable', index: 'telcount'});
+ 	YAHOO.util.Event.addListener("addresssclick", "click", getRow, {url: 'contacts_addressrow.html', wrap: 'addresstable', index: 'addresscount'});
+ 	YAHOO.util.Event.addListener("wwwsclick", "click", getRow, {url: 'contacts_wwwrow.html', wrap: 'wwwtable', index: 'wwwcount'});
+        var removers = YAHOO.util.Dom.getElementsByClassName('removerow');
+ 	YAHOO.util.Event.addListener(removers, "click", removeRow);
+    });
+</script>
+
+[% END %]

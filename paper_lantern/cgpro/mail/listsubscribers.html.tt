@@ -1,0 +1,169 @@
+[% MACRO filter_option(pval, val, text, disabled) BLOCK -%]
+<option value="[% val %]"[% val == pval ? " selected='selected'" : "" %][% disabled ? " disabled='disabled'" : "" %]>[% locale.maketext(text) %]</option>
+[% END -%]
+[%
+SET CPANEL.CPVAR.dprefix = "../../";
+%]
+
+[% js_code = PROCESS js_block %]
+[% WRAPPER '_assets/master.html.tt'
+    app_key = 'mailing_lists'
+    page_js = js_code
+    page_stylesheets = ['css2-min/mail/lists.css']
+-%]
+<h2>Mailing List Subscribers for <strong>[% FORM.email %]</strong></h2>
+[% IF FORM.remove %]
+[% SET result = Api2.exec("CommuniGate" , "UnSub" , {listname=RAW_FORM.item("email"), subemail=RAW_FORM.item("subemail")}) %]
+[% END %]
+[% IF FORM.update %]
+[% SET result = Api2.exec("CommuniGate" , "SetSubSettings" , {listname=RAW_FORM.item("email"), subemail=RAW_FORM.item("subemail"), CGPMLReceivingMode=FORM.CGPMLReceivingMode, CGPMLPostingMode=FORM.CGPMLPostingMode }) %]
+[% END %]
+
+[% IF FORM.add %]
+[% SET result = Api2.exec("CommuniGate" , "Sub" , {listname=RAW_FORM.item("email"), subemail=RAW_FORM.item("subemail"), CGPMLReceivingMode=FORM.CGPMLReceivingMode, CGPMLPostingMode=FORM.CGPMLPostingMode }) %]
+[% END %]
+<p id="descMailingList" class="description">
+  [% locale.maketext("For more information, read the [output,url,_1,documentation,target,_2,id,_3].", "//www.communigate.com/communigatepro/LIST.html", "_blank", "lnkMailingListsDocumentation") %]
+</p>
+
+<p><cpanel print="CGP ERROR : $CPERROR{'CommuniGate'}"></p>
+[% IF CPANEL.CPERROR.CommuniGate -%]
+<div id="autoRespondersError" class="alert alert-danger">
+  <p id="autoRespondersErrorMsg">[% CPANEL.CPERROR.CommuniGate %] </p>
+</div>
+[% END -%]
+<div class="section">
+  <h3>[% locale.maketext("Add a new subscriber") %]</h3>
+  <form method="post" action="" id="userform" name="userform">
+    <div class="form-group">
+      <label id="lblListName" for="email">
+        [% locale.maketext("New subscriber email") %]
+      </label>
+      <div class="row">
+        <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+          <input type="text" class="form-control" name="subemail" id="email" />
+        </div>
+        <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6" id="email_error"></div>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>
+	[% locale.maketext("Receiving mode") %]
+      </label>
+      <div class="row">
+	<div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	  <select class="form-control" name="CGPMLReceivingMode"> 
+	    <option value="feed" selected="selected">Feed (All Messages)</option>
+	    <option value="digest">Digest (Periodic Summary with Table of Content + Messages)</option>
+	    <option value="index">Index (Periodic Summary with Table of Content only)</option>
+	    <option value="null">Null (No Messages) </option>
+	    <option value="banned">Banned (No Messages + no self subscription changes)</option>
+	  </select>
+	</div>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>
+	[% locale.maketext("Posting mode") %]
+      </label>
+      <div class="row">
+	<div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+          <select class="form-control" name="CGPMLPostingMode">
+            <option value="mod1" selected="selected">Moderate next 1 post</option>
+            <option value="mod2">Moderate next 2 posts</option>
+            <option value="mod3">Moderate next 3 posts</option>
+            <option value="mod4">Moderate next 4 posts</option>
+            <option value="mod5">Moderate next 5 posts</option>
+            <option value="modall">Moderate all posts</option>
+            <option value="unmod">Unmoderated</option>
+            <option value="nopost">Prohibit</option>
+          </select>
+	</div>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <input type="submit" id="submit" value="[% locale.maketext("Add") %]" name="add" class="btn btn-primary" />
+    </div>
+  </form>
+</div>
+
+[%
+SET list_subscribers = Api2.exec("CommuniGate", "ListMailingListsSubs", { listname=RAW_FORM.email });
+%]
+
+       <table class="table table-striped responsive-table ng-cloak" ng-controller="mailingListsController as listsController">
+         <thead>
+           <tr>
+             <th class="lists-col-header">
+	       [% locale.maketext("E-mail") %]
+             </th>
+             <th class="lists-col-header">
+	       [% locale.maketext("Receiving Mode") %]
+             </th>
+             <th class="lists-col-header">
+	       [% locale.maketext("Posting Mode") %]
+             </th>
+             <th class="lists-col-header">
+	       [% locale.maketext("Posts count") %]
+             </th>
+             <th class="lists-col-header">
+	       [% locale.maketext("Functions") %]
+             </th>
+           </tr>
+         </thead>
+         <tbody>
+	   [% FOR subscriber IN list_subscribers -%]
+	   <form method="post" action="">
+	   <tr>
+	     <td><strong>[% subscriber.subemail %]</strong></td>
+	     <td>
+	  <select class="form-control" name="CGPMLReceivingMode"> 
+	    [% filter_option(subscriber.rcvmode, "feed", "Feed (All Messages)") %]
+	    [% filter_option(subscriber.rcvmode, "digest", "Digest (Periodic Summary with Table of Content + Messages)") %]
+	    [% filter_option(subscriber.rcvmode, "index", "Index (Periodic Summary with Table of Content only)") %]
+	    [% filter_option(subscriber.rcvmode, "null", "Null (No Messages) ") %]
+	    [% filter_option(subscriber.rcvmode, "banned", "Banned (No Messages + no self subscription changes)") %]
+	    [% filter_option(subscriber.rcvmode, "subscribe", "Subscribed", 1) %]
+	    [% filter_option(subscriber.rcvmode, "unsubscribe", "Unsubscribed", 1) %]
+	  </select>
+	     </td>
+	     <td>
+               <select class="form-control" name="CGPMLPostingMode">
+		 [% filter_option(subscriber.postmode, "1", "Moderate next 1 post") %]
+		 [% filter_option(subscriber.postmode, "2", "Moderate next 2 posts") %]
+		 [% filter_option(subscriber.postmode, "3", "Moderate next 3 posts") %]
+		 [% filter_option(subscriber.postmode, "4", "Moderate next 4 posts") %]
+		 [% filter_option(subscriber.postmode, "5", "Moderate next 5 posts") %]
+		 [% filter_option(subscriber.postmode, "MODERATEALL", "Moderate all posts") %]
+		 [% filter_option(subscriber.postmode, "UNMODERATED", "Unmoderated") %]
+		 [% filter_option(subscriber.postmode, "PROHIBITED", "Prohibit") %]
+               </select>
+	     </td>
+	     <td>[% subscriber.numpost %]</td>
+	     <td style="white-space: nowrap;">
+               <input type="hidden" name="subemail" value="[% subscriber.subemail %]" />
+	       <input type="submit" name="update" value="[% locale.maketext("Update") %]" class="btn btn-primary" />
+	       <input type="submit" name="remove" value="[% locale.maketext("Unsubscribe") %]" class="btn" />
+	     </td>
+	   </tr>
+	   </form>
+	   [% END -%]
+	   [% IF list_subscribers.size < 1 -%]
+	   <tr class="info empty-row">
+	     <td colspan="5">[% locale.maketext("No subscribers available") %]</td>
+	   </tr>
+	   [% END -%]
+	 </tbody>
+       </table>
+
+
+[% INCLUDE _assets/return_link.html.tt return_location='lists.html' return_link_text=locale.maketext('Go Back') %]
+[% END #wrapper %]
+
+[% BLOCK js_block %]
+<script type="text/javascript">
+</script>
+[% END -%]

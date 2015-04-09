@@ -1,0 +1,22 @@
+[% SET CPANEL.CPVAR.headerimg = "../images/mailmenu.gif" %]
+[% SET CPANEL.CPVAR.dprefix = "../../" %]
+
+[%
+   SET del_autoresponder = Api2.exec("CommuniGate", "DeleteAutoresponder", {email=RAW_FORM.email});
+%]
+
+[% WRAPPER '_assets/master.html.tt'
+    app_key = 'autoresponders'
+%]
+<div class="body-content">
+    <div id="autoResponderSuccess" class="alert alert-success">
+        <span id="autoResponderSuccessImg" class="glyphicon glyphicon-ok-sign"></span>
+            <div id="autoResponderSuccessMsg" class="alert-message">
+                [% locale.maketext("The auto responder “[output,class,_1,status]” was deleted.", FORM.email) %]
+            </div>
+        </span>
+    </div>
+
+    [% INCLUDE _assets/return_link.html.tt return_location='autores.html' return_link_text=locale.maketext('Go Back') %]
+</div>
+[% END %]

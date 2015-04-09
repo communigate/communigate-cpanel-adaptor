@@ -1,0 +1,81 @@
+[%-
+
+# Imports
+USE Api2;
+USE DataURI;
+USE JSON;
+USE VarCache;
+USE Encoder;
+%]
+[% MACRO filter_option(pval, val, text) BLOCK -%]
+<option value="[% val %]"[% val == pval and " selected" %]>[% locale.maketext(text) %]</option>
+[% END -%]
+[%
+ SET api_response = Api2.exec( 'CommuniGate', 'get_archiving_configuration', {});
+-%]
+
+[% IF api_response.size -%]
+    [% FOR dom = api_response -%]
+            [% SET oddeven = loop.index % 2 ? 'odd' : 'even' -%]
+            [%-
+                SET archive_active = 0;
+                FOR archive_type IN archive_types;
+                    SET archive_key = "archive_" _ archive_type.key;
+                    IF dom.$archive_key;
+                        SET archive_active = 1;
+                        LAST;
+                    END;
+                END;
+            %]
+            <tr class="row-[% oddeven %]">
+                <td truncate="50">
+                     [% dom.domain FILTER html FILTER replace('\.', '.&#8203;') %]
+                </td>
+                <td>
+		  <p>
+		    <label style="width: 50%; display: inline-block;">Archive Messages after:</label>
+		    <select name="ArchiveMessagesAfter-[% dom.domain %]">
+		      [% filter_option(dom.ArchiveMessagesAfter, "", locale.maketext('CGPdefault')) %]
+		      [% filter_option(dom.ArchiveMessagesAfter, "0", locale.maketext('CGPnever')) %]
+		      [% filter_option(dom.ArchiveMessagesAfter, "1d", locale.maketext('CGPhours', 24)) %]
+		      [% filter_option(dom.ArchiveMessagesAfter, "2d", locale.maketext('CGPdays', 2)) %]
+		      [% filter_option(dom.ArchiveMessagesAfter, "3d", locale.maketext('CGPdays', 3)) %]
+		      [% filter_option(dom.ArchiveMessagesAfter, "5d", locale.maketext('CGPdays', 5)) %]
+		      [% filter_option(dom.ArchiveMessagesAfter, "7d", locale.maketext('CGPdays', 7)) %]
+		      [% filter_option(dom.ArchiveMessagesAfter, "14d", locale.maketext('CGPweeks', 2)) %]
+		      [% filter_option(dom.ArchiveMessagesAfter, "30d", locale.maketext('CGPdays', 30)) %]
+		      [% filter_option(dom.ArchiveMessagesAfter, "90d", locale.maketext('CGPdays', 90)) %]
+		      [% filter_option(dom.ArchiveMessagesAfter, "180d", locale.maketext('CGPdays', 180)) %]
+		      [% filter_option(dom.ArchiveMessagesAfter, "365d", locale.maketext('CGPdays', 365)) %]
+		      [% filter_option(dom.ArchiveMessagesAfter, "730d", locale.maketext('CGPdays', 730)) %]
+		    </select>
+		  </p>
+		  <p>
+		    <label style="width: 50%; display: inline-block;">Delete Messages after:</label>
+		    <select name="DeleteMessagesAfter-[% dom.domain %]">
+		      [% filter_option(dom.DeleteMessagesAfter, "", locale.maketext('CGPdefault')) %]
+		      [% filter_option(dom.DeleteMessagesAfter, "0", locale.maketext('CGPnever')) %]
+		      [% filter_option(dom.DeleteMessagesAfter, "1d", locale.maketext('CGPhours', 24)) %]
+		      [% filter_option(dom.DeleteMessagesAfter, "2d", locale.maketext('CGPdays', 2)) %]
+		      [% filter_option(dom.DeleteMessagesAfter, "3d", locale.maketext('CGPdays', 3)) %]
+		      [% filter_option(dom.DeleteMessagesAfter, "5d", locale.maketext('CGPdays', 5)) %]
+		      [% filter_option(dom.DeleteMessagesAfter, "7d", locale.maketext('CGPdays', 7)) %]
+		      [% filter_option(dom.DeleteMessagesAfter, "14d", locale.maketext('CGPweeks', 2)) %]
+		      [% filter_option(dom.DeleteMessagesAfter, "30d", locale.maketext('CGPdays', 30)) %]
+		      [% filter_option(dom.DeleteMessagesAfter, "90d", locale.maketext('CGPdays', 90)) %]
+		      [% filter_option(dom.DeleteMessagesAfter, "180d", locale.maketext('CGPdays', 180)) %]
+		      [% filter_option(dom.DeleteMessagesAfter, "365d", locale.maketext('CGPdays', 365)) %]
+		      [% filter_option(dom.DeleteMessagesAfter, "730d", locale.maketext('CGPdays', 730)) %]
+		    </select>
+		  </p>
+                </td>
+            </tr>
+    [% END -%]
+[% ELSE -%]
+        [% SET err = form_regex
+        ? locale.maketext('No configured domains match the search term “[_1]”.', form_regex)
+        : locale.maketext('No domains configured.'); -%]
+                <tr>
+                    <td colspan="5" class="errors">[% err FILTER html %]</td>
+                </tr>
+[% END -%]

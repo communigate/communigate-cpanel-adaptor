@@ -1,0 +1,35 @@
+[%
+SET CPANEL.CPVAR.dprefix = "../../";
+SET email_delete_domain_forwarder = Api2.exec("CommuniGate", "delforward", {
+    "account" = RAW_FORM.item("email"),
+    "forwarder" = RAW_FORM.item("emaildest"),
+    "domain" = RAW_FORM.item("email").split("@").1
+});
+%]
+
+[% WRAPPER '_assets/master.html.tt'
+    app_key = 'forwarders'
+ -%]
+
+<div class="body-content">
+  <div class="section">
+    [% IF !CPANEL.CPERROR.item('CommuniGate') %]
+    <div id="mailFwdSuccess" class="alert alert-success">
+      <span id="mailFwdSuccessImg" class="glyphicon glyphicon-ok-sign"></span>
+      <div id="mailFwdSuccessMsg" class="alert-message">
+        [% locale.maketext("Mail for “[_1]” will no longer be forwarded to “[_2]”.", FORM.email, FORM.emaildest) %]
+      </div>
+    </div>
+    [% ELSE %]
+    <div id="fwdCperror" class="alert alert-danger">
+      <span id="fwdCperrorImg" class="glyphicon glyphicon-remove-sign"></span>
+      <div id="fwdCperrorMsg" class="alert-message">
+        [% CPANEL.CPERROR.item('CommuniGate') %]
+      </div>
+    </div>
+    [% END %]
+  </div>
+  [% INCLUDE _assets/return_link.html.tt return_location='fwds.html' return_link_text=locale.maketext('Go Back') %]
+</div>
+
+[% END %]

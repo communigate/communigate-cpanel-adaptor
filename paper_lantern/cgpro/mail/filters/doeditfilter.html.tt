@@ -1,0 +1,31 @@
+[%
+SET CPANEL.CPVAR.dprefix = "../../../";
+SET email_add_forward = Api2.exec("CommuniGate", "storefilter", {
+    "formdump" = RAW_FORM
+});
+%]
+
+[% WRAPPER '_assets/master.html.tt'
+    app_key = 'user_filters'
+ -%]
+<div class="body-content">
+  <div class="section">
+    [% IF CPANEL.CPERROR.item('CommuniGate') %]
+    <div id="fwdCperror" class="alert alert-danger">
+      <span id="fwdCperrorImg" class="glyphicon glyphicon-remove-sign"></span>
+      <div id="fwdCperrorMsg" class="alert-message">
+        [% CPANEL.CPERROR.item('CommuniGate') %]
+      </div>
+    </div>
+    [% ELSE -%]
+    <div id="fwdSuccess" class="alert alert-success">
+      <span id="fwdSuccessImg" class="glyphicon glyphicon-ok-sign"></span>
+      <div id="fwdSuccessMsg" class="alert-message">
+        [% locale.maketext("Filter ”[_1]” saved.", FORM.filtername )%]
+      </div>
+    </div>
+    [% END %]
+    [% INCLUDE _assets/return_link.html.tt return_location='editfilter.html?account=' _ FORM.account _ '&filtername=' _ FORM.filtername return_link_text=locale.maketext('Go Back') %]
+  </div>
+
+[% END %]

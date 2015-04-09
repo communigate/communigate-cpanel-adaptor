@@ -1,0 +1,30 @@
+[% MACRO filter_option(pval, val, text) BLOCK -%]
+<option value="[% val %]"[% val == pval ? " selected='selected'" : "" %]>[% locale.maketext(text) %]</option>
+[% END -%]
+[% IF FORM.id.defined -%]
+[% id = FORM.id -%]
+[% ELSE -%]
+[% id = CPANEL.CPVAR.id -%]
+[% END -%]
+<tr>
+  <td>
+    [% type = tel.keys.grep('(HOME|WORK|CELL|FAX|VIDEO|AGENT|PAGER|OTHER)').0 -%]
+    <select name="teltype-[% id %]" class="form-control">
+      [% filter_option(type, "OTHER", locale.maketext("CGPOTHER")) %]
+      [% filter_option(type, "HOME", locale.maketext("CGPHOME")) %]
+      [% filter_option(type, "WORK", locale.maketext("CGPWORK")) %]
+      [% filter_option(type, "CELL", locale.maketext("CGPCELL")) %]
+      [% filter_option(type, "FAX", locale.maketext("CGPFAX")) %]
+      [% filter_option(type, "VIDEO", locale.maketext("CGPVIDEO")) %]
+      [% filter_option(type, "AGENT", locale.maketext("CGPAGENT")) %]
+      [% filter_option(type, "PAGER", locale.maketext("CGPPAGER")) %]
+    </select>
+  </td>
+  <td><input type="text" name="TEL-[% id %]" class="form-control" value="[% tel.VALUE %]" /></td>
+  <td>
+    <a href="#" class="removerow">
+      <span class="glyphicon glyphicon-trash"></span>
+      Remove
+    </a>
+  </td>
+</tr>
