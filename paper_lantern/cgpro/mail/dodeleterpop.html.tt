@@ -1,0 +1,38 @@
+[%
+SET CPANEL.CPVAR.dprefix = "../../";
+SET CPANEL.CPVAR.headerimg = "../images/mailmenu.gif";
+SET CPANEL.CPVAR.headerinclude = "mail/pops_head.html";
+%]
+
+[% SET delete_rpop = Api2.exec("CommuniGate", "DeleteRPOP", {
+"account" = RAW_FORM.item("account"),
+"rpop" = RAW_FORM.item("rpop"),
+}) %]
+
+[% WRAPPER '_assets/master.html.tt'
+    app_key = 'cgpro_rpop'
+-%] 
+
+<div class="body-content">
+  <div class="section">
+   <p>[% locale.maketext("Delete Remote POP") %]</p>
+    [% IF CPANEL.CPERROR.item('CommuniGate') %]
+    <div class="alert alert-danger">
+      <span class="glyphicon glyphicon-remove-sign"></span>
+      <div class="alert-message">
+        [% CPANEL.CPERROR.item('CommuniGate') %]
+      </div>
+    </div>
+    [% ELSE -%]
+    <div class="alert alert-success">
+      <span class="glyphicon glyphicon-ok-sign"></span>
+      <div class="alert-message">
+	[% locale.maketext("“[_1]” Deleted", FORM.rpop ) %]
+      </div>
+    </div>
+    [% END %]
+
+    [% INCLUDE _assets/return_link.html.tt return_location='rpop.html?account=' _ RAW_FORM.item("account") return_link_text=locale.maketext('Go Back') %]
+  </div>
+</div>
+[% END %]

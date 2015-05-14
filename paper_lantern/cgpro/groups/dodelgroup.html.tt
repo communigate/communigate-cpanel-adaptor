@@ -1,0 +1,22 @@
+[%
+SET CPANEL.CPVAR.dprefix = "../../";
+SET CPANEL.CPVAR.headerimg = "../images/mailmenu.gif";
+%]
+
+[% WRAPPER '_assets/master.html.tt'
+app_key = 'cgpro_groupmail'
+-%]
+
+<div class="body-content">
+  <div class="section"> 
+    <p>
+      [% locale.maketext("Do you really want to delete group “[_1]”?", FORM.email ) %]</p>
+    <div class="form-group">
+      <a class="btn btn-primary" id="btn_delete" href="realdodelgroup.html?email=[% RAW_FORM.item("email") %]">[% locale.maketext("Delete group") %]</a>
+      <a class="btn btn-link" id="btn_cancel" href="groups.html">[% locale.maketext("Cancel") %]</a>
+    </div>
+    [% INCLUDE _assets/return_link.html.tt return_location='groups.html' return_link_text=locale.maketext('Go Back') %]
+  </div>
+</div>
+
+[% END %]

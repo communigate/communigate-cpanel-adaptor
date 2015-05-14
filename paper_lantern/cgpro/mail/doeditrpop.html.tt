@@ -1,0 +1,43 @@
+[%
+SET CPANEL.CPVAR.dprefix = "../../";
+SET CPANEL.CPVAR.headerimg = "../images/mailmenu.gif";
+SET CPANEL.CPVAR.headerinclude = "mail/pops_head.html";
+%]
+
+[% SET edit_rpop = Api2.exec("CommuniGate", "DoEditRPOP", {
+"account" = RAW_FORM.item("account"),
+"period" = RAW_FORM.item("period"),
+"name" = RAW_FORM.item("name"),
+"authName" = RAW_FORM.item("authName"),
+"domain" = RAW_FORM.item("domain"),
+"password" = RAW_FORM.item("password"),
+"mailbox" = RAW_FORM.item("mailbox"),
+"leave" = RAW_FORM.item("leave"),
+"APOP" = RAW_FORM.item("APOP"),
+"TLS" = RAW_FORM.item("TLS"),
+}) %]
+
+[% WRAPPER '_assets/master.html.tt'
+    app_key = 'cgpro_rpop'
+-%] 
+
+<div class="body-content">
+    [% IF CPANEL.CPERROR.item('CommuniGate') %]
+    <div class="alert alert-danger">
+      <span class="glyphicon glyphicon-remove-sign"></span>
+      <div class="alert-message">
+        [% CPANEL.CPERROR.item('CommuniGate') %]
+      </div>
+    </div>
+    [% ELSE -%]
+    <div class="alert alert-success">
+      <span class="glyphicon glyphicon-ok-sign"></span>
+      <div class="alert-message">
+        [% locale.maketext("Remote POP Updated")%]
+      </div>
+    </div>
+    [% END %]
+    
+    [% INCLUDE _assets/return_link.html.tt return_location='rpop.html?account=' _ RAW_FORM.item("account") return_link_text=locale.maketext('Go Back') %]
+</div>
+[% END %]

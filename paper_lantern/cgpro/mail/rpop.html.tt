@@ -1,0 +1,105 @@
+[% MACRO filter_option(pval, val, text) BLOCK -%]
+<option value="[% val %]"[% val == pval ? " selected='selected'" : "" %]>[% locale.maketext(text) %]</option>
+[% END -%]
+
+[%
+SET CPANEL.CPVAR.dprefix = "../../";
+SET CPANEL.CPVAR.headerimg = "../images/mailmenu.gif";
+SET CPANEL.CPVAR.headerinclude = "mail/pops_head.html";
+%]
+
+[% SET accounts = Api2.exec("CommuniGate", "ListAccounts", {}) %]
+
+[% IF RAW_FORM.item("account") %]
+[% SET rpop = Api2.exec("CommuniGate", "ListRPOP", {
+"account" = RAW_FORM.item("account")
+})
+rpop = rpop.0;
+ %]
+[% END %]
+
+[% WRAPPER '_assets/master.html.tt'
+    app_key = 'cgpro_rpop'
+-%] 
+
+<div class="body-content">
+  [% IF RAW_FORM.item("account") %]
+  <h3>[% locale.maketext("Remote POP “[_1]”", FORM.account ) %]</h3>
+  [% END %]
+
+  <div class="pull-right">
+    <form method="get" action="" id="manage_list_form" class="form-inline">
+      <div class="form-group">
+        <label for="manage_list_select" id="txt_Managing" class="col-xs-12 control-label">[% locale.maketext("Managing:") %]</label>
+      </div>
+      <div class="form-group">
+        [% SET accounts = Api2.exec("CommuniGate", "ListAccounts", {}) %]
+        <select name="account" id="manage_list_select" class="col-xs-12 form-control">
+          <option value="">[% locale.maketext("Select account.") %]</option>
+	  [% FOR account IN accounts.sort -%]
+	  [% filter_option(FORM.account, account,account) %]
+	  [% END -%]
+        </select>
+      </div>
+      <noscript>
+        <div class="form-group">
+          <input type="submit" class="btn btn-primary" id="btn_domainSelect_go" value="[% locale.maketext("Go") %]" />
+        </div>
+      </noscript>
+    </form>
+    <script type="text/javascript">
+      YAHOO.util.Event.onDOMReady(function() {
+      YAHOO.util.Event.on("manage_list_select", "change", function() { YAHOO.util.Dom.get("manage_list_form").submit(); });
+      });
+    </script>
+  </div><br /></br />
+
+  [% IF RAW_FORM.item("account") %]
+  <div class="section">
+    <p>
+      <a class="btn btn-primary" href="editrpop.html?account=[% FORM.account %]">[% locale.maketext("CGPAddRemotePOP") %]</a>
+    </p>
+    <table border="0" cellpadding="5" cellspacing="0" id="mailtbl" class="sortable truncate-table table table-striped" width="650">
+      <thead>
+	<tr>
+	  <th class="clickable sorttable_sorted">[% locale.maketext("CGPRemotePOP") %]</th>
+	  <th class="clickable sorttable_nosort">[% locale.maketext("CGPStatus") %]</th>
+	  <th class="clickable sorttable_nosort">[% locale.maketext("Functions") %]</th>
+	</tr>
+      </thead>
+      <colgroup>
+	<col width="30%">
+	<col width="40%">
+	<col width="30%">
+      </colgroup>
+      [% IF rpop.rpop.size() %]
+      <tbody>
+	[% FOR pop IN rpop.rpop.keys -%]
+	<tr>
+	  <td class="truncate nobrd-left">[% pop %]</td>
+	  <td class="truncate sorttable_nosort">
+	    [% rpop.rpopInfo.$pop.completed.replace("(\#T|\_)"," ") %]
+	    [% rpop.rpopInfo.$pop.errorCode %]
+	  </td>
+	  <td class="truncate sorttable_nosort">
+	    <a href="editrpop.html?account=[% FORM.account %]&amp;rpop=[% pop %]" class="btn btn-link">
+	      <span class="glyphicon glyphicon-edit"></span>
+	      [% locale.maketext("CGPViewEdit") %]
+	    </a>
+	    <a href="deleterpop.html?account=[% FORM.account %]&amp;rpop=[% pop %]" class="btn btn-link">
+	      <span class="glyphicon glyphicon-trash"></span>
+	      [% locale.maketext("Delete") %]
+	    </a>
+	</tr>
+	[% END -%]
+	[% ELSE -%]
+	<tr>
+	  <td class="truncate nobrd-left" colspan="4">[% locale.maketext("No Remote POPs.") %]</td>
+	</tr>
+      </tbody>
+      [% END -%]
+    </table>
+  </div>
+  [% END %]
+</div>
+[% END %]

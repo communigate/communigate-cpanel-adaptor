@@ -1,0 +1,59 @@
+[%
+SET CPANEL.CPVAR.dprefix = "../../";
+SET CPANEL.CPVAR.headerimg = "../images/mailmenu.gif";
+%]
+
+[% js_code = PROCESS js_block %]
+
+[% WRAPPER '_assets/master.html.tt'
+page_js = js_code,
+app_key = 'cgpro_groupmail'
+-%]
+
+<div class="body-content">
+  <div class="section">
+    <p>[% locale.maketext("Renaming group “[_1]”?", FORM.email ) %]</p>
+    <form method="post" action="realdorenamegroup.html">
+      <div class="form-group">
+	<label for="rename">[% locale.maketext("New Group Name:") %]</label>
+	<div class="row form-group">
+	  <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	    <div class="input-group">
+	      <input type="text" name="newname" id="newname" class="form-control col-xs-2"/>
+	      <input type="hidden" name="email" value="[% FORM.email %]" />
+	      <span class="input-group-addon">@[% RAW_FORM.item("domain") %]</span>
+	    </div>
+	  </div>
+	  <div id="newname_error" class="col-xs-12 col-sm-6 col-md-6 col-lg-6"></div>	  
+
+	</div>
+
+	<div class="form-group">
+	  <input type="submit" id="submit" class="btn btn-primary" href="realdorenamegroup.html" value="[% locale.maketext("Rename group") %]">
+	  <a class="btn btn-link" id="btn_cancel" href="groups.html">[% locale.maketext("Cancel") %]</a>
+	</div>
+      </div>
+    </form>
+    [% INCLUDE _assets/return_link.html.tt return_location='groups.html' return_link_text=locale.maketext('Go Back') %]
+
+  </div>
+</div>
+
+[% BLOCK js_block %]
+<script type="text/javascript">
+var email_validator = new CPANEL.validate.validator("[% locale.maketext("Rename Group") %]");
+
+function init_page() {
+
+    email_validator.add("newname", "local_part_email(%input%, 'cpanel')", "[% locale.maketext("That is not a valid email address.")  %]");
+    email_validator.attach();
+    
+    CPANEL.validate.attach_to_form("submit", [
+        email_validator
+    ]);
+}
+YAHOO.util.Event.onDOMReady(init_page);
+</script>
+[% END %]
+
+[% END %] 

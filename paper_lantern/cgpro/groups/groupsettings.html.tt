@@ -1,0 +1,206 @@
+[%
+SET CPANEL.CPVAR.dprefix = "../../";
+SET CPANEL.CPVAR.headerimg = "../images/mailmenu.gif";
+%]
+
+[% IF RAW_FORM.item("save") %]
+<!-- IF submit form -->
+[% 
+SET group_settings = Api2.exec("CommuniGate", "SetGroupSettings", {
+"email" = RAW_FORM.item("email"),
+"RemoveToAndCc" = RAW_FORM.item("RemoveToAndCc"),
+"Expand" = RAW_FORM.item("Expand"),
+"FinalDelivery" = RAW_FORM.item("FinalDelivery"),
+"RealName" = RAW_FORM.item("RealName"),
+"RejectAutomatic" = RAW_FORM.item("RejectAutomatic"),
+"RemoveAuthor" = RAW_FORM.item("RemoveAuthor"),
+"SetReplyTo" = RAW_FORM.item("SetReplyTo"),
+#"spectre" = RAW_FORM.item("spectre"),
+"SignalDisabled" = RAW_FORM.item("SignalDisabled"),
+"EmailDisabled" = RAW_FORM.item("EmailDisabled")
+});
+%]
+[% END %]
+
+[%
+SET get_group_settings = Api2.exec("CommuniGate", "GetGroupSettings", {
+"email" = RAW_FORM.item("email")
+});
+get_group_settings = get_group_settings.0;
+%]
+
+[% js_code = PROCESS js_block %]
+
+[% WRAPPER '_assets/master.html.tt'
+page_js = js_code,
+app_key = 'cgpro_groupmail'
+-%]
+<div class="body-content">
+  <div class="section">
+    <p>[% locale.maketext("In this page you can do all group settings for “[_1]”", FORM.email) %]</p>
+    [% IF CPANEL.CPERROR.item('CommuniGate') && RAW_FORM.item("save") %]
+    <div class="alert alert-danger">
+      <span class="glyphicon glyphicon-remove-sign"></span>
+      <div class="alert-message">
+        [% CPANEL.CPERROR.item('CommuniGate') %]
+      </div>
+    </div>
+    [% END %]
+    [% IF !CPANEL.CPERROR.item('CommuniGate') && RAW_FORM.item("save") -%]
+    <div class="alert alert-success">
+      <span class="glyphicon glyphicon-ok-sign"></span>
+      <div class="alert-message">
+        [% locale.maketext("Settings were successfully saved.")%]
+      </div>
+    </div>
+    [% END %]
+
+    [% IF CPANEL.CPERROR.item('CommuniGate') %]
+    <div class="alert alert-danger">
+      <span class="glyphicon glyphicon-remove-sign"></span>
+      <div class="alert-message">
+        [% CPANEL.CPERROR.item('CommuniGate') %]
+      </div>
+    </div>
+    [% END %]
+
+    <form action="groupsettings.html" method="post">
+      <input type="hidden" name="SubmitMLSettings" value="true">
+      <input type="hidden" name="email" value="[% FORM.email %]">
+      <div class="form-group">
+	<label for="realname">[% locale.maketext("Group Name:") %]</label>
+	<div class="row">
+	  <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	    <input type="text" name="RealName" id="RealName" class="form-control col-xs-2" value="[% get_group_settings.RealName %]"/>
+	  </div>
+	  <div id="RealName_error" class="col-xs-12 col-sm-6 col-md-6 col-lg-6"></div>	  
+	</div>
+      </div>
+
+      <div class="form-group">
+	<!-- <label>[% locale.maketext("Posting Policy:") %]</label> -->
+	<div class="row">
+	  <!-- <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6"> -->
+	  <!--   <select name="spectre" id="spectre" class="form-control"> -->
+	  <!--     <option value="0"  -->
+	  <!-- 	      [% IF get_group_settings.spectre == 0 %] -->
+	  <!-- 	      selected="selected" -->
+	  <!-- 	      [% END %] -->
+	  <!-- 	      > -->
+	  <!-- 	Private-Members of this group only</option> -->
+	  <!--     <option value="1" -->
+	  <!-- 	      [% IF get_group_settings.spectre == 1 %] -->
+	  <!-- 	      selected="selected" -->
+	  <!-- 	      [% END %] -->
+	  <!-- 	      > -->
+	  <!-- 	Public-Anyone</option> -->
+	  <!--   </select>	     -->
+	  <!-- </div> -->
+	</div>
+      </div>
+
+      <div class="form-group">
+	<div class="checkbox">
+	  <input type="checkbox" name="RemoveToAndCc"  id="RemoveToAndCc" value="1" 
+		 [% IF get_group_settings.RemoveToAndCc == 'YES' %]
+		 checked
+		 [% END %]
+		 >
+	  <label for="RemoveToAndCc">Remove To and Cc from Distribution</label>
+	</div>
+      </div>
+
+      <div class="form-group">
+	<div class="checkbox">
+	  <input type="checkbox" name="Expand" id="Expand" value="1" 
+		 [% IF get_group_settings.Expand == 'YES' %]
+		 checked
+		 [% END %]
+		 >
+	  <label for="Expand">Expand Group Members</label>
+	</div>
+      </div>
+
+      <div class="form-group">
+	<div class="checkbox">
+	  <input type="checkbox" name="FinalDelivery" id="FinalDelivery" value="1" 
+		 [% IF get_group_settings.FinalDelivery == 'YES' %]
+		 checked
+		 [% END %]
+		 >
+	  <label for="FinalDelivery">Report Delivery to Group</label>
+	</div>
+      </div>
+
+      <div class="form-group">
+	<div class="checkbox">
+	  <input type="checkbox" name="RejectAutomatic" id="RejectAutomatic" value="1" 
+		 [% IF get_group_settings.RejectAutomatic == 'YES' %]
+		 checked
+		 [% END %]
+		 >
+	  <label for="RejectAutomatic">Reject Automatic Messages</label>
+	</div>
+      </div>
+
+      <div class="form-group">
+	<div class="checkbox">
+	  <input type="checkbox" name="RemoveAuthor" id="RemoveAuthor" value="1" 
+		 [% IF get_group_settings.RemoceAuthor == 'YES' %]
+		 checked
+		 [% END %]
+		 >
+	  <label for="RemoveAuthor">Remove Author from Distribution</label>
+	</div>
+      </div>
+
+      <div class="form-group">
+	<div class="checkbox">
+	  <input type="checkbox" name="SetReplyTo" id="SetReplyTo" value="1" 
+		 [% IF get_group_settings.SetReplyTo == 'YES' %]
+		 checked
+		 [% END %]
+		 >
+	  <label for="SetReplyTo">Set Reply-To Group</label>
+	</div>
+      </div>
+
+      <div class="form-group">
+	<div class="checkbox">
+	  <input type="checkbox" name="SignalDisabled" id="SignalDisabled" value="1" 
+		 [% IF get_group_settings.SignalDisabled == 'NO' %]
+		 checked
+		 [% END %]
+		 >
+	  <label for="SignalDisabled">Signalling Enabled</label>
+	</div>
+      </div>
+
+      <div class="form-group">
+	<input type="submit" name="save" id="submit" value="Save Settings" class="btn btn-primary">
+      </div>
+      
+      [% INCLUDE _assets/return_link.html.tt return_location='groups.html' return_link_text=locale.maketext('Go Back') %]
+  </div>
+</div>
+
+[% BLOCK js_block %]
+<script type="text/javascript">
+  var name_validator = new CPANEL.validate.validator("[% locale.maketext("Group Name") %]");
+
+  function init_page() {
+
+  name_validator.add("RealName", "min_length(%input%, 1)", "[% locale.maketext("That is not a valid group name.")  %]");
+  name_validator.attach();
+
+  
+  CPANEL.validate.attach_to_form("submit", [
+  name_validator
+  ]);
+  }
+  YAHOO.util.Event.onDOMReady(init_page);
+</script>
+[% END %]
+
+[% END %]
+

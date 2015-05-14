@@ -1,0 +1,186 @@
+[%
+SET CPANEL.CPVAR.dprefix = "../../";
+SET CPANEL.CPVAR.headerimg = "../images/mailmenu.gif";
+SET CPANEL.CPVAR.headerinclude = "mail/pops_head.html";
+%]
+
+[% SET rpop = Api2.exec("CommuniGate", "EditRPOP", {
+"account" = RAW_FORM.item("account"),
+"rpop" = RAW_FORM.item("rpop"),
+})
+rpop=rpop.0;
+%]
+
+[% WRAPPER '_assets/master.html.tt'
+app_key = 'cgpro_rpop'
+-%] 
+
+<div class="body-content">
+  <div class="section">
+    [% IF !RAW_FORM.item("rpop") %]
+    <h3>[% locale.maketext("Add Remote POP") %]</h3>
+    <script type="text/javascript">
+      var addNew = true;
+    </script>
+    [% ELSE -%]
+    <h3>[% locale.maketext("Edit Remote POP") %]</h3>
+    <script type="text/javascript">
+      var addNew = false;
+    </script>
+    [% END %]
+
+    [% MACRO filter_option(pval, val, text) BLOCK -%]
+    <option value="[% val %]"[% val == pval ? " selected='selected'" : "" %]>[% locale.maketext(text) %]</option>
+    [% END -%]
+    <form action="doeditrpop.html?account=[% FORM.account %]" method="post">
+
+      <div class="form-group">
+	<label for="name">[% locale.maketext("CGPDisplayName") %]</label>
+	<div class="row">
+	  <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	    <input type="text" name="name" id="name" class="form-control col-xs-2" value="[% FORM.rpop %]" [% IF FORM.rpop %] readonly=""[% END %]/>
+	  </div>
+	  <div id="name_error" class="col-xs-12 col-sm-6 col-md-6 col-lg-6"></div>	  
+	</div>
+      </div>
+
+      <div class="form-group">
+	<label for="name">[% locale.maketext("CGPAccount") %]</label>
+	<div class="row">
+	  <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	    <input type="text" name="authName" id="authName" class="form-control col-xs-2" value="[% rpop.rpop.authName %]"/>
+	  </div>
+	  <div id="authName_error" class="col-xs-12 col-sm-6 col-md-6 col-lg-6"></div>	  
+	</div>
+      </div>
+
+      <div class="form-group">
+	<label for="name">[% locale.maketext("CGPHost") %]</label>
+	<div class="row">
+	  <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	    <input type="text" name="domain" id="domain" class="form-control col-xs-2" value="[% rpop.rpop.domain %]"/>
+	  </div>
+	  <div id="domain_error" class="col-xs-12 col-sm-6 col-md-6 col-lg-6"></div>	  
+	</div>
+      </div>
+
+      <div class="form-group">
+	<label for="name">[% locale.maketext("CGPPassword") %]</label>
+	<div class="row">
+	  <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	    <input type="password" name="password" id="password" class="form-control col-xs-2" value="[% rpop.password %]"/>
+	  </div>
+	  <div id="password_error" class="col-xs-12 col-sm-6 col-md-6 col-lg-6"></div>	  
+	</div>
+      </div>
+
+      <div class="form-group">
+	<label for="name">[% locale.maketext("CGPMailbox") %]</label>
+	<div class="row">
+	  <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	    <input type="text" name="mailbox" id="mailbox" class="form-control col-xs-2" value="[% rpop.rpop.mailbox %]"/>
+	  </div>
+	</div>
+      </div>
+
+      <div class="form-group">
+	<div class="checkbox">
+	  <input type="checkbox" id="leave" name="leave" value="YES" 
+		 [% IF rpop.rpop.leave == 'YES' %]
+		 checked
+		 [% END %]
+		 >
+	  <label for="leave">[% locale.maketext("CGPLeaveMessagesOnServer") %]</label>
+	</div>
+      </div>
+
+      <div class="form-group">
+	<div class="checkbox">
+	  <input type="checkbox" id="APOP" name="APOP" value="YES" 
+		 [% IF rpop.rpop.APOP == 'YES' %]
+		 checked
+		 [% END %]
+		 >
+	  <label for="APOP">[% locale.maketext("APOP") %]</label>
+	</div>
+      </div>
+
+      <div class="form-group">
+	<div class="checkbox">
+	  <input type="checkbox" id="TLS" name="TLS" value="YES" 
+		 [% IF rpop.rpop.TLS == 'YES' %]
+		 checked
+		 [% END %]
+		 >
+	  <label for="TLS">[% locale.maketext("TLS") %]</label>
+	</div>
+      </div>
+
+      <div class="form-group">
+	<label for="name">[% locale.maketext("CGPPullEvery") %]</label>
+	<div class="row">
+	  <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	    <select name="period" class="form-control">
+	      [% filter_option( rpop.rpop.period || "600s", "120s" , "2m") %]
+	      [% filter_option( rpop.rpop.period || "600s", "180s" , "3m") %]
+	      [% filter_option( rpop.rpop.period || "600s", "300s" , "5m") %]
+	      [% filter_option( rpop.rpop.period || "600s", "600s" , "10m") %]
+	      [% filter_option( rpop.rpop.period || "600s", "750s" , "15m") %]
+	      [% filter_option( rpop.rpop.period || "600s", "1200s" , "20m") %]
+	      [% filter_option( rpop.rpop.period || "600s", "1800s" , "30m") %]
+	      [% filter_option( rpop.rpop.period || "600s", "3600s" , "60m") %]
+	      [% filter_option( rpop.rpop.period || "600s", "7200s" , "2h") %]
+	      [% filter_option( rpop.rpop.period || "600s", "10800s" , "3h") %]
+	      [% filter_option( rpop.rpop.period || "600s", "18000s" , "5h") %]
+	      [% filter_option( rpop.rpop.period || "600s", "21600s" , "6h") %]
+	      [% filter_option( rpop.rpop.period || "600s", "22800s" , "8h") %]
+	      [% filter_option( rpop.rpop.period || "600s", "86400s" , "24h") %]
+	      [% filter_option( rpop.rpop.period || "600s", "1000000000s" , "CGPDisabled") %]
+	    </select>
+	  </div>
+	</div>
+      </div>
+
+      <div class="form-group">
+	<input type="hidden" name="oldMessageID" value="[% vcard.UID.VALUE.item('Message-ID') %]" />
+	<input type="hidden" name="oldUID" value="[% FORM.contact %]" />
+	<input id="submit" class="btn btn-primary" type="submit" value="[% locale.maketext("CGPSave") %]" name="save" />
+      </div>
+    </form>
+
+    <script type="text/javascript">
+      var LANG = {};
+      LANG.name_input = '[% locale.maketext("CGPDisplayName") %]';
+      LANG.authname_input = '[% locale.maketext("CGPAccount") %]';
+      LANG.domain_input = '[% locale.maketext("CGPHost") %]';
+      LANG.password_input = '[% locale.maketext("CGPPassword") %]';
+      LANG.name_input_invalid = '[% locale.maketext("CGPThisFieldIsRequired") %]!';
+      YAHOO.util.Event.onDOMReady(function () {
+         var VAL_NAME = new CPANEL.validate.validator(LANG.name_input);
+         VAL_NAME.add("name", 'min_length(%input%,1)', LANG.name_input_invalid);
+         VAL_NAME.attach();
+         
+         var VAL_AUTHNAME = new CPANEL.validate.validator(LANG.authname_input);
+         VAL_AUTHNAME.add("authName", 'min_length(%input%,1)', LANG.name_input_invalid);
+         VAL_AUTHNAME.attach();
+         
+         var VAL_DOMAIN = new CPANEL.validate.validator(LANG.domain_input);
+         VAL_DOMAIN.add("domain", 'min_length(%input%,1)', LANG.name_input_invalid);
+         VAL_DOMAIN.attach();
+         
+         
+         var checks = [VAL_NAME, VAL_AUTHNAME, VAL_DOMAIN];
+         if (addNew) {
+            var VAL_PASSWORD = new CPANEL.validate.validator(LANG.password_input);
+            VAL_PASSWORD.add("password", 'min_length(%input%,1)', LANG.name_input_invalid);
+            VAL_PASSWORD.attach();
+            checks.push(VAL_PASSWORD);
+         }
+         CPANEL.validate.attach_to_form("submit", checks);
+      });
+    </script>
+
+    [% INCLUDE _assets/return_link.html.tt return_location='rpop.html?account=' _ RAW_FORM.item("account") return_link_text=locale.maketext('Go Back') %]
+  </div>
+</div>
+[% END %]

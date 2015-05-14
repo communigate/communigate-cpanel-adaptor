@@ -1,0 +1,151 @@
+[%
+SET CPANEL.CPVAR.dprefix = "../../";
+SET CPANEL.CPVAR.headerimg = "../images/mailmenu.gif";
+SET mail_domains = execute("Email", "list_mail_domains", {});
+SET mail_groups = Api2.exec("CommuniGate", "ListGroups", {
+"domain" = RAW_FORM.item("domain"),
+});
+%]
+
+[% js_code = PROCESS js_block %]
+
+[% WRAPPER '_assets/master.html.tt'
+page_js = js_code,
+app_key = 'cgpro_groupmail'
+-%]
+
+<div class="body-content">
+  <div class="section">
+    <h2>[% locale.maketext("CGPGroupCreate")%]</h2>
+
+    <form method="post" action="doaddgroup.html" id="userform" name="userform">
+      <div class="form-group">
+	<label for="realname">[% locale.maketext("Group Name:") %]</label>
+	<div class="row">
+	  <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	    <input type="text" name="realname" id="realname" class="form-control col-xs-2"/>
+	  </div>
+	  <div id="realname_error" class="col-xs-12 col-sm-6 col-md-6 col-lg-6"></div>	  
+	</div>
+      </div>
+
+
+      <div class="form-group">
+	<label for="email">Group Email Address: </label>
+	<div class="row">
+	  <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	    <div class="input-group">
+	      <input type="text" name="email" id="email" class="form-control col-xs-2" />
+	      <span class="input-group-addon">@</span>
+	    </div>
+	  </div>
+	  <div id="email_error" class="col-xs-12 col-sm-6 col-md-6 col-lg-6"></div>	  
+	</div>
+      </div>
+
+      <div class="form-group">
+	<label for="domain">[% locale.maketext("Domain") %]</label>
+	<div class="row">
+	  <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	    <select name="domain" id="domain" class="form-control">
+              [% FOREACH hashref IN mail_domains.data %]
+              <option value="[% hashref.domain.html() %]">[% hashref.domain.html() %]</option>
+              [% END %]
+	    </select>
+	  </div>
+	</div>
+      </div>
+
+
+      <!-- <div class="form-group"> -->
+      <!-- 	<label>[% locale.maketext("Users allowed to post messages to this group:") %]</label> -->
+      <!-- 	<div class="row"> -->
+      <!-- 	  <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6"> -->
+      <!-- 	    <select name="spectre" id="spectre" class="form-control"> -->
+      <!-- 	      <option value="0">Private-Members of this group only</option> -->
+      <!-- 	      <option value="1">Public-Anyone</option> -->
+      <!-- 	    </select>	     -->
+      <!-- 	  </div> -->
+      <!-- 	</div> -->
+      <!-- </div> -->
+
+      <div class="form-group">
+	<input type="submit" id="submit" value="Create Group" class="btn btn-primary" />
+      </div>
+    </form>
+
+
+    <h2>Current groups</h2>
+
+    <table class="sortable truncate-table table table-striped">
+      <thead>
+	<tr>
+	  <th class="clickable">Group Email Address</th>
+	  <th class="clickable sorttable_nosort" colspan="4">Functions</th>
+	</tr>
+      </thead>
+      <colgroup>
+	<col width="40%">
+	<col width="60%">
+      </colgroup>
+      <tbody>
+	[% FOREACH group IN mail_groups %]
+	<tr>
+	  <td class="truncate nobrd-left">
+	    [% group.list.html() %]
+	  </td>
+	  <td class="truncate sorttable_nosort">
+	    <a href="dodelgroup.html?email=[% group.list %]" class="btn btn-link">
+	      <span class="glyphicon glyphicon-trash"></span>
+	      [% locale.maketext("Delete") %]
+	    </a>
+
+	    <a href="dorenamegroup.html?email=[% group.list %]&domain=[% group.domain %]" class="btn btn-link">
+	      <span class="glyphicon glyphicon-edit"></span>
+	      [% locale.maketext("Rename") %]
+	    </a>
+	    
+	    <a href="groupsettings.html?email=[% group.list %]" class="btn btn-link">
+	      <span class="glyphicon glyphicon-cog"></span>
+	      [% locale.maketext("Settings") %]
+	    </a>
+
+	    <a href="groupmembers.html?listname=[% group.list %]" class="btn btn-link">
+	      <span class="glyphicon glyphicon-user"></span>
+	      [% locale.maketext("Group Members") %]
+	    </a>
+
+	  </td>
+	</tr>
+	[% END %]
+      </tbody>
+    </table>
+  </div>
+</div>
+
+
+
+[% BLOCK js_block %]
+<script type="text/javascript">
+var name_validator = new CPANEL.validate.validator("[% locale.maketext("Group Name") %]");
+var email_validator = new CPANEL.validate.validator("[% locale.maketext("Group Email Address") %]");
+
+function init_page() {
+
+    email_validator.add("email", "local_part_email(%input%, 'cpanel')", "[% locale.maketext("That is not a valid email address.")  %]");
+    email_validator.attach();
+
+    name_validator.add("realname", "min_length(%input%, 1)", "[% locale.maketext("That is not a valid group name.")  %]");
+    name_validator.attach();
+
+    
+    CPANEL.validate.attach_to_form("submit", [
+        email_validator,
+        name_validator
+    ]);
+}
+YAHOO.util.Event.onDOMReady(init_page);
+</script>
+[% END %]
+
+[% END %]
