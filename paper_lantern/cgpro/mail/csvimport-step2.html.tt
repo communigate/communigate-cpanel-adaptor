@@ -1,0 +1,200 @@
+[% SET CPANEL.CPVAR.dprefix = "../../" %]
+
+[%
+USE Api2;
+
+IF FORM.item('csvimportid');
+    SET CPANEL.CPVAR.csvimportid = FORM.item('csvimportid');
+ELSE;
+    SET api2_result_CSVImport_uploadimport = Api2.exec("CSVImport" , "uploadimport" , {});
+    SET api2_result_CSVImport_processdata = Api2.exec("CSVImport" , "processdata" , {
+        "otherdelimiter" => RAW_FORM.other_delimiter,
+        "csvimportid" => CPANEL.CPVAR.csvimportid.html,
+        "colheader" => RAW_FORM.colheader,
+        "delimiter" => RAW_FORM.delimiter
+    });
+END;
+
+SET api2_result_CSVImport_loaddata = Api2.exec("CSVImport" , "loaddata" , {
+    "csvimportid" =>CPANEL.CPVAR.csvimportid.html
+});
+SET csv_columnchoices = Api2.exec("CSVImport" , "columnchoices" , {
+    "type" =>(RAW_FORM.item("importtype"))
+});
+SET import_type_data = Api2.exec("CSVImport" , "data" , {
+    "type" =>(RAW_FORM.item("importtype"))
+});
+
+Api1.pre_exec("Email", "listmaildomainsoptndef");
+SET list_domain_options = Api1.exec("Email", "listmaildomainsoptndef", [undef]);
+Api1.post_exec("Email", "listmaildomainsoptndef");
+
+SET return_link = "csvimport.html?importtype=" _ RAW_FORM.item('importtype').uri() _ "&csvimportid=" _ RAW_FORM.item('csvimportid').uri();
+%]
+
+[% js_code = PROCESS js_block %]
+[% WRAPPER '_assets/master.html.tt'
+    app_key = 'address_importer'
+    page_js = js_code
+-%]
+<div class="body-content">
+
+    [% IF (FORM.item('importtype') == "fwd") %]
+        <h2 id="hdrImportFwds">[% locale.maketext("Import Forwarders") %]</h2>
+    [% END %]
+
+    [% IF (FORM.item('importtype') == "email") %]
+        <h2 id="hdrImportAddrs">[% locale.maketext("Import E-mail Accounts") %]</h2>
+    [% END %]
+
+    <div class="section">
+        <form action="csvimport-step3.html" method="get">
+            <input id="hidImportType" type="hidden" name="importtype" value="[% FORM.item('importtype') %]" />
+            <input id="hidImportId" type="hidden" name="csvimportid" value="[% CPANEL.CPVAR.item('csvimportid').html() %]" />
+
+            <h2 id="step1header" style="display:none;">[% locale.maketext("Step 1") %]</h2>
+            <p>[% locale.maketext("Choose the header from the dropdown in the table that corresponds to each column.") %]</p>
+
+            <div>
+                <table id="ssimport" class="nonsortable table table-striped" >
+                    <tr>
+                        [% IF csv_columnchoices.size; %]
+                            [% FOREACH hashref IN csv_columnchoices; %]
+                            <th>
+                                <select class="form-control" onchange="checkcols(this);" name="header[% hashref.num.html() %]">
+                                    [% FOREACH deep_hashref IN hashref.item("options") %]
+                                        <option value="[% deep_hashref.colshortname.html() %]" [% deep_hashref.colselected.html() %]>
+                                            [% deep_hashref.colname.html() %]
+                                        </option>
+                                    [% END; %]
+                                </select>
+                            </th>
+                            [% END; %]
+                        [% ELSE %]
+                            <th>[% locale.maketext("No data could be extracted.") %]</th>
+                        [% END %]
+                    </tr>
+                    [% IF import_type_data.size; %]
+                        [% FOREACH hashref IN import_type_data; %]
+                            <tr id="row[% hashref.num.html() %]">
+                                [% FOREACH deep_hashref IN hashref.item("row"); %]
+                                    <td>[% deep_hashref.value.html() %]</td>
+                                [% END; %]
+                            </tr>
+                        [% END; %]
+                    [% END %]
+                </table>
+            </div>
+
+            <div id="step2" style="display:none;">
+                <h2>[% locale.maketext("Step 2") %]</h2>
+                <p>[% locale.maketext("Select the domain for the users in the list. [output,strong,NOTE]: You will see an appended list if the column contains a list of usernames instead of email addresses.") %]</p>
+
+                <div class="form-group">
+                    <label id="lblDomainSel" for="domainSel">[% locale.maketext("Domain") %]</label>
+                    <div class="row">
+                        <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+                            <select id="domainSel" name="domain" class="form-control">
+                                [% list_domain_options %]
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                [% IF csv_columnchoices.size %]
+                    <input id="btnNext"
+                        type="submit"
+                        class="btn btn-primary"
+                        value="[% locale.maketext("Next") %]" />
+                [% ELSE %]
+                    <input id="btnNext"
+                        type="submit"
+                        class="btn btn-primary"
+                        disabled
+                        value="[% locale.maketext("Next") %]" />
+                [% END %]
+            </div>
+        </form>
+    </div>
+
+    [% INCLUDE _assets/return_link.html.tt return_location=return_link return_link_text=locale.maketext('Go Back') %]
+</div>
+[% END #wrapper %]
+
+[% BLOCK js_block %]
+<script type="text/javascript">
+    var importDataPresent = [% csv_columnchoices.size %];
+    var emailcol = 0;
+    var domainlist = {};
+    var domainlistLoaded = 0;
+    YAHOO.util.Event.onAvailable('ssimport', checktbl);
+
+
+    function loadDomainList() {
+        var selEl=document.getElementById('domainSel');
+        for(var i=0;i<selEl.options.length;i++) {
+            domainlist[selEl.options[i].value]=1;
+        }
+        domainlistLoaded = 1;
+    }
+
+    function checktbl() {
+        if (importDataPresent) {
+            var tableEl = document.getElementById('ssimport');
+            var columnCells = tableEl.rows[0].cells;
+
+            for(var i=0;i<columnCells.length;i++) {
+                var selectEls=columnCells[i].getElementsByTagName('select');
+                checkcols(selectEls[0]);
+            }
+        }
+    }
+    function checkcols(selectboxEl) {
+
+        var headerTH = selectboxEl.parentNode;
+        var headerTBL = selectboxEl.parentNode;
+        var columnNum = headerTH.cellIndex;
+
+        if (selectboxEl.selectedIndex == -1) {
+            if (columnNum == emailcol) { hideStep2(); }
+            return;
+        }
+        var selectVal = selectboxEl.options[selectboxEl.selectedIndex].value;
+
+        if (! domainlistLoaded) {loadDomainList();}
+
+        while(headerTBL && headerTBL.tagName != "TBODY") {
+            headerTBL=headerTBL.parentNode;
+        }
+        for(var i=1;i<headerTBL.rows.length;i++) {
+            var tblData = headerTBL.rows[i].cells[columnNum].innerHTML;
+            if (! tblData.match(/\@/)) {
+                    emailcol = columnNum;
+                    showStep2();
+                    return;
+            } else {
+                var emailParts = tblData.split('@');
+                if (!domainlist[emailParts[1]]) {
+                    showStep2();
+                    return;
+                }
+            }
+        }
+        hideStep2();
+
+    }
+    function hideStep2() {
+        document.getElementById('step2').style.display='none';
+        document.getElementById('step1header').style.display='none';
+    }
+
+
+    function showStep2() {
+        document.getElementById('step2').style.display='';
+        document.getElementById('step1header').style.display='';
+    }
+
+</script>
+[% END %]

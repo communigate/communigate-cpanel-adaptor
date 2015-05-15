@@ -1,0 +1,32 @@
+[%
+# These calls have to be in the same template, so here we go.
+Api2.pre_exec("CSVImport", "loaddata");
+Api2.exec("CSVImport", "loaddata", {"csvimportid"=>RAW_FORM.csvimportid} ).result.html();
+Api2.post_exec("CSVImport", "loaddata");
+-%]
+[% SET doimport = Api2.exec("CommuniGate", "CSVDoImport", {
+"csvimportid" = RAW_FORM.item("csvimportid"),
+"importtype" = RAW_FORM.item("importtype"),
+"domain" = RAW_FORM.item("domain")
+});
+doimport = doimport.0;
+-%]
+[% IF doimport.type == "fwd" -%]
+<!-- Forwarders -->
+[% FOREACH row IN doimport.result -%]
+[% IF row.data.error -%]
+<div class="statusline"> <div class="statusitem">[% row.source %] =&gt; [% row.target %] </div><div class="status red-status">[% row.source %] will NOT be forwarded to [% row.target %]: [% row.error %]</div> </div><script>setcompletestatus([% row.rowcount %], [% row.numrows %])</script>
+[% ELSE -%]
+<div class="statusline"> <div class="statusitem">[% row.source %] =&gt; [% row.target %] </div><div class="status green-status">[% row.source %] will be forwarded to [% row.target %]</div> </div><script>setcompletestatus([% row.rowcount %], [% row.numrows %])</script>
+[% END -%]
+[% END -%]
+[% ELSE -%]
+<!-- Accounts -->
+[% FOREACH row IN doimport.result -%]
+[% IF row.data.0.result -%]
+<div class="statusline"> <div class="statusitem">[% row.email %]</div><div class="status green-status">[% row.email %] imported!</div> </div><script>setcompletestatus([% row.rowcount %], [% row.numrows %])</script>
+[% ELSE -%]
+<div class="statusline"> <div class="statusitem">[% row.email %] </div><div class="status red-status">[% row.email %] NOT imported: [% row.data.0.reason %]</div> </div><script>setcompletestatus([% row.rowcount %], [% row.numrows %])</script>
+[% END -%]
+[% END -%]
+[% END -%]

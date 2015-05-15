@@ -1,0 +1,128 @@
+[%
+SET CPANEL.CPVAR.dprefix = "../../";
+SET CPANEL.CPVAR.itemsperpage = "25";
+
+css_code = PROCESS css_block;
+js_code = PROCESS js_block;
+%]
+
+[% WRAPPER '_assets/master.html.tt'
+    app_key = 'address_importer'
+    page_js = js_code
+    page_styles = css_code
+-%]
+
+<div class="body-content">
+    <h2>[% locale.maketext("Performing Import, please be patient.") %]</h2>
+
+    <div id="import-output">
+        <pre id="import-output-formatted"><img id="loading-spinner" src="../filemanager/img/folders/loading.gif">[% locale.maketext('Loading …') %]</pre>
+    </div>
+
+
+    <div class="section">
+        <div class="form-group">
+            <a href="csvimport.html?importtype=[% RAW_FORM.importtype.uri %]&csvimportid=[% RAW_FORM.csvimportid.uri %]" class="btn btn-primary">
+                [% locale.maketext("Import More") %]
+            </a>
+        </div>
+    </div>
+</div>
+[% END #wrapper %]
+
+[% BLOCK css_block %]
+<style type="text/css">
+    table.importlist {
+        border:none;
+    }
+    #progressbar {
+        padding:15px;
+        border:solid 1px #cbdbea;
+        background:#f3f7fa;
+        width:531px;
+        margin:5px 0 20px 0;
+    }
+    span#total {
+        font-weight:bold;
+        color:#19191b;
+        display:block;
+        text-align:center;
+        margin:5px 0 0 0;
+    }
+    .statusline {
+        padding:5px 0;
+        border-bottom:1px dotted #cbdbea;
+    }
+    .statusitem {
+        font-weight:bold;
+    }
+    .green-status, .status-green {
+        margin:0 0 0 15px;
+        font-weight:normal;
+        background:url(../../images/importok.gif) no-repeat left;
+        padding:5px 0 5px 25px;
+    }
+    .red-status, .status-red {
+        margin:0 0 0 15px;
+        font-weight:normal;
+        background:url(../../images/importerror.png) no-repeat left;
+        padding:5px 0 5px 25px;
+    }
+    #importwrap {
+        width:100%; height:500px; overflow:auto;
+    }
+    #importwrap p {
+        margin:15px 0 0 0;
+        color:#00566a;
+        font-weight:bold;
+        background:#eee;
+        padding:10px;
+    }
+</style>
+[% END #css_block %]
+
+[% BLOCK js_block %]
+
+[% SET ajax_request = CPANEL.ENV.cp_security_token _ "/frontend/paper_lantern/cgpro/mail/live_csvimport-step4.html?csvimportid=" _ RAW_FORM.csvimportid.uri() _ "&importtype=" _ RAW_FORM.importtype.uri() _ "&domain=" _ RAW_FORM.domain.uri(); %]
+<script type="text/javascript">
+    var fullbar = 530;
+
+    function setcompletestatus(incount,totalcount) {
+
+        var incountEl = document.getElementById('incount'),
+            totalCountEl = document.getElementById('totalcount'),
+            uploadBarEl = document.getElementById('uploadbar'),
+            progressBarEl = document.getElementById('progressbar');
+
+        if (incountEl !== null) {
+            incountEl.innerHTML = incount;
+        }
+
+        if (totalCountEl !== null) {
+            totalCountEl.innerHTML = totalcount;
+        }
+
+        if (uploadBarEl !== null) {
+            uploadBarEl.width = parseInt(incount/totalcount*fullbar, 10);
+        }
+
+        if (progressBarEl !== null) {
+            progressBarEl.style.display = '';
+        }
+
+    }
+
+    // must be here to give control back to the new version of jquery we are including
+    // cpanel-all-min-en.js uses an old version of jquery
+    jQuery.noConflict();
+    $(document).ready(function() {
+        $.get("[% ajax_request %]")
+        .done(function(data) {
+            $("#import-output-formatted").html(data);
+        })
+        .fail(function() {
+            $("#import-output-formatted").html("[% locale.maketext('An error occurred while processing your request.') %]")
+        });
+    });
+</script>
+[% END #js_block %]

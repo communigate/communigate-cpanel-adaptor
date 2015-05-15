@@ -1,0 +1,180 @@
+[% SET CPANEL.CPVAR.dprefix = "../../" %]
+[% SET CPANEL.CPVAR.itemsperpage = "25" %]
+
+[% SET CPANEL.CPVAR.importtype = "email" %]
+[% IF (FORM.item('importtype') == "fwd") %]
+    [% SET CPANEL.CPVAR.importtype = "fwd" %]
+[% END %]
+
+[% js_code = PROCESS js_block %]
+[% WRAPPER '_assets/master.html.tt'
+    app_key = 'address_importer'
+    page_js = js_code
+-%]
+<div class="body-content">
+
+    <p id="descCsvImport">
+        [% locale.maketext("This feature allows you to use 2 types of files to create multiple email address or email forwarders for your account simultaneously. You may use Excel spreadsheet files (.xls) or a comma-separated values sheet, aka CSV file (.csv) to import the data. A CSV file is a plain text file that has been given a .csv extension.") %]
+    </p>
+
+    <div id="need-help" class="alert alert-info">
+        <span class="glyphicon glyphicon-info-sign"></span>
+        <div id="csvimportInformationMsg" class="alert-message">
+            [% locale.maketext("Need help setting up a CSV or Excel file for importing? Check out our [output,url,_1,example page,target,_blank].", "csvimport_example.html") %]
+        </div>
+    </div>
+
+    <form action="csvimport-step2.html" enctype="multipart/form-data"  method="post" name="importform">
+
+    <div id="import-steps">
+        <div class="section">
+            <p>[% locale.maketext("[output,strong,Step 1]: Select what you would like to import.") %]</p>
+            [% IF CPANEL.feature('popaccts') %]
+                [% IF (CPANEL.CPVAR.item('importtype') == "email") %]
+                    <div class="form-group">
+                        <div class="radio">
+                             <label id="lblEmailAccts">
+                                <input id="rbtnTypeEmail" type="radio" checked="checked" value="email" name="importtype" />
+                                [% locale.maketext("E-mail Accounts") %]
+                            </label>
+                        </div>
+                    </div>
+                [% ELSE %]
+                    <div class="form-group">
+                        <div class="radio">
+                            <label>
+                                <input id="rbtnTypeEmail" type="radio" value="email" name="importtype" />
+                                [% locale.maketext("E-mail Accounts") %]
+                            </label>
+                        </div>
+                    </div>
+                [% END %]
+            [% END %]
+            [% IF CPANEL.feature('forwarders') %]
+                [% IF (CPANEL.CPVAR.item('importtype') == "fwd") %]
+                    <div class="form-group">
+                        <div class="radio">
+                            <label>
+                                <input id="rbtnTypeFwd" type="radio" value="fwd" name="importtype" checked="checked" />
+                                [% locale.maketext("Forwarders") %]
+                            </label>
+                        </div>
+                    </div>
+                [% ELSE %]
+                    <div class="form-group">
+                        <div class="radio">
+                            <label>
+                                <input id="rbtnTypeFwd" type="radio" value="fwd" name="importtype" />
+                                [% locale.maketext("Forwarders") %]
+                            </label>
+                        </div>
+                    </div>
+
+                [% END %]
+            [% END %]
+        </div>
+        <div class="section">
+            <p>
+                [% locale.maketext("[output,strong,Step 2]: Locate CSV or XLS file on your computer.") %]
+            </p>
+            <p>
+                <input "fileCsv" type="file" name="locate" id="file_input" onchange="check_file_type()" />
+            </p>
+        </div>
+        <div class="section" id="step3" style="display: none">
+            <p>
+                <strong>
+                    [% locale.maketext("Step 3") %]
+                </strong>
+            </p>
+            <div id="step3_choose_delimiter">
+                <p>[% locale.maketext("Select Delimiter") %]</p>
+                <p>
+                    <div class="radio">
+                        <label id="lblDelimComma">
+                            <input type="radio" name="delimiter" value="comma" checked="checked" id="comma_delimiter_radio" />
+                            [% locale.maketext("Comma (,)") %]
+                        </label>
+                    </div>
+                    <div class="radio">
+                        <label id="lblDelimSpace">
+                            <input type="radio" name="delimiter" value="Space" id="space_delimiter_radio" />
+                            [% locale.maketext("Space") %]
+                        </label>
+                    </div>
+                    <div class="radio">
+                        <label id="lblDelimSemicolon">
+                            <input type="radio" name="delimiter" value="Semicolon" id="semicolon_delimiter_radio" />
+                            [% locale.maketext("Semicolon (;)") %]
+                        </label>
+                    </div>
+                    <div class="radio">
+                        <label id="lblDelimTab">
+                            <input type="radio" name="delimiter" value="Tab" id="tab_delimiter_radio" />
+                            [% locale.maketext("Tab") %]
+                        </label>
+                    </div>
+                    <div class="radio">
+                        <div class="form-inline">
+                            <label id="lblDelimOther">
+                                <input type="radio" name="delimiter" value="Other" id="other_delimiter_radio" />
+                                [% locale.maketext("Other") %]
+                            </label>
+                            <label id="lblOtherDelimiterInput">
+                                <input id="txtOtherDelimiter" type="text" size="1" maxlength="1" name="other_delimiter" onchange="handleod(this);" />
+                            </label>
+                        </div>
+                    </div>
+                </p>
+            </div>
+            <div class="checkbox">
+                <label id="lblColHeader">
+                    <input id="chkColHeader" type="checkbox" name="colheader" value="yes" checked="checked" />
+                    [% locale.maketext("Treat first row as column headers.") %]
+                </label>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <input id="btnNext" type="submit" value="[% locale.maketext("Next") %]" name="import" class="btn btn-primary" />
+    </div>
+
+    </form>
+</div>
+[% END #wrapper %]
+
+[% BLOCK js_block %]
+<script type="text/javascript">
+    function message_dialog() {
+        new YAHOO.widget.Dialog('message_panel', {width:'450px',fixedcenter:true,constraintoviewport:true,close:true,draggable:true,modal:false,buttons: [ { text:"Close", handler:function() {message_panel.hide();  }} ],visible:true });
+        message_panel.render();
+    }
+
+    function handleod(thisEl) {
+        var thisval = thisEl.value;
+        if (thisval) {
+            YAHOO.util.Dom.get("other_delimiter_radio").checked = true;
+        } else {
+            YAHOO.util.Dom.get("comma_delimiter_radio").checked = true;
+        }
+    }
+
+    var check_file_type = function() {
+        // get the file name
+        var fname = YAHOO.util.Dom.get("file_input").value;
+
+        // if the file is an .xls do not show the delimiter options
+        if (fname && fname.match(/\.xls$/)) {
+            YAHOO.util.Dom.setStyle("step3_choose_delimiter", "display", "none");
+        }
+        // else display the delimiter options
+        else {
+            YAHOO.util.Dom.setStyle("step3_choose_delimiter", "display", "block");
+        }
+
+        // show step3
+        CPANEL.animate.slide_down("step3");
+    }
+</script>
+[% END %]

@@ -1,0 +1,101 @@
+[% SET CPANEL.CPVAR.dprefix = "../../" %]
+[% SET CPANEL.CPVAR.itemsperpage = "25" %]
+
+[%# the first 2 API2 calls take the user’s input and make the necessary .parsed and .import files respectively, their return value is not used but we need to assign them to a variable so the stringified reference is not printed %]
+[%
+USE Api2;
+
+SET put_the_rv_here_instead_of_printing_it_out_a = Api2.exec("CSVImport" , "loaddata" , {
+    "csvimportid" => FORM.item("csvimportid")
+});
+
+SET put_the_rv_here_instead_of_printing_it_out_b = Api2.exec("CSVImport" , "configimport" , {
+    "defaultdomain" => FORM.domain,
+    "type" => FORM.importtype
+});
+
+SET fetch_import_data = Api2.exec("CSVImport" , "fetchimportdata" , {});
+
+SET return_link = "csvimport-step2.html?importtype=" _ RAW_FORM.importtype.uri() _ "&csvimportid=" _ RAW_FORM.csvimportid.uri();
+%]
+
+[% WRAPPER '_assets/master.html.tt'
+    app_key = 'address_importer'
+-%]
+<div class="body-content">
+    [% IF (FORM.importtype == "fwd") %]
+        <h2 id="hdrImportFwds">[% locale.maketext("Import Forwarders") %]</h2>
+    [% END %]
+    [% IF (FORM.importtype == "email") %]
+        <h2 id="hdrImportAddrs">[% locale.maketext("Import E-mail Accounts") %]</h2>
+    [% END %]
+
+    <p id="csvInformationMsg">
+        [% IF (FORM.importtype == "fwd") %]
+            [% locale.maketext("Review the following forwarders.") %]
+        [% END %]
+
+        [% IF (FORM.importtype == "email") %]
+            [% locale.maketext("Review the following email accounts.") %]
+        [% END %]
+    </p>
+
+    <div class="section">
+        <table class="nonsortable table table-striped">
+            <tr>
+            [% IF (FORM.importtype == "email") %]
+                <th>[% locale.maketext("E-mail Address") %]</th>
+                <th>[% locale.maketext("Password") %]</th>
+                <th>[% locale.maketext("Quota (MB)") %]</th>
+            [% END %]
+            [% IF (FORM.importtype == "fwd") %]
+                <th>[% locale.maketext("Source") %]</th>
+                <th>[% locale.maketext("Destination") %]</th>
+            [% END %]
+            </tr>
+
+            [% IF (FORM.importtype == "email") %]
+                [% IF fetch_import_data.size; %]
+                    [% FOREACH hashref IN fetch_import_data; %]
+                    <tr>
+                        <td>[% hashref.email.html() %]</td>
+                        <td>[% hashref.password.html() %]</td>
+                        <td>[% hashref.quota.html() %]</td>
+                    </tr>
+                    [% END; %]
+                [% ELSE %]
+                    <tr>
+                        <td colspan="3">
+                            [% locale.maketext("No data could be extracted.") %]
+                        </td>
+                    </tr>
+                [% END %]
+            [% END %]
+
+            [% IF (FORM.importtype == "fwd") %]
+                [% IF fetch_import_data.size; %]
+                    [% FOREACH hashref IN fetch_import_data; %]
+                    <tr>
+                        <td>[% hashref.source.html() %]</td>
+                        <td>[% hashref.target.html() %]</td>
+                    </tr>
+                    [% END; %]
+                [% ELSE %]
+                    <tr>
+                        <td colspan="3">
+                            [% locale.maketext("No data could be extracted.") %]
+                        </td>
+                    </tr>
+                [% END %]
+            [% END %]
+        </table>
+
+        <div class="form-group">
+            <a id="lnkFinish" href="csvimport-step4.html?importtype=[% RAW_FORM.importtype.uri %]&csvimportid=[% RAW_FORM.csvimportid.uri %]&domain=[% RAW_FORM.domain.uri %]" class="btn btn-primary">[% locale.maketext("Finish") %]</a>
+        </div>
+    </div>
+
+    [% INCLUDE _assets/return_link.html.tt return_location=return_link return_link_text=locale.maketext('Go Back') %]
+</div>
+[% END #wrapper %]
+
