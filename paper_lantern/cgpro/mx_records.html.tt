@@ -1,0 +1,91 @@
+[%
+    Api2.pre_exec("Email", "listmxs");
+    api2_result_Email_listmxs =  Api2.exec("Email", "listmxs", {"domain"=>FORM.item('domain'), "show_a_records"=>"1"} );
+    Api2.post_exec("Email", "listmxs");
+%]
+
+<table id="mx_records_table"  class="table table_striped" >
+    <thead>
+        <tr>
+            <th style="width: 15%">[% locale.maketext("Priority") %]</th>
+            <th>[% locale.maketext("Destination") %]</th>
+            <th style="width: 25%">[% locale.maketext("Actions") %]</th>
+        </tr>
+    </thead>
+    [% IF api2_result_Email_listmxs.size; %]
+        [% FOREACH hashref IN api2_result_Email_listmxs; %]
+            <input type="hidden" name="mxcheck_state" value="[%  hashref.mxcheck.html() %]" id="mxcheck_state">
+            <input type="hidden" name="detected_state" value="[%  hashref.detected.html() %]" id="detected_state">
+
+                [% FOREACH deep_hashref IN hashref.item('entries'); %]
+                    <tr id="info_row_[% deep_hashref.entrycount.html %]" class="info-[% deep_hashref.row.html%]">
+                        <td id="display_priority_[% deep_hashref.entrycount.html %]">
+                            [% deep_hashref.priority.html %]
+                        </td>
+                        <td id="display_destination_[% deep_hashref.entrycount.html %]">
+                            [% deep_hashref.mx.html %]
+                        </td>
+                        <td>
+                            <span class="btn btn-link" onclick="toggle_module('edit_[% deep_hashref.entrycount.html %]');">
+                                <span class="glyphicon glyphicon-pencil"></span> [% locale.maketext("Edit") %]
+                            </span>&nbsp;
+                            <span class="btn btn-link" onclick="toggle_module('delete_[% deep_hashref.entrycount.html %]');">
+                                <span class="glyphicon glyphicon-trash"></span> [% locale.maketext("Remove") %]
+                            </span>
+                        </td>
+                    </tr>
+                    <tr id="module_row_[% deep_hashref.entrycount.html %]">
+                        <td colspan="3">
+                            <div class="dt_module" id="edit_[% deep_hashref.entrycount.html %]">
+                                <div class="form-group">
+                                    <label>[% locale.maketext('Priority')%]</label>
+                                    <div class="row">
+                                        <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+                                            <input id="priority_[% deep_hashref.entrycount.html %]" type="text" class="form-control" size="3" maxlength="3" value="[% deep_hashref.priority.html %]" />
+                                            <input id="old_priority_[% deep_hashref.entrycount.html %]" type="hidden" value="[% deep_hashref.priority.html %]" />
+                                        </div>
+                                        <div id="priority_[% deep_hashref.entrycount.html %]_error" class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label>[% locale.maketext('Destination') %]</label>
+                                    <div class="row">
+                                        <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+                                            <input id="destination_[% deep_hashref.entrycount.html %]" type="text" class="form-control" value="[% deep_hashref.mx.html %]" />
+                                            <input id="old_destination_[% deep_hashref.entrycount.html %]" type="hidden" value="[% deep_hashref.mx.html %]" />
+                                            <div id="old_destination_[% deep_hashref.entrycount.html %]_error" style="display: none"></div>
+                                        </div>
+                                        <div id="destination_[% deep_hashref.entrycount.html %]_error" class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div id="edit_input_[% deep_hashref.entrycount.html %]" class="form-group">
+                                    <input type="button" class="btn btn-primary" id="confirm_edit_[% deep_hashref.entrycount.html %]" value="[% locale.maketext("Edit") %]" />
+                                    <span class="btn btn-link" onclick="toggle_module('edit_[% deep_hashref.entrycount.html %]')">[% locale.maketext("Cancel") %]</span>
+                                </div>
+                                <div id="edit_status_[% deep_hashref.entrycount.html %]"></div>
+                            </div>
+                            <div class="dt_module" id="delete_[% deep_hashref.entrycount.html %]">
+                                <p>[% locale.maketext("Are you sure you want to delete this record?") %]</p>
+                                <div id="delete_input_[% deep_hashref.entrycount.html %]">
+                                    <input type="button" class="btn btn-primary" id="confirm_delete_[% deep_hashref.entrycount.html %]" value="[% locale.maketext("Delete") %]" onclick="delete_mx_record('[% deep_hashref.entrycount.html %]', '[% deep_hashref.priority.html %]', '[% deep_hashref.mx.html %]')" />
+                                    <span class="btn btn-link" onclick="toggle_module('delete_[% deep_hashref.entrycount.html %]')">[% locale.maketext("Cancel") %]</span>
+                                </div>
+                                <div id="delete_status_[% deep_hashref.entrycount.html %]"></div>
+                            </div>
+                            <div id="status_bar_[% deep_hashref.entrycount.html %]" class="cjt_status_bar"></div>
+                        </td>
+                    </tr>
+                [% END %]
+        [% END %]
+    [% ELSE %]
+    <input type="hidden" name="mxcheck_state" value="0" id="mxcheck_state">
+    <input type="hidden" name="detected_state" value="0" id="detected_state">
+    <tr class="info-even">
+        <td colspan="3">
+            [% locale.maketext("There are no MX records for “[_1]”.", FORM.item('domain')) %]
+        </td>
+    </tr>
+    [% END %]
+</table>

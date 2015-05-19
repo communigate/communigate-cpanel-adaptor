@@ -1,0 +1,72 @@
+[%
+SET CPANEL.CPVAR.dprefix = "../";
+SET CPANEL.CPVAR.headerimg = "../images/mailmenu.gif";
+%]
+
+[% IF RAW_FORM.item("action") == "install" %]
+[% 
+SET install_data =  Api2.exec("CommuniGate", "InstallSRV", {
+"domain" = RAW_FORM.item("domain"),
+"proto" = "CALDAV"
+});
+%]
+[% END %]
+
+[% IF RAW_FORM.item("action") == "uninstall" %]
+[% 
+SET uninstall_data =  Api2.exec("CommuniGate", "UninstallSRV", {
+"domain" = RAW_FORM.item("domain"),
+"proto" = "CALDAV"
+});
+%]
+
+[% END %]
+
+[% WRAPPER '_assets/master.html.tt'
+    app_key = 'cgpro_dns_setup'
+%]
+  
+<div class="body-content">
+  <div class="section">
+    <h3>[% locale.maketext("CGPCALDAV") %]</h3>
+    [% IF RAW_FORM.item("action") == "install" %]
+    [% IF CPANEL.CPERROR.item('CommuniGate') %]
+    <div class="alert alert-danger">
+      <span class="glyphicon glyphicon-remove-sign"></span>
+      <div class="alert-message">
+        [% CPANEL.CPERROR.item('CommuniGate') %]
+      </div>
+    </div>
+    [% ELSE -%]
+    <div class="alert alert-success">
+      <span class="glyphicon glyphicon-ok-sign"></span>
+      <div class="alert-message">
+        [% locale.maketext("Records for " _ RAW_FORM.item("domain") _ " enabled")%]
+      </div>
+    </div>
+    [% END %]
+    [% END %]
+
+    [% IF RAW_FORM.item("action") == "uninstall" %]
+    [% IF CPANEL.CPERROR.item('CommuniGate') %]
+    <div class="alert alert-danger">
+      <span class="glyphicon glyphicon-remove-sign"></span>
+      <div class="alert-message">
+        [% CPANEL.CPERROR.item('CommuniGate') %]
+      </div>
+    </div>
+    [% ELSE -%]
+    <div class="alert alert-success">
+      <span class="glyphicon glyphicon-ok-sign"></span>
+      <div class="alert-message">
+        [% locale.maketext("Records for " _ RAW_FORM.item("domain") _ " disabled")%]
+      </div>
+    </div>
+    [% END %]
+    [% END %]
+
+    [% INCLUDE _assets/return_link.html.tt return_location='dns_setup.html?domain=' _ RAW_FORM.item("domain") return_link_text=locale.maketext('Go Back') %]
+
+  </div>
+</div>
+[% END %]
