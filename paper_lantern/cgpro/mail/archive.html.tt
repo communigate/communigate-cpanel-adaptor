@@ -10,7 +10,7 @@ SET CPANEL.CPVAR.dprefix = "../../";
     [% IF CPANEL.feature('emailarchive') %]
         [% IF (CPANEL.CPCONF.emailarchive == "disable" ? 0 : CPANEL.CPCONF.emailarchive) %]
         <div id="descEmailArchivingAllowsYou" class="header-text">
-            [% locale.maketext("Email Archiving allows you to store a copy of each incoming and outgoing message that is sent to or from a domain on your account. The archives are stored in an uncompressed maildir format so they can be browsed via an IMAP connection. Be aware that archiving email can consume disk space quickly, and you should ensure you have enough disk space available for the retention period you select.") %]
+            [% locale.maketext("Email Archiving allows you to classify by month (week, day, etc.) each incoming message that is sent to a domain on your account.") %]
         </div>
 
         <div class="section">

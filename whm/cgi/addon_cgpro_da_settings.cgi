@@ -50,6 +50,7 @@ if ($FORM{'MailToUnknown'} && $FORM{'MailRerouteAddress'}) {
 				     PasswordEncryption => $FORM{'PasswordEncryption'},
 				     MailToAll => $FORM{'MailToAll'},
 				    });
+  $FORM{'mx_presets'} =~  s/(\r?\n)+/\\e/g;
   $cli->UpdateServerAccountPrefs({
 				  IVRLanguage => $FORM{'IVRLanguage'},
 				  TimeZone => $FORM{'TimeZone'},
@@ -82,6 +83,7 @@ if ($FORM{'MailToUnknown'} && $FORM{'MailRerouteAddress'}) {
 				  EmptyTrash => $FORM{'EmptyTrash'},
 				  EmptyJunk => $FORM{'EmptyJunk'},
 				  JunkBox => $FORM{'JunkBox'},
+				  MxPresets => $FORM{'mx_presets'}
 				 });
 }
 
