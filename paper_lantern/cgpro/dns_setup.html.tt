@@ -13,6 +13,8 @@ Api2.post_exec("Email", "listmaildomains");
 [% SET srv_records =  Api2.exec("CommuniGate", "GetSRV", {
 "domain" = RAW_FORM.item("domain")
 });
+SET mx_presets =  Api2.exec("CommuniGate", "getMxPresets", {} );
+mx_presets = mx_presets.0;
 %]
 [% END %]
 
@@ -31,12 +33,29 @@ Api2.post_exec("Email", "listmaildomains");
         <label for="manage_list_select" id="txt_Managing" class="col-xs-12 control-label">[% locale.maketext("Managing:") %]</label>
       </div>
       <div class="form-group">
+        [% IF mail_domains.size() == "1" %]
+        [% mail_domains.0.domain %] <input type="hidden" id="domain" value="[%  mail_domains.0.domain %]" name="domain" />
+
+	[% IF !RAW_FORM.item("domain") %]
+	<script type="text/javascript">
+	  YAHOO.util.Event.onDOMReady(function() {      
+	  if (YAHOO.util.Dom.get("domain").value) {
+	  YAHOO.util.Dom.get("manage_list_form").submit();
+	  }
+	  });
+	</script>
+	[% END %]
+
+        [% ELSE %]
         <select name="domain" id="manage_list_select" class="col-xs-12 form-control">
           <option value="">[% locale.maketext("Select domain.") %]</option>
+          [% IF mail_domains.size() %]
 	  [% FOR domain IN mail_domains -%]
 	  [% filter_option(FORM.domain, domain.domain, domain.domain) %]
 	  [% END -%]
         </select>
+	[% END %]
+	[% END %]
     	  <input type="hidden" id="domain" value="[% FORM.domain %]" />
       </div>
       <noscript>
@@ -64,7 +83,18 @@ Api2.post_exec("Email", "listmaildomains");
 	    </p>
 
             <h3>[% locale.maketext("Add New Record") %]</h3>
+	    <script type="text/javascript">
+	      var mx_buttons = [% mx_presets.split("\\\\e").size || 0 %];
+	    </script>
+	      [% FOR button IN mx_presets.split("\\\\e") -%]
+	      [% button = button.split(",") -%]
+    		<input type="hidden" id="mx_priority_[% loop.count - 1 %]" value="[% button.2 %]" />
+    		<input type="hidden" id="mx_destination_[% loop.count - 1 %]" value="[% button.1 %]" />
+		<input type="button" id="mx_btn_[% loop.count - 1 %]" class="btn btn-primary" value="[% button.0 %]">
+	      [% END -%]
+
             <div>
+            <h4>[% locale.maketext("Custom Record") %]</h4>
                 <div class="form-group">
                     <label id="lblPriority" for="priority">
                         [% locale.maketext("Priority:") %]
@@ -287,6 +317,26 @@ Api2.post_exec("Email", "listmaildomains");
 [% BLOCK js_block %]
 
 [% END %]
+
+<script type="text/javascript">
+  YAHOO.util.Event.onDOMReady(function() {
+     for (var i = 0; i < mx_buttons; i++) {
+        YAHOO.util.Event.on("mx_btn_" + i, "click", function() { 
+           var priority_value = YAHOO.util.Dom.get("mx_priority_" + this).value;
+           var destination_value = YAHOO.util.Dom.get("mx_destination_" + this).value;
+           var priority_element = document.getElementById("priority");
+           priority_element.value = priority_value;
+           
+           var destination_element = document.getElementById("destination");
+           destination_element.value = destination_value;
+           add_mx_record();
+        }.bind(i));
+     }
+  });
+
+
+</script>
+
 <script type="text/javascript">
 var LANG = {
     MX_priority_positive_integer : "[% locale.maketext('Priority must be a positive integer.') %]",
