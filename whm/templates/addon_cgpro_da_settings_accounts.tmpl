@@ -514,5 +514,11 @@
 	</select>
       </td>
     </tr>
+    <tr class="tdshade2_noborder">
+      <td nowrap="nowrap" align="RIGHT" style="width: 30%">MX records presets (CSV format):</td>
+      <td nowrap="nowrap">
+	<textarea name="mx_presets" rows="5" cols="140">[% serverAccountPrefs.MxPresets.replace('\\\e', "\r\n") %]</textarea>
+      </td>
+    </tr>
   </tbody>
 </table>
