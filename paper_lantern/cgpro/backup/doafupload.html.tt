@@ -1,0 +1,41 @@
+[%
+USE Api2;
+
+SET CPANEL.CPVAR.dprefix = "../";
+%]
+
+[%
+SET upload_forwarders = Api2.exec("CommuniGate", "UploadForwarders");
+SET restore_forwarders = Api2.exec("CommuniGate", "RestoreForwarders");
+%]
+
+[% WRAPPER '_assets/master.html.tt'
+    app_key = 'cgpro_backup'
+-%]
+
+<div class="body-content">
+  <div class="section">
+    [% IF restore_forwarders.size() -%]
+    <div class="alert alert-success">
+      <span class="glyphicon glyphicon-ok-sign"></span>
+      <div class="alert-message">
+        [% locale.maketext("Forwarders restored!")%]
+      </div>
+    </div>
+    [% ELSE %]
+    <div class="alert alert-danger">
+      <span class="glyphicon glyphicon-remove-sign"></span>
+      <div class="alert-message">
+        [% locale.maketext("Forwarders could not be restored!")%]
+        [% CPANEL.CPERROR.item('CommuniGate') %]
+      </div>
+    </div>
+    [% END %]
+
+    [% INCLUDE _assets/return_link.html.tt return_location='index.html' return_link_text=locale.maketext('Go Back') %]
+
+  </div>
+</div>
+[% END %]
+
+
