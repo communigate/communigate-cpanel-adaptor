@@ -136,7 +136,7 @@ SET accounts = Api2.exec("CommuniGate", "ListAccountsBackups");
         <div class="row">
             <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
                 <h3 id="hdrDownloadEmailFwdrs">[% locale.maketext("Download Accounts") %]</h3>
-                <table fixedtruncate="1" class="sortable table table-striped" id="aliastbl">
+                <table fixedtruncate="1" class="sortable table table-striped" id="accountstbl">
                     <tr>
                         <th id="thEmailAccounts">
                             [% locale.maketext("Accounts") %]
@@ -165,8 +165,8 @@ SET accounts = Api2.exec("CommuniGate", "ListAccountsBackups");
                       <input type="hidden" name="delimiter" value="comma" />
 		      <input type="hidden" name="colheader" value="yes" />
 		      <input type="file" name="file10" id="file10_id" />
-                      <div id="file10_id_error" class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
-			<br />
+                    </div>
+                    <div id="file10_id_error" class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
                     </div>
                   </div>
                 </div>
@@ -230,7 +230,7 @@ SET accounts = Api2.exec("CommuniGate", "ListAccountsBackups");
 [% BLOCK js_block %]
 <script type="text/javascript">
     truncate_on = 1;
-    // var inputs_buttons = { file1_id: "file1-submit-button" };
+    var inputs_buttons = { file1_id: "file1-submit-button" };
 
     [% IF CPANEL.feature("mysql") %]
         register_truncate_table('sqlbackuptbl');
@@ -239,6 +239,10 @@ SET accounts = Api2.exec("CommuniGate", "ListAccountsBackups");
     [% IF CPANEL.feature("forwarders") %]
         register_truncate_table('aliastbl');
         inputs_buttons['file4_id'] = 'file4-submit-button';
+    [% END %]
+    [% IF CPANEL.feature("accounts") %]
+        register_truncate_table('accountstbl');
+        inputs_buttons['file10_id'] = 'file10-submit-button';
     [% END %]
     [% IF CPANEL.feature("blockers") %]
         register_truncate_table('filtertbl');

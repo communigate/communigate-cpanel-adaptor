@@ -1,7 +1,7 @@
 [%
 USE Api2;
 
-SET CPANEL.CPVAR.dprefix = "../";
+SET CPANEL.CPVAR.dprefix = "../../";
 %]
 
 [%
