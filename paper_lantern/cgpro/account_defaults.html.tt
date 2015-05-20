@@ -24,10 +24,25 @@ app_key = 'domain_settings'
           <label for="manage_list_select" id="txt_Managing" class="col-xs-12 control-label">[% locale.maketext("Managing:") %]</label>
         </div>
         <div class="form-group">
-          <select name="domain" id="manage_list_select" class="col-xs-12 form-control">
-            <option value="">[% locale.maketext("Select a domain.") %]</option>
-            [% Api1.pre_exec("Email", "listmaildomainsoptndef") ;   Api1.exec("Email", "listmaildomainsoptndef", [RAW_FORM.item('domain')]) ;  Api1.post_exec("Email", "listmaildomainsoptndef") %]
+
+        [% IF domain.size() == "1" %]
+        [% domain %] <input type="hidden" id="domain" value="[% domain %]" name="domain" />
+
+	[% IF !RAW_FORM.item("domain") %]
+	<script type="text/javascript">
+	  YAHOO.util.Event.onDOMReady(function() {      
+	  if (YAHOO.util.Dom.get("domain").value) {
+	  YAHOO.util.Dom.get("manage_list_form").submit();
+	  }
+	  });
+	</script>
+	[% END %]
+	[% ELSE %]
+        <select name="domain" id="manage_list_select" class="col-xs-12 form-control">
+          <option value="">[% locale.maketext("Select a domain.") %]</option>
+          [% Api1.pre_exec("Email", "listmaildomainsoptndef") ;   Api1.exec("Email", "listmaildomainsoptndef", [RAW_FORM.item('domain')]) ;  Api1.post_exec("Email", "listmaildomainsoptndef") %]
           </select>
+	[% END %]
         </div>
         <noscript>
           <div class="form-group">
