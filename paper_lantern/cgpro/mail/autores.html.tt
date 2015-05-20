@@ -96,7 +96,7 @@
 
     </div>
 
-    [% INCLUDE _assets/return_link.html.tt return_location='../index.html' return_link_text=locale.maketext('Go Back') %]
+    [% INCLUDE _assets/return_link.html.tt return_location='../../index.html' return_link_text=locale.maketext('Go Back') %]
 
 [% END %]<!-- end cpanelfeature autoresponders -->
 
