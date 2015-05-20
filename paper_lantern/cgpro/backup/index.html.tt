@@ -230,7 +230,7 @@ SET accounts = Api2.exec("CommuniGate", "ListAccountsBackups");
 [% BLOCK js_block %]
 <script type="text/javascript">
     truncate_on = 1;
-    var inputs_buttons = { file1_id: "file1-submit-button" };
+    var inputs_buttons = {  };
 
     [% IF CPANEL.feature("mysql") %]
         register_truncate_table('sqlbackuptbl');
