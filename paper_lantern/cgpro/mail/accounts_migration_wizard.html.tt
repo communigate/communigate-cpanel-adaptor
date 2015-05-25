@@ -1,0 +1,21 @@
+[%
+SET CPANEL.CPVAR.dprefix = "../../";
+SET CPANEL.CPVAR.headerimag = "../images/mailmenu.gif";
+%]
+
+[% WRAPPER '_assets/master.html.tt'
+    app_key = 'cgpro_migration_wizard'
+-%]
+
+<div class="body-content">
+  <p>
+    [% locale.maketext("In order to migrate all existing accounts to \"Unified Communication\" please follow the following wizard. Please note you will have to change all of your accounts' passwords!") %]
+  </p>
+  
+  <div class="section">
+    <form method="get" action="accounts_migration_wizard_migrate.html">
+      <input type="submit" class="btn btn-primary" value="Continue">
+    </form>
+  </div>
+</div>
+[% END %]

@@ -1,0 +1,253 @@
+[%
+SET CPANEL.CPVAR.dprefix = "../../";
+SET CPANEL.CPVAR.headerimag = "../images/mailmenu.gif";
+
+SET required_strength = Api2.exec("PasswdStrength", "get_required_strength", {"app"=>"pop"} );
+%]
+
+[% IF RAW_FORM.item("submit") %]
+[%
+SET create_account = Api2.exec("CommuniGate" , "createAccount" , {
+"email" = RAW_FORM.item("account"),
+"quota" = RAW_FORM.item("quota"),
+"password" = RAW_FORM.item("password"),
+"realname" = RAW_FORM.item("realame"),
+"autorpop" = RAW_FORM.item("autorpop")
+});
+
+SET passwdpop = Api2.exec("Email" , "passwdpop" , {
+"email" = RAW_FORM.item("email"),
+"domain" = RAW_FORM.item("domain"),
+"password" = RAW_FORM.item("password"),
+"quota" = RAW_FORM.item("quota"),
+});
+%]
+[% END %]
+
+[% IF CPANEL.CPERROR.item('CommuniGate') %]
+SET delete_account = Api2.exec("CommuniGate" , "deleteAccount" , {
+"email" = RAW_FORM.item("account")
+});
+[% END %]
+
+[%
+SET migrate_accounts = Api2.exec("CommuniGate" , "MigrateAccount" , {});
+migrate_accounts = migrate_accounts.0;
+%]
+
+
+[% WRAPPER '_assets/master.html.tt'
+    app_key = 'cgpro_migration_wizard'
+-%]
+
+[% USE dumper %]
+
+<div class="body-content">
+  <div class="section">
+
+
+[% USE CPBranding -%]
+<table border="0" cellpadding="5" width="550" cellspacing="0" id="mailtbl" class="sortable truncate-table table table-striped">
+  <tr>
+    <th class="sorttable_nosort"></th>
+    <th class="sorttable_nosort">[% locale.maketext("Accounts") %]</th>
+  </tr>
+  [% FOR acc IN migrate_accounts.remote_accounts -%]
+  <tr class="row-[% loop.count % 2 ? 'odd' : 'even' %]">
+    <td>
+      <span class="glyphicon glyphicon-ok" style="color: green; font-size:20px;"></span>
+    </td>
+    <td>[% acc %]</td>
+  </tr>
+  [% END -%]
+  [% IF migrate_accounts.account -%]
+  <tr>
+    <td>
+      <span class="glyphicon glyphicon-remove" style="color: red; font-size: 20px;"></span>
+    </td>
+    <td>
+      <h2 style="margin-left: 0;">[% migrate_accounts.account %]</h2>
+      [% IF CPANEL.CPERROR.email -%]
+      <p class="errors">
+	[% CPANEL.CPERROR.email %]
+      </p>
+      [% END -%]
+
+      <form action="" method="post">
+	<div class="form-group">
+	  <label for="realname">[% locale.maketext("Real Name:") %]</label>
+	  <div class="row">
+	    <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	      <input type="text" name="realname" id="realname" class="form-control col-xs-2" tabindex="2"/>
+	    </div>
+	    <div id="realname_error" class="col-xs-12 col-sm-6 col-md-6 col-lg-6"></div>	  
+	  </div>
+	</div>
+	<div class="form-group">
+	  <label for="change_password_input_1">[% locale.maketext("Password:") %]</label>
+	  <div class="row">
+	    <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	      <input type="password" name="password" id="change_password_input_1" class="form-control col-xs-2"/>
+	    </div>
+	    <div id="change_password_input_1_error" class="col-xs-12 col-sm-6 col-md-6 col-lg-6"></div>	  
+	  </div>
+	</div>
+	<div class="form-group">
+	  <label for="change_password_input_2">[% locale.maketext("Password (again):") %]</label>
+	  <div class="row">
+	    <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	      <input type="password" name="password2" id="change_password_input_2" class="form-control col-xs-2"/>
+	    </div>
+	    <div id="change_password_input_2_error" class="col-xs-12 col-sm-6 col-md-6 col-lg-6"></div>	  
+	  </div>
+	</div>
+	
+	<div class="form-group">
+	  <label>
+            [% locale.maketext("Strength") %]
+            <span id="why_strong_passwords_link" class="glyphicon glyphicon-info-sign"></span>
+	  </label>
+	  [% INCLUDE _assets/why_strong_passwords.html.tt %]
+	  <div class="row">
+            <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+              <div id="password_strength_bar" class="password_strength"></div>
+            </div>
+            <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+              <input id="create_strong_password" type="button" class="btn btn-default" value="[% locale.maketext("Password Generator") %]" tabindex="-1" />
+            </div>
+	  </div>
+	</div>
+	
+      <div class="form-group">
+	<div class="checkbox">
+	  <input id="autorpop" type="checkbox" name="autorpop" value="1">
+	  <label for="autorpop">[% locale.maketext("Auto sync mailboxes between accounts:") %]</label>
+	</div>
+      </div>
+
+	<div class="form-group">
+	  <div class="row">
+	    <div id="change_password_input">
+	      <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+		    <input type="hidden" name="quota" value="[% migrate_accounts.accounts.$account.quota %]" />
+		    <input type="hidden" name="email" value="[% migrate_accounts.account.split('@').0 %]" />
+		    <input type="hidden" name="domain" value="[% migrate_accounts.account.split('@').1 %]" />
+		    <input type="hidden" name="account" value="[% migrate_accounts.account %]" />
+		    <input type="submit" name="submit" id="email_table_change_password_confirm" value="[% locale.maketext("Continue") %]" class="btn btn-primary">
+		    <a href="realdelpop.html?domain=[% account.split('@').1 %]&amp;email=[% account.split('@').0 %]&amp;referer=accounts_migration_wizard_migrate.html" onclick="return confirm('[% locale.maketext("DeleteAccount") %] [% account %]?')"  class="btn btn-link">Delete account</a> 
+	      </div>
+	      <div id="change_password_status" class="col-xs-12 col-sm-6 col-md-6 col-lg-6"></div>	  
+	    </div>
+	  </div>
+	</div>
+      </form>
+  </div>
+  <script>
+	// REQUIRED_PASSWORD_STRENGTH = 5;
+	var OPEN_ACTION_DIV = 0;
+	var MENUS = [];
+	var toggle_menu = function(e, o) {
+	// build the menu if it doesn't exist
+	if (typeof(MENUS[o.index]) !== 'object') {
+	// create the menu
+	var options = {
+	position : "dynamic",
+	clicktohide : "true",
+	context : ["email_table_menu_button_" + o.index, "tl", "bl", ["beforeShow", "windowResize", CPANEL.align_panels_event]],
+	shadow : "true",
+	effect: {effect: YAHOO.widget.ContainerEffect.FADE, duration: 0.25}
+	};
+	MENUS[o.index] = new YAHOO.widget.Menu("email_table_menu_" + o.index, options);
+
+	var menu_items = [];
+	// configure email
+	menu_items.push({
+	text: 'Configure Email Client',
+	url: "clientconf.html?acct=" + encodeURIComponent(ACCOUNTS[o.index]['user']) + "@" + encodeURIComponent(ACCOUNTS[o.index]['domain'])
+	});
+	
+	MENUS[o.index].addItems(menu_items);
+	MENUS[o.index].render("menus_div");
+	}
+
+	MENUS[o.index].show();
+	};
+
+	var toggle_action_div = function(e, o) {
+	// if a div, that is not o, is already open, close it
+	if ( OPEN_ACTION_DIV && OPEN_ACTION_DIV.id !== o.id && YAHOO.util.Dom.getStyle(OPEN_ACTION_DIV.id, "display") != "none") {
+	var currently_open_div = OPEN_ACTION_DIV;
+	CPANEL.animate.slide_up( currently_open_div.id , function() { });
+	}
+	
+	// if o is currently displayed, hide it
+	if (YAHOO.util.Dom.getStyle(o.id, "display") != 'none') {
+	CPANEL.animate.slide_up( o.id, function() { });
+	}
+	// else show o and set it as the OPEN_ACTION_DIV
+	else {
+	CPANEL.animate.slide_down( o.id, function() { });
+	OPEN_ACTION_DIV = o;
+	}
+	};
+
+	var verify_local_extension_local = function (e) {
+	return CPANEL.validate.positive_integer(e) && CPANEL.validate.greater_than(e,200) && CPANEL.validate.less_than(e,1000);
+	};
+	var verify_local = function () {
+	var PWD_BAR = new CPANEL.password.strength_bar("password_strength_bar");
+	var VAL_PWD = new CPANEL.validate.validator("email_password_input");
+	var VAL_PWD2 = new CPANEL.validate.validator("email_password_input");
+	// var VAL_QUOTA = new CPANEL.validate.validator("email_quota_input");
+	PWD_BAR.attach("change_password_input_1", function() { VAL_PWD.verify(); });
+	var verify_password_strength_local = function () {
+	if (PWD_BAR.current_strength >= 30) return true;
+	return false;
+	};
+	VAL_PWD.add("change_password_input_1", verify_password_strength_local, YAHOO.lang.substitute("Strength must be at least: 30",{min_passwd_strength: 30}));
+	VAL_PWD.add("change_password_input_1", 'no_chars(%input%, " ")', "email_password_spaces");
+	VAL_PWD.attach();
+	VAL_PWD2.add("change_password_input_2", "equals('change_password_input_1', 'change_password_input_2')", "Passwords do not match!");
+	VAL_PWD2.attach();
+	EVENT.on("create_strong_password", "click", function () {
+	CPANEL.password.generate_password(function (password) {
+	DOM.get("change_password_input_1").value = password;
+	DOM.get("change_password_input_2").value = password;
+	PWD_BAR.check_strength("change_password_input_1", function() { VAL_PWD.verify() });
+	VAL_PWD2.verify();
+	});
+	});
+	CPANEL.validate.attach_to_form("email_table_change_password_confirm", [VAL_PWD, VAL_PWD2]);
+	if (document.getElementById("local_extension_input")) {
+	var VAL_LOCAL_EXT = new CPANEL.validate.validator("CGPLocalExtension");
+	VAL_LOCAL_EXT.add("local_extension_input", 'if_not_empty(%input%,verify_local_extension_local)', YAHOO.lang.substitute("CGPLocalExtensionInvalid",{min: 200, max: 999}));
+	VAL_LOCAL_EXT.attach();
+	CPANEL.validate.attach_to_form("change_quota_confirm", [VAL_LOCAL_EXT]);
+	}
+	};
+
+	YAHOO.util.Event.onDOMReady(function () {
+	verify_local();
+	});
+      </script>
+    </td>
+  </tr>
+  [% END -%]
+  [% FOR acc IN migrate_accounts.diff_accounts -%]
+  <tr>
+    <td>
+      <span class="glyphicon glyphicon-remove" style="color: red; font-size: 20px;"></span>
+    </td>
+    <td>[% acc %]</td>
+  </tr>
+  [% END -%]
+</table>
+
+[% UNLESS migrate_accounts.account -%]
+<p>All accounts are imported!</p>
+<div class="return-link"><a href="../../index.html">&larr; Go Back</a></div>
+[% END -%]
+
+  </div>
+</div>
+[% END %]
