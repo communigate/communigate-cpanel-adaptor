@@ -146,8 +146,9 @@ sub api2_AccountsOverview {
 		my $accountPrefs = $cli->GetAccountEffectivePrefs("$userName\@$domain");
 		my $diskquota = @$accountData{'MaxAccountSize'} || '';
 		$diskquota =~ s/M//g;
-		my $_diskused = $cli->GetAccountInfo("$userName\@$domain","StorageUsed");
-		my $diskused = $_diskused / 1024 /1024;
+		my $_diskused = $cli->GetStorageFileInfo("$userName\@$domain");
+                $_diskused->[0] =~ s/\D+//g;
+                my $diskused = $_diskused->[0] / 1024 /1024;
 		my $diskusedpercent;
 		if ($diskquota eq "unlimited") {
 		    $diskusedpercent = 0;
