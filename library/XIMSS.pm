@@ -10,8 +10,6 @@ BEGIN {
     @INC = (@INC, @addonPaths);
 }
 use XML::Simple;
-# You may need to change this to "use IO::Socket::INET;" if you have INET.pm
-use IO::Socket;
 use LWP::UserAgent;
 use Encode qw(encode_utf8 decode_utf8);
 $CGP::TIMEOUT = 60*5-5;  # 5 minutes timeout
