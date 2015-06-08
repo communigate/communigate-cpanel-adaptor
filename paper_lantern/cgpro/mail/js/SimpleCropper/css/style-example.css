@@ -1,0 +1,34 @@
+/* 
+    Author     : Tomaz Dragar
+    Mail       : <tomaz@dragar.net>
+    Homepage   : http://www.dragar.net
+*/
+
+.clear{
+  font-size: 0px;
+  line-height: 0px;
+  overflow: hidden;
+  width: 0px;
+  height: 0px;
+  clear: both;
+}
+
+.simple-cropper-images{
+  width: 820px;
+  margin: 0 auto 20px;  
+}
+
+.cropme{
+  float: left;
+  background-color: #f1f1f1;
+  margin-bottom: 10px;
+  background-image: url('../images/UploadLight.png');
+  background-position: center center;
+  background-repeat: no-repeat;
+  cursor: pointer;
+}
+
+.cropme:hover{
+  background-image: url('../images/UploadDark.png');
+}
+
