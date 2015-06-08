@@ -22,13 +22,21 @@
   float: left;
   background-color: #f1f1f1;
   margin-bottom: 10px;
-  background-image: url('../images/UploadLight.png');
-  background-position: center center;
-  background-repeat: no-repeat;
   cursor: pointer;
+  text-align: center;
+  vertical-align: middle;
+}
+
+.cropme span {
+    color: #aaaaaa;
+    line-height: 100px;
 }
 
 .cropme:hover{
-  background-image: url('../images/UploadDark.png');
+    color: #666666;
+}
+
+.cropme span:hover{
+    color: #666666;
 }
 

@@ -578,8 +578,9 @@ var DEFAULT_EMAIL_QUOTA = [% execute("Email", "get_default_email_quota_mib").dat
     <script id="image_template" type="text/x-handlebars-template">
       <label style="display: block; margin-top: 10px;">Avatar:</label>
       <div class="cropme" id="crop_{{index}}" style="width: 100px; height: 100px;">
+	<span class="glyphicon glyphicon-camera" style="font-size: 70px;"></span>
 	{{#if acc_photo}}
-	<img id="acc_avatar_{{index}}" src="data:image/png;base64,{{acc_photo}}" style="width: 100%;"></img> 
+	<img id="acc_avatar_{{index}}" src="data:image/png;base64,{{acc_photo}}" style="width: 100%; position: relative; top: -100px;"></img> 
 	{{/if}}
       </div>
       <div class="clear"></div>

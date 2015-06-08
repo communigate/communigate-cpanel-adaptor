@@ -243,9 +243,9 @@ var build_email_table_markup = function() {
 	    && ACCOUNTS[i]['vcard']['fileData'][0]['vCard'][0]['PHOTO'][0]['BINVAL']
 	    && ACCOUNTS[i]['vcard']['fileData'][0]['vCard'][0]['PHOTO'][0]['BINVAL'][0]) {
 	    var acc_photo = ACCOUNTS[i]['vcard']['fileData'][0]['vCard'][0]['PHOTO'][0]['BINVAL'][0];
-	    html += '<img id="avatar_' + i + '" src="data:image/png;base64,' + acc_photo + '" alt="avatar" style="width: 48px; heigth:48px; cursor: pointer; max-width: 100%; max-heigth: 10-0%;">';
+	    html += '<img id="avatar_' + i + '" src="data:image/png;base64,' + acc_photo + '" alt="avatar" style="width: 48px; heigth:48px; cursor: pointer; max-width: 100%; max-heigth: 100%;">';
 	} else {
-	    html += '<img id="avatar_' + i + '" src="js/SimpleCropper/images/avatar_default.png" style="cursor: pointer;" alt="avatar">';
+	    html += '<span class="glyphicon glyphicon-user" id="avatar_' + i + '" style="font-size: 48px; cursor: pointer;"></span>';
 	}
 	
 	html += '</td>';
