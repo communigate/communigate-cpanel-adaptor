@@ -23,6 +23,7 @@ use XIMSS;
 use Cpanel::CPAN::MIME::Base64::Perl qw(decode_base64 encode_base64);
 use Cpanel::Version;
 use URI::Escape;
+use JSON;
 
 require Exporter;
 @ISA    = qw(Exporter);
@@ -136,6 +137,7 @@ sub api2_AccountsOverview {
 
 	my $return_accounts = {};
 	my $freeExtensions = {};
+	my $ximss = getXIMSS($cli->{loginData}->[2] . '@' . $cli->MainDomainName(), $cli->{loginData}->[3]);
 	foreach my $domain (@domains) {
 	    my $accounts=$cli->ListAccounts($domain);
 	    foreach my $userName (sort keys %$accounts) {
@@ -147,8 +149,8 @@ sub api2_AccountsOverview {
 		my $diskquota = @$accountData{'MaxAccountSize'} || '';
 		$diskquota =~ s/M//g;
 		my $_diskused = $cli->GetStorageFileInfo("$userName\@$domain");
-                $_diskused->[0] =~ s/\D+//g;
-                my $diskused = $_diskused->[0] / 1024 /1024;
+		$_diskused->[0] =~ s/\D+//g;
+		my $diskused = $_diskused->[0] / 1024 /1024;
 		my $diskusedpercent;
 		if ($diskquota eq "unlimited") {
 		    $diskusedpercent = 0;
@@ -171,7 +173,20 @@ sub api2_AccountsOverview {
 		    stats => $accountStats,
 		    md5 => md5_hex(lc $userName . "@" . $domain),
 		};
+		# Fetch vCard
+
+		my $time = time();
+		$return_accounts->{$userName . "@" . $domain}->{"vcard"} = $ximss->send({
+		    fileRead => {
+			id => "$time-vcard",
+			type => "vcard",
+			filename => "~$userName\@$domain/profile.vcf"
+		    }
+											}, {forceArray => 1});
+
 	    }
+	    $ximss->close();
+
 	    my $forwarders = $cli->ListForwarders($domain);
 	    for my $forwarder (@$forwarders) {
 		if ($forwarder =~ m/^tn\-\d+/) {
@@ -188,6 +203,7 @@ sub api2_AccountsOverview {
 	}
 	my $defaults = $cli->GetServerAccountDefaults();
 	$cli->Logout();
+
 	return { accounts => $return_accounts,
 		 classes => $defaults->{'ServiceClasses'},
 		 freeExtensions => $freeExtensions,
@@ -201,6 +217,32 @@ sub api2_AccountsOverview {
 		     return sort { $hash->{$a}->{$sort_field} cmp $hash->{$b}->{$sort_field} || $hash->{$a}->{'username'} cmp $hash->{$b}->{'username'} || $hash->{$a}->{'domain'} cmp $hash->{$b}->{'domain'}} keys %$hash;
 		 }
 	};
+}
+
+sub api2_UpdateVCard {
+    my %OPTS = @_;
+    
+    my $cli = getCLI();
+    # SET vCard
+
+    my $vcard = decode_json($OPTS{vcard});
+    my $password = $cli->GetAccountPlainPassword($OPTS{"account"});
+    my $result;
+    if ($password) {
+    	my $ximss = getXIMSS($OPTS{"account"}, $password);
+    	my $time = time();
+    	$result = $ximss->send({
+    	    fileWrite => {
+    		id => "$time-vcard",
+    		type => "vcard",
+    		filename => "profile.vcf",
+    		vCard => $vcard
+    	    }
+    				  });
+	 $ximss->close();
+    }
+    $cli->Logout();
+    return $result;
 }
 
 sub api2_ListAccounts {
@@ -1851,9 +1893,9 @@ sub api2_AddGroup{
   	$cli->SetGroup("$listname\@$domain",$Settings);
 
 	# Create rule if posting is restricted to members : (spectre = 0)
-	if (!$spectre) {
-		SetGroupInternal("$listname\@$domain");
-	}
+	# if (!$spectre) {
+	# 	SetGroupInternal("$listname\@$domain");
+	# }
 	$cli->Logout();
 
         return @result;
@@ -1969,26 +2011,26 @@ sub api2_GetGroupSettings {
 	my $cli = getCLI();
         my $listSettings = $cli->GetGroup("$email");
         my $error_msg = $cli->getErrMessage();
-        my @result;
+        my $result;
         if ($error_msg eq "OK") {
                 foreach (keys %$listSettings) {
                         my $key=$_;
                         my $value = @$listSettings{$key};
-                        push( @result, { "$key" => "$value" } );
+                        $result->{$key} = $value;
                         $Cpanel::CPDATA{"$key"} = "$value";
              }
         } else {
                 $Cpanel::CPERROR{'CommuniGate'} = $error_msg;
         }
-	if (IsGroupInternal($email)) {
-		push( @result, { "spectre" => "0" } );
-                $Cpanel::CPDATA{"spectre"} = "0";
-	} else {
-		push( @result, { "spectre" => "1" } );
-                $Cpanel::CPDATA{"spectre"} = "1";
-	}
+	# if (IsGroupInternal($email)) {
+	#     $result->{spectre} = 0;
+	#     $Cpanel::CPDATA{"spectre"} = "0";
+	# } else {
+	#     $result->{spectre} = 1;
+	#     $Cpanel::CPDATA{"spectre"} = "1";
+	# }
 	$cli->Logout();
-        return @result;
+        return $result;
 }
 
 sub api2_SetAutoresponder {
@@ -2421,12 +2463,12 @@ sub api2_SetGroupSettings {
 	    $Cpanel::CPERROR{'CommuniGate'} = $error_msg;
         }
 	$cli->Logout();
-	if ($OPTS{'spectre'} && IsGroupInternal($email)) {
-		SetGroupExternal($email);
-	}
-	if (!$OPTS{'spectre'} && (!IsGroupInternal($email))) {
-                SetGroupInternal($email);
-        }
+	# if ($OPTS{'spectre'} && IsGroupInternal($email)) {
+	# 	SetGroupExternal($email);
+	# }
+	# if (!$OPTS{'spectre'} && (!IsGroupInternal($email))) {
+        #         SetGroupInternal($email);
+        # }
 	$cli->Logout();
         return @result;
 }
@@ -4486,12 +4528,25 @@ sub api2_DoEditRPOP {
 	if ($domain eq $dom) {
 	    my $settings = $cli->GetAccountRPOPs($account);
 	    $OPTS{'name'} =~ s/\W//g;
-	    $settings->{$OPTS{'name'}} = {
-		authName => $OPTS{'authName'},
-		domain => $OPTS{'domain'},
-		password => $OPTS{'password'},
-		period => $OPTS{'period'},
-	    };
+	    if ($settings->{$OPTS{'name'}}) {
+		# Edit
+		$settings->{$OPTS{'name'}} = {
+		    authName => $OPTS{'authName'},
+		    domain => $OPTS{'domain'},
+		    period => $OPTS{'period'},
+		};
+		if ($OPTS{'password'}) {
+		    $settings->{$OPTS{'name'}}->{'password'} = $OPTS{'password'};
+		}
+	    } else {
+		# Add
+		$settings->{$OPTS{'name'}} = {
+		    authName => $OPTS{'authName'},
+		    domain => $OPTS{'domain'},
+		    password => $OPTS{'password'},
+		    period => $OPTS{'period'},
+		};
+	    }
 	    if ($OPTS{'mailbox'}) {
 		$settings->{$OPTS{'name'}}->{'mailbox'} = $OPTS{'mailbox'};
 	    } else {
@@ -4923,6 +4978,12 @@ sub api2_CSVDoImport {
     my $domhash  = { map { $_ => 1 } @Cpanel::DOMAINS };
     my $numrows  = scalar @$importdata;
     my $rowcount = 0;
+    my $result = { result => []};
+    if ( $type eq 'fwd' ) {
+	$result->{type} = 'fwd';
+    } else {
+	$result->{type} = 'account';
+    }
     foreach my $row (@$importdata) {
         $rowcount++;
         my ( $status, $msg );
@@ -4932,18 +4993,24 @@ sub api2_CSVDoImport {
 	addforward (
 	    domain => $dom,
 	    email => $user,
-	    fwdemail => $row->{'terget'},
+	    fwdemail => $row->{'target'},
 	    cli => $cli
 	    );
+	if ($cli->getErrMessage && $cli->getErrMessage ne "OK") {
+	    push @{$result->{result}}, {source => $row->{'source'}, target => $row->{'target'}, rowcount => $rowcount, numrows => $numrows, error => $cli->getErrMessage};
+	} else {
+	    push @{$result->{result}}, {source => $row->{'source'}, target => $row->{'target'}, rowcount => $rowcount, numrows => $numrows};
+	}
 	$cli->Logout();
         }
         else {
 	    my ($user, $dom) = split "@", $row->{'email'};
 	    my $apiref = Cpanel::Api2::Exec::api2_preexec( 'Email', 'addpop' );
 	    my ( $data, $status ) = Cpanel::Api2::Exec::api2_exec( 'Email', 'addpop', $apiref, {domain => $dom, email=> $user, password => $row->{'password'}, quota => $row->{'quota'}} );
+	    push @{$result->{result}}, {data => $data, status => $status, email => $row->{'email'}, rowcount => $rowcount, numrows => $numrows};
         }
-        print qq{<script>setcompletestatus($rowcount,$numrows)</script>\n\n};
     }
+    return $result;
 }
 
 sub api2_UpdatePSTN {
@@ -5042,6 +5109,14 @@ sub api2_getCGProServer {
     my $loginData = $cli->{loginData};
     $cli->Logout();
     return $loginData->[0];
+}
+
+sub api2_getMxPresets {
+   my $cli = getCLI();
+    my $loginData = $cli->{loginData};
+    my $prefs = $cli->GetServerAccountPrefs();
+    $cli->Logout();
+    return $prefs->{"MxPresets"};
 }
 
 sub versioncmp( $$ ) {
