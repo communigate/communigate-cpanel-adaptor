@@ -245,7 +245,7 @@ var build_email_table_markup = function() {
 	    var acc_photo = ACCOUNTS[i]['vcard']['fileData'][0]['vCard'][0]['PHOTO'][0]['BINVAL'][0];
 	    html += '<img id="avatar_' + i + '" src="data:image/png;base64,' + acc_photo + '" alt="avatar" style="width: 48px; heigth:48px; cursor: pointer; max-width: 100%; max-heigth: 100%;">';
 	} else {
-	    html += '<span class="glyphicon glyphicon-user" id="avatar_' + i + '" style="font-size: 48px; cursor: pointer;"></span>';
+	    html += '<img id="avatar_' + i + '" style="width: 48px; heigth:48px; cursor: pointer; max-width: 100%; max-heigth: 100%;">' + '<span class="glyphicon glyphicon-user" id="span_avatar_' + i + '" style="font-size: 48px; cursor: pointer;"></span>' + '</img>';
 	}
 	
 	html += '</td>';
@@ -1349,6 +1349,7 @@ var change_avatar = function(e, o) {
     var index = o.index;
     // create the API variables
     var selector_img = "#crop_" + index + " img";
+
     if ( $(selector_img)['0'] ) {
     var new_avatar = $(selector_img).attr('src');	
     }
@@ -1372,16 +1373,16 @@ var change_avatar = function(e, o) {
 
     new_avatar = encodeURIComponent(new_avatar.substring(22));
     
-    	if (ACCOUNTS[i]['vcard']
-	    && ACCOUNTS[i]['vcard']['fileData']
-	    && ACCOUNTS[i]['vcard']['fileData'][0]
-	    && ACCOUNTS[i]['vcard']['fileData'][0]['vCard']
-	    && ACCOUNTS[i]['vcard']['fileData'][0]['vCard'][0]
-	    && ACCOUNTS[i]['vcard']['fileData'][0]['vCard'][0]['PHOTO']
-	    && ACCOUNTS[i]['vcard']['fileData'][0]['vCard'][0]['PHOTO'][0]
-	    && ACCOUNTS[i]['vcard']['fileData'][0]['vCard'][0]['PHOTO'][0]['BINVAL']
-	    && ACCOUNTS[i]['vcard']['fileData'][0]['vCard'][0]['PHOTO'][0]['BINVAL'][0]) {
-	    var vCard_obj = ACCOUNTS[i]['vcard']['fileData'][0]['vCard'][0];
+    	if (ACCOUNTS[o.index]['vcard']
+	    && ACCOUNTS[o.index]['vcard']['fileData']
+	    && ACCOUNTS[o.index]['vcard']['fileData'][0]
+	    && ACCOUNTS[o.index]['vcard']['fileData'][0]['vCard']
+	    && ACCOUNTS[o.index]['vcard']['fileData'][0]['vCard'][0]
+	    && ACCOUNTS[o.index]['vcard']['fileData'][0]['vCard'][0]['PHOTO']
+	    && ACCOUNTS[o.index]['vcard']['fileData'][0]['vCard'][0]['PHOTO'][0]
+	    && ACCOUNTS[o.index]['vcard']['fileData'][0]['vCard'][0]['PHOTO'][0]['BINVAL']
+	    && ACCOUNTS[o.index]['vcard']['fileData'][0]['vCard'][0]['PHOTO'][0]['BINVAL'][0]) {
+	    var vCard_obj = ACCOUNTS[o.index]['vcard']['fileData'][0]['vCard'][0];
 	    vCard_obj['PHOTO'][0]['BINVAL'][0] = new_avatar;
 	} else {
 	    var vCard_obj = {
@@ -1397,7 +1398,7 @@ var change_avatar = function(e, o) {
         "cpanel_jsonapi_version": 2,
         "cpanel_jsonapi_module": "CommuniGate",
         "cpanel_jsonapi_func": "UpdateVCard",
-	"account": ACCOUNTS[o.index]['prefs']['AccountName'],
+	"account": ACCOUNTS[o.index]['prefs']['AccountName']
     };
 
     // callback functions
@@ -1420,6 +1421,8 @@ var change_avatar = function(e, o) {
             if (data.cpanelresult.event && (data.cpanelresult.event['result'] == 1)) {
                 var status = "";
                 CPANEL.widgets.status_bar("status_bar_" + index, "success", "Changed avatar", status);
+		var selector_span_avatar = "#span_avatar_" + index;
+		$(selector_span_avatar).css("display", "none");
 		var selector_avatar = "#avatar_" + index;
 		$(selector_avatar).attr("src", 'data:image/png;base64,' + new_avatar);
             } else if (data.cpanelresult.event && (data.cpanelresult.event['result'] == 0)) {
