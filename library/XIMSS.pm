@@ -10,9 +10,8 @@ BEGIN {
     @INC = (@INC, @addonPaths);
 }
 use XML::Simple;
-# You may need to change this to "use IO::Socket::INET;" if you have INET.pm
-use IO::Socket;
-
+use LWP::UserAgent;
+use Encode qw(encode_utf8 decode_utf8);
 $CGP::TIMEOUT = 60*5-5;  # 5 minutes timeout
 
 sub new {
@@ -41,90 +40,97 @@ sub connect {
 
   delete $this->{theSocket} if exists $this->{theSocket};
 
-  $this->{theSocket} = new IO::Socket::INET( %{$this->{connParams}} );
-
-  unless(defined $this->{theSocket} && $this->{theSocket}) {
-    $CGP::ERR_STRING = "Can't open connection to CGPro Server";
-    return undef;
-  };
-  $this->{theSocket}->autoflush(1);
-  $this->{'lastAccess'}=time();
-  my $time = time();
-  $this->send({
-      login => {
-	  authData => $this->{authData},
-	  password => $this->{password},
-	  id => "$time-login"
-      }
-	      });
-
-  my $loginResult = $this->parseResponse("$time-login");
-  if (defined $loginResult->{response}->{errorNum}) {
-      croak 'You must pass correct authData and password parameter to XIMSS::new: ' . $loginResult->{response}->{errorText};
+  my $ua = LWP::UserAgent->new(
+      ssl_opts => { verify_hostname => 0 }
+      );
+  $ua->timeout(15);
+  $ua->env_proxy;
+   my $response = $ua->get("https://" . $this->{"connParams"}->{"PeerAddr"} . ":9100/ximsslogin/?username=" . $this->{"authData"} . "&password=" . $this->{"password"}); 
+  if ($response->is_success) {
+      my $response = XMLin($response->content, KeyAttr => "IgnoreKeyAttr");
+      $this->{SID} = $response->{"session"}->{"urlID"};
   }
-  $this->{isConnected} = 1;
-  $this->{SID} = $loginResult->{session}->{urlID};
+  else {
+      warn $response->status_line;
+  }
   1;
 }
 
 sub send {
   my ($this, $data) = @_;
   my $command = XMLout ($data, RootName => undef );
-  if( time() - $this->{'lastAccess'} > $CGP::TIMEOUT ||
-     !($this->{theSocket}) || $this->{theSocket}->error()) {
-      $this->{theSocket}->shutdown(SHUT_RDWR) if($this->{theSocket});
-      unless($this->connect()) {
-      	  die "Failure: Can't reopen XIMSS connection";
-      }
+ 
+  my $ua = LWP::UserAgent->new(
+      ssl_opts => { verify_hostname => 0 }
+      );
+  $ua->timeout(15);
+  $ua->env_proxy;
+  my $response = $ua->post("https://" . $this->{"connParams"}->{"PeerAddr"} . ":9100/Session/" . $this->{"SID"} . "/sync", Content => "<XIMSS>" . $command.  "</XIMSS>");
+  if ($response->is_success) {
+      return XMLin(encode_utf8 $response->content, KeyAttr => "IgnoreKeyAttr");
   }
-  print STDERR ref($this) . "->send($command)\n\n" if $this->{'debug'};
-  $this->{'lastAccess'} = time();
-  print {$this->{theSocket}} $command . "\000";
+  else {
+      warn $response->status_line;
+      return undef;
+  }
 }
 
 sub _parseResponse {
     my $this = shift;
-    my $socket = $this->{theSocket};
-    my $prev = $/;
-    $/ = "\000";
-    my $responseLine = $this->{theSocket}->getline();
-    $/ = $prev;
-    $responseLine =~ s/\000//g;
-    $responseLine .= $this->_parseResponse() unless $responseLine =~ m/^\</i;
-    print STDERR "XIMSS->_parseResponse::responseLine = $responseLine\n\n" if $this->{'debug'};
-    $this->{'lastAccess'}=time();
-    return $responseLine;
+    # my $socket = $this->{theSocket};
+    # my $prev = $/;
+    # $/ = "\000";
+    # my $responseLine = $this->{theSocket}->getline();
+    # $/ = $prev;
+    # $responseLine =~ s/\000//g;
+    # $responseLine .= $this->_parseResponse() unless $responseLine =~ m/^\</i;
+    # print STDERR "XIMSS->_parseResponse::responseLine = $responseLine\n\n" if $this->{'debug'};
+    # $this->{'lastAccess'}=time();
+    # return $responseLine;
 }
 
 sub parseResponse {
     my $this = shift;
     my $id = shift;
-    croak "Pass and id" unless $id;
-    my $string = $this->_parseResponse();
-    my $response = XMLin("<opt>" . $string  . "</opt>", KeyAttr => "IgnoreKeyAttr");
-    for my $tag (keys %$response) {
-	if (ref($response->{$tag}) eq "ARRAY") {
-	    for my $subres (@{$response->{$tag}}) {
-		push @{$this->{responses}->{delete $subres->{id}}->{$tag}}, $subres;
-	    }
-	} else {
-	    $this->{responses}->{delete $response->{$tag}->{id}}->{$tag} = $response->{$tag};
-	}
-    }
-
-    return delete $this->{responses}->{$id};
+    # croak "Pass and id" unless $id;
+    # my $string = $this->_parseResponse();
+    # my $response = XMLin("<opt>" . $string  . "</opt>", KeyAttr => "IgnoreKeyAttr");
+    # for my $tag (keys %$response) {
+    # 	if (ref($response->{$tag}) eq "ARRAY") {
+    # 	    for my $subres (@{$response->{$tag}}) {
+    # 		push @{$this->{responses}->{delete $subres->{id}}->{$tag}}, $subres;
+    # 	    }
+    # 	} else {
+    # 	    $this->{responses}->{delete $response->{$tag}->{id}}->{$tag} = $response->{$tag};
+    # 	}
+    # }
+    # return delete $this->{responses}->{$id};
 }
 sub getAnyResponse {
   my $this = shift;
-  my $string = $this->_parseResponse();
-  return XMLin("<opt>" . $string  . "</opt>", KeyAttr => "IgnoreKeyAttr");
+  # my $string = $this->_parseResponse();
+  # return XMLin("<opt>" . $string  . "</opt>", KeyAttr => "IgnoreKeyAttr");
 }
 
 sub close {
     my $this = shift;
     my $time = time();
-    $this->send({bye => {id => "$time-bye"}});
-    delete $this->{responses};
+    my $command = XMLout({bye => {id => "$time-bye"}}, RootName => undef );
+    my $ua = LWP::UserAgent->new(
+        ssl_opts => { verify_hostname => 0 }
+        );
+    $ua->timeout(15);
+    $ua->env_proxy;
+    my $response = $ua->post("https://" . $this->{"connParams"}->{"PeerAddr"} . ":9100/Session/" . $this->{"SID"} . "/sync", Content => "<XIMSS>" . $command.  "</XIMSS>");
+    
+    if ($response->is_success) {
+        # warn XMLin($response->content, KeyAttr => "IgnoreKeyAttr");
+        # urlID
+    }
+    else {
+        warn $response->status_line;
+    }
+
 }
 
 1;
