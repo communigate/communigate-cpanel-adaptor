@@ -168,7 +168,7 @@ YAHOO.util.Event.onDOMReady(function () {
       <td>
 	<a href="deleteextension.html?extension=[% extension.uri_dest %]&amp;display=[% extension.html_dest %]"><span class="glyphicon glyphicon-trash"></span> [% locale.maketext('Delete') %]</a>[% IF extension.type == "number" && extension.assignedType == "a" %], 
 	[% UNLESS extension.out -%]
-	<a href="setoutgoingnumber.html?extension=[% extension.uri_dest %]"><span class="glyphicon glyphicon-upload"></span> [% locale.maketext('Set As Outgoing') %]</a>
+	<a href="setoutgoingnumber.html?extension=[% extension.uri_dest %]"><span class="glyphicon glyphicon-arrow-right"></span> [% locale.maketext('Set As Outgoing') %]</a>
 	[% ELSE %]
 	<a href="unsetoutgoingnumber.html?extension=[% extension.uri_dest %]"><span class="glyphicon glyphicon-remove"></span> [% locale.maketext('Unset As Outgoing') %]</a>
 	[% END -%]
