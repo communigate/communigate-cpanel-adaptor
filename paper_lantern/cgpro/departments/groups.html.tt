@@ -1,0 +1,119 @@
+[%
+SET CPANEL.CPVAR.dprefix = "../../";
+SET CPANEL.CPVAR.headerimg = "../../images/mailmenu.gif";
+
+# list domains
+Api2.pre_exec("Email", "listmaildomains");
+SET api2_result_Email_listmaildomains =  Api2.exec("Email", "listmaildomains", {} );
+Api2.post_exec("Email", "listmaildomains");
+
+SET departments = Api2.exec("CommuniGate", "ListDepartments", {
+"domain" = RAW_FORM.item("domain")
+});
+
+%]
+
+[% WRAPPER '_assets/master.html.tt'
+app_key = 'cgpro_departments'
+-%]
+
+<div class="body-content">
+
+  <h3>Add Department Member</h3>
+  <form method="post" action="doaddgroup.html" id="userform" name="userform">
+    <div class="form-group">
+      <label for="realname">
+	[% locale.maketext("Department Name") %]
+      </label>
+      <div class="row">
+	<div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	  <input id="realname" type="text" name="realname" class="form-control" />
+	</div>
+      </div>
+      <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	<div id="email_error"></div>
+      </div>
+    </div>
+    <div class="row form-group">
+      <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	<label for="email">
+	  [% locale.maketext("Department Address")  %]
+	</label>
+	<div class="input-group">
+          [% IF (CPANEL.CPVAR.maildomainscount == "1") %]
+          <input id="email" type="text" name="email" class="form-control" />
+          <span id="spanAddEmailAccountDomains" class="input-group-addon">
+            [% IF api2_result_Email_listmaildomains.size(); %]
+            [% FOREACH hashref IN api2_result_Email_listmaildomains %]
+            [% hashref.domain.html(); %]
+            <input id="add_email_domain" type="hidden" value="[%  hashref.domain.html() %]" />
+            [% END %]
+            [% END %]
+          </span>
+	  [% ELSE %]
+          <input id="email" name="email" type="text" class="form-control" />
+          <span id="atSignAddEmailAccount" class="input-group-addon">
+            @
+          </span>
+          [% END %]
+	</div>
+
+      </div>
+      <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	<div id="add_email_account_error"></div>
+      </div>
+    </div>
+    [% IF (CPANEL.CPVAR.maildomainscount > "1") %]
+    <div class="form-group">
+      <label id="lblAddEmailDomain" for="add_email_domain">
+	[% locale.maketext("Domain")  %]
+      </label>
+      <div class="row">
+	<div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	  <select name="domain" id="domain" class="form-control">
+            [% IF api2_result_Email_listmaildomains.size(); %]
+            [% FOREACH hashref IN api2_result_Email_listmaildomains; %]
+            <option value="[%  hashref.domain.html() %]">
+              [%  hashref.domain.html() %]
+            </option>
+            [% END %]
+            [% END %]
+	  </select>
+	</div>
+	<div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	</div>
+      </div>
+    </div>
+    [% END %]
+    <div class="form-group">
+      <input type="submit" id="submit" value="[% locale.maketext("Create Department") %]" class="btn btn-primary"/>
+    </div>
+    <div id="add_email_status_bar" style="margin:0 -5px;" class="cjt_status_bar"></div>
+  </form>
+
+  <h3>Current Departments</h3>
+  <table id="mailtbl" class="table table-striped">
+    <thead>
+      <tr>
+	<th>Department Address</th>
+	<th colspan="4">Functions</th>
+      </tr>
+    </thead>
+    <tbody>
+      [% IF departments.size() == 0 %]
+      <td colspan="5">Currently there aren't any departments!</td>
+      [% ELSE %]
+      [% FOREACH department IN departments %]
+      <tr>
+	<td>[% department.list %]</td>
+	<td><a href="dodelgroup.html?email=[% department.list %]&domain=[% department.domain %]"><span class="glyphicon glyphicon-trash"></span> Delete</a></td>
+	<td><a href="dorenamegroup.html?email=[% department.list %]&domain=[% department.domain %]"><span class="glyphicon glyphicon-pencil"></span> Rename</a></td>
+	<td><a href="groupsettings.html?email=[% department.list %]&domain=[% department.domain %]"><span class="glyphicon glyphicon-cog"></span> Settings</a></td>
+	<td><a href="groupmembers.html?listname=[% department.list %]"><span class="glyphicon glyphicon-user"></span> Department Members</a></td>
+      </tr>
+      [% END %]
+      [% END %]
+    </tbody>
+  </table>
+</div><!-- end body-content -->
+[% END %]

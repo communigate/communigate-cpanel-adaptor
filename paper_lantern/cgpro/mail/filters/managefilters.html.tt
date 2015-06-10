@@ -7,9 +7,6 @@ api2_result_Email_listpops = api2_result_Email_listpops.0.accounts;
 [% WRAPPER '_assets/master.html.tt'
 app_key = 'user_filters'
 %]
-[% USE Dumper; %]
-<pre>[% Dumper.dump(api2_result_Email_listpops) %]</pre>
-
 
 <div class="body-content">
   <div class="section">

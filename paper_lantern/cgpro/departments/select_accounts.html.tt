@@ -1,0 +1,13 @@
+[% MACRO filter_option(pval, val, text) BLOCK -%]
+<option value="[% val %]"[% val == pval ? " selected='selected'" : "" %]>[% locale.maketext(text) %]</option>
+[% END -%]
+<select id="account" name="account">
+  [% filter_option(account, "", "CGPPleaseSelect") %]
+  [% FOR account IN accounts.sort -%]
+  [% myclass = accounts.$account.class -%]
+  [% classstring = classes.$myclass.AccessModes.join(',') -%]
+  [% IF !CPANEL.CPVAR.accounttype || (classstring.search(CPANEL.CPVAR.accounttype) || classstring == "All") -%]
+  [% filter_option(FORM.account, account, account) %]
+  [% END -%]
+  [% END -%]
+</select>
