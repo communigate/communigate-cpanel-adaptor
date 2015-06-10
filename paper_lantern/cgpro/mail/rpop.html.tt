@@ -8,7 +8,9 @@ SET CPANEL.CPVAR.headerimg = "../images/mailmenu.gif";
 SET CPANEL.CPVAR.headerinclude = "mail/pops_head.html";
 %]
 
-[% SET accounts = Api2.exec("CommuniGate", "ListAccounts", {}) %]
+[% SET accounts = Api2.exec("CommuniGate", "ListAccounts", {})
+accounts = accounts.0.accounts;
+%]
 
 [% IF RAW_FORM.item("account") %]
 [% SET rpop = Api2.exec("CommuniGate", "ListRPOP", {
@@ -33,14 +35,13 @@ rpop = rpop.0;
         <label for="manage_list_select" id="txt_Managing" class="col-xs-12 control-label">[% locale.maketext("Managing:") %]</label>
       </div>
       <div class="form-group">
-        [% SET accounts = Api2.exec("CommuniGate", "ListAccounts", {}) %]
         <select name="account" id="manage_list_select" class="col-xs-12 form-control">
           <option value="">[% locale.maketext("Select account.") %]</option>
 	  [% FOR account IN accounts.sort -%]
 	  [% filter_option(FORM.account, account,account) %]
 	  [% END -%]
         </select>
-      </div>
+  </div>
       <noscript>
         <div class="form-group">
           <input type="submit" class="btn btn-primary" id="btn_domainSelect_go" value="[% locale.maketext("Go") %]" />

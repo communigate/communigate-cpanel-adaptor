@@ -1,12 +1,15 @@
 [%
 SET CPANEL.CPVAR.dprefix = "../../../";
 SET api2_result_Email_listpops =  Api2.exec("CommuniGate", "ListAccounts", {} );
+api2_result_Email_listpops = api2_result_Email_listpops.0.accounts;
 %]
-
 
 [% WRAPPER '_assets/master.html.tt'
 app_key = 'user_filters'
 %]
+[% USE Dumper; %]
+<pre>[% Dumper.dump(api2_result_Email_listpops) %]</pre>
+
 
 <div class="body-content">
   <div class="section">
@@ -22,9 +25,9 @@ app_key = 'user_filters'
         [% IF api2_result_Email_listpops.size %]
         [% FOREACH account IN api2_result_Email_listpops %]
         <tr>
-          <td>[% account %]</td>
+          <td>[% account.key %]</td>
           <td><div>
-              <a class="btn btn-link" href="userfilters.html?account=[% account %]">
+              <a class="btn btn-link" href="userfilters.html?account=[% account.key %]">
                 <span class="fa fa-wrench fa-lg"></span>
                 [% locale.maketext("Manage Filters") %]</a>
           </div></td>

@@ -247,18 +247,37 @@ sub api2_UpdateVCard {
 
 sub api2_ListAccounts {
     my %OPTS = @_;
+    my $show_classes = $OPTS{'classes'};
     my $invert = $OPTS{'invert'};
     my @domains = Cpanel::Email::listmaildomains();
     my $cli = getCLI();
-    my $return_accounts = [];
+    my $return_accounts = {};
+    my $all_classes;
     foreach my $domain (@domains) {
 	my $accounts=$cli->ListAccounts($domain);
 	foreach my $userName (sort keys %$accounts) {
 	    next if $userName eq 'pbx' || $userName eq 'ivr';
-	    push @$return_accounts, $userName . "@" . $domain;
+
+	    my $accountData = $cli->GetAccountEffectiveSettings("$userName\@$domain");
+	    my $service = @$accountData{'ServiceClass'} || '';
+	    if ($OPTS{'classes'}) {
+	    $all_classes = @$accountData{'ServiceClasses'} unless $all_classes;
+	    }
+
+	    $return_accounts->{$userName . "@" . $domain} = {
+		domain => $domain,
+		username => $userName,
+		class => $service
+	    };
 	}
     }
-    return $return_accounts;
+    my $return = {
+	accounts => $return_accounts
+    };
+    if ($OPTS{'classes'}) {
+    $return->{"classes"} = $all_classes;
+    }
+    return $return;
 }
 
 sub api2_AccountDefaults {

@@ -16,13 +16,15 @@
           <label for="manage_list_select" id="txt_Managing" class="col-xs-12 control-label">[% locale.maketext("Managing:") %]</label>
         </div>
         <div class="form-group">
-          [% SET accounts = Api2.exec("CommuniGate", "ListAccounts", {}) %]
-          <select name="account" id="manage_list_select" class="col-xs-12 form-control">
-            <option value="">[% locale.maketext("Select account.") %]</option>
-	    [% FOR account IN accounts.sort -%]
-	    [% filter_option(FORM.account, account,account) %]
-	    [% END -%]
-          </select>
+          [% SET accounts = Api2.exec("CommuniGate", "ListAccounts", {})
+	  accounts = accounts.0.accounts;
+	  %]
+        <select name="account" id="manage_list_select" class="col-xs-12 form-control">
+          <option value="">[% locale.maketext("Select account.") %]</option>
+	  [% FOR account IN accounts.sort -%]
+	  [% filter_option(FORM.account, account,account) %]
+	  [% END -%]
+        </select>
         </div>
         <noscript>
           <div class="form-group">
