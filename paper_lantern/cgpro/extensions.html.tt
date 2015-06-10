@@ -160,7 +160,13 @@ YAHOO.util.Event.onDOMReady(function () {
       <th class="sorttable_nosort">[% locale.maketext("Functions") %]</th>
     </tr>
     </thead>
-    
+
+    [% IF extensions.size() == 0 %]
+    <tr>
+    <td colspan="3">Currently there aren't any extensions!</td>
+    </tr>
+    [% ELSE %]
+    [% END %]
     [% FOR extension IN extensions -%]
     <tr class="row-[% loop.count % 2 ? 'even' : 'odd' %]">
       <td class="truncate">[% extension.html_dest %]</td>
