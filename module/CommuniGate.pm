@@ -2788,16 +2788,8 @@ sub api2_DKIMVerification {
 
 sub api2_doUpdateSignalRule {
     my %OPTS = @_;
-    my $formdump = $OPTS{'formdump'};
-    my $params = {};
+    my $params = $OPTS{'formdump'};
     my $locale = Cpanel::Locale->get_handle();
-    for my $row (split "\n", $formdump) {
-	if ($row =~ m/^(\S+)\s\=\s(.*?)$/) {
-	    my $key =$1;
-	    my $value = $2;
-	    $params->{$key} = $value;
-	}
-    }
     my $return = {};
     my $cli = getCLI();
     if ($params->{ruleName} && $params->{RequestURI}) {

@@ -1,0 +1,42 @@
+[%
+SET CPANEL.CPVAR.dprefix = "../";
+SET CPANEL.CPVAR.headerimg = "../images/mailmenu.gif";
+
+SET rules = Api2.exec("CommuniGate", "listSignalRules", {});
+rules = rules.0;
+%]
+
+[% WRAPPER '_assets/master.html.tt'
+app_key = 'cgpro_call_rules'
+-%]
+
+<div class="body-content">
+  <a class="btn btn-primary" href="addcallrule.html">Add Rule</a>
+  <table id="mailtbl" class="table table-striped">
+    <thead>
+      <tr>
+	<th>[% locale.maketext("Rule Name") %]</th>
+	<th>[% locale.maketext("Tools") %]</th>
+      </tr>
+    </thead>
+    <tbody>
+      [% FOR rule IN rules.rules -%]
+      <tr>
+	<td>[% rule.1 %]</td>
+	<td>
+	  <a href="addcallrule.html?rule=[% rule.1 %]&domain=[% rule.4 %]"><span class="glyphicon glyphicon-pencil"></span> [% locale.maketext("Edit") %]</a>
+	  <a href="delcallrule.html?rule=[% rule.1 %]&domain=[% rule.4 %]" style="margin-left: 10px;"><span class="glyphicon glyphicon-trash"></span> [% locale.maketext("Delete") %]</a>
+	</td>
+      </tr>
+      [% END -%]
+      [% UNLESS rules.rules.size -%]
+      <tr>
+	<td colspan="2">
+	  [% locale.maketext("No rules added!") %]
+	</td>
+      </tr>
+      [% END -%]
+    </tbody>
+  </table>
+</div> <!-- END body-content -->
+[% END %]

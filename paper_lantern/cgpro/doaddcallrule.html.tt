@@ -1,0 +1,34 @@
+[%
+SET CPANEL.CPVAR.dprefix = "../";
+SET CPANEL.CPVAR.headerimg = "../images/mailmenu.gif";
+
+SET update_rule = Api2.exec("CommuniGate", "doUpdateSignalRule", {
+"formdump" = RAW_FORM
+});
+%]
+
+[% WRAPPER '_assets/master.html.tt'
+app_key = 'cgpro_call_rules'
+-%]
+
+<div class="body-content">
+  <div class="section">
+    [% IF update_rule.0.msg == "Rules updated successfuly!" %]
+    <div class="alert alert-success">
+      <span class="glyphicon glyphicon-ok-sign"></span>
+      <div class="alert-message">
+        [% locale.maketext("Rule Successfully Updated!")%]
+      </div>
+    </div>
+    [% ELSE -%]
+    <div class="alert alert-danger">
+      <span class="glyphicon glyphicon-remove-sign"></span>
+      <div class="alert-message">
+        [% CPANEL.CPERROR.item('CommuniGate') %]
+      </div>
+    </div>    
+    [% END %]
+    [% INCLUDE _assets/return_link.html.tt return_location='call_rules.html.tt' return_link_text=locale.maketext('Go Back') %]
+  </div>
+</div>
+[% END %]
