@@ -76,12 +76,13 @@ app_key = 'cgpro_call_register'
     document.getElementById("selectPeriod").submit();
     }
     </script>
+    <h2>Register</h2>
     <div class="search-panel">
       <form method="GET" action="callregister.html">
 	<div class="form-group">
 	  <label>[% locale.maketext("Search") %]:</label>
 	  <div class="row">
-	    <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	    <div class="col-xs-6 col-sm-3 col-md-3 col-lg-3">
               <input type="text" id="search_input" size="15" class="form-control" name="searchregex" value="[% FORM.searchregex %]">
 	      <input type="hidden" name="account" value="[% FORM.account %]" />
 	      <input type="hidden" name="period" value="[% FORM.period %]" />
@@ -91,7 +92,7 @@ app_key = 'cgpro_call_register'
 	</div>
       </form>
     </div>
-    <table class="table">
+    <table class="table table-striped">
       <thead>
 	<tr>
 	  <th class="cell">[% locale.maketext("CGPTimeOfCall") %]</th>
