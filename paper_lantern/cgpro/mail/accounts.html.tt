@@ -66,11 +66,61 @@ var DEFAULT_EMAIL_QUOTA = [% execute("Email", "get_default_email_quota_mib").dat
   .hidden {
   display: none;
   }
-  .settings td{
+
+  .col2, col4 {
+  white-space: nowrap; 
+  text-align: center;
+  }
+
+  .settings td {
   padding-right: 10px;
   }
+
   a {
   cursor: pointer;
+  }
+
+  .col2span {
+  margin-left: 15px;
+  }
+
+  .col4span, .col3span {
+  margin-left: 30px;
+  }
+
+  .dt_info_row td{
+  margin-top: -1px;
+  }
+  
+  .table>tbody>.action-row>td {
+  border: none;
+  }
+
+  .action-row {
+  border: none;
+  }
+
+  .avatar {
+  max-width: 48px;
+  cursor: pointer;
+  }
+
+  .avatar_span {
+  font-size: 48px; 
+  cursor: pointer;
+  }
+
+  .realname_acc {
+  font-weight: bold;
+  }
+
+  .progress {
+  border-radius: 0; 
+  height: 2px;
+  }
+
+  .glyphmargin {
+  margin-right: 3px
   }
 </style>
 

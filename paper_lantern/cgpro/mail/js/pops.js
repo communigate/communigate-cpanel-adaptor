@@ -203,7 +203,7 @@ var build_email_table_markup = function() {
 
     // loop through the email accounts and build the table
     var html = '<table id="table_email_accts" class="table table-striped" border="0" cellspacing="0" cellpadding="0">';
-    html += '<thead>' + '<tr>' + '<th class="col0"> </th>' + '<th class="col1">Account</span></th>' + '<th class="col2"><span style="margin-left: 15px;">Stats</span></th>' + '<th class="col4"><span style="margin-left: 30px;">Type</span></th>' + '<th class="col3"><span style="margin-left: 30px;">Actions</span></th>';
+    html += '<thead>' + '<tr>' + '<th class="col0"> </th>' + '<th class="col1">Account</span></th>' + '<th class="col2"><span>Stats</span></th>' + '<th class="col4"><span>Type</span></th>' + '<th class="col3"><span class="col3span">References</span></th>';
     html += '<colgroup>' + '<col>' + '<col width="30%">' + '<col width="9%">' + '<col width="10%">' + '<col width="53%">' + '</colgroup>';
 
     for (var i = 0; i < ACCOUNTS.length; i++) {
@@ -221,18 +221,6 @@ var build_email_table_markup = function() {
         html += '<tr id="account_row_' + i + '" class="dt_info_row ' + row_toggle + '">';
 	html += '<td class="col0 dt-module" title="Change Avatar" onclick="toggle_action_div(null, {id:\'image_module_' + i + '\', index:' + i + ', action:\'image_crop\'})">';
 
-	// if ( typeof(ACCOUNTS[i]['vcard']) != "undefined" && typeof(ACCOUNTS[i]['vcard']['fileData']) != "undefined" && typeof(ACCOUNTS[i]['vcard']['fileData']['vCard']) != "undefined" && typeof(ACCOUNTS[i]['vcard']['fileData']['vCard']['PHOTO']) != "undefined" && typeof(ACCOUNTS[i]['vcard']['fileData']['vCard']['PHOTO']['BINVAL']) != "undefined" ){
-	//     var acc_photo = ACCOUNTS[i]['vcard']['fileData']['vCard']['PHOTO']['BINVAL'];
-	//     html += '<img src="data:image/png;base64,' + acc_photo + '" alt="avatar" style="width: 48px; heigth:48px; max-width: 100%; max-heigth: 100%;">';
-	// }
-	// else{
-	//     html += '<img src="js/SimpleCropper/images/avatar_default.png" alt="avatar">';
-	// }
-	// if ( typeof(ACCOUNTS[i]['vcard']) != "undefined" && typeof(ACCOUNTS[i]['vcard']['fileData']) != "undefined"){
-	//     html += '<img src="js/SimpleCropper/images/avatar_default.png" alt="avatar">';
-	// }
-
-
 	if (ACCOUNTS[i]['vcard']
 	    && ACCOUNTS[i]['vcard']['fileData']
 	    && ACCOUNTS[i]['vcard']['fileData'][0]
@@ -243,15 +231,15 @@ var build_email_table_markup = function() {
 	    && ACCOUNTS[i]['vcard']['fileData'][0]['vCard'][0]['PHOTO'][0]['BINVAL']
 	    && ACCOUNTS[i]['vcard']['fileData'][0]['vCard'][0]['PHOTO'][0]['BINVAL'][0]) {
 	    var acc_photo = ACCOUNTS[i]['vcard']['fileData'][0]['vCard'][0]['PHOTO'][0]['BINVAL'][0];
-	    html += '<img id="avatar_' + i + '" src="data:image/png;base64,' + acc_photo + '" alt="avatar" style="width: 48px; heigth:48px; cursor: pointer; max-width: 100%; max-heigth: 100%;">';
+	    html += '<img id="avatar_' + i + '" src="data:image/png;base64,' + acc_photo + '" alt="avatar" style="max-width: 48px; cursor: pointer;">';
 	} else {
-	    html += '<img id="avatar_' + i + '" style="width: 48px; heigth:48px; cursor: pointer; max-width: 100%; max-heigth: 100%;">' + '<span class="glyphicon glyphicon-user" id="span_avatar_' + i + '" style="font-size: 48px; cursor: pointer;"></span>' + '</img>';
+	    html += '<img class="avatar" id="avatar_' + i + '">' + '<span class="glyphicon glyphicon-user avatar_span" id="span_avatar_' + i + '"></span>' + '</img>';
 	}
 	
 	html += '</td>';
         html += '<td class="col1">';
 	if (ACCOUNTS[i]['prefs']['RealName']){
-	html += '<span id="realname_' + i + '" style="font-weight: bold;">' + ACCOUNTS[i]['prefs']['RealName'] + '</span>' + '<br>';
+	html += '<span class="realname_acc" id="realname_' + i + '">' + ACCOUNTS[i]['prefs']['RealName'] + '</span>' + '<br>';
 	}
 	html += ACCOUNTS[i]['prefs']['AccountName'] + '</td>';
 	if (ACCOUNTS[i]['humandiskquota'] == 0){
@@ -260,9 +248,9 @@ var build_email_table_markup = function() {
 	else{
 	    var diskquota_acc = ACCOUNTS[i]['humandiskquota'];
 	}
-        html += '<td class="col2" style="white-space: nowrap; text-align: center;">' + ACCOUNTS[i]['used'] + '<input type="hidden" id="diskused_' + i + '" value="' + ACCOUNTS[i]['used'] + '" /> / <span id="quota_' + i + '">' + diskquota_acc + '</span> <span class="megabyte_font">MB</span><br />';
+        html += '<td class="col2">' + ACCOUNTS[i]['used'] + '<input type="hidden" id="diskused_' + i + '" value="' + ACCOUNTS[i]['used'] + '" /> / <span id="quota_' + i + '">' + diskquota_acc + '</span> <span class="megabyte_font">MB</span><br />';
         html += '<div class="table_progress_bar" id="usage_bar_' + i + '">';
-        html += '<div class="progress" style="border-radius: 0; height: 2px;">';
+        html += '<div class="progress">';
         html += '<div class="progress-bar" role="progressbar" style="width: 0%;">';
         html += '<span class="sr-only">0%</span>';
         html += '</div>';
@@ -320,17 +308,17 @@ var build_email_table_markup = function() {
 	    acc_modes_webcal = "color: #aaaaaa;";
 	}
 	html += '<span id="acc_type_' + i + '" onclick="toggle_action_div(null, {id:\'change_type_module_' + i + '\', index:' + i + ', action:\'change_type\'})">' + ACCOUNTS[i]['class'] + '</span>' + '<br>';
-	html += '<span id="icon_envelope_' + i + '" class="glyphicon glyphicon-envelope" onclick="toggle_action_div(null, {id:\'change_type_module_' + i + '\', index:' + i + ', action:\'change_type\'})" title="Mail" style="margin-right: 3px;' + acc_modes_mail + '"></span>';
-	html += '<span id="icon_comment_' + i + '" class="glyphicon glyphicon-comment" onclick="toggle_action_div(null, {id:\'change_type_module_' + i + '\', index:' + i + ', action:\'change_type\'})" title="Chat/Jabber/XMPP" style="margin-right: 3px;' + acc_modes_xmpp + '"></span>';
-	html += '<span id="icon_phone_' + i + '" class="glyphicon glyphicon-phone" onclick="toggle_action_div(null, {id:\'change_type_module_' + i + '\', index:' + i + ', action:\'change_type\'})" title="SIP (Internet calls)" style="margin-right: 3px;' + acc_modes_sip + '"></span>';
+	html += '<span id="icon_envelope_' + i + '" class="glyphmargin glyphicon glyphicon-envelope" onclick="toggle_action_div(null, {id:\'change_type_module_' + i + '\', index:' + i + ', action:\'change_type\'})" title="Mail"' + acc_modes_mail + '"></span>';
+	html += '<span id="icon_comment_' + i + '" class="glyphmargin glyphicon glyphicon-comment" onclick="toggle_action_div(null, {id:\'change_type_module_' + i + '\', index:' + i + ', action:\'change_type\'})" title="Chat/Jabber/XMPP"' + acc_modes_xmpp + '"></span>';
+	html += '<span id="icon_phone_' + i + '" class="glyphmargin glyphicon glyphicon-phone" onclick="toggle_action_div(null, {id:\'change_type_module_' + i + '\', index:' + i + ', action:\'change_type\'})" title="SIP (Internet calls)"' + acc_modes_sip + '"></span>';
 	html += '<span id="icon_calendar_' + i + '" class="glyphicon glyphicon-calendar" onclick="toggle_action_div(null, {id:\'change_type_module_' + i + '\', index:' + i + ', action:\'change_type\'})" title="Calendar" style="' + acc_modes_webcal + '"></span>';
 	html += '</td>';
         html += '<td class="col3">';
         html += '<table class="table_email_accts_actions" bnorder="0" cellspacing="0" cellpadding="0"><tr>';
         // html += '<td><span class="btn btn-link" onclick="toggle_action_div(null, {id:\'show_details_module_' + i + '\', index:' + i + ', action:\'show_details\'})">' + '<span class="glyphicon glyphicon-tasks"></span>' + ' Details' + '</span></td>';
-        html += '<td><span class="btn btn-link" onclick="toggle_action_div(null, {id:\'change_password_module_' + i + '\', index:' + i + ', action:\'change_password\'})">' + '<span class="fa fa-key fa-lg"></span>' + " " + LANG.change_password_br + '</span></td>';
-        html += '<td><span class="btn btn-link" onclick="toggle_action_div(null, {id:\'change_quota_module_' + i + '\', index:' + i + ', action:\'change_quota\'})">' + '<span class="glyphicon glyphicon-cog"></span>' + ' Change Details' + '</span></td>';
-        html += '<td><span class="btn btn-link" onclick="toggle_action_div(null, {id:\'change_type_module_' + i + '\', index:' + i + ', action:\'change_type\'})">' + '<span class="glyphicon glyphicon-list"></span>' + ' Change Type' + '</span></td>';
+        html += '<td><span class="btn btn-link" onclick="toggle_action_div(null, {id:\'change_password_module_' + i + '\', index:' + i + ', action:\'change_password\'})">' + '<span class="fa fa-key fa-lg"></span>' + " Password" + '</span></td>';
+        html += '<td><span class="btn btn-link" onclick="toggle_action_div(null, {id:\'change_quota_module_' + i + '\', index:' + i + ', action:\'change_quota\'})">' + '<span class="glyphicon glyphicon-cog"></span>' + ' Details' + '</span></td>';
+        html += '<td><span class="btn btn-link" onclick="toggle_action_div(null, {id:\'change_type_module_' + i + '\', index:' + i + ', action:\'change_type\'})">' + '<span class="glyphicon glyphicon-list"></span>' + ' Type' + '</span></td>';
         html += '<td><span class="btn btn-link" onclick="toggle_action_div(null, {id:\'airsync_module_' + i + '\', index:' + i + ', action:\'airsync\'})">' + '<span class="glyphicon glyphicon-transfer"></span>' + '<span class="glyphicon glyphicon-phone"></span>' + ' AirSync' + '</span></td>';
         html += '<td><span class="btn btn-link" onclick="toggle_action_div(null, {id:\'delete_module_' + i + '\', index:' + i + ', action:\'delete\'})">' + '<span class="glyphicon glyphicon-trash"></span>' + " " + LANG.delete2 + '</span></td>';
         html += '<td><div class="btn-group">';
@@ -345,7 +333,7 @@ var build_email_table_markup = function() {
         html += '</td>';
         html += '</tr>';
 
-        html += '<tr id="dt_module_row_' + i + '" class="' + row_toggle + ' action-row"><td colspan="5">';
+        html += '<tr id="dt_module_row_' + i + '" class="' + row_toggle + ' action-row" style="border: none;"><td colspan="5">';
         html += '<div id="show_details_module_' + i + '" class="dt_module" style="display: none; margin-left: 0;"></div>';
         html += '<div id="change_password_module_' + i + '" class="dt_module" style="display: none"></div>';
         html += '<div id="change_quota_module_' + i + '" class="dt_module" style="display: none"></div>';
