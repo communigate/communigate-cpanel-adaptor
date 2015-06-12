@@ -31,31 +31,36 @@ app_key = 'cgpro_call_register'
   [% MACRO filter_option(pval, val, text) BLOCK -%]
   <option value="[% val %]"[% val == pval ? " selected='selected'" : "" %]>[% locale.maketext(text) %]</option>
   [% END -%]
-  <div class="section">
-    <form action="" method="GET" id="selectAccount">
+  <div class="pull-right">
+    <div class="form-inline">
       <div class="form-group">
 	<label>[% locale.maketext("CGPAccount") %]:</label>
+      </div>
+      <div class="form-group">
 	<div class="row">
 	  <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
-	    <select id="account" class="form-control" onchange="toggle_account()" name="account">
-	      [% filter_option(account, "", "CGPPleaseSelect") %]
-	      [% FOR account IN accounts.sort -%]
-	      [% filter_option(FORM.account, account, account) %]
-	      [% END -%]
-	    </select>
+	    <form action="" class="form-inline" method="GET" id="selectAccount">
+	      <select id="account" class="form-control" onchange="toggle_account()" name="account">
+		[% filter_option(account, "", "CGPPleaseSelect") %]
+		[% FOR account IN accounts.sort -%]
+		[% filter_option(FORM.account, account, account) %]
+		[% END -%]
+	      </select>
+	    </form>
 	  </div>
 	</div>
       </div>
-    </form>
-
+    </div>
+    <div class="clear"></div>
     <script type="text/javascript">
       function toggle_account () {
       document.getElementById("selectAccount").submit();
       }
     </script>
-  </div>
+  </div><br /></br />
 
   [% IF RAW_FORM.item("account") %]
+<div>
   <form action="" method="GET" id="selectPeriod">
     <div class="form-group">
       <label>[% locale.maketext("CGPPeriod") %]:</label>
@@ -71,6 +76,7 @@ app_key = 'cgpro_call_register'
       </div>
     </div>
   </form>
+</div>
     <script type="text/javascript">
     function toggle_period () {
     document.getElementById("selectPeriod").submit();
