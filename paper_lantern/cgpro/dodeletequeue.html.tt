@@ -1,0 +1,32 @@
+[%
+SET CPANEL.CPVAR.dprefix = "../";
+SET CPANEL.CPVAR.headerimg = "../images/mailmenu.gif";
+
+SET del_queue = Api2.exec("CommuniGate", "DeleteQueue", {
+"queue" = RAW_FORM.item("queue")
+});
+%]
+
+[% WRAPPER '_assets/master.html.tt'
+app_key = 'cgpro_caller_queues'
+-%]
+
+<div class="body-content">
+  [% IF CPANEL.CPERROR.item('CommuniGate') %]
+  <div class="alert alert-danger">
+    <span class="glyphicon glyphicon-remove-sign"></span>
+    <div class="alert-message">
+      [% CPANEL.CPERROR.item('CommuniGate') %]
+    </div>
+  </div>
+  [% ELSE -%]
+  <div class="alert alert-success">
+    <span class="glyphicon glyphicon-ok-sign"></span>
+    <div class="alert-message">
+      [% locale.maketext("“[_1]” Deleted!", FORM.name ) %]
+    </div>
+  </div>
+  [% END %]
+  [% INCLUDE _assets/return_link.html.tt return_location='queues.html.tt' return_link_text=locale.maketext('Go Back') %]
+</div>
+[% END %]

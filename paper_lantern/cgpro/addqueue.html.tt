@@ -1,0 +1,58 @@
+[% MACRO filter_option(pval, val, text) BLOCK -%]
+<option value="[% val %]"[% val == pval ? " selected='selected'" : "" %]>[% locale.maketext(text) %]</option>
+[% END -%]
+
+[%
+SET CPANEL.CPVAR.dprefix = "../";
+SET CPANEL.CPVAR.headerimg = "../images/mailmenu.gif";
+
+SET add_queue = Api2.exec("CommuniGate", "AddQueue", {
+"queue" = RAW_FORM.item("queue")
+});
+name = add_queue.0.name;
+department = add_queue.0.department;
+departments = add_queue.0.departments;
+%]
+
+[% WRAPPER '_assets/master.html.tt'
+app_key = 'cgpro_caller_queues'
+-%]
+
+<div class="body-content">
+  [% IF name %]
+  <h2>Edit Queue</h2>
+  [% ELSE %]
+  <h2>Add Queue</h2>
+  [% END %]
+  
+  <form action="doaddqueue.html" method="post">
+    <div class="section">
+      <div class="form-group">
+	<label>Queue Name</label>
+	<div class="row">
+	  <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	    <input type="text" class="form-control" name="queueName" value="[% name %]" />
+	    <input type="hidden" name="queue" value="[% FORM.queue %]" />
+	  </div>
+	</div>
+      </div>
+      <div class="form-group">
+	<label>Call Department</label>
+	<div class="row">
+	  <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	    <select name="department" id="department" class="form-control">
+	      [% FOR dep IN departments -%]
+	      [% filter_option(department, dep, dep) %]
+	      [% END -%]
+	    </select>
+	  </div>
+	</div>
+      </div>
+      <div class="form-group">
+	<input type="submit" id="activate-button" name="submit" value="Save" class="btn btn-primary" />
+      </div>
+      [% INCLUDE _assets/return_link.html.tt return_location='queues.html.tt' return_link_text=locale.maketext('Go Back') %]
+    </div>
+  </form>
+</div>
+[% END %]

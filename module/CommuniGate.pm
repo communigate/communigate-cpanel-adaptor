@@ -3951,12 +3951,30 @@ sub api2_DoAddQueue {
     my @domains = Cpanel::Email::listmaildomains();
     my $cli = getCLI();
     my (undef,$dom) = split '@', $OPTS{'department'};
+    my $return = {};
+    use Data::Dumper;
+    my $fwds = $cli->ListForwarders($dom);	    
+    
+    foreach my $forwarder (@$fwds) {
+	if ($forwarder =~ m/^activequeue_/) {
+	    my $fwd = $cli->GetForwarder("$forwarder\@$dom");
+	    my (undef,$has_name) = split ',', $fwd;
+	    my ($has_name_real, undef) = split '}', $has_name;
+	    if ( $OPTS{'name'} eq $has_name_real ) {
+		$return->{"error"} = "This queue name is already used!";
+	    	$cli->Logout();
+	    	return $return;
+	    }
+	}
+    }
+    
     for my $domain (@domains) {
 	if ($domain eq $dom && $OPTS{'department'}) {
 	    unless ($cli->GetAccountSettings("pbx\@$domain")) {
 		$cli->CreateAccount(accountName => "pbx\@$domain");
 		$cli->SetAccountRights("pbx\@$domain", ['Domain', 'CanImpersonate', 'CanCreateGroups']);
 	    }
+	    
 	    if ($OPTS{'queue'}) {
 	    	$cli->DeleteForwarder($OPTS{'queue'});
 	    }
@@ -3964,12 +3982,20 @@ sub api2_DoAddQueue {
 	    if ($OPTS{'name'}) {
 		$queuestring .= "," . $OPTS{'name'} if $OPTS{'name'};
 	    }
-	    unless ($cli->GetGroup("activequeuegroup_" . $OPTS{'department'})) {
-		$cli->CreateGroup("activequeuegroup_" . $OPTS{'department'}, {EmailDisabled => 'YES'});
+	    if ( !$OPTS{'queue'} ) {
+	    $cli->CreateGroup("activequeuegroup_" . $OPTS{'department'}, {EmailDisabled => 'YES'});
+	    my $error_msg = $cli->getErrMessage();
+	    unless ($error_msg eq "OK") {
+		$return->{"error"} = $error_msg;
+	    	$cli->Logout();
+	    	return $return;
 	    }
+	    }
+	    my $forwarders = $cli->ListForwarders($domain);	    
 	    $cli->CreateForwarder("activequeue_" . $OPTS{'department'}, 'activequeue{' . $queuestring . '}#pbx@' . $domain);
+
 	    $cli->CreateForwarder("activequeuetoggle_" . $OPTS{'department'}, 'togglegroupmember{' . $OPTS{'department'} . ',' . "activequeuegroup_" . $OPTS{'department'} . '}#pbx@' . $domain);
-	    my $forwarders = $cli->ListForwarders($domain);
+	    my $forwarders = $cli->ListForwarders($domain);	    
 	    foreach my $forwarder (@$forwarders) {
 		next unless $forwarder =~ m/^tn\-\d+$/i;
 		my $fwd = $cli->GetForwarder("$forwarder\@$domain");
@@ -3980,8 +4006,9 @@ sub api2_DoAddQueue {
 	    }
 	}
     }
+     
     $cli->Logout();
-    return { msg => ""};
+    return $return;
 }
 
 sub api2_ListQueues {

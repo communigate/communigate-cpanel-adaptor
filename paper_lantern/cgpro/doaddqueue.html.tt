@@ -1,0 +1,34 @@
+[%
+SET CPANEL.CPVAR.dprefix = "../";
+SET CPANEL.CPVAR.headerimg = "../images/mailmenu.gif";
+
+SET do_add_queue = Api2.exec("CommuniGate", "DoAddQueue", {
+"queue" = RAW_FORM.item("queue"),
+"name" = RAW_FORM.item("queueName"),
+"department" = RAW_FORM.item("department")
+});
+%]
+
+[% WRAPPER '_assets/master.html.tt'
+app_key = 'cgpro_caller_queues'
+-%]
+
+<div class="body-content">
+  [% IF do_add_queue.0.error %]
+  <div class="alert alert-danger">
+    <span class="glyphicon glyphicon-remove-sign"></span>
+    <div class="alert-message">
+      [% do_add_queue.0.error %]
+    </div>
+  </div>
+  [% ELSE -%]
+  <div class="alert alert-success">
+    <span class="glyphicon glyphicon-ok-sign"></span>
+    <div class="alert-message">
+      [% locale.maketext("Queue Modified Successfully!")%]
+    </div>
+  </div>
+  [% END %]
+  [% INCLUDE _assets/return_link.html.tt return_location='queues.html.tt' return_link_text=locale.maketext('Go Back') %]
+</div>
+[% END %]

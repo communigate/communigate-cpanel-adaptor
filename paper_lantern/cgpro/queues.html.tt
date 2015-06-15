@@ -1,0 +1,47 @@
+[%
+SET CPANEL.CPVAR.dprefix = "../";
+SET CPANEL.CPVAR.headerimg = "../images/mailmenu.gif";
+
+SET queues = Api2.exec("CommuniGate", "ListQueues", {
+"domain" = RAW_FORM.item("domain"),
+"regex" = RAW_FORM.item("searchregex")
+});
+%]
+
+[% WRAPPER '_assets/master.html.tt'
+app_key = 'cgpro_caller_queues'
+-%]
+
+<div class="body-content">
+  <a class="btn btn-primary" href="addqueue.html">Add Queue</a>
+  <table id="mailtbl" class="table table-striped">
+    <colgroup>
+      <col width="35%" align="left" />
+      <col width="35%" align="left" />
+      <col width="15%" align="center" />
+    </colgroup>
+    <thead>
+    <tr>
+      <th>Queue Name</th>
+      <th>Department</th>
+      <th>Functions</th>
+    </tr>
+    </thead>
+    <tbody>
+      [% IF queues.size == 0 %]
+      <tr>
+	<td colspan="3">There are no Caller Queues!</td>
+      </tr>
+      [% END %]
+      
+      [% FOREACH queue IN queues %]
+      <tr>
+	<td>[% queue.name %]</td>
+	<td>[% queue.department %]</td>
+	<td><a href="deletequeue.html?queue=[% queue.queue %]&amp;name=[% queue.name %]" style="margin-left: 10px;"><span class="glyphicon glyphicon-trash"></span> Delete</a></td>
+      </tr>
+      [% END %]
+    </tbody>
+  </table>
+</div><!-- end body-content -->
+[% END %]
