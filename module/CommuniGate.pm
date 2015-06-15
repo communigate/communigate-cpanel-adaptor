@@ -3952,7 +3952,6 @@ sub api2_DoAddQueue {
     my $cli = getCLI();
     my (undef,$dom) = split '@', $OPTS{'department'};
     my $return = {};
-    use Data::Dumper;
     my $fwds = $cli->ListForwarders($dom);	    
     
     foreach my $forwarder (@$fwds) {

@@ -1,0 +1,95 @@
+[% MACRO filter_option(pval, val, text) BLOCK -%]
+<option value="[% val %]"[% val == pval ? " selected='selected'" : "" %]>[% locale.maketext(text) %]</option>
+[% END -%]
+[%
+SET CPANEL.CPVAR.dprefix = "../";
+SET CPANEL.CPVAR.headerimg = "../images/mailmenu.gif";
+
+SET accounts = Api2.exec("CommuniGate", "ListAccounts", {});
+accounts = accounts.0.accounts;
+%]
+
+[% IF RAW_FORM.item("account") %]
+[%
+SET all_rsip = Api2.exec("CommuniGate", "ListRSIP", {
+"account" = RAW_FORM.item("account")
+});
+rsip = all_rsip.0.rsip;
+settings = all_rsip.0.settings;
+rsipInfo = all_rsip.0.rsipInfo;
+%]
+[% END %]
+
+[% WRAPPER '_assets/master.html.tt'
+app_key = 'cgpro_rsip'
+-%]
+
+<div class="body-content">
+  <div class="pull-right">
+    <div class="form-inline">
+      <div class="form-group">
+	<label class="control-label" style="margin: 0 15px;">[% locale.maketext("CGPAccount") %]:</label>
+      </div>
+      <div class="form-group">
+	<div class="row">
+	  <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	    <form action="" class="form-inline" method="GET" id="selectAccount">
+	      <select id="account" class="form-control" onchange="toggle_account()" name="account">
+		[% filter_option(account, "", "CGPPleaseSelect") %]
+		[% FOR account IN accounts.sort -%]
+		[% filter_option(FORM.account, account, account) %]
+		[% END -%]
+	      </select>
+	    </form>
+	  </div>
+	</div>
+      </div>
+    </div>
+    <div class="clear"></div>
+  </div>
+    <script type="text/javascript">
+      function toggle_account () {
+      document.getElementById("selectAccount").submit();
+      }
+    </script><br /><br />
+    
+    [% IF RAW_FORM.item("account") %]
+    <div class="form-group">
+      <a class="btn btn-primary" href="editrsip.html?account=[% FORM.account %]">[% locale.maketext("CGPAddRemoteSIP") %]</a>
+    </div>
+    <table border="0" cellpadding="5" cellspacing="0" id="mailtbl" class="table table-striped">
+      <thead>
+      <tr>
+	<th class="cell">[% locale.maketext("CGPRemoteSIP") %]</th>
+	<th class="cell">[% locale.maketext("CGPStatus") %]</th>
+	<th class="cell-end sorttable_nosort">[% locale.maketext("Functions") %]</th>
+      </tr>
+      </thead>
+      <tbody>
+      [% FOR sip IN rsip.keys.sort -%]
+      <tr>
+	<td class="truncate">[% sip %][% IF settings.PSTNFromName == rsip.$sip.fromName && settings.PSTNGatewayAuthName == rsip.$sip.authName %] ([% locale.maketext("CGPOutgoing") %])[% END %]</td>
+	<td class="truncate">
+	  [% rsipInfo.$sip.completed.replace("(\#T|\_)"," ") %]
+	  [% rsipInfo.$sip.errorCode %]
+	</td>
+	<td>
+	  <a href="editrsip.html?account=[% FORM.account %]&amp;rsip=[% sip %]"><span class="glyphicon glyphicon-pencil"></span> [% locale.maketext('CGPViewEdit') %]</a> ,
+	  <a href="deletersip.html?account=[% FORM.account %]&amp;rsip=[% sip %]"><span class="glyphicon glyphicon-trash"></span> [% locale.maketext('Delete') %]</a>
+	  [% UNLESS settings.PSTNFromName == rsip.$sip.fromName && settings.PSTNGatewayAuthName == rsip.$sip.authName %]
+	  , <a href="updatepstn.html?account=[% FORM.account %]&amp;rsip=[% sip %]"><span class="glyphicon glyphicon-arrow-right"></span> [% locale.maketext('Set as outgoing') %]</a>
+	  [% END -%]
+	</td>
+      </tr>
+      [% END -%]
+      [% UNLESS rsip.keys.size -%]
+      <tr>
+	<td class="truncate" colspan="4">[% locale.maketext("No Remote SIPs.") %]</td>
+      </tr>
+      [% END -%]
+      </tbody>
+    </table>
+    [% END %]
+  </div>
+</div>
+[% END %]

@@ -1,0 +1,53 @@
+[%
+SET CPANEL.CPVAR.dprefix = "../";
+SET CPANEL.CPVAR.headerimg = "../images/mailmenu.gif";
+SET return_link = "rsip.html?account=" _ RAW_FORM.item('account').uri();
+%]
+
+[%
+SET rsip = Api2.exec("CommuniGate", "DoEditRSIP", {
+"account" = RAW_FORM.item("account"),
+"name" = RAW_FORM.item("name"),
+"authName" = RAW_FORM.item("authName"),
+"fromName" = RAW_FORM.item("fromName"),
+"domain" = RAW_FORM.item("domain"),
+"password" = RAW_FORM.item("password"),
+"targetName" = RAW_FORM.item("targetName"),
+"period" = RAW_FORM.item("period")
+});
+rsip = rsip.0.rsip;
+%]
+
+[% WRAPPER '_assets/master.html.tt'
+app_key = 'cgpro_rsip'
+-%]
+
+<div class="body-content">
+  [% IF RAW_FORM.item("rsip") %]
+  <h3>Edit Remote SIP</h3>  
+  [% ELSE %]
+  <h3>Add Remote SIP</h3>
+  [% END %]
+
+  <div class="section">
+    [% IF CPANEL.CPERROR.item('CommuniGate') %]
+    <div class="alert alert-danger">
+      <span class="glyphicon glyphicon-remove-sign"></span>
+      <div class="alert-message">
+        [% CPANEL.CPERROR.item('CommuniGate') %]
+      </div>
+    </div>
+    [% ELSE -%]
+    <div class="alert alert-success">
+      <span class="glyphicon glyphicon-ok-sign"></span>
+      <div class="alert-message">
+        [% locale.maketext("Remote SIP Updated!")%]
+      </div>
+    </div>
+    [% END %]
+    
+    [% INCLUDE _assets/return_link.html.tt return_location=return_link return_link_text=locale.maketext('Go Back') %]
+  </div>
+</div>
+[% END %]
+
