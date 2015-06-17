@@ -1,0 +1,13 @@
+[%
+SET CPANEL.CPVAR.id = RAW_FORM.item("id");
+SET CPANEL.CPVAR.basename = RAW_FORM.item("basename");
+SET get_ivr_sounds = Api2.exec("CommuniGate", "GetIVRSounds", {
+"domain" = RAW_FORM.item("domain")
+});
+files = get_ivr_sounds.0.files;
+%]
+[% MACRO filter_option(pval, val, text) BLOCK -%]
+<option value="[% val %]"[% val == pval ? " selected='selected'" : "" %]>[% locale.maketext(text) %]</option>
+[% END -%]
+
+[% PROCESS cgpro/ivr_soundrow.tmpl -%]

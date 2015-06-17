@@ -4134,15 +4134,7 @@ sub api2_EditIVR {
 
 sub api2_DoEditIVR {
     my %OPTS = @_;
-    my $formdump = $OPTS{'formdump'};
-    my $params = {};
-    for my $row (split "\n", $formdump) {
-	if ($row =~ m/^(\S+)\s\=\s(.*?)$/) {
-	    my $key =$1;
-	    my $value = $2;
-	    $params->{$key} = $value;
-	}
-    }
+    my $params = $OPTS{'formdump'};
     my @domains = Cpanel::Email::listmaildomains();
     my $domain = $domains[0];
     $domain = $params->{'domain'} if $params->{'domain'};
