@@ -7,7 +7,7 @@ SET email_delete_domain_forwarder = Api2.exec("CommuniGate", "RemoveBuddy", {
 %]
 
 [% WRAPPER '_assets/master.html.tt'
-    app_key = 'xmpp_roster'
+    app_key = 'cgpro_xmpp_roster'
  -%]
 
 <div class="body-content">

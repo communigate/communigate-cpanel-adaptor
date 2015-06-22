@@ -1,7 +1,7 @@
 [% SET CPANEL.CPVAR.dprefix = "../../" %]
 
 [% WRAPPER '_assets/master.html.tt'
-    app_key = 'autoresponders'
+    app_key = 'cgpro_autoresponders'
 %]
     <div class="body-content">
         <p id="descAutoResponderConfirm">

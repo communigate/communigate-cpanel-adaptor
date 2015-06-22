@@ -8,7 +8,7 @@ SET email_add_forward = Api2.exec("CommuniGate", "addforward", {
 %]
 
 [% WRAPPER '_assets/master.html.tt'
-    app_key = 'forwarders'
+    app_key = 'cgpro_forwarders'
  -%]
 
 <div class="body-content">

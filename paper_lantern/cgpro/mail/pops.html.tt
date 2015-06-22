@@ -1,0 +1,450 @@
+[%-
+CPANEL.CPVAR.dprefix = "../../",
+CPANEL.CPVAR.userdefined_quota_default_value = execute("Email", "get_default_email_quota_mib").data;
+
+IF CPANEL.feature('popaccts');
+
+IF (CPANEL.CPCONF.email_account_quota_userdefined_default_value);
+SET CPANEL.CPVAR.userdefined_quota_default_value = CPANEL.CPCONF.email_account_quota_userdefined_default_value.html();
+END;
+
+IF !(CPANEL.CPCONF.email_account_quota_default_selected == "unlimited");
+            SET CPANEL.CPVAR.quota_selected_userdefined = "checked",
+CPANEL.CPVAR.default_quota_selected = "userdefined";
+END;
+
+IF !(CPANEL.CPVAR.quota_selected_userdefined);
+SET CPANEL.CPVAR.quota_selected_unlimited = "checked",
+CPANEL.CPVAR.default_quota_selected = "unlimited";
+        END;
+
+# list domains
+Api2.pre_exec("Email", "listmaildomains");
+SET api2_result_Email_listmaildomains =  Api2.exec("Email", "listmaildomains", {} );
+Api2.post_exec("Email", "listmaildomains");
+
+# Fetch the required strength
+Api2.pre_exec("PasswdStrength", "get_required_strength");
+SET required_strength_resp = Api2.exec("PasswdStrength", "get_required_strength", {"app"=>"pop"} );
+Api2.post_exec("PasswdStrength", "get_required_strength");
+
+IF required_strength_resp.size();
+SET required_strength = required_strength_resp.0.strength;
+END;
+
+# stats bar
+Api2.pre_exec("StatsBar", "stat");
+SET email_account_stats = Api2.exec("StatsBar", "stat", {"warnings"=>"1", "infinitylang"=>"true", "warninglevel"=>"80", "display"=>"emailac_counts"} );
+Api2.post_exec("StatsBar", "stat");
+SET accounts_maxed = (CPANEL.CPVAR.item('statsbar_emailac_counts_maxed'));
+
+Api1.pre_exec("Email", "checkfastmail");
+SET check_fast_mail = Api1.exec("Email", "checkfastmail", [undef]);
+Api1.post_exec("Email", "checkfastmail");
+
+END;
+-%]
+
+[% js_code = PROCESS js_block %]
+[% WRAPPER '_assets/master.html.tt'
+    app_key = 'cgpro_groupware'
+    page_js = js_code
+    page_scripts = ['sharedjs/handlebars_optimized.js', 'cgpro/mail/js/pops.js']
+    page_stylesheets = ['css2-min/mail/pops.css']
+-%]
+
+<script type="text/javascript">
+var MAX_EMAIL_QUOTA = [% execute("Email", "get_max_email_quota_mib").data.json() %];
+var DEFAULT_EMAIL_QUOTA = [% execute("Email", "get_default_email_quota_mib").data.json() %];
+</script>
+
+<div class="body-content">
+[% IF CPANEL.feature('popaccts') %]
+    <p id="descEmailAccounts" class="description">
+        [%-
+            IF (CPANEL.CPVAR.item('maildomainscount') >= "1");
+                locale.maketext("Manage the email accounts associated with your domain. For more information, read the [output,url,_1,documentation,target,_2,id,_3].", "//go.cpanel.net/PLDAccounts", "_blank", "lnkAccountsDocumentation");
+            END
+        -%]
+    </p>
+
+    [% IF email_account_stats.size() %]
+        <div class="alert alert-warning">
+            <span class="glyphicon glyphicon-exclamation-sign"></span>
+            <div class="alert-message">
+                [% locale.maketext("[output,strong,Warning]: You currently use [numf,_1] out of [numf,_2]", email_account_stats.0.count, email_account_stats.0.max) %]
+            </div>
+        </div>
+     [% END %]
+
+    <div class="section">
+        <h2 id="hdrAddEmailAccount">[% locale.maketext("Add Email Account") %]</h2>
+
+        [% IF accounts_maxed %]
+            <div id="usingMaximumNumberOfEmailAccounts" class="alert alert-warning">
+                <span id="usingMaximumNumberOfEmailAccountsImg" class="glyphicon glyphicon-exclamation-sign"></span>
+                <div id="usingMaximumNumberOfEmailAccountsMsg" class="alert-message">
+                    [% locale.maketext("[output,strong,Warning:] You are currently using the maximum number of Email Accounts.") %]
+                    [% locale.maketext("If you need more, contact your service provider.") %]
+                </div>
+            </div>
+        [% END %]
+
+        [% IF accounts_maxed %]
+            <div id="new_email_account_input_div" class="section hide">
+        [% ELSE %]
+            <div id="new_email_account_input_div" class="section">
+        [% END %]
+            <div class="form-group">
+                <label id="lblAddEmailAccount" for="add_email_account">
+                    [% locale.maketext("Email") %]
+                </label>
+                <div class="row">
+                    <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+                        <div class="input-group">
+                            [% IF (CPANEL.CPVAR.maildomainscount == "1") %]
+                                <input id="add_email_account" type="text" class="form-control" />
+                                <span id="spanAddEmailAccountDomains" class="input-group-addon">
+                                    @[% IF api2_result_Email_listmaildomains.size(); %]
+                                           [% FOREACH hashref IN api2_result_Email_listmaildomains %]
+                                                [% hashref.domain.html(); %]
+                                                <input id="add_email_domain" type="hidden" value="[%  hashref.domain.html() %]" />
+                                           [% END %]
+                                        [% END %]
+                                </span>
+                            [% ELSE %]
+                                <input id="add_email_account" type="text" class="form-control" />
+                                <span id="atSignAddEmailAccount" class="input-group-addon">
+                                    @
+                                </span>
+                            [% END %]
+                        </div>
+
+                    </div>
+                    <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+                        <div id="add_email_account_error"></div>
+                    </div>
+                </div>
+            </div>
+            [% IF (CPANEL.CPVAR.maildomainscount > "1") %]
+            <div class="form-group">
+                <label id="lblAddEmailDomain" for="add_email_domain">
+                    [% locale.maketext("Domain")  %]
+                </label>
+                <div class="row">
+                    <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+                        <select id="add_email_domain" class="form-control">
+                            [% IF api2_result_Email_listmaildomains.size(); %]
+                               [% FOREACH hashref IN api2_result_Email_listmaildomains; %]
+                                    <option value="[%  hashref.domain.html() %]">
+                                        [%  hashref.domain.html() %]
+                                    </option>
+                                [% END %]
+                            [% END %]
+                        </select>
+                    </div>
+                    <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+                    </div>
+                </div>
+            </div>
+            [% END %]
+            <div class="form-group">
+                <label id="lblAddEmailPassword" for="add_email_password1">
+                    [% locale.maketext("Password") %]
+                </label>
+                <div class="row">
+                    <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+                        <input type="password" id="add_email_password1" class="form-control" />
+                    </div>
+                    <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+                        <div id="add_email_password1_error"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label id="lblAddEmailPassword2" for="add_email_password2">
+                    [% locale.maketext("Password (Again)") %]
+                </label>
+                <div class="row">
+                    <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+                        <input type="password" id="add_email_password2" class="form-control" />
+                    </div>
+                    <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+                        <div id="add_email_password2_error"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label id="lblPasswordStrength">
+                    [% locale.maketext("Strength") %]
+                    <span id="why_strong_passwords_link" class="glyphicon glyphicon-info-sign"></span>
+                </label>
+                [% INCLUDE _assets/why_strong_passwords.html.tt %]
+                <div class="row">
+                    <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+                        <div id="password_strength" class="password_strength"></div>
+                    </div>
+                    <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+                        <input id="create_strong_password" type="button" class="btn btn-default" value="[% locale.maketext("Password Generator") %]" tabindex="-1" />
+                    </div>
+                </div>
+            </div>
+            <!-- <div class="form-group"> -->
+            <!--      <div class="row"> -->
+            <!--         <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6"> -->
+            <!--             <div class="form-inline"> -->
+            <!--                 <input id="quota_number" type="hidden" name="quota" checked /> -->
+            <!--                 <input id="quota_number_input" type="hidden" class="form-control" size="7" maxlength="7" value="250" /> -->
+            <!--             </div> -->
+            <!--         </div> -->
+            <!--         <div id="quota_number_input_error" class="col-xs-12 col-sm-6 col-md-6 col-lg-6"> -->
+            <!--         </div> -->
+            <!--     </div> -->
+            <!--     <div class="row"> -->
+            <!--         <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6"> -->
+            <!--             <label class="form-inline"> -->
+            <!--                 <input id="quota_unlimited" type="hidden" name="quota" /> -->
+            <!--             </label> -->
+            <!--         </div> -->
+            <!--         <div id="quota_unlimited_error" class="col-xs-12 col-sm-6 col-md-6 col-lg-6"> -->
+            <!--         </div> -->
+            <!--     </div> -->
+            <!-- </div> -->
+            <div class="form-group">
+                <input id="add_email_create" class="btn btn-primary" type="button" value="[% locale.maketext("Create Account") %]" />
+                <div id="add_email_create_status"></div>
+            </div>
+            <div id="add_email_status_bar" style="margin:0 -5px;" class="cjt_status_bar"></div>
+        </div><!-- end create email account -->
+    </div>
+
+    <div class="section">
+        <h2 id="hdrEmailAccounts">[% locale.maketext("Email Accounts")  %]</h2>
+        <div class="row">
+            <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+                <div class="row">
+                    <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+                        <input id="email_table_search_input" type="text" class="form-control" />
+                    </div>
+                    <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+                        <input id="email_table_search_button" type="button" class="btn btn-primary" value="[% locale.maketext("Search")  %]" />
+                        <input id="email_table_clear_search" type="button" class="btn btn-primary" value="[% locale.maketext("Clear")  %]" style="display:none" onclick="clear_search()" />
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+                <div class="row">
+                    <div class="col-xs-9">
+                        <label id="lblPageSize" for="email_table_items_per_page" class="pull-right">
+                            [% locale.maketext("Page Size")  %]
+                        </label>
+                    </div>
+                    <div class="col-xs-3">
+                        <div class="form-group">
+                            <select id="email_table_items_per_page" class="form-control">
+                                <option value="10">10</option>
+                                <option value="25">25</option>
+                                <option value="50">50</option>
+                                <option value="100">100</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <table id="accounts_table_head" class="table table-striped">
+            <thead>
+                <tr>
+                    <th class="col1">
+                        <span id="email_table_account_sort" class="action_link">[% locale.maketext("Account") %]</span>
+                        <span id="email_table_account_sort_img"></span> @
+                        <span id="email_table_domain_sort" class="action_link">[% locale.maketext("Domain") %]</span>
+                        <span id="email_table_domain_sort_img"></span>
+                    </th>
+                    <th class="col2">
+                        <span id="email_table_usage_sort" class="action_link">[% locale.maketext("Usage") %]</span>
+                        <span id="email_table_usage_sort_img"></span> /
+                        <span id="email_table_quota_sort"class="action_link">[% locale.maketext("Quota") %]</span>
+                        <span id="email_table_quota_sort_img"></span> /
+                        <span id="email_table_percent_sort" class="action_link">%</span>
+                        <span id="email_table_percent_sort_img"></span>
+                    </th>
+                    <th id="email_table_actions" class="col3">[% locale.maketext("Actions") %]</th>
+                </tr>
+            </thead>
+        </table>
+        <div id="accounts_table" class="yui-skin-sam"></div>
+        <div id="menus_div"></div>
+    </div>
+
+
+    <script id="change_password_template" type="text/x-handlebars-template">
+        <div class="form-group">
+            <label>[% locale.maketext('Password') %]</label>
+            <div class="row">
+                <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+                    <input type="password" id="change_password_input_1_{{index}}" class="form-control" />
+                </div>
+                <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+                    <span id="change_password_input_1_{{index}}_error"></span>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label>[% locale.maketext("Password (Again)") %]</label>
+            <div class="row">
+                <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+                    <input type="password" id="change_password_input_2_{{index}}" class="form-control" />
+                </div>
+                <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+                    <span id="change_password_input_2_{{index}}_error"></span>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label>[% locale.maketext("Strength") %]</label>
+            <div class="row">
+                <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+                </div>
+                <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+                    <div id="password_strength_bar_{{index}}" class="password_strength"></div>
+                </div>
+                <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+                    <input type="button" id="create_strong_password_{{index}}" class="btn btn-default" value="[% locale.maketext("Password Generator") %]" tabindex="-1" />
+                </div>
+            </div>
+
+        </div>
+        <div class="form-group" id="change_password_input_{{index}}">
+            <input type="button" class="btn btn-primary" value="[% locale.maketext('Change Password') %]" id="email_table_change_password_confirm_{{index}}" />
+            <button class="btn btn-link" id="email_table_change_password_cancel_{{index}}">[% locale.maketext("Cancel") %]</button>
+        </div>
+        <div id="change_password_status_{{index}}"></div>
+    </script>
+
+    <script id="change_quota_template" type="text/x-handlebars-template">
+        <div class="form-group">
+            <span id="current_quota_{{index}}_error" style="display: none"></span>
+            <label for="quota">
+                [% locale.maketext("Mailbox Quota")  %]
+            </label>
+            <input type="hidden" id="current_quota_{{index}}" value="{{diskquota}}" />
+            <div class="row">
+                <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+                    <div class="form-inline">
+                        <input type="radio" name="quota_{{index}}" id="quota_number_{{index}}" {{#unless isUnlimited}}checked="checked"{{/unless}} />
+                        <input type="text" class="form-control" size="7" maxlength="7" {{#if isUnlimited}}value="{{quotaDefaultValue}}"{{else}}value="{{diskquota}}"{{/if}} id="quota_number_input_{{index}}" />
+                        <span>MB</span>
+                    </div>
+                </div>
+                <div id="quota_number_input_{{index}}_error" class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+                     <label class="form-inline">
+                        <input type="radio" name="quota_{{index}}" id="quota_unlimited_{{index}}" {{#if isUnlimited}}checked="checked"{{/if}} />
+                        <span>[% locale.maketext("Unlimited") %]</span>
+                    </label>
+                </div>
+                <div id="quota_unlimited_{{index}}_error" class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+                </div>
+            </div>
+        </div>
+        <div class="form-group" id="change_quota_input_{{index}}">
+            <input type="button" class="btn btn-primary" value="[% locale.maketext('Change Quota') %]" id="change_quota_confirm_{{index}}" />
+            <button class="btn btn-link" id="email_table_change_quota_cancel_{{index}}">[% locale.maketext("Cancel") %]</button>
+        </div>
+        <div id="change_quota_status_{{index}}"></div>
+    </script>
+
+    <script id="delete_template" type="text/x-handlebars-template">
+        <div class="form-group">
+            <p>[% locale.maketext("Delete") %] {{email}}?</p>
+        </div>
+        <div class="form-group" id="delete_confirm_input_{{index}}">
+            <input type="button" class="btn btn-primary" id="email_table_delete_confirm_{{index}}" value="[% locale.maketext("Delete")  %]" />
+            <button class="btn btn-link" id="email_table_delete_cancel_{{index}}">[% locale.maketext("Cancel") %]</button>
+        </div>
+        <div id="delete_email_status_{{index}}"></div>
+    </script>
+[% END %]
+<!-- end cpanelfeature popaccts -->
+
+[% IF !CPANEL.feature('popaccts') %]
+    [%  Api1.exec("include", ["../refresh.html"]) %]
+[% END %]
+
+</div><!-- end body-content div -->
+[% END #wrapper %]
+
+[% BLOCK js_block %]
+<script type="text/javascript">
+var MORE_IMG = '<span class="caret"></span>';
+
+var WEBMAIL_ENABLED = false;
+[% IF CPANEL.feature('webmail') %]
+    WEBMAIL_ENABLED = true;
+[% END %]
+
+var REQUIRED_PASSWORD_STRENGTH = parseInt('[% required_strength %]', 10) || 5;
+var USERDEFINED_QUOTA_DEFAULT_VALUE = [% CPANEL.CPVAR.userdefined_quota_default_value.json() %] || [% execute("Email", "get_default_email_quota_mib").data.json() %];
+var DEFAULT_QUOTA_SELECTED = '[% CPANEL.CPVAR.default_quota_selected.html() %]';
+var LANG = {
+    search_email : "[% locale.maketext("Search Email")  %]",
+    change_password_br : "[% locale.maketext("Change Password") %]",
+    change_quota_br : "[% locale.maketext("Change Quota") %]",
+    delete2 : "[% locale.maketext("Delete")  %]",
+    more : "[% locale.maketext("More")  %]",
+    password : "[% locale.maketext("Password")  %]",
+    password2 : "[% locale.maketext("Password (Again)")  %]",
+    strength : "[% locale.maketext("Strength")  %]",
+    password_generator : "[% locale.maketext("Password Generator")  %]",
+    change_password : "[% locale.maketext("Change Password")  %]",
+    mailbox_quota : "[% locale.maketext("Mailbox Quota")  %]",
+    change_quota : "[% locale.maketext("Change Quota")  %]",
+    access_webmail : "[% locale.maketext("Access Webmail")  %]",
+    configure_email_client : "[% locale.maketext("Configure Email Client")  %]",
+    next : "[% locale.maketext("Next")  %]",
+    prev : '[% locale.maketext("[output,abbr,Prev,Previous]") %]',
+    loading : "[% locale.maketext("Loading …") %]",
+    deleting : "[% locale.maketext("Deleting …") %]",
+    changing_password : "[% locale.maketext("Changing password …") %]",
+    changing_quota : "[% locale.maketext("Changing quota …") %]",
+    ajax_failure : "[% locale.maketext("[asis,AJAX] Failure. Refresh the page and try again.") %]",
+    creating_account : "[% locale.maketext("Creating account …") %]",
+    created_account : "[% locale.maketext("Created account.") %]",
+    not_valid_email : "[% locale.maketext("That is not a valid email address.")  %]",
+    email_max_128_char : "[% locale.maketext("Email address cannot be longer than 128 characters.")  %]",
+    email_quota_2gig : "[% locale.maketext("Quotas cannot exceed [format_bytes,_1].", execute("Email", "get_max_email_quota").data)  %]",
+    email_quota_number_or_unlimited : "[% locale.maketext("Quota must be a number or you must set the quota to either a number or [output,em,unlimited].")  %]",
+    email_quota_number : "[% locale.maketext("Quota must be a positive integer.")  %]",
+    account_name : "[% locale.maketext("Account Name")  %]",
+    deleted : "[% locale.maketext("Deleted")  %]",
+    Unlimited : "[% locale.maketext("Unlimited")  %]",
+    permission_401 : "[% locale.maketext("HTTP Status: 401 Permission Denied")  %]",
+    ajax_failure : "[% locale.maketext("AJAX Failure.")  %]",
+    retrying_3_seconds : "[% locale.maketext("Retrying in 3 seconds …")  %]",
+    no_accounts_found : "[% locale.maketext("No Accounts Found")  %]",
+    must_change_before_edit : "[% locale.maketext("You must change something before you can edit.")  %]",
+    password_changed : "[% locale.maketext("Password Changed")  %]",
+    account_created : "[% locale.maketext("Account Created")  %]",
+    unknown_error : "[% locale.maketext("Unknown Error")  %]",
+    More : "[% locale.maketext("More")  %]",
+    Changed_Quota : "[% locale.maketext("Changed Quota")  %]",
+    Quota : "[% locale.maketext("Quota")  %]"
+};
+[% IF CPANEL.feature('defaultaddress') AND CPANEL.CPVAR.maindiscard != "1" %]
+YAHOO.util.Event.onDOMReady(function() {
+    CPANEL.panels.create_help("default_account_help", "default_account_help_text");
+});
+[% END %]
+
+[%# INSERT 'sharedjs/handlebars_optimized.js' -%]
+</script>
+[% END #js_block %]
+

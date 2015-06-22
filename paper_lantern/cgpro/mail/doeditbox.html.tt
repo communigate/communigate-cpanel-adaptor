@@ -5,7 +5,7 @@ SET email_add_forward = Api2.exec("CommuniGate", "DoEditContactsBox", {
 });
 %]
 [% WRAPPER '_assets/master.html.tt'
-    app_key = 'contacts'
+    app_key = 'cgpro_contacts'
  -%]
 
 <div class="body-content">

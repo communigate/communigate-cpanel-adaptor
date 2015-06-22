@@ -3,7 +3,7 @@
 [% END -%]
 [% SET CPANEL.CPVAR.dprefix = "../" %]
 [% WRAPPER '_assets/master.html.tt'
-app_key = 'xmpp_clients'
+app_key = 'cgpro_xmpp_clients'
 -%]
 <div class="body-content">
   [% IF CPANEL.feature('cgpro_xmpp_clients') %]

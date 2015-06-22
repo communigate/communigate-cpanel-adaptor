@@ -6,7 +6,7 @@
 [% js_code = PROCESS js_block %]
 [% WRAPPER '_assets/master.html.tt'
     page_js = js_code,
-    app_key = 'xmpp_roster'
+    app_key = 'cgpro_xmpp_roster'
 -%]
 
 <div class="body-content">

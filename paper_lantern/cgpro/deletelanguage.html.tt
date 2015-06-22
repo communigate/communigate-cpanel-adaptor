@@ -1,0 +1,23 @@
+[%
+SET CPANEL.CPVAR.dprefix = "../";
+SET CPANEL.CPVAR.headerimg = "../images/mailmenu.gif";
+SET return_link = "soundsmanager.html?domain=" _ FORM.domain;
+%]
+
+[% WRAPPER '_assets/master.html.tt'
+app_key = 'cgpro_sounds_manager'
+-%]
+
+<div class="body-content">
+  <p>
+      [% locale.maketext("Are you sure you want to delete language “[_1]”?", FORM.lang ) %]</p>
+  <p> 
+  <p>
+      <strong>[% locale.maketext("Warning!!! This will delete all local audio files for [_1] language! “[_1]”?", FORM.lang ) %]</strong>
+  <p> 
+  <a class="btn btn-primary" href="dodeletelanguage.html?lang=[% RAW_FORM.item("lang") %]&domain=[% RAW_FORM.item("domain") %]">Delete</a> 
+  <a class="btn btn-link" href="soundsmanager.html?domain=[% RAW_FORM.item("domain") %]">Cancel</a>
+</p>
+[% INCLUDE _assets/return_link.html.tt return_location=return_link return_link_text=locale.maketext('Go Back') %]
+</div>
+[% END %]

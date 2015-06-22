@@ -25,7 +25,7 @@ app_key = 'cgpro_extensions'
 -%]
 <div class="body-content">
   <div class="section">
-    <h2>[% locale.maketext("CGPAssignExtension") %]</h2>
+    <h3>[% locale.maketext("CGPAssignExtension") %]</h3>
     <form id="mainform" method="post" action="" name="mainform">
       <div class="form-group">
 	<label>[% locale.maketext("Assign To:") %]</label>
@@ -71,7 +71,7 @@ app_key = 'cgpro_extensions'
       </div>
     </form>
 
-    <h2>[% locale.maketext("CGPAssignLocalExtension") %]</h2>
+    <h3>[% locale.maketext("CGPAssignLocalExtension") %]</h3>
     <form id="mainform" method="post" action="" name="mainform">
       [% IF CPANEL.CPERROR.CommuniGate_local_extension -%]
       <pre>

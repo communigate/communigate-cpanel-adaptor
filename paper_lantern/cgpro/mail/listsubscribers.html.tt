@@ -7,7 +7,7 @@ SET CPANEL.CPVAR.dprefix = "../../";
 
 [% js_code = PROCESS js_block %]
 [% WRAPPER '_assets/master.html.tt'
-    app_key = 'mailing_lists'
+    app_key = 'cgpro_mailing_lists'
     page_js = js_code
     page_stylesheets = ['css2-min/mail/lists.css']
 -%]

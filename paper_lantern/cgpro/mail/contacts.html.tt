@@ -5,7 +5,7 @@
 [% js_code = PROCESS js_block %]
 [% WRAPPER '_assets/master.html.tt'
     page_js = js_code,
-    app_key = 'contacts'
+    app_key = 'cgpro_contacts'
 -%]
 <div class="body-content">
 

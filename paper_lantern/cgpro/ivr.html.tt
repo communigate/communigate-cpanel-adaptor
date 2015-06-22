@@ -77,6 +77,11 @@ clear: both;
       </tr>
     </thead>
     <tbody>
+      [% IF ivrs.size == 0 %]
+      <tr>
+	<td colspan="2">Currently there aren't any IVR menus!</td>
+      </tr>
+      [% ELSE %]
       [% FOREACH ivr IN ivrs %]
       <tr>
 	<td>[% ivr.name %]</td>
@@ -85,6 +90,7 @@ clear: both;
 	  <a href="deleteivr.html?ivr=[% ivr.id %]&domain=[% ivr.domain %]&name=[% ivr.name %]" style="margin-left: 10px;"><span class="glyphicon glyphicon-trash"></span> Delete</a>
 	</td>
       </tr>
+      [% END %]
       [% END %]
     </tbody>
   </table>

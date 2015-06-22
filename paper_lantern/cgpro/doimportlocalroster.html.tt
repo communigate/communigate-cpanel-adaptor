@@ -6,7 +6,7 @@ SET email_add_forward = Api2.exec("CommuniGate", "ImportLocalRoster", {
 %]
 
 [% WRAPPER '_assets/master.html.tt'
-    app_key = 'xmpp_roster'
+    app_key = 'cgpro_xmpp_roster'
  -%]
 
 <div class="body-content">

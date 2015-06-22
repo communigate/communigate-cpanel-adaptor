@@ -46,8 +46,9 @@
 -%]
 
 [% js_code = PROCESS js_block %]
+
 [% WRAPPER '_assets/master.html.tt'
-    app_key = 'cgpro_groupware'
+    app_key = 'cgpro_accounts'
     page_js = js_code
     page_scripts = ['sharedjs/handlebars_optimized.js', 'cgpro/mail/js/pops.js']
     page_stylesheets = ['css2-min/mail/pops.css']
@@ -72,12 +73,31 @@ var DEFAULT_EMAIL_QUOTA = [% execute("Email", "get_default_email_quota_mib").dat
   text-align: center;
   }
 
+  .change_quota_first {
+  padding-left: 0;
+  }
+
   .settings td {
   padding-right: 10px;
   }
 
   a {
   cursor: pointer;
+  }
+
+  .dropdown-menu a.btn-link {
+  color: #428BCA;
+  text-align: left;
+  }
+
+  .dropdown-menu a.btn-link:hover {
+  color: #428BCA;
+  }
+
+  .dropdown-menu li a.btn-link span{
+  padding-left: 0;
+  padding-top: 0;
+  padding-bottom: 0;  
   }
 
   .col2span {
@@ -105,9 +125,16 @@ var DEFAULT_EMAIL_QUOTA = [% execute("Email", "get_default_email_quota_mib").dat
   cursor: pointer;
   }
 
+  .glyph-edit {
+  display: none;
+  top: -35px;
+  left: -48px;
+  }
+
   .avatar_span {
   font-size: 48px; 
   cursor: pointer;
+  display: inline;
   }
 
   .realname_acc {
@@ -121,6 +148,18 @@ var DEFAULT_EMAIL_QUOTA = [% execute("Email", "get_default_email_quota_mib").dat
 
   .glyphmargin {
   margin-right: 3px
+  }
+
+  .change_quota_btn {
+  max-width: 130px;
+  }
+
+  .change_quota_status {
+  line-height: 35px;
+  }
+
+  .loading_avatar_status {
+  margin-bottom: 10px;
   }
 </style>
 
@@ -371,10 +410,11 @@ var DEFAULT_EMAIL_QUOTA = [% execute("Email", "get_default_email_quota_mib").dat
     </script>
 
     <script id="change_quota_template" type="text/x-handlebars-template">
+      <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6 change_quota_first">
         <div class="form-group" style="margin-top: 10px;">
             <label>[% locale.maketext('Real Name:') %]</label>
             <div class="row">
-                <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
                     <input type="text" id="realname_input_{{index}}" value="{{real_name}}" name="realname" class="form-control" />
                 </div>
                 <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
@@ -412,39 +452,6 @@ var DEFAULT_EMAIL_QUOTA = [% execute("Email", "get_default_email_quota_mib").dat
             </div>
         </div>
 
-        <div class="form-group">
-            <label>[% locale.maketext('Organisation Unit:') %]</label>
-            <div class="row">
-                <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
-                    <input type="text" id="ou_input_{{index}}" value="{{organisation_unit}}" name="unit" class="form-control" />
-                </div>
-                <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
-                    <span id="ou_input_{{index}}_error"></span>
-                </div>
-            </div>
-        </div>
-        <div class="form-group">
-            <label>[% locale.maketext('Mobile Phone:') %]</label>
-            <div class="row">
-                <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
-                    <input type="text" id="mobile_phone_input_{{index}}" value="{{mobile_phone}}" name="mobile" class="form-control" />
-                </div>
-                <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
-                    <span id="mobile_phone_input_{{index}}_error"></span>
-                </div>
-            </div>
-        </div>
-        <div class="form-group">
-            <label>[% locale.maketext('Work Phone:') %]</label>
-            <div class="row">
-                <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
-                    <input type="text" id="work_phone_input_{{index}}" value="{{work_phone}}" name="workphone" class="form-control" />
-                </div>
-                <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
-                    <span id="work_phone_input_{{index}}_error"></span>
-                </div>
-            </div>
-        </div>
 
         <div class="form-group" style="margin-bottom: 0;">
           <label>[% locale.maketext('Work Days:') %]</label>
@@ -478,11 +485,49 @@ var DEFAULT_EMAIL_QUOTA = [% execute("Email", "get_default_email_quota_mib").dat
           </div>
         </div>
     </div>
-    <div class="form-group" id="change_quota_input_{{index}}">
-      <input type="button" class="btn btn-primary" value="[% locale.maketext('Change Details') %]" id="change_quota_confirm_{{index}}" />
-      <button class="btn btn-link" id="email_table_change_quota_cancel_{{index}}">[% locale.maketext("Cancel") %]</button>
+   </div>
+
+	<div class="col-xs-12 col-sm-6 col-md-6 col-lg-6" style="margin-top: 10px;">
+          <div class="form-group">
+            <label>[% locale.maketext('Organisation Unit:') %]</label>
+            <div class="row">
+              <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                <input type="text" id="ou_input_{{index}}" value="{{organisation_unit}}" name="unit" class="form-control" />
+              </div>
+              <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+                <span id="ou_input_{{index}}_error"></span>
+              </div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>[% locale.maketext('Mobile Phone:') %]</label>
+            <div class="row">
+              <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                <input type="text" id="mobile_phone_input_{{index}}" value="{{mobile_phone}}" name="mobile" class="form-control" />
+              </div>
+              <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+                <span id="mobile_phone_input_{{index}}_error"></span>
+              </div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>[% locale.maketext('Work Phone:') %]</label>
+            <div class="row">
+              <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                <input type="text" id="work_phone_input_{{index}}" value="{{work_phone}}" name="workphone" class="form-control" />
+              </div>
+              <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+                <span id="work_phone_input_{{index}}_error"></span>
+              </div>
+            </div>
+          </div>
+	</div>
+
+    <div class="form-group col-xs-12 col-sm-12 col-md-12 col-lg-12" id="change_quota_input_{{index}}">
+      <input type="button" class="btn btn-primary col-xs-6 col-sm-2 col-md-2 col-lg-2 change_quota_btn" value="[% locale.maketext('Change Details') %]" id="change_quota_confirm_{{index}}" />
+      <button class="btn btn-link col-xs-6 col-sm-1 col-md-1 col-lg-1" id="email_table_change_quota_cancel_{{index}}">[% locale.maketext("Cancel") %]</button>
+      <div class="col-xs-6 col-sm-3 col-md-3 col-lg-3 change_quota_status" id="change_quota_status_{{index}}"></div>
     </div>
-    <div id="change_quota_status_{{index}}"></div>
     </script>
 
     <script id="delete_template" type="text/x-handlebars-template">
@@ -513,7 +558,7 @@ var DEFAULT_EMAIL_QUOTA = [% execute("Email", "get_default_email_quota_mib").dat
 	</div>
 
 	<h3>[% locale.maketext("Device List") %]</h3>
-	<table cellpadding="5" id="mailtbl_{{index}}" class="table table-striped" style="width: 80%;">
+	<table cellpadding="5" id="mailtbl_{{index}}" class="table table-striped">
 	  <thead>
 	    <tr>
 	      <th class="cell">[% locale.maketext("DeviceID") %]</th>
@@ -635,6 +680,7 @@ var DEFAULT_EMAIL_QUOTA = [% execute("Email", "get_default_email_quota_mib").dat
       </div>
       <div class="clear"></div>
       <div class="form-group" style="display: block;" id="change_avatar_input_{{index}}">
+	<div class="loading_avatar_status"></div>      
         <input type="button" class="btn btn-primary" value="[% locale.maketext('Change Avatar') %]" id="change_avatar_confirm_{{index}}" />
         <button class="btn btn-link" id="change_avatar_cancel_{{index}}">[% locale.maketext("Cancel") %]</button>
       </div>
@@ -753,6 +799,11 @@ var DEFAULT_EMAIL_QUOTA = [% execute("Email", "get_default_email_quota_mib").dat
 
 [% BLOCK js_block %]
 <script type="text/javascript">
+
+$(".avatar_span").click(
+function(){ console.log("hover"); }
+);
+
 var MORE_IMG = '<span class="caret"></span>';
 
 var WEBMAIL_ENABLED = false;
@@ -818,4 +869,3 @@ YAHOO.util.Event.onDOMReady(function() {
 <script type="text/javascript" src="js/SimpleCropper/scripts/jquery.Jcrop.js"></script>
 <script type="text/javascript" src="js/SimpleCropper/scripts/jquery.SimpleCropper.js"></script>
 [% END #js_block %]
-

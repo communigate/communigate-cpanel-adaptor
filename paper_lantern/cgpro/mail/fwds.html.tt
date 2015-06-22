@@ -7,7 +7,7 @@ SET api2_result_Email_listforwards = Api2.exec("CommuniGate", "listforwards", {}
 END;
 %]
 [% WRAPPER '_assets/master.html.tt'
-    app_key = 'forwarders'
+    app_key = 'cgpro_forwarders'
  -%]
 
 <div class="body-content">
@@ -62,7 +62,7 @@ END;
   </div>
   [% END %]<!-- end cpanelfeature forwarders -->
 
-  [% INCLUDE _assets/return_link.html.tt return_location='../index.html' return_link_text=locale.maketext('Go Back') %]
+  [% INCLUDE _assets/return_link.html.tt return_location='../../index.html' return_link_text=locale.maketext('Go Back') %]
 </div>
 [% END %]
 

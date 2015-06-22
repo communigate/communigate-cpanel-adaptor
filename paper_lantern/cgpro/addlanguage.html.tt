@@ -1,0 +1,38 @@
+[%
+SET CPANEL.CPVAR.dprefix = "../";
+SET CPANEL.CPVAR.headerimg = "../images/mailmenu.gif";
+SET return_link = "soundsmanager.html?domain=" _ RAW_FORM.item("domain"); 
+%]
+[% WRAPPER '_assets/master.html.tt'
+app_key = 'cgpro_sounds_manager'
+-%]
+
+<div class="body-content">
+  <form action="doaddlanguage.html?domain=[% FORM.domain %]" method="post" enctype="multipart/form-data">
+    <div class="form-group">
+      <label for="lang">[% locale.maketext("Language") %]</label>
+      <div class="row">
+	<div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	  <input class="form-control" type="text" name="lang" id="lang" />
+	</div>
+	<div id="lang_error" class="col-xs-12 col-sm-6 col-md-6 col-lg-6"></div>	  
+      </div>
+    </div>
+    <div class="form-group">
+      <input type="submit" id="activate-button" name="submit" value="Save" class="btn btn-primary" />
+    </div>
+  </form>
+  [% INCLUDE _assets/return_link.html.tt return_location=return_link return_link_text=locale.maketext('Go Back') %]
+</div> <!-- END body-content -->
+[% END %]
+<script type="text/javascript">
+  var LANG = {};
+  LANG.lang_input = '<cpanel langprint="CGPLanguage">';
+    LANG.lang_input_invalid = '<cpanel langprint="CGPThisFieldIsRequired">!';
+      YAHOO.util.Event.onDOMReady(function () {
+      var VAL_LANG = new CPANEL.validate.validator(LANG.lang_input);
+      VAL_LANG.add("lang", 'min_length(%input%,1)', LANG.lang_input_invalid);
+      VAL_LANG.attach();
+      CPANEL.validate.attach_to_form("activate-button", [VAL_LANG]);
+      });
+</script>

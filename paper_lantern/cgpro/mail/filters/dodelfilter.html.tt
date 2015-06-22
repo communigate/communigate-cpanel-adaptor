@@ -7,7 +7,7 @@ SET email_add_forward = Api2.exec("CommuniGate", "deletefilter", {
 %]
 
 [% WRAPPER '_assets/master.html.tt'
-    app_key = 'user_filters'
+    app_key = 'cgpro_user_filters'
  -%]
 <div class="body-content">
   <div class="section">
@@ -28,5 +28,5 @@ SET email_add_forward = Api2.exec("CommuniGate", "deletefilter", {
     [% END %]
     [% INCLUDE _assets/return_link.html.tt return_location='userfilters.html?account=' _ FORM.account return_link_text=locale.maketext('Go Back') %]
   </div>
-
+</div>
 [% END %]

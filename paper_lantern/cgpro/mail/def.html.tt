@@ -6,7 +6,7 @@ SET def_addresses = Api2.exec("CommuniGate","ListDefAddress", {});
 
 [%# js_code = PROCESS js_block %]
 [% WRAPPER '_assets/master.html.tt'
-    app_key = 'default_address'
+    app_key = 'cgpro_default_address'
  -%]
 
 <div class="body-content">

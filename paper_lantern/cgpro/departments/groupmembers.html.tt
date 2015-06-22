@@ -71,11 +71,18 @@ app_key = 'cgpro_departments'
 	  <select id="account" name="account" class="form-control">
 	    [% filter_option(account, "", "CGPPleaseSelect") %]
 	    [% FOR account IN accounts.sort -%]
-	    [% myclass = accounts.$account.class -%]
-	    [% classstring = classes.$myclass.AccessModes.join(',') -%]
-	    [% IF (classstring.search("XMPP") || classstring == "All") -%]
-	    [% filter_option(FORM.account, account, account) %]
-	    [% END -%]
+              [% myclass = accounts.$account.class -%]
+              [% classstring = classes.$myclass.AccessModes.join(',') -%]
+	      [% IF (classstring.search("SIP") || classstring == "All") -%]
+	        [% added_string = "" %]
+	        [% FOREACH member IN group_members %]
+	        [% added_string = added_string _ member.subemail %]   
+	        [% END %]
+	        [% IF ( added_string.search(account) ) -%]
+	        [% ELSE %]
+         	    [% filter_option(FORM.account, account, account) %]
+	        [% END %]
+	      [% END -%]
 	    [% END -%]
 	  </select>
 	</div>

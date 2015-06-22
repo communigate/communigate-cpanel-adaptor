@@ -22,7 +22,7 @@
 [% js_code = PROCESS js_block %]
 [% css_code = PROCESS css_block %]
 [% WRAPPER '_assets/master.html.tt'
-    app_key = 'user_filters'
+    app_key = 'cgpro_user_filters'
     page_js = js_code
     page_styles = css_code
 %]
@@ -30,9 +30,9 @@
 
 <div class="body-content">
     [% IF email_acct %]
-    <h2 id="hdrEditFilters">[% locale.maketext("Edit Filters for “[_1]”",email_acct) %]</h2>
+    <h3 id="hdrEditFilters">[% locale.maketext("Edit Filters for “[_1]”",email_acct) %]</h3>
     [% ELSE %]
-    <h2 id="hdrEditFilters">[% locale.maketext("Edit Filters for “All Mail on your Account”") %]</h2>
+    <h3 id="hdrEditFilters">[% locale.maketext("Edit Filters for “All Mail on your Account”") %]</h3>
     [% END %]
 
     <div class="section">
@@ -40,20 +40,23 @@
     </div>
 
     <div class="section">
-        <h2 id="hdrCurrentFilters">[% locale.maketext("Current Filters") %]</h2>
-
+      [% IF api2_result_Email_filterlist.size == 0 %]
+      <h3 id="hdrCurrentFilters">[% locale.maketext("Currently there aren't any filters!") %]</h3>
+      [% ELSE %]
+      <h3 id="hdrCurrentFilters">[% locale.maketext("Current Filters") %]</h3>
+      [% END %]
         <div id="filter_container">
-            [% IF api2_result_Email_filterlist.size;
+	  [% IF api2_result_Email_filterlist.size;
                FOREACH hashref IN api2_result_Email_filterlist;
             %]
                 <div class="filter_wrapper">
                     <div class="filter" id="[% hashref.filtername.html() %]-filter" title="[% locale.maketext('Drag to reorder.') %]">
-                        <div class="arrows">
-                            <ul class="move">
-                                <li class="up"><a href="#" onclick="move_up(this); return false"></a></li>
-                                <li class="down"><a href="#" onclick="move_down(this); return false"></a></li>
-                            </ul>
-                        </div>
+                        <!-- <div class="arrows"> -->
+                        <!--     <ul class="move"> -->
+                        <!--         <li class="up"><a href="#" onclick="move_up(this); return false"></a></li> -->
+                        <!--         <li class="down"><a href="#" onclick="move_down(this); return false"></a></li> -->
+                        <!--     </ul> -->
+                        <!-- </div> -->
                         <div class="filter-title">[%  hashref.filtername.html() %]</div>
                         <div class="actions">
                             <a class="btn btn-link" href="editfilter.html?account=[% FORM.account %]&filtername=[% hashref.filtername.uri() %]">
@@ -65,12 +68,12 @@
                                 [% locale.maketext("Delete") %]
                             </a>
                         </div>
-                        <div class="arrows2">
-                            <ul class="move">
-                                <li class="up"><a href="#" onclick="move_up(this); return false"></a></li>
-                                <li class="down"><a href="#" onclick="move_down(this); return false"></a></li>
-                            </ul>
-                        </div>
+                        <!-- <div class="arrows2"> -->
+                        <!--     <ul class="move"> -->
+                        <!--         <li class="up"><a href="#" onclick="move_up(this); return false"></a></li> -->
+                        <!--         <li class="down"><a href="#" onclick="move_down(this); return false"></a></li> -->
+                        <!--     </ul> -->
+                        <!-- </div> -->
                         <div class="clear"></div>
                     </div>
                 </div>

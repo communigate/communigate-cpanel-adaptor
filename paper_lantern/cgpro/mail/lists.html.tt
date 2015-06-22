@@ -5,11 +5,30 @@ SET mail_domains = execute("Email", "list_mail_domains", {});
 
 [% js_code = PROCESS js_block %]
 [% WRAPPER '_assets/master.html.tt'
-    app_key = 'mailing_lists'
+    app_key = 'cgpro_mailing_lists'
     page_js = js_code
     page_scripts = ['sharedjs/handlebars_optimized.js']
     page_stylesheets = ['css2-min/mail/lists.css']
 -%]
+
+<style>
+  .ng-cloak {
+  display: table !important;
+  }
+
+  .empty-row {
+  border: none;
+  }
+
+  .table tbody tr.info {
+  border: none;
+  }
+
+  .table tbody tr.info td {
+  background: #F9F9F9;
+  }
+</style>
+
 <div class="body-content">
     <p id="descMailingList" class="description">
         [% locale.maketext("Use a single address to send email to multiple email addresses. For more information, read the [output,url,_1,documentation,target,_2,id,_3].", "//www.communigate.com/communigatepro/LIST.html", "_blank", "lnkMailingListsDocumentation") %]

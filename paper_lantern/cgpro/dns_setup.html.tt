@@ -25,6 +25,22 @@ mx_presets = mx_presets.0;
     page_scripts = ['js2-min/mail/mx.js']
 %]
 
+<style>
+  table tbody tr:nth-child(2n) td {
+  border: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+  }
+
+  table tbody tr:nth-child(2n) td .btn {
+  margin-bottom: 10px;
+  }  
+
+  table tbody tr:nth-child(2n+1) td {
+  background: #F9F9F9;
+  }
+</style>
+
 <div class="body-content">
 
   <div class="pull-right">
@@ -81,8 +97,7 @@ mx_presets = mx_presets.0;
 	    <p class="description" id="descMx">
               [% locale.maketext("Reroute a domain[output,apos]s incoming mail to a specific server. Use this feature to create a backup mail exchanger to handle email in case your server fails. For more information, read the [output,url,_1,documentation,target,_2,id,_3].", "//go.cpanel.net/PLDMxEntry", "_blank", "lnkMxEntryDocumentation") %]
 	    </p>
-
-            <h3>[% locale.maketext("Add New Record") %]</h3>
+            <h3>[% locale.maketext("Predefined records") %]</h3>
 	    <script type="text/javascript">
 	      var mx_buttons = [% mx_presets.split("\\\\e").size || 0 %];
 	    </script>
@@ -94,7 +109,7 @@ mx_presets = mx_presets.0;
 	      [% END -%]
 
             <div>
-            <h4>[% locale.maketext("Custom Record") %]</h4>
+            <h3>[% locale.maketext("Add New Record") %]</h3>
                 <div class="form-group">
                     <label id="lblPriority" for="priority">
                         [% locale.maketext("Priority:") %]

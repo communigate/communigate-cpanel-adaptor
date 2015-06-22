@@ -57,7 +57,6 @@
 
 [% FOR q = get_filter.data.rules %]
 <tr id="rule[% loop.index+1 %]">
-<td valign="middle" class="acltd" width="20"><img onclick="moveup(this); this.src='icon_arrow_up_disabled.gif';" id="[% loop.index+1 %]-moveup" src="icon_arrow_up_disabled.gif" onmouseover="this.src='icon_arrow_up.gif';" onmouseout="this.src='icon_arrow_up_disabled.gif';" class="moveact"><br /><img onclick="movedown(this); this.src='icon_arrow_down_disabled.gif';" id="[% loop.index+1 %]-movedown" src="icon_arrow_down_disabled.gif"  onmouseover="this.src='icon_arrow_down.gif';" onmouseout="this.src='icon_arrow_down_disabled.gif';" class="moveact"></td>
 <td class="frow">
 <div style="float: left; display:inline; width: 510px;">
 <select name="part[% loop.index+1 %]" onchange="handlepart(this)" style="width:250px;" autocomplete="off" autofill="off">

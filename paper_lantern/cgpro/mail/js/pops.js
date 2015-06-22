@@ -231,9 +231,9 @@ var build_email_table_markup = function() {
 	    && ACCOUNTS[i]['vcard']['fileData'][0]['vCard'][0]['PHOTO'][0]['BINVAL']
 	    && ACCOUNTS[i]['vcard']['fileData'][0]['vCard'][0]['PHOTO'][0]['BINVAL'][0]) {
 	    var acc_photo = ACCOUNTS[i]['vcard']['fileData'][0]['vCard'][0]['PHOTO'][0]['BINVAL'][0];
-	    html += '<img id="avatar_' + i + '" src="data:image/png;base64,' + acc_photo + '" alt="avatar" style="max-width: 48px; cursor: pointer;">';
+	    html += '<img class="avatar" id="avatar_' + i + '" src="data:image/png;base64,' + acc_photo + '" alt="avatar" style="max-width: 48px; cursor: pointer;">' + '</img>';
 	} else {
-	    html += '<img class="avatar" id="avatar_' + i + '">' + '<span class="glyphicon glyphicon-user avatar_span" id="span_avatar_' + i + '"></span>' + '</img>';
+	    html += '<img class="avatar" id="avatar_' + i + '">' + '<span class="glyphicon glyphicon-user avatar_span avatar" id="span_avatar_' + i + '"></span>' + '<span class="glyphicon glyphicon-user glyph-edit"></span>' + '</img>';
 	}
 	
 	html += '</td>';
@@ -308,9 +308,9 @@ var build_email_table_markup = function() {
 	    acc_modes_webcal = "color: #aaaaaa;";
 	}
 	html += '<span id="acc_type_' + i + '" onclick="toggle_action_div(null, {id:\'change_type_module_' + i + '\', index:' + i + ', action:\'change_type\'})">' + ACCOUNTS[i]['class'] + '</span>' + '<br>';
-	html += '<span id="icon_envelope_' + i + '" class="glyphmargin glyphicon glyphicon-envelope" onclick="toggle_action_div(null, {id:\'change_type_module_' + i + '\', index:' + i + ', action:\'change_type\'})" title="Mail"' + acc_modes_mail + '"></span>';
-	html += '<span id="icon_comment_' + i + '" class="glyphmargin glyphicon glyphicon-comment" onclick="toggle_action_div(null, {id:\'change_type_module_' + i + '\', index:' + i + ', action:\'change_type\'})" title="Chat/Jabber/XMPP"' + acc_modes_xmpp + '"></span>';
-	html += '<span id="icon_phone_' + i + '" class="glyphmargin glyphicon glyphicon-phone" onclick="toggle_action_div(null, {id:\'change_type_module_' + i + '\', index:' + i + ', action:\'change_type\'})" title="SIP (Internet calls)"' + acc_modes_sip + '"></span>';
+	html += '<span id="icon_envelope_' + i + '" class="glyphmargin glyphicon glyphicon-envelope" onclick="toggle_action_div(null, {id:\'change_type_module_' + i + '\', index:' + i + ', action:\'change_type\'})" title="Mail" style="' + acc_modes_mail + '"></span>';
+	html += '<span id="icon_comment_' + i + '" class="glyphmargin glyphicon glyphicon-comment" onclick="toggle_action_div(null, {id:\'change_type_module_' + i + '\', index:' + i + ', action:\'change_type\'})" title="Chat/Jabber/XMPP" style="' + acc_modes_xmpp + '"></span>';
+	html += '<span id="icon_phone_' + i + '" class="glyphmargin glyphicon glyphicon-phone" onclick="toggle_action_div(null, {id:\'change_type_module_' + i + '\', index:' + i + ', action:\'change_type\'})" title="SIP (Internet calls)" style="' + acc_modes_sip + '"></span>';
 	html += '<span id="icon_calendar_' + i + '" class="glyphicon glyphicon-calendar" onclick="toggle_action_div(null, {id:\'change_type_module_' + i + '\', index:' + i + ', action:\'change_type\'})" title="Calendar" style="' + acc_modes_webcal + '"></span>';
 	html += '</td>';
         html += '<td class="col3">';
@@ -318,15 +318,19 @@ var build_email_table_markup = function() {
         // html += '<td><span class="btn btn-link" onclick="toggle_action_div(null, {id:\'show_details_module_' + i + '\', index:' + i + ', action:\'show_details\'})">' + '<span class="glyphicon glyphicon-tasks"></span>' + ' Details' + '</span></td>';
         html += '<td><span class="btn btn-link" onclick="toggle_action_div(null, {id:\'change_password_module_' + i + '\', index:' + i + ', action:\'change_password\'})">' + '<span class="fa fa-key fa-lg"></span>' + " Password" + '</span></td>';
         html += '<td><span class="btn btn-link" onclick="toggle_action_div(null, {id:\'change_quota_module_' + i + '\', index:' + i + ', action:\'change_quota\'})">' + '<span class="glyphicon glyphicon-cog"></span>' + ' Details' + '</span></td>';
-        html += '<td><span class="btn btn-link" onclick="toggle_action_div(null, {id:\'change_type_module_' + i + '\', index:' + i + ', action:\'change_type\'})">' + '<span class="glyphicon glyphicon-list"></span>' + ' Type' + '</span></td>';
-        html += '<td><span class="btn btn-link" onclick="toggle_action_div(null, {id:\'airsync_module_' + i + '\', index:' + i + ', action:\'airsync\'})">' + '<span class="glyphicon glyphicon-transfer"></span>' + '<span class="glyphicon glyphicon-phone"></span>' + ' AirSync' + '</span></td>';
+        html += '<td><span class="btn btn-link" onclick="toggle_action_div(null, {id:\'change_type_module_' + i + '\', index:' + i + ', action:\'change_type\'})">' + '<span class="glyphicon glyphicon-list"></span>' + ' Plan' + '</span></td>';
         html += '<td><span class="btn btn-link" onclick="toggle_action_div(null, {id:\'delete_module_' + i + '\', index:' + i + ', action:\'delete\'})">' + '<span class="glyphicon glyphicon-trash"></span>' + " " + LANG.delete2 + '</span></td>';
         html += '<td><div class="btn-group">';
+        html += '<button id="email_table_menu_button_' + i + '" class="btn btn-default dropdown-toggle" data-toggle="dropdown" type="button">More<span class="caret"><span></button>';
         html += '<ul class="dropdown-menu" role="menu">';
-        if (WEBMAIL_ENABLED) {
-            html += '<li><a id="email_table_menu_webmail_' + i + '" href="webmailform.html?user=' + encodeURIComponent(ACCOUNTS[i]['user']) + '@' + encodeURIComponent(ACCOUNTS[i]['domain']) + '&amp;domain=' + encodeURIComponent(ACCOUNTS[i]['domain']) + '" target="_blank">' + LANG.access_webmail + '</a></li>';
-        }
-        html += '<li><a id="email_table_menu_configure_email_' + i + '" href="clientconf.html?acct=' + encodeURIComponent(ACCOUNTS[i]['user']) + '@' + encodeURIComponent(ACCOUNTS[i]['domain']) + '">' + LANG.configure_email_client + '</a></li>';
+	if (acc_modes.indexOf('SIP') > -1 || acc_modes == "All"){
+	    html += '<li id="li_extensions_' + i + '"><a class="btn btn-link" href="../extensions.html" target="_blank">' + '<span class="btn btn-link">' + '<span class="glyphicon glyphicon-earphone"></span>' + " Extensions" + '</span>' + '</a></li>';
+	} else {
+	    	    html += '<li style="display: none;" id="li_extensions_' + i + '"><a class="btn btn-link" href="../extensions.html" target="_blank">' + '<span class="btn btn-link">' + '<span class="glyphicon glyphicon-earphone"></span>' + " Extensions" + '</span>' + '</a></li>';
+	}
+
+	html += '<li><a class="btn btn-link"><span class="btn btn-link" onclick="toggle_action_div(null, {id:\'airsync_module_' + i + '\', index:' + i + ', action:\'airsync\'})">' + '<span class="glyphicon glyphicon-transfer"></span>' + '<span class="glyphicon glyphicon-phone"></span>' + ' ActiveSync&trade;' + '</span></a></li>';
+	
         html += '</ul>';
         html += '</div></td>';
         html += '</tr></table>';
@@ -1007,7 +1011,6 @@ var change_quota = function(index) {
     YAHOO.util.Connect.asyncRequest('GET', CPANEL.urls.json_api(api2_call), callback, '');
 
     // show the ajax loading icon
-    YAHOO.util.Dom.setStyle("change_quota_input_" + index, "display", "none");
     YAHOO.util.Dom.get("change_quota_status_" + index).innerHTML = CPANEL.icons.ajax + " " + "Changing Details" + "...";
 };
 
@@ -1252,6 +1255,14 @@ var change_type = function(e, o) {
     // callback functions
     var callback = {
         success: function(o) {
+	    var selector_li_ext = "#li_extensions_" + index;
+	    if (api2_call['class'] != "NotJabberOnly") {
+		$(selector_li_ext).hide();
+	    }
+	    else {
+		$(selector_li_ext).show();
+	    }
+	    
             YAHOO.util.Dom.get("change_type_status_" + index).innerHTML = '';
             YAHOO.util.Dom.setStyle("change_type_input_" + index, "display", "block");
             toggle_action_div(null, {

@@ -1,7 +1,7 @@
 [%
 SET CPANEL.CPVAR.dprefix = "../../../";
 SET email_acct = execute( 'Email', 'account_name', {"account"=>RAW_FORM.account, "display"=>"0"}).data;
-SET app_name = 'user_filters';
+SET app_name = 'cgpro_user_filters';
 %]
 
 [% js_code = PROCESS js_block %]
