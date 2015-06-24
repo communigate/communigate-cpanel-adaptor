@@ -443,6 +443,7 @@ sub api2_UpdateAccountClass {
     my $current = 0;
     $current = current_class_accounts($OPTS{'class'}, $cli) if $max > 0;
     my $setting = { ServiceClass => $OPTS{'class'}, AccessModes => 'default' };
+    my $error_msg = "";
     if ($max > $current || $max == -1) {
 	$cli->UpdateAccountSettings($OPTS{'account'}, $setting);
 	if ($OPTS{'restrictAccess'}) {
@@ -455,12 +456,14 @@ sub api2_UpdateAccountClass {
 	}
 	$cli->UpdateAccountSettings($OPTS{'account'}, $setting);
 	$cli->Logout();
+	$error_msg = "Updated Successfuly.";
 	$Cpanel::CPERROR{'CommuniGate'} = "Updated Successfuly.";
 	return {};
     } else {
 	$cli->Logout();
+	$error_msg = "Maximum " .$OPTS{'class'} . " accounts for your plan is $max. Upgrade your plan for more " .$OPTS{'class'} . " accounts!";
 	$Cpanel::CPERROR{'CommuniGate'} = "Maximum " .$OPTS{'class'} . " accounts for your plan is $max. Upgrade your plan for more " .$OPTS{'class'} . " accounts!";
-	return {};
+	return { "msg" => $error_msg};
     }
 }
 
@@ -741,8 +744,6 @@ sub api2_ListExtensions {
 		  my $settings = $cli->GetAccountSettings($object);
 		  my $telnums = $pbxPrefs->{"Gateways"}->{$defaultPrefs->{"assignedTelnums"}->{$number}->{"gateway"}}->{"callInGw"}->{"telnums"};
 		  my @telnum = grep {$_->{'telnum'} eq $number} @$telnums;
-		  # use Data::Dumper;
-		  # die Dumper $number;
  		  if ($telnum[0] && $telnum[0]->{'authname'} eq $settings->{"PSTNGatewayAuthName"} && $telnum[0]->{'username'} eq $settings->{"PSTNFromName"}) {
 		      $ext->{'out'} = 1;
 		  }
@@ -948,7 +949,7 @@ sub api2_GetExtensions {
 	  my $domainPrefs = $cli->GetAccountDefaultPrefs($domain);
 	  if ($domainPrefs->{assignedTelnums}) {
 	      foreach my $number (keys %{$domainPrefs->{assignedTelnums}}) {
-		  push @result, {extension => $number, short => $number} unless $domainPrefs->{assignedTelnums}->{$number}->{'assigned'};
+		  push @result, {extension => $number, short => $number } unless $domainPrefs->{assignedTelnums}->{$number}->{'assigned'};
 	      }
 	  }
 	  last;
@@ -959,6 +960,40 @@ sub api2_GetExtensions {
   } else {
       unshift @result, {extension => "", short => "-- Please Select --"};
   }
+  
+  $cli->Logout();
+  return @result;
+}
+
+sub api2_GetExtensionsForPSTN {
+  my %OPTS = @_;
+  my $domain = $OPTS{'domain'};
+  my @domains = Cpanel::Email::listmaildomains();
+  my $cli = getCLI();
+  my @result;
+  for my $dom (@domains) {
+      if ($dom eq $domain) {
+	  my $domainPrefs = $cli->GetAccountDefaultPrefs($domain);
+	  my $domainDefaults = $cli->GetAccountDefaults($domain);
+	  push @result, {selected => $domainDefaults};
+	  my $defaultDomain = $cli->MainDomainName();
+	  if ($domainPrefs->{assignedTelnums}) {
+	      foreach my $number (keys %{$domainPrefs->{assignedTelnums}}) {
+		  my $gateway = $domainPrefs->{"assignedTelnums"}->{$number}->{"gateway"};
+		  my $prefs = $cli->GetAccountPrefs("pbx\@$defaultDomain");
+		  my @telnum = grep {$_->{"telnum"} eq $number} @{$prefs->{"Gateways"}->{$gateway}->{"callInGw"}->{"telnums"}};
+		  push @result, {extension => $number, short => $number, telnum => @telnum[0] } unless $domainPrefs->{assignedTelnums}->{$number}->{'assigned'};
+	      }
+	  }
+	  last;
+      }
+  }
+  if ($#result == 0) {
+      push @result, {extension => "", short => "No extansion available for $domain"};
+  } else {
+      unshift @result, {extension => "", short => "-- Please Select --"};
+  }
+  
   $cli->Logout();
   return @result;
 }
@@ -2801,9 +2836,9 @@ sub api2_doUpdateSignalRule {
 	$rule->[2] = [];
 	push @{	$rule->[2]}, ['Method', 'is', 'INVITE'];
 	push @{	$rule->[2]}, ['RequestURI', 'is', "sip:" . $params->{RequestURI}];
-	my $timeOfDay = $params->{fromHour} . ":" .$params->{fromMinutes} . "-" . $params->{toHour} . ":" . $params->{toMinutes};
+	my $timeOfDay = $params->{fromHour} . "-" . $params->{toHour};
 	if ($timeOfDay =~ m/^\d\d:\d\d-\d\d:\d\d$/) {
-	    push @{$rule->[2]}, ["Time Of Day", 'in', $params->{fromHour} . ":" .$params->{fromMinutes} . "-" . $params->{toHour} . ":" . $params->{toMinutes}];
+	    push @{$rule->[2]}, ["Time Of Day", 'in', $params->{fromHour} . "-" . $params->{toHour}];
 	}
 	if ($params->{weekDays}) {
 	    push @{$rule->[2]}, [ "Current Day", "in", join(",", map { $params->{$_} } grep { /^weekDays\-?/ }  sort keys %$params)];
@@ -4378,8 +4413,10 @@ sub api2_UpdateWav {
 		if (!$data) {
 		    $cli->CreateDomain("$domain");
 		}
-		$cli->CreateDomainPBX($domain);
-		$cli->CreateDomainPBX($domain, lc $OPTS{'lang'});
+		if ($OPTS{'lang'} ne 'english') {
+		    $cli->CreateDomainPBX($domain);
+		    $cli->CreateDomainPBX($domain, lc $OPTS{'lang'});
+		}
 		$cli->StoreDomainPBXFile($domain, $filename, encode_base64($filedata, ""));
 		$Cpanel::CPERROR{'CommuniGate'} = $cli->getErrMessage unless ($cli->getErrMessage eq "OK");
 	    } else {
@@ -4731,6 +4768,61 @@ sub api2_DeleteRSIP {
     $cli->Logout();
     return $result;
 }
+
+sub api2_GetAccountDefaults {
+    my %OPTS = @_;
+    my $dom = $OPTS{'domain'};
+    my @domains = Cpanel::Email::listmaildomains();
+    my $cli = getCLI();
+    my $result = {};
+
+    for my $domain (@domains) {
+	if ($domain eq $dom) {
+	    my $acc_defaults = $cli->GetAccountDefaults("sevdip.bg");
+	    $result->{'account_defaults'} = $acc_defaults;
+	    $result->{"domain"}=$dom;
+	    last;
+	}
+    }
+
+    $cli->Logout();
+    return $result;
+}
+
+sub api2_SetDomainPSTN {
+    my %OPTS = @_;
+    my $dom = $OPTS{'domain'};
+    my $number = $OPTS{'extension'};
+    my @domains = Cpanel::Email::listmaildomains();
+    my $cli = getCLI();
+    my $result = {};
+
+    for my $domain (@domains) {
+	if ($domain eq $dom) {
+	    my $defaultDomain = $cli->MainDomainName();
+	    my $myPrefs = $cli->GetAccountDefaultPrefs($domain);
+	    my $gateway = $myPrefs->{"assignedTelnums"}->{$number}->{"gateway"};
+	    my $prefs = $cli->GetAccountPrefs("pbx\@$defaultDomain");
+	    my @telnum = grep {$_->{"telnum"} eq $number} @{$prefs->{"Gateways"}->{$gateway}->{"callInGw"}->{"telnums"}};
+	    $cli->UpdateAccountDefaults(domain => $domain,
+	    				settings => {
+					    PSTNFromName => $telnum[0]->{'username'},
+					    PSTNGatewayAuthName => $telnum[0]->{'authname'},
+					    PSTNGatewayDomain => $telnum[0]->{'domain'},
+					    PSTNGatewayPassword => $telnum[0]->{'authpass'},
+					    PSTNGatewayVia => $telnum[0]->{'domain'}
+	    				});
+	    my $afterPrefs = $cli->GetAccountDefaults($domain);
+	    $result->{'after'} = $afterPrefs;
+	    last;
+	}
+    }
+
+    $cli->Logout();
+    return $result;
+}
+
+
 sub api2_ListAirSyncs {
     my %OPTS = @_;
     my $account = $OPTS{'account'};

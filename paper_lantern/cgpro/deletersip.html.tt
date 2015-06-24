@@ -1,11 +1,11 @@
 [%
 SET CPANEL.CPVAR.dprefix = "../";
 SET CPANEL.CPVAR.headerimg = "../images/mailmenu.gif";
-SET return_link = "rsip.html?account=" _ RAW_FORM.item('account').uri();
+SET return_link = "extensions.html?rsip_account=" _ RAW_FORM.item('account').uri();
 %]
 
 [% WRAPPER '_assets/master.html.tt'
-app_key = 'cgpro_rsip'
+app_key = 'cgpro_extensions'
 -%]
 
 <div class="body-content">
