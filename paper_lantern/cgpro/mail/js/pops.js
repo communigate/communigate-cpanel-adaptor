@@ -90,7 +90,18 @@ var update_email_accounts = function(new_acc) {
 				    "action": "change_quota"
 				    });
 		    }; 
-		}; 		       
+		}; 		  
+		$(".avatar_span").mouseover(function() {
+			$(this).next("span").show();
+		    }).mouseout(function(){
+			$(this).next("span").hide();
+			});
+		$(".avatar").mouseover(function() {
+			$(this).next("span").show();
+		    }).mouseout(function(){
+			$(this).next("span").hide();
+			});
+     
 		search_email();
             } catch (e) {
                 json_parse_error();
@@ -231,9 +242,9 @@ var build_email_table_markup = function() {
 	    && ACCOUNTS[i]['vcard']['fileData'][0]['vCard'][0]['PHOTO'][0]['BINVAL']
 	    && ACCOUNTS[i]['vcard']['fileData'][0]['vCard'][0]['PHOTO'][0]['BINVAL'][0]) {
 	    var acc_photo = ACCOUNTS[i]['vcard']['fileData'][0]['vCard'][0]['PHOTO'][0]['BINVAL'][0];
-	    html += '<img class="avatar" id="avatar_' + i + '" src="data:image/png;base64,' + acc_photo + '" alt="avatar" style="max-width: 48px; cursor: pointer;">' + '</img>';
+	    html += '<div class="img-div-rel"><img class="avatar" id="avatar_' + i + '" src="data:image/png;base64,' + acc_photo + '" alt="avatar" style="max-width: 48px; cursor: pointer;">' + '<span class="glyphicon glyphicon-edit glyph-edit"></span>' + '</img></div>';
 	} else {
-	    html += '<img class="avatar" id="avatar_' + i + '">' + '<span class="glyphicon glyphicon-user avatar_span avatar" id="span_avatar_' + i + '"></span>' + '<span class="glyphicon glyphicon-user glyph-edit"></span>' + '</img>';
+	    html += '<div class="img-div-rel"><img class="avatar" id="avatar_' + i + '">' + '<span class="glyphicon glyphicon-user avatar_span" id="span_avatar_' + i + '"></span>' + '<span class="glyphicon glyphicon-edit glyph-edit"></span>' + '</img></div>';
 	}
 	
 	html += '</td>';
@@ -412,7 +423,6 @@ var build_email_table_markup = function() {
 
     return html;
 };
-
 // add event handlers for the new email table
 var build_progress_bars = function() {
     for (var i = 0; i < ACCOUNTS.length; i++) {
@@ -1919,6 +1929,10 @@ var init_mail = function() {
 
     // update the accounts object and build the email table
     update_email_accounts();
+  $("#span_avatar_1").mouseover(function() {
+  console.log("works!");
+ }).mouseout(function(){
+ });
 
     grab_default_account_disk_used();
 };

@@ -988,7 +988,7 @@ sub api2_GetExtensionsForPSTN {
 		  my $gateway = $domainPrefs->{"assignedTelnums"}->{$number}->{"gateway"};
 		  my $prefs = $cli->GetAccountPrefs("pbx\@$defaultDomain");
 		  my @telnum = grep {$_->{"telnum"} eq $number} @{$prefs->{"Gateways"}->{$gateway}->{"callInGw"}->{"telnums"}};
-		  push @result, {extension => $number, short => $number, telnum => @telnum[0] } unless $domainPrefs->{assignedTelnums}->{$number}->{'assigned'};
+		  push @result, {extension => $number, short => $number, telnum => @telnum[0] };
 	      }
 	  }
 	  last;
