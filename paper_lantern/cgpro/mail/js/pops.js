@@ -240,8 +240,18 @@ var build_email_table_markup = function() {
         html += '<td class="col1">';
 	if (ACCOUNTS[i]['prefs']['RealName']){
 	html += '<span class="realname_acc" id="realname_' + i + '">' + ACCOUNTS[i]['prefs']['RealName'] + '</span>' + '<br>';
+	} else {
+	html += '<span class="realname_acc" id="realname_' + i + '">' + '</span>';
 	}
-	html += ACCOUNTS[i]['prefs']['AccountName'] + '</td>';
+	html += ACCOUNTS[i]['prefs']['AccountName'] + '<br>';
+	for (var num in ACCOUNTS[i]['prefs']['assignedTelnums']) {
+	    if (ACCOUNTS[i]['prefs']['assignedTelnums'].hasOwnProperty(num)){
+		if (ACCOUNTS[i]['prefs']['assignedTelnums'][num]['assigned'] && ACCOUNTS[i]['prefs']['assignedTelnums'][num]['assigned'] == ("a:" + ACCOUNTS[i]['prefs']['AccountName'])) {
+		html += '<span class="glyphicon glyphicon-earphone glyphtel">' + '<span class="telnum">' + num + '</span>' + '</span>';
+		}
+	    }
+        }
+	html += '</td>';
 	if (ACCOUNTS[i]['humandiskquota'] == 0){
 	    var diskquota_acc = " ∞ ";
 	}
@@ -260,7 +270,6 @@ var build_email_table_markup = function() {
 	if (ACCOUNTS[i]['stats']['MessagesSent']){
 	    var sent = ACCOUNTS[i]['stats']['MessagesSent'].substring(1);
 	    html += sent + ' / ';
-
 	}
 	else {
 	    html += 0 + ' / ';
@@ -977,7 +986,11 @@ var change_quota = function(index) {
 		}
 		var selector_acc_realname = "#realname_" + index;
 		var selector_acc_quota = "#quota_" + index;
-		$(selector_acc_realname).text(api2_call.realaname);
+		if (api2_call.realaname == "") {
+		    $(selector_acc_realname).find('br').remove();
+		    $(selector_acc_realname).hide();
+		}
+		$(selector_acc_realname).text(api2_call.realaname).append('<br>');
 		if (api2_call.quota == 0){
 		    var diskquota_acc_show = " ∞ ";
 		}
@@ -1277,9 +1290,13 @@ var change_type = function(e, o) {
                 CPANEL.widgets.status_bar("status_bar_" + index, "error", CPANEL.lang.json_error, CPANEL.lang.json_parse_failed);
                 return;
             }
+	    
+	    if (data.cpanelresult.data[0].msg) {
+                CPANEL.widgets.status_bar("status_bar_" + index, "error", CPANEL.lang.Error, data.cpanelresult.data[0].msg);
+	    } 
 
             // update the table and display the status
-            if (data.cpanelresult.event && (data.cpanelresult.event['result'] == 1)) {
+            else if (data.cpanelresult.event && (data.cpanelresult.event['result'] == 1)) {
                 var new_type = api2_call.class;
                 var status = new_type;
                 CPANEL.widgets.status_bar("status_bar_" + index, "success", "Changed type: ", status);
@@ -1291,6 +1308,11 @@ var change_type = function(e, o) {
 		$(selector_acc_type).text(api2_call.class);
        		var acc_class = api2_call.class;
 		var acc_modes = CLASSES[acc_class]['AccessModes'];
+
+		// if (data[0].msg) {
+		//     console.log(data[0].msg);
+		// }
+		
 		if (acc_modes.indexOf('Mail') > -1 || acc_modes == "All"){
 		    $(selector_icon_envelope).css("color", "#000000");
 		}

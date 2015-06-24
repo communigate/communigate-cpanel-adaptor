@@ -44,7 +44,6 @@
 
     END;
 -%]
-
 [% js_code = PROCESS js_block %]
 
 [% WRAPPER '_assets/master.html.tt'
@@ -147,7 +146,17 @@ var DEFAULT_EMAIL_QUOTA = [% execute("Email", "get_default_email_quota_mib").dat
   }
 
   .glyphmargin {
-  margin-right: 3px
+  margin-right: 3px;
+  }
+  
+  .telnum {
+  font-family: "Open Sans";
+  padding-left: 5px;
+  }
+
+  .glyphtel {
+  margin-right: 10px;
+
   }
 
   .change_quota_btn {
@@ -164,6 +173,8 @@ var DEFAULT_EMAIL_QUOTA = [% execute("Email", "get_default_email_quota_mib").dat
 </style>
 
 <div class="body-content">
+
+
 [% IF CPANEL.feature('popaccts') %]
     <p id="descEmailAccounts" class="description">
         [%-
