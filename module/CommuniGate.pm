@@ -947,15 +947,21 @@ sub api2_GetExtensions {
   for my $dom (@domains) {
       if ($dom eq $domain) {
 	  my $domainPrefs = $cli->GetAccountDefaultPrefs($domain);
+	  my $domainDefaults = $cli->GetAccountDefaults($domain);
+	  push @result, {selected => $domainDefaults};
+	  my $defaultDomain = $cli->MainDomainName();
 	  if ($domainPrefs->{assignedTelnums}) {
 	      foreach my $number (keys %{$domainPrefs->{assignedTelnums}}) {
-		  push @result, {extension => $number, short => $number } unless $domainPrefs->{assignedTelnums}->{$number}->{'assigned'};
+		  my $gateway = $domainPrefs->{"assignedTelnums"}->{$number}->{"gateway"};
+		  my $prefs = $cli->GetAccountPrefs("pbx\@$defaultDomain");
+		  my @telnum = grep {$_->{"telnum"} eq $number} @{$prefs->{"Gateways"}->{$gateway}->{"callInGw"}->{"telnums"}};
+		  push @result, {extension => $number, short => $number, telnum => @telnum[0] } unless $domainPrefs->{assignedTelnums}->{$number}->{'assigned'};
 	      }
 	  }
 	  last;
       }
   }
-  if ($#result == -1) {
+  if ($#result == 0) {
       push @result, {extension => "", short => "No extansion available for $domain"};
   } else {
       unshift @result, {extension => "", short => "-- Please Select --"};
