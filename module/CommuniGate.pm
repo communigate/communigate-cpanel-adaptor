@@ -1004,6 +1004,22 @@ sub api2_GetExtensionsForPSTN {
   return @result;
 }
 
+sub api2_GetXMPPStatus {
+  my %OPTS = @_;
+  my $account = $OPTS{'account'};
+  my $cli = getCLI();
+  my @result;
+
+  my $status = $cli->GetAccountPresence($account);
+  if (ref($status) eq "ARRAY") {
+      $status = $status->[0];
+  }
+  push @result, {status => $status};
+  
+  $cli->Logout();
+  return @result;
+}
+
 sub api2_delforward {
         my %OPTS = @_;
         my $domain = $OPTS{'domain'};
