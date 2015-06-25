@@ -250,7 +250,7 @@ var build_email_table_markup = function() {
 	html += '</td>';
         html += '<td class="col1">';
 	if (ACCOUNTS[i]['prefs']['RealName']){
-	html += '<span class="realname_acc" id="realname_' + i + '">' + ACCOUNTS[i]['prefs']['RealName'] + '</span>' + '<br>';
+	html += '<span style="display: block" class="realname_acc" id="realname_' + i + '">' + ACCOUNTS[i]['prefs']['RealName'] + '</span>';
 	} else {
 	html += '<span class="realname_acc" id="realname_' + i + '">' + '</span>';
 	}
@@ -997,19 +997,21 @@ var change_quota = function(index) {
 		var selector_acc_realname = "#realname_" + index;
 		var selector_acc_quota = "#quota_" + index;
 		if (api2_call.realaname == "") {
-		    $(selector_acc_realname).find('br').remove();
 		    $(selector_acc_realname).hide();
+		} else {
+		    if ($(selector_acc_realname).text() != "") {
+			$(selector_acc_realname).html(api2_call.realaname).css("display", "block");
+		    } else {
+			$(selector_acc_realname).text(api2_call.realaname).css("display", "block");
+		    }
 		}
-		$(selector_acc_realname).text(api2_call.realaname).append('<br>');
 		if (api2_call.quota == 0){
 		    var diskquota_acc_show = " ∞ ";
 		}
 		else{
 		    var diskquota_acc_show = api2_call.quota;
 		}
-		
 		$(selector_acc_quota).text(diskquota_acc_show);
-
             } else if (data.cpanelresult.data && (data.cpanelresult.data[0].result == 0)) {
                 CPANEL.widgets.status_bar("status_bar_" + index, "error", CPANEL.lang.Error, data.cpanelresult.data[0].reason);
             } else {
