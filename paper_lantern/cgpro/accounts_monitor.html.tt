@@ -1,5 +1,5 @@
 [%
-SET CPANEL.CPVAR.dprefix = "../../";
+SET CPANEL.CPVAR.dprefix = "../";
 SET CPANEL.CPVAR.headerimg = "../images/mailmenu.gif";
 
 SET accounts = Api2.exec("CommuniGate", "ListAccounts", {
