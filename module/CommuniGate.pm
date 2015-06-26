@@ -803,10 +803,53 @@ sub api2_ListExtensions {
   return @result;
 }
 
+sub api2_GetAccountAliases {
+  my %OPTS = @_;
+  my $cli = getCLI();
+  my $result = {};
+  
+  my $aliases = $cli->GetAccountAliases($OPTS{'account'});
+  $result->{"aliases"} = $aliases;
+  $cli->Logout();
+  return $result;
+}
+
+sub api2_DeleteAlias {
+  my %OPTS = @_;
+  my $cli = getCLI();
+  my $result = {};
+  
+  my $aliases = $cli->GetAccountAliases($OPTS{'account'});
+  $result->{"aliases"} = $aliases;
+  my $arrSize = @$aliases;
+  $result->{"arr_size"} = $arrSize;
+
+  my $index = 0;
+  for (my $i=0; $i <= $arrSize; $i++) {
+      if ($aliases->[$i] eq $OPTS{'alias'}) {
+  	    $result->{"found"} = $aliases->[$i];
+	    splice($aliases, $index, 1);
+      }
+  }
+  my $set_aliases = $cli->SetAccountAliases($OPTS{'account'}, $aliases);
+  my $error_msg = $cli->getErrMessage();
+  if ($error_msg eq "OK") {
+      $result->{"error_msg"} = $error_msg;
+  } else {
+      $Cpanel::CPERROR{'CommuniGate'} = $error_msg;
+      $result->{"error_msg"} = $error_msg;
+  }
+
+  $result->{"aliases"} = $aliases;
+  $cli->Logout();
+  return $result;
+}
+
 sub api2_AssignExtension {
   my %OPTS = @_;
   my @domains = Cpanel::Email::listmaildomains();
   my $cli = getCLI();
+  my $result = {};
 
   if ($OPTS{'extension'} || $OPTS{'local_extension'}) {
       my (undef, $domain) = split '@', $OPTS{'account'};
@@ -814,11 +857,26 @@ sub api2_AssignExtension {
   	  if ($dom eq $domain) {
   	      my $userForwarders = $cli->FindForwarders($domain,$OPTS{'account'});
   	      if ($OPTS{'local_extension'}) {
-  		  $cli->CreateForwarder($OPTS{'local_extension'} . "\@$domain", $OPTS{'account'});
-  		  unless ($cli->getErrMessage eq "OK") {
-  		      $Cpanel::CPERROR{'CommuniGate_local_extension'} = $cli->getErrMessage;
-  		      last;
-  		  }
+		  
+		  my $aliases = $cli->GetAccountAliases($OPTS{'account'});
+		  $result->{"old_aliases"} = $aliases;
+
+		  my $found = 0;
+		  for my $alias (@$aliases) {
+		      $found = 1 if "$alias" eq "$OPTS{'local_extension'}";
+		  }
+
+		  push @$aliases, "$OPTS{'local_extension'}";
+
+		  my $set_aliases = $cli->SetAccountAliases($OPTS{'account'}, $aliases);
+
+		  my $error_msg = $cli->getErrMessage();
+		  if ($error_msg eq "OK") {
+		      $result->{"error_msg"} = $error_msg;
+		  } else {
+  		      $Cpanel::CPERROR{'CommuniGate_local_extension'} = $error_msg;
+		      $result->{"error_msg"} = $error_msg;
+		  }
   	      }
 	      my ($objType, $objAddress) = split ":", $OPTS{'account'};
 	      if ($OPTS{'extension'}) {
@@ -849,7 +907,6 @@ sub api2_AssignExtension {
       }
   }
 
-  my $result = {};
   my $defaults = $cli->GetServerAccountDefaults();
   $result->{"classes"} = $defaults->{"ServiceClasses"};
   foreach my $domain (@domains) {

@@ -21,6 +21,7 @@ rsipInfo = all_rsip.0.rsipInfo;
 [%
 SET CPANEL.CPVAR.dprefix = "../";
 SET CPANEL.CPVAR.headerimg = "../images/mailmenu.gif";
+
 SET assign_extension = Api2.exec("CommuniGate", "AssignExtension", {
 "account" = RAW_FORM.item("account"),
 "extension" = RAW_FORM.item("extension"),
@@ -63,6 +64,13 @@ SET list_extensions = Api2.exec("CommuniGate", "GetExtensionsForPSTN", {
 "domain" = "sevdip.bg"
 });
 selected_ext = list_extensions.1.selected.PSTNGatewayAuthName;
+%]
+
+[%
+SET list_aliases = Api2.exec("CommuniGate", "GetAccountAliases", {
+"account" = "spalazliev@sevdip.bg"
+});
+list_aliases = list_aliases.0.aliases;
 %]
 
 
@@ -292,6 +300,24 @@ YAHOO.util.Event.onDOMReady(function () {
       </td>
     </tr>
     [% END -%]
+
+    [% FOR account = accounts.keys.sort -%]
+    [%
+    SET list_aliases = Api2.exec("CommuniGate", "GetAccountAliases", {
+    "account" = account
+    });
+    list_aliases = list_aliases.0.aliases;
+    %]
+    [% FOR alias = list_aliases -%]
+    <tr>
+      <td>[% alias %]</td>
+      <td>[% account %]</td>
+      <td>
+	<a href="deletealias.html?alias=[% alias %]&account=[% account %]"><span class="glyphicon glyphicon-trash"></span> [% locale.maketext('Delete') %]</a>
+      </td>
+    </tr>
+    [% END %]
+    [% END %]
   </table>
 
 
