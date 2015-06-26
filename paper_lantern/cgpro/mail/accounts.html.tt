@@ -130,7 +130,7 @@ var DEFAULT_EMAIL_QUOTA = [% execute("Email", "get_default_email_quota_mib").dat
   left: 0;
   top: 0;
   font-size: 18px;
-  background: rgba(220,220,220,0.3);
+  background: rgba(220,220,220,0.7);
   }
   
   .img-div-rel {

@@ -1,5 +1,6 @@
-cgpro_account_status_monitor:Accounts status monitor (CGPro)
-cgpro_backup:Backup Manager (CGPro)
+cgpro_account_status_monitor: Accounts status monitor (CGPro)
+cgpro_accounts: Accounts (CGPro)
+cgpro_backup: Backup Manager (CGPro)
 cgpro_dnssrv:DNS SRV records (CGPro)
 cgpro_helpers:Helpers (CGPro)
 cgpro_autoresponders: Autoresponders (CGPro)

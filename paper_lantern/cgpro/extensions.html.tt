@@ -279,12 +279,6 @@ YAHOO.util.Event.onDOMReady(function () {
     </tr>
     </thead>
 
-    [% IF extensions.size() == 0 %]
-    <tr>
-    <td colspan="3">Currently there aren't any extensions!</td>
-    </tr>
-    [% ELSE %]
-    [% END %]
     [% FOR extension IN extensions -%]
     <tr class="row-[% loop.count % 2 ? 'even' : 'odd' %]">
       <td class="truncate">[% extension.html_dest %]</td>
@@ -301,6 +295,7 @@ YAHOO.util.Event.onDOMReady(function () {
     </tr>
     [% END -%]
 
+    [% aliases_count = 0 %]
     [% FOR account = accounts.keys.sort -%]
     [%
     SET list_aliases = Api2.exec("CommuniGate", "GetAccountAliases", {
@@ -308,6 +303,8 @@ YAHOO.util.Event.onDOMReady(function () {
     });
     list_aliases = list_aliases.0.aliases;
     %]
+    [% aliases_count = aliases_count + list_aliases.size %]
+
     [% FOR alias = list_aliases -%]
     <tr>
       <td>[% alias %]</td>
@@ -315,6 +312,14 @@ YAHOO.util.Event.onDOMReady(function () {
       <td>
 	<a href="deletealias.html?alias=[% alias %]&account=[% account %]"><span class="glyphicon glyphicon-trash"></span> [% locale.maketext('Delete') %]</a>
       </td>
+    </tr>
+    [% END %]
+    [% END %]
+
+    [% IF extensions.size() == 0 %]
+    [% IF aliases_count == 0 %]
+    <tr>
+    <td colspan="3">Currently there aren't any extensions!</td>
     </tr>
     [% END %]
     [% END %]
@@ -355,7 +360,7 @@ YAHOO.util.Event.onDOMReady(function () {
     <table border="0" cellpadding="5" cellspacing="0" id="mailtbl" class="table table-striped">
       <thead>
 	<tr>
-	  <th class="cell">[% locale.maketext("CGPRemoteSIP") %]</th>
+	  <th class="cell">[% locale.maketext("SIP registrations") %]</th>
 	  <th class="cell">[% locale.maketext("CGPStatus") %]</th>
 	  <th class="cell-end sorttable_nosort">[% locale.maketext("Functions") %]</th>
 	</tr>
@@ -379,7 +384,7 @@ YAHOO.util.Event.onDOMReady(function () {
 	[% END -%]
 	[% UNLESS rsip.keys.size -%]
 	<tr>
-	  <td class="truncate" colspan="4">[% locale.maketext("No Remote SIPs.") %]</td>
+	  <td class="truncate" colspan="4">[% locale.maketext("No SIP registrations.") %]</td>
 	</tr>
 	[% END -%]
       </tbody>
