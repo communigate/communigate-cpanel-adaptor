@@ -6,7 +6,6 @@ SET CPANEL.CPVAR.dprefix = "../";
 Api2.pre_exec("Email", "listmaildomains");
 SET mail_domains =  Api2.exec("Email", "listmaildomains", {} );
 Api2.post_exec("Email", "listmaildomains");
-
 %]
 
 [% IF RAW_FORM.item("domain") %]
@@ -18,11 +17,16 @@ mx_presets = mx_presets.0;
 %]
 [% END %]
 
-[% js_code = PROCESS js_block %]
+[%
+Api2.pre_exec("Email", "listmxs");
+api2_result_Email_listmxs =  Api2.exec("Email", "listmxs", {"domain"=>FORM.item('domain'), "show_a_records"=>"1"} );
+Api2.post_exec("Email", "listmxs");
+listmxs = api2_result_Email_listmxs.0.entries;
+%]
+
 [% WRAPPER '_assets/master.html.tt'
     app_key = 'cgpro_dns_setup'
-    page_js = js_code
-    page_scripts = ['js2-min/mail/mx.js']
+    page_scripts = ['cgpro/mail/js/mx.js']
 %]
 
 <style>
@@ -38,6 +42,17 @@ mx_presets = mx_presets.0;
 
   table tbody tr:nth-child(2n+1) td {
   background: #F9F9F9;
+  }
+
+  #predefined_loading {
+  padding: 20px;
+  padding-left: 0px;
+  }
+
+  #clear_loading {
+  padding-left: 10px;
+  display: inline;
+  line-height: 35px;
   }
 </style>
 
@@ -64,15 +79,19 @@ mx_presets = mx_presets.0;
 
         [% ELSE %]
         <select name="domain" id="manage_list_select" class="col-xs-12 form-control">
-          <option value="">[% locale.maketext("Select domain.") %]</option>
           [% IF mail_domains.size() %]
 	  [% FOR domain IN mail_domains -%]
 	  [% filter_option(FORM.domain, domain.domain, domain.domain) %]
 	  [% END -%]
         </select>
+	[% IF !RAW_FORM.item("domain") %]
+	<script type="text/javascript">
+	  YAHOO.util.Dom.get("manage_list_form").submit();
+	</script>
 	[% END %]
 	[% END %]
-    	  <input type="hidden" id="domain" value="[% FORM.domain %]" />
+	[% END %]
+    	<input type="hidden" id="domain" value="[% FORM.domain %]" />
       </div>
       <noscript>
         <div class="form-group">
@@ -101,14 +120,18 @@ mx_presets = mx_presets.0;
 	    <script type="text/javascript">
 	      var mx_buttons = [% mx_presets.split("\\\\e").size || 0 %];
 	    </script>
-	      [% FOR button IN mx_presets.split("\\\\e") -%]
-	      [% button = button.split(",") -%]
-    		<input type="hidden" id="mx_priority_[% loop.count - 1 %]" value="[% button.2 %]" />
-    		<input type="hidden" id="mx_destination_[% loop.count - 1 %]" value="[% button.1 %]" />
-		<input type="button" id="mx_btn_[% loop.count - 1 %]" class="btn btn-primary" value="[% button.0 %]">
-	      [% END -%]
 
+	    [% FOR button IN mx_presets.split("\\\\e") -%]
+	    [% button = button.split(",") -%]
+	    [% button_name = button.shift -%]
+	    [% button_name_ids = button_name | replace('\s+', '_') -%]
+	    [% button = button.join(',') %]
+	    <input type="hidden" class="all_data_[% button_name_ids %]" id="mx_data_[% button_name_ids %]" value="[% button %]" />
+	    <input type="button" id="mx_btn_[% loop.count - 1 %]" class="btn btn-primary" value="[% button_name_ids %]">
+	    [% END -%]
             <div>
+	    <div id="predefined_loading"></div>
+
             <h3>[% locale.maketext("Add New Record") %]</h3>
                 <div class="form-group">
                     <label id="lblPriority" for="priority">
@@ -142,10 +165,13 @@ mx_presets = mx_presets.0;
 
         <div class="section">
             <h3 id="hdrMxEntries">[% locale.maketext("MX Records") %]</h3>
+            <div class="form-group" style="display: inline">
+              <input class="btn btn-primary" id="clear_mx_records" type="button" value="Clear All Records" />
+            </div>
+	    <div id="clear_loading"></div>
             <div id="mx_entries"></div>
         </div>
     </div><!-- end mx_input_and_table -->
-
     <!-- SRV -->
     [% IF RAW_FORM.item("domain") %]
     <div>
@@ -221,7 +247,7 @@ mx_presets = mx_presets.0;
 [% END -%]
 </div>
 [% END %]
-        <div class="section" style="display:none">
+        <div class="section" style="display: none;">
             <h2 id="hdrEmailRouting">[% locale.maketext("Email Routing") %]</h2>
 
             <div class="alert alert-warning">
@@ -275,7 +301,7 @@ mx_presets = mx_presets.0;
 
                 <div class="form-group">
                     <label id="mxcheck_local_label">
-                        <input type="radio" name="mxcheck" id="mxcheck_local" value="local" />
+                        <input type="radio" name="testradio" id="mxcheck_local" value="local" />
                         [% locale.maketext("Local Mail Exchanger") %]
                     </label>
                     <span class="action_link" id="lnkMoreLocal" onclick="CPANEL.util.toggle_more_less(this, 'mxcheck_local_desc');">[% locale.maketext("more »")  %]</span>
@@ -329,27 +355,115 @@ mx_presets = mx_presets.0;
 </div><!-- end body-content -->
 [% END %]
 
-[% BLOCK js_block %]
+<script type="text/javascript">
 
-[% END %]
+var add_mx_record_predefined = function(caller) {
+
+var do_add_mx_record_predefined = function(data) {
+var data_arr = data.split(",");
+var data_arr_couples = [];
+
+for (i = 0, j=0; j < data_arr.length; i++,j+=2) {
+data_arr_couples[i] = data_arr[j] + "," + data_arr[j+1];
+}
+
+var i = 0;
+function sendAjax(){
+YAHOO.util.Dom.get("predefined_loading").innerHTML = CPANEL.icons.ajax + " Loading, please wait...";
+var couple = data_arr_couples[i].split(",");
+exchanger_couple = couple[0];
+preference_couple = couple[1];
+
+var api2_call = {
+"cpanel_jsonapi_version": 2,
+"cpanel_jsonapi_module": "Email",
+"cpanel_jsonapi_func": "addmx",
+"domain": YAHOO.util.Dom.get("domain").value,
+"exchanger": exchanger_couple,
+"preference": preference_couple
+};
+
+$.ajax({
+type: "GET",
+url: CPANEL.urls.json_api() + '&' + $.param(api2_call),
+data: api2_call,
+success: function(){
+YAHOO.util.Dom.get("predefined_loading").innerHTML = "";
+i++;
+if (i < data_arr_couples.length) sendAjax();
+update_mx_records_table();
+}
+});
+
+}
+sendAjax();
+change_mxcheck_default("remote");
+}
+
+var selector = "#mx_data_" + caller;
+var data = $(selector).val();
+do_add_mx_record_predefined(data);
+}
+
+function delete_all_records(){
+var rowCount = $('.record-row').length;
+if (!rowCount == 0) {
+var delete_data = [];
+var index = 0;
+$(".record-row").each( function() {
+index++;
+var priority = $(this).find('td.priority').text().trim(); 
+var destination = $(this).find('td.destination').text().trim(); 
+delete_data[index - 1] = [];
+delete_data[index - 1][0] = priority;
+delete_data[index - 1][1] = destination;
+});
+
+var count = 0;
+function deleteRow(){
+YAHOO.util.Dom.get("clear_loading").innerHTML = CPANEL.icons.ajax + " Loading, please wait...";
+var couple = delete_data[count];
+exchange = couple[0];
+preference = couple[1];
+
+var api2_call = {
+"cpanel_jsonapi_version": 2,
+"cpanel_jsonapi_module": "Email",
+"cpanel_jsonapi_func": "delmx",
+"domain": YAHOO.util.Dom.get("domain").value,
+"exchange": preference,
+"preference": exchange
+};
+
+$.ajax({
+type: "GET",
+url: CPANEL.urls.json_api() + '&' + $.param(api2_call),
+success: function(){
+YAHOO.util.Dom.get("clear_loading").innerHTML = "";
+count++;
+if (count < delete_data.length) deleteRow();
+	update_mx_records_table();
+	}
+	});
+}
+deleteRow();
+change_mxcheck_default("local");
+}
+}
+</script>
 
 <script type="text/javascript">
-  YAHOO.util.Event.onDOMReady(function() {
-     for (var i = 0; i < mx_buttons; i++) {
-        YAHOO.util.Event.on("mx_btn_" + i, "click", function() { 
-           var priority_value = YAHOO.util.Dom.get("mx_priority_" + this).value;
-           var destination_value = YAHOO.util.Dom.get("mx_destination_" + this).value;
-           var priority_element = document.getElementById("priority");
-           priority_element.value = priority_value;
-           
-           var destination_element = document.getElementById("destination");
-           destination_element.value = destination_value;
-           add_mx_record();
-        }.bind(i));
-     }
+  YAHOO.util.Event.onDOMReady(function() {  
+  $("#clear_mx_records").click(function() {
+  delete_all_records();
   });
-
-
+for (var i = 0; i < mx_buttons; i++) {
+		    var selector = "#mx_btn_" + i;
+		    $( selector ).click(function() {
+		    add_mx_record_predefined(this.value);
+		    });
+		    }
+		    });
 </script>
 
 <script type="text/javascript">

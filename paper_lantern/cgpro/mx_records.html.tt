@@ -2,8 +2,8 @@
     Api2.pre_exec("Email", "listmxs");
     api2_result_Email_listmxs =  Api2.exec("Email", "listmxs", {"domain"=>FORM.item('domain'), "show_a_records"=>"1"} );
     Api2.post_exec("Email", "listmxs");
+mxes = api2_result_Email_listmxs.0.entries;
 %]
-
 <table id="mx_records_table"  class="table table_striped" >
     <thead>
         <tr>
@@ -18,12 +18,12 @@
             <input type="hidden" name="detected_state" value="[%  hashref.detected.html() %]" id="detected_state">
 
                 [% FOREACH deep_hashref IN hashref.item('entries'); %]
-                    <tr id="info_row_[% deep_hashref.entrycount.html %]" class="info-[% deep_hashref.row.html%]">
-                        <td id="display_priority_[% deep_hashref.entrycount.html %]">
-                            [% deep_hashref.priority.html %]
+                    <tr id="info_row_[% deep_hashref.entrycount.html %]" class="record-row info-[% deep_hashref.row.html%]">
+                        <td id="display_priority_[% deep_hashref.entrycount.html %]" class="priority">
+                            [%- deep_hashref.priority.html -%]
                         </td>
-                        <td id="display_destination_[% deep_hashref.entrycount.html %]">
-                            [% deep_hashref.mx.html %]
+                        <td id="display_destination_[% deep_hashref.entrycount.html %]" class="destination">
+                            [%- deep_hashref.mx.html -%]
                         </td>
                         <td>
                             <span class="btn btn-link" onclick="toggle_module('edit_[% deep_hashref.entrycount.html %]');">
