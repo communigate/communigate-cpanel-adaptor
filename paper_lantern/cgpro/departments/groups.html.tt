@@ -29,9 +29,9 @@ app_key = 'cgpro_departments'
 	<div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
 	  <input id="realname" type="text" name="realname" class="form-control" />
 	</div>
-      </div>
       <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
-	<div id="email_error"></div>
+	<div id="realname_error"></div>
+      </div>
       </div>
     </div>
     <div class="row form-group">
@@ -60,7 +60,7 @@ app_key = 'cgpro_departments'
 
       </div>
       <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
-	<div id="add_email_account_error"></div>
+	<div id="email_error" style="position: relative; top:23px; "></div>
       </div>
     </div>
     [% IF (CPANEL.CPVAR.maildomainscount > "1") %]
@@ -117,3 +117,23 @@ app_key = 'cgpro_departments'
   </table>
 </div><!-- end body-content -->
 [% END %]
+<script type="text/javascript">
+var name_validator = new CPANEL.validate.validator("[% locale.maketext("Group Name") %]");
+var email_validator = new CPANEL.validate.validator("[% locale.maketext("Group Email Address") %]");
+
+function init_page() {
+
+    email_validator.add("email", "local_part_email(%input%, 'cpanel')", "[% locale.maketext("That is not a valid email address.")  %]");
+    email_validator.attach();
+
+    name_validator.add("realname", "min_length(%input%, 1)", "[% locale.maketext("That is not a valid group name.")  %]");
+    name_validator.attach();
+
+    
+    CPANEL.validate.attach_to_form("submit", [
+        email_validator,
+        name_validator
+    ]);
+}
+YAHOO.util.Event.onDOMReady(init_page);
+</script>
