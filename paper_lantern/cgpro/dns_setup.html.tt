@@ -369,7 +369,7 @@ data_arr_couples[i] = data_arr[j] + "," + data_arr[j+1];
 
 var i = 0;
 function sendAjax(){
-YAHOO.util.Dom.get("predefined_loading").innerHTML = CPANEL.icons.ajax + " Loading, please wait...";
+YAHOO.util.Dom.get("predefined_loading").innerHTML = CPANEL.icons.ajax + " Please wait...";
 var couple = data_arr_couples[i].split(",");
 exchanger_couple = couple[0];
 preference_couple = couple[1];
@@ -421,7 +421,7 @@ delete_data[index - 1][1] = destination;
 
 var count = 0;
 function deleteRow(){
-YAHOO.util.Dom.get("clear_loading").innerHTML = CPANEL.icons.ajax + " Loading, please wait...";
+YAHOO.util.Dom.get("clear_loading").innerHTML = CPANEL.icons.ajax + " Please wait...";
 var couple = delete_data[count];
 exchange = couple[0];
 preference = couple[1];

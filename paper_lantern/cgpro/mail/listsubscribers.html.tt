@@ -94,7 +94,7 @@ SET CPANEL.CPVAR.dprefix = "../../";
 SET list_subscribers = Api2.exec("CommuniGate", "ListMailingListsSubs", { listname=RAW_FORM.email });
 %]
 
-       <table class="table table-striped responsive-table ng-cloak" ng-controller="mailingListsController as listsController">
+       <table class="table table-striped responsive-table" >
          <thead>
            <tr>
              <th class="lists-col-header">

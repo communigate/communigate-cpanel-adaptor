@@ -6,6 +6,20 @@ IF CPANEL.feature('forwarders');
 SET api2_result_Email_listforwards = Api2.exec("CommuniGate", "listforwards", {});
 END;
 %]
+[%
+SET accounts = Api2.exec("CommuniGate", "ListAccounts", {});
+accounts = accounts.0.accounts;
+SET account_forwarders = {};
+
+%]
+[%
+SET extensions = Api2.exec("CommuniGate", "ListExtensions", {
+"account" = RAW_FORM.item("account"),
+"extension" = RAW_FORM.item("extension"),
+"local_extension" = RAW_FORM.item("local_extension")
+});
+%]
+
 [% WRAPPER '_assets/master.html.tt'
     app_key = 'cgpro_forwarders'
  -%]
@@ -33,8 +47,30 @@ END;
           <th id="tblHead_ForwardTo">[% locale.maketext("Forward To")  %]</th>
           <th id="tblHead_ForwarderFunctions" class="sorttable_nosort">[% locale.maketext("Actions")  %]</th>
         </tr>
+
         [% IF api2_result_Email_listforwards.size(); %]
+	[% str = "" %]
         [% FOREACH hashref IN api2_result_Email_listforwards; %]
+        [% FOREACH ext IN extensions %]
+
+        [% IF hashref.dest == ext.dest %]
+
+	[% str = str _ hashref.dest _ "," %]
+
+        [% ext = hashref.html_dest %]
+        [% appendval = { $ext => hashref } %]
+        [% account_forwarders.import(appendval) %]
+
+        [% END %]
+        [% END %]
+        [% END %]
+        [% END %]
+	
+        [% IF api2_result_Email_listforwards.size(); %]
+        [% FOREACH hashref IN api2_result_Email_listforwards %]
+
+	[% IF str.search(hashref.dest)  %]
+	[% ELSE %]
         <tr>
           <td class="truncate nobrd-left">
             [% hashref.item('html_dest').html() %]
@@ -43,12 +79,14 @@ END;
             [% hashref.item('html_forward').html() %]
           </td>
           <td class="nobrd">
-            <a class="btn btn-link" href="dodelfwdconfirm.html?domain=[% FORM.item('domain') %]&amp;email=[% hashref.item('uri_dest') %]&amp;emaildest=[% hashref.forward | url %]">
+            <a class="btn btn-link" href="dodelfwdconfirm.html?domain=[% FORM.item('domain') %]&amp;email=[% hashref.value.item('uri_dest') %]&amp;emaildest=[% hashref.value.forward | url %]">
               <span class="glyphicon glyphicon-trash"></span> [% locale.maketext("Delete") %]
             </a>
           </td>
         </tr>
-        [% END %]
+       
+ [% END %]
+ [% END %]
         [% ELSE %]
         <tr>
           <td colspan="5" class="errors">
@@ -65,4 +103,3 @@ END;
   [% INCLUDE _assets/return_link.html.tt return_location='../../index.html' return_link_text=locale.maketext('Go Back') %]
 </div>
 [% END %]
-

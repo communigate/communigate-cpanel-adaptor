@@ -94,7 +94,7 @@
 [% filter_option(q.match, "greater than", locale.maketext("CGPgreaterThan")) %]
 [% filter_option(q.match, "less than", locale.maketext("CGPlessThan")) %]
 </select>
-<input type="text" class="form-control" name="val[% loop.index+1 %]" size="60" style="width:498px" value="[% q.val FILTER html %]">
+<input type="text" id="val[% loop.index+1 %]" class="form-control rule_field" name="val[% loop.index+1 %]" size="60" style="width:498px" value="[% q.val FILTER html %]">
 </div>
 <div style="float: right; display:inline; padding-top: 11px; ">
 <input type="button" value="-" name="ruleremove[% loop.index+1 %]" class="btn btn-default" disabled="disabled" onclick="removerule(this);">
@@ -111,6 +111,21 @@
 </table>
 <script type="text/javascript">
     window.onload = function() { checkaddrembuttons('rule'); };
+    
+    $("#filterform").submit(function( event ) {
+    var is_filled = 0;
+    
+    $(".rule_field").each( function(){
+      if ( $(this).val() == "" ) {
+        is_filled += 1;
+      }
+    });
+    
+    if ( is_filled != 0 ) {
+    alert( "Please fill rule fields!" );
+    event.preventDefault();
+    }
+    });
 </script>
 <br />
 

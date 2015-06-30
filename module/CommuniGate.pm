@@ -856,9 +856,15 @@ sub api2_AssignExtension {
       for my $dom (@domains) {
   	  if ($dom eq $domain) {
   	      my $userForwarders = $cli->FindForwarders($domain,$OPTS{'account'});
-  	      if ($OPTS{'local_extension'}) {
-		  
-		  my $aliases = $cli->GetAccountAliases($OPTS{'account'});
+
+	      $result->{"accounttt"} = $OPTS{'account'};
+	      my ($objType, $objAddress) = split ":", $OPTS{'account'};
+	      $result->{"objTypeeee"} = $objType;
+	      $result->{"objAddresssss"} = $objAddress;
+
+
+  	      if ( $OPTS{'local_extension'} && ($objType eq "a") ) {
+		  my $aliases = $cli->GetAccountAliases($objAddress);
 		  $result->{"old_aliases"} = $aliases;
 
 		  my $found = 0;
@@ -868,7 +874,7 @@ sub api2_AssignExtension {
 
 		  push @$aliases, "$OPTS{'local_extension'}";
 
-		  my $set_aliases = $cli->SetAccountAliases($OPTS{'account'}, $aliases);
+		  my $set_aliases = $cli->SetAccountAliases($objAddress, $aliases);
 
 		  my $error_msg = $cli->getErrMessage();
 		  if ($error_msg eq "OK") {
@@ -877,9 +883,15 @@ sub api2_AssignExtension {
   		      $Cpanel::CPERROR{'CommuniGate_local_extension'} = $error_msg;
 		      $result->{"error_msg"} = $error_msg;
 		  }
-  	      }
-	      my ($objType, $objAddress) = split ":", $OPTS{'account'};
-	      if ($OPTS{'extension'}) {
+  	      } else {
+		  $cli->CreateForwarder($OPTS{'local_extension'} . "\@$domain", $OPTS{'account'});
+		  unless ($cli->getErrMessage eq "OK") {
+		      $Cpanel::CPERROR{'CommuniGate_local_extension'} = $cli->getErrMessage;
+		      last;
+		  }
+	      }
+
+	       if ($OPTS{'extension'}) {
 		  if ($objType eq "a") {
 		      my $telnums = $cli->GetAccountTelnums($objAddress);
 		      push @$telnums, $OPTS{"extension"} unless grep {$_ == $OPTS{"extension"}} @$telnums;
@@ -1039,6 +1051,7 @@ sub api2_GetExtensionsForPSTN {
 	  my $domainPrefs = $cli->GetAccountDefaultPrefs($domain);
 	  my $domainDefaults = $cli->GetAccountDefaults($domain);
 	  push @result, {selected => $domainDefaults};
+	  push @result, {extension => "none", short => "None"};
 	  my $defaultDomain = $cli->MainDomainName();
 	  if ($domainPrefs->{assignedTelnums}) {
 	      foreach my $number (keys %{$domainPrefs->{assignedTelnums}}) {
@@ -5233,6 +5246,34 @@ sub api2_UpdatePSTN {
 		    PSTNGatewayVia => $rsips->{$OPTS{'rsip'}}->{'domain'}
 					});
 
+	    last;
+	}
+    }
+    $cli->Logout();
+    return $result;
+}
+
+sub api2_UnsetPSTN {
+    my %OPTS = @_;
+    my $account = $OPTS{'account'};
+    my (undef,$dom) = split "@", $account;
+
+    my @domains = Cpanel::Email::listmaildomains();
+    my $cli = getCLI();
+
+    my $result = {};
+    for my $domain (@domains) {
+	if ($domain eq $dom) {
+	    my $defaultDomain = $cli->MainDomainName();
+	    my $myPrefs = $cli->GetAccountDefaultPrefs($domain);
+	    # my ($accType, $account) = split ":", $myPrefs->{"assignedTelnums"}->{$number}->{"assigned"};
+		$cli->UpdateAccountSettings($account, {
+		    PSTNFromName => "default",
+	    	    PSTNGatewayAuthName => "default",
+	    	    PSTNGatewayDomain => "default",
+	    	    PSTNGatewayPassword => "default",
+	    	    PSTNGatewayVia => "default"
+					    });
 	    last;
 	}
     }

@@ -5,6 +5,8 @@ SET list_extensions = Api2.exec("CommuniGate", "GetExtensionsForPSTN", {
 selected_ext_authName = list_extensions.1.selected.PSTNGatewayAuthName;
 selected_ext_fromName = list_extensions.1.selected.PSTNFromName;
 %]
+[% USE dumper %]
+<pre>[% dumper.dump(list_extensions) %]</pre>
 
 [% FOREACH ext IN list_extensions %]
 [% IF !ext.selected %]

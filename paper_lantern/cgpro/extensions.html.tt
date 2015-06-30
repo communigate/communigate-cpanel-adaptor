@@ -56,14 +56,6 @@ SET assign_ext_domain = Api2.exec("CommuniGate", "SetDomainPSTN", {
 SET account_defaults = Api2.exec("CommuniGate", "GetAccountDefaults", {
 "domain" = domains.0.domain
 });
-
-%]
-
-[%
-SET list_extensions = Api2.exec("CommuniGate", "GetExtensionsForPSTN", {
-"domain" = "sevdip.bg"
-});
-selected_ext = list_extensions.1.selected.PSTNGatewayAuthName;
 %]
 
 [%
@@ -72,7 +64,6 @@ SET list_aliases = Api2.exec("CommuniGate", "GetAccountAliases", {
 });
 list_aliases = list_aliases.0.aliases;
 %]
-
 
 [% WRAPPER '_assets/master.html.tt'
 app_key = 'cgpro_extensions'
@@ -87,7 +78,7 @@ app_key = 'cgpro_extensions'
 <div class="body-content">
   <div class="section">
     <div id="setpstntodomain" style="display:none">
-      <h3>[% locale.maketext("Assign phone number to domain") %]</h3>
+      <h3>[% locale.maketext("Assign outgoing number to domain") %]</h3>
       <form id="mainform2" method="post" action="" name="mainform2">
 	<div class="form-group">
 	  <label>[% locale.maketext("Assign To:") %]</label>
@@ -112,12 +103,12 @@ app_key = 'cgpro_extensions'
 	  </div>
 	</div>
 	<div class="form-group">
-	  <input id="new_email_submit2" class="btn btn-primary" type="submit" value="[% locale.maketext("Assign phone number to domain") %]" tabindex="5" />
+	  <input id="new_email_submit2" class="btn btn-primary" type="submit" value="[% locale.maketext("Assign outgoing number to domain") %]" tabindex="5" />
 	</div>
       </form>
     </div>
     <div id="assign_phone_number_did" style="display: none;">
-    <h3>[% locale.maketext("CGPAssignExtension") %]</h3>
+    <h3>[% locale.maketext("Assign outgoing number to account") %]</h3>
     <form id="mainform" method="post" action="" name="mainform">
       <div class="form-group">
 	<label>[% locale.maketext("Assign To:") %]</label>
@@ -179,7 +170,7 @@ app_key = 'cgpro_extensions'
 	      [% myclass = accounts.$account.details.ServiceClass -%]
 	      [% classstring = classes.$myclass.AccessModes.join(',') -%]
 	      [% IF classstring == 'All' || classstring.search("SIP") -%]
-	      <option value="[% account %]">[% account %] ([% locale.maketext("CGPAccount") %])</option>
+	      <option value="a:[% account %]">[% account %] ([% locale.maketext("CGPAccount") %])</option>
 	      [% END -%]
 	      [% END -%]
 	      [% FOR account = departments -%]
@@ -246,9 +237,6 @@ var getExtensions2 = function () {
 if ( $("#extension2 option").length > 1 ) {
 $("#setpstntodomain").show();
 }
-<!-- if ( $("#extension option").length > 1 ) { -->
-<!-- $("#assign_phone_number_did").show(); -->
-<!-- } -->
 	    },
 		}, null);
 };
@@ -278,7 +266,7 @@ YAHOO.util.Event.onDOMReady(function () {
       <th class="sorttable_nosort">[% locale.maketext("Functions") %]</th>
     </tr>
     </thead>
-
+    
     [% FOR extension IN extensions -%]
     <tr class="row-[% loop.count % 2 ? 'even' : 'odd' %]">
       <td class="truncate">[% extension.html_dest %]</td>
@@ -376,6 +364,9 @@ YAHOO.util.Event.onDOMReady(function () {
 	  <td>
 	    <a href="editrsip.html?account=[% FORM.rsip_account %]&amp;rsip=[% sip %]"><span class="glyphicon glyphicon-pencil"></span> [% locale.maketext('CGPViewEdit') %]</a> ,
 	    <a href="deletersip.html?account=[% FORM.rsip_account %]&amp;rsip=[% sip %]"><span class="glyphicon glyphicon-trash"></span> [% locale.maketext('Delete') %]</a>
+	    [% IF settings.PSTNFromName == rsip.$sip.fromName && settings.PSTNGatewayAuthName == rsip.$sip.authName %]
+	    , <a href="unsetaccountpstn.html?account=[% FORM.rsip_account %]"><span class="glyphicon glyphicon-remove"></span> [% locale.maketext('Unset As Outgoing') %]</a>
+	    [% END %]
 	    [% UNLESS settings.PSTNFromName == rsip.$sip.fromName && settings.PSTNGatewayAuthName == rsip.$sip.authName %]
 	    , <a href="updatepstn.html?account=[% FORM.rsip_account %]&amp;rsip=[% sip %]"><span class="glyphicon glyphicon-arrow-right"></span> [% locale.maketext('Set as outgoing') %]</a>
 	    [% END -%]
