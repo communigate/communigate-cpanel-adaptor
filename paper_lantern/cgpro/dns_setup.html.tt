@@ -352,10 +352,9 @@ listmxs = api2_result_Email_listmxs.0.entries;
                 </div>
             </div>
         </div>
+
 <script type="text/javascript">
-
-var add_mx_record_predefined = function(caller) {
-
+var add_mx_record_predef = function(caller) {
 var do_add_mx_record_predefined = function(data) {
 var data_arr = data.split(",");
 var data_arr_couples = [];
@@ -457,7 +456,7 @@ change_mxcheck_default("local");
 for (var i = 0; i < mx_buttons; i++) {
 		    var selector = "#mx_btn_" + i;
 		    $( selector ).click(function() {
-		    add_mx_record_predefined(this.value);
+		    add_mx_record_predef(this.value);
 		    });
 		    }
 		    });
@@ -484,9 +483,10 @@ var LANG = {
     MX_Remote : "[% locale.maketext('Remote') %]"
 };
 </script>
-	[% ELSE %]
-	[% PROCESS cgpro/icn_description.html.tt %]
-	[% END %]
+
+[% ELSE %]
+[% PROCESS cgpro/icn_description.html.tt %]
+[% END %]
 </div><!-- end body-content -->
 [% END %]
 
