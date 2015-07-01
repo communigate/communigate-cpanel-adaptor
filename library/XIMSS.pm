@@ -45,7 +45,7 @@ sub connect {
       );
   $ua->timeout(15);
   $ua->env_proxy;
-   my $response = $ua->get("https://" . $this->{"connParams"}->{"PeerAddr"} . ":9100/ximsslogin/?username=" . $this->{"authData"} . "&password=" . $this->{"password"}); 
+   my $response = $ua->get("https://" . $this->{"connParams"}->{"PeerAddr"} . ":9100/ximsslogin/?username=" . $this->{"authData"} . "&password=" . $this->{"password"});
   if ($response->is_success) {
       my $response = XMLin($response->content, KeyAttr => "IgnoreKeyAttr");
       $this->{SID} = $response->{"session"}->{"urlID"};
@@ -57,9 +57,9 @@ sub connect {
 }
 
 sub send {
-  my ($this, $data) = @_;
+  my ($this, $data, $options) = @_;
   my $command = XMLout ($data, RootName => undef );
- 
+
   my $ua = LWP::UserAgent->new(
       ssl_opts => { verify_hostname => 0 }
       );
@@ -67,7 +67,7 @@ sub send {
   $ua->env_proxy;
   my $response = $ua->post("https://" . $this->{"connParams"}->{"PeerAddr"} . ":9100/Session/" . $this->{"SID"} . "/sync", Content => "<XIMSS>" . $command.  "</XIMSS>");
   if ($response->is_success) {
-      return XMLin(encode_utf8 $response->content, KeyAttr => "IgnoreKeyAttr");
+    return XMLin(encode_utf8 $response->content, KeyAttr => "IgnoreKeyAttr", forceArray => ($options->{forceArray} || 0));
   }
   else {
       warn $response->status_line;
@@ -75,42 +75,19 @@ sub send {
   }
 }
 
+# Deprecated functions
 sub _parseResponse {
     my $this = shift;
-    # my $socket = $this->{theSocket};
-    # my $prev = $/;
-    # $/ = "\000";
-    # my $responseLine = $this->{theSocket}->getline();
-    # $/ = $prev;
-    # $responseLine =~ s/\000//g;
-    # $responseLine .= $this->_parseResponse() unless $responseLine =~ m/^\</i;
-    # print STDERR "XIMSS->_parseResponse::responseLine = $responseLine\n\n" if $this->{'debug'};
-    # $this->{'lastAccess'}=time();
-    # return $responseLine;
 }
 
 sub parseResponse {
     my $this = shift;
     my $id = shift;
-    # croak "Pass and id" unless $id;
-    # my $string = $this->_parseResponse();
-    # my $response = XMLin("<opt>" . $string  . "</opt>", KeyAttr => "IgnoreKeyAttr");
-    # for my $tag (keys %$response) {
-    # 	if (ref($response->{$tag}) eq "ARRAY") {
-    # 	    for my $subres (@{$response->{$tag}}) {
-    # 		push @{$this->{responses}->{delete $subres->{id}}->{$tag}}, $subres;
-    # 	    }
-    # 	} else {
-    # 	    $this->{responses}->{delete $response->{$tag}->{id}}->{$tag} = $response->{$tag};
-    # 	}
-    # }
-    # return delete $this->{responses}->{$id};
 }
 sub getAnyResponse {
   my $this = shift;
-  # my $string = $this->_parseResponse();
-  # return XMLin("<opt>" . $string  . "</opt>", KeyAttr => "IgnoreKeyAttr");
 }
+# END Deprecated functions
 
 sub close {
     my $this = shift;
@@ -122,7 +99,7 @@ sub close {
     $ua->timeout(15);
     $ua->env_proxy;
     my $response = $ua->post("https://" . $this->{"connParams"}->{"PeerAddr"} . ":9100/Session/" . $this->{"SID"} . "/sync", Content => "<XIMSS>" . $command.  "</XIMSS>");
-    
+
     if ($response->is_success) {
         # warn XMLin($response->content, KeyAttr => "IgnoreKeyAttr");
         # urlID
