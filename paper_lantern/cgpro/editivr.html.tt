@@ -82,10 +82,10 @@ margin-left: 10px;
 	<thead>
 	<tr>
 	  <th>
-	    [% locale.maketext('CGPButton') %]
+	    [% locale.maketext('Button') %]
 	  </th>
 	  <th>
-	    [% locale.maketext('CGPLanguage') %]
+	    [% locale.maketext('Language') %]
 	  </th>
 	  <th></th>
 	</tr>
@@ -102,7 +102,7 @@ margin-left: 10px;
 	  <td>
 	    <select name="language-[% id %]" class="form-control">
 	      [% index = id - 1 -%]
-	      [% filter_option("", "", "CGPNone") %]
+	      [% filter_option("", "", "None") %]
 	      [% filter_option(ivr.languages.$index.$id, "english", "english (Default)") %]
 	      [% FOR file IN files.keys.sort -%]
 	      [% IF files.$file.keys.size == 0 -%]
@@ -124,7 +124,7 @@ margin-left: 10px;
     <div class="form-group">
       <div class="checkbox">
 	<input type="checkbox" name="DED" id="DED" value="1"[% IF ivr.DED %] checked="checked"[% END %] />
-	<label for="DED">[% locale.maketext('CGPEnableDED') %]</label>
+	<label for="DED">[% locale.maketext('EnableDED') %]</label>
       </div>
     </div>
     
@@ -160,13 +160,13 @@ margin-left: 10px;
 	<thead>
 	<tr>
 	  <th style="padding: 0 10px;">
-	    [% locale.maketext('CGPButton') %]
+	    [% locale.maketext('Button') %]
 	  </th>
 	  <th>
-	    [% locale.maketext('CGPAction') %]
+	    [% locale.maketext('Action') %]
 	  </th>
 	  <th>
-	    [% locale.maketext('CGPSoundToPlay') %]
+	    [% locale.maketext('SoundToPlay') %]
 	  </th>
 	</tr>
 	</thead>
@@ -186,17 +186,17 @@ margin-left: 10px;
 	      [% myclass = accounts.$account.details.ServiceClass-%]
 	      [% classstring = classes.$myclass.AccessModes.join(',') -%]
 	      [% IF classstring == 'All' || classstring.search("SIP") -%]
-	      [% filter_option(ivr.buttons.$id.action, account, locale.maketext("CGPCall")_ ' '  _ account _ " (" _ locale.maketext("CGPAccount") _ ")") %]
+	      [% filter_option(ivr.buttons.$id.action, account, locale.maketext("Call")_ ' '  _ account _ " (" _ locale.maketext("Account") _ ")") %]
 	      [% END -%]
 	      [% END -%]
 	      [% FOR account = departments -%]
-	      [% filter_option(ivr.buttons.$id.action, account, locale.maketext("CGPCall")_ ' '  _ account _ " (" _ locale.maketext("CGPDepartment") _ ")") %]
+	      [% filter_option(ivr.buttons.$id.action, account, locale.maketext("Call")_ ' '  _ account _ " (" _ locale.maketext("Department") _ ")") %]
 	      [% END -%]
 	      [% FOR queue = queues -%]
-	      [% filter_option( ivr.buttons.$id.action, queue.value, locale.maketext("CGPCall")_ ' '  _ queue.name _ " (" _ locale.maketext("CGPQueue") _ ")") %]
+	      [% filter_option( ivr.buttons.$id.action, queue.value, locale.maketext("Call")_ ' '  _ queue.name _ " (" _ locale.maketext("Queue") _ ")") %]
 	      [% END -%]
 	      [% FOR menu = ivrs -%]
-	      [% filter_option( ivr.buttons.$id.action, menu.value, locale.maketext("CGPCall")_ ' '  _ menu.name _ " (" _ locale.maketext("CGPIVRMenu") _ ")") %]
+	      [% filter_option( ivr.buttons.$id.action, menu.value, locale.maketext("Call")_ ' '  _ menu.name _ " (" _ locale.maketext("IVRMenu") _ ")") %]
 	      [% END -%]
 	      [% filter_option( ivr.buttons.$id.action, 'hangup', locale.maketext("Return to previous / Hang up")) %]
 	      [% filter_option( ivr.buttons.$id.action, 'play', locale.maketext("Play the sound:")) %]
@@ -243,14 +243,14 @@ margin-left: 10px;
     <div class="form-group">
       <input type="hidden" name="oldMessageID" value="[% vcard.UID.VALUE.item('Message-ID') %]" />
       <input type="hidden" name="oldUID" value="[% FORM.contact %]" />
-      <input id="ivr_submit" class="btn btn-primary" type="submit" value="[% locale.maketext("CGPSave") %]" name="save" />
+      <input id="ivr_submit" class="btn btn-primary" type="submit" value="[% locale.maketext("Save") %]" name="save" />
     </div>
   </form>
 
 <script type="text/javascript">
   var LANG = {};
-  LANG.name_input = "[% locale.maketext("CGPName") %]";
-  LANG.name_input_invalid = "[% locale.maketext("CGPThisFieldIsRequired") %]!";
+  LANG.name_input = "[% locale.maketext("Name") %]";
+  LANG.name_input_invalid = "[% locale.maketext("This Field Is Required") %]!";
   var domain = '[% domain %]';
   var getRow = function (e, data) {
   YAHOO.util.Event.preventDefault(e); 

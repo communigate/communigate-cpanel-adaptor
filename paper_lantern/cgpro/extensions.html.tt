@@ -120,17 +120,17 @@ app_key = 'cgpro_extensions'
 	      [% myclass = account.value.details.ServiceClass -%]
 	      [% classstring = classes.$myclass.AccessModes.join(',') -%]
 	      [% IF classstring == 'All' || classstring.search("SIP") -%]
-	      <option value="a:[% account.key %]">[% account.key %] ([% locale.maketext("CGPAccount") %])</option>
+	      <option value="a:[% account.key %]">[% account.key %] ([% locale.maketext("Account") %])</option>
 	      [% END -%]
 	      [% END %]
 	      [% FOREACH account IN departments -%]
-	      <option value="g:[% account %]">[% account %] ([% locale.maketext("CGPDepartment") %])</option>
+	      <option value="g:[% account %]">[% account %] ([% locale.maketext("Department") %])</option>
 	      [% END -%]
 	      [% FOR queue IN queues -%]
-	      <option value="q:[% queue.value %]">[% queue.name %] ([% locale.maketext("CGPQueue") %])</option>
+	      <option value="q:[% queue.value %]">[% queue.name %] ([% locale.maketext("Queue") %])</option>
 	      [% END -%]
 	      [% FOR ivr IN ivrs -%]
-  	      <option value="i:[% ivr.value %]">[% ivr.name %] ([% locale.maketext("CGPIVRMenu") %])</option>
+  	      <option value="i:[% ivr.value %]">[% ivr.name %] ([% locale.maketext("IVRMenu") %])</option>
 	      [% END -%]
 	    </select>
 	  </div>
@@ -150,12 +150,12 @@ app_key = 'cgpro_extensions'
       </div>
 
       <div class="form-group">
-	<input id="new_email_submit" class="btn btn-primary" type="submit" value="[% locale.maketext("CGPAssignExtension") %]" tabindex="5" />
+	<input id="new_email_submit" class="btn btn-primary" type="submit" value="[% locale.maketext("AssignExtension") %]" tabindex="5" />
       </div>
     </form>
     </div>
 
-    <h3>[% locale.maketext("CGPAssignLocalExtension") %]</h3>
+    <h3>[% locale.maketext("AssignLocalExtension") %]</h3>
     <form id="mainform" method="post" action="" name="mainform">
       [% IF CPANEL.CPERROR.CommuniGate_local_extension -%]
       <pre>
@@ -171,18 +171,18 @@ app_key = 'cgpro_extensions'
 	      [% myclass = accounts.$account.details.ServiceClass -%]
 	      [% classstring = classes.$myclass.AccessModes.join(',') -%]
 	      [% IF classstring == 'All' || classstring.search("SIP") -%]
-	      <option value="a:[% account %]">[% account %] ([% locale.maketext("CGPAccount") %])</option>
+	      <option value="a:[% account %]">[% account %] ([% locale.maketext("Account") %])</option>
 	      [% END -%]
 	      [% END -%]
 	      [% FOR account = departments -%]
-	      <option value="[% account %]">[% account %] ([% locale.maketext("CGPDepartment") %])</option>
+	      <option value="[% account %]">[% account %] ([% locale.maketext("Department") %])</option>
 	      [% END -%]
 	      [% FOR queue = queues -%]
-	      <option value="[% queue.value %]">[% queue.name %] ([% locale.maketext("CGPQueue") %])</option>
-	      <option value="[% queue.toggle %]">[% queue.name %] ([% locale.maketext("CGPQueueToggleAgent") %])</option>
+	      <option value="[% queue.value %]">[% queue.name %] ([% locale.maketext("Queue") %])</option>
+	      <option value="[% queue.toggle %]">[% queue.name %] ([% locale.maketext("Queue Toggle Agent") %])</option>
 	      [% END -%]
 	      [% FOR ivr = ivrs -%]
-	      <option value="[% ivr.value %]">[% ivr.name %] ([% locale.maketext("CGPIVRMenu") %])</option>
+	      <option value="[% ivr.value %]">[% ivr.name %] ([% locale.maketext("IVRMenu") %])</option>
 	      [% END -%]
 	    </select>
 	  </div>
@@ -190,7 +190,7 @@ app_key = 'cgpro_extensions'
 	</div>
       </div>
       <div class="form-group">
-	<label for="email">[% locale.maketext("CGPLocalExtension") %]:</label>
+	<label for="email">[% locale.maketext("LocalExtension") %]:</label>
 	<div class="row">
 	  <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
 	    <input type="text" name="local_extension" id="local_extension" class="form-control"/>
@@ -199,15 +199,15 @@ app_key = 'cgpro_extensions'
 	</div>
       </div>
       <div class="form-group">
-	<input id="add_local_extension" class="btn btn-primary" type="submit" value="[% locale.maketext("CGPAssignLocalExtension") %]" tabindex="5" />
+	<input id="add_local_extension" class="btn btn-primary" type="submit" value="[% locale.maketext("AssignLocalExtension") %]" tabindex="5" />
       </div>
     </form>
   </div>
 
 <script type="text/javascript">
 var LANG = {};
-LANG.local_extension_input = "[% locale.maketext("CGPLocalExtension") %]";
-LANG.local_extension_input_invalid = "[% locale.maketext('CGPLocalExtensionInvalid','{min}', '{max}') %]";
+LANG.local_extension_input = "[% locale.maketext("LocalExtension") %]";
+LANG.local_extension_input_invalid = "[% locale.maketext('LocalExtensionInvalid','{min}', '{max}') %]";
 CPANEL.validate.verify_local_extension_local = function (e) {
     return CPANEL.validate.positive_integer(e) && CPANEL.validate.greater_than(e,200) && CPANEL.validate.less_than(e,1000);
 };
@@ -318,7 +318,7 @@ YAHOO.util.Event.onDOMReady(function () {
   <div class="rsip">
     <h3>SIP Registration</h3>
     <div class="form-group">
-      <label>[% locale.maketext("CGPAccount") %]:</label>
+      <label>[% locale.maketext("Account") %]:</label>
       <div class="row">
 	<div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
 	  <form action="" class="" method="GET" id="selectAccount">
@@ -350,20 +350,20 @@ YAHOO.util.Event.onDOMReady(function () {
       <thead>
 	<tr>
 	  <th class="cell">[% locale.maketext("SIP registrations") %]</th>
-	  <th class="cell">[% locale.maketext("CGPStatus") %]</th>
+	  <th class="cell">[% locale.maketext("Status") %]</th>
 	  <th class="cell-end sorttable_nosort">[% locale.maketext("Functions") %]</th>
 	</tr>
       </thead>
       <tbody>
 	[% FOR sip IN rsip.keys.sort -%]
 	<tr>
-	  <td class="truncate">[% sip %][% IF settings.PSTNFromName == rsip.$sip.fromName && settings.PSTNGatewayAuthName == rsip.$sip.authName %] ([% locale.maketext("CGPOutgoing") %])[% END %]</td>
+	  <td class="truncate">[% sip %][% IF settings.PSTNFromName == rsip.$sip.fromName && settings.PSTNGatewayAuthName == rsip.$sip.authName %] ([% locale.maketext("Outgoing") %])[% END %]</td>
 	  <td class="truncate">
 	    [% rsipInfo.$sip.completed.replace("(\#T|\_)"," ") %]
 	    [% rsipInfo.$sip.errorCode %]
 	  </td>
 	  <td>
-	    <a href="editrsip.html?account=[% FORM.rsip_account %]&amp;rsip=[% sip %]"><span class="glyphicon glyphicon-pencil"></span> [% locale.maketext('CGPViewEdit') %]</a> ,
+	    <a href="editrsip.html?account=[% FORM.rsip_account %]&amp;rsip=[% sip %]"><span class="glyphicon glyphicon-pencil"></span> [% locale.maketext('View/Edit') %]</a> ,
 	    <a href="deletersip.html?account=[% FORM.rsip_account %]&amp;rsip=[% sip %]"><span class="glyphicon glyphicon-trash"></span> [% locale.maketext('Delete') %]</a>
 	    [% IF settings.PSTNFromName == rsip.$sip.fromName && settings.PSTNGatewayAuthName == rsip.$sip.authName %]
 	    , <a href="unsetaccountpstn.html?account=[% FORM.rsip_account %]"><span class="glyphicon glyphicon-remove"></span> [% locale.maketext('Unset As Outgoing') %]</a>

@@ -27,8 +27,8 @@ app_key = 'cgpro_sounds_manager'
 [% END %]
 <script type="text/javascript">
   var LANG = {};
-  LANG.lang_input = '<cpanel langprint="CGPLanguage">';
-    LANG.lang_input_invalid = '<cpanel langprint="CGPThisFieldIsRequired">!';
+  LANG.lang_input = '<cpanel langprint="Language">';
+    LANG.lang_input_invalid = '<cpanel langprint="This Field Is Required">!';
       YAHOO.util.Event.onDOMReady(function () {
       var VAL_LANG = new CPANEL.validate.validator(LANG.lang_input);
       VAL_LANG.add("lang", 'min_length(%input%,1)', LANG.lang_input_invalid);

@@ -121,7 +121,7 @@ app_key = 'cgpro_sounds_manager'
   <h3>[% locale.maketext("Languages") %]</h3>
 
   <p>
-    <a class="btn btn-primary" href="addlanguage.html?domain=[% FORM.domain %]">[% locale.maketext("CGPAddLanguage") %]</a>
+    <a class="btn btn-primary" href="addlanguage.html?domain=[% FORM.domain %]">[% locale.maketext("AddLanguage") %]</a>
   </p>
   <table id="mailtbl" class="table table-striped table-langurages">
     <thead>
@@ -134,7 +134,7 @@ app_key = 'cgpro_sounds_manager'
     <tr>
       <td class="sorttable_nosort">[% language %]</td>
       <td>
-	<a href="updatewavs.html?domain=[% list_domain %]&amp;lang=[% language %]">[% locale.maketext("CGPBatchUpdateWav") %]</a>
+	<a href="updatewavs.html?domain=[% list_domain %]&amp;lang=[% language %]">[% locale.maketext("BatchUpdateWav") %]</a>
 	[% IF langs.$language == "domain" -%]
 	<a href="deletelanguage.html?domain=[% list_domain %]&amp;lang=[% language %]">[% locale.maketext("Delete") %]</a>
 	[% END -%]

@@ -26,7 +26,6 @@ SET CPANEL.CPVAR.dprefix = "../../";
   [% locale.maketext("For more information, read the [output,url,_1,documentation,target,_2,id,_3].", "//www.communigate.com/communigatepro/LIST.html", "_blank", "lnkMailingListsDocumentation") %]
 </p>
 
-<p><cpanel print="CGP ERROR : $CPERROR{'CommuniGate'}"></p>
 [% IF CPANEL.CPERROR.CommuniGate -%]
 <div id="autoRespondersError" class="alert alert-danger">
   <p id="autoRespondersErrorMsg">[% CPANEL.CPERROR.CommuniGate %] </p>

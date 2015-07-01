@@ -80,13 +80,13 @@ app_key = 'cgpro_domain_settings'
         <div class="row">
           <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
 	    <select name="MailToAllAction" id="MailToAllAction"  class="form-control">
-	      [% filter_option("", "default", locale.maketext("CGPdefault") _ " (" _ locale.maketext("CGP" _ serverDomainDefaults.MailToAllAction) _ ")") %]
-	      [% filter_option(domainSettings.MailToAllAction, "anybody",locale.maketext("CGPanybody")) %]
-	      [% filter_option(domainSettings.MailToAllAction, "clients", locale.maketext("CGPclients")) %]
-	      [% filter_option(domainSettings.MailToAllAction, "Authenticated Users", locale.maketext("CGPAuthenticated Users")) %]
-	      [% filter_option(domainSettings.MailToAllAction, "Authenticated Domain Users", locale.maketext("CGPAuthenticated Domain Users")) %]
-	      [% filter_option(domainSettings.MailToAllAction, "Authenticated Administrator", locale.maketext("CGPAuthenticated Administrator")) %]
-	      [% filter_option(domainSettings.MailToAllAction, "nobody", locale.maketext("CGPnobody")) %]
+	      [% filter_option("", "default", locale.maketext("Default") _ " (" _ locale.maketext("" _ serverDomainDefaults.MailToAllAction) _ ")") %]
+	      [% filter_option(domainSettings.MailToAllAction, "anybody",locale.maketext("Anybody")) %]
+	      [% filter_option(domainSettings.MailToAllAction, "clients", locale.maketext("Clients")) %]
+	      [% filter_option(domainSettings.MailToAllAction, "Authenticated Users", locale.maketext("Authenticated Users")) %]
+	      [% filter_option(domainSettings.MailToAllAction, "Authenticated Domain Users", locale.maketext("Authenticated Domain Users")) %]
+	      [% filter_option(domainSettings.MailToAllAction, "Authenticated Administrator", locale.maketext("Authenticated Administrator")) %]
+	      [% filter_option(domainSettings.MailToAllAction, "nobody", locale.maketext("Nobody")) %]
 	    </select>
 	  </div>
 	</div>
@@ -98,62 +98,62 @@ app_key = 'cgpro_domain_settings'
         <div class="row">
           <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
 	      <select name="TimeZone" id="TimeZone" class="form-control">
-		[% filter_option("", "default", locale.maketext("CGPdefault") _ " (" _ locale.maketext("CGP" _ (serverAccountPrefs.TimeZone == "HostOS" ? "Fictitious Server Zone" : serverAccountPrefs.TimeZone )) _ ")") %]
-		[% filter_option(accountDefaultPrefs.TimeZone, "HostOS", locale.maketext("CGPFictitious Server Zone")) %]
-		[% filter_option(accountDefaultPrefs.TimeZone, "Europe/Eastern", locale.maketext("CGPEurope/Eastern")) %]
-		[% filter_option(accountDefaultPrefs.TimeZone, "Europe/Central", locale.maketext("CGPEurope/Central")) %]
-		[% filter_option(accountDefaultPrefs.TimeZone, "Europe/Western", locale.maketext("CGPEurope/Western")) %]
-		[% filter_option(accountDefaultPrefs.TimeZone, "Europe/Moscow", locale.maketext("CGPEurope/Moscow")) %]
-		[% filter_option(accountDefaultPrefs.TimeZone, "NorthAmerica/Alaska", locale.maketext("CGPNorthAmerica/Alaska")) %]
-		[% filter_option(accountDefaultPrefs.TimeZone, "NorthAmerica/Pacific", locale.maketext("CGPNorthAmerica/Pacific")) %]
-		[% filter_option(accountDefaultPrefs.TimeZone, "NorthAmerica/Mountain", locale.maketext("CGPNorthAmerica/Mountain")) %]
-		[% filter_option(accountDefaultPrefs.TimeZone, "NorthAmerica/Eastern", locale.maketext("CGPNorthAmerica/Eastern")) %]
-		[% filter_option(accountDefaultPrefs.TimeZone, "NorthAmerica/Atlantic", locale.maketext("CGPNorthAmerica/Atlantic")) %]
-		[% filter_option(accountDefaultPrefs.TimeZone, "Newfoundland", locale.maketext("CGPNewfoundland")) %]
-		[% filter_option(accountDefaultPrefs.TimeZone, "Russia/Ekaterinburg", locale.maketext("CGPRussia/Ekaterinburg")) %]
-		[% filter_option(accountDefaultPrefs.TimeZone, "Russia/Novosibirsk", locale.maketext("CGPRussia/Novosibirsk")) %]
-		[% filter_option(accountDefaultPrefs.TimeZone, "Russia/Krasnoyarsk", locale.maketext("CGPRussia/Krasnoyarsk")) %]
-		[% filter_option(accountDefaultPrefs.TimeZone, "Russia/Irkutsk", locale.maketext("CGPRussia/Irkutsk")) %]
-		[% filter_option(accountDefaultPrefs.TimeZone, "Russia/Yakutsk", locale.maketext("CGPRussia/Yakutsk")) %]
-		[% filter_option(accountDefaultPrefs.TimeZone, "Russia/Vladivostok", locale.maketext("CGPRussia/Vladivostok")) %]
-		[% filter_option(accountDefaultPrefs.TimeZone, "Russia/Magadan", locale.maketext("CGPRussia/Magadan")) %]
-		[% filter_option(accountDefaultPrefs.TimeZone, "Russia/Kamchatka", locale.maketext("CGPRussia/Kamchatka")) %]
-		[% filter_option(accountDefaultPrefs.TimeZone, "SouthAmerica/Chile", locale.maketext("CGPSouthAmerica/Chile")) %]
-		[% filter_option(accountDefaultPrefs.TimeZone, "SouthAmerica/Brasil", locale.maketext("CGPSouthAmerica/Brasil")) %]
-		[% filter_option(accountDefaultPrefs.TimeZone, "SouthAmerica/Paraguay", locale.maketext("CGPSouthAmerica/Paraguay")) %]
-		[% filter_option(accountDefaultPrefs.TimeZone, "Australia/Adelaide", locale.maketext("CGPAustralia/Adelaide")) %]
-		[% filter_option(accountDefaultPrefs.TimeZone, "Australia/NorthernTerritory", locale.maketext("CGPAustralia/NorthernTerritory")) %]
-		[% filter_option(accountDefaultPrefs.TimeZone, "Australia/East", locale.maketext("CGPAustralia/East")) %]
-		[% filter_option(accountDefaultPrefs.TimeZone, "NewZealand/Auckland", locale.maketext("CGPNewZealand/Auckland")) %]
-		[% filter_option(accountDefaultPrefs.TimeZone, "Asia/Lebanon", locale.maketext("CGPAsia/Lebanon")) %]
-		[% filter_option(accountDefaultPrefs.TimeZone, "Asia/Jordan", locale.maketext("CGPAsia/Jordan")) %]
-		[% filter_option(accountDefaultPrefs.TimeZone, "Asia/Syria", locale.maketext("CGPAsia/Syria")) %]
-		[% filter_option(accountDefaultPrefs.TimeZone, "Asia/Israel", locale.maketext("CGPAsia/Israel")) %]
-		[% filter_option(accountDefaultPrefs.TimeZone, "Asia/Iraq", locale.maketext("CGPAsia/Iraq")) %]
-		[% filter_option(accountDefaultPrefs.TimeZone, "Asia/Iran", locale.maketext("CGPAsia/Iran")) %]
-		[% filter_option(accountDefaultPrefs.TimeZone, "Asia/Afghanistan", locale.maketext("CGPAsia/Afghanistan")) %]
-		[% filter_option(accountDefaultPrefs.TimeZone, "Asia/India", locale.maketext("CGPAsia/India")) %]
-		[% filter_option(accountDefaultPrefs.TimeZone, "(-1100) Samoa", locale.maketext("CGP(-1100) Samoa")) %]
-		[% filter_option(accountDefaultPrefs.TimeZone, "(-1000) Hawaii/Tahiti", locale.maketext("CGP(-1000) Hawaii/Tahiti")) %]
-		[% filter_option(accountDefaultPrefs.TimeZone, "(-0900) Marquesas Islands", locale.maketext("CGP(-0900) Marquesas Islands")) %]
-		[% filter_option(accountDefaultPrefs.TimeZone, "(-0700) Arizona", locale.maketext("CGP(-0700) Arizona")) %]
-		[% filter_option(accountDefaultPrefs.TimeZone, "(-0600) Central America", locale.maketext("CGP(-0600) Central America")) %]
-		[% filter_option(accountDefaultPrefs.TimeZone, "(-0500) Haiti/Peru", locale.maketext("CGP(-0500) Haiti/Peru")) %]
-		[% filter_option(accountDefaultPrefs.TimeZone, "(-0400) Venezuela/Guyana", locale.maketext("CGP(-0400) Venezuela/Guyana")) %]
-		[% filter_option(accountDefaultPrefs.TimeZone, "(-0300) Argentina/Uruguay", locale.maketext("CGP(-0300) Argentina/Uruguay")) %]
-		[% filter_option(accountDefaultPrefs.TimeZone, "GMT (+0000)", locale.maketext("CGPGMT (+0000)")) %]
-		[% filter_option(accountDefaultPrefs.TimeZone, "(+0100) Algeria/Congo", locale.maketext("CGP(+0100) Algeria/Congo")) %]
-		[% filter_option(accountDefaultPrefs.TimeZone, "(+0200) Egypt/South Africa", locale.maketext("CGP(+0200) Egypt/South Africa")) %]
-		[% filter_option(accountDefaultPrefs.TimeZone, "(+0300) Saudi Arabia", locale.maketext("CGP(+0300) Saudi Arabia")) %]
-		[% filter_option(accountDefaultPrefs.TimeZone, "(+0400) Oman", locale.maketext("CGP(+0400) Oman")) %]
-		[% filter_option(accountDefaultPrefs.TimeZone, "(+0500) Pakistan", locale.maketext("CGP(+0500) Pakistan")) %]
-		[% filter_option(accountDefaultPrefs.TimeZone, "(+0600) Bangladesh", locale.maketext("CGP(+0600) Bangladesh")) %]
-		[% filter_option(accountDefaultPrefs.TimeZone, "(+0700) Thailand/Vietnam", locale.maketext("CGP(+0700) Thailand/Vietnam")) %]
-		[% filter_option(accountDefaultPrefs.TimeZone, "(+0800) China/Malaysia", locale.maketext("CGP(+0800) China/Malaysia")) %]
-		[% filter_option(accountDefaultPrefs.TimeZone, "(+0900) Japan/Korea", locale.maketext("CGP(+0900) Japan/Korea")) %]
-		[% filter_option(accountDefaultPrefs.TimeZone, "(+1000) Queensland", locale.maketext("CGP(+1000) Queensland")) %]
-		[% filter_option(accountDefaultPrefs.TimeZone, "(+1100) Micronesia", locale.maketext("CGP(+1100) Micronesia")) %]
-		[% filter_option(accountDefaultPrefs.TimeZone, "(+1200) Fiji", locale.maketext("CGP(+1200) Fiji")) %]
+		[% filter_option("", "default", locale.maketext("Default") _ " (" _ locale.maketext("" _ (serverAccountPrefs.TimeZone == "HostOS" ? "Fictitious Server Zone" : serverAccountPrefs.TimeZone )) _ ")") %]
+		[% filter_option(accountDefaultPrefs.TimeZone, "HostOS", locale.maketext("Fictitious Server Zone")) %]
+		[% filter_option(accountDefaultPrefs.TimeZone, "Europe/Eastern", locale.maketext("Europe/Eastern")) %]
+		[% filter_option(accountDefaultPrefs.TimeZone, "Europe/Central", locale.maketext("Europe/Central")) %]
+		[% filter_option(accountDefaultPrefs.TimeZone, "Europe/Western", locale.maketext("Europe/Western")) %]
+		[% filter_option(accountDefaultPrefs.TimeZone, "Europe/Moscow", locale.maketext("Europe/Moscow")) %]
+		[% filter_option(accountDefaultPrefs.TimeZone, "NorthAmerica/Alaska", locale.maketext("NorthAmerica/Alaska")) %]
+		[% filter_option(accountDefaultPrefs.TimeZone, "NorthAmerica/Pacific", locale.maketext("NorthAmerica/Pacific")) %]
+		[% filter_option(accountDefaultPrefs.TimeZone, "NorthAmerica/Mountain", locale.maketext("NorthAmerica/Mountain")) %]
+		[% filter_option(accountDefaultPrefs.TimeZone, "NorthAmerica/Eastern", locale.maketext("NorthAmerica/Eastern")) %]
+		[% filter_option(accountDefaultPrefs.TimeZone, "NorthAmerica/Atlantic", locale.maketext("NorthAmerica/Atlantic")) %]
+		[% filter_option(accountDefaultPrefs.TimeZone, "Newfoundland", locale.maketext("Newfoundland")) %]
+		[% filter_option(accountDefaultPrefs.TimeZone, "Russia/Ekaterinburg", locale.maketext("Russia/Ekaterinburg")) %]
+		[% filter_option(accountDefaultPrefs.TimeZone, "Russia/Novosibirsk", locale.maketext("Russia/Novosibirsk")) %]
+		[% filter_option(accountDefaultPrefs.TimeZone, "Russia/Krasnoyarsk", locale.maketext("Russia/Krasnoyarsk")) %]
+		[% filter_option(accountDefaultPrefs.TimeZone, "Russia/Irkutsk", locale.maketext("Russia/Irkutsk")) %]
+		[% filter_option(accountDefaultPrefs.TimeZone, "Russia/Yakutsk", locale.maketext("Russia/Yakutsk")) %]
+		[% filter_option(accountDefaultPrefs.TimeZone, "Russia/Vladivostok", locale.maketext("Russia/Vladivostok")) %]
+		[% filter_option(accountDefaultPrefs.TimeZone, "Russia/Magadan", locale.maketext("Russia/Magadan")) %]
+		[% filter_option(accountDefaultPrefs.TimeZone, "Russia/Kamchatka", locale.maketext("Russia/Kamchatka")) %]
+		[% filter_option(accountDefaultPrefs.TimeZone, "SouthAmerica/Chile", locale.maketext("SouthAmerica/Chile")) %]
+		[% filter_option(accountDefaultPrefs.TimeZone, "SouthAmerica/Brasil", locale.maketext("SouthAmerica/Brasil")) %]
+		[% filter_option(accountDefaultPrefs.TimeZone, "SouthAmerica/Paraguay", locale.maketext("SouthAmerica/Paraguay")) %]
+		[% filter_option(accountDefaultPrefs.TimeZone, "Australia/Adelaide", locale.maketext("Australia/Adelaide")) %]
+		[% filter_option(accountDefaultPrefs.TimeZone, "Australia/NorthernTerritory", locale.maketext("Australia/NorthernTerritory")) %]
+		[% filter_option(accountDefaultPrefs.TimeZone, "Australia/East", locale.maketext("Australia/East")) %]
+		[% filter_option(accountDefaultPrefs.TimeZone, "NewZealand/Auckland", locale.maketext("NewZealand/Auckland")) %]
+		[% filter_option(accountDefaultPrefs.TimeZone, "Asia/Lebanon", locale.maketext("Asia/Lebanon")) %]
+		[% filter_option(accountDefaultPrefs.TimeZone, "Asia/Jordan", locale.maketext("Asia/Jordan")) %]
+		[% filter_option(accountDefaultPrefs.TimeZone, "Asia/Syria", locale.maketext("Asia/Syria")) %]
+		[% filter_option(accountDefaultPrefs.TimeZone, "Asia/Israel", locale.maketext("Asia/Israel")) %]
+		[% filter_option(accountDefaultPrefs.TimeZone, "Asia/Iraq", locale.maketext("Asia/Iraq")) %]
+		[% filter_option(accountDefaultPrefs.TimeZone, "Asia/Iran", locale.maketext("Asia/Iran")) %]
+		[% filter_option(accountDefaultPrefs.TimeZone, "Asia/Afghanistan", locale.maketext("Asia/Afghanistan")) %]
+		[% filter_option(accountDefaultPrefs.TimeZone, "Asia/India", locale.maketext("Asia/India")) %]
+		[% filter_option(accountDefaultPrefs.TimeZone, "(-1100) Samoa", locale.maketext("(-1100) Samoa")) %]
+		[% filter_option(accountDefaultPrefs.TimeZone, "(-1000) Hawaii/Tahiti", locale.maketext("(-1000) Hawaii/Tahiti")) %]
+		[% filter_option(accountDefaultPrefs.TimeZone, "(-0900) Marquesas Islands", locale.maketext("(-0900) Marquesas Islands")) %]
+		[% filter_option(accountDefaultPrefs.TimeZone, "(-0700) Arizona", locale.maketext("(-0700) Arizona")) %]
+		[% filter_option(accountDefaultPrefs.TimeZone, "(-0600) Central America", locale.maketext("(-0600) Central America")) %]
+		[% filter_option(accountDefaultPrefs.TimeZone, "(-0500) Haiti/Peru", locale.maketext("(-0500) Haiti/Peru")) %]
+		[% filter_option(accountDefaultPrefs.TimeZone, "(-0400) Venezuela/Guyana", locale.maketext("(-0400) Venezuela/Guyana")) %]
+		[% filter_option(accountDefaultPrefs.TimeZone, "(-0300) Argentina/Uruguay", locale.maketext("(-0300) Argentina/Uruguay")) %]
+		[% filter_option(accountDefaultPrefs.TimeZone, "GMT (+0000)", locale.maketext("GMT (+0000)")) %]
+		[% filter_option(accountDefaultPrefs.TimeZone, "(+0100) Algeria/Congo", locale.maketext("(+0100) Algeria/Congo")) %]
+		[% filter_option(accountDefaultPrefs.TimeZone, "(+0200) Egypt/South Africa", locale.maketext("(+0200) Egypt/South Africa")) %]
+		[% filter_option(accountDefaultPrefs.TimeZone, "(+0300) Saudi Arabia", locale.maketext("(+0300) Saudi Arabia")) %]
+		[% filter_option(accountDefaultPrefs.TimeZone, "(+0400) Oman", locale.maketext("(+0400) Oman")) %]
+		[% filter_option(accountDefaultPrefs.TimeZone, "(+0500) Pakistan", locale.maketext("(+0500) Pakistan")) %]
+		[% filter_option(accountDefaultPrefs.TimeZone, "(+0600) Bangladesh", locale.maketext("(+0600) Bangladesh")) %]
+		[% filter_option(accountDefaultPrefs.TimeZone, "(+0700) Thailand/Vietnam", locale.maketext("(+0700) Thailand/Vietnam")) %]
+		[% filter_option(accountDefaultPrefs.TimeZone, "(+0800) China/Malaysia", locale.maketext("(+0800) China/Malaysia")) %]
+		[% filter_option(accountDefaultPrefs.TimeZone, "(+0900) Japan/Korea", locale.maketext("(+0900) Japan/Korea")) %]
+		[% filter_option(accountDefaultPrefs.TimeZone, "(+1000) Queensland", locale.maketext("(+1000) Queensland")) %]
+		[% filter_option(accountDefaultPrefs.TimeZone, "(+1100) Micronesia", locale.maketext("(+1100) Micronesia")) %]
+		[% filter_option(accountDefaultPrefs.TimeZone, "(+1200) Fiji", locale.maketext("(+1200) Fiji")) %]
 	      </select>
 	  </div>
 	</div>
@@ -165,7 +165,7 @@ app_key = 'cgpro_domain_settings'
         <div class="row">
           <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
 	      <select name="WorkDayStart" id="WorkDayStart" class="form-control">
-		[% filter_option("", "default", locale.maketext("CGPdefault") _ " (" _ (serverAccountPrefs.WorkDayStart div 3600) _ ((serverAccountPrefs.WorkDayStart % 3600) ? ":30" : ":00") _ ")") %]
+		[% filter_option("", "default", locale.maketext("Default") _ " (" _ (serverAccountPrefs.WorkDayStart div 3600) _ ((serverAccountPrefs.WorkDayStart % 3600) ? ":30" : ":00") _ ")") %]
 		[% FOR hour IN [ 0..23 ] -%]
 		[% filter_option(accountDefaultPrefs.WorkDayStart, hour * 3600, hour _ ":00") %]
 		[% filter_option(accountDefaultPrefs.WorkDayStart, (hour + 0.5) * 3600, hour _ ":30") %]
@@ -181,7 +181,7 @@ app_key = 'cgpro_domain_settings'
         <div class="row">
           <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
 	      <select name="WorkDayEnd" id="WorkDayEnd" class="form-control">
-		[% filter_option("", "default", locale.maketext("CGPdefault") _ " (" _ (serverAccountPrefs.WorkDayEnd div 3600) _ ((serverAccountPrefs.WorkDayEnd % 3600) ? ":30" : ":00") _ ")") %]
+		[% filter_option("", "default", locale.maketext("Default") _ " (" _ (serverAccountPrefs.WorkDayEnd div 3600) _ ((serverAccountPrefs.WorkDayEnd % 3600) ? ":30" : ":00") _ ")") %]
 		[% FOR hour IN [ 0..23 ] -%]
 		[% filter_option(accountDefaultPrefs.WorkDayEnd, hour * 3600, hour _ ":00") %]
 		[% filter_option(accountDefaultPrefs.WorkDayEnd, (hour + 0.5) * 3600, hour _ ":30") %]
@@ -198,14 +198,14 @@ app_key = 'cgpro_domain_settings'
         <div class="row">
           <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
 	      <select name="WeekStart" id="WeekStart" class="form-control">
-		[% filter_option("", "default", locale.maketext("CGPdefault") _ " (" _ locale.maketext( "CGP" _ serverAccountPrefs.WeekStart) _ ")") %]
-		[% filter_option(accountDefaultPrefs.WeekStart, "Sun", locale.maketext("CGPSun")) %]
-		[% filter_option(accountDefaultPrefs.WeekStart, "Mon", locale.maketext("CGPMon")) %]
-		[% filter_option(accountDefaultPrefs.WeekStart, "Tue", locale.maketext("CGPTue")) %]
-		[% filter_option(accountDefaultPrefs.WeekStart, "Wed", locale.maketext("CGPWed")) %]
-		[% filter_option(accountDefaultPrefs.WeekStart, "Thu", locale.maketext("CGPThu")) %]
-		[% filter_option(accountDefaultPrefs.WeekStart, "Fri", locale.maketext("CGPFri")) %]
-		[% filter_option(accountDefaultPrefs.WeekStart, "Sat", locale.maketext("CGPSat")) %]
+		[% filter_option("", "default", locale.maketext("Default") _ " (" _ locale.maketext( "" _ serverAccountPrefs.WeekStart) _ ")") %]
+		[% filter_option(accountDefaultPrefs.WeekStart, "Sun", locale.maketext("Sun")) %]
+		[% filter_option(accountDefaultPrefs.WeekStart, "Mon", locale.maketext("Mon")) %]
+		[% filter_option(accountDefaultPrefs.WeekStart, "Tue", locale.maketext("Tue")) %]
+		[% filter_option(accountDefaultPrefs.WeekStart, "Wed", locale.maketext("Wed")) %]
+		[% filter_option(accountDefaultPrefs.WeekStart, "Thu", locale.maketext("Thu")) %]
+		[% filter_option(accountDefaultPrefs.WeekStart, "Fri", locale.maketext("Fri")) %]
+		[% filter_option(accountDefaultPrefs.WeekStart, "Sat", locale.maketext("Sat")) %]
 	      </select>
 	  </div>
 	</div>
@@ -217,13 +217,13 @@ app_key = 'cgpro_domain_settings'
         </label>
         <div class="row">
           <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
-	      [% filter_check("WorkDays", accountDefaultPrefs.WorkDays || serverAccountPrefs.WorkDays, "Sun", locale.maketext("CGPSun")) %]
-	      [% filter_check("WorkDays", accountDefaultPrefs.WorkDays || serverAccountPrefs.WorkDays, "Mon", locale.maketext("CGPMon")) %]
-	      [% filter_check("WorkDays", accountDefaultPrefs.WorkDays || serverAccountPrefs.WorkDays, "Tue", locale.maketext("CGPTue")) %]
-	      [% filter_check("WorkDays", accountDefaultPrefs.WorkDays || serverAccountPrefs.WorkDays, "Wed", locale.maketext("CGPWed")) %]
-	      [% filter_check("WorkDays", accountDefaultPrefs.WorkDays || serverAccountPrefs.WorkDays, "Thu", locale.maketext("CGPThu")) %]
-	      [% filter_check("WorkDays", accountDefaultPrefs.WorkDays || serverAccountPrefs.WorkDays, "Fri", locale.maketext("CGPFri")) %]
-	      [% filter_check("WorkDays", accountDefaultPrefs.WorkDays || serverAccountPrefs.WorkDays, "Sat", locale.maketext("CGPSat")) %]
+	      [% filter_check("WorkDays", accountDefaultPrefs.WorkDays || serverAccountPrefs.WorkDays, "Sun", locale.maketext("Sun")) %]
+	      [% filter_check("WorkDays", accountDefaultPrefs.WorkDays || serverAccountPrefs.WorkDays, "Mon", locale.maketext("Mon")) %]
+	      [% filter_check("WorkDays", accountDefaultPrefs.WorkDays || serverAccountPrefs.WorkDays, "Tue", locale.maketext("Tue")) %]
+	      [% filter_check("WorkDays", accountDefaultPrefs.WorkDays || serverAccountPrefs.WorkDays, "Wed", locale.maketext("Wed")) %]
+	      [% filter_check("WorkDays", accountDefaultPrefs.WorkDays || serverAccountPrefs.WorkDays, "Thu", locale.maketext("Thu")) %]
+	      [% filter_check("WorkDays", accountDefaultPrefs.WorkDays || serverAccountPrefs.WorkDays, "Fri", locale.maketext("Fri")) %]
+	      [% filter_check("WorkDays", accountDefaultPrefs.WorkDays || serverAccountPrefs.WorkDays, "Sat", locale.maketext("Sat")) %]
 	  </div>
 	</div>
       </div>
@@ -235,7 +235,7 @@ app_key = 'cgpro_domain_settings'
         <div class="row">
           <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
 	    <select name="number" id="number" class="form-control">
-	      [% filter_option(accountDefaultPrefs.WeekStart, "", "CGPNone") %]
+	      [% filter_option(accountDefaultPrefs.WeekStart, "", "None") %]
 	      [% FOR number IN outhoingNumbers.keys -%]
 	      [% filter_option(outhoingNumber, number, number) %]
 	      [% END -%]
@@ -261,7 +261,7 @@ app_key = 'cgpro_domain_settings'
 	</div>
       </div>
       <div class="form-group">
-        <input type="submit" value="[% locale.maketext("CGPSave") %]" class="btn btn-primary"  name="save" />
+        <input type="submit" value="[% locale.maketext("Save") %]" class="btn btn-primary"  name="save" />
       </div>
 </form>
 <!-- END the form -->

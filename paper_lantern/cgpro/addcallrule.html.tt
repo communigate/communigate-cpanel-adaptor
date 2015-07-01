@@ -11,6 +11,8 @@
 SET CPANEL.CPVAR.dprefix = "../";
 SET CPANEL.CPVAR.headerimg = "../images/mailmenu.gif";
 
+SET select_times = ["06:00","06:30","07:00","07:30","08:00","08:30","09:00","09:30","10:00","10:30","11:00","11:30","12:00","12:30","13:00","13:30","14:00","14:30","15:00","15:30","16:00","16:30","17:00","17:30","18:00","18:30","19:00","19:30","20:00","20:30","21:00","21:30","22:00","22:30","23:00","23:30","00:00","00:30","01:00","01:30","02:00","02:30","03:00","03:30","04:00","04:30","05:00","05:30"];
+
 SET rule = Api2.exec("CommuniGate", "updateSignalRule", {
 "therule" = RAW_FORM.item("rule"),
 "domain" = RAW_FORM.item("domain")
@@ -27,6 +29,18 @@ classes = list_accounts.0.classes;
 app_key = 'cgpro_call_rules'
 -%]
 
+<style>
+  #fromHour {
+  display: inline;
+  max-width: 80px;
+  }
+
+  #toHour {  
+  display: inline;
+  max-width: 80px;
+  }  
+</style>        
+
 <div class="body-content">
   <form action="doaddcallrule.html" method="post">
     <div class="form-group">
@@ -40,13 +54,13 @@ app_key = 'cgpro_call_rules'
       </div>
     </div>
 
-    <h2>[% locale.maketext('CGPRule Conditions') %]</h2>
+    <h2>[% locale.maketext('Rule Conditions') %]</h2>
     <div class="form-group">
       <label>[% locale.maketext("Addressed To") %]</label>
       <div class="row">
 	<div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
 	  <select name="RequestURI" id="RequestURI" class="form-control">
-	    <option value="">[% locale.maketext("CGPPlease select account") %]</option>
+	    <option value="">[% locale.maketext("Please select account") %]</option>
 	    [% foundSome = 0 -%]
 	    [% FOR account IN accounts -%]
 	    [% myclass = account.value.class -%]
@@ -58,7 +72,7 @@ app_key = 'cgpro_call_rules'
 	    [% END -%]
 	  </select>
 	  [% UNLESS foundSome -%]
-	  <p>[% locale.maketext("CGPNoCallAccounts",'<a href="mail/accounts.html">', '</a>') %]</p>
+	  <p>[% locale.maketext("No Call Accounts",'<a href="mail/accounts.html">', '</a>') %]</p>
 	  [% END -%]
 	</div>
 	  <div id="RequestURI_error" class="col-xs-12 col-sm-6 col-md-6 col-lg-6"></div>
@@ -69,11 +83,19 @@ app_key = 'cgpro_call_rules'
       <label>[% locale.maketext("During the time interval") %]</label>
       <div class="row">
 	<div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
-	  [% locale.maketext("CGPFrom") %]
+	  [% locale.maketext("From") %]
 	  [% tod = rule.conditions.TimeOfDay.split("[:-]") -%]
-	  <input type="text" id="fromHour" name="fromHour" maxlength="2" value="[% tod.0 %]" style="width: 25px;"/>:<input type="text" id="fromMinutes" name="fromMinutes" maxlength="2" value="[% tod.1 %]" style="width: 25px;"/>
-	  [% locale.maketext("CGPTo") %]
-	  <input type="text" id="toHour" name="toHour" maxlength="2" value="[% tod.2 %]" style="width: 25px;"/>:<input type="text" id="toMinutes" name="toMinutes" maxlength="2" value="[% tod.3 %]" style="width: 25px;"/> <span>HH:MM-HH:MM</span>
+	  <select id="fromHour" name="fromHour" value="[% tod.0 %]" class="form-control">
+	    [% FOREACH time IN select_times %]
+	    [% filter_option(rule.conditions.TimeOfDay.split("-").0, time, time) %]
+	    [% END %]
+	  </select> 
+	  [% locale.maketext("To") %]
+	  <select id="toHour" name="toHour" value="[% tod.2 %]" class="form-control">
+	    [% FOREACH time IN select_times %]
+	    [% filter_option(rule.conditions.TimeOfDay.split("-").1, time, time) %]
+	    [% END %]
+	  </select> 
 	</div>
       </div>
     </div>
@@ -82,13 +104,13 @@ app_key = 'cgpro_call_rules'
       <label>[% locale.maketext("On week days") %]</label>
       <div class="row">
 	<div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
-	  [% filter_check("weekDays", rule.conditions.CurrentDay, "Sun", locale.maketext("CGPSun")) %]
-	  [% filter_check("weekDays", rule.conditions.CurrentDay, "Mon", locale.maketext("CGPMon")) %]
-	  [% filter_check("weekDays", rule.conditions.CurrentDay, "Tue", locale.maketext("CGPTue")) %]
-	  [% filter_check("weekDays", rule.conditions.CurrentDay, "Wed", locale.maketext("CGPWed")) %]
-	  [% filter_check("weekDays", rule.conditions.CurrentDay, "Thu", locale.maketext("CGPThu")) %]
-	  [% filter_check("weekDays", rule.conditions.CurrentDay, "Fri", locale.maketext("CGPFri")) %]
-	  [% filter_check("weekDays", rule.conditions.CurrentDay, "Sat", locale.maketext("CGPSat")) %]
+	  [% filter_check("weekDays", rule.conditions.CurrentDay, "Sun", locale.maketext("Sun")) %]
+	  [% filter_check("weekDays", rule.conditions.CurrentDay, "Mon", locale.maketext("Mon")) %]
+	  [% filter_check("weekDays", rule.conditions.CurrentDay, "Tue", locale.maketext("Tue")) %]
+	  [% filter_check("weekDays", rule.conditions.CurrentDay, "Wed", locale.maketext("Wed")) %]
+	  [% filter_check("weekDays", rule.conditions.CurrentDay, "Thu", locale.maketext("Thu")) %]
+	  [% filter_check("weekDays", rule.conditions.CurrentDay, "Fri", locale.maketext("Fri")) %]
+	  [% filter_check("weekDays", rule.conditions.CurrentDay, "Sat", locale.maketext("Sat")) %]
 	</div>
       </div>
     </div>
@@ -128,26 +150,26 @@ app_key = 'cgpro_call_rules'
       <div class="row">
 	<div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
 	  <select name="status" class="form-control">
-	    [% filter_option(rule.conditions.Presence, "", locale.maketext("CGPany")) %]
-	    [% filter_option(rule.conditions.Presence, "busy", locale.maketext("CGPbusy")) %]
-	    [% filter_option(rule.conditions.Presence, "away", locale.maketext("CGPaway")) %]
-	    [% filter_option(rule.conditions.Presence, "busy,away", locale.maketext("CGPaway or busy")) %]
+	    [% filter_option(rule.conditions.Presence, "", locale.maketext("any")) %]
+	    [% filter_option(rule.conditions.Presence, "busy", locale.maketext("busy")) %]
+	    [% filter_option(rule.conditions.Presence, "away", locale.maketext("away")) %]
+	    [% filter_option(rule.conditions.Presence, "busy,away", locale.maketext("away or busy")) %]
 	  </select>
 	</div>
       </div>
     </div>
 
-    <h2>[% locale.maketext('CGPRule Action') %]</h2>
+    <h2>[% locale.maketext('Rule Action') %]</h2>
     <div class="form-group">
       <label>[% locale.maketext("For user with status") %]</label>
       <div class="row">
 	<div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
 	  <select name="action" id="action" class="form-control">
 	    [% filter_option(rule.action.0, "", locale.maketext("Please select action")) %]
-	    [% filter_option(rule.action.0, "Redirect to", locale.maketext("CGPRedirect to")) %]
-	    [% filter_option(rule.action.0, "Fork to", locale.maketext("CGPFork to")) %]
-	    [% filter_option(rule.action.0, "Reject with", locale.maketext("CGPReject")) %]
-	    [% filter_option(rule.action.0, "Stop processing", locale.maketext("CGPStop processing")) %]
+	    [% filter_option(rule.action.0, "Redirect to", locale.maketext("Redirect to")) %]
+	    [% filter_option(rule.action.0, "Fork to", locale.maketext("Fork to")) %]
+	    [% filter_option(rule.action.0, "Reject with", locale.maketext("Reject")) %]
+	    [% filter_option(rule.action.0, "Stop processing", locale.maketext("Stop processing")) %]
 	  </select>
 	</div>
 	<div id="action_error" class="col-xs-12 col-sm-6 col-md-6 col-lg-6"></div>
@@ -223,6 +245,7 @@ app_key = 'cgpro_call_rules'
     </div>
   </form>
   <script type="text/javascript" src="addcallrule.js"></script>
+  
   [% INCLUDE _assets/return_link.html.tt return_location='call_rules.html.tt' return_link_text=locale.maketext('Go Back') %]
 </div> <!-- END body-content -->
 [% END %]

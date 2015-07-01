@@ -14,7 +14,7 @@ app_key = 'cgpro_groupmail'
 <div class="body-content">
   [% IF CPANEL.feature('cgpro_groupmail') %]
   <div class="section">
-    <h2>[% locale.maketext("CGPGroupCreate")%]</h2>
+    <h2>[% locale.maketext("Create Group")%]</h2>
 
     <form method="post" action="doaddgroup.html" id="userform" name="userform">
       <div class="form-group">

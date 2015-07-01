@@ -180,7 +180,7 @@ listmxs = api2_result_Email_listmxs.0.entries;
 	[% locale.maketext('DNS SRV records supplement the Domain you manage with information that will allow such services like Instant Messaging and VoIP to work better with other companies and people. You can read more technical information about DNS SRV records in the Wikipedia:') %]
 	<a href="http://en.wikipedia.org/wiki/SRV_record">http://en.wikipedia.org/wiki/SRV_record</a>
       </p>
-      <h3>[% locale.maketext("CGPJabberXMPP") %]</h3>
+      <h3>[% locale.maketext("JabberXMPP") %]</h3>
       <p class="description">
 	[% locale.maketext('By enabling this setting external XMPP (Jabber) based Instant Messaging servers will be able to send you buddy requests and chat messages. This setting is particularly important for people using Gtalk. Once this is enabled, you should be able to "request a buddy" from google (user@gmail.com) in your IM client. In addition, when servers using Jabber or MS Lync are properly configured, you will be able to add these colleagues or friends to your Buddy list and they will be able to see when you are online or not.') %]
       </p>
@@ -198,7 +198,7 @@ listmxs = api2_result_Email_listmxs.0.entries;
 	<a class="input-button btn btn-primary" href="set_xmpp.html?domain=[% FORM.domain %]&action=install">[% locale.maketext("Enable") %]</a>
       </p>
       [% END -%]
-      <h3>[% locale.maketext("CGPSIP") %]</h3>
+      <h3>[% locale.maketext("SIP") %]</h3>
       <p class="description">
 	[% locale.maketext("'By enabling this setting you will be able to make and receive phone calls from external clients using the SIP protocol. When properly configured, a person will be able to call you simply by sending the request to \"username@yourdomain.com\". The same is try for you to place a call to an external system using SIP when their DNS SRV records are properly defined.") %]
       </p>
@@ -214,7 +214,7 @@ listmxs = api2_result_Email_listmxs.0.entries;
       </p>
       [% END -%]
 
-      <h3>[% locale.maketext("CGPCALDAV") %]</h3>
+      <h3>[% locale.maketext("CALDAV") %]</h3>
       <p class="description">
 	[% locale.maketext("'By enabling this setting you will be able to create and share a calendar with external systems. This could be a partner company, or colleague that wants to collaborate with you.") %]
       </p>
@@ -230,7 +230,7 @@ listmxs = api2_result_Email_listmxs.0.entries;
       </p>
       [% END -%]
 
-      <h3>[% locale.maketext("CGPCARDDAV") %]</h3>
+      <h3>[% locale.maketext("CARDDAV") %]</h3>
       <p class="description">
 	[% locale.maketext("'By enabling this setting, you will be able to share contacts in your address book with external systems that also use the CardDAV protocol. This can be of particular use for home / office situations or when you want to share address resources with a partner company or colleague that uses a different system.") %]
       </p>

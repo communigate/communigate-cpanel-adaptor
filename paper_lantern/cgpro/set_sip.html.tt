@@ -28,7 +28,7 @@ SET uninstall_data =  Api2.exec("CommuniGate", "UninstallSRV", {
   
 <div class="body-content">
   <div class="section">
-    <h3>[% locale.maketext("CGPSIP") %]</h3>
+    <h3>[% locale.maketext("SIP") %]</h3>
     [% IF RAW_FORM.item("action") == "install" %]
     [% IF CPANEL.CPERROR.item('CommuniGate') %]
     <div class="alert alert-danger">

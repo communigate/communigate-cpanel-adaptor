@@ -69,7 +69,7 @@ app_key = 'cgpro_departments'
 	  <option value="[% val %]"[% val == pval ? " selected='selected'" : "" %]>[% locale.maketext(text) %]</option>
 	  [% END -%]
 	  <select id="account" name="account" class="form-control">
-	    [% filter_option(account, "", "CGPPleaseSelect") %]
+	    [% filter_option(account, "", "Please Select") %]
 	    [% FOR account IN accounts.sort -%]
               [% myclass = accounts.$account.class -%]
               [% classstring = classes.$myclass.AccessModes.join(',') -%]

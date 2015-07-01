@@ -33,7 +33,7 @@ app_key = 'cgpro_call_register'
   <div class="pull-right">
     <div class="form-inline">
       <div class="form-group">
-	<label class="control-label" style="margin: 0 15px;">[% locale.maketext("CGPAccount") %]:</label>
+	<label class="control-label" style="margin: 0 15px;">[% locale.maketext("Account") %]:</label>
       </div>
       <div class="form-group">
 	<div class="row">
@@ -66,7 +66,7 @@ app_key = 'cgpro_call_register'
 <div>
   <form action="" method="GET" id="selectPeriod">
     <div class="form-group">
-      <label>[% locale.maketext("CGPPeriod") %]:</label>
+      <label>[% locale.maketext("Period") %]:</label>
       <div class="row">
 	<div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
 	  <select id="period" class="form-control" onchange="toggle_period()" name="period">
@@ -96,7 +96,7 @@ app_key = 'cgpro_call_register'
               <input type="text" id="search_input" size="15" class="form-control" name="searchregex" value="[% FORM.searchregex %]">
 	      <input type="hidden" name="account" value="[% FORM.account %]" />
 	      <input type="hidden" name="period" value="[% FORM.period %]" />
-	      [% IF FORM.searchregex %]<a href="callregister.html?account=[% FORM.account %]&amp;period=[% FORM.period %]">[% locale.maketext('CGPClear') %]</a>[% END -%]
+	      [% IF FORM.searchregex %]<a href="callregister.html?account=[% FORM.account %]&amp;period=[% FORM.period %]">[% locale.maketext('Clear') %]</a>[% END -%]
 	    </div>
             <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
               <input id="email_table_clear_search" type="button" class="btn btn-primary" value="[% locale.maketext("Clear")  %]" onclick="clear_search()" />
@@ -109,12 +109,12 @@ app_key = 'cgpro_call_register'
     <table class="table table-striped">
       <thead>
 	<tr>
-	  <th class="cell">[% locale.maketext("CGPTimeOfCall") %]</th>
-	  <th class="cell">[% locale.maketext("CGPInOut") %]</th>
-	  <th class="cell">[% locale.maketext("CGPPeer") %]</th>
-	  <!-- <th class="cell">[% locale.maketext("CGPCallerId") %]</th> -->
-	  <th class="cell">[% locale.maketext("CGPDuration") %]</th>
-	  <th class="cell-end">[% locale.maketext("CGPError") %]</th>
+	  <th class="cell">[% locale.maketext("Time Of Call") %]</th>
+	  <th class="cell">[% locale.maketext("In/Out") %]</th>
+	  <th class="cell">[% locale.maketext("Peer") %]</th>
+	  <!-- <th class="cell">[% locale.maketext("CallerId") %]</th> -->
+	  <th class="cell">[% locale.maketext("Duration") %]</th>
+	  <th class="cell-end">[% locale.maketext("Error") %]</th>
 	</tr>
       </thead>
       [% IF calls.size == 0 %]

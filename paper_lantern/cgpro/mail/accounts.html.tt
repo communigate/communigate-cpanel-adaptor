@@ -593,7 +593,7 @@ var DEFAULT_EMAIL_QUOTA = [% execute("Email", "get_default_email_quota_mib").dat
 	  <table class="settings settings_ssl">
 	    <tbody>
 	      <tr>
-		<th colspan="2" style="text-align: center;">[% locale.maketext("CGPSecureSSL/TLSSettings") %] <br />
+		<th colspan="2" style="text-align: center;">[% locale.maketext("SecureSSL/TLSSettings") %] <br />
 		  ([% locale.maketext("Recommended") %])
 		</th>
 	      </tr>
@@ -605,7 +605,7 @@ var DEFAULT_EMAIL_QUOTA = [% execute("Email", "get_default_email_quota_mib").dat
 		</td>
 	      </tr>
 	      <tr>
-		<td>[% locale.maketext("CGPPassword") %]:</td>
+		<td>[% locale.maketext("Password") %]:</td>
 		<td class="escape-note"><em>( [% locale.maketext("Use the email account’s password.") %] )</em></td>
 	      </tr>
 	      <tr>
@@ -616,21 +616,21 @@ var DEFAULT_EMAIL_QUOTA = [% execute("Email", "get_default_email_quota_mib").dat
 		</td>
 	      </tr>
 	      <tr>
-		<td>[% locale.maketext("CGPServer") %]:</td>
+		<td>[% locale.maketext("Server") %]:</td>
 		<td class="data">
 		  <span id="airsync_server_{{index}}" style="font-weight: bold;">
 		  </span>
 		</td>
 	      </tr>
 	      <tr>
-		<td>[% locale.maketext("CGPPort") %]:</td>
+		<td>[% locale.maketext("Port") %]:</td>
 		<td class="data">
 		  <strong>443</strong>
 		</td>
 	      </tr>
 	      <tr>
-		<td>[% locale.maketext("CGPuseSSL") %]:</td>
-		<td><strong>[% locale.maketext("CGPleaveTicked") %]</strong></td>
+		<td>[% locale.maketext("Use SSL") %]:</td>
+		<td><strong>[% locale.maketext("Leave Ticked") %]</strong></td>
 	      </tr>
 	    </tbody>
 	  </table>
@@ -640,11 +640,11 @@ var DEFAULT_EMAIL_QUOTA = [% execute("Email", "get_default_email_quota_mib").dat
 	  <table class="settings">
 	    <tbody>
 	      <tr>
-		<th colspan="2" style="text-align: center;">[% locale.maketext("CGPNonSecureSettings") %] <br />
-		  ([% locale.maketext("CGPNOTRecommended") %])
+		<th colspan="2" style="text-align: center;">[% locale.maketext("Non Secure Settings") %] <br />
+		  ([% locale.maketext("NOT Recommended") %])
 		</th>
 	      <tr>
-		<td>[% locale.maketext("CGPUsername") %]:</td>
+		<td>[% locale.maketext("Username") %]:</td>
 		<td class="data">
 		  <span id="airsync_username_non_ssl_{{index}}" style="font-weight: bold;">
 		  </span>

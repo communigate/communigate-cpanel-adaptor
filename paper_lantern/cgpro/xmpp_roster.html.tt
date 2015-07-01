@@ -106,9 +106,9 @@
     <h2>[% locale.maketext("XMPP roster of") %] [% FORM.item('account') %]</h2>
     <table id="mailtbl" class="sortable truncate-table table table-striped">
       <tr>
-	<th class="cell">[% locale.maketext("CGPBuddy") %]</th>
-	<th class="cell">[% locale.maketext("CGPName") %]</th>
-	<th class="cell">[% locale.maketext("CGPGroup") %]</th>
+	<th class="cell">[% locale.maketext("Buddy") %]</th>
+	<th class="cell">[% locale.maketext("Name") %]</th>
+	<th class="cell">[% locale.maketext("Group") %]</th>
 	<th class="cell-end sorttable_nosort">[% locale.maketext("Actions") %]</th>
       </tr>
       [% FOR buddy IN roster.0.roster -%]

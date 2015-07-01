@@ -9,7 +9,7 @@ SET accounts = Api2.exec("CommuniGate", "AccountsOverview", {});
 <div class="body-content">
   <div class="section">
     <form method="post" action="doimportlocalroster.html?account=[% FORM.account %]" id="userform" name="userform">
-      [% filter_option(account, "", "CGPPleaseSelect") %]
+      [% filter_option(account, "", "Please Select") %]
       [% FOR account IN accounts.0.accounts.keys -%]
       [% IF account == FORM.account; NEXT; END -%]
       [% myclass = accounts.0.accounts.$account.class -%]
