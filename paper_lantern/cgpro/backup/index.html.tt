@@ -32,10 +32,7 @@ SET forwarders = Api2.exec("CommuniGate", "ListForwardersBackups");
 SET accounts = Api2.exec("CommuniGate", "ListAccountsBackups");
 %]
 
-[% js_code = PROCESS js_block %]
-
 [% WRAPPER '_assets/master.html.tt'
-    page_js = js_code
     app_key = 'cgpro_backup'
 -%]
 
@@ -250,10 +247,6 @@ SET accounts = Api2.exec("CommuniGate", "ListAccountsBackups");
         </div>
         [% END %]
     </div>
-    [% END %]
-</div>
-
-[% BLOCK js_block %]
 <script type="text/javascript">
     truncate_on = 1;
     var inputs_buttons = {  };
@@ -289,7 +282,10 @@ SET accounts = Api2.exec("CommuniGate", "ListAccountsBackups");
     YAHOO.util.Event.onDOMReady(init);
 
 </script>
-[% END #js_block %]
 
+    [% ELSE %]
+    [% PROCESS cgpro/icn_description.html.tt %]
+    [% END %]
+</div>
 [% END #wrapper -%]
 

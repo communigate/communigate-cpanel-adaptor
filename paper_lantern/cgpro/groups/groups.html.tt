@@ -7,10 +7,7 @@ SET mail_groups = Api2.exec("CommuniGate", "ListGroups", {
 });
 %]
 
-[% js_code = PROCESS js_block %]
-
 [% WRAPPER '_assets/master.html.tt'
-page_js = js_code,
 app_key = 'cgpro_groupmail'
 -%]
 
@@ -127,10 +124,6 @@ app_key = 'cgpro_groupmail'
       </tbody>
     </table>
   </div>
-  [% END %]
-</div>
-
-[% BLOCK js_block %]
 <script type="text/javascript">
 var name_validator = new CPANEL.validate.validator("[% locale.maketext("Group Name") %]");
 var email_validator = new CPANEL.validate.validator("[% locale.maketext("Group Email Address") %]");
@@ -151,6 +144,10 @@ function init_page() {
 }
 YAHOO.util.Event.onDOMReady(init_page);
 </script>
-[% END %]
+  [% ELSE %]
+  [% PROCESS cgpro/icn_description.html.tt %]
+  [% END %]
+</div>
+
 
 [% END %]

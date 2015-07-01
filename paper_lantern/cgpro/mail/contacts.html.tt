@@ -9,7 +9,6 @@
 -%]
 <div class="body-content">
   [% IF CPANEL.feature('cgpro_contacts') %]
-
   <div class="pull-right">
     <div id="manage-list">
       <form method="get" action="" id="manage_list_form" class="form-inline">
@@ -133,6 +132,8 @@
 
   [% END -%]
   [% INCLUDE _assets/return_link.html.tt return_location='../../index.html' return_link_text=locale.maketext('Go Back') %]
+  [% ELSE %]
+  [% PROCESS cgpro/icn_description.html.tt %]
   [% END %]
 </div><!-- end body-content -->
 [% END %]

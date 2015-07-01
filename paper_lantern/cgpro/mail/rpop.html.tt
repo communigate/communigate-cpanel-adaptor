@@ -107,6 +107,8 @@ rpop = rpop.0;
     </table>
   </div>
   [% END %]
+  [% ELSE %]
+  [% PROCESS cgpro/icn_description.html.tt %]
   [% END %]
 </div>
 [% END %]

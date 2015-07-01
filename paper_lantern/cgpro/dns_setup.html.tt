@@ -57,7 +57,7 @@ listmxs = api2_result_Email_listmxs.0.entries;
 </style>
 
 <div class="body-content">
-  [% IF CPANEL.feature('cgpro_dns_setup') %]
+  [% IF CPANEL.feature('cgpro_changemx') %]
   <div class="pull-right">
     <form method="get" action="" id="manage_list_form" class="form-inline">
       <div class="form-group">
@@ -352,10 +352,6 @@ listmxs = api2_result_Email_listmxs.0.entries;
                 </div>
             </div>
         </div>
-	[% END %]
-</div><!-- end body-content -->
-[% END %]
-
 <script type="text/javascript">
 
 var add_mx_record_predefined = function(caller) {
@@ -488,3 +484,9 @@ var LANG = {
     MX_Remote : "[% locale.maketext('Remote') %]"
 };
 </script>
+	[% ELSE %]
+	[% PROCESS cgpro/icn_description.html.tt %]
+	[% END %]
+</div><!-- end body-content -->
+[% END %]
+

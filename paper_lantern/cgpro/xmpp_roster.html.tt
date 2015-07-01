@@ -20,7 +20,6 @@
         <div class="form-group">
           [% SET accounts = Api2.exec("CommuniGate", "AccountsOverview", {}) %]
           <select name="account" id="manage_list_select" class="col-xs-12 form-control">
-            <option value="">[% locale.maketext("Select account.") %]</option>
 	    [% FOR account IN accounts.0.accounts.keys -%]
 	    [% myclass = accounts.0.accounts.$account.class -%]
 	    [% classstring = accounts.0.classes.$myclass.AccessModes.join(',') -%]
@@ -29,6 +28,11 @@
 	    [% END -%]
 	    [% END -%]
           </select>
+	[% IF !RAW_FORM.item("account") %]
+	<script type="text/javascript">
+	  YAHOO.util.Dom.get("manage_list_form").submit();
+	</script>
+	[% END %]
         </div>
         <noscript>
           <div class="form-group">
@@ -133,6 +137,8 @@
   </div>
   [% INCLUDE _assets/return_link.html.tt return_location='../index.html' return_link_text=locale.maketext('Go Back') %]
 
+  [% ELSE %]
+  [% PROCESS cgpro/icn_description.html.tt %]
   [% END %]<!-- end cpanelfeature autoresponders -->
 </div><!-- end body-content -->
 [% END %]

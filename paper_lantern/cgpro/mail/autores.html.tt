@@ -97,9 +97,11 @@
     </div>
 
     [% INCLUDE _assets/return_link.html.tt return_location='../../index.html' return_link_text=locale.maketext('Go Back') %]
-
-[% END %]<!-- end cpanelfeature autoresponders -->
-
+    
+    [% ELSE %]
+    [% PROCESS cgpro/icn_description.html.tt %]
+    [% END %]<!-- end cpanelfeature autoresponders -->
+    
 </div><!-- end body-content -->
 [% END %]
 

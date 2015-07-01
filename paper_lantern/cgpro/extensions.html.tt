@@ -383,8 +383,8 @@ YAHOO.util.Event.onDOMReady(function () {
     </table>
     [% END %]
   </div>
+  [% ELSE %]
+  [% PROCESS icn_description.html.tt %]
   [% END %]
 </div>
-
-
 [% END %]

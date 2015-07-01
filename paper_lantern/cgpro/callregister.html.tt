@@ -184,6 +184,8 @@ app_key = 'cgpro_call_register'
       $("#search_input").keyup( search_logs );
 
     </script>
+    [% ELSE %]
+    [% PROCESS cgpro/icn_description.html.tt %]
     [% END %]
 </div><!-- end body-content div -->
 [% END %]

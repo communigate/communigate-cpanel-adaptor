@@ -6,8 +6,7 @@ SET CPANEL.CPVAR.dprefix = "../../";
     app_key = 'cgpro_archive'
 -%]
 <div class="body-content">
-
-    [% IF CPANEL.feature('cgpro_archive') %]
+    [% IF CPANEL.feature('cgpro_emailarchive') %]
         [% IF (CPANEL.CPCONF.emailarchive == "disable" ? 0 : CPANEL.CPCONF.emailarchive) %]
         <div id="descEmailArchivingAllowsYou" class="header-text">
             [% locale.maketext("Email Archiving allows you to store a copy of each incoming and outgoing message that is sent to or from a domain on your account. The archives are stored in an uncompressed maildir format so they can be browsed via an IMAP connection. Be aware that archiving email can consume disk space quickly, and you should ensure you have enough disk space available for the retention period you select.") %]
@@ -47,10 +46,12 @@ SET CPANEL.CPVAR.dprefix = "../../";
         </div>
 
         [% END %]
-    [% END %]
+	[% ELSE %]
+	[% PROCESS cgpro/icn_description.html.tt %]
+	[% END %]
 
     [% IF !(CPANEL.CPCONF.emailarchive == "disable" ? 0 : CPANEL.CPCONF.emailarchive) %]
         [% locale.maketext("Email archiving is disabled.") %]
-    [% END %]
+	[% END %]
 </div>
 [% END #wrapper %]
