@@ -20,7 +20,7 @@ SET return_link = "csvimport-step2.html?importtype=" _ RAW_FORM.importtype.uri()
 %]
 
 [% WRAPPER '_assets/master.html.tt'
-    app_key = 'address_importer'
+    app_key = 'cgpro_address_importer'
 -%]
 <div class="body-content">
     [% IF (FORM.importtype == "fwd") %]

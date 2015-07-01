@@ -247,18 +247,37 @@ sub api2_UpdateVCard {
 
 sub api2_ListAccounts {
     my %OPTS = @_;
+    my $show_classes = $OPTS{'classes'};
     my $invert = $OPTS{'invert'};
     my @domains = Cpanel::Email::listmaildomains();
     my $cli = getCLI();
-    my $return_accounts = [];
+    my $return_accounts = {};
+    my $all_classes;
     foreach my $domain (@domains) {
 	my $accounts=$cli->ListAccounts($domain);
 	foreach my $userName (sort keys %$accounts) {
 	    next if $userName eq 'pbx' || $userName eq 'ivr';
-	    push @$return_accounts, $userName . "@" . $domain;
+
+	    my $accountData = $cli->GetAccountEffectiveSettings("$userName\@$domain");
+	    my $service = @$accountData{'ServiceClass'} || '';
+	    if ($OPTS{'classes'}) {
+	    $all_classes = @$accountData{'ServiceClasses'} unless $all_classes;
+	    }
+
+	    $return_accounts->{$userName . "@" . $domain} = {
+		domain => $domain,
+		username => $userName,
+		class => $service
+	    };
 	}
     }
-    return $return_accounts;
+    my $return = {
+	accounts => $return_accounts
+    };
+    if ($OPTS{'classes'}) {
+    $return->{"classes"} = $all_classes;
+    }
+    return $return;
 }
 
 sub api2_AccountDefaults {
@@ -424,6 +443,7 @@ sub api2_UpdateAccountClass {
     my $current = 0;
     $current = current_class_accounts($OPTS{'class'}, $cli) if $max > 0;
     my $setting = { ServiceClass => $OPTS{'class'}, AccessModes => 'default' };
+    my $error_msg = "";
     if ($max > $current || $max == -1) {
 	$cli->UpdateAccountSettings($OPTS{'account'}, $setting);
 	if ($OPTS{'restrictAccess'}) {
@@ -436,12 +456,14 @@ sub api2_UpdateAccountClass {
 	}
 	$cli->UpdateAccountSettings($OPTS{'account'}, $setting);
 	$cli->Logout();
+	$error_msg = "Updated Successfuly.";
 	$Cpanel::CPERROR{'CommuniGate'} = "Updated Successfuly.";
 	return {};
     } else {
 	$cli->Logout();
+	$error_msg = "Maximum " .$OPTS{'class'} . " accounts for your plan is $max. Upgrade your plan for more " .$OPTS{'class'} . " accounts!";
 	$Cpanel::CPERROR{'CommuniGate'} = "Maximum " .$OPTS{'class'} . " accounts for your plan is $max. Upgrade your plan for more " .$OPTS{'class'} . " accounts!";
-	return {};
+	return { "msg" => $error_msg};
     }
 }
 
@@ -722,8 +744,6 @@ sub api2_ListExtensions {
 		  my $settings = $cli->GetAccountSettings($object);
 		  my $telnums = $pbxPrefs->{"Gateways"}->{$defaultPrefs->{"assignedTelnums"}->{$number}->{"gateway"}}->{"callInGw"}->{"telnums"};
 		  my @telnum = grep {$_->{'telnum'} eq $number} @$telnums;
-		  # use Data::Dumper;
-		  # die Dumper $number;
  		  if ($telnum[0] && $telnum[0]->{'authname'} eq $settings->{"PSTNGatewayAuthName"} && $telnum[0]->{'username'} eq $settings->{"PSTNFromName"}) {
 		      $ext->{'out'} = 1;
 		  }
@@ -783,25 +803,95 @@ sub api2_ListExtensions {
   return @result;
 }
 
+sub api2_GetAccountAliases {
+  my %OPTS = @_;
+  my $cli = getCLI();
+  my $result = {};
+  
+  my $aliases = $cli->GetAccountAliases($OPTS{'account'});
+  $result->{"aliases"} = $aliases;
+  $cli->Logout();
+  return $result;
+}
+
+sub api2_DeleteAlias {
+  my %OPTS = @_;
+  my $cli = getCLI();
+  my $result = {};
+  
+  my $aliases = $cli->GetAccountAliases($OPTS{'account'});
+  $result->{"aliases"} = $aliases;
+  my $arrSize = @$aliases;
+  $result->{"arr_size"} = $arrSize;
+
+  my $index = 0;
+  for (my $i=0; $i <= $arrSize; $i++) {
+      if ($aliases->[$i] eq $OPTS{'alias'}) {
+  	    $result->{"found"} = $aliases->[$i];
+	    splice($aliases, $index, 1);
+      }
+  }
+  my $set_aliases = $cli->SetAccountAliases($OPTS{'account'}, $aliases);
+  my $error_msg = $cli->getErrMessage();
+  if ($error_msg eq "OK") {
+      $result->{"error_msg"} = $error_msg;
+  } else {
+      $Cpanel::CPERROR{'CommuniGate'} = $error_msg;
+      $result->{"error_msg"} = $error_msg;
+  }
+
+  $result->{"aliases"} = $aliases;
+  $cli->Logout();
+  return $result;
+}
+
 sub api2_AssignExtension {
   my %OPTS = @_;
   my @domains = Cpanel::Email::listmaildomains();
   my $cli = getCLI();
+  my $result = {};
 
   if ($OPTS{'extension'} || $OPTS{'local_extension'}) {
       my (undef, $domain) = split '@', $OPTS{'account'};
       for my $dom (@domains) {
   	  if ($dom eq $domain) {
   	      my $userForwarders = $cli->FindForwarders($domain,$OPTS{'account'});
-  	      if ($OPTS{'local_extension'}) {
-  		  $cli->CreateForwarder($OPTS{'local_extension'} . "\@$domain", $OPTS{'account'});
-  		  unless ($cli->getErrMessage eq "OK") {
-  		      $Cpanel::CPERROR{'CommuniGate_local_extension'} = $cli->getErrMessage;
-  		      last;
-  		  }
-  	      }
+
+	      $result->{"accounttt"} = $OPTS{'account'};
 	      my ($objType, $objAddress) = split ":", $OPTS{'account'};
-	      if ($OPTS{'extension'}) {
+	      $result->{"objTypeeee"} = $objType;
+	      $result->{"objAddresssss"} = $objAddress;
+
+
+  	      if ( $OPTS{'local_extension'} && ($objType eq "a") ) {
+		  my $aliases = $cli->GetAccountAliases($objAddress);
+		  $result->{"old_aliases"} = $aliases;
+
+		  my $found = 0;
+		  for my $alias (@$aliases) {
+		      $found = 1 if "$alias" eq "$OPTS{'local_extension'}";
+		  }
+
+		  push @$aliases, "$OPTS{'local_extension'}";
+
+		  my $set_aliases = $cli->SetAccountAliases($objAddress, $aliases);
+
+		  my $error_msg = $cli->getErrMessage();
+		  if ($error_msg eq "OK") {
+		      $result->{"error_msg"} = $error_msg;
+		  } else {
+  		      $Cpanel::CPERROR{'CommuniGate_local_extension'} = $error_msg;
+		      $result->{"error_msg"} = $error_msg;
+		  }
+  	      } else {
+		  $cli->CreateForwarder($OPTS{'local_extension'} . "\@$domain", $OPTS{'account'});
+		  unless ($cli->getErrMessage eq "OK") {
+		      $Cpanel::CPERROR{'CommuniGate_local_extension'} = $cli->getErrMessage;
+		      last;
+		  }
+	      }
+
+	       if ($OPTS{'extension'}) {
 		  if ($objType eq "a") {
 		      my $telnums = $cli->GetAccountTelnums($objAddress);
 		      push @$telnums, $OPTS{"extension"} unless grep {$_ == $OPTS{"extension"}} @$telnums;
@@ -829,7 +919,6 @@ sub api2_AssignExtension {
       }
   }
 
-  my $result = {};
   my $defaults = $cli->GetServerAccountDefaults();
   $result->{"classes"} = $defaults->{"ServiceClasses"};
   foreach my $domain (@domains) {
@@ -927,19 +1016,76 @@ sub api2_GetExtensions {
   for my $dom (@domains) {
       if ($dom eq $domain) {
 	  my $domainPrefs = $cli->GetAccountDefaultPrefs($domain);
+	  my $domainDefaults = $cli->GetAccountDefaults($domain);
+	  push @result, {selected => $domainDefaults};
+	  my $defaultDomain = $cli->MainDomainName();
 	  if ($domainPrefs->{assignedTelnums}) {
 	      foreach my $number (keys %{$domainPrefs->{assignedTelnums}}) {
-		  push @result, {extension => $number, short => $number} unless $domainPrefs->{assignedTelnums}->{$number}->{'assigned'};
+		  my $gateway = $domainPrefs->{"assignedTelnums"}->{$number}->{"gateway"};
+		  my $prefs = $cli->GetAccountPrefs("pbx\@$defaultDomain");
+		  my @telnum = grep {$_->{"telnum"} eq $number} @{$prefs->{"Gateways"}->{$gateway}->{"callInGw"}->{"telnums"}};
+		  push @result, {extension => $number, short => $number, telnum => @telnum[0] } unless $domainPrefs->{assignedTelnums}->{$number}->{'assigned'};
 	      }
 	  }
 	  last;
       }
   }
-  if ($#result == -1) {
+  if ($#result == 0) {
       push @result, {extension => "", short => "No extansion available for $domain"};
   } else {
       unshift @result, {extension => "", short => "-- Please Select --"};
   }
+  
+  $cli->Logout();
+  return @result;
+}
+
+sub api2_GetExtensionsForPSTN {
+  my %OPTS = @_;
+  my $domain = $OPTS{'domain'};
+  my @domains = Cpanel::Email::listmaildomains();
+  my $cli = getCLI();
+  my @result;
+  for my $dom (@domains) {
+      if ($dom eq $domain) {
+	  my $domainPrefs = $cli->GetAccountDefaultPrefs($domain);
+	  my $domainDefaults = $cli->GetAccountDefaults($domain);
+	  push @result, {selected => $domainDefaults};
+	  push @result, {extension => "none", short => "None"};
+	  my $defaultDomain = $cli->MainDomainName();
+	  if ($domainPrefs->{assignedTelnums}) {
+	      foreach my $number (keys %{$domainPrefs->{assignedTelnums}}) {
+		  my $gateway = $domainPrefs->{"assignedTelnums"}->{$number}->{"gateway"};
+		  my $prefs = $cli->GetAccountPrefs("pbx\@$defaultDomain");
+		  my @telnum = grep {$_->{"telnum"} eq $number} @{$prefs->{"Gateways"}->{$gateway}->{"callInGw"}->{"telnums"}};
+		  push @result, {extension => $number, short => $number, telnum => @telnum[0] };
+	      }
+	  }
+	  last;
+      }
+  }
+  if ($#result == 0) {
+      push @result, {extension => "", short => "No extansion available for $domain"};
+  } else {
+      unshift @result, {extension => "", short => "-- Please Select --"};
+  }
+  
+  $cli->Logout();
+  return @result;
+}
+
+sub api2_GetXMPPStatus {
+  my %OPTS = @_;
+  my $account = $OPTS{'account'};
+  my $cli = getCLI();
+  my @result;
+
+  my $status = $cli->GetAccountPresence($account);
+  if (ref($status) eq "ARRAY") {
+      $status = $status->[0];
+  }
+  push @result, {status => $status};
+  
   $cli->Logout();
   return @result;
 }
@@ -2769,16 +2915,8 @@ sub api2_DKIMVerification {
 
 sub api2_doUpdateSignalRule {
     my %OPTS = @_;
-    my $formdump = $OPTS{'formdump'};
-    my $params = {};
+    my $params = $OPTS{'formdump'};
     my $locale = Cpanel::Locale->get_handle();
-    for my $row (split "\n", $formdump) {
-	if ($row =~ m/^(\S+)\s\=\s(.*?)$/) {
-	    my $key =$1;
-	    my $value = $2;
-	    $params->{$key} = $value;
-	}
-    }
     my $return = {};
     my $cli = getCLI();
     if ($params->{ruleName} && $params->{RequestURI}) {
@@ -2790,9 +2928,9 @@ sub api2_doUpdateSignalRule {
 	$rule->[2] = [];
 	push @{	$rule->[2]}, ['Method', 'is', 'INVITE'];
 	push @{	$rule->[2]}, ['RequestURI', 'is', "sip:" . $params->{RequestURI}];
-	my $timeOfDay = $params->{fromHour} . ":" .$params->{fromMinutes} . "-" . $params->{toHour} . ":" . $params->{toMinutes};
+	my $timeOfDay = $params->{fromHour} . "-" . $params->{toHour};
 	if ($timeOfDay =~ m/^\d\d:\d\d-\d\d:\d\d$/) {
-	    push @{$rule->[2]}, ["Time Of Day", 'in', $params->{fromHour} . ":" .$params->{fromMinutes} . "-" . $params->{toHour} . ":" . $params->{toMinutes}];
+	    push @{$rule->[2]}, ["Time Of Day", 'in', $params->{fromHour} . "-" . $params->{toHour}];
 	}
 	if ($params->{weekDays}) {
 	    push @{$rule->[2]}, [ "Current Day", "in", join(",", map { $params->{$_} } grep { /^weekDays\-?/ }  sort keys %$params)];
@@ -3940,12 +4078,29 @@ sub api2_DoAddQueue {
     my @domains = Cpanel::Email::listmaildomains();
     my $cli = getCLI();
     my (undef,$dom) = split '@', $OPTS{'department'};
+    my $return = {};
+    my $fwds = $cli->ListForwarders($dom);	    
+    
+    foreach my $forwarder (@$fwds) {
+	if ($forwarder =~ m/^activequeue_/) {
+	    my $fwd = $cli->GetForwarder("$forwarder\@$dom");
+	    my (undef,$has_name) = split ',', $fwd;
+	    my ($has_name_real, undef) = split '}', $has_name;
+	    if ( $OPTS{'name'} eq $has_name_real ) {
+		$return->{"error"} = "This queue name is already used!";
+	    	$cli->Logout();
+	    	return $return;
+	    }
+	}
+    }
+    
     for my $domain (@domains) {
 	if ($domain eq $dom && $OPTS{'department'}) {
 	    unless ($cli->GetAccountSettings("pbx\@$domain")) {
 		$cli->CreateAccount(accountName => "pbx\@$domain");
 		$cli->SetAccountRights("pbx\@$domain", ['Domain', 'CanImpersonate', 'CanCreateGroups']);
 	    }
+	    
 	    if ($OPTS{'queue'}) {
 	    	$cli->DeleteForwarder($OPTS{'queue'});
 	    }
@@ -3953,12 +4108,20 @@ sub api2_DoAddQueue {
 	    if ($OPTS{'name'}) {
 		$queuestring .= "," . $OPTS{'name'} if $OPTS{'name'};
 	    }
-	    unless ($cli->GetGroup("activequeuegroup_" . $OPTS{'department'})) {
-		$cli->CreateGroup("activequeuegroup_" . $OPTS{'department'}, {EmailDisabled => 'YES'});
+	    if ( !$OPTS{'queue'} ) {
+	    $cli->CreateGroup("activequeuegroup_" . $OPTS{'department'}, {EmailDisabled => 'YES'});
+	    my $error_msg = $cli->getErrMessage();
+	    unless ($error_msg eq "OK") {
+		$return->{"error"} = $error_msg;
+	    	$cli->Logout();
+	    	return $return;
 	    }
+	    }
+	    my $forwarders = $cli->ListForwarders($domain);	    
 	    $cli->CreateForwarder("activequeue_" . $OPTS{'department'}, 'activequeue{' . $queuestring . '}#pbx@' . $domain);
+
 	    $cli->CreateForwarder("activequeuetoggle_" . $OPTS{'department'}, 'togglegroupmember{' . $OPTS{'department'} . ',' . "activequeuegroup_" . $OPTS{'department'} . '}#pbx@' . $domain);
-	    my $forwarders = $cli->ListForwarders($domain);
+	    my $forwarders = $cli->ListForwarders($domain);	    
 	    foreach my $forwarder (@$forwarders) {
 		next unless $forwarder =~ m/^tn\-\d+$/i;
 		my $fwd = $cli->GetForwarder("$forwarder\@$domain");
@@ -3969,8 +4132,9 @@ sub api2_DoAddQueue {
 	    }
 	}
     }
+     
     $cli->Logout();
-    return { msg => ""};
+    return $return;
 }
 
 sub api2_ListQueues {
@@ -4097,15 +4261,7 @@ sub api2_EditIVR {
 
 sub api2_DoEditIVR {
     my %OPTS = @_;
-    my $formdump = $OPTS{'formdump'};
-    my $params = {};
-    for my $row (split "\n", $formdump) {
-	if ($row =~ m/^(\S+)\s\=\s(.*?)$/) {
-	    my $key =$1;
-	    my $value = $2;
-	    $params->{$key} = $value;
-	}
-    }
+    my $params = $OPTS{'formdump'};
     my @domains = Cpanel::Email::listmaildomains();
     my $domain = $domains[0];
     $domain = $params->{'domain'} if $params->{'domain'};
@@ -4349,8 +4505,10 @@ sub api2_UpdateWav {
 		if (!$data) {
 		    $cli->CreateDomain("$domain");
 		}
-		$cli->CreateDomainPBX($domain);
-		$cli->CreateDomainPBX($domain, lc $OPTS{'lang'});
+		if ($OPTS{'lang'} ne 'english') {
+		    $cli->CreateDomainPBX($domain);
+		    $cli->CreateDomainPBX($domain, lc $OPTS{'lang'});
+		}
 		$cli->StoreDomainPBXFile($domain, $filename, encode_base64($filedata, ""));
 		$Cpanel::CPERROR{'CommuniGate'} = $cli->getErrMessage unless ($cli->getErrMessage eq "OK");
 	    } else {
@@ -4702,6 +4860,61 @@ sub api2_DeleteRSIP {
     $cli->Logout();
     return $result;
 }
+
+sub api2_GetAccountDefaults {
+    my %OPTS = @_;
+    my $dom = $OPTS{'domain'};
+    my @domains = Cpanel::Email::listmaildomains();
+    my $cli = getCLI();
+    my $result = {};
+
+    for my $domain (@domains) {
+	if ($domain eq $dom) {
+	    my $acc_defaults = $cli->GetAccountDefaults("sevdip.bg");
+	    $result->{'account_defaults'} = $acc_defaults;
+	    $result->{"domain"}=$dom;
+	    last;
+	}
+    }
+
+    $cli->Logout();
+    return $result;
+}
+
+sub api2_SetDomainPSTN {
+    my %OPTS = @_;
+    my $dom = $OPTS{'domain'};
+    my $number = $OPTS{'extension'};
+    my @domains = Cpanel::Email::listmaildomains();
+    my $cli = getCLI();
+    my $result = {};
+
+    for my $domain (@domains) {
+	if ($domain eq $dom) {
+	    my $defaultDomain = $cli->MainDomainName();
+	    my $myPrefs = $cli->GetAccountDefaultPrefs($domain);
+	    my $gateway = $myPrefs->{"assignedTelnums"}->{$number}->{"gateway"};
+	    my $prefs = $cli->GetAccountPrefs("pbx\@$defaultDomain");
+	    my @telnum = grep {$_->{"telnum"} eq $number} @{$prefs->{"Gateways"}->{$gateway}->{"callInGw"}->{"telnums"}};
+	    $cli->UpdateAccountDefaults(domain => $domain,
+	    				settings => {
+					    PSTNFromName => $telnum[0]->{'username'},
+					    PSTNGatewayAuthName => $telnum[0]->{'authname'},
+					    PSTNGatewayDomain => $telnum[0]->{'domain'},
+					    PSTNGatewayPassword => $telnum[0]->{'authpass'},
+					    PSTNGatewayVia => $telnum[0]->{'domain'}
+	    				});
+	    my $afterPrefs = $cli->GetAccountDefaults($domain);
+	    $result->{'after'} = $afterPrefs;
+	    last;
+	}
+    }
+
+    $cli->Logout();
+    return $result;
+}
+
+
 sub api2_ListAirSyncs {
     my %OPTS = @_;
     my $account = $OPTS{'account'};
@@ -5033,6 +5246,34 @@ sub api2_UpdatePSTN {
 		    PSTNGatewayVia => $rsips->{$OPTS{'rsip'}}->{'domain'}
 					});
 
+	    last;
+	}
+    }
+    $cli->Logout();
+    return $result;
+}
+
+sub api2_UnsetPSTN {
+    my %OPTS = @_;
+    my $account = $OPTS{'account'};
+    my (undef,$dom) = split "@", $account;
+
+    my @domains = Cpanel::Email::listmaildomains();
+    my $cli = getCLI();
+
+    my $result = {};
+    for my $domain (@domains) {
+	if ($domain eq $dom) {
+	    my $defaultDomain = $cli->MainDomainName();
+	    my $myPrefs = $cli->GetAccountDefaultPrefs($domain);
+	    # my ($accType, $account) = split ":", $myPrefs->{"assignedTelnums"}->{$number}->{"assigned"};
+		$cli->UpdateAccountSettings($account, {
+		    PSTNFromName => "default",
+	    	    PSTNGatewayAuthName => "default",
+	    	    PSTNGatewayDomain => "default",
+	    	    PSTNGatewayPassword => "default",
+	    	    PSTNGatewayVia => "default"
+					    });
 	    last;
 	}
     }

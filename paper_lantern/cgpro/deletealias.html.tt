@@ -1,0 +1,19 @@
+[%
+SET CPANEL.CPVAR.dprefix = "../";
+SET CPANEL.CPVAR.headerimg = "../images/mailmenu.gif";
+%]
+
+[% WRAPPER '_assets/master.html.tt'
+app_key = 'cgpro_extensions'
+-%]
+
+<div class="body-content">
+  <p>
+      [% locale.maketext("Are you sure you want to delete extension “[_1]”?", FORM.alias ) %]</p>
+  <p> 
+  <a class="btn btn-primary" href="dodeletealias.html?alias=[% RAW_FORM.item('alias') %]&account=[% RAW_FORM.item('account') %]">Delete</a> 
+  <a class="btn btn-link" href="extensions.html">Cancel</a>
+</p>
+[% INCLUDE _assets/return_link.html.tt return_location='extensions.html' return_link_text=locale.maketext('Go Back') %]
+</div>
+[% END %]

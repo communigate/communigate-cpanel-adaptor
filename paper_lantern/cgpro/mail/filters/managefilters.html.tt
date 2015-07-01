@@ -1,40 +1,105 @@
 [%
 SET CPANEL.CPVAR.dprefix = "../../../";
 SET api2_result_Email_listpops =  Api2.exec("CommuniGate", "ListAccounts", {} );
+api2_result_Email_listpops = api2_result_Email_listpops.0.accounts;
 %]
 
-
 [% WRAPPER '_assets/master.html.tt'
-app_key = 'user_filters'
+app_key = 'cgpro_user_filters'
 %]
 
 <div class="body-content">
+  [% IF CPANEL.feature('cgpro_filters') %]
   <div class="section">
     <h2 id="hdrByUsers">[% locale.maketext("Filters by Users") %]</h2>
+
+    <div class="form-group">
+      <label>[% locale.maketext("Search") %]:</label>
+      <div class="row">
+	<div class="col-xs-6 col-sm-3 col-md-3 col-lg-3">
+          <input type="text" id="search_input" size="15" class="form-control" name="searchregex" value="[% FORM.searchregex %]">
+	  <input type="hidden" name="account" value="[% FORM.account %]" />
+	  <input type="hidden" name="period" value="[% FORM.period %]" />
+	  [% IF FORM.searchregex %]<a href="callregister.html?account=[% FORM.account %]&amp;period=[% FORM.period %]">[% locale.maketext('CGPClear') %]</a>[% END -%]
+	</div>
+        <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+          <input id="email_table_clear_search" type="button" class="btn btn-primary" value="[% locale.maketext("Clear")  %]" onclick="clear_search()" />
+        </div>
+      </div>
+    </div>
+
     <table id="actiontbl" class="sortable table table-striped">
+      <colgroup>
+	<col width="85%" align="left" />
+	<col width="15%" align="left" />
+      </colgroup>
+      
       <thead>
         <tr>
           <th>[% locale.maketext("Account") %]</th>
-          <th>[% locale.maketext("Actions") %]</th>
+          <th class="sorttable_nosort" style="text-align: center">[% locale.maketext("Actions") %]</th>
         </tr>
       </thead>
       <tbody>
         [% IF api2_result_Email_listpops.size %]
         [% FOREACH account IN api2_result_Email_listpops %]
-        <tr>
-          <td>[% account %]</td>
+        <tr class="result_rows">
+          <td class="td1">[% account.key %]</td>
           <td><div>
-              <a class="btn btn-link" href="userfilters.html?account=[% account %]">
+              <a class="btn btn-link" href="userfilters.html?account=[% account.key %]">
                 <span class="fa fa-wrench fa-lg"></span>
                 [% locale.maketext("Manage Filters") %]</a>
           </div></td>
         </tr>
         [% END %]
         [% END %]
+	<tr class="no_results" style="display: none; background: #F9F9F9"><td colspan="2">No Results Found!</td></tr>
       </tbody>
     </table>
   </div>
   [% INCLUDE _assets/return_link.html.tt return_location='../../../index.html' return_link_text=locale.maketext('Go Back') %]
-</div><!-- end body-content -->
 
+  [% ELSE %]
+  [% PROCESS cgpro/icn_description.html.tt %]
+  [% END %]
+</div><!-- end body-content -->
 [% END %]
+    <script>
+      var clear_search = function() {
+      YAHOO.util.Dom.get("search_input").value = "";
+      search_logs();
+      };
+
+      var search_logs = function() {
+      
+      $(".result_rows").each( function(index) {
+      $(this).css("display", "")
+      });
+      
+        var no_rows = 0;       
+
+        $(".result_rows").each( function(index) {
+          no_rows = 0;
+          $(".no_results").css("display", "none");
+          var searchstring = "";
+          var searchregex = $("#search_input").val();
+          searchstring += $(this).find(".td1").html();
+          var res = searchstring.match(searchregex);
+
+      if (!res) {
+            $(this).css("display", "none");
+          }
+          var none = $(this).css("display");
+          if (none != "none") {
+            no_rows += 1;
+          }
+        });
+      
+        if (no_rows == 0) {
+        $(".no_results").show();
+        }
+      }   
+
+      $("#search_input").keyup( search_logs );
+
+    </script>

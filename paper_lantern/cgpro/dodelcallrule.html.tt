@@ -1,0 +1,35 @@
+[%
+SET CPANEL.CPVAR.dprefix = "../";
+SET CPANEL.CPVAR.headerimg = "../images/mailmenu.gif";
+
+SET update_rule = Api2.exec("CommuniGate", "delSignalRule", {
+"rule" = RAW_FORM.item("rule"),
+"domain" = RAW_FORM.item("domain")
+});
+%]
+
+[% WRAPPER '_assets/master.html.tt'
+app_key = 'cgpro_call_rules'
+-%]
+<div class="body-content">
+  <div class="section">
+    [% IF CPANEL.CPERROR.item('CommuniGate') %]
+    <div class="alert alert-danger">
+      <span class="glyphicon glyphicon-remove-sign"></span>
+      <div class="alert-message">
+        [% CPANEL.CPERROR.item('CommuniGate') %]
+      </div>
+    </div>
+    [% ELSE -%]
+    <div class="alert alert-success">
+      <span class="glyphicon glyphicon-ok-sign"></span>
+      <div class="alert-message">
+        [% locale.maketext("Rule Deleted")%]
+      </div>
+    </div>
+    [% END %]
+    
+    [% INCLUDE _assets/return_link.html.tt return_location='call_rules.html' return_link_text=locale.maketext('Go Back') %]
+  </div>
+</div>
+[% END %]

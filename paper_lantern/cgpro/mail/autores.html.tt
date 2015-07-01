@@ -1,11 +1,11 @@
 [% SET CPANEL.CPVAR.dprefix = "../../" %]
 
 [% WRAPPER '_assets/master.html.tt'
-    app_key = 'autoresponders'
+    app_key = 'cgpro_autoresponders'
  -%]
 <div class="body-content">
 
-[% IF CPANEL.feature('autoresponders') %]
+[% IF CPANEL.feature('cgpro_autoresponders') %]
 
     <div class="section">
         [% IF !(ExpVar.expand('$appname') == "webmail") %]
@@ -97,9 +97,11 @@
     </div>
 
     [% INCLUDE _assets/return_link.html.tt return_location='../../index.html' return_link_text=locale.maketext('Go Back') %]
-
-[% END %]<!-- end cpanelfeature autoresponders -->
-
+    
+    [% ELSE %]
+    [% PROCESS cgpro/icn_description.html.tt %]
+    [% END %]<!-- end cpanelfeature autoresponders -->
+    
 </div><!-- end body-content -->
 [% END %]
 

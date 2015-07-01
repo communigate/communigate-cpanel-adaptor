@@ -40,8 +40,6 @@ migrate_accounts = migrate_accounts.0;
     app_key = 'cgpro_migration_wizard'
 -%]
 
-[% USE dumper %]
-
 <div class="body-content">
   <div class="section">
 

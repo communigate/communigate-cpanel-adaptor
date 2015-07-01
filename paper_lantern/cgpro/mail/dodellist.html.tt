@@ -1,7 +1,7 @@
 [% SET CPANEL.CPVAR.dprefix="../../"  %]
 
 [% WRAPPER '_assets/master.html.tt'
-    app_key = 'mailing_lists'
+    app_key = 'cgpro_mailing_lists'
 -%]
 <div class="body-content">
 

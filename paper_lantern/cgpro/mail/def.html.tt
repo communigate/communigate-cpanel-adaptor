@@ -6,10 +6,11 @@ SET def_addresses = Api2.exec("CommuniGate","ListDefAddress", {});
 
 [%# js_code = PROCESS js_block %]
 [% WRAPPER '_assets/master.html.tt'
-    app_key = 'default_address'
+    app_key = 'cgpro_default_address'
  -%]
 
 <div class="body-content">
+  [% IF CPANEL.feature('cgpro_defaultaddress') %]
     <p id="defaultAddressDesc" class="description">
         [% locale.maketext("The default email address will \"catch\" any mail that is sent to an invalid email address for your domain. You can also choose to Discard, Reject, or Accept and bounce any mails sent to an invalid email address for your domain.") %]
 
@@ -47,9 +48,11 @@ SET def_addresses = Api2.exec("CommuniGate","ListDefAddress", {});
         </form>
 	[% END -%]
       </table>
-
       [% INCLUDE _assets/return_link.html.tt return_location='../../index.html' return_link_text=locale.maketext('Go Back') %]
 
+      [% ELSE %]
+      [% PROCESS cgpro/icn_description.html.tt %]
+      [% END %]
 </div>
 
 [% END %]

@@ -1,0 +1,390 @@
+[% MACRO filter_option(pval, val, text) BLOCK -%]
+<option value="[% val %]"[% val == pval ? " selected='selected'" : "" %]>[% locale.maketext(text) %]</option>
+[% END -%]
+
+[%
+SET rsip_accounts = Api2.exec("CommuniGate", "ListAccounts", {});
+rsip_accounts = rsip_accounts.0.accounts;
+%]
+
+[% IF RAW_FORM.item("rsip_account") %]
+[%
+SET all_rsip = Api2.exec("CommuniGate", "ListRSIP", {
+"account" = RAW_FORM.item("rsip_account")
+});
+rsip = all_rsip.0.rsip;
+settings = all_rsip.0.settings;
+rsipInfo = all_rsip.0.rsipInfo;
+%]
+[% END %]
+
+[%
+SET CPANEL.CPVAR.dprefix = "../";
+SET CPANEL.CPVAR.headerimg = "../images/mailmenu.gif";
+
+SET assign_extension = Api2.exec("CommuniGate", "AssignExtension", {
+"account" = RAW_FORM.item("account"),
+"extension" = RAW_FORM.item("extension"),
+"local_extension" = RAW_FORM.item("local_extension")
+});
+
+departments = assign_extension.0.departments;
+queues = assign_extension.0.queues;
+ivrs = assign_extension.0.ivrs;
+classes = assign_extension.0.classes;
+accounts = assign_extension.0.accounts;
+
+SET extensions = Api2.exec("CommuniGate", "ListExtensions", {
+"account" = RAW_FORM.item("account"),
+"extension" = RAW_FORM.item("extension"),
+"local_extension" = RAW_FORM.item("local_extension")
+});
+
+SET domains = Api2.exec("Email", "listmaildomains", {});
+%]
+
+[% IF RAW_FORM.item("extension2") %]
+[%
+SET assign_ext_domain = Api2.exec("CommuniGate", "SetDomainPSTN", {
+"domain" = RAW_FORM.item("domain"),
+"extension" = RAW_FORM.item("extension2"),
+});
+%]
+[% END %]
+
+[%
+SET account_defaults = Api2.exec("CommuniGate", "GetAccountDefaults", {
+"domain" = domains.0.domain
+});
+%]
+
+[%
+SET list_aliases = Api2.exec("CommuniGate", "GetAccountAliases", {
+"account" = "spalazliev@sevdip.bg"
+});
+list_aliases = list_aliases.0.aliases;
+%]
+
+[% WRAPPER '_assets/master.html.tt'
+app_key = 'cgpro_extensions'
+-%]
+
+<style>
+  .rsip {
+  margin-top: 30px;
+  }
+</style>
+
+<div class="body-content">
+  [% IF CPANEL.feature('cgpro_extensions') %]
+  <div class="section">
+    <div id="setpstntodomain" style="display:none">
+      <h3>[% locale.maketext("Assign outgoing number to domain") %]</h3>
+      <form id="mainform2" method="post" action="" name="mainform2">
+	<div class="form-group">
+	  <label>[% locale.maketext("Assign To:") %]</label>
+	  <div class="row">
+	    <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	      <select name="domain" id="domain" class="form-control">
+		[% FOREACH domain IN domains %]
+		<option value="[% domain.domain %]">[% domain.domain %]</option>
+		[% END %]
+	      </select>
+	    </div>
+	  </div>
+	</div>
+	<div class="form-group">
+	  <label>[% locale.maketext("Extension:") %]</label>
+	  <div class="row">
+	    <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	      <select name="extension2" id="extension2" class="form-control">
+		<option value="s">Please Select 'Assign to' first</option>
+	      </select>
+	    </div>
+	  </div>
+	</div>
+	<div class="form-group">
+	  <input id="new_email_submit2" class="btn btn-primary" type="submit" value="[% locale.maketext("Assign outgoing number to domain") %]" tabindex="5" />
+	</div>
+      </form>
+    </div>
+    <div id="assign_phone_number_did" style="display: none;">
+    <h3>[% locale.maketext("Assign outgoing number to account") %]</h3>
+    <form id="mainform" method="post" action="" name="mainform">
+      <div class="form-group">
+	<label>[% locale.maketext("Assign To:") %]</label>
+	<div class="row">
+	  <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	    <select name="account" id="account" class="form-control">
+	      [% FOREACH account IN accounts %]
+	      [% myclass = account.value.details.ServiceClass -%]
+	      [% classstring = classes.$myclass.AccessModes.join(',') -%]
+	      [% IF classstring == 'All' || classstring.search("SIP") -%]
+	      <option value="a:[% account.key %]">[% account.key %] ([% locale.maketext("CGPAccount") %])</option>
+	      [% END -%]
+	      [% END %]
+	      [% FOREACH account IN departments -%]
+	      <option value="g:[% account %]">[% account %] ([% locale.maketext("CGPDepartment") %])</option>
+	      [% END -%]
+	      [% FOR queue IN queues -%]
+	      <option value="q:[% queue.value %]">[% queue.name %] ([% locale.maketext("CGPQueue") %])</option>
+	      [% END -%]
+	      [% FOR ivr IN ivrs -%]
+  	      <option value="i:[% ivr.value %]">[% ivr.name %] ([% locale.maketext("CGPIVRMenu") %])</option>
+	      [% END -%]
+	    </select>
+	  </div>
+	  <div id="realanem_error"></div>
+	</div>
+      </div>
+
+      <div class="form-group">
+	<label>[% locale.maketext("Extension:") %]</label>
+	<div class="row">
+	  <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	    <select name="extension" id="extension" class="form-control">
+	      <option value="s">Please Select 'Assign to' first</option>
+	    </select>
+	  </div>
+	</div>
+      </div>
+
+      <div class="form-group">
+	<input id="new_email_submit" class="btn btn-primary" type="submit" value="[% locale.maketext("CGPAssignExtension") %]" tabindex="5" />
+      </div>
+    </form>
+    </div>
+
+    <h3>[% locale.maketext("CGPAssignLocalExtension") %]</h3>
+    <form id="mainform" method="post" action="" name="mainform">
+      [% IF CPANEL.CPERROR.CommuniGate_local_extension -%]
+      <pre>
+	[% CPANEL.CPERROR.CommuniGate_local_extension | ucfirst %].
+      </pre>
+      [% END -%]
+      <div class="form-group">
+	<label>[% locale.maketext("Assign To:") %]</label>
+	<div class="row">
+	  <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	    <select name="account" class="form-control">
+	      [% FOR account = accounts.keys.sort -%]
+	      [% myclass = accounts.$account.details.ServiceClass -%]
+	      [% classstring = classes.$myclass.AccessModes.join(',') -%]
+	      [% IF classstring == 'All' || classstring.search("SIP") -%]
+	      <option value="a:[% account %]">[% account %] ([% locale.maketext("CGPAccount") %])</option>
+	      [% END -%]
+	      [% END -%]
+	      [% FOR account = departments -%]
+	      <option value="[% account %]">[% account %] ([% locale.maketext("CGPDepartment") %])</option>
+	      [% END -%]
+	      [% FOR queue = queues -%]
+	      <option value="[% queue.value %]">[% queue.name %] ([% locale.maketext("CGPQueue") %])</option>
+	      <option value="[% queue.toggle %]">[% queue.name %] ([% locale.maketext("CGPQueueToggleAgent") %])</option>
+	      [% END -%]
+	      [% FOR ivr = ivrs -%]
+	      <option value="[% ivr.value %]">[% ivr.name %] ([% locale.maketext("CGPIVRMenu") %])</option>
+	      [% END -%]
+	    </select>
+	  </div>
+	  <div id="realname_error" class="col-xs-12 col-sm-6 col-md-6 col-lg-6"></div>	  
+	</div>
+      </div>
+      <div class="form-group">
+	<label for="email">[% locale.maketext("CGPLocalExtension") %]:</label>
+	<div class="row">
+	  <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	    <input type="text" name="local_extension" id="local_extension" class="form-control"/>
+	  </div>
+	  <div id="local_extension_error" class="col-xs-12 col-sm-6 col-md-6 col-lg-6"></div>	  
+	</div>
+      </div>
+      <div class="form-group">
+	<input id="add_local_extension" class="btn btn-primary" type="submit" value="[% locale.maketext("CGPAssignLocalExtension") %]" tabindex="5" />
+      </div>
+    </form>
+  </div>
+
+<script type="text/javascript">
+var LANG = {};
+LANG.local_extension_input = "[% locale.maketext("CGPLocalExtension") %]";
+LANG.local_extension_input_invalid = "[% locale.maketext('CGPLocalExtensionInvalid','{min}', '{max}') %]";
+CPANEL.validate.verify_local_extension_local = function (e) {
+    return CPANEL.validate.positive_integer(e) && CPANEL.validate.greater_than(e,200) && CPANEL.validate.less_than(e,1000);
+};
+var getExtensions = function () {
+    var select = document.getElementById("account");
+    var wrap = document.getElementById("extension");
+    wrap.innerHTML = "";
+
+    YAHOO.util.Connect.asyncRequest('GET', 'getextensions.html?domain=' + select.value.split("@")[1], {
+	    success: function(o) {
+		wrap.innerHTML = o.responseText;
+if ( $("#extension option").length > 1 ) {
+$("#assign_phone_number_did").show();
+}
+	    },
+		}, null);
+};
+
+var getExtensions2 = function () {
+    var select = document.getElementById("domain");
+    var wrap = document.getElementById("extension2");
+    wrap.innerHTML = "";
+
+    YAHOO.util.Connect.asyncRequest('GET', 'getextensionsfordomain.html?domain=' + select.value, {
+	    success: function(o) {
+
+		wrap.innerHTML = o.responseText;
+if ( $("#extension2 option").length > 1 ) {
+$("#setpstntodomain").show();
+}
+	    },
+		}, null);
+};
+
+YAHOO.util.Event.onDOMReady(function () {
+	getExtensions();
+	getExtensions2();
+	YAHOO.util.Event.addListener("account", "change", getExtensions);
+	YAHOO.util.Event.addListener("domain", "change", getExtensions2);
+	var VAL_LOCAL_EXT = new CPANEL.validate.validator(LANG.local_extension_input);
+	VAL_LOCAL_EXT.add("local_extension", 'verify_local_extension_local', YAHOO.lang.substitute(LANG.local_extension_input_invalid,{min: 200, max: 999}));
+	VAL_LOCAL_EXT.attach();
+	CPANEL.validate.attach_to_form("add_local_extension", [VAL_LOCAL_EXT]);
+    });
+</script>
+
+  <table border="0" cellpadding="5" width="550" cellspacing="0" id="mailtbl" class="table table-striped">
+    <colgroup>
+      <col width="12%" align="left" />
+      <col width="25%" align="left" />
+      <col width="30%" align="center" />
+    </colgroup>
+    <thead>
+    <tr>
+      <th>[% locale.maketext("Extensions /<br> Phone Numbers (DID)") %]</th>
+      <th>[% locale.maketext("Assigned To") %]</th>
+      <th class="sorttable_nosort">[% locale.maketext("Functions") %]</th>
+    </tr>
+    </thead>
+    
+    [% FOR extension IN extensions -%]
+    <tr class="row-[% loop.count % 2 ? 'even' : 'odd' %]">
+      <td class="truncate">[% extension.html_dest %]</td>
+      <td class="truncate">[% extension.html_forward %]</td>
+      <td>
+	<a href="deleteextension.html?extension=[% extension.uri_dest %]&amp;display=[% extension.html_dest %]"><span class="glyphicon glyphicon-trash"></span> [% locale.maketext('Delete') %]</a>[% IF extension.type == "number" && extension.assignedType == "a" %], 
+	[% UNLESS extension.out -%]
+	<a href="setoutgoingnumber.html?extension=[% extension.uri_dest %]"><span class="glyphicon glyphicon-arrow-right"></span> [% locale.maketext('Set As Outgoing') %]</a>
+	[% ELSE %]
+	<a href="unsetoutgoingnumber.html?extension=[% extension.uri_dest %]"><span class="glyphicon glyphicon-remove"></span> [% locale.maketext('Unset As Outgoing') %]</a>
+	[% END -%]
+	[% END %]
+      </td>
+    </tr>
+    [% END -%]
+
+    [% aliases_count = 0 %]
+    [% FOR account = accounts.keys.sort -%]
+    [%
+    SET list_aliases = Api2.exec("CommuniGate", "GetAccountAliases", {
+    "account" = account
+    });
+    list_aliases = list_aliases.0.aliases;
+    %]
+    [% aliases_count = aliases_count + list_aliases.size %]
+
+    [% FOR alias = list_aliases -%]
+    <tr>
+      <td>[% alias %]</td>
+      <td>[% account %]</td>
+      <td>
+	<a href="deletealias.html?alias=[% alias %]&account=[% account %]"><span class="glyphicon glyphicon-trash"></span> [% locale.maketext('Delete') %]</a>
+      </td>
+    </tr>
+    [% END %]
+    [% END %]
+
+    [% IF extensions.size() == 0 %]
+    [% IF aliases_count == 0 %]
+    <tr>
+    <td colspan="3">Currently there aren't any extensions!</td>
+    </tr>
+    [% END %]
+    [% END %]
+  </table>
+
+
+  <div class="rsip">
+    <h3>SIP Registration</h3>
+    <div class="form-group">
+      <label>[% locale.maketext("CGPAccount") %]:</label>
+      <div class="row">
+	<div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	  <form action="" class="" method="GET" id="selectAccount">
+	    <select id="rsip_account" class="form-control" onchange="toggle_account()" name="rsip_account">
+	      [% FOR account IN rsip_accounts.sort -%]
+	      [% filter_option(FORM.rsip_account, account, account) %]
+	      [% END -%]
+	    </select>
+	  </form>
+	  
+	  [% IF !RAW_FORM.item("rsip_account") %]
+	  <script type="text/javascript">
+	    YAHOO.util.Dom.get("selectAccount").submit();
+	  </script>
+	  [% END %]
+	</div>
+      </div>
+    </div>
+    <script type="text/javascript">
+      function toggle_account () {
+      document.getElementById("selectAccount").submit();
+      }
+    </script>    
+    [% IF RAW_FORM.item("rsip_account") %]
+    <div class="form-group">
+      <a class="btn btn-primary" href="editrsip.html?account=[% FORM.rsip_account %]">[% locale.maketext("Add SIP Registration") %]</a>
+    </div>
+    <table border="0" cellpadding="5" cellspacing="0" id="mailtbl" class="table table-striped">
+      <thead>
+	<tr>
+	  <th class="cell">[% locale.maketext("SIP registrations") %]</th>
+	  <th class="cell">[% locale.maketext("CGPStatus") %]</th>
+	  <th class="cell-end sorttable_nosort">[% locale.maketext("Functions") %]</th>
+	</tr>
+      </thead>
+      <tbody>
+	[% FOR sip IN rsip.keys.sort -%]
+	<tr>
+	  <td class="truncate">[% sip %][% IF settings.PSTNFromName == rsip.$sip.fromName && settings.PSTNGatewayAuthName == rsip.$sip.authName %] ([% locale.maketext("CGPOutgoing") %])[% END %]</td>
+	  <td class="truncate">
+	    [% rsipInfo.$sip.completed.replace("(\#T|\_)"," ") %]
+	    [% rsipInfo.$sip.errorCode %]
+	  </td>
+	  <td>
+	    <a href="editrsip.html?account=[% FORM.rsip_account %]&amp;rsip=[% sip %]"><span class="glyphicon glyphicon-pencil"></span> [% locale.maketext('CGPViewEdit') %]</a> ,
+	    <a href="deletersip.html?account=[% FORM.rsip_account %]&amp;rsip=[% sip %]"><span class="glyphicon glyphicon-trash"></span> [% locale.maketext('Delete') %]</a>
+	    [% IF settings.PSTNFromName == rsip.$sip.fromName && settings.PSTNGatewayAuthName == rsip.$sip.authName %]
+	    , <a href="unsetaccountpstn.html?account=[% FORM.rsip_account %]"><span class="glyphicon glyphicon-remove"></span> [% locale.maketext('Unset As Outgoing') %]</a>
+	    [% END %]
+	    [% UNLESS settings.PSTNFromName == rsip.$sip.fromName && settings.PSTNGatewayAuthName == rsip.$sip.authName %]
+	    , <a href="updatepstn.html?account=[% FORM.rsip_account %]&amp;rsip=[% sip %]"><span class="glyphicon glyphicon-arrow-right"></span> [% locale.maketext('Set as outgoing') %]</a>
+	    [% END -%]
+	  </td>
+	</tr>
+	[% END -%]
+	[% UNLESS rsip.keys.size -%]
+	<tr>
+	  <td class="truncate" colspan="4">[% locale.maketext("No SIP registrations.") %]</td>
+	</tr>
+	[% END -%]
+      </tbody>
+    </table>
+    [% END %]
+  </div>
+  [% ELSE %]
+  [% PROCESS icn_description.html.tt %]
+  [% END %]
+</div>
+[% END %]

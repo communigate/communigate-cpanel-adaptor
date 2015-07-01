@@ -5,7 +5,7 @@ SET mail_domains = execute("Email", "list_mail_domains", {});
 
 [% js_code = PROCESS js_block %]
 [% WRAPPER '_assets/master.html.tt'
-    app_key = 'mailing_lists'
+    app_key = 'cgpro_mailing_lists'
     page_js = js_code
 -%]
 <h2>[% locale.maketext("Rename Mailing List") %]</h2>

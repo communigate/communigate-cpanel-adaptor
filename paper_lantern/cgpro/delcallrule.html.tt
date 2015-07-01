@@ -1,0 +1,23 @@
+[%
+SET CPANEL.CPVAR.dprefix = "../";
+SET CPANEL.CPVAR.headerimg = "../images/mailmenu.gif";
+
+SET update_rule = Api2.exec("CommuniGate", "doUpdateSignalRule", {
+"form" = RAW_FORM
+});
+%]
+
+[% WRAPPER '_assets/master.html.tt'
+app_key = 'cgpro_call_rules'
+-%]
+<div class="body-content">
+  <p>
+    [% locale.maketext("Are you sure you want to delete extension “[_1]”?", FORM.rule ) %]
+  </p>
+  <p> 
+    <a class="btn btn-primary" href="dodelcallrule.html?rule=[% RAW_FORM.item('rule') %]&domain=[% RAW_FORM.item('domain') %]">Delete</a> 
+    <a class="btn btn-link" href="call_rules.html">Cancel</a>
+  </p>
+  [% INCLUDE _assets/return_link.html.tt return_location='call_rules.html' return_link_text=locale.maketext('Go Back') %]
+</div>
+[% END %]

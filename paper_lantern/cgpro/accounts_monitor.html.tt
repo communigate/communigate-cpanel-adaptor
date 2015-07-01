@@ -1,0 +1,126 @@
+[%
+SET CPANEL.CPVAR.dprefix = "../";
+SET CPANEL.CPVAR.headerimg = "../images/mailmenu.gif";
+
+SET accounts = Api2.exec("CommuniGate", "ListAccounts", {
+});
+accounts = accounts.0.accounts;
+
+SET status = Api2.exec("CommuniGate", "GetXMPPStatus", {
+"account" = "spalazliev@sevdip.bg"
+});
+%]
+
+[% WRAPPER '_assets/master.html.tt'
+    app_key = 'cgpro_account_status_monitor'
+-%]
+
+<div class="body-content">
+  [% IF CPANEL.feature('cgpro_account_status_monitor') %]
+  <div class="section">
+    <h2 id="hdrEmailAccounts">[% locale.maketext("Accounts")  %]</h2>
+    <div class="row">
+      <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+        <div class="row">
+          <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	    <label>[% locale.maketext("Search")  %]</label>
+            <input id="search_input" type="text" class="form-control" />
+          </div>
+          <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+            <input id="email_table_clear_search" type="button" class="btn btn-primary" value="[% locale.maketext("Clear")  %]" style="margin-top: 23px;" onclick="clear_search()" />
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="accounts_table" class="yui-skin-sam">	
+      <table class="table table-striped">
+	<colgroup>
+	  <col width="50%" align="left" />
+	  <col width="50%" align="left" />
+	</colgroup>
+	<thead>
+	  <tr>
+	    <th>Account</th>
+	    <th>Status</th>
+	  </tr>
+	</thead>
+	[% IF accounts.size == 0 %]
+	<tr><td>No accounts!</td></tr>
+	[% ELSE %]
+	[% FOREACH account IN accounts %]
+	[%
+	SET status = Api2.exec("CommuniGate", "GetXMPPStatus", {
+	"account" = account.key
+	});
+	%]
+	<tr class="result_rows">
+	  <td class="td1">[% account.key %]</td>
+	  [% IF status.0.status == "#NULL#" %]
+	  [% status.0.status = "offline" %]
+	  <td><span class="glyphicon glyphicon-off"></span> [% status.0.status %]</td>
+	  [% ELSE %]
+	  <td>
+	    [% IF status.0.status == "online" %]
+	    <span class="glyphicon glyphicon-user" style="color: #64BB0F"></span>
+	    [% ELSIF status.0.status == "busy" %]
+	    <span class="glyphicon glyphicon-minus-sign" style="color: #ff0000"></span>
+	    [% ELSIF status.0.status == "be-back" %]
+	    <span class="glyphicon glyphicon-tag" style="color: #D8C101"></span>
+	    [% ELSIF status.0.status == "on-phone" %]
+	    <span class="glyphicon glyphicon-earphone" style="color: #ff0000"></span>
+	    [% ELSIF status.0.status == "away" %]
+	    <span class="glyphicon glyphicon-user" style="color: #D8C101"></span>
+	    [% ELSIF status.0.status == "in-meeting" %]
+	    <span class="glyphicon glyphicon-minus-sign" style="color: #ff0000"></span>
+	    [% ELSIF status.0.status == "out-lunch" %]
+	    <span class="glyphicon glyphicon-cutlery"></span>
+	    [% END %]
+	    [% status.0.status %]
+	  </td>
+	  [% END %]
+	</tr>
+	[% END %]
+	[% END %]
+	<tr class="no_results" style="display: none;"><td colspan="2">No results!</td></tr>
+      </table>
+    </div>
+    <div id="menus_div"></div>
+  </div>
+  [% ELSE %]
+  [% PROCESS cgpro/icn_description.html.tt %]
+  [% END %]
+</div>
+<script>
+  var clear_search = function() {
+  YAHOO.util.Dom.get("search_input").value = "";
+  search_logs();
+  };
+
+  var search_logs = function() {
+  $(".result_rows").each( function(index) {
+  $(this).css("display", "")
+  });
+  var no_rows = 0;       
+  
+  $(".result_rows").each( function(index) {
+  $(".no_results").css("display", "none");
+  var searchstring = "";
+  var searchregex = $("#search_input").val();
+  searchstring += $(this).find(".td1").html();
+  var res = searchstring.match(searchregex);
+  if (!res) {
+  $(this).css("display", "none");
+  }
+  var none = $(this).css("display");
+  if (none != "none") {
+  no_rows += 1;
+  }
+  });
+  console.log(no_rows);
+  if (no_rows == 0) {
+  $(".no_results").show();
+  }
+  }   
+  $("#search_input").keyup( search_logs );
+</script>
+[% END %]

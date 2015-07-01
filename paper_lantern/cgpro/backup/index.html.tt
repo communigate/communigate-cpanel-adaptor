@@ -32,15 +32,12 @@ SET forwarders = Api2.exec("CommuniGate", "ListForwardersBackups");
 SET accounts = Api2.exec("CommuniGate", "ListAccountsBackups");
 %]
 
-[% js_code = PROCESS js_block %]
-
 [% WRAPPER '_assets/master.html.tt'
-    page_js = js_code
     app_key = 'cgpro_backup'
 -%]
 
 <div class="body-content">
-
+  [% IF CPANEL.feature('cgpro_backup') %]
     <div class="section">
 
         [% IF CPANEL.feature("mysql") %]
@@ -55,13 +52,21 @@ SET accounts = Api2.exec("CommuniGate", "ListAccountsBackups");
                     </tr>
                     </thead>
                     <tbody>
+		      [% IF mysql_list_db_backups.size() < 1 %]
                         [% FOREACH hashref IN mysql_list_db_backups %]
                         <tr>
                             <td class="cell nobrd-left truncate" truncatefixed="25">
                                 <a href="[% CPANEL.ENV.cp_security_token %]/getsqlbackup/[% hashref.db | url %].sql.gz" id="databases_[% loop.count() %]">[% hashref.db.html() %]</a>
                             </td>
                         </tr>
-                        [% END %]
+			[% END %]
+		    [% ELSE %]
+                    <tr>
+                        <td class="cell nobrd-left truncate" truncatefixed="25">
+			  [% locale.maketext("There aren't any forwarders to download") %]
+                        </td>
+                    </tr>
+		    [% END %]
                     </tbody>
                 </table>
             </div>
@@ -98,6 +103,7 @@ SET accounts = Api2.exec("CommuniGate", "ListAccountsBackups");
                         </th>
                     </tr>
                     <tbody>
+		    [% IF forwarders.size() %]
                     [% FOREACH hashref IN forwarders %]
                     <tr>
                         <td class="cell nobrd-left truncate" truncatefixed="25">
@@ -106,6 +112,14 @@ SET accounts = Api2.exec("CommuniGate", "ListAccountsBackups");
                         </td>
                     </tr>
                     [% END %]
+		    
+		    [% ELSE %]
+                    <tr>
+                        <td class="cell nobrd-left truncate" truncatefixed="25">
+			  [% locale.maketext("There aren't any forwarders to download") %]
+                        </td>
+                    </tr>
+		    [% END %]
                     </tbody>
                 </table>
             </div>
@@ -143,14 +157,23 @@ SET accounts = Api2.exec("CommuniGate", "ListAccountsBackups");
                         </th>
                     </tr>
                     <tbody>
-                    [% FOREACH hashref IN accounts %]
+		      [% IF accounts.size() %]
+                      [% FOREACH hashref IN accounts %]
                     <tr>
                         <td class="cell nobrd-left truncate" truncatefixed="25">
                             <a href="getaccbackup.live.cgi?domain=[% hashref.domain | url %]" id="accounts_[% loop.count() %]">[%- hashref.domain.html() -%]</a>
 
                         </td>
                     </tr>
-                    [% END %]
+			[% END %]
+		    [% ELSE %]
+                    <tr>
+                        <td class="cell nobrd-left truncate" truncatefixed="25">
+			  [% locale.maketext("There aren't any forwarders to download") %]
+                        </td>
+                    </tr>
+		    [% END %]
+
                     </tbody>
                 </table>
             </div>
@@ -224,10 +247,6 @@ SET accounts = Api2.exec("CommuniGate", "ListAccountsBackups");
         </div>
         [% END %]
     </div>
-
-</div>
-
-[% BLOCK js_block %]
 <script type="text/javascript">
     truncate_on = 1;
     var inputs_buttons = {  };
@@ -263,7 +282,10 @@ SET accounts = Api2.exec("CommuniGate", "ListAccountsBackups");
     YAHOO.util.Event.onDOMReady(init);
 
 </script>
-[% END #js_block %]
 
+    [% ELSE %]
+    [% PROCESS cgpro/icn_description.html.tt %]
+    [% END %]
+</div>
 [% END #wrapper -%]
 

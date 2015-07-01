@@ -3,7 +3,7 @@ SET CPANEL.CPVAR.dprefix = "../";
 %]
 
 [% WRAPPER '_assets/master.html.tt'
-    app_key = 'xmpp_roster'
+    app_key = 'cgpro_xmpp_roster'
  -%]
 
 <div class="body-content">

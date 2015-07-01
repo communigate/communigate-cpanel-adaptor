@@ -1,0 +1,228 @@
+[% MACRO filter_option(pval, val, text) BLOCK -%]
+<option value="[% val %]"[% val == pval ? " selected='selected'" : "" %]>[% locale.maketext(text) %]</option>
+[% END -%]
+
+[% MACRO filter_check(name, pval, val, text) BLOCK -%]
+<input type="checkbox" name="[% name %]" value="[% val %]" id="[% name %]-[% val %]"[% IF pval.join("").search(val); " checked='checked'"; END %] />
+<label for="[% name %]-[% val %]">[% text %]</label>
+[% END -%]
+
+[%
+SET CPANEL.CPVAR.dprefix = "../";
+SET CPANEL.CPVAR.headerimg = "../images/mailmenu.gif";
+
+SET rule = Api2.exec("CommuniGate", "updateSignalRule", {
+"therule" = RAW_FORM.item("rule"),
+"domain" = RAW_FORM.item("domain")
+});
+rule = rule.0.rule;
+%]
+
+[% SET list_accounts = Api2.exec("CommuniGate", "ListAccounts", {"classes" = "1"}); 
+accounts = list_accounts.0.accounts;
+classes = list_accounts.0.classes;
+%]
+
+[% WRAPPER '_assets/master.html.tt'
+app_key = 'cgpro_call_rules'
+-%]
+
+<div class="body-content">
+  <form action="doaddcallrule.html" method="post">
+    <div class="form-group">
+      <label>[% locale.maketext("Rule Name") %]</label>
+      <div class="row">
+	<div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	  <input type="text" name="ruleName" id="rulename" value="[% rule.name %]" class="form-control"/>
+	  <input type="hidden" name="ruleOldName" value="[% rule.name %]" />
+	</div>
+	<div id="rulename_error" class="col-xs-12 col-sm-6 col-md-6 col-lg-6"></div>
+      </div>
+    </div>
+
+    <h2>[% locale.maketext('CGPRule Conditions') %]</h2>
+    <div class="form-group">
+      <label>[% locale.maketext("Addressed To") %]</label>
+      <div class="row">
+	<div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	  <select name="RequestURI" id="RequestURI" class="form-control">
+	    <option value="">[% locale.maketext("CGPPlease select account") %]</option>
+	    [% foundSome = 0 -%]
+	    [% FOR account IN accounts -%]
+	    [% myclass = account.value.class -%]
+	    [% classstring = classes.$myclass.AccessModes.join(',') -%]
+	    [% IF classstring.search('SIP') || classstring == "All" -%]
+	    [% filter_option(rule.conditions.RequestURI.split(":").1, account.key, account.key) %]
+	    [% foundSome = 1 -%]
+	    [% END -%]
+	    [% END -%]
+	  </select>
+	  [% UNLESS foundSome -%]
+	  <p>[% locale.maketext("CGPNoCallAccounts",'<a href="mail/accounts.html">', '</a>') %]</p>
+	  [% END -%]
+	</div>
+	  <div id="RequestURI_error" class="col-xs-12 col-sm-6 col-md-6 col-lg-6"></div>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>[% locale.maketext("During the time interval") %]</label>
+      <div class="row">
+	<div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	  [% locale.maketext("CGPFrom") %]
+	  [% tod = rule.conditions.TimeOfDay.split("[:-]") -%]
+	  <input type="text" id="fromHour" name="fromHour" maxlength="2" value="[% tod.0 %]" style="width: 25px;"/>:<input type="text" id="fromMinutes" name="fromMinutes" maxlength="2" value="[% tod.1 %]" style="width: 25px;"/>
+	  [% locale.maketext("CGPTo") %]
+	  <input type="text" id="toHour" name="toHour" maxlength="2" value="[% tod.2 %]" style="width: 25px;"/>:<input type="text" id="toMinutes" name="toMinutes" maxlength="2" value="[% tod.3 %]" style="width: 25px;"/> <span>HH:MM-HH:MM</span>
+	</div>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>[% locale.maketext("On week days") %]</label>
+      <div class="row">
+	<div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	  [% filter_check("weekDays", rule.conditions.CurrentDay, "Sun", locale.maketext("CGPSun")) %]
+	  [% filter_check("weekDays", rule.conditions.CurrentDay, "Mon", locale.maketext("CGPMon")) %]
+	  [% filter_check("weekDays", rule.conditions.CurrentDay, "Tue", locale.maketext("CGPTue")) %]
+	  [% filter_check("weekDays", rule.conditions.CurrentDay, "Wed", locale.maketext("CGPWed")) %]
+	  [% filter_check("weekDays", rule.conditions.CurrentDay, "Thu", locale.maketext("CGPThu")) %]
+	  [% filter_check("weekDays", rule.conditions.CurrentDay, "Fri", locale.maketext("CGPFri")) %]
+	  [% filter_check("weekDays", rule.conditions.CurrentDay, "Sat", locale.maketext("CGPSat")) %]
+	</div>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>[% locale.maketext("On stage") %]</label>
+      <div class="row">
+	<div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	  <select name="Stage" class="form-control">
+	    [% filter_option(rule.Stage, "1000", "0 s") %]
+	    [% filter_option(rule.Stage, "999", "1 s") %]
+	    [% filter_option(rule.Stage, "998", "2 s") %]
+	    [% filter_option(rule.Stage, "997", "3 s") %]
+	    [% filter_option(rule.Stage, "996", "4 s") %]
+	    [% filter_option(rule.Stage, "996", "5 s") %]
+	    [% filter_option(rule.Stage, "993", "7 s") %]
+	    [% filter_option(rule.Stage, "990", "10 s") %]
+	    [% filter_option(rule.Stage, "985", "15 s") %]
+	    [% filter_option(rule.Stage, "980", "20 s") %]
+	    [% filter_option(rule.Stage, "975", "25 s") %]
+	    [% filter_option(rule.Stage, "970", "30 s") %]
+	    [% filter_option(rule.Stage, "960", "40 s") %]
+	    [% filter_option(rule.Stage, "940", "60 s") %]
+	    [% filter_option(rule.Stage, "910", "90 s") %]
+	    [% filter_option(rule.Stage, "880", "2 min") %]
+	    [% filter_option(rule.Stage, "400", "10 min") %]
+	    [% filter_option(rule.Stage, "5", "No Answer") %]
+	    [% filter_option(rule.Stage, "3", "Busy") %]
+	    [% filter_option(rule.Stage, "1", "Failure") %]
+	  </select>
+	</div>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>[% locale.maketext("For user with status") %]</label>
+      <div class="row">
+	<div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	  <select name="status" class="form-control">
+	    [% filter_option(rule.conditions.Presence, "", locale.maketext("CGPany")) %]
+	    [% filter_option(rule.conditions.Presence, "busy", locale.maketext("CGPbusy")) %]
+	    [% filter_option(rule.conditions.Presence, "away", locale.maketext("CGPaway")) %]
+	    [% filter_option(rule.conditions.Presence, "busy,away", locale.maketext("CGPaway or busy")) %]
+	  </select>
+	</div>
+      </div>
+    </div>
+
+    <h2>[% locale.maketext('CGPRule Action') %]</h2>
+    <div class="form-group">
+      <label>[% locale.maketext("For user with status") %]</label>
+      <div class="row">
+	<div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	  <select name="action" id="action" class="form-control">
+	    [% filter_option(rule.action.0, "", locale.maketext("Please select action")) %]
+	    [% filter_option(rule.action.0, "Redirect to", locale.maketext("CGPRedirect to")) %]
+	    [% filter_option(rule.action.0, "Fork to", locale.maketext("CGPFork to")) %]
+	    [% filter_option(rule.action.0, "Reject with", locale.maketext("CGPReject")) %]
+	    [% filter_option(rule.action.0, "Stop processing", locale.maketext("CGPStop processing")) %]
+	  </select>
+	</div>
+	<div id="action_error" class="col-xs-12 col-sm-6 col-md-6 col-lg-6"></div>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <div class="row">
+	<div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	  <span id="actionText"><strong>sip</strong>
+	    <input type="text" name="actionText" value="[% UNLESS rule.action.0 == "Reject with"; rule.action.1; END -%]" class="form-control" style="max-width: 20%"/>
+	  </span>
+	</div>
+      </div>
+    </div>
+
+
+    <script type="text/javascript">
+      $("#fromHour").keyup(function(event){
+      if ( $("#fromHour").val() > 24 ) {
+      $("#fromHour").val(24);
+      }
+      if ( $("#fromHour").val() < 0 ) {
+      $("#fromHour").val(0);
+      }
+      });
+
+      $("#fromMinutes").keyup(function(event){
+      if ( $("#fromMinutes").val() > 59 ) {
+      $("#fromMinutes").val(59);
+      }
+      if ( $("#fromMinutes").val() < 0 ) {
+      $("#fromMinutes").val(0);
+      }
+      });
+
+      $("#toHour").keyup(function(event){
+      if ( $("#toHour").val() > 24 ) {
+      $("#toHour").val(24);
+      }
+      if ( $("#toHour").val() < 0 ) {
+      $("#toHour").val(0);
+      }
+      });
+
+      $("#toMinutes").keyup(function(event){
+      if ( $("#toMinutes").val() > 59 ) {
+      $("#toMinutes").val(59);
+      }
+      if ( $("#toMinutes").val() < 0 ) {
+      $("#toMinutes").val(0);
+      }
+      });
+      
+      var sel = document.getElementById("action");
+      var inp = document.getElementById("actionText");
+      var showHideInput = function () {
+      inp.style.display = "none";
+      if (sel.value ==  "Redirect to" || sel.value ==  "Fork to") {
+      inp.style.display = "inline";
+      };
+      };
+      showHideInput();
+      sel.onchange=function(){showHideInput()};
+    </script>
+
+    <div class="form-group">
+      <div class="row">
+	<div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	  <input type="submit" id="activate-button" name="submit" value="Save" class="btn btn-primary" />
+	</div>
+      </div>
+    </div>
+  </form>
+  <script type="text/javascript" src="addcallrule.js"></script>
+  [% INCLUDE _assets/return_link.html.tt return_location='call_rules.html.tt' return_link_text=locale.maketext('Go Back') %]
+</div> <!-- END body-content -->
+[% END %]

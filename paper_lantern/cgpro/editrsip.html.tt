@@ -1,0 +1,149 @@
+[% MACRO filter_option(pval, val, text) BLOCK -%]
+<option value="[% val %]"[% val == pval ? " selected='selected'" : "" %]>[% locale.maketext(text) %]</option>
+[% END -%]
+[%
+SET CPANEL.CPVAR.dprefix = "../";
+SET CPANEL.CPVAR.headerimg = "../images/mailmenu.gif";
+SET return_link = "extensions.html?rsip_account=" _ RAW_FORM.item('account').uri();
+%]
+
+[%
+SET rsip = Api2.exec("CommuniGate", "EditRSIP", {
+"account" = RAW_FORM.item("account"),
+"rsip" = RAW_FORM.item("rsip")
+});
+rsip = rsip.0.rsip;
+%]
+
+[% WRAPPER '_assets/master.html.tt'
+app_key = 'cgpro_extensions'
+-%]
+
+<div class="body-content">
+  [% IF RAW_FORM.item("rsip") %]
+  <h3>Edit Remote SIP</h3>  
+  [% ELSE %]
+  <h3>Add Remote SIP</h3>
+  [% END %]
+
+  <form action="doeditrsip.html?account=[% FORM.account %]" method="post">
+    <div class="form-group">
+      <label for="name">[% locale.maketext("Display Name") %]</label>
+      <div class="row">
+	<div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	  <input type="text" class="form-control" name="name" id="name" value="[% FORM.rsip %]"[% IF FORM.rsip %] readonly=""[% END %] />
+	</div>
+	<div id="name_error" class="cjt_validation_error col-xs-12 col-sm-6 col-md-6 col-lg-6"></div>	  
+      </div>
+    </div>
+    <div class="form-group">
+      <label for="name">[% locale.maketext("Account") %]</label>
+      <div class="row">
+	<div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	  <input type="text" class="form-control" name="fromName" id="fromName" value="[% rsip.fromName %]" />
+	</div>
+	<div id="fromName_error" class="cjt_validation_error col-xs-12 col-sm-6 col-md-6 col-lg-6"></div>	  
+      </div>
+    </div>
+    <div class="form-group">
+      <label for="name">[% locale.maketext("Host") %]</label>
+      <div class="row">
+	<div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	  <input type="text" class="form-control" name="domain" id="domain" value="[% rsip.domain %]" />
+	</div>
+	<div id="domain_error" class="cjt_validation_error col-xs-12 col-sm-6 col-md-6 col-lg-6"></div>	  
+      </div>
+    </div>
+    <div class="form-group">
+      <label for="name">[% locale.maketext("Authentication Name") %]</label>
+      <div class="row">
+	<div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	  <input type="text" class="form-control" name="authName" id="authName" value="[% rsip.authName %]" />
+	</div>
+	<div id="authName_error" class="cjt_validation_error col-xs-12 col-sm-6 col-md-6 col-lg-6"></div>	  
+      </div>
+    </div>
+    <div class="form-group">
+      <label for="name">[% locale.maketext("Password") %]</label>
+      <div class="row">
+	<div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	  <input type="password" name="password" class="form-control" id="password" value="[% rsip.password %]" />
+	</div>
+	<div id="password_error" class="cjt_validation_error col-xs-12 col-sm-6 col-md-6 col-lg-6"></div>	  
+      </div>
+    </div>
+    <div class="form-group">
+      <label for="name">[% locale.maketext("Target") %]</label>
+      <div class="row">
+	<div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	  <input type="text" name="targetName" class="form-control" value="[% rsip.targetName %]" />
+	</div>
+	<div id="targetName_error" class="cjt_validation_error col-xs-12 col-sm-6 col-md-6 col-lg-6"></div>	  
+      </div>
+    </div>
+    <div class="form-group">
+      <label for="name">[% locale.maketext("Pull Every") %]</label>
+      <div class="row">
+	<div class="col-xs-12 col-sm-2 col-md-2 col-lg-2">
+	  <select class="form-control" name="period">
+	    [% filter_option( rsip.period || "600s", "120s" , "2m") %]
+	    [% filter_option( rsip.period || "600s", "180s" , "3m") %]
+	    [% filter_option( rsip.period || "600s", "300s" , "5m") %]
+	    [% filter_option( rsip.period || "600s", "600s" , "10m") %]
+	    [% filter_option( rsip.period || "600s", "750s" , "15m") %]
+	    [% filter_option( rsip.period || "600s", "1200s" , "20m") %]
+	    [% filter_option( rsip.period || "600s", "1800s" , "30m") %]
+	    [% filter_option( rsip.period || "600s", "3600s" , "60m") %]
+	    [% filter_option( rsip.period || "600s", "7200s" , "2h") %]
+	    [% filter_option( rsip.period || "600s", "10800s" , "3h") %]
+	    [% filter_option( rsip.period || "600s", "18000s" , "5h") %]
+	    [% filter_option( rsip.period || "600s", "21600s" , "6h") %]
+	    [% filter_option( rsip.period || "600s", "22800s" , "8h") %]
+	    [% filter_option( rsip.period || "600s", "86400s" , "24h") %]
+	    [% filter_option( rsip.period || "600s", "1000000000s" , "CGPDisabled") %]
+	  </select>
+	</div>
+	<div id="targetName_error" class="cjt_validation_error col-xs-12 col-sm-6 col-md-6 col-lg-6"></div>	  
+      </div>
+    </div>
+    <div class="form-group">
+      <input type="hidden" name="oldMessageID" value="[% vcard.UID.VALUE.item('Message-ID') %]" />
+      <input type="hidden" name="oldUID" value="[% FORM.contact %]" />
+      <input id="submit" class="btn btn-primary" type="submit" value="[% locale.maketext("CGPSave") %]" name="save" />
+    </div>
+  </form>
+  <script type="text/javascript">
+    var LANG = {};
+    LANG.name_input = '[% locale.maketext("CGPDisplayName") %]';
+    LANG.authname_input = '[% locale.maketext("CGPAuthenticationName") %]';
+    LANG.fromname_input = '[% locale.maketext("CGPAccount") %]';
+    LANG.domain_input = '[% locale.maketext("CGPHost") %]';
+    LANG.password_input = '[% locale.maketext("CGPPassword") %]';
+    LANG.name_input_invalid = '[% locale.maketext("CGPThisFieldIsRequired") %]!';
+    YAHOO.util.Event.onDOMReady(function () {
+    var VAL_NAME = new CPANEL.validate.validator(LANG.name_input);
+    VAL_NAME.add("name", 'min_length(%input%,1)', LANG.name_input_invalid);
+    VAL_NAME.attach();
+    
+    var VAL_AUTHNAME = new CPANEL.validate.validator(LANG.authname_input);
+    VAL_AUTHNAME.add("authName", 'min_length(%input%,1)', LANG.name_input_invalid);
+    VAL_AUTHNAME.attach();
+    
+    var VAL_FROMNAME = new CPANEL.validate.validator(LANG.fromname_input);
+    VAL_FROMNAME.add("fromName", 'min_length(%input%,1)', LANG.name_input_invalid);
+    VAL_FROMNAME.attach();
+    
+    var VAL_DOMAIN = new CPANEL.validate.validator(LANG.domain_input);
+    VAL_DOMAIN.add("domain", 'min_length(%input%,1)', LANG.name_input_invalid);
+    VAL_DOMAIN.attach();
+    
+    var VAL_PASSWORD = new CPANEL.validate.validator(LANG.password_input);
+    VAL_PASSWORD.add("password", 'min_length(%input%,1)', LANG.name_input_invalid);
+    VAL_PASSWORD.attach();
+    
+    CPANEL.validate.attach_to_form("submit", [VAL_NAME, VAL_FROMNAME, VAL_AUTHNAME, VAL_DOMAIN, VAL_PASSWORD]);
+    });
+  </script>
+  [% INCLUDE _assets/return_link.html.tt return_location=return_link return_link_text=locale.maketext('Go Back') %]
+</div>
+[% END %]

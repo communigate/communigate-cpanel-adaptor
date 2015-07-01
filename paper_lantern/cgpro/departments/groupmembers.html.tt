@@ -1,0 +1,129 @@
+[%
+SET CPANEL.CPVAR.dprefix = "../../";
+SET CPANEL.CPVAR.headerimg = "../../images/mailmenu.gif";
+%]
+
+[% IF RAW_FORM.item("unsub") %]
+[%
+SET departments = Api2.exec("CommuniGate", "RemoveGroupMember", {
+"listname" = RAW_FORM.item("listname"),
+"subemail" = RAW_FORM.item("subemail")
+});
+%]
+[% END %]
+
+[% IF RAW_FORM.item("sub") %]
+[%
+SET departments = Api2.exec("CommuniGate", "AddGroupMember", {
+"listname" = RAW_FORM.item("listname"),
+"CGPMLReceivingMode" = RAW_FORM.item("CGPMLReceivingMode"),
+"CGPMLPostingMode" = RAW_FORM.item("CGPMLPostingMode"),
+"account" = RAW_FORM.item("account")
+});
+%]
+[% END %]
+
+[%
+SET group_members = Api2.exec("CommuniGate", "ListGroupMembers", {
+"listname" = RAW_FORM.item("listname")
+});
+%]
+
+[% SET list_accounts = Api2.exec("CommuniGate", "ListAccounts", {"classes" = "1"}); 
+accounts = list_accounts.0.accounts;
+classes = list_accounts.0.classes;
+%]
+
+[% WRAPPER '_assets/master.html.tt'
+app_key = 'cgpro_departments'
+-%]
+
+<div class="body-content">
+  [% IF CPANEL.CPERROR.item('CommuniGate') && RAW_FORM.item("unsub") %]
+  <div class="alert alert-danger">
+    <span class="glyphicon glyphicon-remove-sign"></span>
+    <div class="alert-message">
+      [% CPANEL.CPERROR.item('CommuniGate') %]
+    </div>
+  </div>
+  [% END %]
+  [% IF CPANEL.CPERROR.item('CommuniGate') && RAW_FORM.item("sub") %]
+  <div class="alert alert-danger">
+    <span class="glyphicon glyphicon-remove-sign"></span>
+    <div class="alert-message">
+      [% CPANEL.CPERROR.item('CommuniGate') %]
+    </div>
+  </div>
+  [% END %]
+
+  <form method="post" action="groupmembers.html" id="subform" name="subform">
+    <input type="hidden" name="sub" value="sub">
+    <input type="hidden" name="listname" value="[% RAW_FORM.item("listname") %]">
+    <div class="form-group">
+      <label for="realname">
+	[% locale.maketext("Email Address") %]
+      </label>
+      <div class="row">
+	<div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	  [% MACRO filter_option(pval, val, text) BLOCK -%]
+	  <option value="[% val %]"[% val == pval ? " selected='selected'" : "" %]>[% locale.maketext(text) %]</option>
+	  [% END -%]
+	  <select id="account" name="account" class="form-control">
+	    [% filter_option(account, "", "CGPPleaseSelect") %]
+	    [% FOR account IN accounts.sort -%]
+              [% myclass = accounts.$account.class -%]
+              [% classstring = classes.$myclass.AccessModes.join(',') -%]
+	      [% IF (classstring.search("SIP") || classstring == "All") -%]
+	        [% added_string = "" %]
+	        [% FOREACH member IN group_members %]
+	        [% added_string = added_string _ member.subemail %]   
+	        [% END %]
+	        [% IF ( added_string.search(account) ) -%]
+	        [% ELSE %]
+         	    [% filter_option(FORM.account, account, account) %]
+	        [% END %]
+	      [% END -%]
+	    [% END -%]
+	  </select>
+	</div>
+      </div>
+      <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	<div id="email_error"></div>
+      </div>
+    </div>
+      <div class="form-group">
+	<input type="submit" id="submit" value="[% locale.maketext("Add Member") %]" class="btn btn-primary"/>
+      </div>
+  </form>
+
+  <h3>Current Department Members</h3>
+  <table id="mailtbl" class="table table-striped">
+    <thead>
+      <tr>
+	<th>Email Address</th>
+	<th>Functions</th>
+      </tr>
+    </thead>
+    <tbody>
+      [% IF group_members.size() == 0 %]
+      <td colspan="2">Currently there aren't any group members!</td>
+      [% ELSE %]
+      [% FOREACH member IN group_members %]
+      <tr>
+	<td>[% member.subemail %]</td>
+	<td>
+	  <form method="post" action="groupmembers.html" id="userform" name="unsub">
+	    <input type="hidden" name="unsub" value="unsub"></input>
+	    <input type="hidden" name="subemail" value="[% member.subemail %]"></input>
+	    <input type="hidden" name="listname" value="[% RAW_FORM.item("listname") %]"></input>
+	    <button type="submit" id="my_button" class="btn btn-primary" value="Update">Remove</button>
+	  </form>
+	</td>
+      </tr>
+      [% END %]
+      [% END %]
+    </tbody>
+  </table>
+[% INCLUDE _assets/return_link.html.tt return_location='groups.html' return_link_text=locale.maketext('Go Back') %]
+</div>
+[% END %]

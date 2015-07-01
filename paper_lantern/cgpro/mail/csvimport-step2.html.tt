@@ -34,7 +34,7 @@ SET return_link = "csvimport.html?importtype=" _ RAW_FORM.item('importtype').uri
 
 [% js_code = PROCESS js_block %]
 [% WRAPPER '_assets/master.html.tt'
-    app_key = 'address_importer'
+    app_key = 'cgpro_address_importer'
     page_js = js_code
 -%]
 <div class="body-content">

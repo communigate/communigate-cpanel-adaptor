@@ -4,7 +4,7 @@ SET mail_rename_list = Api2.exec("CommuniGate", "RenameMailingList", { email=RAW
 %]
 
 [% WRAPPER '_assets/master.html.tt'
-    app_key = 'mailing_lists'
+    app_key = 'cgpro_mailing_lists'
 -%]
 <div class="body-content">
 

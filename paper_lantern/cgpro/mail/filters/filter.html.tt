@@ -57,7 +57,6 @@
 
 [% FOR q = get_filter.data.rules %]
 <tr id="rule[% loop.index+1 %]">
-<td valign="middle" class="acltd" width="20"><img onclick="moveup(this); this.src='icon_arrow_up_disabled.gif';" id="[% loop.index+1 %]-moveup" src="icon_arrow_up_disabled.gif" onmouseover="this.src='icon_arrow_up.gif';" onmouseout="this.src='icon_arrow_up_disabled.gif';" class="moveact"><br /><img onclick="movedown(this); this.src='icon_arrow_down_disabled.gif';" id="[% loop.index+1 %]-movedown" src="icon_arrow_down_disabled.gif"  onmouseover="this.src='icon_arrow_down.gif';" onmouseout="this.src='icon_arrow_down_disabled.gif';" class="moveact"></td>
 <td class="frow">
 <div style="float: left; display:inline; width: 510px;">
 <select name="part[% loop.index+1 %]" onchange="handlepart(this)" style="width:250px;" autocomplete="off" autofill="off">
@@ -95,7 +94,7 @@
 [% filter_option(q.match, "greater than", locale.maketext("CGPgreaterThan")) %]
 [% filter_option(q.match, "less than", locale.maketext("CGPlessThan")) %]
 </select>
-<input type="text" class="form-control" name="val[% loop.index+1 %]" size="60" style="width:498px" value="[% q.val FILTER html %]">
+<input type="text" id="val[% loop.index+1 %]" class="form-control rule_field" name="val[% loop.index+1 %]" size="60" style="width:498px" value="[% q.val FILTER html %]">
 </div>
 <div style="float: right; display:inline; padding-top: 11px; ">
 <input type="button" value="-" name="ruleremove[% loop.index+1 %]" class="btn btn-default" disabled="disabled" onclick="removerule(this);">
@@ -112,6 +111,21 @@
 </table>
 <script type="text/javascript">
     window.onload = function() { checkaddrembuttons('rule'); };
+    
+    $("#filterform").submit(function( event ) {
+    var is_filled = 0;
+    
+    $(".rule_field").each( function(){
+      if ( $(this).val() == "" ) {
+        is_filled += 1;
+      }
+    });
+    
+    if ( is_filled != 0 ) {
+    alert( "Please fill rule fields!" );
+    event.preventDefault();
+    }
+    });
 </script>
 <br />
 

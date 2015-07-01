@@ -90,7 +90,18 @@ var update_email_accounts = function(new_acc) {
 				    "action": "change_quota"
 				    });
 		    }; 
-		}; 		       
+		}; 		  
+		$(".avatar_span").mouseover(function() {
+			$(this).next("span").show();
+		    }).mouseout(function(){
+			$(this).next("span").hide();
+			});
+		$(".avatar").mouseover(function() {
+			$(this).next("span").show();
+		    }).mouseout(function(){
+			$(this).next("span").hide();
+			});
+     
 		search_email();
             } catch (e) {
                 json_parse_error();
@@ -203,7 +214,7 @@ var build_email_table_markup = function() {
 
     // loop through the email accounts and build the table
     var html = '<table id="table_email_accts" class="table table-striped" border="0" cellspacing="0" cellpadding="0">';
-    html += '<thead>' + '<tr>' + '<th class="col0"> </th>' + '<th class="col1">Account</span></th>' + '<th class="col2"><span style="margin-left: 15px;">Stats</span></th>' + '<th class="col4"><span style="margin-left: 30px;">Type</span></th>' + '<th class="col3"><span style="margin-left: 30px;">Actions</span></th>';
+    html += '<thead>' + '<tr>' + '<th class="col0"> </th>' + '<th class="col1">Account</span></th>' + '<th class="col2"><span>Stats</span></th>' + '<th class="col4"><span>Type</span></th>' + '<th class="col3"><span class="col3span">References</span></th>';
     html += '<colgroup>' + '<col>' + '<col width="30%">' + '<col width="9%">' + '<col width="10%">' + '<col width="53%">' + '</colgroup>';
 
     for (var i = 0; i < ACCOUNTS.length; i++) {
@@ -221,18 +232,6 @@ var build_email_table_markup = function() {
         html += '<tr id="account_row_' + i + '" class="dt_info_row ' + row_toggle + '">';
 	html += '<td class="col0 dt-module" title="Change Avatar" onclick="toggle_action_div(null, {id:\'image_module_' + i + '\', index:' + i + ', action:\'image_crop\'})">';
 
-	// if ( typeof(ACCOUNTS[i]['vcard']) != "undefined" && typeof(ACCOUNTS[i]['vcard']['fileData']) != "undefined" && typeof(ACCOUNTS[i]['vcard']['fileData']['vCard']) != "undefined" && typeof(ACCOUNTS[i]['vcard']['fileData']['vCard']['PHOTO']) != "undefined" && typeof(ACCOUNTS[i]['vcard']['fileData']['vCard']['PHOTO']['BINVAL']) != "undefined" ){
-	//     var acc_photo = ACCOUNTS[i]['vcard']['fileData']['vCard']['PHOTO']['BINVAL'];
-	//     html += '<img src="data:image/png;base64,' + acc_photo + '" alt="avatar" style="width: 48px; heigth:48px; max-width: 100%; max-heigth: 100%;">';
-	// }
-	// else{
-	//     html += '<img src="js/SimpleCropper/images/avatar_default.png" alt="avatar">';
-	// }
-	// if ( typeof(ACCOUNTS[i]['vcard']) != "undefined" && typeof(ACCOUNTS[i]['vcard']['fileData']) != "undefined"){
-	//     html += '<img src="js/SimpleCropper/images/avatar_default.png" alt="avatar">';
-	// }
-
-
 	if (ACCOUNTS[i]['vcard']
 	    && ACCOUNTS[i]['vcard']['fileData']
 	    && ACCOUNTS[i]['vcard']['fileData'][0]
@@ -243,26 +242,36 @@ var build_email_table_markup = function() {
 	    && ACCOUNTS[i]['vcard']['fileData'][0]['vCard'][0]['PHOTO'][0]['BINVAL']
 	    && ACCOUNTS[i]['vcard']['fileData'][0]['vCard'][0]['PHOTO'][0]['BINVAL'][0]) {
 	    var acc_photo = ACCOUNTS[i]['vcard']['fileData'][0]['vCard'][0]['PHOTO'][0]['BINVAL'][0];
-	    html += '<img id="avatar_' + i + '" src="data:image/png;base64,' + acc_photo + '" alt="avatar" style="width: 48px; heigth:48px; cursor: pointer; max-width: 100%; max-heigth: 100%;">';
+	    html += '<div class="img-div-rel"><img class="avatar" id="avatar_' + i + '" src="data:image/png;base64,' + acc_photo + '" alt="avatar" style="max-width: 48px; cursor: pointer;">' + '<span class="glyphicon glyphicon-edit glyph-edit"></span>' + '</img></div>';
 	} else {
-	    html += '<span class="glyphicon glyphicon-user" id="avatar_' + i + '" style="font-size: 48px; cursor: pointer;"></span>';
+	    html += '<div class="img-div-rel"><img class="avatar" id="avatar_' + i + '">' + '<span class="glyphicon glyphicon-user avatar_span" id="span_avatar_' + i + '"></span>' + '<span class="glyphicon glyphicon-edit glyph-edit"></span>' + '</img></div>';
 	}
 	
 	html += '</td>';
         html += '<td class="col1">';
 	if (ACCOUNTS[i]['prefs']['RealName']){
-	html += '<span id="realname_' + i + '" style="font-weight: bold;">' + ACCOUNTS[i]['prefs']['RealName'] + '</span>' + '<br>';
+	html += '<span style="display: block" class="realname_acc" id="realname_' + i + '">' + ACCOUNTS[i]['prefs']['RealName'] + '</span>';
+	} else {
+	html += '<span class="realname_acc" id="realname_' + i + '">' + '</span>';
 	}
-	html += ACCOUNTS[i]['prefs']['AccountName'] + '</td>';
+	html += ACCOUNTS[i]['prefs']['AccountName'] + '<br>';
+	for (var num in ACCOUNTS[i]['prefs']['assignedTelnums']) {
+	    if (ACCOUNTS[i]['prefs']['assignedTelnums'].hasOwnProperty(num)){
+		if (ACCOUNTS[i]['prefs']['assignedTelnums'][num]['assigned'] && ACCOUNTS[i]['prefs']['assignedTelnums'][num]['assigned'] == ("a:" + ACCOUNTS[i]['prefs']['AccountName'])) {
+		html += '<span class="glyphicon glyphicon-earphone glyphtel">' + '<span class="telnum">' + num + '</span>' + '</span>';
+		}
+	    }
+        }
+	html += '</td>';
 	if (ACCOUNTS[i]['humandiskquota'] == 0){
 	    var diskquota_acc = " ∞ ";
 	}
 	else{
 	    var diskquota_acc = ACCOUNTS[i]['humandiskquota'];
 	}
-        html += '<td class="col2" style="white-space: nowrap; text-align: center;">' + ACCOUNTS[i]['used'] + '<input type="hidden" id="diskused_' + i + '" value="' + ACCOUNTS[i]['used'] + '" /> / <span id="quota_' + i + '">' + diskquota_acc + '</span> <span class="megabyte_font">MB</span><br />';
+        html += '<td class="col2">' + ACCOUNTS[i]['used'] + '<input type="hidden" id="diskused_' + i + '" value="' + ACCOUNTS[i]['used'] + '" /> / <span id="quota_' + i + '">' + diskquota_acc + '</span> <span class="megabyte_font">MB</span><br />';
         html += '<div class="table_progress_bar" id="usage_bar_' + i + '">';
-        html += '<div class="progress" style="border-radius: 0; height: 2px;">';
+        html += '<div class="progress">';
         html += '<div class="progress-bar" role="progressbar" style="width: 0%;">';
         html += '<span class="sr-only">0%</span>';
         html += '</div>';
@@ -272,7 +281,6 @@ var build_email_table_markup = function() {
 	if (ACCOUNTS[i]['stats']['MessagesSent']){
 	    var sent = ACCOUNTS[i]['stats']['MessagesSent'].substring(1);
 	    html += sent + ' / ';
-
 	}
 	else {
 	    html += 0 + ' / ';
@@ -320,32 +328,36 @@ var build_email_table_markup = function() {
 	    acc_modes_webcal = "color: #aaaaaa;";
 	}
 	html += '<span id="acc_type_' + i + '" onclick="toggle_action_div(null, {id:\'change_type_module_' + i + '\', index:' + i + ', action:\'change_type\'})">' + ACCOUNTS[i]['class'] + '</span>' + '<br>';
-	html += '<span id="icon_envelope_' + i + '" class="glyphicon glyphicon-envelope" onclick="toggle_action_div(null, {id:\'change_type_module_' + i + '\', index:' + i + ', action:\'change_type\'})" title="Mail" style="margin-right: 3px;' + acc_modes_mail + '"></span>';
-	html += '<span id="icon_comment_' + i + '" class="glyphicon glyphicon-comment" onclick="toggle_action_div(null, {id:\'change_type_module_' + i + '\', index:' + i + ', action:\'change_type\'})" title="Chat/Jabber/XMPP" style="margin-right: 3px;' + acc_modes_xmpp + '"></span>';
-	html += '<span id="icon_phone_' + i + '" class="glyphicon glyphicon-phone" onclick="toggle_action_div(null, {id:\'change_type_module_' + i + '\', index:' + i + ', action:\'change_type\'})" title="SIP (Internet calls)" style="margin-right: 3px;' + acc_modes_sip + '"></span>';
+	html += '<span id="icon_envelope_' + i + '" class="glyphmargin glyphicon glyphicon-envelope" onclick="toggle_action_div(null, {id:\'change_type_module_' + i + '\', index:' + i + ', action:\'change_type\'})" title="Mail" style="' + acc_modes_mail + '"></span>';
+	html += '<span id="icon_comment_' + i + '" class="glyphmargin glyphicon glyphicon-comment" onclick="toggle_action_div(null, {id:\'change_type_module_' + i + '\', index:' + i + ', action:\'change_type\'})" title="Chat/Jabber/XMPP" style="' + acc_modes_xmpp + '"></span>';
+	html += '<span id="icon_phone_' + i + '" class="glyphmargin glyphicon glyphicon-phone" onclick="toggle_action_div(null, {id:\'change_type_module_' + i + '\', index:' + i + ', action:\'change_type\'})" title="SIP (Internet calls)" style="' + acc_modes_sip + '"></span>';
 	html += '<span id="icon_calendar_' + i + '" class="glyphicon glyphicon-calendar" onclick="toggle_action_div(null, {id:\'change_type_module_' + i + '\', index:' + i + ', action:\'change_type\'})" title="Calendar" style="' + acc_modes_webcal + '"></span>';
 	html += '</td>';
         html += '<td class="col3">';
         html += '<table class="table_email_accts_actions" bnorder="0" cellspacing="0" cellpadding="0"><tr>';
         // html += '<td><span class="btn btn-link" onclick="toggle_action_div(null, {id:\'show_details_module_' + i + '\', index:' + i + ', action:\'show_details\'})">' + '<span class="glyphicon glyphicon-tasks"></span>' + ' Details' + '</span></td>';
-        html += '<td><span class="btn btn-link" onclick="toggle_action_div(null, {id:\'change_password_module_' + i + '\', index:' + i + ', action:\'change_password\'})">' + '<span class="fa fa-key fa-lg"></span>' + " " + LANG.change_password_br + '</span></td>';
-        html += '<td><span class="btn btn-link" onclick="toggle_action_div(null, {id:\'change_quota_module_' + i + '\', index:' + i + ', action:\'change_quota\'})">' + '<span class="glyphicon glyphicon-cog"></span>' + ' Change Details' + '</span></td>';
-        html += '<td><span class="btn btn-link" onclick="toggle_action_div(null, {id:\'change_type_module_' + i + '\', index:' + i + ', action:\'change_type\'})">' + '<span class="glyphicon glyphicon-list"></span>' + ' Change Type' + '</span></td>';
-        html += '<td><span class="btn btn-link" onclick="toggle_action_div(null, {id:\'airsync_module_' + i + '\', index:' + i + ', action:\'airsync\'})">' + '<span class="glyphicon glyphicon-transfer"></span>' + '<span class="glyphicon glyphicon-phone"></span>' + ' AirSync' + '</span></td>';
+        html += '<td><span class="btn btn-link" onclick="toggle_action_div(null, {id:\'change_password_module_' + i + '\', index:' + i + ', action:\'change_password\'})">' + '<span class="fa fa-key fa-lg"></span>' + " Password" + '</span></td>';
+        html += '<td><span class="btn btn-link" onclick="toggle_action_div(null, {id:\'change_quota_module_' + i + '\', index:' + i + ', action:\'change_quota\'})">' + '<span class="glyphicon glyphicon-cog"></span>' + ' Details' + '</span></td>';
+        html += '<td><span class="btn btn-link" onclick="toggle_action_div(null, {id:\'change_type_module_' + i + '\', index:' + i + ', action:\'change_type\'})">' + '<span class="glyphicon glyphicon-list"></span>' + ' Plan' + '</span></td>';
         html += '<td><span class="btn btn-link" onclick="toggle_action_div(null, {id:\'delete_module_' + i + '\', index:' + i + ', action:\'delete\'})">' + '<span class="glyphicon glyphicon-trash"></span>' + " " + LANG.delete2 + '</span></td>';
         html += '<td><div class="btn-group">';
+        html += '<button id="email_table_menu_button_' + i + '" class="btn btn-default dropdown-toggle" data-toggle="dropdown" type="button">More<span class="caret"><span></button>';
         html += '<ul class="dropdown-menu" role="menu">';
-        if (WEBMAIL_ENABLED) {
-            html += '<li><a id="email_table_menu_webmail_' + i + '" href="webmailform.html?user=' + encodeURIComponent(ACCOUNTS[i]['user']) + '@' + encodeURIComponent(ACCOUNTS[i]['domain']) + '&amp;domain=' + encodeURIComponent(ACCOUNTS[i]['domain']) + '" target="_blank">' + LANG.access_webmail + '</a></li>';
-        }
-        html += '<li><a id="email_table_menu_configure_email_' + i + '" href="clientconf.html?acct=' + encodeURIComponent(ACCOUNTS[i]['user']) + '@' + encodeURIComponent(ACCOUNTS[i]['domain']) + '">' + LANG.configure_email_client + '</a></li>';
+	if (acc_modes.indexOf('SIP') > -1 || acc_modes == "All"){
+	    html += '<li id="li_extensions_' + i + '"><a class="btn btn-link" href="../extensions.html" target="_blank">' + '<span class="btn btn-link">' + '<span class="glyphicon glyphicon-earphone"></span>' + " Extensions" + '</span>' + '</a></li>';
+	} else {
+	    	    html += '<li style="display: none;" id="li_extensions_' + i + '"><a class="btn btn-link" href="../extensions.html" target="_blank">' + '<span class="btn btn-link">' + '<span class="glyphicon glyphicon-earphone"></span>' + " Extensions" + '</span>' + '</a></li>';
+	}
+
+	html += '<li><a class="btn btn-link"><span class="btn btn-link" onclick="toggle_action_div(null, {id:\'airsync_module_' + i + '\', index:' + i + ', action:\'airsync\'})">' + '<span class="glyphicon glyphicon-transfer"></span>' + '<span class="glyphicon glyphicon-phone"></span>' + ' ActiveSync&trade;' + '</span></a></li>';
+	
         html += '</ul>';
         html += '</div></td>';
         html += '</tr></table>';
         html += '</td>';
         html += '</tr>';
 
-        html += '<tr id="dt_module_row_' + i + '" class="' + row_toggle + ' action-row"><td colspan="5">';
+        html += '<tr id="dt_module_row_' + i + '" class="' + row_toggle + ' action-row" style="border: none;"><td colspan="5">';
         html += '<div id="show_details_module_' + i + '" class="dt_module" style="display: none; margin-left: 0;"></div>';
         html += '<div id="change_password_module_' + i + '" class="dt_module" style="display: none"></div>';
         html += '<div id="change_quota_module_' + i + '" class="dt_module" style="display: none"></div>';
@@ -411,7 +423,6 @@ var build_email_table_markup = function() {
 
     return html;
 };
-
 // add event handlers for the new email table
 var build_progress_bars = function() {
     for (var i = 0; i < ACCOUNTS.length; i++) {
@@ -985,16 +996,22 @@ var change_quota = function(index) {
 		}
 		var selector_acc_realname = "#realname_" + index;
 		var selector_acc_quota = "#quota_" + index;
-		$(selector_acc_realname).text(api2_call.realaname);
+		if (api2_call.realaname == "") {
+		    $(selector_acc_realname).hide();
+		} else {
+		    if ($(selector_acc_realname).text() != "") {
+			$(selector_acc_realname).html(api2_call.realaname).css("display", "block");
+		    } else {
+			$(selector_acc_realname).text(api2_call.realaname).css("display", "block");
+		    }
+		}
 		if (api2_call.quota == 0){
 		    var diskquota_acc_show = " ∞ ";
 		}
 		else{
 		    var diskquota_acc_show = api2_call.quota;
 		}
-		
 		$(selector_acc_quota).text(diskquota_acc_show);
-
             } else if (data.cpanelresult.data && (data.cpanelresult.data[0].result == 0)) {
                 CPANEL.widgets.status_bar("status_bar_" + index, "error", CPANEL.lang.Error, data.cpanelresult.data[0].reason);
             } else {
@@ -1019,7 +1036,6 @@ var change_quota = function(index) {
     YAHOO.util.Connect.asyncRequest('GET', CPANEL.urls.json_api(api2_call), callback, '');
 
     // show the ajax loading icon
-    YAHOO.util.Dom.setStyle("change_quota_input_" + index, "display", "none");
     YAHOO.util.Dom.get("change_quota_status_" + index).innerHTML = CPANEL.icons.ajax + " " + "Changing Details" + "...";
 };
 
@@ -1264,6 +1280,14 @@ var change_type = function(e, o) {
     // callback functions
     var callback = {
         success: function(o) {
+	    var selector_li_ext = "#li_extensions_" + index;
+	    if (api2_call['class'] != "NotJabberOnly") {
+		$(selector_li_ext).hide();
+	    }
+	    else {
+		$(selector_li_ext).show();
+	    }
+	    
             YAHOO.util.Dom.get("change_type_status_" + index).innerHTML = '';
             YAHOO.util.Dom.setStyle("change_type_input_" + index, "display", "block");
             toggle_action_div(null, {
@@ -1278,9 +1302,13 @@ var change_type = function(e, o) {
                 CPANEL.widgets.status_bar("status_bar_" + index, "error", CPANEL.lang.json_error, CPANEL.lang.json_parse_failed);
                 return;
             }
+	    
+	    if (data.cpanelresult.data[0].msg) {
+                CPANEL.widgets.status_bar("status_bar_" + index, "error", CPANEL.lang.Error, data.cpanelresult.data[0].msg);
+	    } 
 
             // update the table and display the status
-            if (data.cpanelresult.event && (data.cpanelresult.event['result'] == 1)) {
+            else if (data.cpanelresult.event && (data.cpanelresult.event['result'] == 1)) {
                 var new_type = api2_call.class;
                 var status = new_type;
                 CPANEL.widgets.status_bar("status_bar_" + index, "success", "Changed type: ", status);
@@ -1292,6 +1320,11 @@ var change_type = function(e, o) {
 		$(selector_acc_type).text(api2_call.class);
        		var acc_class = api2_call.class;
 		var acc_modes = CLASSES[acc_class]['AccessModes'];
+
+		// if (data[0].msg) {
+		//     console.log(data[0].msg);
+		// }
+		
 		if (acc_modes.indexOf('Mail') > -1 || acc_modes == "All"){
 		    $(selector_icon_envelope).css("color", "#000000");
 		}
@@ -1349,6 +1382,7 @@ var change_avatar = function(e, o) {
     var index = o.index;
     // create the API variables
     var selector_img = "#crop_" + index + " img";
+
     if ( $(selector_img)['0'] ) {
     var new_avatar = $(selector_img).attr('src');	
     }
@@ -1372,16 +1406,16 @@ var change_avatar = function(e, o) {
 
     new_avatar = encodeURIComponent(new_avatar.substring(22));
     
-    	if (ACCOUNTS[i]['vcard']
-	    && ACCOUNTS[i]['vcard']['fileData']
-	    && ACCOUNTS[i]['vcard']['fileData'][0]
-	    && ACCOUNTS[i]['vcard']['fileData'][0]['vCard']
-	    && ACCOUNTS[i]['vcard']['fileData'][0]['vCard'][0]
-	    && ACCOUNTS[i]['vcard']['fileData'][0]['vCard'][0]['PHOTO']
-	    && ACCOUNTS[i]['vcard']['fileData'][0]['vCard'][0]['PHOTO'][0]
-	    && ACCOUNTS[i]['vcard']['fileData'][0]['vCard'][0]['PHOTO'][0]['BINVAL']
-	    && ACCOUNTS[i]['vcard']['fileData'][0]['vCard'][0]['PHOTO'][0]['BINVAL'][0]) {
-	    var vCard_obj = ACCOUNTS[i]['vcard']['fileData'][0]['vCard'][0];
+    	if (ACCOUNTS[o.index]['vcard']
+	    && ACCOUNTS[o.index]['vcard']['fileData']
+	    && ACCOUNTS[o.index]['vcard']['fileData'][0]
+	    && ACCOUNTS[o.index]['vcard']['fileData'][0]['vCard']
+	    && ACCOUNTS[o.index]['vcard']['fileData'][0]['vCard'][0]
+	    && ACCOUNTS[o.index]['vcard']['fileData'][0]['vCard'][0]['PHOTO']
+	    && ACCOUNTS[o.index]['vcard']['fileData'][0]['vCard'][0]['PHOTO'][0]
+	    && ACCOUNTS[o.index]['vcard']['fileData'][0]['vCard'][0]['PHOTO'][0]['BINVAL']
+	    && ACCOUNTS[o.index]['vcard']['fileData'][0]['vCard'][0]['PHOTO'][0]['BINVAL'][0]) {
+	    var vCard_obj = ACCOUNTS[o.index]['vcard']['fileData'][0]['vCard'][0];
 	    vCard_obj['PHOTO'][0]['BINVAL'][0] = new_avatar;
 	} else {
 	    var vCard_obj = {
@@ -1397,7 +1431,7 @@ var change_avatar = function(e, o) {
         "cpanel_jsonapi_version": 2,
         "cpanel_jsonapi_module": "CommuniGate",
         "cpanel_jsonapi_func": "UpdateVCard",
-	"account": ACCOUNTS[o.index]['prefs']['AccountName'],
+	"account": ACCOUNTS[o.index]['prefs']['AccountName']
     };
 
     // callback functions
@@ -1420,6 +1454,8 @@ var change_avatar = function(e, o) {
             if (data.cpanelresult.event && (data.cpanelresult.event['result'] == 1)) {
                 var status = "";
                 CPANEL.widgets.status_bar("status_bar_" + index, "success", "Changed avatar", status);
+		var selector_span_avatar = "#span_avatar_" + index;
+		$(selector_span_avatar).css("display", "none");
 		var selector_avatar = "#avatar_" + index;
 		$(selector_avatar).attr("src", 'data:image/png;base64,' + new_avatar);
             } else if (data.cpanelresult.event && (data.cpanelresult.event['result'] == 0)) {
@@ -1895,6 +1931,10 @@ var init_mail = function() {
 
     // update the accounts object and build the email table
     update_email_accounts();
+  $("#span_avatar_1").mouseover(function() {
+  console.log("works!");
+ }).mouseout(function(){
+ });
 
     grab_default_account_disk_used();
 };

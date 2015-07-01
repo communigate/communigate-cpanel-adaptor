@@ -6,7 +6,7 @@
 %]
 
 [% WRAPPER '_assets/master.html.tt'
-    app_key = 'autoresponders'
+    app_key = 'cgpro_autoresponders'
 %]
 <div class="body-content">
     <div id="autoResponderSuccess" class="alert alert-success">

@@ -3,7 +3,7 @@
 [% END -%]
 [% SET CPANEL.CPVAR.dprefix = "../" %]
 [% WRAPPER '_assets/master.html.tt'
-app_key = 'xmpp_clients'
+app_key = 'cgpro_xmpp_clients'
 -%]
 <div class="body-content">
   [% IF CPANEL.feature('cgpro_xmpp_clients') %]
@@ -16,7 +16,6 @@ app_key = 'xmpp_clients'
         <div class="form-group">
           [% SET accounts = Api2.exec("CommuniGate", "AccountsOverview", {}) %]
           <select name="account" id="manage_list_select" class="col-xs-12 form-control">
-            <option value="">[% locale.maketext("Select account.") %]</option>
 	    [% FOR account IN accounts.0.accounts.keys -%]
 	    [% myclass = accounts.0.accounts.$account.class -%]
 	    [% classstring = accounts.0.classes.$myclass.AccessModes.join(',') -%]
@@ -25,6 +24,11 @@ app_key = 'xmpp_clients'
 	    [% END -%]
 	    [% END -%]
           </select>
+	[% IF !RAW_FORM.item("account") %]
+	<script type="text/javascript">
+	  YAHOO.util.Dom.get("manage_list_form").submit();
+	</script>
+	[% END %]
         </div>
         <noscript>
           <div class="form-group">
@@ -172,9 +176,11 @@ app_key = 'xmpp_clients'
     </table>
 
   </div>
-  [% END -%] <!-- END feature -->
   [% INCLUDE _assets/return_link.html.tt return_location='../index.html' return_link_text=locale.maketext('Go Back') %]
 
+  [% ELSE %]
+  [% PROCESS cgpro/icn_description.html.tt %]
+  [% END -%] <!-- END feature -->
 </div><!-- end body-content -->
 [% END %]
 

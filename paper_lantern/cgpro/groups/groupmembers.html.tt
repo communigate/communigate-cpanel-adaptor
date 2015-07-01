@@ -20,6 +20,7 @@ SET unsub_data = Api2.exec("CommuniGate", "RemoveGroupMember", {
 [% 
 SET accounts = Api2.exec("CommuniGate", "ListAccounts", {
 });
+accounts = accounts.0.accounts;
 %]
 
 <div class="body-content">

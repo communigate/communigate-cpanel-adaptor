@@ -1,0 +1,43 @@
+[%
+SET CPANEL.CPVAR.dprefix = "../";
+SET CPANEL.CPVAR.headerimg = "../images/mailmenu.gif";
+
+SET upload_file = Api2.exec("CommuniGate", "UploadFile", {
+"file" = RAW_FORM.item("sound")
+});
+
+SET update_wav = Api2.exec("CommuniGate", "UpdateWav", {
+"file" = RAW_FORM.item("file"),
+"domain" = RAW_FORM.item("domain"),
+"lang" = RAW_FORM.item("lang")
+});
+
+SET return_link = 'soundsmanager.html?domain=' _ RAW_FORM.item("domain");
+%]
+
+[% WRAPPER '_assets/master.html.tt'
+app_key = 'cgpro_sounds_manager'
+-%]
+
+<div class="body-content">
+  <div class="section">
+    [% IF CPANEL.CPERROR.item('CommuniGate') %]
+    <div class="alert alert-danger">
+      <span class="glyphicon glyphicon-remove-sign"></span>
+      <div class="alert-message">
+        [% CPANEL.CPERROR.item('CommuniGate') %]
+      </div>
+    </div>
+    [% ELSE -%]
+    <div class="alert alert-success">
+      <span class="glyphicon glyphicon-ok-sign"></span>
+      <div class="alert-message">
+        [% locale.maketext("Sound updated!")%]
+      </div>
+    </div>
+    [% END %]
+    
+    [% INCLUDE _assets/return_link.html.tt return_location=return_link return_link_text=locale.maketext('Go Back') %]
+  </div>
+</div>
+[% END %]

@@ -1,0 +1,20 @@
+[%
+SET CPANEL.CPVAR.dprefix = "../";
+SET CPANEL.CPVAR.headerimg = "../images/mailmenu.gif";
+%]
+
+[% WRAPPER '_assets/master.html.tt'
+app_key = 'cgpro_caller_queues'
+-%]
+
+<div class="body-content">
+  <p>
+      [% locale.maketext("Are you sure you want to delete queue “[_1]”?", FORM.name ) %]</p>
+  <p> 
+  <a class="btn btn-primary" href="dodeletequeue.html?queue=[% RAW_FORM.item("queue") %]&name=[% RAW_FORM.item("name") %]">Delete</a> 
+  <a class="btn btn-link" href="queues.html">Cancel</a>
+</p>
+
+  [% INCLUDE _assets/return_link.html.tt return_location='queues.html.tt' return_link_text=locale.maketext('Go Back') %]
+</div> 
+[% END %]

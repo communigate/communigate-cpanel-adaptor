@@ -1,0 +1,192 @@
+[% MACRO filter_option(pval, val, text) BLOCK -%]
+<option value="[% val %]"[% val == pval ? " selected='selected'" : "" %]>[% locale.maketext(text) %]</option>
+[% END -%]
+[%
+SET CPANEL.CPVAR.dprefix = "../";
+SET CPANEL.CPVAR.headerimg = "../images/mailmenu.gif";
+%]
+
+[% SET accounts = Api2.exec("CommuniGate", "ListAccounts", {"classes" = "1"}); 
+classes = accounts.0.classes;
+accounts = accounts.0.accounts;
+%]
+
+[% IF RAW_FORM.item("account") %]
+[% SET calls = Api2.exec("CommuniGate", "ListCalls", {
+"account" = RAW_FORM.item("account"),
+"period" = RAW_FORM.item("period")
+}); 
+files = calls.0.files;
+calls = calls.0.calls;
+%]
+[% END %]
+
+[% WRAPPER '_assets/master.html.tt'
+app_key = 'cgpro_call_register'
+-%]
+
+<div class="body-content">
+  [% IF CPANEL.feature('cgpro_call_register') %]
+  [% MACRO filter_option(pval, val, text) BLOCK -%]
+  <option value="[% val %]"[% val == pval ? " selected='selected'" : "" %]>[% locale.maketext(text) %]</option>
+  [% END -%]
+  <div class="pull-right">
+    <div class="form-inline">
+      <div class="form-group">
+	<label class="control-label" style="margin: 0 15px;">[% locale.maketext("CGPAccount") %]:</label>
+      </div>
+      <div class="form-group">
+	<div class="row">
+	  <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	    <form action="" class="form-inline" method="GET" id="selectAccount">
+	      <select id="account" class="form-control" onchange="toggle_account()" name="account">
+		[% FOR account IN accounts.sort -%]
+		[% filter_option(FORM.account, account, account) %]
+		[% END -%]
+	      </select>
+	    </form>
+	  </div>
+	  [% IF !RAW_FORM.item("account") %]
+	  <script type="text/javascript">
+	    YAHOO.util.Dom.get("selectAccount").submit();
+	  </script>
+	  [% END %]
+	</div>
+      </div>
+    </div>
+    <div class="clear"></div>
+    <script type="text/javascript">
+      function toggle_account () {
+      document.getElementById("selectAccount").submit();
+      }
+    </script>
+  </div><br /></br />
+
+  [% IF RAW_FORM.item("account") %]
+<div>
+  <form action="" method="GET" id="selectPeriod">
+    <div class="form-group">
+      <label>[% locale.maketext("CGPPeriod") %]:</label>
+      <div class="row">
+	<div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	  <select id="period" class="form-control" onchange="toggle_period()" name="period">
+	    [% FOR file IN files.keys.sort.reverse -%]
+	    [% filter_option(FORM.period, "calls-" _ files.$file, files.$file) %]
+	    [% END -%]
+	  </select>
+	  <input type="hidden" name="account" value="[% FORM.account %]" />
+	</div>
+      </div>
+    </div>
+  </form>
+</div>
+    <script type="text/javascript">
+    function toggle_period () {
+    document.getElementById("selectPeriod").submit();
+    }
+    </script>
+
+    <h2>Register</h2>
+    <div class="search-panel">
+      <form method="GET" action="callregister.html">
+	<div class="form-group">
+	  <label>[% locale.maketext("Search") %]:</label>
+	  <div class="row">
+	    <div class="col-xs-6 col-sm-3 col-md-3 col-lg-3">
+              <input type="text" id="search_input" size="15" class="form-control" name="searchregex" value="[% FORM.searchregex %]">
+	      <input type="hidden" name="account" value="[% FORM.account %]" />
+	      <input type="hidden" name="period" value="[% FORM.period %]" />
+	      [% IF FORM.searchregex %]<a href="callregister.html?account=[% FORM.account %]&amp;period=[% FORM.period %]">[% locale.maketext('CGPClear') %]</a>[% END -%]
+	    </div>
+            <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+              <input id="email_table_clear_search" type="button" class="btn btn-primary" value="[% locale.maketext("Clear")  %]" onclick="clear_search()" />
+            </div>
+	    
+	  </div>
+	</div>
+      </form>
+    </div>
+    <table class="table table-striped">
+      <thead>
+	<tr>
+	  <th class="cell">[% locale.maketext("CGPTimeOfCall") %]</th>
+	  <th class="cell">[% locale.maketext("CGPInOut") %]</th>
+	  <th class="cell">[% locale.maketext("CGPPeer") %]</th>
+	  <!-- <th class="cell">[% locale.maketext("CGPCallerId") %]</th> -->
+	  <th class="cell">[% locale.maketext("CGPDuration") %]</th>
+	  <th class="cell-end">[% locale.maketext("CGPError") %]</th>
+	</tr>
+      </thead>
+      [% IF calls.size == 0 %]
+      <tr>
+	<td colspan="5">No Calls!</td>
+      </tr>
+      [% END %]
+      
+      [% iter_row = 0; %]
+      [% FOR call IN calls.reverse -%]
+      [% searchstring = call.join(',') | lower -%]
+      [% FORM.searchregex = FORM.searchregex | lower -%]
+      [% matches = searchstring.match(FORM.searchregex) %]
+      [% IF !FORM.searchregex || (matches = searchstring.match(FORM.searchregex)) -%]
+      [% iter_row = iter_row +1; %]
+      
+      <tr id="result_row_[% iter_row %]" class="result_rows">
+	<td style="white-space: nowrap" class="td1">[% call.1 %]</td>
+	<td class="td2">[% call.2 == "I" ? "In" : "Out"%]</td>
+	<td class="td3">[% call.3 | html %]</td>
+	<!-- <td>[% call.4 %]</td> -->
+	<td class="td4">[% call.5 || 0 %]s</td>
+	<td class="td5">[% call.7 %]</td>
+      </tr>
+      [% END -%]
+      [% END -%]
+      <tr class="no_results" style="display: none;"><td colspan="5">No Results Found!</td></tr>
+    </table>
+    [% END %]
+
+    <script>
+      var clear_search = function() {
+      YAHOO.util.Dom.get("search_input").value = "";
+      search_logs();
+      };
+
+      var search_logs = function() {
+            $(".result_rows").each( function(index) {
+          $(this).css("display", "")
+        });
+        var no_rows = 0;       
+        $(".result_rows").each( function(index) {
+          no_rows = 0;
+          $(".no_results").css("display", "none");
+          var searchstring = "";
+          var searchregex = $("#search_input").val();
+          searchstring += $(this).find(".td1").html();
+          searchstring += $(this).find(".td2").html();
+          searchstring += $(this).find(".td3").html();
+          searchstring += $(this).find(".td4").html();
+          searchstring += $(this).find(".td5").html();
+          var res = searchstring.match(searchregex);
+          if (!res) {
+            $(this).css("display", "none");
+          }
+          var none = $(this).css("display");
+          if (none != "none") {
+            no_rows += 1;
+          }
+        });
+      
+        if (no_rows == 0) {
+        $(".no_results").show();
+        }
+      }   
+
+      $("#search_input").keyup( search_logs );
+
+    </script>
+    [% ELSE %]
+    [% PROCESS cgpro/icn_description.html.tt %]
+    [% END %]
+</div><!-- end body-content div -->
+[% END %]
+ 

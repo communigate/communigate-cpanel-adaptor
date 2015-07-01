@@ -5,10 +5,10 @@
 [% js_code = PROCESS js_block %]
 [% WRAPPER '_assets/master.html.tt'
     page_js = js_code,
-    app_key = 'contacts'
+    app_key = 'cgpro_contacts'
 -%]
 <div class="body-content">
-
+  [% IF CPANEL.feature('cgpro_contacts') %]
   <div class="pull-right">
     <div id="manage-list">
       <form method="get" action="" id="manage_list_form" class="form-inline">
@@ -16,13 +16,19 @@
           <label for="manage_list_select" id="txt_Managing" class="col-xs-12 control-label">[% locale.maketext("Managing:") %]</label>
         </div>
         <div class="form-group">
-          [% SET accounts = Api2.exec("CommuniGate", "ListAccounts", {}) %]
-          <select name="account" id="manage_list_select" class="col-xs-12 form-control">
-            <option value="">[% locale.maketext("Select account.") %]</option>
-	    [% FOR account IN accounts.sort -%]
-	    [% filter_option(FORM.account, account,account) %]
-	    [% END -%]
-          </select>
+          [% SET accounts = Api2.exec("CommuniGate", "ListAccounts", {})
+	  accounts = accounts.0.accounts;
+	  %]
+        <select name="account" id="manage_list_select" class="col-xs-12 form-control">
+	  [% FOR account IN accounts.sort -%]
+	  [% filter_option(FORM.account, account,account) %]
+	  [% END -%]
+        </select>
+	[% IF !RAW_FORM.item("account") %]
+	<script type="text/javascript">
+	  YAHOO.util.Dom.get("manage_list_form").submit();
+	</script>
+	[% END %]
         </div>
         <noscript>
           <div class="form-group">
@@ -126,7 +132,9 @@
 
   [% END -%]
   [% INCLUDE _assets/return_link.html.tt return_location='../../index.html' return_link_text=locale.maketext('Go Back') %]
-
+  [% ELSE %]
+  [% PROCESS cgpro/icn_description.html.tt %]
+  [% END %]
 </div><!-- end body-content -->
 [% END %]
 

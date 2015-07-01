@@ -6,7 +6,7 @@ SET mail_domains = execute("Email", "list_mail_domains", {});
 [% js_code = PROCESS js_block %]
 [% WRAPPER '_assets/master.html.tt'
     page_js = js_code,
-    app_key = 'forwarders'
+    app_key = 'cgpro_forwarders'
  -%]
 
 <div class="body-content">

@@ -115,54 +115,99 @@ IFS=$OLDIFS
 tLen=${#THEMES[@]}
 lLen=${#LOCALES[@]}
 
-for (( i=0; i<${tLen}; i++ ));
-do
-    if [ "${THEMES[$i]}" == "${BASEDIR}/CommuniGate" ]
-    then
-        continue
-    fi
-    cp -r "${PACKSRC}/theme/cgpro" "${THEMES[$i]}/"
-    cp "${PACKSRC}/icons/"* "${THEMES[$i]}/branding"
-    cp "${PACKSRC}/plugin/dynamicui_cgpro.conf" "${THEMES[$i]}/dynamicui/"
-    if [ ! -d ${THEMES[$i]}/js2-min/cgpro ]
-    then
-	mkdir -p ${THEMES[$i]}/js2-min/cgpro
-    fi
-    if [ ! -L ${THEMES[$i]}/js2-min/cgpro/mail ]
-    then
-	ln -s ${THEMES[$i]}/js2-min/mail ${THEMES[$i]}/js2-min/cgpro/
-    fi
-    if [ ! -d ${THEMES[$i]}/css2-min/cgpro ]
-    then
-	mkdir -p ${THEMES[$i]}/css2-min/cgpro
-    fi
-    if [ ! -L ${THEMES[$i]}/css2-min/cgpro/mail ]
-    then
-	ln -s ${THEMES[$i]}/css2-min/mail ${THEMES[$i]}/css2-min/cgpro/
-    fi
-    chmod +x ${THEMES[$i]}/cgpro/backup/getaccbackup.live.cgi
-    chmod +x ${THEMES[$i]}/cgpro/backup/getaliasesbackup.live.cgi
-    chmod +x ${THEMES[$i]}/cgpro/backup/getfiltersbackup.live.cgi
-    chmod +x ${THEMES[$i]}/cgpro/mail/checkDomainSettings.live.cgi
-    chmod +x ${THEMES[$i]}/cgpro/mail/getDomainAccounts.live.cgi
-    chmod +x ${THEMES[$i]}/cgpro/mail/getVCARD.live.cgi
-    chmod +x ${THEMES[$i]}/cgpro/mail/getQR.live.cgi
-    chmod +x ${THEMES[$i]}/cgpro/mail/contactsimport.live.cgi
-    chmod +x ${THEMES[$i]}/cgpro/getXmppHistory.live.cgi
-    chmod +x ${THEMES[$i]}/cgpro/playwav.live.cgi
-    chmod +x ${THEMES[$i]}/cgpro/getwav.live.cgi
+PKGSRC = $(dirname "$0");
 
-    for ((j=0; j<${lLen}; j++)); do
-        TARGET=${THEMES[$i]}/locale/`basename ${LOCALES[$j]} '{}'`.yaml.local
-        if [ ! -f ${TARGET} ]
-        then
-            echo "---" > ${TARGET}
-        else
-	    sed -i -e '/^"*CGP/d' ${TARGET}
-        fi
-        cat ${LOCALES[$j]} >> ${TARGET}
-    done
+cp ${PKGSRC}/module/*.pm /usr/local/cpanel/Cpanel/
+
+# Start x3
+cp -r "${PKGSRC}/theme/*" "${BASEDIR}/x3/"
+cp "${PKGSRC}/icons/*" "${BASEDIR}/x3/branding"
+cp "${PKGSRC}/plugin/*.conf" "${BASEDIR}/x3/dynamicui/"
+
+if [ ! -d ${BASEDIR}/x3/js2-min/cgpro ]
+then
+    mkdir -p ${BASEDIR}/x3/js2-min/cgpro
+fi
+if [ ! -L ${BASEDIR}/x3/js2-min/cgpro/mail ]
+then
+    ln -s ${BASEDIR}/x3/js2-min/mail ${BASEDIR}/x3/js2-min/cgpro/
+fi
+if [ ! -d ${BASEDIR}/x3/css2-min/cgpro ]
+then
+    mkdir -p ${BASEDIR}/x3/css2-min/cgpro
+fi
+if [ ! -L ${BASEDIR}/x3/css2-min/cgpro/mail ]
+then
+    ln -s ${BASEDIR}/x3/css2-min/mail ${BASEDIR}/x3/css2-min/cgpro/
+fi
+chmod +x ${BASEDIR}/x3/cgpro/backup/getaccbackup.live.cgi
+chmod +x ${BASEDIR}/x3/cgpro/backup/getaliasesbackup.live.cgi
+chmod +x ${BASEDIR}/x3/cgpro/backup/getfiltersbackup.live.cgi
+chmod +x ${BASEDIR}/x3/cgpro/mail/checkDomainSettings.live.cgi
+chmod +x ${BASEDIR}/x3/cgpro/mail/getDomainAccounts.live.cgi
+chmod +x ${BASEDIR}/x3/cgpro/mail/getVCARD.live.cgi
+chmod +x ${BASEDIR}/x3/cgpro/mail/getQR.live.cgi
+chmod +x ${BASEDIR}/x3/cgpro/mail/contactsimport.live.cgi
+chmod +x ${BASEDIR}/x3/cgpro/getXmppHistory.live.cgi
+chmod +x ${BASEDIR}/x3/cgpro/playwav.live.cgi
+chmod +x ${BASEDIR}/x3/cgpro/getwav.live.cgi
+
+for ((j=0; j<${lLen}; j++)); do
+    TARGET=${BASEDIR}/x3/locale/`basename ${LOCALES[$j]} '{}'`.yaml.local
+    if [ ! -f ${TARGET} ]
+    then
+        echo "---" > ${TARGET}
+    else
+	sed -i -e '/^"*CGP/d' ${TARGET}
+    fi
+    cat ${LOCALES[$j]} >> ${TARGET}
 done
+# END x3
+
+# START paper_lantern
+cp -r "${PKGSRC}/theme_paper_lantern/cgpro" "${BASEDIR}/paper_lantern/"
+cp "${PKGSRC}/icons_paper_lantern/"* "${BASEDIR}/paper_lantern/branding"
+cp "${PKGSRC}/plugin/*.conf" "${BASEDIR}/paper_lantern/dynamicui/"
+
+if [ ! -d ${BASEDIR}/paper_lantern/js2-min/cgpro ]
+then
+    mkdir -p ${BASEDIR}/paper_lantern/js2-min/cgpro
+fi
+if [ ! -L ${BASEDIR}/paper_lantern/js2-min/cgpro/mail ]
+then
+    ln -s ${BASEDIR}/paper_lantern/js2-min/mail ${BASEDIR}/paper_lantern/js2-min/cgpro/
+fi
+if [ ! -d ${BASEDIR}/paper_lantern/css2-min/cgpro ]
+then
+    mkdir -p ${BASEDIR}/paper_lantern/css2-min/cgpro
+fi
+if [ ! -L ${BASEDIR}/paper_lantern/css2-min/cgpro/mail ]
+then
+    ln -s ${BASEDIR}/paper_lantern/css2-min/mail ${BASEDIR}/paper_lantern/css2-min/cgpro/
+fi
+chmod +x ${BASEDIR}/paper_lantern/cgpro/backup/getaccbackup.live.cgi
+chmod +x ${BASEDIR}/paper_lantern/cgpro/backup/getaliasesbackup.live.cgi
+chmod +x ${BASEDIR}/paper_lantern/cgpro/backup/getfiltersbackup.live.cgi
+chmod +x ${BASEDIR}/paper_lantern/cgpro/mail/checkDomainSettings.live.cgi
+chmod +x ${BASEDIR}/paper_lantern/cgpro/mail/getDomainAccounts.live.cgi
+chmod +x ${BASEDIR}/paper_lantern/cgpro/mail/getVCARD.live.cgi
+chmod +x ${BASEDIR}/paper_lantern/cgpro/mail/getQR.live.cgi
+chmod +x ${BASEDIR}/paper_lantern/cgpro/mail/contactsimport.live.cgi
+chmod +x ${BASEDIR}/paper_lantern/cgpro/getXmppHistory.live.cgi
+chmod +x ${BASEDIR}/paper_lantern/cgpro/playwav.live.cgi
+chmod +x ${BASEDIR}/paper_lantern/cgpro/getwav.live.cgi
+
+for ((j=0; j<${lLen}; j++)); do
+    TARGET=${BASEDIR}/paper_lantern/locale/`basename ${LOCALES[$j]} '{}'`.yaml.local
+    if [ ! -f ${TARGET} ]
+    then
+        echo "---" > ${TARGET}
+    else
+	sed -i -e '/^"*CGP/d' ${TARGET}
+    fi
+    cat ${LOCALES[$j]} >> ${TARGET}
+done
+# END paper_lantern 
 
 # Install CommuniGate Plugin Webmail
 BASEDIR='/usr/local/cpanel/base/webmail';

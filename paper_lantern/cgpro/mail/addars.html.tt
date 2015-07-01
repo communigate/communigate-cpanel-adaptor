@@ -3,7 +3,7 @@
 [% js_code = PROCESS js_block %]
 [% css_code = PROCESS css_block %]
 [% WRAPPER '_assets/master.html.tt'
-    app_key = 'autoresponders'
+    app_key = 'cgpro_autoresponders'
     page_js = js_code
     page_scripts = ['/yui/calendar/calendar.js', '/cjt/calendar.js']
     page_stylesheets = ['/yui/assets/skins/sam/calendar.css', 'css/calendar.css']

@@ -1,0 +1,102 @@
+[%
+SET CPANEL.CPVAR.dprefix = "../";
+SET CPANEL.CPVAR.headerimg = "../images/mailmenu.gif";
+
+SET domains = Api2.exec("Email", "listmaildomains", {});
+
+SET ivrs = Api2.exec("CommuniGate", "ListIVRs", {
+"domain" = RAW_FORM.item("domain")
+});
+%]
+
+[% WRAPPER '_assets/master.html.tt'
+app_key = 'cgpro_ivr'
+-%]
+
+<style>
+.ivr-btn-add {
+max-width: 121px;
+padding-left: 0;
+padding-right: 0;
+}
+
+.ivr-label-for {
+line-height: 35px;
+max-width: 30px;
+}
+
+.ivr-checkbox {
+margin-top: -3px;
+}
+
+.clear {
+clear: both;
+}
+</style>
+
+<div class="body-content">
+  [% IF CPANEL.feature('cgpro_ivr') %]
+  <div class="section">
+    <form action="editivr.html" method="get">
+      <div class="form-group">
+	<div class="ivr-btn-add col-xs-12 col-sm-2 col-md-2 col-lg-2">
+	  <input type="submit" class="btn btn-primary" value="Add IVR menu" />
+	</div>
+	<div class="ivr-label-for col-xs-12 col-sm-1 col-md-1 col-lg-1">for</div>
+	<div class="col-xs-12 col-sm-3 col-md-3 col-lg-3">
+	  [% IF domains.size == 1 %]
+	  <input type="hidden" name="domain" id="domain" value="[% domains.0.domain %]">
+	  [% ELSE %]
+	  <select name="domain" id="domain" class="form-control">
+	    [% FOREACH domain IN domains %]
+	    <option value="[% domain.domain %]">[% domain.domain %]</option>
+	    [% END %]
+	  </select>
+	  [% END %]
+	</div>
+	<div class="ivr-checkbox form-group col-xs-12 col-sm-3 col-md-3 col-lg-3">
+	  <div class="checkbox">
+	    <input type="checkbox" name="template" id="template" value="1" />
+	    <label for="template">[% locale.maketext("Load default template") %]</label>
+	  </div>
+	</div>
+      </div>  
+    </form>
+    <div class="clear"></div>
+  </div>
+
+  <h3>IVR menus</h3>
+  <table border="0" cellpadding="5" cellspacing="0" id="mailtbl" class="table table-striped">
+    <colgroup>
+      <col width="70%" align="left" />
+      <col width="15%" align="center" />
+    </colgroup>
+    <thead>
+      <tr>
+	<th>Name</th>
+	<th>Functions</th>
+      </tr>
+    </thead>
+    <tbody>
+      [% IF ivrs.size == 0 %]
+      <tr>
+	<td colspan="2">Currently there aren't any IVR menus!</td>
+      </tr>
+      [% ELSE %]
+      [% FOREACH ivr IN ivrs %]
+      <tr>
+	<td>[% ivr.name %]</td>
+	<td>
+	  <a href="editivr.html?ivr=[% ivr.id %]&domain=[% ivr.domain %]" ><span class="glyphicon glyphicon-pencil"></span> View/Edit</a>
+	  <a href="deleteivr.html?ivr=[% ivr.id %]&domain=[% ivr.domain %]&name=[% ivr.name %]" style="margin-left: 10px;"><span class="glyphicon glyphicon-trash"></span> Delete</a>
+	</td>
+      </tr>
+      [% END %]
+      [% END %]
+    </tbody>
+  </table>
+  [% ELSE %]
+  [% PROCESS cgpro/icn_description.html.tt %]
+  [% END %]
+</div><!-- end body-content -->
+[% END %]

@@ -3,7 +3,7 @@ SET CPANEL.CPVAR.dprefix = "../../../";
 %]
 
 [% WRAPPER '_assets/master.html.tt'
-    app_key = 'user_filters'
+    app_key = 'cgpro_user_filters'
  -%]
 
 <div class="body-content">

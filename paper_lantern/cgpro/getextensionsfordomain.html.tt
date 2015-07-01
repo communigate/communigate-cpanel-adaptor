@@ -1,0 +1,23 @@
+[%
+SET list_extensions = Api2.exec("CommuniGate", "GetExtensionsForPSTN", {
+"domain" = RAW_FORM.item("domain")
+});
+selected_ext_authName = list_extensions.1.selected.PSTNGatewayAuthName;
+selected_ext_fromName = list_extensions.1.selected.PSTNFromName;
+%]
+[% USE dumper %]
+<pre>[% dumper.dump(list_extensions) %]</pre>
+
+[% FOREACH ext IN list_extensions %]
+[% IF !ext.selected %]
+[% IF selected_ext_authName == ext.telnum.authname %]
+[% IF selected_ext_fromName == ext.telnum.username %]
+<option value="[% ext.extension %]" selected>[% ext.short %]</option>
+[% END %]
+[% ELSE %]
+<option value="[% ext.extension %]">[% ext.short %]</option>
+[% END %]
+[% ELSE %]
+
+[% END %]
+[% END %]
