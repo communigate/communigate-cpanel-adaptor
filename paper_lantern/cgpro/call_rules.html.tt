@@ -11,6 +11,7 @@ app_key = 'cgpro_call_rules'
 -%]
 
 <div class="body-content">
+  [% IF CPANEL.feature('cgpro_call_rules') %]
   <a class="btn btn-primary" href="addcallrule.html">Add Rule</a>
   <table id="mailtbl" class="table table-striped">
     <thead>
@@ -38,5 +39,6 @@ app_key = 'cgpro_call_rules'
       [% END -%]
     </tbody>
   </table>
+  [% END %]
 </div> <!-- END body-content -->
 [% END %]

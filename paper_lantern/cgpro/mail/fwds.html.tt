@@ -25,7 +25,7 @@ SET extensions = Api2.exec("CommuniGate", "ListExtensions", {
  -%]
 
 <div class="body-content">
-  [% IF CPANEL.feature('forwarders') %]
+  [% IF CPANEL.feature('cgpro_forwarders') %]
 
   <div id="hdrForwarder" class="section">
     <h2>[% locale.maketext("Create an Email Account Forwarder") %]</h2>

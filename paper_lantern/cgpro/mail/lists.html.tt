@@ -30,6 +30,7 @@ SET mail_domains = execute("Email", "list_mail_domains", {});
 </style>
 
 <div class="body-content">
+  [% IF CPANEL.feature('cgpro_mailing_lists') %]
     <p id="descMailingList" class="description">
         [% locale.maketext("Use a single address to send email to multiple email addresses. For more information, read the [output,url,_1,documentation,target,_2,id,_3].", "//www.communigate.com/communigatepro/LIST.html", "_blank", "lnkMailingListsDocumentation") %]
     </p>
@@ -162,7 +163,7 @@ SET mail_domains = execute("Email", "list_mail_domains", {});
         </div>
     </section>
     <!-- table -->
-
+    [% END %]
 </div><!-- end body-content -->
 [% END #wrapper %]
 

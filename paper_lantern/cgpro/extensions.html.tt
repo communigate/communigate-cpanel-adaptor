@@ -76,6 +76,7 @@ app_key = 'cgpro_extensions'
 </style>
 
 <div class="body-content">
+  [% IF CPANEL.feature('cgpro_extensions') %]
   <div class="section">
     <div id="setpstntodomain" style="display:none">
       <h3>[% locale.maketext("Assign outgoing number to domain") %]</h3>
@@ -382,8 +383,8 @@ YAHOO.util.Event.onDOMReady(function () {
     </table>
     [% END %]
   </div>
+  [% END %]
 </div>
 
-</div><!-- end body-content -->
 
 [% END %]

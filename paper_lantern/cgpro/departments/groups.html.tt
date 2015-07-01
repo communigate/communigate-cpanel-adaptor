@@ -18,7 +18,7 @@ app_key = 'cgpro_departments'
 -%]
 
 <div class="body-content">
-
+  [% IF CPANEL.feature('cgpro_departments') %]
   <h3>Add Department Member</h3>
   <form method="post" action="doaddgroup.html" id="userform" name="userform">
     <div class="form-group">
@@ -115,6 +115,7 @@ app_key = 'cgpro_departments'
       [% END %]
     </tbody>
   </table>
+  [% END %]
 </div><!-- end body-content -->
 [% END %]
 <script type="text/javascript">

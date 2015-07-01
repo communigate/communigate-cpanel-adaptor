@@ -180,7 +180,7 @@ var DEFAULT_EMAIL_QUOTA = [% execute("Email", "get_default_email_quota_mib").dat
 </style>
 
 <div class="body-content">
-[% IF CPANEL.feature('popaccts') %]
+[% IF CPANEL.feature('cgpro_accounts') %]
     <p id="descEmailAccounts" class="description">
         [%-
             IF (CPANEL.CPVAR.item('maildomainscount') >= "1");

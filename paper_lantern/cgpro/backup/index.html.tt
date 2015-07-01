@@ -40,7 +40,7 @@ SET accounts = Api2.exec("CommuniGate", "ListAccountsBackups");
 -%]
 
 <div class="body-content">
-
+  [% IF CPANEL.feature('cgpro_backup') %]
     <div class="section">
 
         [% IF CPANEL.feature("mysql") %]
@@ -250,7 +250,7 @@ SET accounts = Api2.exec("CommuniGate", "ListAccountsBackups");
         </div>
         [% END %]
     </div>
-
+    [% END %]
 </div>
 
 [% BLOCK js_block %]

@@ -15,6 +15,7 @@ app_key = 'cgpro_groupmail'
 -%]
 
 <div class="body-content">
+  [% IF CPANEL.feature('cgpro_groupmail') %]
   <div class="section">
     <h2>[% locale.maketext("CGPGroupCreate")%]</h2>
 
@@ -126,9 +127,8 @@ app_key = 'cgpro_groupmail'
       </tbody>
     </table>
   </div>
+  [% END %]
 </div>
-
-
 
 [% BLOCK js_block %]
 <script type="text/javascript">

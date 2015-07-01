@@ -57,7 +57,7 @@ listmxs = api2_result_Email_listmxs.0.entries;
 </style>
 
 <div class="body-content">
-
+  [% IF CPANEL.feature('cgpro_dns_setup') %]
   <div class="pull-right">
     <form method="get" action="" id="manage_list_form" class="form-inline">
       <div class="form-group">
@@ -352,6 +352,7 @@ listmxs = api2_result_Email_listmxs.0.entries;
                 </div>
             </div>
         </div>
+	[% END %]
 </div><!-- end body-content -->
 [% END %]
 

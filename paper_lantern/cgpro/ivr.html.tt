@@ -35,6 +35,7 @@ clear: both;
 </style>
 
 <div class="body-content">
+  [% IF CPANEL.feature('cgpro_ivr') %]
   <div class="section">
     <form action="editivr.html" method="get">
       <div class="form-group">
@@ -94,5 +95,6 @@ clear: both;
       [% END %]
     </tbody>
   </table>
+  [% END %]
 </div><!-- end body-content -->
 [% END %]

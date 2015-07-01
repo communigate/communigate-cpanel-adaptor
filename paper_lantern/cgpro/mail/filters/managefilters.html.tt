@@ -9,6 +9,7 @@ app_key = 'cgpro_user_filters'
 %]
 
 <div class="body-content">
+  [% IF CPANEL.feature('cgpro_user_filters') %]
   <div class="section">
     <h2 id="hdrByUsers">[% locale.maketext("Filters by Users") %]</h2>
 
@@ -57,6 +58,7 @@ app_key = 'cgpro_user_filters'
     </table>
   </div>
   [% INCLUDE _assets/return_link.html.tt return_location='../../../index.html' return_link_text=locale.maketext('Go Back') %]
+  [% END %]
 </div><!-- end body-content -->
 [% END %]
     <script>
