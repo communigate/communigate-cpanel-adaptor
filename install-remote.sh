@@ -115,14 +115,12 @@ IFS=$OLDIFS
 tLen=${#THEMES[@]}
 lLen=${#LOCALES[@]}
 
-PKGSRC = $(dirname "$0");
-
-cp ${PKGSRC}/module/*.pm /usr/local/cpanel/Cpanel/
+cp ${PACKSRC}/module/*.pm /usr/local/cpanel/Cpanel/
 
 # Start x3
-cp -r "${PKGSRC}/theme/*" "${BASEDIR}/x3/"
-cp "${PKGSRC}/icons/*" "${BASEDIR}/x3/branding"
-cp "${PKGSRC}/plugin/*.conf" "${BASEDIR}/x3/dynamicui/"
+cp -r ${PACKSRC}/theme/* ${BASEDIR}/x3/
+cp ${PACKSRC}/icons/* ${BASEDIR}/x3/branding
+cp ${PACKSRC}/plugin/*.conf ${BASEDIR}/x3/dynamicui/
 
 if [ ! -d ${BASEDIR}/x3/js2-min/cgpro ]
 then
@@ -165,9 +163,9 @@ done
 # END x3
 
 # START paper_lantern
-cp -a "${PKGSRC}/paper_lantern/*" "${BASEDIR}/paper_lantern/"
-cp "${PKGSRC}/icons_paper_lantern/*" "${BASEDIR}/paper_lantern/styled/basic/icons/"
-cp "${PKGSRC}/plugin/*.conf" "${BASEDIR}/paper_lantern/dynamicui"
+cp -a ${PACKSRC}/paper_lantern/* ${BASEDIR}/paper_lantern/
+cp ${PACKSRC}/icons/* ${BASEDIR}/paper_lantern/styled/basic/icons/
+cp ${PACKSRC}/plugin/*.conf ${BASEDIR}/paper_lantern/dynamicui
 
 if [ ! -d ${BASEDIR}/paper_lantern/js2-min/cgpro ]
 then
