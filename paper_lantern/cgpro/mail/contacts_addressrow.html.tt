@@ -10,12 +10,12 @@
   <td>
     [% type = adr.keys.grep('(HOME|WORK|DOM|POSTAL|PARCEL|OTHER)').0 -%]
     <select name="addresstype-[% id %]" class="form-control">
-      [% filter_option(type, "OTHER", locale.maketext("CGPOTHER")) %]
-      [% filter_option(type, "HOME", locale.maketext("CGPHOME")) %]
-      [% filter_option(type, "WORK", locale.maketext("CGPWORK")) %]
-      [% filter_option(type, "DOM", locale.maketext("CGPDOM")) %]
-      [% filter_option(type, "POSTAL", locale.maketext("CGPPOSTAL")) %]
-      [% filter_option(type, "PARCEL", locale.maketext("CGPPARCEL")) %]
+      [% filter_option(type, "OTHER", locale.maketext("OTHER")) %]
+      [% filter_option(type, "HOME", locale.maketext("HOME")) %]
+      [% filter_option(type, "WORK", locale.maketext("WORK")) %]
+      [% filter_option(type, "DOM", locale.maketext("DOM")) %]
+      [% filter_option(type, "POSTAL", locale.maketext("POSTAL")) %]
+      [% filter_option(type, "PARCEL", locale.maketext("PARCEL")) %]
     </select>
   </td>
   <td>

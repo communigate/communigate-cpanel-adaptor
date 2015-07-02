@@ -10,9 +10,9 @@
   <td>
     [% type = page.keys.grep('(HOME|WORK|OTHER)').0 -%]
     <select name="urltype-[% id %]" class="form-control">
-      [% filter_option(type, "HOME", locale.maketext("CGPHOME")) %]
-      [% filter_option(type, "WORK", locale.maketext("CGPWORK")) %]
-      [% filter_option(type, "OTHER", locale.maketext("CGPOTHER")) %]
+      [% filter_option(type, "HOME", locale.maketext("HOME")) %]
+      [% filter_option(type, "WORK", locale.maketext("WORK")) %]
+      [% filter_option(type, "OTHER", locale.maketext("OTHER")) %]
     </select>
   </td>
   <td><input type="text" name="URL-[% id %]" class="form-control" value="[% page.VALUE %]" /></td>

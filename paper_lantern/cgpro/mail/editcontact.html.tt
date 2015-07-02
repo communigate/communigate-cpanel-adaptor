@@ -17,6 +17,7 @@ END;
     page_js = js_code,
     app_key = 'cgpro_contacts'
  -%]
+
 <div class="body-content">
     <div class="section">
       [% IF FORM.contact -%]
@@ -110,12 +111,16 @@ END;
 		    [% months = ['', 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'Ocober', 'November', 'December'] -%]
 		    [% FOR i IN [1 .. 12] -%]
 		    [% if = FILTER format('%02d'); i; END %]
-		    [% filter_option(BDAY.1, if, locale.maketext( "CGP" _ months.$i)) %]
+		    [% filter_option(BDAY.1, if, locale.maketext( months.$i)) %]
 		    [% END -%]
 		  </select>
+		  
+		  [% USE current_year = date(format => '%Y') %]
+		  [% current_year = current_year.format %]
+
 		  <select name="BYEAR">
 		    <option value=""></option>
-		    [% FOR i IN [1900 .. YEAR] -%]
+		    [% FOR i IN [1900 .. current_year] -%]
 		    [% filter_option(BDAY.0, i, i) %]
 		    [% END -%]
 		  </select>
@@ -206,7 +211,7 @@ END;
 	    </table>
 	    <p><a href="#" id="wwwsclick" class="btn btn-default">[% locale.maketext("New web page") %]</a><input type="hidden" name="wwwcount" id="wwwcount" value="[% CPANEL.CPVAR.id %]" /></p>
 
-	    <h3>[% locale.maketext('CGPAdditionalInfo') %]</h3>
+	    <h3>[% locale.maketext('Additional Info') %]</h3>
 
             <div class="form-group">
               <label for="NICKNAME">
@@ -270,10 +275,9 @@ END;
 	    </div>
         </form>
     </div>
-
+</div>
     [% INCLUDE _assets/return_link.html.tt return_location='contacts.html?account=' _ FORM.account return_link_text=locale.maketext('Go Back') %]
 
-</div>
 [% END %]
 
 [% BLOCK js_block %]

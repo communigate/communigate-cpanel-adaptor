@@ -60,39 +60,39 @@
 <td class="frow">
 <div style="float: left; display:inline; width: 510px;">
 <select name="part[% loop.index+1 %]" onchange="handlepart(this)" style="width:250px;" autocomplete="off" autofill="off">
-  [% filter_option(q.part, "From", locale.maketext("CGPFrom")) %]
-  [% filter_option(q.part, "Sender", locale.maketext("CGPSender")) %]
-  [% filter_option(q.part, "Return-Path", locale.maketext("CGPReturnPath")) %]
-  [% filter_option(q.part, "To", locale.maketext("CGPTo")) %]
-  [% filter_option(q.part, "Cc", locale.maketext("CGPCc")) %]
-  [% filter_option(q.part, "Any To or Cc", locale.maketext("CGPAnyToorCc")) %]
-  [% filter_option(q.part, "Each To or Cc", locale.maketext("CGPEachToorCc")) %]
-  [% filter_option(q.part, "Reply-To", locale.maketext("CGPReplyTo")) %]
-  [% filter_option(q.part, "'From' Name", locale.maketext("CGPFromName")) %]
-  [% filter_option(q.part, "Subjects", locale.maketext("CGPSubject")) %]
-  [% filter_option(q.part, "Message-ID", locale.maketext("CGPMessageID")) %]
-  [% filter_option(q.part, "Message Size", locale.maketext("CGPMessageSize")) %]
-  [% filter_option(q.part, "Time Of Day", locale.maketext("CGPTimeOfDay")) %]
-  [% filter_option(q.part, "Current Date", locale.maketext("CGPCurrentDate")) %]
-  [% filter_option(q.part, "Current Day", locale.maketext("CGPCurrentDay")) %]
-  [% filter_option(q.part, "Preference", locale.maketext("CGPPreference")) %]
-  [% filter_option(q.part, "FreeBusy", locale.maketext("CGPFreeBusy")) %]
-  [% filter_option(q.part, "Human Generated", locale.maketext("CGPHumanGenerated")) %]
-  [% filter_option(q.part, "Header Field", locale.maketext("CGPHeaderField")) %]
-  [% filter_option(q.part, "Any Recipient", locale.maketext("CGPAnyRecipient")) %]
-  [% filter_option(q.part, "Each Recipient", locale.maketext("CGPEachRecipient")) %]
-  [% filter_option(q.part, "Existing Mailbox", locale.maketext("CGPExistingMailbox")) %]
-  [% filter_option(q.part, "Security", locale.maketext("CGPSecurity")) %]
-  [% filter_option(q.part, "Source", locale.maketext("CGPSource")) %]
-  [% filter_option(q.part, "Submit Address", locale.maketext("CGPSubmitAddress")) %]
+  [% filter_option(q.part, "From", locale.maketext("From")) %]
+  [% filter_option(q.part, "Sender", locale.maketext("Sender")) %]
+  [% filter_option(q.part, "Return-Path", locale.maketext("Return Path")) %]
+  [% filter_option(q.part, "To", locale.maketext("To")) %]
+  [% filter_option(q.part, "Cc", locale.maketext("Cc")) %]
+  [% filter_option(q.part, "Any To or Cc", locale.maketext("Any, To or Cc")) %]
+  [% filter_option(q.part, "Each To or Cc", locale.maketext("Each, To or Cc")) %]
+  [% filter_option(q.part, "Reply-To", locale.maketext("Reply To")) %]
+  [% filter_option(q.part, "'From' Name", locale.maketext("From Name")) %]
+  [% filter_option(q.part, "Subjects", locale.maketext("Subject")) %]
+  [% filter_option(q.part, "Message-ID", locale.maketext("Message-ID")) %]
+  [% filter_option(q.part, "Message Size", locale.maketext("Message Size")) %]
+  [% filter_option(q.part, "Time Of Day", locale.maketext("Time Of Day")) %]
+  [% filter_option(q.part, "Current Date", locale.maketext("Current Date")) %]
+  [% filter_option(q.part, "Current Day", locale.maketext("Current Day")) %]
+  [% filter_option(q.part, "Preference", locale.maketext("Preference")) %]
+  [% filter_option(q.part, "FreeBusy", locale.maketext("Free/Busy")) %]
+  [% filter_option(q.part, "Human Generated", locale.maketext("Human Generated")) %]
+  [% filter_option(q.part, "Header Field", locale.maketext("Header Field")) %]
+  [% filter_option(q.part, "Any Recipient", locale.maketext("Any Recipient")) %]
+  [% filter_option(q.part, "Each Recipient", locale.maketext("Each Recipient")) %]
+  [% filter_option(q.part, "Existing Mailbox", locale.maketext("Existing Mailbox")) %]
+  [% filter_option(q.part, "Security", locale.maketext("Security")) %]
+  [% filter_option(q.part, "Source", locale.maketext("Source")) %]
+  [% filter_option(q.part, "Submit Address", locale.maketext("Submit Address")) %]
 </select>
 <select name="match[% loop.index+1 %]" style="width:250px;" autocomplete="off" autofill="off">
-[% filter_option(q.match, "is", locale.maketext("CGPis")) %]
-[% filter_option(q.match, "is not", locale.maketext("CGPisNot")) %]
-[% filter_option(q.match, "in", locale.maketext("CGPin")) %]
-[% filter_option(q.match, "not in", locale.maketext("CGPnotIn")) %]
-[% filter_option(q.match, "greater than", locale.maketext("CGPgreaterThan")) %]
-[% filter_option(q.match, "less than", locale.maketext("CGPlessThan")) %]
+[% filter_option(q.match, "is", locale.maketext("is")) %]
+[% filter_option(q.match, "is not", locale.maketext("is not")) %]
+[% filter_option(q.match, "in", locale.maketext("in")) %]
+[% filter_option(q.match, "not in", locale.maketext("not in")) %]
+[% filter_option(q.match, "greater than", locale.maketext("greater than")) %]
+[% filter_option(q.match, "less than", locale.maketext("less than")) %]
 </select>
 <input type="text" id="val[% loop.index+1 %]" class="form-control rule_field" name="val[% loop.index+1 %]" size="60" style="width:498px" value="[% q.val FILTER html %]">
 </div>
@@ -121,7 +121,7 @@
       }
     });
     
-    if ( is_filled != 0 ) {
+    if ( xis_filled != 0 ) {
     alert( "Please fill rule fields!" );
     event.preventDefault();
     }
@@ -140,26 +140,26 @@
     <div class="pull-left">
         <div class="form-group">
             <select name="action[% loop.index+1 %]" id="action_menu" onchange="handleaction(this);" style="width:220px;" autocomplete="off" autofill="off">
-	      [% filter_option(q.action, "Store in", locale.maketext("CGPStorein")) %]
-	      [% filter_option(q.action, "Mark", locale.maketext("CGPMark")) %]
-	      [% filter_option(q.action, "Add Header", locale.maketext("CGPAddHeader")) %]
-	      [% filter_option(q.action, "Tag Submit", locale.maketext("CGPTagSubject")) %]
-	      [% filter_option(q.action, "Reject with", locale.maketext("CGPRejectwith")) %]
-	      [% filter_option(q.action, "Discard", locale.maketext("CGPDiscard")) %]
-	      [% filter_option(q.action, "Stop Processing", locale.maketext("CGPStopProcessing")) %]
-	      [% filter_option(q.action, "Remember 'From' in", locale.maketext("CGPRememberFromin")) %]
-	      [% filter_option(q.action, "Accept Request", locale.maketext("CGPAcceptRequest")) %]
-	      [% filter_option(q.action, "Store Encrypted in", locale.maketext("CGPStoreEncryptedin")) %]
-	      [% filter_option(q.action, "Copy Attachments into", locale.maketext("CGPCopyAttachmentsinto")) %]
-	      [% filter_option(q.action, "Redirect To", locale.maketext("CGPRedirectTo")) %]
-	      [% filter_option(q.action, "Forward to", locale.maketext("CGPForwardTo")) %]
-	      [% filter_option(q.action, "Mirror to", locale.maketext("CGPMirrorTo")) %]
-	      [% filter_option(q.action, "Replay with", locale.maketext("CGPReplyWith")) %]
-	      [% filter_option(q.action, "Replay to All with", locale.maketext("CGPReplytoAllwith")) %]
-	      [% filter_option(q.action, "React with", locale.maketext("CGPReactwith")) %]
-	      [% filter_option(q.action, "Send IM", locale.maketext("CGPSendIM")) %]
-	      [% filter_option(q.action, "Execute URL", locale.maketext("CGPExecuteURL")) %]
-	      [% filter_option(q.action, "FingerNotify", locale.maketext("CGPFingerNotify")) %]
+	      [% filter_option(q.action, "Store in", locale.maketext("Store in")) %]
+	      [% filter_option(q.action, "Mark", locale.maketext("Mark")) %]
+	      [% filter_option(q.action, "Add Header", locale.maketext("Add Header")) %]
+	      [% filter_option(q.action, "Tag Submit", locale.maketext("Tag Subject")) %]
+	      [% filter_option(q.action, "Reject with", locale.maketext("Reject with")) %]
+	      [% filter_option(q.action, "Discard", locale.maketext("Discard")) %]
+	      [% filter_option(q.action, "Stop Processing", locale.maketext("Stop Processing")) %]
+	      [% filter_option(q.action, "Remember 'From' in", locale.maketext("Remember From in")) %]
+	      [% filter_option(q.action, "Accept Request", locale.maketext("Accept Request")) %]
+	      [% filter_option(q.action, "Store Encrypted in", locale.maketext("Store Encrypted in")) %]
+	      [% filter_option(q.action, "Copy Attachments into", locale.maketext("Copy Attachments into")) %]
+	      [% filter_option(q.action, "Redirect To", locale.maketext("Redirect To")) %]
+	      [% filter_option(q.action, "Forward to", locale.maketext("Forward To")) %]
+	      [% filter_option(q.action, "Mirror to", locale.maketext("Mirror To")) %]
+	      [% filter_option(q.action, "Replay with", locale.maketext("Reply With")) %]
+	      [% filter_option(q.action, "Replay to All with", locale.maketext("Reply to All with")) %]
+	      [% filter_option(q.action, "React with", locale.maketext("React with")) %]
+	      [% filter_option(q.action, "Send IM", locale.maketext("Send IM")) %]
+	      [% filter_option(q.action, "Execute URL", locale.maketext("Execute URL")) %]
+	      [% filter_option(q.action, "FingerNotify", locale.maketext("FingerNotify")) %]
             </select>
         </div>
         <div class="form-group">

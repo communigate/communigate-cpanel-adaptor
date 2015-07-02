@@ -155,7 +155,7 @@ app_key = 'cgpro_extensions'
     </form>
     </div>
 
-    <h3>[% locale.maketext("AssignLocalExtension") %]</h3>
+    <h3>[% locale.maketext("Assign Local Extension") %]</h3>
     <form id="mainform" method="post" action="" name="mainform">
       [% IF CPANEL.CPERROR.CommuniGate_local_extension -%]
       <pre>
@@ -199,7 +199,7 @@ app_key = 'cgpro_extensions'
 	</div>
       </div>
       <div class="form-group">
-	<input id="add_local_extension" class="btn btn-primary" type="submit" value="[% locale.maketext("AssignLocalExtension") %]" tabindex="5" />
+	<input id="add_local_extension" class="btn btn-primary" type="submit" value="[% locale.maketext("Assign Local Extension") %]" tabindex="5" />
       </div>
     </form>
   </div>

@@ -10,13 +10,13 @@
 <tr>
   <td>
     <select name="aclto-[% id %]" class="form-control">
-      [% filter_option(acl, "anyone@", "CGPAnyoneInDomain" ) %]
+      [% filter_option(acl, "anyone@", "Anyone In Domain" ) %]
       [% FOR account IN addressbook.0.accounts.keys.grep(CPANEL.CPVAR.domain _ '$').sort %]
-      [% filter_option(acl, account.split("@").0, account _ (domain ? '@' _ domain : '') _ " (" _ locale.maketext("CGPAccount") _ ")" ) %]
+      [% filter_option(acl, account.split("@").0, account _ (domain ? '@' _ domain : '') _ " (" _ locale.maketext("Account") _ ")" ) %]
       [% END %]
       [% FOR account IN addressbook.0.groups.keys.grep(CPANEL.CPVAR.domain _ '$').sort %]
       [% IF !groups.$account.EmailDisabled || groups.$account.EmailDisabled == 'NO' -%]
-      [% filter_option(acl, '#' _ account.split("@").0, account _ (domain ? '@' _ domain : '') _ " (" _ locale.maketext("CGPGroup") _ ")" ) %]
+      [% filter_option(acl, '#' _ account.split("@").0, account _ (domain ? '@' _ domain : '') _ " (" _ locale.maketext("Group") _ ")" ) %]
       [% END -%]
       [% END -%]
     </select>

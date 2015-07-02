@@ -35,37 +35,37 @@ USE Encoder;
 		  <p>
 		    <label style="width: 50%; display: inline-block;">Archive Messages after:</label>
 		    <select name="ArchiveMessagesAfter-[% dom.domain %]">
-		      [% filter_option(dom.ArchiveMessagesAfter, "", locale.maketext('CGPdefault')) %]
-		      [% filter_option(dom.ArchiveMessagesAfter, "0", locale.maketext('CGPnever')) %]
-		      [% filter_option(dom.ArchiveMessagesAfter, "1d", locale.maketext('CGPhours', 24)) %]
-		      [% filter_option(dom.ArchiveMessagesAfter, "2d", locale.maketext('CGPdays', 2)) %]
-		      [% filter_option(dom.ArchiveMessagesAfter, "3d", locale.maketext('CGPdays', 3)) %]
-		      [% filter_option(dom.ArchiveMessagesAfter, "5d", locale.maketext('CGPdays', 5)) %]
-		      [% filter_option(dom.ArchiveMessagesAfter, "7d", locale.maketext('CGPdays', 7)) %]
-		      [% filter_option(dom.ArchiveMessagesAfter, "14d", locale.maketext('CGPweeks', 2)) %]
-		      [% filter_option(dom.ArchiveMessagesAfter, "30d", locale.maketext('CGPdays', 30)) %]
-		      [% filter_option(dom.ArchiveMessagesAfter, "90d", locale.maketext('CGPdays', 90)) %]
-		      [% filter_option(dom.ArchiveMessagesAfter, "180d", locale.maketext('CGPdays', 180)) %]
-		      [% filter_option(dom.ArchiveMessagesAfter, "365d", locale.maketext('CGPdays', 365)) %]
-		      [% filter_option(dom.ArchiveMessagesAfter, "730d", locale.maketext('CGPdays', 730)) %]
+		      [% filter_option(dom.ArchiveMessagesAfter, "", locale.maketext('default')) %]
+		      [% filter_option(dom.ArchiveMessagesAfter, "0", locale.maketext('never')) %]
+		      [% filter_option(dom.ArchiveMessagesAfter, "1d", locale.maketext('24 hours')) %]
+		      [% filter_option(dom.ArchiveMessagesAfter, "2d", locale.maketext('2 days')) %]
+		      [% filter_option(dom.ArchiveMessagesAfter, "3d", locale.maketext('3 days')) %]
+		      [% filter_option(dom.ArchiveMessagesAfter, "5d", locale.maketext('5 days')) %]
+		      [% filter_option(dom.ArchiveMessagesAfter, "7d", locale.maketext('7 days')) %]
+		      [% filter_option(dom.ArchiveMessagesAfter, "14d", locale.maketext('2 weeks')) %]
+		      [% filter_option(dom.ArchiveMessagesAfter, "30d", locale.maketext('30 days')) %]
+		      [% filter_option(dom.ArchiveMessagesAfter, "90d", locale.maketext('90 days')) %]
+		      [% filter_option(dom.ArchiveMessagesAfter, "180d", locale.maketext('180 days')) %]
+		      [% filter_option(dom.ArchiveMessagesAfter, "365d", locale.maketext('365 days')) %]
+		      [% filter_option(dom.ArchiveMessagesAfter, "730d", locale.maketext('730 days')) %]
 		    </select>
 		  </p>
 		  <p>
 		    <label style="width: 50%; display: inline-block;">Delete Messages after:</label>
 		    <select name="DeleteMessagesAfter-[% dom.domain %]">
-		      [% filter_option(dom.DeleteMessagesAfter, "", locale.maketext('CGPdefault')) %]
-		      [% filter_option(dom.DeleteMessagesAfter, "0", locale.maketext('CGPnever')) %]
-		      [% filter_option(dom.DeleteMessagesAfter, "1d", locale.maketext('CGPhours', 24)) %]
-		      [% filter_option(dom.DeleteMessagesAfter, "2d", locale.maketext('CGPdays', 2)) %]
-		      [% filter_option(dom.DeleteMessagesAfter, "3d", locale.maketext('CGPdays', 3)) %]
-		      [% filter_option(dom.DeleteMessagesAfter, "5d", locale.maketext('CGPdays', 5)) %]
-		      [% filter_option(dom.DeleteMessagesAfter, "7d", locale.maketext('CGPdays', 7)) %]
-		      [% filter_option(dom.DeleteMessagesAfter, "14d", locale.maketext('CGPweeks', 2)) %]
-		      [% filter_option(dom.DeleteMessagesAfter, "30d", locale.maketext('CGPdays', 30)) %]
-		      [% filter_option(dom.DeleteMessagesAfter, "90d", locale.maketext('CGPdays', 90)) %]
-		      [% filter_option(dom.DeleteMessagesAfter, "180d", locale.maketext('CGPdays', 180)) %]
-		      [% filter_option(dom.DeleteMessagesAfter, "365d", locale.maketext('CGPdays', 365)) %]
-		      [% filter_option(dom.DeleteMessagesAfter, "730d", locale.maketext('CGPdays', 730)) %]
+		      [% filter_option(dom.DeleteMessagesAfter, "", locale.maketext('default')) %]
+		      [% filter_option(dom.DeleteMessagesAfter, "0", locale.maketext('never')) %]
+		      [% filter_option(dom.DeleteMessagesAfter, "1d", locale.maketext('24 hours')) %]
+		      [% filter_option(dom.DeleteMessagesAfter, "2d", locale.maketext('2 days')) %]
+		      [% filter_option(dom.DeleteMessagesAfter, "3d", locale.maketext('3 days')) %]
+		      [% filter_option(dom.DeleteMessagesAfter, "5d", locale.maketext('5 days')) %]
+		      [% filter_option(dom.DeleteMessagesAfter, "7d", locale.maketext('7 days')) %]
+		      [% filter_option(dom.DeleteMessagesAfter, "14d", locale.maketext('2 weeks')) %]
+		      [% filter_option(dom.DeleteMessagesAfter, "30d", locale.maketext('30 days')) %]
+		      [% filter_option(dom.DeleteMessagesAfter, "90d", locale.maketext('90 days')) %]
+		      [% filter_option(dom.DeleteMessagesAfter, "180d", locale.maketext('180 days')) %]
+		      [% filter_option(dom.DeleteMessagesAfter, "365d", locale.maketext('365 days')) %]
+		      [% filter_option(dom.DeleteMessagesAfter, "730d", locale.maketext('730 days')) %]
 		    </select>
 		  </p>
                 </td>
