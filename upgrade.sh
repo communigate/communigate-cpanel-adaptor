@@ -145,9 +145,9 @@ cp ${PKGSRC}/module/*.pm /usr/local/cpanel/Cpanel/
 
 # Start x3
 
-rm -rf ${BASEDIR}/x3/cgpro
+rm -rf "${BASEDIR}/x3/cgpro"
 cp -r "${PKGSRC}/theme/*" "${BASEDIR}/x3/"
-rm -f ${BASEDIR}/x3/branding/cgpro_*
+rm -f "${BASEDIR}/x3/branding/cgpro_*"
 cp "${PKGSRC}/icons/*" "${BASEDIR}/x3/branding"
 cp "${PKGSRC}/plugin/*.conf" "${BASEDIR}/x3/dynamicui/"
 
@@ -197,9 +197,9 @@ done
 # END x3
 
 # START paper_lantern
-rm -rf ${BASEDIR}/paper_lantern/cgpro
+rm -rf "${BASEDIR}/theme_paper_lantern/cgpro"
 cp -r "${PKGSRC}/theme_paper_lantern/cgpro" "${BASEDIR}/paper_lantern/"
-rm -f ${BASEDIR}/paper_lantern/branding/cgpro_*
+rm -f "${BASEDIR}/icons_paper_lantern/branding/cgpro_*"
 cp "${PKGSRC}/icons_paper_lantern/"* "${BASEDIR}/paper_lantern/branding"
 cp "${PKGSRC}/plugin/*.conf" "${BASEDIR}/paper_lantern/dynamicui/"
 

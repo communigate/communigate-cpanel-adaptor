@@ -165,9 +165,9 @@ done
 # END x3
 
 # START paper_lantern
-cp -r "${PKGSRC}/theme_paper_lantern/cgpro" "${BASEDIR}/paper_lantern/"
-cp "${PKGSRC}/icons_paper_lantern/"* "${BASEDIR}/paper_lantern/branding"
-cp "${PKGSRC}/plugin/*.conf" "${BASEDIR}/paper_lantern/dynamicui/"
+cp -a "${PKGSRC}/paper_lantern/*" "${BASEDIR}/paper_lantern/"
+cp "${PKGSRC}/icons_paper_lantern/*" "${BASEDIR}/paper_lantern/styled/basic/icons/"
+cp "${PKGSRC}/plugin/*.conf" "${BASEDIR}/paper_lantern/dynamicui"
 
 if [ ! -d ${BASEDIR}/paper_lantern/js2-min/cgpro ]
 then
