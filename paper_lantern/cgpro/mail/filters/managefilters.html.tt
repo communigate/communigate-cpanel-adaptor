@@ -64,42 +64,36 @@ app_key = 'cgpro_user_filters'
   [% END %]
 </div><!-- end body-content -->
 [% END %]
-    <script>
-      var clear_search = function() {
-      YAHOO.util.Dom.get("search_input").value = "";
-      search_logs();
-      };
+<script>
+  var clear_search = function() {
+  YAHOO.util.Dom.get("search_input").value = "";
+  search_logs();
+  };
 
-      var search_logs = function() {
-      
-      $(".result_rows").each( function(index) {
-      $(this).css("display", "")
-      });
-      
-        var no_rows = 0;       
-
-        $(".result_rows").each( function(index) {
-          no_rows = 0;
-          $(".no_results").css("display", "none");
-          var searchstring = "";
-          var searchregex = $("#search_input").val();
-          searchstring += $(this).find(".td1").html();
-          var res = searchstring.match(searchregex);
-
-      if (!res) {
-            $(this).css("display", "none");
-          }
-          var none = $(this).css("display");
-          if (none != "none") {
-            no_rows += 1;
-          }
-        });
-      
-        if (no_rows == 0) {
-        $(".no_results").show();
-        }
-      }   
-
-      $("#search_input").keyup( search_logs );
-
-    </script>
+  var search_logs = function() {
+  $(".result_rows").each( function(index) {
+  $(this).css("display", "")
+  });
+  var no_rows = 0;       
+  
+  $(".result_rows").each( function(index) {
+  $(".no_results").css("display", "none");
+  var searchstring = "";
+  var searchregex = $("#search_input").val();
+  searchstring += $(this).find(".td1").html();
+  var res = searchstring.match(searchregex);
+  if (!res) {
+  $(this).css("display", "none");
+  }
+  var none = $(this).css("display");
+  if (none != "none") {
+  no_rows += 1;
+  }
+  });
+  console.log(no_rows);
+  if (no_rows == 0) {
+  $(".no_results").show();
+  }
+  }   
+  $("#search_input").keyup( search_logs );
+</script>
