@@ -35,7 +35,7 @@ app_key = 'cgpro_rpop'
     <form action="doeditrpop.html?account=[% FORM.account %]" method="post">
 
       <div class="form-group">
-	<label for="name">[% locale.maketext("CGPDisplayName") %]</label>
+	<label for="name">[% locale.maketext("Display Name") %]</label>
 	<div class="row">
 	  <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
 	    <input type="text" name="name" id="name" class="form-control col-xs-2" value="[% FORM.rpop %]" [% IF FORM.rpop %] readonly=""[% END %]/>
@@ -45,7 +45,7 @@ app_key = 'cgpro_rpop'
       </div>
 
       <div class="form-group">
-	<label for="name">[% locale.maketext("CGPAccount") %]</label>
+	<label for="name">[% locale.maketext("Account") %]</label>
 	<div class="row">
 	  <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
 	    <input type="text" name="authName" id="authName" class="form-control col-xs-2" value="[% rpop.rpop.authName %]"/>
@@ -55,7 +55,7 @@ app_key = 'cgpro_rpop'
       </div>
 
       <div class="form-group">
-	<label for="name">[% locale.maketext("CGPHost") %]</label>
+	<label for="name">[% locale.maketext("Host") %]</label>
 	<div class="row">
 	  <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
 	    <input type="text" name="domain" id="domain" class="form-control col-xs-2" value="[% rpop.rpop.domain %]"/>
@@ -65,7 +65,7 @@ app_key = 'cgpro_rpop'
       </div>
 
       <div class="form-group">
-	<label for="name">[% locale.maketext("CGPPassword") %]</label>
+	<label for="name">[% locale.maketext("Password") %]</label>
 	<div class="row">
 	  <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
 	    <input type="password" name="password" id="password" class="form-control col-xs-2" value="[% rpop.password %]"/>
@@ -75,7 +75,7 @@ app_key = 'cgpro_rpop'
       </div>
 
       <div class="form-group">
-	<label for="name">[% locale.maketext("CGPMailbox") %]</label>
+	<label for="name">[% locale.maketext("Mailbox") %]</label>
 	<div class="row">
 	  <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
 	    <input type="text" name="mailbox" id="mailbox" class="form-control col-xs-2" value="[% rpop.rpop.mailbox %]"/>
@@ -90,7 +90,7 @@ app_key = 'cgpro_rpop'
 		 checked
 		 [% END %]
 		 >
-	  <label for="leave">[% locale.maketext("CGPLeaveMessagesOnServer") %]</label>
+	  <label for="leave">[% locale.maketext("Leave Messages On Server") %]</label>
 	</div>
       </div>
 
@@ -117,7 +117,7 @@ app_key = 'cgpro_rpop'
       </div>
 
       <div class="form-group">
-	<label for="name">[% locale.maketext("CGPPullEvery") %]</label>
+	<label for="name">[% locale.maketext("Pull Every") %]</label>
 	<div class="row">
 	  <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
 	    <select name="period" class="form-control">
@@ -135,7 +135,7 @@ app_key = 'cgpro_rpop'
 	      [% filter_option( rpop.rpop.period || "600s", "21600s" , "6h") %]
 	      [% filter_option( rpop.rpop.period || "600s", "22800s" , "8h") %]
 	      [% filter_option( rpop.rpop.period || "600s", "86400s" , "24h") %]
-	      [% filter_option( rpop.rpop.period || "600s", "1000000000s" , "CGPDisabled") %]
+	      [% filter_option( rpop.rpop.period || "600s", "1000000000s" , "Disabled") %]
 	    </select>
 	  </div>
 	</div>
@@ -144,17 +144,17 @@ app_key = 'cgpro_rpop'
       <div class="form-group">
 	<input type="hidden" name="oldMessageID" value="[% vcard.UID.VALUE.item('Message-ID') %]" />
 	<input type="hidden" name="oldUID" value="[% FORM.contact %]" />
-	<input id="submit" class="btn btn-primary" type="submit" value="[% locale.maketext("CGPSave") %]" name="save" />
+	<input id="submit" class="btn btn-primary" type="submit" value="[% locale.maketext("Save") %]" name="save" />
       </div>
     </form>
 
     <script type="text/javascript">
       var LANG = {};
-      LANG.name_input = '[% locale.maketext("CGPDisplayName") %]';
-      LANG.authname_input = '[% locale.maketext("CGPAccount") %]';
-      LANG.domain_input = '[% locale.maketext("CGPHost") %]';
-      LANG.password_input = '[% locale.maketext("CGPPassword") %]';
-      LANG.name_input_invalid = '[% locale.maketext("CGPThisFieldIsRequired") %]!';
+      LANG.name_input = '[% locale.maketext("Display Name") %]';
+      LANG.authname_input = '[% locale.maketext("Account") %]';
+      LANG.domain_input = '[% locale.maketext("Host") %]';
+      LANG.password_input = '[% locale.maketext("Password") %]';
+      LANG.name_input_invalid = '[% locale.maketext("This Field Is Required") %]!';
       YAHOO.util.Event.onDOMReady(function () {
          var VAL_NAME = new CPANEL.validate.validator(LANG.name_input);
          VAL_NAME.add("name", 'min_length(%input%,1)', LANG.name_input_invalid);

@@ -63,13 +63,13 @@ rpop = rpop.0;
   [% IF RAW_FORM.item("account") %]
   <div class="section">
     <p>
-      <a class="btn btn-primary" href="editrpop.html?account=[% FORM.account %]">[% locale.maketext("CGPAddRemotePOP") %]</a>
+      <a class="btn btn-primary" href="editrpop.html?account=[% FORM.account %]">[% locale.maketext("Add Remote POP") %]</a>
     </p>
     <table border="0" cellpadding="5" cellspacing="0" id="mailtbl" class="sortable truncate-table table table-striped" width="650">
       <thead>
 	<tr>
-	  <th class="clickable sorttable_sorted">[% locale.maketext("CGPRemotePOP") %]</th>
-	  <th class="clickable sorttable_nosort">[% locale.maketext("CGPStatus") %]</th>
+	  <th class="clickable sorttable_sorted">[% locale.maketext("Remote POP") %]</th>
+	  <th class="clickable sorttable_nosort">[% locale.maketext("Status") %]</th>
 	  <th class="clickable sorttable_nosort">[% locale.maketext("Functions") %]</th>
 	</tr>
       </thead>
@@ -90,7 +90,7 @@ rpop = rpop.0;
 	  <td class="truncate sorttable_nosort">
 	    <a href="editrpop.html?account=[% FORM.account %]&amp;rpop=[% pop %]" class="btn btn-link">
 	      <span class="glyphicon glyphicon-edit"></span>
-	      [% locale.maketext("CGPViewEdit") %]
+	      [% locale.maketext("View/Edit") %]
 	    </a>
 	    <a href="deleterpop.html?account=[% FORM.account %]&amp;rpop=[% pop %]" class="btn btn-link">
 	      <span class="glyphicon glyphicon-trash"></span>
