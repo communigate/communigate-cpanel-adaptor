@@ -81,7 +81,7 @@ rm -f /etc/chkserv.d/CommuniGate
 rm -f /etc/chkserv.d/CommuniGate_spamd
 sed -i -e '/^CommuniGate/d' /etc/chkserv.d/chkservd.conf
 
-# Uninstall CommuniGate Plugin
+# Install CommuniGate Plugin
 BASEDIR='/usr/local/cpanel/base/frontend';
 SAVEIFS=$IFS
 IFS=$(echo -en "\n\b")
@@ -92,24 +92,39 @@ IFS=$OLDIFS
 tLen=${#THEMES[@]}
 lLen=${#LOCALES[@]}
 
-for (( i=0; i<${tLen}; i++ ));
-do
-    if [ "${THEMES[$i]}" == "${BASEDIR}/CommuniGate" ]
-    then
-        continue
-    fi
-    rm -rf ${THEMES[$i]}/cgpro
-    rm -f ${THEMES[$i]}/branding/cgpro_*
-    rm -rf ${THEMES[$i]}/dynamicui/dynamicui_cgpro.conf
-    rm -f ${THEMES[$i]}/js2-min/cgpro/mail
-    rmdir  ${THEMES[$i]}/js2-min/cgpro
-    rm -f ${THEMES[$i]}/css2-min/cgpro/mail
-    rmdir ${THEMES[$i]}/css2-min/cgpro
-    for ((j=0; j<${lLen}; j++)); do
-        TARGET=${THEMES[$i]}/locale/`basename ${LOCALES[$j]} '{}'`.yaml.local
-	sed -i -e '/^"*CGP/d' ${TARGET}
-    done
+PKGSRC = $(dirname "$0");
+
+cp ${PKGSRC}/module/*.pm /usr/local/cpanel/Cpanel/
+
+# Start x3
+rm -rf ${BASEDIR}/x3/cgpro
+rm -f ${BASEDIR}/x3/branding/cgpro_*
+rm -rf ${BASEDIR}/x3/dynamicui/dynamicui_cgpro.conf
+rm -f ${BASEDIR}/x3/js2-min/cgpro/mail
+rmdir  ${BASEDIR}/x3/js2-min/cgpro
+rm -f ${BASEDIR}/x3/css2-min/cgpro/mail
+rmdir ${BASEDIR}/x3/css2-min/cgpro
+
+for ((j=0; j<${lLen}; j++)); do
+    TARGET=${BASEDIR}/x3/locale/`basename ${LOCALES[$j]} '{}'`.yaml.local
+    sed -i -e '/^"*CGP/d' ${TARGET}
 done
+# END x3
+
+# START paper_lantern
+rm -rf ${BASEDIR}/x3/cgpro
+rm -f ${BASEDIR}/x3/branding/cgpro_*
+rm -rf ${BASEDIR}/x3/dynamicui/dynamicui_cgpro.conf
+rm -f ${BASEDIR}/x3/js2-min/cgpro/mail
+rmdir  ${BASEDIR}/x3/js2-min/cgpro
+rm -f ${BASEDIR}/x3/css2-min/cgpro/mail
+rmdir ${BASEDIR}/x3/css2-min/cgpro
+
+for ((j=0; j<${lLen}; j++)); do
+    TARGET=${BASEDIR}/x3/locale/`basename ${LOCALES[$j]} '{}'`.yaml.local
+    sed -i -e '/^"*CGP/d' ${TARGET}
+done
+# END paper_lantern 
 
 # Uninstall CommuniGate Plugin Webmail
 BASEDIR='/usr/local/cpanel/base/webmail';
