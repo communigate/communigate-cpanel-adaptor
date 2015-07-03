@@ -15,7 +15,7 @@ SET settings = Api2.exec("CommuniGate", "AccountDefaults", {save=RAW_FORM.item("
 app_key = 'cgpro_domain_settings'
 -%]
 <div class="body-content">
-  [% IF CPANEL.feature('cgpro_account_defaults') %]
+  [% IF CPANEL.feature('cgpro_domain_settings') %]
   [% IF !(ExpVar.expand('$appname') == "webmail") %]
   <div class="pull-right">
     <div id="manage-list">
@@ -269,9 +269,7 @@ app_key = 'cgpro_domain_settings'
 [%END -%]
 [% INCLUDE _assets/return_link.html.tt return_location='../index.html' return_link_text=locale.maketext('Go Back') %]
 
-  [% ELSE %]
-  [% PROCESS cgpro/icn_description.html.tt %]
-  [% END %]<!-- end cpanelfeature autoresponders -->
+[% END %]<!-- end cpanelfeature autoresponders -->
 
 </div><!-- end body-content -->
 [% END %]

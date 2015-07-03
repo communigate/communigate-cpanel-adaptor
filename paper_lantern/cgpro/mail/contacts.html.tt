@@ -9,6 +9,7 @@
 -%]
 <div class="body-content">
   [% IF CPANEL.feature('cgpro_contacts') %]
+
   <div class="pull-right">
     <div id="manage-list">
       <form method="get" action="" id="manage_list_form" class="form-inline">

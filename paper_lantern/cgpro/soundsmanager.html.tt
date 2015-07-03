@@ -41,7 +41,6 @@ app_key = 'cgpro_sounds_manager'
 </style>
 
 <div class="body-content"> 
-  [% IF CPANEL.feature('cgpro_sounds_manager') %]
   [% MACRO filter_option(pval, val, text) BLOCK -%]
   <option value="[% val %]"[% val == pval ? " selected='selected'" : "" %]>[% locale.maketext(text) %]</option>
   [% END -%]
@@ -64,11 +63,6 @@ app_key = 'cgpro_sounds_manager'
 	      </select>
 	      [% END %]
 	    </form>
-	  [% IF !RAW_FORM.item("domain") %]
-	  <script type="text/javascript">
-	    YAHOO.util.Dom.get("selectDomain").submit();
-	  </script>
-	  [% END %]
 	  </div>
 	</div>
       </div>
@@ -145,9 +139,6 @@ app_key = 'cgpro_sounds_manager'
   </table>
   <iframe src="" id="frame" style="width: 0; height: 0; visibility: hidden;">
   </iframe>
-  [% ELSE %]
-  [% PROCESS cgpro/icn_description.html.tt %]
-  [% END %]
 </div>
 <script type="text/javascript">
 var playFile = function (e) {

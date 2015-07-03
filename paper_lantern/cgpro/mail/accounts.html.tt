@@ -802,10 +802,8 @@ var DEFAULT_EMAIL_QUOTA = [% execute("Email", "get_default_email_quota_mib").dat
 	<tr>
       </table>
     </script>
-
-    [% ELSE %]
-    [% PROCESS cgpro/icn_description.html.tt %]
-    [% END %]<!-- end cpanelfeature popaccts -->
+[% END %]
+<!-- end cpanelfeature popaccts -->
 
 [% IF !CPANEL.feature('popaccts') %]
     [%  Api1.exec("include", ["../refresh.html"]) %]
