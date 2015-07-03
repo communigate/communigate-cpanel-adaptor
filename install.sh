@@ -195,21 +195,30 @@ chmod u+s /opt/CommuniGate/mail
 BASEDIR='/usr/local/cpanel/base/frontend';
 SAVEIFS=$IFS
 IFS=$(echo -en "\n\b")
-THEMES=($(find ${BASEDIR} -maxdepth 1 -mindepth 1 -type d))
+
 LOCALES=($(find ${PACKSRC}/locale -maxdepth 1 -mindepth 1))
 IFS=$OLDIFS
 
-tLen=${#THEMES[@]}
 lLen=${#LOCALES[@]}
 
-PKGSRC = $(dirname "$0");
-
-cp ${PKGSRC}/module/*.pm /usr/local/cpanel/Cpanel/
+cp ${PACKSRC}/module/*.pm /usr/local/cpanel/Cpanel/
 
 # Start x3
-cp -r "${PKGSRC}/theme/*" "${BASEDIR}/x3/"
-cp "${PKGSRC}/icons/*" "${BASEDIR}/x3/branding"
-cp "${PKGSRC}/plugin/*.conf" "${BASEDIR}/x3/dynamicui/"
+if [ ! -d ${BASEDIR}/x3/cgpro ]
+then
+    mkdir -p ${BASEDIR}/x3/cgpro
+fi
+if [ ! -d ${BASEDIR}/x3/branding ]
+then
+    mkdir -p ${BASEDIR}/x3/branding
+fi
+if [ ! -d ${BASEDIR}/x3/dynamicui ]
+then
+    mkdir -p ${BASEDIR}/x3/dynamicui
+fi
+cp -r ${PACKSRC}/theme/cgpro/* ${BASEDIR}/x3/cgpro
+cp ${PACKSRC}/icons/* ${BASEDIR}/x3/branding
+cp ${PACKSRC}/plugin/*.conf ${BASEDIR}/x3/dynamicui
 
 if [ ! -d ${BASEDIR}/x3/js2-min/cgpro ]
 then
@@ -238,23 +247,24 @@ chmod +x ${BASEDIR}/x3/cgpro/mail/contactsimport.live.cgi
 chmod +x ${BASEDIR}/x3/cgpro/getXmppHistory.live.cgi
 chmod +x ${BASEDIR}/x3/cgpro/playwav.live.cgi
 chmod +x ${BASEDIR}/x3/cgpro/getwav.live.cgi
-
-for ((j=0; j<${lLen}; j++)); do
-    TARGET=${BASEDIR}/x3/locale/`basename ${LOCALES[$j]} '{}'`.yaml.local
-    if [ ! -f ${TARGET} ]
-    then
-        echo "---" > ${TARGET}
-    else
-	sed -i -e '/^"*CGP/d' ${TARGET}
-    fi
-    cat ${LOCALES[$j]} >> ${TARGET}
-done
 # END x3
 
 # START paper_lantern
-cp -r "${PKGSRC}/theme_paper_lantern/cgpro" "${BASEDIR}/paper_lantern/"
-cp "${PKGSRC}/icons_paper_lantern/"* "${BASEDIR}/paper_lantern/branding"
-cp "${PKGSRC}/plugin/*.conf" "${BASEDIR}/paper_lantern/dynamicui/"
+if [ ! -d ${BASEDIR}/paper_lantern/cgpro ]
+then
+    mkdir -p ${BASEDIR}/paper_lantern/cgpro
+fi
+if [ ! -d ${BASEDIR}/paper_lantern/styled/basic/icons/ ]
+then
+    mkdir -p ${BASEDIR}/paper_lantern/styled/basic/icons/
+fi
+if [ ! -d ${BASEDIR}/paper_lantern/dynamicui ]
+then
+    mkdir -p ${BASEDIR}/paper_lantern/dynamicui
+fi
+cp -a ${PACKSRC}/paper_lantern/cgpro/* ${BASEDIR}/paper_lantern/cgpro/
+cp ${PACKSRC}/icons/* ${BASEDIR}/paper_lantern/styled/basic/icons/
+cp ${PACKSRC}/plugin/*.conf ${BASEDIR}/paper_lantern/dynamicui/
 
 if [ ! -d ${BASEDIR}/paper_lantern/js2-min/cgpro ]
 then
@@ -283,17 +293,6 @@ chmod +x ${BASEDIR}/paper_lantern/cgpro/mail/contactsimport.live.cgi
 chmod +x ${BASEDIR}/paper_lantern/cgpro/getXmppHistory.live.cgi
 chmod +x ${BASEDIR}/paper_lantern/cgpro/playwav.live.cgi
 chmod +x ${BASEDIR}/paper_lantern/cgpro/getwav.live.cgi
-
-for ((j=0; j<${lLen}; j++)); do
-    TARGET=${BASEDIR}/paper_lantern/locale/`basename ${LOCALES[$j]} '{}'`.yaml.local
-    if [ ! -f ${TARGET} ]
-    then
-        echo "---" > ${TARGET}
-    else
-	sed -i -e '/^"*CGP/d' ${TARGET}
-    fi
-    cat ${LOCALES[$j]} >> ${TARGET}
-done
 # END paper_lantern 
 
 # Install CommuniGate Plugin Webmail
