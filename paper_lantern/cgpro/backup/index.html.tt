@@ -282,9 +282,6 @@ SET accounts = Api2.exec("CommuniGate", "ListAccountsBackups");
     YAHOO.util.Event.onDOMReady(init);
 
 </script>
-
-    [% ELSE %]
-    [% PROCESS cgpro/icn_description.html.tt %]
     [% END %]
 </div>
 [% END #wrapper -%]

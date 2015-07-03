@@ -44,8 +44,6 @@ app_key = 'cgpro_caller_queues'
       [% END %]
     </tbody>
   </table>
-  [% ELSE %]
-  [% PROCESS cgpro/icn_description.html.tt %]
   [% END %]
 </div><!-- end body-content -->
 [% END %]

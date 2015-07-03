@@ -39,8 +39,6 @@ app_key = 'cgpro_call_rules'
       [% END -%]
     </tbody>
   </table>
-  [% ELSE %]
-  [% PROCESS cgpro/icn_description.html.tt %]
   [% END %]
 </div> <!-- END body-content -->
 [% END %]

@@ -135,8 +135,6 @@ function init_page() {
 }
 YAHOO.util.Event.onDOMReady(init_page);
 </script>
-  [% ELSE %]
-  [% PROCESS cgpro/icn_description.html.tt %]
   [% END %]
 </div><!-- end body-content -->
 [% END %]

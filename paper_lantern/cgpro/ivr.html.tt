@@ -95,8 +95,6 @@ clear: both;
       [% END %]
     </tbody>
   </table>
-  [% ELSE %]
-  [% PROCESS cgpro/icn_description.html.tt %]
   [% END %]
 </div><!-- end body-content -->
 [% END %]

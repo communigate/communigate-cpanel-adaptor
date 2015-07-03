@@ -37,6 +37,7 @@ rpop = rpop.0;
       </div>
       <div class="form-group">
         <select name="account" id="manage_list_select" class="col-xs-12 form-control">
+          <option value="">[% locale.maketext("Select account.") %]</option>
 	  [% FOR account IN accounts.sort -%]
 	  [% filter_option(FORM.account, account,account) %]
 	  [% END -%]
@@ -107,8 +108,6 @@ rpop = rpop.0;
     </table>
   </div>
   [% END %]
-  [% ELSE %]
-  [% PROCESS cgpro/icn_description.html.tt %]
   [% END %]
 </div>
 [% END %]

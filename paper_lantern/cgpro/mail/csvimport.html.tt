@@ -13,7 +13,6 @@
 -%]
 <div class="body-content">
   [% IF CPANEL.feature('cgpro_csvimport') %]
-
     <p id="descCsvImport">
         [% locale.maketext("This feature allows you to use 2 types of files to create multiple email address or email forwarders for your account simultaneously. You may use Excel spreadsheet files (.xls) or a comma-separated values sheet, aka CSV file (.csv) to import the data. A CSV file is a plain text file that has been given a .csv extension.") %]
     </p>
@@ -142,8 +141,6 @@
     </div>
 
     </form>
-    [% ELSE %]
-    [% PROCESS cgpro/icn_description.html.tt %]
     [% END %]
 </div>
 [% END #wrapper %]

@@ -86,8 +86,6 @@ SET status = Api2.exec("CommuniGate", "GetXMPPStatus", {
     </div>
     <div id="menus_div"></div>
   </div>
-  [% ELSE %]
-  [% PROCESS cgpro/icn_description.html.tt %]
   [% END %]
 </div>
 <script>

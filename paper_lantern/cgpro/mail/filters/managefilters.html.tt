@@ -58,9 +58,6 @@ app_key = 'cgpro_user_filters'
     </table>
   </div>
   [% INCLUDE _assets/return_link.html.tt return_location='../../../index.html' return_link_text=locale.maketext('Go Back') %]
-
-  [% ELSE %]
-  [% PROCESS cgpro/icn_description.html.tt %]
   [% END %]
 </div><!-- end body-content -->
 [% END %]

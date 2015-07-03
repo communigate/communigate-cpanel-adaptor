@@ -483,9 +483,6 @@ var LANG = {
     MX_Remote : "[% locale.maketext('Remote') %]"
 };
 </script>
-
-[% ELSE %]
-[% PROCESS cgpro/icn_description.html.tt %]
 [% END %]
 </div><!-- end body-content -->
 [% END %]
