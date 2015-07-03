@@ -13,7 +13,7 @@ app_key = 'cgpro_caller_queues'
 -%]
 
 <div class="body-content">
-  [% IF CPANEL.feature('cgpro_caller_queues) %]
+  [% IF CPANEL.feature('cgpro_caller_queues') %]
   <a class="btn btn-primary" href="addqueue.html">Add Queue</a>
   <table id="mailtbl" class="table table-striped">
     <colgroup>

@@ -15,7 +15,7 @@ SET settings = Api2.exec("CommuniGate", "AccountDefaults", {save=RAW_FORM.item("
 app_key = 'cgpro_domain_settings'
 -%]
 <div class="body-content">
-  [% IF CPANEL.feature('cgpro_domain_settings') %]
+  [% IF CPANEL.feature('cgpro_account_defaults') %]
   [% IF !(ExpVar.expand('$appname') == "webmail") %]
   <div class="pull-right">
     <div id="manage-list">

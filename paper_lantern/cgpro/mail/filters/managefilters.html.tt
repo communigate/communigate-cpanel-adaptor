@@ -9,7 +9,7 @@ app_key = 'cgpro_user_filters'
 %]
 
 <div class="body-content">
-  [% IF CPANEL.feature('cgpro_user_filters') %]
+  [% IF CPANEL.feature('cgpro_filters') %]
   <div class="section">
     <h2 id="hdrByUsers">[% locale.maketext("Filters by Users") %]</h2>
 
