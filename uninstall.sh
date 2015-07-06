@@ -101,6 +101,7 @@ rmdir ${BASEDIR}/x3/css2-min/cgpro
 
 # Start paper_lantern
 rm -rf ${BASEDIR}/paper_lantern/cgpro
+rm -f ${BASEDIR}/paper_lantern/styled/basic/icons/cgpro_*
 rm -rf ${BASEDIR}/paper_lantern/dynamicui/dynamicui_cgpro*.conf
 rm -f ${BASEDIR}/paper_lantern/js2-min/cgpro/mail
 rmdir  ${BASEDIR}/paper_lantern/js2-min/cgpro

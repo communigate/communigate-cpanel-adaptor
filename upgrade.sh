@@ -199,6 +199,8 @@ if [ ! -d ${BASEDIR}/paper_lantern/dynamicui ]
 then
     mkdir -p ${BASEDIR}/paper_lantern/dynamicui
 fi
+
+cp -a ${PACKSRC}/icons_paper_lantern/* ${BASEDIR}/paper_lantern/styled/basic/icons/
 cp -a ${PACKSRC}/paper_lantern/cgpro/* ${BASEDIR}/paper_lantern/cgpro/
 cp ${PACKSRC}/plugin_paper_lantern/*.conf ${BASEDIR}/paper_lantern/dynamicui/
 
