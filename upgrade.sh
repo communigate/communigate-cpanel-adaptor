@@ -231,6 +231,8 @@ chmod +x ${BASEDIR}/paper_lantern/cgpro/mail/contactsimport.live.cgi
 chmod +x ${BASEDIR}/paper_lantern/cgpro/getXmppHistory.live.cgi
 chmod +x ${BASEDIR}/paper_lantern/cgpro/playwav.live.cgi
 chmod +x ${BASEDIR}/paper_lantern/cgpro/getwav.live.cgi
+
+/usr/local/cpanel/bin/sprite_generator --all
 # END paper_lantern 
 
 # Install CommuniGate Plugin Webmail
