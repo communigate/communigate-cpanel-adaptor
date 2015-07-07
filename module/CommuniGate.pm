@@ -862,7 +862,6 @@ sub api2_AssignExtension {
 	      $result->{"objTypeeee"} = $objType;
 	      $result->{"objAddresssss"} = $objAddress;
 
-
   	      if ( $OPTS{'local_extension'} && ($objType eq "a") ) {
 		  my $aliases = $cli->GetAccountAliases($objAddress);
 		  $result->{"old_aliases"} = $aliases;
@@ -878,15 +877,17 @@ sub api2_AssignExtension {
 
 		  my $error_msg = $cli->getErrMessage();
 		  if ($error_msg eq "OK") {
-		      $result->{"error_msg"} = $error_msg;
 		  } else {
   		      $Cpanel::CPERROR{'CommuniGate_local_extension'} = $error_msg;
-		      $result->{"error_msg"} = $error_msg;
 		  }
   	      } else {
-		  $cli->CreateForwarder($OPTS{'local_extension'} . "\@$domain", $OPTS{'account'});
+		  $result->{"local_ext"} = $OPTS{'extension'} . "\@$domain";
+		  
+		  
+		  $cli->CreateForwarder($OPTS{'extension'} . "\@$domain", $objAddress);
 		  unless ($cli->getErrMessage eq "OK") {
 		      $Cpanel::CPERROR{'CommuniGate_local_extension'} = $cli->getErrMessage;
+		      $result->{"error_msg"} = $cli->getErrMessage;
 		      last;
 		  }
 	      }
@@ -976,6 +977,7 @@ sub api2_DeleteExtension {
 	      if ($number =~ m/^\d{3}$/) {
 		  $cli->DeleteForwarder($OPTS{'extension'});
 	      } else {
+		  $cli->DeleteForwarder($OPTS{'extension'});
 		  my $prefs = $cli->GetAccountDefaultPrefs($domain);
 		  my ($type, $account) = split ":", $prefs->{'assignedTelnums'}->{$number}->{"assigned"};
 		  if ($type eq "a") {
@@ -1017,7 +1019,6 @@ sub api2_GetExtensions {
       if ($dom eq $domain) {
 	  my $domainPrefs = $cli->GetAccountDefaultPrefs($domain);
 	  my $domainDefaults = $cli->GetAccountDefaults($domain);
-	  push @result, {selected => $domainDefaults};
 	  my $defaultDomain = $cli->MainDomainName();
 	  if ($domainPrefs->{assignedTelnums}) {
 	      foreach my $number (keys %{$domainPrefs->{assignedTelnums}}) {
@@ -1030,7 +1031,7 @@ sub api2_GetExtensions {
 	  last;
       }
   }
-  if ($#result == 0) {
+  if ($#result < -1) {
       push @result, {extension => "", short => "No extansion available for $domain"};
   } else {
       unshift @result, {extension => "", short => "-- Please Select --"};

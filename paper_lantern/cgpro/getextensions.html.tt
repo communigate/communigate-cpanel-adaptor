@@ -1,14 +1,9 @@
 [%
-SET list_extensions = Api2.exec("CommuniGate", "GetExtensions", {
+SET list_extensions_acc = Api2.exec("CommuniGate", "GetExtensions", {
 "domain" = RAW_FORM.item("domain")
 });
-selected_ext = list_extensions.1.selected.PSTNGatewayAuthName;
 %]
 
-[% FOREACH ext IN list_extensions %]
-[% IF !ext.selected %]
+[% FOREACH ext IN list_extensions_acc %]
 <option value="[% ext.extension %]">[% ext.short %]</option>
-[% ELSE %]
-
-[% END %]
 [% END %]
