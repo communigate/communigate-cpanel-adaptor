@@ -562,7 +562,10 @@ var before_show_module = function(o) {
         }
 
         if (o.action == 'change_type') {
-	    var all_classes = Object.keys(CLASSES).map(function(k) { return ACCOUNTS[o.index]['data']['ServiceClasses'][k] });
+
+	    var all_classes = Object.keys(CLASSES).map(function(k) { 
+		    return CLASSES[k] 
+		});
 	    
 	    var all_classes_keys = [];
 	    for(var k in CLASSES) all_classes_keys.push(k);
@@ -1261,10 +1264,14 @@ var change_type = function(e, o) {
         "account": ACCOUNTS[o.index]['prefs']['AccountName'],
     };
     
-    var all_classes = Object.keys(ACCOUNTS[o.index]['data']['ServiceClasses']).map(function(k) { return ACCOUNTS[o.index]['data']['ServiceClasses'][k] });
+    var all_classes = Object.keys(CLASSES).map(function(k) { 
+	    return CLASSES[k] 
+	});
+    
+    // var all_classes = Object.keys(ACCOUNTS[o.index]['data']['ServiceClasses']).map(function(k) { return ACCOUNTS[o.index]['data']['ServiceClasses'][k] });
     
     var all_classes_keys = [];
-    for(var k in ACCOUNTS[o.index]['data']['ServiceClasses']) all_classes_keys.push(k);
+    for(var k in CLASSES) all_classes_keys.push(k);
     
     for (var i = 0; i < all_classes_keys.length; i++) {
 	if (YAHOO.util.Dom.get("class_" + all_classes_keys[i]+ "_" + o.index).checked){
