@@ -92,14 +92,14 @@ var update_email_accounts = function(new_acc) {
 		    }; 
 		}; 		  
 		$(".avatar_span").mouseover(function() {
-			$(this).next("span").show();
+			$(this).siblings("span.glyph-edit:first").show();
 		    }).mouseout(function(){
-			$(this).next("span").hide();
+			$(this).siblings("span.glyph-edit:first").hide();
 			});
 		$(".avatar").mouseover(function() {
-			$(this).next("span").show();
+			$(this).siblings("span.glyph-edit:first").show();
 		    }).mouseout(function(){
-			$(this).next("span").hide();
+			$(this).siblings("span.glyph-edit:first").hide();
 			});
      
 		search_email();
