@@ -851,70 +851,76 @@ sub api2_AssignExtension {
   my $cli = getCLI();
   my $result = {};
 
+  # my ($objType, $objAddress) = split ":", $OPTS{'account'};
+  # $result->{"objType"} = $objType;
+  # $result->{"objAddr"} = $objAddress;
+
+  # $result->{"local_ext"} = $OPTS{'local_extension'};
+  # $result->{"ext"} = $OPTS{'extension'};
+  # $result->{"acc"} = $OPTS{'account'};
+
   if ($OPTS{'extension'} || $OPTS{'local_extension'}) {
       my (undef, $domain) = split '@', $OPTS{'account'};
       for my $dom (@domains) {
   	  if ($dom eq $domain) {
   	      my $userForwarders = $cli->FindForwarders($domain,$OPTS{'account'});
 
-	      $result->{"accounttt"} = $OPTS{'account'};
-	      my ($objType, $objAddress) = split ":", $OPTS{'account'};
-	      $result->{"objTypeeee"} = $objType;
-	      $result->{"objAddresssss"} = $objAddress;
+  	      my ($objType, $objAddress) = split ":", $OPTS{'account'};
+  $result->{"objType"} = $objType;
+  $result->{"objAddr"} = $objAddress;
 
   	      if ( $OPTS{'local_extension'} && ($objType eq "a") ) {
-		  my $aliases = $cli->GetAccountAliases($objAddress);
-		  $result->{"old_aliases"} = $aliases;
+		  
+  	      	  my $aliases = $cli->GetAccountAliases($objAddress);
+  	      	  $result->{"old_aliases"} = $aliases;
 
-		  my $found = 0;
-		  for my $alias (@$aliases) {
-		      $found = 1 if "$alias" eq "$OPTS{'local_extension'}";
-		  }
+  	      	  my $found = 0;
+  	      	  for my $alias (@$aliases) {
+  	      	      $found = 1 if "$alias" eq "$OPTS{'local_extension'}";
+  	      	  }
 
-		  push @$aliases, "$OPTS{'local_extension'}";
+  	      	  push @$aliases, "$OPTS{'local_extension'}";
 
-		  my $set_aliases = $cli->SetAccountAliases($objAddress, $aliases);
+  	      	  my $set_aliases = $cli->SetAccountAliases($objAddress, $aliases);
 
-		  my $error_msg = $cli->getErrMessage();
-		  if ($error_msg eq "OK") {
-		  } else {
-  		      $Cpanel::CPERROR{'CommuniGate_local_extension'} = $error_msg;
-		  }
+  	      	  my $error_msg = $cli->getErrMessage();
+  	      	  if ($error_msg eq "OK") {
+  	      	  } else {
+  	      	      $Cpanel::CPERROR{'CommuniGate_local_extension'} = $error_msg;
+  	      	  }
   	      } else {
-		  $result->{"local_ext"} = $OPTS{'extension'} . "\@$domain";
 		  
-		  
-		  $cli->CreateForwarder($OPTS{'extension'} . "\@$domain", $objAddress);
-		  unless ($cli->getErrMessage eq "OK") {
-		      $Cpanel::CPERROR{'CommuniGate_local_extension'} = $cli->getErrMessage;
-		      $result->{"error_msg"} = $cli->getErrMessage;
-		      last;
-		  }
-	      }
+  	      	  $cli->CreateForwarder($OPTS{'local_extension'} . "\@$domain", $objType);
+  	      	  unless ($cli->getErrMessage eq "OK") {
+  	      	      $Cpanel::CPERROR{'CommuniGate_local_extension'} = $cli->getErrMessage;
+  	      	      $result->{"error_msg"} = $cli->getErrMessage;
+  	      	      last;
+  	      	  }
+  	      }
 
-	       if ($OPTS{'extension'}) {
-		  if ($objType eq "a") {
-		      my $telnums = $cli->GetAccountTelnums($objAddress);
-		      push @$telnums, $OPTS{"extension"} unless grep {$_ == $OPTS{"extension"}} @$telnums;
-		      $cli->SetAccountTelnums($objAddress, $telnums);
-		  } else {
-		      my $rules = $cli->GetServerSignalRules();
-		      push @$rules, [
-			  "100005",
-			  $OPTS{"extension"} . '@' . $domain,
-			  [["To","is",$OPTS{"extension"} . '@' . $domain],["Method","is","INVITE"]],
-			  [["Redirect to", $objAddress]]
-		      ] unless grep {$_->[1] eq $OPTS{"extension"} . '@' . $domain} @$rules; # LOAD possible
-		      $cli->SetServerSignalRules($rules);
-		  }
-		  my $prefs = $cli->GetAccountDefaultPrefs($domain);
-		  $prefs->{'assignedTelnums'}->{$OPTS{"extension"}}->{"assigned"} = $OPTS{"account"};
-		  $cli->UpdateAccountDefaultPrefs(
-		      domain => $domain,
-		      settings => {
-			  assignedTelnums => $prefs->{'assignedTelnums'}
-		      });
-	      }
+  	       if ($OPTS{'extension'}) {
+  		  if ($objType eq "a") {
+  		      my $telnums = $cli->GetAccountTelnums($objAddress);
+  		      push @$telnums, $OPTS{"extension"} unless grep {$_ == $OPTS{"extension"}} @$telnums;
+  		      $cli->SetAccountTelnums($objAddress, $telnums);
+  		  } else {
+  		      my $rules = $cli->GetServerSignalRules();
+  		      push @$rules, [
+  			  "100005",
+  			  $OPTS{"extension"} . '@' . $domain,
+  			  [["To","is",$OPTS{"extension"} . '@' . $domain],["Method","is","INVITE"]],
+  			  [["Redirect to", $objAddress]]
+  		      ] unless grep {$_->[1] eq $OPTS{"extension"} . '@' . $domain} @$rules; # LOAD possible
+  		      $cli->SetServerSignalRules($rules);
+  		  }
+  		  my $prefs = $cli->GetAccountDefaultPrefs($domain);
+  		  $prefs->{'assignedTelnums'}->{$OPTS{"extension"}}->{"assigned"} = $OPTS{"account"};
+  		  $cli->UpdateAccountDefaultPrefs(
+  		      domain => $domain,
+  		      settings => {
+  			  assignedTelnums => $prefs->{'assignedTelnums'}
+  		      });
+  	      }
   	      last;
   	  }
       }
