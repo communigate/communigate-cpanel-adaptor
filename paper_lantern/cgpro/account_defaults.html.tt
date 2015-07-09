@@ -24,11 +24,14 @@ app_key = 'cgpro_domain_settings'
           <label for="manage_list_select" id="txt_Managing" class="col-xs-12 control-label">[% locale.maketext("Managing:") %]</label>
         </div>
         <div class="form-group">
+	  [% IF domain.size() < 1 %]
+				
+				[% END %]
 
         [% IF domain.size() == "1" %]
         [% domain %] <input type="hidden" id="domain" value="[% domain %]" name="domain" />
 
-	[% IF !RAW_FORM.item("domain") %]
+	[% IF !RAW_FORM.item("domain") && domain.size() > 0 %]
 	<script type="text/javascript">
 	  YAHOO.util.Event.onDOMReady(function() {      
 	  if (YAHOO.util.Dom.get("domain").value) {

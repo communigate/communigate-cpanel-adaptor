@@ -41,7 +41,7 @@ rpop = rpop.0;
 	  [% filter_option(FORM.account, account,account) %]
 	  [% END -%]
         </select>
-	[% IF !RAW_FORM.item("account") %]
+	[% IF !RAW_FORM.item("account") && accounts.size > 0 %]
 	<script type="text/javascript">
 	  YAHOO.util.Dom.get("manage_list_form").submit();
 	</script>

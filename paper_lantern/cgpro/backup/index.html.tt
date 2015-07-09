@@ -41,7 +41,7 @@ SET accounts = Api2.exec("CommuniGate", "ListAccountsBackups");
     <div class="section">
 
         [% IF CPANEL.feature("mysql") %]
-        <div class="row">
+        <div class="row" style="display: none;">
             <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
                 <h3 id="hdrDownloadMysqlDb">[% locale.maketext("Download a MySQL Database Backup") %]</h3>
                 <table fixedtruncate="1" class="sortable truncate-table table table-striped" id="sqlbackuptbl">

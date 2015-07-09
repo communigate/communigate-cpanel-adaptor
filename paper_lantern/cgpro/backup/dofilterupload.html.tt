@@ -33,7 +33,7 @@ SET restore_filters = Api2.exec("CommuniGate", "RestoreFilters");
     [% END %]
 
     [% INCLUDE _assets/return_link.html.tt return_location='index.html' return_link_text=locale.maketext('Go Back') %]
-
+  </div>
   </div>
   [% END %]
 </div>

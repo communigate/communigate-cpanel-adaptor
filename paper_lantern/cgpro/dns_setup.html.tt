@@ -67,7 +67,7 @@ listmxs = api2_result_Email_listmxs.0.entries;
         [% IF mail_domains.size() == "1" %]
         [% mail_domains.0.domain %] <input type="hidden" id="domain" value="[%  mail_domains.0.domain %]" name="domain" />
 
-	[% IF !RAW_FORM.item("domain") %]
+	[% IF !RAW_FORM.item("domain") && mail_domains.size > 0 %]
 	<script type="text/javascript">
 	  YAHOO.util.Event.onDOMReady(function() {      
 	  if (YAHOO.util.Dom.get("domain").value) {

@@ -589,17 +589,19 @@ sub addforward {
 	    } else {
 		my $found=0;
 		my @NewRules;
-		foreach my $Rule (@$Rules) {
-		    if ($Rule->[1] eq "#Redirect") {
-			my %rules;
-			for my $mail (split(',', $Rule->[3]->[0]->[1])) {
-			    $rules{$mail} = 1;
+		if (ref ($Rules) eq 'ARRAY') {
+		    foreach my $Rule (@$Rules) {
+			if (ref ($Rule) eq 'ARRAY' && $Rule->[1] eq "#Redirect") {
+			    my %rules;
+			    for my $mail (split(',', $Rule->[3]->[0]->[1])) {
+				$rules{$mail} = 1;
+			    }
+			    $rules{$fwdemail} = 1;
+			    $Rule->[3]->[0]->[1] = join(',', keys(%rules));
+			    $found=1;
 			}
-			$rules{$fwdemail} = 1;
-			$Rule->[3]->[0]->[1] = join(',', keys(%rules));
-			$found=1;
+			push(@NewRules,$Rule);
 		    }
-		    push(@NewRules,$Rule);
 		}
 		if (!$found) {
 		    my $Rule= [1,'#Redirect',[],[['Mirror to',$fwdemail]]];
@@ -2408,7 +2410,10 @@ sub api2_RestoreFilters {
     close FI;
     unlink $file;
     my $loaded_data = YAML::Syck::Load($yaml);
+
+    if (ref ($loaded_data) eq 'ARRAY') {
     $loaded_data = $loaded_data->[0];
+    }
     foreach my $domain (@domains) {
 	my $accounts = $cli->ListAccounts($domain);
 	my $apiref = Cpanel::Api2::Exec::api2_preexec( 'Email', 'storefilter' );
@@ -2423,12 +2428,14 @@ sub api2_RestoreFilters {
 			# Real CGPro filter
 			my $newrules = [];
 			my $found = 0;
-			for my $rule (@$rules) {
-			    if ($rule->[1] eq $filter->[1]) {
-				push @$newrules, $filter;
-				$found = 1;
-			    } else {
-				push @$newrules, $rule;
+			if (ref ($rules) eq 'ARRAY') {
+			    for my $rule (@$rules) {
+				if (ref ($rule) eq 'ARRAY' && $rule->[1] eq $filter->[1]) {
+				    push @$newrules, $filter;
+				    $found = 1;
+				} else {
+				    push @$newrules, $rule;
+				}
 			    }
 			}
 			push @$newrules, $filter unless $found;
@@ -2797,8 +2804,12 @@ sub api2_dumpfilters {
 	for my $account (sort keys %$accounts) {
 	    $filters->{"$account\@$domain"} = [];
 	    my $rules = $cli->GetAccountMailRules("$account\@$domain");
-	    for my $rule (@$rules) {
-		push @{$filters->{"$account\@$domain"}}, $rule if $rule->[1] !~ m/^#/;
+	    if (ref ($rules) eq 'ARRAY') {
+		for my $rule (@$rules) {
+		    if (ref ($rule) eq 'ARRAY') {
+			push @{$filters->{"$account\@$domain"}}, $rule if $rule->[1] !~ m/^#/;
+		    }
+		}
 	    }
 	}
     }
