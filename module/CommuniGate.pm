@@ -866,8 +866,12 @@ sub api2_AssignExtension {
   	      my $userForwarders = $cli->FindForwarders($domain,$OPTS{'account'});
 
   	      my ($objType, $objAddress) = split ":", $OPTS{'account'};
-  $result->{"objType"} = $objType;
-  $result->{"objAddr"} = $objAddress;
+
+	      $result->{"loc_ext"} = $OPTS{'local_extension'};
+	      $result->{"ext"} = $OPTS{'extension'};
+	      $result->{"acc"} = $OPTS{'account'};
+	      $result->{"objType"} = $objType;
+	      $result->{"objAddr"} = $objAddress;
 
   	      if ( $OPTS{'local_extension'} && ($objType eq "a") ) {
 		  
@@ -889,13 +893,21 @@ sub api2_AssignExtension {
   	      	      $Cpanel::CPERROR{'CommuniGate_local_extension'} = $error_msg;
   	      	  }
   	      } else {
-		  
-  	      	  $cli->CreateForwarder($OPTS{'local_extension'} . "\@$domain", $objType);
-  	      	  unless ($cli->getErrMessage eq "OK") {
-  	      	      $Cpanel::CPERROR{'CommuniGate_local_extension'} = $cli->getErrMessage;
-  	      	      $result->{"error_msg"} = $cli->getErrMessage;
-  	      	      last;
-  	      	  }
+		  if ($objType eq "a" || $objType eq "g" || $objType eq "i" || $objType eq "q" ) {
+		      $cli->CreateForwarder($OPTS{'extension'} . "\@$domain", $objAddress);
+		      unless ($cli->getErrMessage eq "OK") {
+			  $Cpanel::CPERROR{'CommuniGate_local_extension'} = $cli->getErrMessage;
+			  $result->{"error_msg"} = $cli->getErrMessage;
+			  last;
+		      }
+		  } else {
+		      $cli->CreateForwarder($OPTS{'local_extension'} . "\@$domain", $objType);
+		      unless ($cli->getErrMessage eq "OK") {
+			  $Cpanel::CPERROR{'CommuniGate_local_extension'} = $cli->getErrMessage;
+			  $result->{"error_msg"} = $cli->getErrMessage;
+			  last;
+		      }
+		  }
   	      }
 
   	       if ($OPTS{'extension'}) {
@@ -2220,9 +2232,10 @@ sub api2_SetAutoresponder {
 				     ],
 				     ["Remember 'From' in", 'RepliedAddresses']
 				    ]];
-
+	
         $cli->UpdateAutoresponder(email => $OPTS{'email'} . '@' . $OPTS{'domain'}, rule => $rule );
         $cli->Logout();
+
 }
 
 sub api2_DeleteAutoresponder {
@@ -2241,7 +2254,8 @@ sub api2_ListAutoresponders {
 	my @result;
         foreach my $domain (@domains) {
                 my $accounts=$cli->ListAccounts($domain);
-                my $userName;
+
+		my $userName;
                 foreach $userName (sort keys %$accounts) {
 		  my $account = "$userName\@$domain";
 		  if ($OPTS{regex}) {

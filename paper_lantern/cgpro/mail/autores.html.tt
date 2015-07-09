@@ -66,6 +66,7 @@
                 SET auto_responders = Api2.exec("CommuniGate" , "ListAutoresponders" , {});
                 Api2.post_exec("CommuniGate", "ListAutoresponders");
             %]
+	    
             [% IF auto_responders.size; %]
                 [% FOREACH hashref IN auto_responders; %]
                 <tr class="row-[% loop.index % 2 == 0 ? "even" : "odd" %]">

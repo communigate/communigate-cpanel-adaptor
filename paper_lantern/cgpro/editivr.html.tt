@@ -124,7 +124,7 @@ margin-left: 10px;
     <div class="form-group">
       <div class="checkbox">
 	<input type="checkbox" name="DED" id="DED" value="1"[% IF ivr.DED %] checked="checked"[% END %] />
-	<label for="DED">[% locale.maketext('EnableDED') %]</label>
+	<label for="DED">[% locale.maketext('Enabled') %]</label>
       </div>
     </div>
     

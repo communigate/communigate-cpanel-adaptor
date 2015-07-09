@@ -52,7 +52,7 @@ SET accounts = Api2.exec("CommuniGate", "ListAccountsBackups");
                     </tr>
                     </thead>
                     <tbody>
-		      [% IF mysql_list_db_backups.size() < 1 %]
+		      [% IF mysql_list_db_backups.size() > 0 %]
                         [% FOREACH hashref IN mysql_list_db_backups %]
                         <tr>
                             <td class="cell nobrd-left truncate" truncatefixed="25">
@@ -62,8 +62,8 @@ SET accounts = Api2.exec("CommuniGate", "ListAccountsBackups");
 			[% END %]
 		    [% ELSE %]
                     <tr>
-                        <td class="cell nobrd-left truncate" truncatefixed="25">
-			  [% locale.maketext("There aren't any forwarders to download") %]
+                        <td class="cell nobrd-left truncate">
+			  [% locale.maketext("There aren't any databases to download") %]
                         </td>
                     </tr>
 		    [% END %]

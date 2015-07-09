@@ -10,6 +10,11 @@
     page_styles = css_code
  -%]
 
+[%
+SET accounts = Api2.exec("CommuniGate", "ListAccounts", {});
+accounts = accounts.0.accounts;
+%]
+
 <div class="body-content">
     [% INCLUDE cgpro/mail/auto_responder.html.tt %]
 
@@ -19,9 +24,32 @@
     [% INCLUDE _assets/_calendar.html.tt %]
 
     [% INCLUDE _assets/return_link.html.tt return_location='autores.html' return_link_text=locale.maketext('Go Back') %]
+<script type="text/javascript">
+var getAccounts = function () {
+    var select = document.getElementById("ddlDomain");
+    var wrap = document.getElementById("accounts");
+    wrap.innerHTML = "";
+
+    YAHOO.util.Connect.asyncRequest('GET', 'getaccountsfordomain.html?domain=' + select.value, {
+	    success: function(o) {
+              wrap.innerHTML = o.responseText;
+	    },
+    }, null);
+};
+
+YAHOO.util.Event.onDOMReady(function () {
+	getAccounts();
+	YAHOO.util.Event.addListener("ddlDomain", "change", getAccounts);
+    });
+$("#mainform").submit(function(event) {
+if ($("#accounts").val() == "There are not any accounts for this domain!") {
+alert("Please select account!");
+event.preventDefault();
+}
+});
+</script>
 
 </div><!-- end body-content -->
-
 [% END %]
 
 [% BLOCK js_block %]

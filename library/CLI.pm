@@ -3911,19 +3911,22 @@ sub UpdateAutoresponder {
   my $rules = $this->parseWords($this->getWords);
   my $changesApplied = 0;
   my $lc = 0;
-  foreach my $rule (@{$rules}) {
-      if  ( $rule->[1] eq "#Vacation" ) {
-	  $this->send('REMOVEACCOUNTSUBSET ' . $params{email} . ' SUBSET RepliedAddresses');
-	  if ($params{'rule'}) {
-	      $rule = $params{'rule'};
-	  } else {
-	      delete $rules->[$lc];
+  if (ref ($rules) eq 'ARRAY') {
+      foreach my $rule (@{$rules}) {
+	  if  (ref ($rule) eq 'ARRAY' && $rule->[1] eq "#Vacation" ) {
+	      $this->send('REMOVEACCOUNTSUBSET ' . $params{email} . ' SUBSET RepliedAddresses');
+	      if ($params{'rule'}) {
+		  $rule = $params{'rule'};
+	      } else {
+		  delete $rules->[$lc];
+	      }
+	      $changesApplied = 1;
+	      last;
 	  }
-	  $changesApplied = 1;
-	  last;
+	  $lc++;
       }
-      $lc++;
   }
+
   if ((! $changesApplied) && exists $params{'rule'}) {
       push @$rules, $params{'rule'};
   }
@@ -3945,9 +3948,11 @@ sub GetAutoresponder {
   return undef unless $this->_parseResponse();
   my $rules = $this->parseWords($this->getWords);
   my $changesApplied = 0;
-  foreach my $rule (@{$rules}) {
-      if  ( $rule->[1] eq "#Vacation" ) {
-	  return $rule;
+  if (ref ($rules) eq 'ARRAY') {
+      foreach my $rule (@{$rules}) {
+	  if  (ref ($rule) eq 'ARRAY' && $rule->[1] eq "#Vacation" ) {
+	      return $rule;
+	  }
       }
   }
   return undef;

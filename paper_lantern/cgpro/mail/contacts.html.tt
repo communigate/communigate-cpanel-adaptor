@@ -70,12 +70,12 @@
       <a class="btn btn-default" href="setdefaultbox.html?account=[% FORM.account %]&amp;box=[% box %]">[% locale.maketext("Set default address book") %]</a>
       [% END -%]
       <a class="btn btn-default" href="getVCARD.live.cgi?account=[% FORM.account %]&amp;box=[% box %]&amp;name=[% box %]">[% locale.maketext("Download as vCard") %]</a>
-      <a class="btn btn-default" href="contactsimport.html?account=[% FORM.account %]&amp;box=[% box %]">[% locale.maketext("CGPImportContacts") %]</a>
+      <a class="btn btn-default" href="contactsimport.html?account=[% FORM.account %]&amp;box=[% box %]">[% locale.maketext("Import Contacts") %]</a>
     </p>
     
     <table class="sortable truncate-table table table-striped">
       <tr>
-	<th class="cell" colspan="3">[% locale.maketext("CGPContact") %]</th>
+	<th class="cell" colspan="3">[% locale.maketext("Contact") %]</th>
 	<th class="cell-end sorttable_nosort" colspan="4">[% locale.maketext("Actions") %]</th>
       </tr>
       [% FOR contact IN contacts.0.contacts.$box -%]
@@ -83,15 +83,15 @@
 	<td class="truncate"><a href="editcontact[% IF contact.group %]sgroup[% END %].html?account=[% FORM.account %]&amp;contact=[% contact.uid %]&amp;box=[% box %]">[% contact.name %]</a></td>
 	<td class="truncate nobrd-left"  style="vertical-align: top;">
 	  [% IF contact.group -%]
-	  ([% locale.maketext('CGPContactsGroup') %])
+	  ([% locale.maketext('Contacts Group') %])
 	  [% END -%]
 	  [% FOR mail IN contact.email; mail.t = mail.type.grep('(HOME|WORK|OTHER)').0; -%]
-	  <a href="mailto:[% mail.value %]">[% mail.value %]</a> [% IF mail.t %]([% locale.maketext('CGP' _ mail.t) %])[% END -%] <br/>
+	  <a href="mailto:[% mail.value %]">[% mail.value %]</a> [% IF mail.t %]([% locale.maketext(mail.t) %])[% END -%] <br/>
 	  [% END -%]
 	</td>
 	<td class="truncate" style="vertical-align: top;">
 	  [% FOR tel IN contact.tel; tel.t = tel.type.grep('(HOME|WORK|CELL|FAX|VIDEO|AGENT|PAGER|OTHER)').0; -%]
-	  <a href="tel:[% tel.value %]">[% tel.value %]</a> [% IF tel.t %]([% locale.maketext('CGP' _ tel.t) %])[% END -%] <br/>
+	  <a href="tel:[% tel.value %]">[% tel.value %]</a> [% IF tel.t %]([% locale.maketext(tel.t) %])[% END -%] <br/>
 	  [% END -%]
 	</td>
 	<td>

@@ -8,9 +8,6 @@
     app_key = 'cgpro_autoresponders'
 %]
 
-[% USE dumper %]
-<pre>[% dumper.dump(add_responder) %]</pre>
-
     <div class="body-content">
         <div class="section">
             <h2 id="hdrAddAutoResponders">[% locale.maketext("Add Auto Responder") %]</h2>

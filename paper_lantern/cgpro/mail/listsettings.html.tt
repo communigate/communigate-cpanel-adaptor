@@ -145,15 +145,12 @@ page_js = js_code
   </div>
   
   <div class="form-group">
-    <label>
-      [% locale.maketext("Request Confirmation") %]
+    <label style="font-weight: normal;">
+      <input type="checkbox" name="Confirmation" value="1" [% CPANEL.CPDATA.Confirmation == "YES" ? " checked='checked'" : "" %] />
+      Request Confirmation
     </label>
-    <div class="row">
-      <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
-	<input type="checkbox" name="Confirmation" value="1"[% CPANEL.CPDATA.Confirmation == "YES" ? " checked='checked'" : "" %] />
-      </div>
-    </div>
   </div>
+
   <h3>Confirmation Request Message</h3>
 
   <div class="form-group">

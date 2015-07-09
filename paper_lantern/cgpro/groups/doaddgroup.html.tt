@@ -32,7 +32,7 @@ app_key = 'cgpro_groupmail'
     [% END %]
 
     [% INCLUDE _assets/return_link.html.tt return_location='groups.html' return_link_text=locale.maketext('Go Back') %]
-
+  </div>
   </div>
   [% END %]
 </div>

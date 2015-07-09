@@ -1,0 +1,21 @@
+[%
+SET accounts = Api2.exec("CommuniGate", "ListAccounts", {});
+accounts = accounts.0.accounts;
+%]
+
+[% count = 0 %]
+[% FOREACH acc IN accounts %]
+[% IF RAW_FORM.item("domain") == acc.value.domain %]
+[% count = 1 %]
+[% END %]
+[% END %]
+
+[% IF count == 1 %]
+[% FOREACH acc IN accounts %]
+[% IF RAW_FORM.item("domain") == acc.value.domain %]
+<option value="[% acc.value.username %]" >[% acc.value.username %]</option>
+[% END %]
+[% END %]
+[% ELSE %]
+<option>There are not any accounts for this domain!</option>
+[% END %]

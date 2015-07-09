@@ -146,7 +146,7 @@ app_key = 'cgpro_groupmail'
       <div class="form-group">
 	<div class="checkbox">
 	  <input type="checkbox" name="RemoveAuthor" id="RemoveAuthor" value="1" 
-		 [% IF get_group_settings.RemoceAuthor == 'YES' %]
+		 [% IF get_group_settings.RemoveAuthor == 'YES' %]
 		 checked
 		 [% END %]
 		 >
