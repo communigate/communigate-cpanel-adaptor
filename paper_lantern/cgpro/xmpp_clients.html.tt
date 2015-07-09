@@ -21,7 +21,7 @@ app_key = 'cgpro_xmpp_clients'
 	    [% myclass = accounts.0.accounts.$account.class -%]
 	    [% classstring = accounts.0.classes.$myclass.AccessModes.join(',') -%]
 	    [% IF classstring.search("XMPP") || classstring == "All" -%]
-            [% premium_accounts = 0 %]
+            [% premium_accounts = 1 %]
 	    [% filter_option(FORM.account, account,account) %]
 	    [% END -%]
 	    [% END -%]
