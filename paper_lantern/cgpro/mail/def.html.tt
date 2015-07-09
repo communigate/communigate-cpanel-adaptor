@@ -1,6 +1,10 @@
 [%
 SET CPANEL.CPVAR.dprefix = "../../";
-SET result = Api2.exec("CommuniGate", "SetDefAddress", { domain=RAW_FORM.item("domain"), action=RAW_FORM("actionoption"), fwdmail=RAW_FORM("CGPForwardAddress") });
+SET result = Api2.exec("CommuniGate", "SetDefAddress", { 
+"domain" = RAW_FORM.item("domain"), 
+"action" = RAW_FORM("action"), 
+"fwdmail" = RAW_FORM("ForwardAddress") 
+});
 SET def_addresses = Api2.exec("CommuniGate","ListDefAddress", {});
 %]
 
@@ -28,16 +32,16 @@ SET def_addresses = Api2.exec("CommuniGate","ListDefAddress", {});
 	      [% hashref.domain %]
 	    </td>
 	    <td>
-	      <select name="actionoption" class="form-control">
+	      <select name="action" class="form-control">
 		<option value=""> -- </option>
-		<option [% hashref.discard %] value="CGPDefDiscard">Discard email</option>
-		<option [% hashref.reject %] value="CGPDefReject">Reject email</option>
-                <option [% hashref.forward %] value="CGPDefForward">Forward to this address:</option>
-		<option [% hashref.acceptedandbounced %] value="CGPDefAcceptedAndBounced">Accept and bounce</option>
+		<option [% hashref.discard %] value="DefDiscard">Discard email</option>
+		<option [% hashref.reject %] value="DefReject">Reject email</option>
+                <option [% hashref.forward %] value="DefForward">Forward to this address:</option>
+		<option [% hashref.acceptedandbounced %] value="DefAcceptedAndBounced">Accept and bounce</option>
 	      </select>
 	    </td>
 	    <td>
-	      <input type="text" name="CGPForwardAddress" value="[% hashref.MailRerouteAddress %]" class="form-control" />	
+	      <input type="text" name="ForwardAddress" value="[% IF hashref.MailRerouteAddress != "spamtrap" %][% hashref.MailRerouteAddress %][% END %]" class="form-control" />	
 	    </td>
 	    <td>
 	      <input type="hidden" name="setdefault" value="dummy" />

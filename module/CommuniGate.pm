@@ -1217,10 +1217,10 @@ sub api2_SetDefAddress {
 	my $data = $cli->GetDomainSettings("$domain");
 	$cli->CreateDomain("$domain") unless $data;
 	my $domainData;
-	if ($action eq "CGPDefDiscard") { @$domainData{'MailToUnknown'} = "Discarded"; @$domainData{'MailRerouteAddress'} = "";}
-	if ($action eq "CGPDefReject") { @$domainData{'MailToUnknown'} = "Rejected"; @$domainData{'MailRerouteAddress'} = "";}
-	if ($action eq "CGPDefForward") { @$domainData{'MailToUnknown'} = "Rerouted to"; @$domainData{'MailRerouteAddress'} = "$fwdmail"; }
-	if ($action eq "CGPDefAcceptedAndBounced") { @$domainData{'MailToUnknown'} = "Accepted and Bounced"; }
+	if ($action eq "DefDiscard") { @$domainData{'MailToUnknown'} = "Discarded"; @$domainData{'MailRerouteAddress'} = "";}
+	if ($action eq "DefReject") { @$domainData{'MailToUnknown'} = "Rejected"; @$domainData{'MailRerouteAddress'} = "";}
+	if ($action eq "DefForward") { @$domainData{'MailToUnknown'} = "Rerouted to"; @$domainData{'MailRerouteAddress'} = "$fwdmail"; }
+	if ($action eq "DefAcceptedAndBounced") { @$domainData{'MailToUnknown'} = "Accepted and Bounced"; }
         $cli->UpdateDomainSettings(domain => $domain,settings => $domainData);
         $cli->Logout();
 }
