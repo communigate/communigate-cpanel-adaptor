@@ -28,10 +28,16 @@
 	    [% END -%]
 	    [% END -%]
           </select>
-	    [% IF !RAW_FORM.item("account") %]
+	    [% IF !RAW_FORM.item("account") && accounts.0.accounts.keys.size > 0 %]
 	    <script type="text/javascript">
 	      YAHOO.util.Dom.get("manage_list_form").submit();
 	    </script>
+	    [% END %]
+	    [% IF accounts.0.accounts.keys.size < 1 %]
+						   <script>
+						     $("#manage_list_select").hide();
+						   </script>
+	  <p style="margin-top: 10px">No accounts!</p>
 	    [% END %]
         </div>
         <noscript>
