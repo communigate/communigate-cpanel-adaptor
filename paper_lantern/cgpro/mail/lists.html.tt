@@ -57,7 +57,7 @@ SET mail_domains = execute("Email", "list_mail_domains", {});
                     </div>
                 </div>
 
-                [% IF mail_domains.data.size > 1 %]
+                [% IF mail_domains.data.size %]
                 <div class="form-group">
                     <label id="lblDomain" for="domain">
                         [% locale.maketext("Domain") %]
@@ -72,8 +72,6 @@ SET mail_domains = execute("Email", "list_mail_domains", {});
                         </div>
                     </div>
                 </div>
-                [% ELSIF mail_domains.data.size %]
-                <input id="hidDomain" type="hidden" name="domain" value="[% mail_domains.data.0.domain.html() %]" />
                 [% END %]
 
                 <div class="form-group">
