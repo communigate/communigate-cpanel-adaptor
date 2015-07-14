@@ -5377,27 +5377,6 @@ sub api2_UnsetAccountPSTN {
     return $result;
 }
 
-sub api2_SetServerSignalRules {
-    my %OPTS = @_;
-    my $domain = $OPTS{'domain'};
-    my $cli = getCLI();
-
-    my @enable_data = [];
-    $enable_data[0][0][0] = "100010";
-    $enable_data[0][0][1] = 'ccOut_'. $domain;
-    $enable_data[0][0][2][0] = ['Method', 'is', 'INVITE'];
-    $enable_data[0][0][2][1] = ['Submit Address', 'is not', 'LOCAL [0.0.0.0]*'];
-    $enable_data[0][0][2][2] = ['From', 'is', '*@' . $domain];
-    $enable_data[0][0][3][0] = ['Redirect to', 'ccincoming#pbx@' . $domain];
-    $enable_data[0][0][3][1] = ['Stop Processing'];
-
-    $cli->SetServerSignalRules(@enable_data);
-    my $error_msg = $cli->getErrMessage();
-
-    $cli->Logout();
-    return $error_msg;
-}
-
 sub api2_CreatePbxAccount {
     my %OPTS = @_;
     my $cli = getCLI();
@@ -5438,48 +5417,61 @@ sub api2_UnsetAdministrator {
     return $error_msg;
 }
 
-sub api2_UnsetServerSignalRules {
-    my $cli = getCLI();
-    my @disable_data = [];
-
-    $cli->SetServerSignalRules(@disable_data);
-    my $error_msg = $cli->getErrMessage();
-
-    $cli->Logout();
-    return $error_msg;
-}
-
 sub api2_SetDomainSignalRules {
     my %OPTS = @_;
     my $domain = $OPTS{'domain'};
     my $cli = getCLI();
+    my $rules = $cli->GetDomainSignalRules( $domain );
 
     my @enable_data = [];
-    $enable_data[0][0][0] = "100010";
-    $enable_data[0][0][1] = 'ccIn_' . $domain;
-    $enable_data[0][0][2][0] = ['Method', 'is', 'INVITE'];
-    $enable_data[0][0][2][1] = ['RequestURI', 'is not', '*;fromCC=true'];
-    $enable_data[0][0][3][0] = ['Redirect to', 'ccincoming#pbx'];
-    $enable_data[0][0][3][1] = ['Stop Processing'];
-
-    $cli->SetDomainSignalRules($domain, @enable_data);
+    $enable_data[0][0] = "100010";
+    $enable_data[0][1] = 'ccIn_' . $domain;
+    $enable_data[0][2][0] = ['Method', 'is', 'INVITE'];
+    $enable_data[0][2][1] = ['RequestURI', 'is not', '*;fromCC=true'];
+    $enable_data[0][3][0] = ['Redirect to', 'ccincoming#pbx'];
+    $enable_data[0][3][1] = ['Stop Processing'];
+    
+    push($rules,@enable_data);
+    
+    $cli->SetDomainSignalRules($domain, $rules);
     my $error_msg = $cli->getErrMessage();
 
     $cli->Logout();
-    return $error_msg;
+    return $rules;
 }
 
 sub api2_UnsetDomainSignalRules {
     my %OPTS = @_;
+    my $rule = "ccIn_";
+    my $dom = $OPTS{'domain'};
+    my @domains = Cpanel::Email::listmaildomains();
+    my $cli = getCLI();
+    my $newrules = [];
+    for my $domain (@domains) {
+	if ($domain eq $dom) {
+	    my $rules = $cli->GetDomainSignalRules( $domain );
+	    for my $r (@$rules) {
+		push @$newrules, $r unless $r->[1] eq $rule . $domain;
+	    }
+	    $cli->SetDomainSignalRules($domain, $newrules);
+	    last;
+	}
+    }
+    my $error_msg = $cli->getErrMessage();
+    $cli->Logout();
+    return $newrules;
+}
+
+sub api2_GetDomainSignalRules {
+    my %OPTS = @_;
     my $domain = $OPTS{'domain'};
     my $cli = getCLI();
-    my @disable_data = [];
 
-    $cli->SetDomainSignalRules($OPTS{'domain'}, @disable_data);
+    my $rules = $cli->GetDomainSignalRules($OPTS{'domain'});
     my $error_msg = $cli->getErrMessage();
 
     $cli->Logout();
-    return $error_msg;
+    return $rules;
 }
 
 sub api2_CCStatus {
@@ -5489,10 +5481,6 @@ sub api2_CCStatus {
     my $cli = getCLI();
     my $result = {};
     
-    my $server_rules = $cli->GetServerSignalRules();
-    $result->{"server_rules"} = $server_rules;
-    my $error_server_rules = $cli->getErrMessage();
-    $result->{"error_server_rules"} = $error_server_rules;
     my $domain_rules = $cli->GetDomainSignalRules($domain);
     $result->{"domain_rules"} = $domain_rules;
     my $error_domain_rules = $cli->getErrMessage();
@@ -5527,14 +5515,10 @@ sub api2_GetAccountRights {
 }
 
 sub api2_GetCCLimit {
-    my %OPTS = @_;
-
     my $cli = getCLI();
     my $result = {};
-
     my $cc_limit = Cpanel::CachedDataStore::fetch_ref( '/var/cpanel/cgpro/classes.yaml' ) || {};
     $result->{"cc_limit"} = $cc_limit;
-
     $cli->Logout();
     return $result;
 }

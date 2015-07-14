@@ -188,9 +188,13 @@ var CCStatus = function(domain) {
 	    }
 
 	    var domain_rules = false;
-	    var domain_rules_str = JSON.stringify(data.domain_rules);
-	    if (domain_rules_str && domain_rules_str == "[[\"100010\",\"ccIn_" + domain + "\",[[\"Method\",\"is\",\"INVITE\"],[\"RequestURI\",\"is not\",\"*;fromCC=true\"]],[[\"Redirect to\",\"ccincoming#pbx\"],[\"Stop Processing\"]]]]") {
-		domain_rules = true;
+	    for (var i=0; i < data.domain_rules.length; i++ ) {
+		var domain_rules_str = JSON.stringify(data.domain_rules[i]);
+		var compar = "[\"100010\",\"ccIn_" + domain + "\",[[\"Method\",\"is\",\"INVITE\"],[\"RequestURI\",\"is not\",\"*;fromCC=true\"]],[[\"Redirect to\",\"ccincoming#pbx\"],[\"Stop Processing\"]]]";
+	
+		if (domain_rules_str && domain_rules_str == compar) {
+		    domain_rules = true;
+		}
 	    }
 	    
 	    // YAHOO.util.Dom.get("status_loading").innerHTML = "";
@@ -253,6 +257,32 @@ var GetAllDomains = function () {
 	});
 }
 
+var GetDomainRules = function (domain) {
+    var api2_call = {
+	"cpanel_jsonapi_version": 2,
+	"cpanel_jsonapi_module": "CommuniGate",
+	"cpanel_jsonapi_func": "GetDomainSignalRules",
+	"domain": domain
+    };
+    var data;
+    // callback functions
+    var success = function(o) {
+	// data = $.parseJSON(o);
+	// if (data.cpanelresult.data) {
+	//     DOMAINS = data.cpanelresult.data;
+	//     CheckIfCCActivated();
+	// }
+    }
+    // send the AJAX request
+    $.ajax({
+	    type: "POST",
+	    url: CPANEL.urls.json_api(),
+	    data: api2_call,
+	    success: success,
+	    dataType: "text"
+	});
+}
+
 var GetCCLimit = function () {
     var api2_call = {
 	"cpanel_jsonapi_version": 2,
@@ -265,8 +295,10 @@ var GetCCLimit = function () {
 	data = $.parseJSON(o);
 	if (data.cpanelresult.data[0]) {
 	    data = data.cpanelresult.data[0];
-	    CCLIMIT = data.cc_limit.CommuniGate.contact_center.all;
-	    CCStatus(domain);
+	    if (data.cc_limit) {
+		CCLIMIT = data.cc_limit.CommuniGate.contact_center.all;
+		CCStatus(domain);
+	    }
 	}
     }
     // send the AJAX request
@@ -294,15 +326,21 @@ var CheckIfCCActivated = function () {
 	var success = function(o) {
 	    var data = $.parseJSON(o);
 	    if (data.cpanelresult.data[0]) {
-	    	data = data.cpanelresult.data[0]
-	    	var domain_rules = false;
-	    	var domain_rules_str = JSON.stringify(data.domain_rules);
-	    	if (domain_rules_str && domain_rules_str == "[[\"100010\",\"ccIn_" + DOMAINS[counter]["domain"] + "\",[[\"Method\",\"is\",\"INVITE\"],[\"RequestURI\",\"is not\",\"*;fromCC=true\"]],[[\"Redirect to\",\"ccincoming#pbx\"],[\"Stop Processing\"]]]]") {
-	    	    domain_rules = true;
-	    	}	    
-	    	if (domain_rules) {
-	    	    ALREADY_ENABLED += 1;
-	    	}
+	    	data = data.cpanelresult.data[0];
+		
+		for (var i=0; i < data.domain_rules.length; i++ ) {
+		    var domain_rules = false;
+		    var domain_rules_str = JSON.stringify(data.domain_rules[i]);
+		    console.log(domain_rules_str);
+		    var compar = "[\"100010\",\"ccIn_" + DOMAINS[counter]["domain"] + "\",[[\"Method\",\"is\",\"INVITE\"],[\"RequestURI\",\"is not\",\"*;fromCC=true\"]],[[\"Redirect to\",\"ccincoming#pbx\"],[\"Stop Processing\"]]]";
+		    if (domain_rules_str && domain_rules_str == compar) {
+			domain_rules = true;
+		    }
+		    if (domain_rules) {
+			ALREADY_ENABLED += 1;
+		    }
+		}
+	    
 		counter += 1;
 		if (counter < DOMAINS.length) {
 		CCStatusForDomain();
@@ -547,6 +585,7 @@ function getUrlParameter(sParam)
 
 var domain = getUrlParameter('domain');
 GetCCLimit();
+GetDomainRules(domain);
 
 YAHOO.util.Dom.get("status_loading").innerHTML = CPANEL.icons.ajax + " Please, wait...";
 
