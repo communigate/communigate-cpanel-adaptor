@@ -252,31 +252,33 @@ sub api2_ListAccounts {
     my @domains = Cpanel::Email::listmaildomains();
     my $cli = getCLI();
     my $return_accounts = {};
-    my $all_classes;
     foreach my $domain (@domains) {
 	my $accounts=$cli->ListAccounts($domain);
 	foreach my $userName (sort keys %$accounts) {
 	    next if $userName eq 'pbx' || $userName eq 'ivr';
-
+	    my $accountRights = $cli->GetAccountRights("$userName\@$domain");
 	    my $accountData = $cli->GetAccountEffectiveSettings("$userName\@$domain");
 	    my $service = @$accountData{'ServiceClass'} || '';
-	    if ($OPTS{'classes'}) {
-	    $all_classes = @$accountData{'ServiceClasses'} unless $all_classes;
-	    }
 
 	    $return_accounts->{$userName . "@" . $domain} = {
 		domain => $domain,
 		username => $userName,
-		class => $service
+		rights => $accountRights,
+		class => $service,
+		data => $accountData
 	    };
 	}
     }
+
     my $return = {
 	accounts => $return_accounts
     };
     if ($OPTS{'classes'}) {
-    $return->{"classes"} = $all_classes;
+    my $defaults = $cli->GetServerAccountDefaults();
+    $return->{"classes"} = $defaults->{'ServiceClasses'}
     }
+    
+    $cli->Logout();
     return $return;
 }
 
@@ -4902,7 +4904,7 @@ sub api2_GetAccountDefaults {
 
     for my $domain (@domains) {
 	if ($domain eq $dom) {
-	    my $acc_defaults = $cli->GetAccountDefaults("sevdip.bg");
+	    my $acc_defaults = $cli->GetAccountDefaults($domain);
 	    $result->{'account_defaults'} = $acc_defaults;
 	    $result->{"domain"}=$dom;
 	    last;
@@ -5351,10 +5353,8 @@ sub api2_UnsetAccountPSTN {
     my %OPTS = @_;
     my $extension = $OPTS{'extension'};
     my ($number,$dom) = split "@", $extension;
-
     my @domains = Cpanel::Email::listmaildomains();
     my $cli = getCLI();
-
     my $result = {};
     for my $domain (@domains) {
 	if ($domain eq $dom) {
@@ -5373,6 +5373,168 @@ sub api2_UnsetAccountPSTN {
 	    last;
 	}
     }
+    $cli->Logout();
+    return $result;
+}
+
+sub api2_SetServerSignalRules {
+    my %OPTS = @_;
+    my $domain = $OPTS{'domain'};
+    my $cli = getCLI();
+
+    my @enable_data = [];
+    $enable_data[0][0][0] = "100010";
+    $enable_data[0][0][1] = 'ccOut_'. $domain;
+    $enable_data[0][0][2][0] = ['Method', 'is', 'INVITE'];
+    $enable_data[0][0][2][1] = ['Submit Address', 'is not', 'LOCAL [0.0.0.0]*'];
+    $enable_data[0][0][2][2] = ['From', 'is', '*@' . $domain];
+    $enable_data[0][0][3][0] = ['Redirect to', 'ccincoming#pbx@' . $domain];
+    $enable_data[0][0][3][1] = ['Stop Processing'];
+
+    $cli->SetServerSignalRules(@enable_data);
+    my $error_msg = $cli->getErrMessage();
+
+    $cli->Logout();
+    return $error_msg;
+}
+
+sub api2_CreatePbxAccount {
+    my %OPTS = @_;
+    my $cli = getCLI();
+    my $domain = $OPTS{'domain'};
+    my $create_pbx = $cli->CreateAccount(accountName => 'pbx@' . $domain);
+    my $error_msg = $cli->getErrMessage();
+    $cli->Logout();
+    return $error_msg;
+}
+
+sub api2_SetPbxRights {
+    my %OPTS = @_;
+    my $domain = $OPTS{'domain'};
+    my $cli = getCLI();
+    $cli->SetAccountRights('pbx@' . $domain , ['Domain', 'BasicSettings', 'CanCreateNamedTasks', 'CanAccessWebSites', 'CanCreateAliases', 'CanImpersonate']);  
+    my $error_msg = $cli->getErrMessage();
+    $cli->Logout();
+    return $error_msg;
+}
+
+sub api2_SetAdministrator {
+    my %OPTS = @_;
+    my $account = $OPTS{'account'};
+    my $cli = getCLI();
+    $cli->SetAccountRights($account , ['Domain', 'BasicSettings', 'PSTNSettings','CanCreateAccounts', 'CanCreateNamedTasks', 'CanAccessWebSites', 'CanCreateAliases']);  
+    my $error_msg = $cli->getErrMessage();
+    $cli->Logout();
+    return $error_msg;
+}
+
+sub api2_UnsetAdministrator {
+    my %OPTS = @_;
+    my $account = $OPTS{'account'};
+    my $cli = getCLI();
+    $cli->SetAccountRights($account , []);  
+    my $error_msg = $cli->getErrMessage();
+    $cli->Logout();
+    return $error_msg;
+}
+
+sub api2_UnsetServerSignalRules {
+    my $cli = getCLI();
+    my @disable_data = [];
+
+    $cli->SetServerSignalRules(@disable_data);
+    my $error_msg = $cli->getErrMessage();
+
+    $cli->Logout();
+    return $error_msg;
+}
+
+sub api2_SetDomainSignalRules {
+    my %OPTS = @_;
+    my $domain = $OPTS{'domain'};
+    my $cli = getCLI();
+
+    my @enable_data = [];
+    $enable_data[0][0][0] = "100010";
+    $enable_data[0][0][1] = 'ccIn_' . $domain;
+    $enable_data[0][0][2][0] = ['Method', 'is', 'INVITE'];
+    $enable_data[0][0][2][1] = ['RequestURI', 'is not', '*;fromCC=true'];
+    $enable_data[0][0][3][0] = ['Redirect to', 'ccincoming#pbx'];
+    $enable_data[0][0][3][1] = ['Stop Processing'];
+
+    $cli->SetDomainSignalRules($domain, @enable_data);
+    my $error_msg = $cli->getErrMessage();
+
+    $cli->Logout();
+    return $error_msg;
+}
+
+sub api2_UnsetDomainSignalRules {
+    my %OPTS = @_;
+    my $domain = $OPTS{'domain'};
+    my $cli = getCLI();
+    my @disable_data = [];
+
+    $cli->SetDomainSignalRules($OPTS{'domain'}, @disable_data);
+    my $error_msg = $cli->getErrMessage();
+
+    $cli->Logout();
+    return $error_msg;
+}
+
+sub api2_CCStatus {
+    my %OPTS = @_;
+
+    my $domain = $OPTS{'domain'};
+    my $cli = getCLI();
+    my $result = {};
+    
+    my $server_rules = $cli->GetServerSignalRules();
+    $result->{"server_rules"} = $server_rules;
+    my $error_server_rules = $cli->getErrMessage();
+    $result->{"error_server_rules"} = $error_server_rules;
+    my $domain_rules = $cli->GetDomainSignalRules($domain);
+    $result->{"domain_rules"} = $domain_rules;
+    my $error_domain_rules = $cli->getErrMessage();
+    $result->{"error_domain_rules"} = $error_domain_rules;
+    my $account_prefs = $cli->GetAccountPrefs('pbx@' . $domain);
+    $result->{"account_prefs"} = $account_prefs;
+    my $error_account_prefs = $cli->getErrMessage();
+    $result->{"error_account_prefs"} = $error_account_prefs;
+    my $account_rights = $cli->GetAccountRights('pbx@' . $domain);
+    $result->{"account_rights"} = $account_rights;
+    my $error_account_rights = $cli->getErrMessage();
+    $result->{"error_account_rights"} = $error_account_rights;
+
+    $cli->Logout();
+    return $result;
+}
+
+sub api2_GetAccountRights {
+    my %OPTS = @_;
+    my $account = $OPTS{'account'};
+
+    my $cli = getCLI();
+    my $result = {};
+
+    my $account_rights = $cli->GetAccountRights($account);
+    $result->{"account_rights"} = $account_rights;
+    my $error_account_rights = $cli->getErrMessage();
+    $result->{"error_account_rights"} = $error_account_rights;
+
+    $cli->Logout();
+    return $result;
+}
+
+sub api2_GetCCLimit {
+    my %OPTS = @_;
+
+    my $cli = getCLI();
+    my $result = {};
+
+    my $cc_limit = Cpanel::CachedDataStore::fetch_ref( '/var/cpanel/cgpro/classes.yaml' ) || {};
+    $result->{"cc_limit"} = $cc_limit;
+
     $cli->Logout();
     return $result;
 }

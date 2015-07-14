@@ -1,0 +1,92 @@
+[% MACRO filter_option(pval, val, text) BLOCK -%]
+<option value="[% val %]"[% val == pval ? " selected='selected'" : "" %]>[% locale.maketext(text) %]</option>
+[% END -%]
+[%
+SET CPANEL.CPVAR.dprefix = "../../";
+SET CPANEL.CPVAR.headerimg = "../../images/mailmenu.gif";
+%]
+[%
+SET mail_domains =  Api2.exec("Email", "listmaildomains", {} );
+%]
+
+[% WRAPPER '_assets/master.html.tt'
+    app_key = 'cgpro_contact_center'
+-%] 
+
+<style>
+  a:hover {
+  cursor: pointer;
+  }
+</style>
+
+<div class="body-content">
+  <div class="pull-right">
+    <div class="pull-right">
+      <form method="get" action="" id="manage_list_form" class="form-inline">
+	<div class="form-group">
+          <label for="manage_list_select" id="txt_Managing" class="col-xs-12 control-label">[% locale.maketext("Managing:") %]</label>
+	</div>
+	<div class="form-group">
+          [% IF mail_domains.size() == "1" %]
+          [% mail_domains.0.domain %] <input type="hidden" id="domain" value="[%  mail_domains.0.domain %]" name="domain" />
+
+	  [% IF !RAW_FORM.item("domain") && mail_domains.size > 0 %]
+	  <script type="text/javascript">
+	    YAHOO.util.Event.onDOMReady(function() {      
+	    if (YAHOO.util.Dom.get("domain").value) {
+	    YAHOO.util.Dom.get("manage_list_form").submit();
+	    }
+	    });
+	  </script>
+	  [% END %]
+
+          [% ELSE %]
+          <select name="domain" id="manage_list_select" class="col-xs-12 form-control">
+            [% IF mail_domains.size() %]
+	    [% FOR domain IN mail_domains -%]
+	    [% filter_option(FORM.domain, domain.domain, domain.domain) %]
+	    [% END -%]
+          </select>
+	  [% IF !RAW_FORM.item("domain") %]
+	  <script type="text/javascript">
+	    YAHOO.util.Dom.get("manage_list_form").submit();
+	  </script>
+	  [% END %]
+	  [% END %]
+	  [% END %]
+    	  <input type="hidden" id="domain" value="[% FORM.domain %]" />
+	</div>
+	<noscript>
+          <div class="form-group">
+            <input type="submit" class="btn btn-primary" id="btn_domainSelect_go" value="[% locale.maketext("Go") %]" />
+          </div>
+	</noscript>
+      </form>
+      <script type="text/javascript">
+	YAHOO.util.Event.onDOMReady(function() {
+	YAHOO.util.Event.on("manage_list_select", "change", function() { YAHOO.util.Dom.get("manage_list_form").submit(); });
+	});
+      </script>
+    </div>
+  </div><br /></br />
+
+  <span id="status_loading"></span>
+
+  <p id="enabled_cc" style="display: none;">
+    <span class="disabled success btn" style="color:green">[% locale.maketext("Enabled") %]</span>
+    <a class="input-button btn btn-primary" id="btn_disable">[% locale.maketext("Disable") %]</a>
+    <span id="disabling_loading"></span>
+  </p>
+
+  <p id="disabled_cc" style="display: none;">
+    <span class="disabled btn">[% locale.maketext("Disabled") %]</span>
+    <a class="input-button btn btn-primary" id="btn_enable">[% locale.maketext("Enable") %]</a>
+    <span id="enabling_loading"></span>
+  </p>
+
+<span id="table_loading"></span>
+<span id="enabled_error" style="display: none;">Already enabled for another domain!</span>
+<div id="accountsTable"></div>
+<script src="js/contact_center.js"></script> 
+</div>
+[% END %]
