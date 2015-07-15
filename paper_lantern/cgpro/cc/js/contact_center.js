@@ -1,305 +1,26 @@
 var ACCOUNTS;
-var ENABLED;
 var DOMAINS;
-var ALREADY_ENABLED = 0;
-var CCLIMIT;
+var ENABLED = 0;
+var CCLIMIT = 0;
 
-var SetDomainSignalRules = function(domain) {
+var GetCCLimit = function (domain) {
     var api2_call = {
 	"cpanel_jsonapi_version": 2,
 	"cpanel_jsonapi_module": "CommuniGate",
-        "cpanel_jsonapi_func": "SetDomainSignalRules",
-	"domain" : domain
-    };
-    // callback functions
-    var success = function(o) {
-	YAHOO.util.Dom.get("enabling_loading").innerHTML = "";
-	$("#enabled_cc").show();
-	$("#disabled_cc").hide();
-	GetAccounts();
-    }
-
-    // send the AJAX request
-    $.ajax({
-	    type: "POST",
-	    url: CPANEL.urls.json_api(),
-	    data: api2_call,
-	    success: success,
-	    dataType: "text"
-	});
-
-    // show the ajax loading icon
-    YAHOO.util.Dom.get("enabling_loading").innerHTML = CPANEL.icons.ajax + " Please, wait...";
-};
-
-var UnsetDomainSignalRules = function(domain) {
-    var api2_call = {
-	"cpanel_jsonapi_version": 2,
-	"cpanel_jsonapi_module": "CommuniGate",
-        "cpanel_jsonapi_func": "UnsetDomainSignalRules",
-	"domain": domain
-    };
-    // callback functions
-    var success = function(o) {
-	YAHOO.util.Dom.get("disabling_loading").innerHTML = "";
-	$("#enabled_cc").hide();
-	$("#disabled_cc").show();
-	$("#accounts_table").hide();
-    }
-
-    // send the AJAX request
-    $.ajax({
-	    type: "POST",
-	    url: CPANEL.urls.json_api(),
-	    data: api2_call,
-	    success: success,
-	    dataType: "text"
-	});
-
-    // show the ajax loading icon
-    YAHOO.util.Dom.get("disabling_loading").innerHTML = CPANEL.icons.ajax + " Please, wait...";
-};
-
-var SetServerSignalRules = function(domain) {
-    var api2_call = {
-	"cpanel_jsonapi_version": 2,
-	"cpanel_jsonapi_module": "CommuniGate",
-        "cpanel_jsonapi_func": "SetServerSignalRules",
-	"domain" : domain
-    };
-    // callback functions
-    var success = function(o) {
-	YAHOO.util.Dom.get("enabling_loading").innerHTML = "";
-	SetDomainSignalRules(domain);
-    }
-
-    // send the AJAX request
-    $.ajax({
-	    type: "POST",
-	    url: CPANEL.urls.json_api(),
-	    data: api2_call,
-	    success: success,
-	    dataType: "text"
-	});
-
-    // show the ajax loading icon
-    YAHOO.util.Dom.get("enabling_loading").innerHTML = CPANEL.icons.ajax + " Please, wait...";
-};
-
-var UnsetServerSignalRules = function() {
-    var api2_call = {
-	"cpanel_jsonapi_version": 2,
-	"cpanel_jsonapi_module": "CommuniGate",
-        "cpanel_jsonapi_func": "UnsetServerSignalRules"
-    };
-    // callback functions
-    var success = function(o) {
-	YAHOO.util.Dom.get("disabling_loading").innerHTML = "";
-	$("#enabled_cc").hide();
-	$("#disabled_cc").show();
-    }
-
-    // send the AJAX request
-    $.ajax({
-	    type: "POST",
-	    url: CPANEL.urls.json_api(),
-	    data: api2_call,
-	    success: success,
-	    dataType: "text"
-	});
-
-    // show the ajax loading icon
-    YAHOO.util.Dom.get("disabling_loading").innerHTML = CPANEL.icons.ajax + " Please, wait...";
-};
-
-var CreatePbxAccount = function(domain) {
-    var api2_call = {
-	"cpanel_jsonapi_version": 2,
-	"cpanel_jsonapi_module": "CommuniGate",
-        "cpanel_jsonapi_func": "CreatePbxAccount",
-	"domain" : domain
-    };
-    // callback functions
-    var success = function(o) {
-	YAHOO.util.Dom.get("enabling_loading").innerHTML = "";
-	SetPbxRights(domain);
-    }
-    // send the AJAX request
-    $.ajax({
-	    type: "POST",
-	    url: CPANEL.urls.json_api() + '&' + $.param(api2_call),
-	    data: api2_call,
-	    success: success,
-	    dataType: "text"
-	});
-
-    // show the ajax loading icon
-    YAHOO.util.Dom.get("enabling_loading").innerHTML = CPANEL.icons.ajax + " Please, wait...";
-};
-
-var SetPbxRights = function(domain) {
-    var api2_call = {
-	"cpanel_jsonapi_version": 2,
-	"cpanel_jsonapi_module": "CommuniGate",
-        "cpanel_jsonapi_func": "SetPbxRights",
-	"domain" : domain
-    };
-    // callback functions
-    var success = function(o) {
-	YAHOO.util.Dom.get("enabling_loading").innerHTML = "";
-	SetDomainSignalRules(domain);
-    }
-
-    // send the AJAX request
-    $.ajax({
-	    type: "POST",
-	    url: CPANEL.urls.json_api(),
-	    data: api2_call,
-	    success: success,
-	    dataType: "text"
-	});
-
-    // show the ajax loading icon
-    YAHOO.util.Dom.get("enabling_loading").innerHTML = CPANEL.icons.ajax + " Please, wait...";
-};
-
-var CCStatus = function(domain) {
-    var api2_call = {
-	"cpanel_jsonapi_version": 2,
-	"cpanel_jsonapi_module": "CommuniGate",
-        "cpanel_jsonapi_func": "CCStatus",
-	"domain": domain
-    };
-    // callback functions
-    var success = function(o) {
-	var data = $.parseJSON(o);
-
-	if (data.cpanelresult.data[0]) {
-	    data = data.cpanelresult.data[0]
-	    var pbx_account = false;
-	    if (data.account_prefs && data.account_prefs.AccountName && data.account_prefs.AccountName == "pbx@" + domain) {
-		pbx_account = true;
-	    }
-	    
-	    var account_rights = false;
-	    var account_rights_str = JSON.stringify(data.account_rights);
-	    if (account_rights_str && account_rights_str == "[\"Domain\",\"BasicSettings\",\"CanCreateNamedTasks\",\"CanAccessWebSites\",\"CanCreateAliases\",\"CanImpersonate\"]") {
-		account_rights = true;
-	    }
-
-	    var domain_rules = false;
-	    for (var i=0; i < data.domain_rules.length; i++ ) {
-		var domain_rules_str = JSON.stringify(data.domain_rules[i]);
-		var compar = "[\"100010\",\"ccIn_" + domain + "\",[[\"Method\",\"is\",\"INVITE\"],[\"RequestURI\",\"is not\",\"*;fromCC=true\"]],[[\"Redirect to\",\"ccincoming#pbx\"],[\"Stop Processing\"]]]";
-	
-		if (domain_rules_str && domain_rules_str == compar) {
-		    domain_rules = true;
-		}
-	    }
-	    
-	    // YAHOO.util.Dom.get("status_loading").innerHTML = "";
-	    YAHOO.util.Dom.get("enabling_loading").innerHTML = "";
-	    
-	    if (pbx_account, account_rights, domain_rules) {
-		$("#enabled_cc").show();
-		ENABLED = true;
-		GetAccounts();
-		YAHOO.util.Dom.get("status_loading").innerHTML = "";
-	    }
-	    else {
-		// $("#disabled_cc").show();
-		ENABLED = false;
-		GetAllDomains();
-	    }
-	}
-	else {
-	    // YAHOO.util.Dom.get("status_loading").innerHTML = "";
-	    // YAHOO.util.Dom.get("enabling_loading").innerHTML = "";
-	}
-    }
-
-    // send the AJAX request
-    $.ajax({
-	    type: "POST",
-	    url: CPANEL.urls.json_api(),
-	    data: api2_call,
-	    success: success,
-	    dataType: "text"
-	});
-
-    // show the ajax loading icon
-    YAHOO.util.Dom.get("enabling_loading").innerHTML = CPANEL.icons.ajax + " Please, wait...";
-    YAHOO.util.Dom.get("status_loading").innerHTML = CPANEL.icons.ajax + " Please, wait...";
-};
-
-var GetAllDomains = function () {
-    var api2_call = {
-	"cpanel_jsonapi_version": 2,
-	"cpanel_jsonapi_module": "Email",
-	"cpanel_jsonapi_func": "listmaildomains"
-    };
-    var data;
-    // callback functions
-    var success = function(o) {
-	data = $.parseJSON(o);
-	if (data.cpanelresult.data) {
-	    DOMAINS = data.cpanelresult.data;
-	    CheckIfCCActivated();
-	}
-    }
-    // send the AJAX request
-    $.ajax({
-	    type: "POST",
-	    url: CPANEL.urls.json_api(),
-	    data: api2_call,
-	    success: success,
-	    dataType: "text"
-	});
-}
-
-var GetDomainRules = function (domain) {
-    var api2_call = {
-	"cpanel_jsonapi_version": 2,
-	"cpanel_jsonapi_module": "CommuniGate",
-	"cpanel_jsonapi_func": "GetDomainSignalRules",
+	"cpanel_jsonapi_func": "CC_GetCCLimit",
 	"domain": domain
     };
     var data;
-    // callback functions
-    var success = function(o) {
-	// data = $.parseJSON(o);
-	// if (data.cpanelresult.data) {
-	//     DOMAINS = data.cpanelresult.data;
-	//     CheckIfCCActivated();
-	// }
-    }
-    // send the AJAX request
-    $.ajax({
-	    type: "POST",
-	    url: CPANEL.urls.json_api(),
-	    data: api2_call,
-	    success: success,
-	    dataType: "text"
-	});
-}
-
-var GetCCLimit = function () {
-    var api2_call = {
-	"cpanel_jsonapi_version": 2,
-	"cpanel_jsonapi_module": "CommuniGate",
-	"cpanel_jsonapi_func": "GetCCLimit"
-    };
-    var data;
+    var domain_dot_pos = domain.lastIndexOf(".");
+    var domain_username = domain.substring(0, domain_dot_pos);
     // callback functions
     var success = function(o) {
 	data = $.parseJSON(o);
 	if (data.cpanelresult.data[0]) {
 	    data = data.cpanelresult.data[0];
-	    if (data.cc_limit) {
-		CCLIMIT = data.cc_limit.CommuniGate.contact_center.all;
-		CCStatus(domain);
-	    }
+	    CCLIMIT = data;
 	}
+	CC_CheckEnabled();
     }
     // send the AJAX request
     $.ajax({
@@ -309,82 +30,20 @@ var GetCCLimit = function () {
 	    success: success,
 	    dataType: "text"
 	});
-}
+};    
 
-var CheckIfCCActivated = function () {
-    ALREADY_ENABLED = 0;
-    var counter = 0;
-    var CCStatusForDomain = function() {
-	$("#enabled_error").hide();
-	var api2_call = {
-	    "cpanel_jsonapi_version": 2,
-	    "cpanel_jsonapi_module": "CommuniGate",
-	    "cpanel_jsonapi_func": "CCStatus",
-	    "domain": DOMAINS[counter]["domain"]
-	};
-	// callback functions
-	var success = function(o) {
-	    var data = $.parseJSON(o);
-	    if (data.cpanelresult.data[0]) {
-	    	data = data.cpanelresult.data[0];
-		
-		for (var i=0; i < data.domain_rules.length; i++ ) {
-		    var domain_rules = false;
-		    var domain_rules_str = JSON.stringify(data.domain_rules[i]);
-		    console.log(domain_rules_str);
-		    var compar = "[\"100010\",\"ccIn_" + DOMAINS[counter]["domain"] + "\",[[\"Method\",\"is\",\"INVITE\"],[\"RequestURI\",\"is not\",\"*;fromCC=true\"]],[[\"Redirect to\",\"ccincoming#pbx\"],[\"Stop Processing\"]]]";
-		    if (domain_rules_str && domain_rules_str == compar) {
-			domain_rules = true;
-		    }
-		    if (domain_rules) {
-			ALREADY_ENABLED += 1;
-		    }
-		}
-	    
-		counter += 1;
-		if (counter < DOMAINS.length) {
-		CCStatusForDomain();
-		}
-
-		if (ALREADY_ENABLED < CCLIMIT && counter >= DOMAINS.length) {
-		    YAHOO.util.Dom.get("status_loading").innerHTML = "";
-		    $("#disabled_cc").show();
-		    $("#enabled_error").hide();
-		}
-		if (ALREADY_ENABLED >= CCLIMIT) {
-		    YAHOO.util.Dom.get("status_loading").innerHTML = "";
-		    $("#enabled_error").show();
-		}
-	    }
-	}
-	// send the AJAX request
-	$.ajax({
-		type: "POST",
-		url: CPANEL.urls.json_api(),
-		data: api2_call,
-		success: success,
-		dataType: "text"
-	    });
-	// show the ajax loading icon
-	// YAHOO.util.Dom.get("enabling_loading").innerHTML = CPANEL.icons.ajax + " Please, wait...";
-	// YAHOO.util.Dom.get("status_loading").innerHTML = CPANEL.icons.ajax + " Please, wait...";
-    };
-    CCStatusForDomain();
-};
-
-var GetAccounts = function(domain) {
+var GetAccounts = function() {
     var api2_call = {
 	"cpanel_jsonapi_version": 2,
 	"cpanel_jsonapi_module": "CommuniGate",
-        "cpanel_jsonapi_func": "ListAccounts",
-        "classes": "1",
+	"cpanel_jsonapi_func": "ListAccounts",
+	"classes": "1",
     };
     // callback functions
     var success = function(o) {
 	var data = $.parseJSON(o);
-
 	if (data.cpanelresult.data[0]) {
-	    data = data.cpanelresult.data[0]
+	    data = data.cpanelresult.data[0];
 	    ACCOUNTS = data.accounts;
 	    CLASSES = data.classes;
 	    loadTable();
@@ -400,6 +59,152 @@ var GetAccounts = function(domain) {
 	});
     YAHOO.util.Dom.get(table_loading).innerHTML = " " + CPANEL.icons.ajax + " Please, wait...";
     $("#accounts_table").remove();
+};
+
+var EnableCC = function (domain) {
+    var api2_call = {
+	"cpanel_jsonapi_version": 2,
+	"cpanel_jsonapi_module": "CommuniGate",
+	"cpanel_jsonapi_func": "CC_Enable",
+	"domain": domain
+    };
+    var data;
+    var domain_dot_pos = domain.lastIndexOf(".");
+    var domain_username = domain.substring(0, domain_dot_pos);
+    // callback functions
+    var success = function(o) {
+	YAHOO.util.Dom.get(enabling_loading).innerHTML = "";
+	data = $.parseJSON(o);
+	$("#enabled_cc").show();
+	$("#disabled_cc").hide();
+	GetAccounts();	
+    }
+    // send the AJAX request
+    $.ajax({
+	    type: "POST",
+	    url: CPANEL.urls.json_api(),
+	    data: api2_call,
+	    success: success,
+	    dataType: "text"
+	});
+    YAHOO.util.Dom.get(enabling_loading).innerHTML = " " + CPANEL.icons.ajax + " Please, wait...";
+};
+
+var DisableCC = function (domain) {
+    var api2_call = {
+	"cpanel_jsonapi_version": 2,
+	"cpanel_jsonapi_module": "CommuniGate",
+	"cpanel_jsonapi_func": "CC_Disable",
+	"domain": domain
+    };
+    var data;
+    // callback functions
+    var success = function(o) {
+	YAHOO.util.Dom.get(disabling_loading).innerHTML = "";
+	$("#enabled_cc").hide();
+	$("#disabled_cc").show();
+	$("#accounts_table").remove();
+    }
+    // send the AJAX request
+    $.ajax({
+	    type: "POST",
+	    url: CPANEL.urls.json_api(),
+	    data: api2_call,
+	    success: success,
+	    dataType: "text"
+	});
+    YAHOO.util.Dom.get(disabling_loading).innerHTML = " " + CPANEL.icons.ajax + " Please, wait...";
+};
+
+var CCStatus = function (domain) {
+    var api2_call = {
+	"cpanel_jsonapi_version": 2,
+	"cpanel_jsonapi_module": "CommuniGate",
+	"cpanel_jsonapi_func": "CC_Status",
+	"domain": domain
+    };
+    var data;
+    // callback functions
+    var success = function(o) {
+	data = $.parseJSON(o);
+	if (data.cpanelresult.data[0]) {
+	    data = data.cpanelresult.data[0];
+	    if (data.enabled == "YES") {
+		YAHOO.util.Dom.get(status_loading).innerHTML = "";
+		$("#enabled_cc").show();
+		GetAccounts();
+	    }
+	    else {
+		GetCCLimit(domain);		
+	    }
+	}
+    }
+    // send the AJAX request
+    $.ajax({
+	    type: "POST",
+	    url: CPANEL.urls.json_api(),
+	    data: api2_call,
+	    success: success,
+	    dataType: "text"
+	});
+    YAHOO.util.Dom.get(status_loading).innerHTML = " " + CPANEL.icons.ajax + " Please, wait...";
+};
+
+var CC_CheckEnabled = function () {
+    var api2_call = {
+	"cpanel_jsonapi_version": 2,
+	"cpanel_jsonapi_module": "CommuniGate",
+	"cpanel_jsonapi_func": "CC_CheckEnabled"
+    };
+    var data;
+    // callback functions
+    var success = function(o) {
+	YAHOO.util.Dom.get(status_loading).innerHTML = "";
+	data = $.parseJSON(o);
+	if (data.cpanelresult.data[0]) {
+	    ENABLED = data.cpanelresult.data[0].enabled;
+	}
+	if (ENABLED < CCLIMIT) {
+	    $("#disabled_cc").show();
+	}
+	else {
+	    $("#enabled_error").show();
+	}
+    }
+    // send the AJAX request
+    $.ajax({
+	    type: "POST",
+	    url: CPANEL.urls.json_api(),
+	    data: api2_call,
+	    success: success,
+	    dataType: "text"
+	});
+};
+	
+var CC_UpdateAdministrator = function (account, action) {
+    var api2_call = {
+	"cpanel_jsonapi_version": 2,
+	"cpanel_jsonapi_module": "CommuniGate",
+	"cpanel_jsonapi_func": "CC_UpdateAdministrator",
+	"account": account,
+	"action": action
+    };
+    var data;
+    // callback functions
+    var success = function(o) {
+	GetAccounts();
+    }
+    // send the AJAX request
+    $.ajax({
+	    type: "POST",
+	    url: CPANEL.urls.json_api(),
+	    data: api2_call,
+	    success: success,
+	    dataType: "text"
+	});
+    var selector_loading = "#loading_" + account.split("@")[0];
+    $(selector_loading).html(" " + CPANEL.icons.ajax + " Please, wait...");
+    // YAHOO.util.Dom.get(selector_loading).innerHTML = " " + CPANEL.icons.ajax + " Please, wait...";
 };
 
 var loadTable = function () {
@@ -466,109 +271,16 @@ var loadTable = function () {
     }
     $(".btn_set_administrator").click(function(e){
 	    var caller = $(this).parent().parent().find("td:first-child").text();
-	    SetAdministrator(caller);
+	    CC_UpdateAdministrator(caller, "set");
 	});
     $(".btn_unset_administrator").click(function(e){
 	    var caller = $(this).parent().parent().find("td:first-child").text();
 	    caller = caller.split("(");
 	    caller = caller[0];
-	    UnsetAdministrator(caller);
+	    CC_UpdateAdministrator(caller, "unset");
 	});
-}
-
-var SetAdministrator = function(account) {
-    var api2_call = {
-	"cpanel_jsonapi_version": 2,
-	"cpanel_jsonapi_module": "CommuniGate",
-        "cpanel_jsonapi_func": "SetAdministrator",
-	"account" : account
-    };
-    // callback functions
-    var success = function(o) {
-	GetAccounts(domain);
-    }
-    // send the AJAX request
-    $.ajax({
-	    type: "POST",
-	    url: CPANEL.urls.json_api(),
-	    data: api2_call,
-	    success: success,
-	    dataType: "text"
-	});
-
-    // show the ajax loading icon
-    var span_loading = 'loading_' + account.split("@")[0];
-    YAHOO.util.Dom.get(span_loading).innerHTML = " " + CPANEL.icons.ajax + " Please, wait...";
 };
 
-var UnsetAdministrator = function(account) {
-    var api2_call = {
-	"cpanel_jsonapi_version": 2,
-	"cpanel_jsonapi_module": "CommuniGate",
-        "cpanel_jsonapi_func": "UnsetAdministrator",
-	"account" : account
-    };
-    // callback functions
-    var success = function(o) {
-	GetAccounts(domain);
-    }
-    // send the AJAX request
-    $.ajax({
-	    type: "POST",
-	    url: CPANEL.urls.json_api(),
-	    data: api2_call,
-	    success: success,
-	    dataType: "text"
-	});
-    // show the ajax loading icon
-    var span_loading = 'loading_' + account.split("@")[0];
-    YAHOO.util.Dom.get(span_loading).innerHTML = " " + CPANEL.icons.ajax + " Please, wait...";
-};
-
-var RemoveAllAdmins = function(account) {
-    var admins_arr = [];
-    for (var acc in ACCOUNTS) {
-	if (ACCOUNTS[acc].rights.join(",").indexOf("Domain") > -1 && ACCOUNTS[acc].rights.join(",").indexOf("BasicSettings") > -1 && ACCOUNTS[acc].rights.join(",").indexOf("PSTNSettings") > -1 && ACCOUNTS[acc].rights.join(",").indexOf("CanCreateAccounts") > -1 && ACCOUNTS[acc].rights.join(",").indexOf("CanCreateAliases") > -1 && ACCOUNTS[acc].rights.join(",").indexOf("CanCreateNamedTasks") > -1 && ACCOUNTS[acc].rights.join(",").indexOf("CanAccessWebSites") > -1) {
-	    admins_arr.push(acc);
-	}
-    }
-    var counter = 0;
-    var RemoveAdmin = function (account) {
-    	var api2_call = {
-    	    "cpanel_jsonapi_version": 2,
-    	    "cpanel_jsonapi_module": "CommuniGate",
-    	    "cpanel_jsonapi_func": "UnsetAdministrator",
-    	    "account" : account
-    	};
-    	// callback functions
-    	var success = function(o) {
-	    YAHOO.util.Dom.get("disabling_loading").innerHTML = "";
-	    counter += 1;
-	    if (counter < admins_arr.length) {
-		RemoveAdmin(admins_arr[counter]);
-	    }
-	    if (counter >= admins_arr.length) {
-		UnsetDomainSignalRules(domain);
-	    }
-    	}
-    	// send the AJAX request
-    	$.ajax({
-    		type: "POST",
-    		url: CPANEL.urls.json_api(),
-    		data: api2_call,
-    		success: success,
-    		dataType: "text"
-    	    });
-    	// show the ajax loading icon
-	YAHOO.util.Dom.get("disabling_loading").innerHTML = CPANEL.icons.ajax + " Please, wait...";
-    }
-    if (admins_arr[0]) {
-	RemoveAdmin(admins_arr[0]);
-    }
-    if (admins_arr.length == 0) {
-	UnsetDomainSignalRules(domain);
-    }
-};
 
 function getUrlParameter(sParam)
 {
@@ -581,18 +293,20 @@ function getUrlParameter(sParam)
 		return sParameterName[1];
 	    }
     }
-}    
-
+};    
 var domain = getUrlParameter('domain');
-GetCCLimit();
-GetDomainRules(domain);
-
-YAHOO.util.Dom.get("status_loading").innerHTML = CPANEL.icons.ajax + " Please, wait...";
 
 $("#btn_enable").click(function(e){
-	CreatePbxAccount(domain);
+	EnableCC(domain);
     });
 $("#btn_disable").click(function(e){
-	RemoveAllAdmins();
+	DisableCC(domain);
+    });
+$("#btn_try3").click(function(e){
+	CCStatus(domain);
+    });
+$("#btn_try4").click(function(e){
+	CC_CheckEnabled();
     });
 
+CCStatus(domain);

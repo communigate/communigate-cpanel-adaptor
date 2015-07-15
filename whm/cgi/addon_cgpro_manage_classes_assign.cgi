@@ -44,6 +44,7 @@ if ($FORM{'save'}) {
     for my $class (keys %{$defaults->{ServiceClasses}}) {
 	$data->{$FORM{'account'}}->{$class}->{'all'} = $FORM{$class . '-all'};
     }
+    $data->{$FORM{'account'}}->{'contact_center'}->{'all'} = $FORM{'contact_center'};
     Cpanel::CachedDataStore::store_ref( '/var/cpanel/cgpro/classes.yaml', $data );
 }
 
