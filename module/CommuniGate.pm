@@ -5440,12 +5440,8 @@ sub api2_CC_CheckEnabled {
 	my $domain_rules = $cli->GetDomainSignalRules($domain);
 	my $compare = "ccIn_" . $domain;
 	if (ref ($domain_rules) eq 'ARRAY') {		
-	    $result->{"firstif"} = $count_enabled;
-	    $result->{"dasd"} = $domain_rules;
 	    for my $rule (@$domain_rules) {
-		$result->{"beforesecondif"} = $rule;
 		if (ref ($rule) eq 'ARRAY' && $rule->[1] eq $compare) {
-		    $result->{"secondif"} = $count_enabled;
 		    $count_enabled += 1;
 		}
 	    }
@@ -5463,12 +5459,34 @@ sub api2_CC_Enable {
     my $result = {};
     $result->{"error_msg"} = "OK";
     my $domain = $OPTS{'domain'};
+    my @domains = Cpanel::Email::listmaildomains();
+
+    my $max = max_class_accounts($domain, "contact_center");
+    my $count_enabled = 0;
+    for my $domain (@domains) {
+	my $domain_rules = $cli->GetDomainSignalRules($domain);
+	my $compare = "ccIn_" . $domain;
+	if (ref ($domain_rules) eq 'ARRAY') {		
+	    for my $rule (@$domain_rules) {
+		if (ref ($rule) eq 'ARRAY' && $rule->[1] eq $compare) {
+		    $count_enabled += 1;
+		}
+	    }
+	}
+	last;
+    }
+    if ($count_enabled >= $max) {
+	$result->{"error_msg"} = "Limit for this account is reached!";
+	$cli->Logout();
+	return $result;
+    }
+
     # Create pbx account
     my $pbx_prefs = $cli-> GetAccountPrefs('pbx@' . $domain);
     if (!@$pbx_prefs{"AccountName"}) {
     	my $create_pbx = $cli->CreateAccount(accountName => 'pbx@' . $domain);
     	my $error_msg = $cli->getErrMessage();
-    	unless ($cli->getErrMessage eq "OK" || $cli->getErrMessage eq "account with this name already exists") {
+    	unless ($cli->getErrMessage eq "OK") {
     	    $result->{"error_msg"} = $cli->getErrMessage;
     	    $cli->Logout();
     	    return $result;
@@ -5496,8 +5514,6 @@ sub api2_CC_Enable {
     ];
 
     my $rules = $cli->GetDomainSignalRules( $domain );
-    $result->{"rules"} = $rules;
-    $result->{"endata"} = $enable_data;
     push @$rules, $enable_data;
     $cli->SetDomainSignalRules($domain, $rules);
 
@@ -5522,7 +5538,7 @@ sub api2_CC_Disable {
 	$cli->SetAccountRights($userName . "\@$domain" , []);  
     }
     # Remove domain signal rule
-    my $rule = "ccIn_";
+    my $rule_name = "ccIn_";
     my @domains = Cpanel::Email::listmaildomains();
     my $newrules = [];
     for my $dom (@domains) {
@@ -5531,7 +5547,7 @@ sub api2_CC_Disable {
 	    if (ref ($rules) eq 'ARRAY') {		
 		for my $r (@$rules) {
 		    if (ref ($r) eq 'ARRAY') {		
-			push @$newrules, $r unless $r->[1] eq $rule . $domain;
+			push @$newrules, $r unless $r->[1] eq $rule_name . $domain;
 		    }
 		}
 	    }
