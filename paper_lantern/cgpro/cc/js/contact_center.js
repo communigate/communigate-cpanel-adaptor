@@ -302,11 +302,5 @@ $("#btn_enable").click(function(e){
 $("#btn_disable").click(function(e){
 	DisableCC(domain);
     });
-$("#btn_try3").click(function(e){
-	CCStatus(domain);
-    });
-$("#btn_try4").click(function(e){
-	CC_CheckEnabled();
-    });
 
 CCStatus(domain);

@@ -5399,51 +5399,28 @@ sub api2_CC_Status {
     my $domain = $OPTS{'domain'};
     my $cli = getCLI();
     my $result = {};
-    my $is_pbx_account = 0;
     my $is_domain_rule = 0;
-    my $is_enabled = 0;
-    my $is_pbx_rights = 0;
     my @domains = Cpanel::Email::listmaildomains();
     my $newrules = [];
-    # Check is there pbx account
-    my $account_prefs = $cli->GetAccountPrefs('pbx@' . $domain);
-    if ($account_prefs && @$account_prefs{"AccountName"}) {
-	$is_pbx_account = 1;
-	$result->{"pbx_account"} = @$account_prefs{'AccountName'};
-    }
-    unless ($cli->getErrMessage eq "OK") {
-	$result->{"pbx_account"} = $cli->getErrMessage;
-    }
-    # Check if pbx has rights
-    $result->{"pbx_rights"} = "";
-    my $account_rights = $cli->GetAccountRights('pbx@' . $domain);
-    my $account_rights_str = to_json($account_rights);
-    my $compar = "[\"Domain\",\"BasicSettings\",\"CanCreateNamedTasks\",\"CanAccessWebSites\",\"CanCreateAliases\",\"CanImpersonate\"]";
-    if ($account_rights_str eq $compar) {
-	$is_pbx_rights = 1;
-	$result->{"pbx_rights"} = "OK";
-    }
-    unless ($cli->getErrMessage eq "OK") {
-	$result->{"pbx_rights"} = $cli->getErrMessage;
-    }
     # Check is there domain rule
     $result->{"domain_rule"} = "";
     for my $dom (@domains) {
 	if ($dom eq $domain) {
 	    $result->{"domain_rule"} = "";
 	    my $domain_rules = $cli->GetDomainSignalRules($domain);
-	    my $compar = "[\"100010\",\"ccIn_" . $domain . "\",[[\"Method\",\"is\",\"INVITE\"],[\"RequestURI\",\"is not\",\"*;fromCC=true\"]],[[\"Redirect to\",\"ccincoming#pbx\"],[\"Stop Processing\"]]]";
-	    for my $rule (@$domain_rules) {
-		my $rule_str = to_json($rule);
-		if ($rule_str eq $compar) {
-		    $is_domain_rule = 1;
-		    $result->{"domain_rule"} = "OK";
+	    my $compare = "ccIn_" . $domain;
+	    if (ref ($domain_rules) eq 'ARRAY') {		
+		for my $rule (@$domain_rules) {
+		    if (ref ($rule) eq 'ARRAY' && $rule->[1] eq $compare) {
+			$is_domain_rule = 1;
+			$result->{"domain_rule"} = "OK";
+		    }
 		}
+		last;
 	    }
-	    last;
 	}
     }
-    if ($is_pbx_account eq 1 && $is_pbx_rights eq 1 && $is_domain_rule eq 1) {
+    if ($is_domain_rule eq 1) {
 	$result->{"enabled"} = "YES";
     } else {
 	$result->{"enabled"} = "NO";
@@ -5458,20 +5435,23 @@ sub api2_CC_CheckEnabled {
     my $count_enabled = 0;
     my $result = {};
     my @domains = Cpanel::Email::listmaildomains();
-
     # Check is there domain rule
     for my $domain (@domains) {
 	my $domain_rules = $cli->GetDomainSignalRules($domain);
-	my $compar = "[\"100010\",\"ccIn_" . $domain . "\",[[\"Method\",\"is\",\"INVITE\"],[\"RequestURI\",\"is not\",\"*;fromCC=true\"]],[[\"Redirect to\",\"ccincoming#pbx\"],[\"Stop Processing\"]]]";
-	for my $rule (@$domain_rules) {
-	    my $rule_str = to_json($rule);
-	    if ($rule_str eq $compar) {
-		$count_enabled += 1;
+	my $compare = "ccIn_" . $domain;
+	if (ref ($domain_rules) eq 'ARRAY') {		
+	    $result->{"firstif"} = $count_enabled;
+	    $result->{"dasd"} = $domain_rules;
+	    for my $rule (@$domain_rules) {
+		$result->{"beforesecondif"} = $rule;
+		if (ref ($rule) eq 'ARRAY' && $rule->[1] eq $compare) {
+		    $result->{"secondif"} = $count_enabled;
+		    $count_enabled += 1;
+		}
 	    }
 	}
 	last;
     }
-
     $result->{"enabled"} = $count_enabled;
     $cli->Logout();
     return $result;
@@ -5483,14 +5463,16 @@ sub api2_CC_Enable {
     my $result = {};
     $result->{"error_msg"} = "OK";
     my $domain = $OPTS{'domain'};
-
     # Create pbx account
-    my $create_pbx = $cli->CreateAccount(accountName => 'pbx@' . $domain);
-    my $error_msg = $cli->getErrMessage();
-    unless ($cli->getErrMessage eq "OK" || $cli->getErrMessage eq "account with this name already exists") {
-	$result->{"error_msg"} = $cli->getErrMessage;
-	$cli->Logout();
-	return $result;
+    my $pbx_prefs = $cli-> GetAccountPrefs('pbx@' . $domain);
+    if (!@$pbx_prefs{"AccountName"}) {
+    	my $create_pbx = $cli->CreateAccount(accountName => 'pbx@' . $domain);
+    	my $error_msg = $cli->getErrMessage();
+    	unless ($cli->getErrMessage eq "OK" || $cli->getErrMessage eq "account with this name already exists") {
+    	    $result->{"error_msg"} = $cli->getErrMessage;
+    	    $cli->Logout();
+    	    return $result;
+    	}
     }
     # Set pbx rights
     $cli->SetAccountRights('pbx@' . $domain , ['Domain', 'BasicSettings', 'CanCreateNamedTasks', 'CanAccessWebSites', 'CanCreateAliases', 'CanImpersonate']);  
@@ -5500,16 +5482,25 @@ sub api2_CC_Enable {
 	return $result;
     }
     # Set domain signal rules
-    my $rules = $cli->GetDomainSignalRules($domain);
-    my @enable_data = [];
-    $enable_data[0][0] = "100010";
-    $enable_data[0][1] = 'ccIn_' . $domain;
-    $enable_data[0][2][0] = ['Method', 'is', 'INVITE'];
-    $enable_data[0][2][1] = ['RequestURI', 'is not', '*;fromCC=true'];
-    $enable_data[0][3][0] = ['Redirect to', 'ccincoming#pbx'];
-    $enable_data[0][3][1] = ['Stop Processing'];
-    push($rules,@enable_data);
+    my $enable_data = [
+	"100010",
+	'ccIn_' . $domain,
+	[
+	 ['Method', 'is', 'INVITE'],
+	 ['RequestURI', 'is not', '*;fromCC=true']
+	],
+	[
+	 ['Redirect to', 'ccincoming#pbx'],
+	 ['Stop Processing'],
+	]
+    ];
+
+    my $rules = $cli->GetDomainSignalRules( $domain );
+    $result->{"rules"} = $rules;
+    $result->{"endata"} = $enable_data;
+    push @$rules, $enable_data;
     $cli->SetDomainSignalRules($domain, $rules);
+
     unless ($cli->getErrMessage eq "OK") {
 	$result->{"error_msg"} = $cli->getErrMessage;
 	$cli->Logout();
@@ -5529,7 +5520,6 @@ sub api2_CC_Disable {
     # Remove accounts rights
     foreach my $userName (sort keys %$accounts) {
 	$cli->SetAccountRights($userName . "\@$domain" , []);  
-	$result->{"accr" . $userName} = $cli->getErrMessage;
     }
     # Remove domain signal rule
     my $rule = "ccIn_";
@@ -5538,8 +5528,12 @@ sub api2_CC_Disable {
     for my $dom (@domains) {
 	if ($dom eq $domain) {
 	    my $rules = $cli->GetDomainSignalRules( $domain );
-	    for my $r (@$rules) {
-		push @$newrules, $r unless $r->[1] eq $rule . $domain;
+	    if (ref ($rules) eq 'ARRAY') {		
+		for my $r (@$rules) {
+		    if (ref ($r) eq 'ARRAY') {		
+			push @$newrules, $r unless $r->[1] eq $rule . $domain;
+		    }
+		}
 	    }
 	    $cli->SetDomainSignalRules($domain, $newrules);
 	    last;
@@ -5557,12 +5551,8 @@ sub api2_CC_Disable {
 sub api2_CC_GetCCLimit {
     my %OPTS = @_;
     my $domain = $OPTS{'domain'};
-    
     my $cli = getCLI();
-    my $result = {};
-
     my $max = max_class_accounts($domain, "contact_center");
-
     $cli->Logout();
     return $max;
 }
