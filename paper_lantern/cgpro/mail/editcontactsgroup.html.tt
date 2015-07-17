@@ -1,0 +1,135 @@
+[% MACRO filter_option(pval, val, text) BLOCK -%]
+<option value="[% val %]" id="[% val %]"[% val == pval ? " selected='selected'" : "" %]>[% locale.maketext(text) %]</option>
+[% END -%]
+[%
+SET CPANEL.CPVAR.dprefix = "../../";
+%]
+[%
+SET update_group = Api2.exec("CommuniGate", "EditContactsGroup", {
+"account" = RAW_FORM.item("account"), 
+"UID" = RAW_FORM.item("contact"), 
+"box" = RAW_FORM.item("box") 
+});
+contacts = update_group.0.contacts;
+vcard = update_group.0.vcard;
+allmails = update_group.0.allmails;
+forceArray = update_group.0.forceArray;
+%]
+[% WRAPPER '_assets/master.html.tt'
+    app_key = 'cgpro_contacts'
+ -%]
+
+[% USE dumper %]
+<pre>[% dumper.dump(update_group) %]</pre>
+<pre>[% dumper.dump(RAW_FORM) %]</pre>
+
+	    [% FOR member IN forceArray(vcard.MEMBER) %]
+<pre>[% dumper.dump(member) %]</pre>
+	    [% filter_option("", member.CN _ "|" _ member.VALUE, member.CN _ " &lt;" _ member.VALUE _ "&gt;") %]
+	    [% END -%]
+
+
+<div class="body-content">
+  [% IF !RAW_FORM.item("group") %]
+  <h2>Add Contacts Group</h2>
+  [% ELSE %]
+  <h2>Edit Contacts Group</h2>
+  [% END %]
+
+  <form action="doeditcontactsgroup.html?account=[% FORM.account %]&amp;box=[% FORM.box %]" method="post" id="form">
+    <div class="form-group">
+      <label>[% locale.maketext("Group Name") %]</label>
+      <div class="row">
+	<div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	  <input type="text" name="NAME" id="name" class="form-control col-xs-2" value="[% vcard.FN.VALUE %]"/>
+	</div>
+	<div id="NAME_error" class="col-xs-12 col-sm-6 col-md-6 col-lg-6"></div>	  
+      </div>
+    </div>
+    <div class="form-group">
+      <label>[% locale.maketext("Note") %]</label>
+      <div class="row">
+	<div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	  <input type="text" name="NOTE" id="note" class="form-control col-xs-2" value="[% vcard.NOTE.VALUE %]"/>
+	</div>
+	<div id="realname_error" class="col-xs-12 col-sm-6 col-md-6 col-lg-6"></div>	  
+      </div>
+    </div>
+    <h2>[% locale.maketext('Group Members') %]</h2>
+    <table id="emailstable">
+      <tr>
+	<th>
+	  [% locale.maketext('All Contacts') %]
+	</th>
+	<th></th>
+	<th>
+	  [% locale.maketext('Members') %]
+	</th>
+      </tr>
+      <tr>
+	<td>
+	  <select multiple="multiple" style="height: 250px; width: 290px" id="all">
+	    <option value="" style="display: none;"></option>
+	    [% FOR contact IN contacts -%]
+	    [% FOR mail IN contact.email %]
+	    [% UNLESS allmails.search(mail.VALUE) -%]
+	    [% filter_option("", contact.name _ "|" _ mail.VALUE, contact.name _ " &lt;" _ mail.VALUE _ "&gt;") %]
+	    [% END -%]
+	    [% END -%]
+	    [% END -%]
+	  </select>
+	</td>
+	<td style="padding: 0 5px; text-align: center;">
+	  <p>
+	    <a href="#" id="add">Add &gt;</a>
+	  </p>
+	  <p>
+	    <a href="#" id="remove">&lt; Remove</a>
+	  </p>
+	</td>
+	<td>
+	  <select multiple="multiple" style="height: 250px; width: 290px" id="members" name="members">
+	    <option value="" style="display: none;"></option>
+	    [% FOR member IN forceArray(vcard.MEMBER) %]
+	    [% filter_option("", member.CN _ "|" _ member.VALUE, member.CN _ " &lt;" _ member.VALUE _ "&gt;") %]
+	    [% END -%]
+	  </select>
+	</td>
+      </tr>
+    </table>
+    <div class="form-group" style="margin-top: 15px;">
+      <div class="row">
+	<div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	  <input type="hidden" name="oldMessageID" value="[% vcard.UID.VALUE %]" />
+	  <input type="hidden" name="oldUID" value="[% FORM.contact %]" />
+	  <input id="new_email_submit" class="btn btn-primary" type="submit" value="[% locale.maketext("Save") %]" name="save" />
+	</div>
+      </div>
+    </div>
+  </form>
+  [% INCLUDE _assets/return_link.html.tt return_location='contacts.html?account=' _ FORM.account return_link_text=locale.maketext('Go Back') %]
+</div>
+[% END %]
+
+<script type="text/javascript">
+var moveContacts = function (e, data) {
+    YAHOO.util.Event.preventDefault(e);
+    var selected = YAHOO.util.Selector.query('#' + data.from + ' option').filter( function (item) {
+	    return item.selected;
+	});
+    for (var i = 0; i < selected.length; i++) {
+	var members = YAHOO.util.Selector.query('#' + data.to + ' option');
+	YAHOO.util.Dom.insertAfter(selected[i], members[members.length - 1]);
+    }
+};
+YAHOO.util.Event.onDOMReady(function () {
+ 	YAHOO.util.Event.addListener("add", "click", moveContacts, {from: 'all', to: 'members'} );
+ 	YAHOO.util.Event.addListener("remove", "click", moveContacts, {from: 'members', to: 'all'} );
+ 	YAHOO.util.Event.addListener("form", "submit", function () {
+		var members = YAHOO.util.Selector.query('#members option');
+		for (var i = 0; i < members.length; i++) {
+		    members[i].selected = true;
+		}
+	    });
+    });
+</script>

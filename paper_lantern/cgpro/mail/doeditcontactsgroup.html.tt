@@ -1,16 +1,18 @@
 [%
 SET CPANEL.CPVAR.dprefix = "../../";
-SET email_add_forward = Api2.exec("CommuniGate", "DoEditContact", {
-    "formdump" = RAW_FORM
-});
 %]
-
+[%
+SET update_group = Api2.exec("CommuniGate", "DoEditContactsGroup", {
+"formdump" = RAW_FORM 
+});
+contacts = update_group.0.contacts;
+%]
 [% WRAPPER '_assets/master.html.tt'
     app_key = 'cgpro_contacts'
  -%]
 
 [% USE dumper %]
-<pre>[% dumper.dump(email_add_forward) %]</pre>
+<pre>[% dumper.dump(update_group) %]</pre>
 <pre>[% dumper.dump(RAW_FORM) %]</pre>
 
 <div class="body-content">
@@ -26,12 +28,14 @@ SET email_add_forward = Api2.exec("CommuniGate", "DoEditContact", {
     <div id="fwdSuccess" class="alert alert-success">
       <span id="fwdSuccessImg" class="glyphicon glyphicon-ok-sign"></span>
       <div id="fwdSuccessMsg" class="alert-message">
-        [% locale.maketext("Contacts updated.")%]
+        [% locale.maketext("Contacts group ”[_1]” was successfully updated.", FORM.NAME )%]
       </div>
     </div>
     [% END %]
 
     [% INCLUDE _assets/return_link.html.tt return_location='contacts.html?account=' _ FORM.account return_link_text=locale.maketext('Go Back') %]
+
   </div>
 </div>
+
 [% END %]

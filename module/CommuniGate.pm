@@ -104,9 +104,7 @@ sub max_class_accounts {
  my $data = Cpanel::CachedDataStore::fetch_ref( '/var/cpanel/cgpro/classes.yaml' ) || {};
  my $limit = $data->{default}->{$class}->{all};
  $limit = $data->{$Cpanel::CPDATA{'PLAN'}}->{$class}->{all} if $data->{$Cpanel::CPDATA{'PLAN'}}->{$class}->{all};
- if ( $limit >= 0 ) {
-     $limit += $data->{$Cpanel::CPDATA{'USER'}}->{$class}->{all} if $data->{$Cpanel::CPDATA{'USER'}}->{$class}->{all};
- }
+ $limit = $data->{$Cpanel::CPDATA{'USER'}}->{$class}->{all} if $data->{$Cpanel::CPDATA{'USER'}}->{$class}->{all};
  return $limit;
 }
 
@@ -252,31 +250,33 @@ sub api2_ListAccounts {
     my @domains = Cpanel::Email::listmaildomains();
     my $cli = getCLI();
     my $return_accounts = {};
-    my $all_classes;
     foreach my $domain (@domains) {
 	my $accounts=$cli->ListAccounts($domain);
 	foreach my $userName (sort keys %$accounts) {
 	    next if $userName eq 'pbx' || $userName eq 'ivr';
-
+	    my $accountRights = $cli->GetAccountRights("$userName\@$domain");
 	    my $accountData = $cli->GetAccountEffectiveSettings("$userName\@$domain");
 	    my $service = @$accountData{'ServiceClass'} || '';
-	    if ($OPTS{'classes'}) {
-	    $all_classes = @$accountData{'ServiceClasses'} unless $all_classes;
-	    }
 
 	    $return_accounts->{$userName . "@" . $domain} = {
 		domain => $domain,
 		username => $userName,
-		class => $service
+		rights => $accountRights,
+		class => $service,
+		data => $accountData
 	    };
 	}
     }
+
     my $return = {
 	accounts => $return_accounts
     };
     if ($OPTS{'classes'}) {
-    $return->{"classes"} = $all_classes;
+    my $defaults = $cli->GetServerAccountDefaults();
+    $return->{"classes"} = $defaults->{'ServiceClasses'}
     }
+    
+    $cli->Logout();
     return $return;
 }
 
@@ -3368,34 +3368,34 @@ sub api2_EditContactsGroup {
 	    if ($password) {
 		my $ximss = getXIMSS($account, $password);
 		my $time = time();
-		$ximss->send({folderOpen => {
+		my $mailbox = $ximss->send({folderOpen => {
 		        id => "$time-mailbox",
 			folder => $OPTS{'box'},
 			    sortField => "To"
 			      }});
-		my $mailbox = $ximss->parseResponse("$time-mailbox");
+
 		if ($mailbox->{'folderReport'}) {
-		        $ximss->send(
-			    {
-				folderBrowse => {
-				    id => "$time-messages",
-				    folder => $OPTS{'box'},
-				    index => {
-					    from => 0,
-					    till => ($mailbox->{'folderReport'}->{'messages'})
-				    }
+		    my $messages = $ximss->send(
+			{
+			    folderBrowse => {
+				id => "$time-messages",
+				folder => $OPTS{'box'},
+				index => {
+				    from => 0,
+				    till => ($mailbox->{'folderReport'}->{'messages'})
 				}
-			    });
-			my $messages = $ximss->parseResponse("$time-messages");
+			    }
+			});
+		    
 			if ($messages->{'folderReport'}) {
 			    for my $message (@{forceArray($messages->{'folderReport'})}) {
-				$ximss->send({folderRead => {
+				my $contact = $ximss->send({folderRead => {
 				    id => "$time-contact",
 				    folder => $OPTS{box},
 				    UID => $message->{"UID"},
 				    totalSizeLimit => 5000
 					      }});
-				my $contact = $ximss->parseResponse("$time-contact");
+
 				if ($contact->{'folderMessage'} && defined $contact->{'folderMessage'}->{EMail}->{MIME}->{vCard}) {
 				    push @{$contacts}, {
 					email => forceArray($contact->{'folderMessage'}->{EMail}->{MIME}->{vCard}->{EMAIL}),
@@ -3403,13 +3403,12 @@ sub api2_EditContactsGroup {
 				    };
 				}
 			    }
-			    $ximss->send({folderRead => {
+ 			    my $contact = $ximss->send({folderRead => {
 				    id => "$time-contact",
 				    folder => $OPTS{'box'},
 				    UID => $OPTS{'UID'},
 				        totalSizeLimit => 5000
 					  }});
-			    my $contact = $ximss->parseResponse("$time-contact");
 			    if ($contact->{'folderMessage'}) {
 				$vcard = $contact->{folderMessage}->{EMail}->{MIME}->{vCardGroup};
 			    }
@@ -3428,16 +3427,10 @@ sub api2_EditContactsGroup {
 }
 sub api2_DoEditContactsGroup {
     my %OPTS = @_;
-    my $formdump = $OPTS{'formdump'};
-    my $params = {};
-    for my $row (split "\n", $formdump) {
-	if ($row =~ m/^(\S+)\s\=\s(.*?)$/) {
-    my $key =$1;
-    my $value = $2;
-    $params->{$key} = $value;
-	}
-    }
+    my $params = $OPTS{'formdump'};
     my $message = {};
+    use Data::Dumper;
+    
     if ($params->{save} && $params->{NAME}) {
 	my (undef,$dom) = split "@", $params->{account};
 	my @domains = Cpanel::Email::listmaildomains();
@@ -3447,6 +3440,7 @@ sub api2_DoEditContactsGroup {
 	for my $domain (@domains) {
 	    if ($domain eq $dom) {
 		my $password = $cli->GetAccountPlainPassword($params->{account});
+		
 		if ($password) {
 		    my $boxes = $cli->ListMailboxes(accountName => $params->{account});
 		    for my $box (keys %$boxes) {
@@ -3457,6 +3451,7 @@ sub api2_DoEditContactsGroup {
 		    }
 		    $message = {};
 		    my $members = [map {[split '\|', $params->{$_}]} grep {/members/} keys %$params];
+
 		    my $emails = [];
 		    for my $member (@$members) {
 			push @$emails, {
@@ -3473,12 +3468,11 @@ sub api2_DoEditContactsGroup {
 
 		    my $time = time();
 		    my $ximss = getXIMSS($params->{account}, $password);
-		    $ximss->send({folderOpen => {
+		    my $mailbox = $ximss->send({folderOpen => {
 			id => "$time-mailbox",
 			folder => $params->{'box'},
 			sortField => "To"
 				  }});
-		    my $mailbox = $ximss->parseResponse("$time-mailbox");
 		    if ($mailbox->{'folderReport'}) {
 			my $contact = {
 			        id => "$time-append",
@@ -3489,8 +3483,7 @@ sub api2_DoEditContactsGroup {
 			    $contact->{'replacesUID'} = $params->{oldUID};
 			    $contact->{'checkOld'} = 'yes';
 			}
-			$ximss->send({contactAppend => $contact});
-			my $append = $ximss->parseResponse("$time-append");
+			my $append = $ximss->send({contactAppend => $contact});
 			$Cpanel::CPERROR{'CommuniGate'} = $append->{response}->{errorText} if $append->{response}->{errorText};
 		    }
 		    $ximss->send({folderClose => {id => "$time-close", folder=>$params->{'box'}}});
@@ -4902,7 +4895,7 @@ sub api2_GetAccountDefaults {
 
     for my $domain (@domains) {
 	if ($domain eq $dom) {
-	    my $acc_defaults = $cli->GetAccountDefaults("sevdip.bg");
+	    my $acc_defaults = $cli->GetAccountDefaults($domain);
 	    $result->{'account_defaults'} = $acc_defaults;
 	    $result->{"domain"}=$dom;
 	    last;
@@ -5351,10 +5344,8 @@ sub api2_UnsetAccountPSTN {
     my %OPTS = @_;
     my $extension = $OPTS{'extension'};
     my ($number,$dom) = split "@", $extension;
-
     my @domains = Cpanel::Email::listmaildomains();
     my $cli = getCLI();
-
     my $result = {};
     for my $domain (@domains) {
 	if ($domain eq $dom) {

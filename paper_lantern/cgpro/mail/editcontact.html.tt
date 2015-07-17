@@ -288,7 +288,7 @@ var getRow = function (e, data) {
     var index = YAHOO.util.Dom.get(data.index);
     YAHOO.util.Connect.asyncRequest('GET', data.url + '?id=' + index.value, {
 	    success: function(o) {
-                wrap.innerHTML = wrap.innerHTML + o.responseText;
+$(wrap).append(o.responseText);
                 var removers = YAHOO.util.Dom.getElementsByClassName('removerow');
  	        YAHOO.util.Event.addListener(removers, "click", removeRow);
 	    },
