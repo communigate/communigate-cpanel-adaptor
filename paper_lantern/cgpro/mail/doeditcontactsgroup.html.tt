@@ -11,10 +11,6 @@ contacts = update_group.0.contacts;
     app_key = 'cgpro_contacts'
  -%]
 
-[% USE dumper %]
-<pre>[% dumper.dump(update_group) %]</pre>
-<pre>[% dumper.dump(RAW_FORM) %]</pre>
-
 <div class="body-content">
   <div class="section">
     [% IF CPANEL.CPERROR.item('CommuniGate') %]
@@ -32,10 +28,7 @@ contacts = update_group.0.contacts;
       </div>
     </div>
     [% END %]
-
     [% INCLUDE _assets/return_link.html.tt return_location='contacts.html?account=' _ FORM.account return_link_text=locale.maketext('Go Back') %]
-
   </div>
 </div>
-
 [% END %]

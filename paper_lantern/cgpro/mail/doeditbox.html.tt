@@ -25,9 +25,7 @@ SET email_add_forward = Api2.exec("CommuniGate", "DoEditContactsBox", {
       </div>
     </div>
     [% END %]
-
-	[% INCLUDE _assets/return_link.html.tt return_location='contacts.html?account=' _ FORM.account return_link_text=locale.maketext('Go Back') %]
-
+    [% INCLUDE _assets/return_link.html.tt return_location='contacts.html?account=' _ FORM.account return_link_text=locale.maketext('Go Back') %]
   </div>
-
+</div>
 [% END %]

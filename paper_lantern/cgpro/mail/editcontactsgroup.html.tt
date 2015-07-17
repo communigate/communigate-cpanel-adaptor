@@ -15,19 +15,13 @@ vcard = update_group.0.vcard;
 allmails = update_group.0.allmails;
 forceArray = update_group.0.forceArray;
 %]
+[% IF vcard.MEMBER == "" %]
+[% vcard.MEMBER = [[]] %]
+[% END %]
+[% vcard.MEMBER = vcard.MEMBER.0 ? vcard.MEMBER : [vcard.MEMBER] %]
 [% WRAPPER '_assets/master.html.tt'
     app_key = 'cgpro_contacts'
  -%]
-
-[% USE dumper %]
-<pre>[% dumper.dump(update_group) %]</pre>
-<pre>[% dumper.dump(RAW_FORM) %]</pre>
-
-	    [% FOR member IN forceArray(vcard.MEMBER) %]
-<pre>[% dumper.dump(member) %]</pre>
-	    [% filter_option("", member.CN _ "|" _ member.VALUE, member.CN _ " &lt;" _ member.VALUE _ "&gt;") %]
-	    [% END -%]
-
 
 <div class="body-content">
   [% IF !RAW_FORM.item("group") %]
@@ -89,9 +83,11 @@ forceArray = update_group.0.forceArray;
 	</td>
 	<td>
 	  <select multiple="multiple" style="height: 250px; width: 290px" id="members" name="members">
-	    <option value="" style="display: none;"></option>
-	    [% FOR member IN forceArray(vcard.MEMBER) %]
+	    <option style ="display:none;"></option>
+	    [% FOR member IN vcard.MEMBER %]
+	    [% IF member.CN %]
 	    [% filter_option("", member.CN _ "|" _ member.VALUE, member.CN _ " &lt;" _ member.VALUE _ "&gt;") %]
+	    [% END %]
 	    [% END -%]
 	  </select>
 	</td>

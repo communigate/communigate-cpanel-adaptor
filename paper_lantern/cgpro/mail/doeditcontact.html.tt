@@ -9,10 +9,6 @@ SET email_add_forward = Api2.exec("CommuniGate", "DoEditContact", {
     app_key = 'cgpro_contacts'
  -%]
 
-[% USE dumper %]
-<pre>[% dumper.dump(email_add_forward) %]</pre>
-<pre>[% dumper.dump(RAW_FORM) %]</pre>
-
 <div class="body-content">
   <div class="section">
     [% IF CPANEL.CPERROR.item('CommuniGate') %]
