@@ -32,7 +32,7 @@ SET def_addresses = Api2.exec("CommuniGate","ListDefAddress", {});
 	      [% hashref.domain %]
 	    </td>
 	    <td>
-	      <select name="action" class="form-control">
+	      <select id="action_[% loop.count %]" name="action" class="form-control action">
 		<option value=""> -- </option>
 		<option [% hashref.discard %] value="DefDiscard">Discard email</option>
 		<option [% hashref.reject %] value="DefReject">Reject email</option>
@@ -41,7 +41,7 @@ SET def_addresses = Api2.exec("CommuniGate","ListDefAddress", {});
 	      </select>
 	    </td>
 	    <td>
-	      <input type="text" name="ForwardAddress" value="[% IF hashref.MailRerouteAddress != "spamtrap" %][% hashref.MailRerouteAddress %][% END %]" class="form-control" />	
+	      <input id="text_[% loop.count %]" type="text" name="ForwardAddress" value="[% IF hashref.MailRerouteAddress != "spamtrap" %][% hashref.MailRerouteAddress %][% END %]" class="form-control text"  />	
 	    </td>
 	    <td>
 	      <input type="hidden" name="setdefault" value="dummy" />
@@ -58,6 +58,34 @@ SET def_addresses = Api2.exec("CommuniGate","ListDefAddress", {});
 </div>
 
 [% END %]
+<script type="text/javascript">
+$(".action").change(function(){
+var caller_id = this.id;
+var separator = caller_id.indexOf("_");
+var caller = caller_id.substr(separator + 1);
+var value = $(this).find(":selected").val();
+var selector_text = "#text_" + caller;
+$(selector_text).val("");
+if (value == "DefForward") {
+$(selector_text).removeAttr('disabled');
+} else {
+$(selector_text).attr('disabled', 'disabled');
+}
+});
+
+$(".action").each(function() {
+var caller_id = this.id;
+var separator = caller_id.indexOf("_");
+var caller = caller_id.substr(separator + 1);
+var value = $(this).find(":selected").val();
+var selector_text = "#text_" + caller;
+if (value == "DefForward") {
+$(selector_text).removeAttr('disabled');
+} else {
+$(selector_text).attr('disabled', 'disabled');
+}
+});
+</script>
 
 [% BLOCK js_block %]
 <script type="text/javascript">

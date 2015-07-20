@@ -22,7 +22,8 @@ SET mail_domains = execute("Email", "list_mail_domains", {});
               <div class="row">
                 <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
                   <div class="input-group">
-                    <input type="text" class="form-control col-xs-2" autofill="off" autocomplete="off" id="email" name="email" />
+                    <select id="email" name="email" class="form-control">
+                    </select>
                     <span class="input-group-addon">@</span>
                   </div>
                 </div>
@@ -68,11 +69,23 @@ SET mail_domains = execute("Email", "list_mail_domains", {});
 
 </div>
 [% END %]
-
+<script type="text/javascript">
+var checkDomainAccounts = function () {
+    var select = document.getElementById("ddlDomain");
+    var wrap = document.getElementById("email");
+    YAHOO.util.Connect.asyncRequest('GET', 'getaccountsfordomain.html?domain=' + select.value, {
+	    success: function(o) {
+		wrap.innerHTML = o.responseText;
+	    },
+		}, null);
+};
+YAHOO.util.Event.onDOMReady(function () {
+	checkDomainAccounts();
+	YAHOO.util.Event.addListener("ddlDomain", "change", checkDomainAccounts);
+    });
+</script>
 [% BLOCK js_block %]
 <script type="text/javascript">
-
-
 //a bit more complicated than other validators because the criteria
 //can be altered in WHM
 var validate_system_user = function() {

@@ -3024,7 +3024,6 @@ sub api2_ListContacts {
 	    my $password = $cli->GetAccountPlainPassword($account);
 	    if ($password) {
 		my $boxes = $cli->ListMailboxes(accountName => $account);
-		use Data::Dumper;
 		for my $box (keys %$boxes) {
 		    delete $boxes->{$box} unless ref($boxes->{$box}) eq "HASH" && $boxes->{$box}->{'Class'} eq 'IPF.Contact';
 		}
@@ -3429,7 +3428,6 @@ sub api2_DoEditContactsGroup {
     my %OPTS = @_;
     my $params = $OPTS{'formdump'};
     my $message = {};
-    use Data::Dumper;
     
     if ($params->{save} && $params->{NAME}) {
 	my (undef,$dom) = split "@", $params->{account};
@@ -3652,58 +3650,100 @@ sub api2_ImportContacts {
     my (undef,$domain) = split "@", $account;
     my $cli = getCLI();
     my $result;
+    
     foreach my $dom (@domains) {
 	if ($dom eq $domain) {
-	    if ($OPTS{"filename"} =~ m/\.vcf$/i && $OPTS{'box'}) {
-		for my $unit (@{$OPTS{data}}) {
-		    my $message = {};
-		    $message->{"UID"}->{"VALUE"} = [join ".", map{ join "", map { int rand(9) } 1..$_} (10,1)];
-		    for my $row (@$unit) {
-			if ($row->{'name'} eq 'FN') {
-			    $message->{"X-FILE-AS"} = [$row->{'value'}];
-			    $message->{"FN"} = [$row->{'value'}];
-			} elsif ($row->{'name'} eq 'N') {
- 			    my @vals = split ';', $row->{'value'};
+	    if ($Cpanel::CPVAR{"filepath"} && $Cpanel::CPVAR{"filename"} =~ m/\.vcf/i && $OPTS{'box'}) {
+		my $buffer;
+		my $filedata;
+		open(FI, "<", $Cpanel::CPVAR{"filepath"});
+		binmode FI;
+		while ( read( FI, $buffer, 16 ) ) {
+		    $filedata .= $buffer;
+		}
+		close FI;
+		my @file_array = split /\n/, $filedata;
+		my $data = [];
+		my $contact = [];
+		my $rowdata = {};
+		my $encoded = undef;
+		
+		for my $row (@file_array) {
+		    if ($row =~ m/^(\w+);?(\w+)?.*?\:(.*?)$/) {
+			$rowdata = {name => $1, value => $3};
+			next if $rowdata->{name} eq 'BEGIN' || $rowdata->{name} eq 'VERSION';
+			$rowdata->{type} = $2 if $2 && $2 ne "CHARSER" && $2 ne "ENCODING";
+			if ($row =~ s/;CHARSET=UTF-8;ENCODING=QUOTED-PRINTABLE//i) {
+			    $encoded = "qp";
+			    next if $rowdata->{value} =~ s/=$//;
+			} else {
+			    $encoded = undef;
+			}
+		    } else {
+			$rowdata->{value} .= $row;
+		    }
+		    next if $rowdata->{name} eq 'PHOTO';
+		    if ($encoded) {
+			$rowdata->{value} = decode_qp($rowdata->{value});
+		    }
+		    if ($rowdata->{name} eq 'END') {
+			push @$data, $contact;
+			$contact = [];
+		    }
+		    push @$contact, $rowdata unless $rowdata->{name} eq "END";
+		}
+		   		  
+		my $message = {};
+		$message->{"UID"}->{"VALUE"} = [join ".", map{ join "", map { int rand(9) } 1..$_} (10,1)];
+		for my $row (@$data) {
+		    for my $row2 (@$row) {
+
+		    	if (ref($row2) eq "HASH" && $row2->{'name'} eq 'FN') {
+			    $message->{"X-FILE-AS"} = [$row2->{'value'}];
+			    $message->{"FN"} = [$row2->{'value'}];
+
+			} elsif (ref($row2) eq "HASH" && $row2->{'name'} eq 'N') {
+ 			    my @vals = split ';', $row2->{'value'};
 			    $message->{"N"}->{"GIVEN"} = [$vals[1]] if $vals[1];
 			    $message->{"N"}->{"MIDDLE"} = [$vals[2]] if $vals[2];
 			    $message->{"N"}->{"FAMILY"} = [$vals[0]] if $vals[0];
-			} elsif ($row->{'name'} eq 'ORG') {
- 			    my @vals = split ';', $row->{'value'};
+			} elsif ($row2->{'name'} eq 'ORG') {
+ 			    my @vals = split ';', $row2->{'value'};
 			    $message->{"ORG"}->{"ORGNAME"} = [$vals[0]] if $vals[0];
 			    $message->{"ORG"}->{"ORGUNIT"} = [$vals[2]] if $vals[2];
-			} elsif ($row->{'name'} eq 'TITLE') {
-			    $message->{"TITLE"}->{"VALUE"} = [$row->{'value'}];
-			} elsif ($row->{'name'} eq 'BDAY') {
-			    $message->{"BDAY"}->{"VALUE"} = [$row->{'value'}];
-			} elsif ($row->{'name'} eq 'NICKNAME') {
-			    $message->{"NICKNAME"}->{"VALUE"} = [$row->{'value'}];
-			} elsif ($row->{'name'} eq 'ROLE') {
-			    $message->{"ROLE"}->{"VALUE"} = [$row->{'value'}];
-			} elsif ($row->{'name'} eq 'TZ') {
-			    $message->{"TZ"}->{"VALUE"} = [$row->{'value'}];
-			} elsif ($row->{'name'} eq 'GEO') {
-			    $message->{"GEO"}->{"VALUE"} = [$row->{'value'}];
-			} elsif ($row->{'name'} eq 'NOTE') {
-			    $message->{"NOTE"}->{"VALUE"} = [$row->{'value'}];
-			} elsif ($row->{'name'} eq 'EMAIL') {
+			} elsif ($row2->{'name'} eq 'TITLE') {
+			    $message->{"TITLE"}->{"VALUE"} = [$row2->{'value'}];
+			} elsif ($row2->{'name'} eq 'BDAY') {
+			    $message->{"BDAY"}->{"VALUE"} = [$row2->{'value'}];
+			} elsif ($row2->{'name'} eq 'NICKNAME') {
+			    $message->{"NICKNAME"}->{"VALUE"} = [$row2->{'value'}];
+			} elsif ($row2->{'name'} eq 'ROLE') {
+			    $message->{"ROLE"}->{"VALUE"} = [$row2->{'value'}];
+			} elsif ($row2->{'name'} eq 'TZ') {
+			    $message->{"TZ"}->{"VALUE"} = [$row2->{'value'}];
+			} elsif ($row2->{'name'} eq 'GEO') {
+			    $message->{"GEO"}->{"VALUE"} = [$row2->{'value'}];
+			} elsif ($row2->{'name'} eq 'NOTE') {
+			    $message->{"NOTE"}->{"VALUE"} = [$row2->{'value'}];
+			} elsif ($row2->{'name'} eq 'EMAIL') {
 			    $message->{"EMAIL"} = [] unless $message->{"EMAIL"};
 			    push @{$message->{"EMAIL"}}, {
-				VALUE => [$row->{'value'}],
-				USERID => [$row->{'value'}],
-				($row->{'type'} || 'OTHER') => {},
+				VALUE => [$row2->{'value'}],
+				USERID => [$row2->{'value'}],
+				($row2->{'type'} || 'OTHER') => {},
 			    };
-			} elsif ($row->{'name'} eq 'TEL') {
+			} elsif ($row2->{'name'} eq 'TEL') {
 			    $message->{"TEL"} = [] unless $message->{"TEL"};
 			    push @{$message->{"TEL"}}, {
-				VALUE => [$row->{'value'}],
-				NUMBER => [$row->{'value'}],
-				($row->{'type'} || 'OTHER') => {},
+				VALUE => [$row2->{'value'}],
+				NUMBER => [$row2->{'value'}],
+				($row2->{'type'} || 'OTHER') => {},
 			    };
-			} elsif ($row->{'name'} eq 'ADR') {
- 			    my @vals = split ';', $row->{'value'};
+			} elsif ($row2->{'name'} eq 'ADR') {
+ 			    my @vals = split ';', $row2->{'value'};
 			    $message->{"ADR"} = [] unless $message->{"ADR"};
 			    my $address = {
-				($row->{'type'} || 'OTHER') => {},
+				($row2->{'type'} || 'OTHER') => {},
 			    };
 			    $address->{POBOX} = [$vals[0]] if $vals[0];
 			    $address->{STREET} = [$vals[2]] if $vals[2];
@@ -3712,14 +3752,14 @@ sub api2_ImportContacts {
 			    $address->{PCODE} = [$vals[5]] if $vals[5];
 			    $address->{CTRY} = [$vals[6]] if $vals[6];
 			    push @{$message->{"ADR"}}, $address;
-			} elsif ($row->{'name'} eq 'URL') {
+			} elsif ($row2->{'name'} eq 'URL') {
 			    $message->{"URL"} = [] unless $message->{"URL"};
 			    push @{$message->{"URL"}}, {
-				VALUE => [$row->{'value'}],
-				($row->{'type'} || 'OTHER') => {},
+				VALUE => [$row2->{'value'}],
+				($row2->{'type'} || 'OTHER') => {},
 			    };
 			}
-		    }
+		    }		    
 		    # Insert the contact;
 		    my $time = time();
 		    my $password = $cli->GetAccountPlainPassword($account);
@@ -3743,10 +3783,11 @@ sub api2_ImportContacts {
 			$ximss->close();
 		    }
 		}
-	    } elsif ($OPTS{"filename"} =~ m/\.csv$/i && $OPTS{'box'}) {
-		my $file = $Cpanel::homedir . '/tmp/' . $OPTS{"filename"};
+	    } elsif ($Cpanel::CPVAR{"filepath"} && $Cpanel::CPVAR{"filename"} =~ m/\.csv/i && $OPTS{'box'}) {
+		my $file = $Cpanel::CPVAR{"filepath"};
                 system '/usr/local/cpanel/bin/csvprocess', $file, ( $OPTS{'header'} ? 1 : 0 ), ',';
 		my $importdata = Storable::lock_retrieve( $file  . '.parsed' );
+
                 for my $row (@{$importdata->{data}}) {
 		    my $message = {};
 		    $message->{"UID"}->{"VALUE"} = [join ".", map{ join "", map { int rand(9) } 1..$_} (10,1)];
@@ -3824,17 +3865,17 @@ sub api2_ImportContacts {
 		    $message->{"TZ"}->{"VALUE"} = [$row->[39]] if $row->[39];
 		    $message->{"GEO"}->{"VALUE"} = [$row->[40]] if $row->[40];
 		    $message->{"NOTE"}->{"VALUE"} = [$row->[41]] if $row->[41];
+
 		    # Insert the contact;
 		    my $time = time();
 		    my $password = $cli->GetAccountPlainPassword($account);
 		    if ($password) {
 		    	my $ximss = getXIMSS($account, $password);
-		    	$ximss->send({folderOpen => {
+		    	my $mailbox = $ximss->send({folderOpen => {
 		    	    id => "$time-mailbox",
 		    	    folder => $OPTS{'box'},
 		    	    sortField => "To"
 		    		      }});
-		    	my $mailbox = $ximss->parseResponse("$time-mailbox");
 		    	$Cpanel::CPERROR{'CommuniGate'} = $mailbox->{response}->{errorText} if $mailbox->{response}->{errorText};
 		    	if ($mailbox->{'folderReport'}) {
 		    	    my $contact = {
@@ -3842,8 +3883,7 @@ sub api2_ImportContacts {
 		    		folder => $OPTS{'box'},
 		    		vCard => $message
 		    	    };
-		    	    $ximss->send({contactAppend => $contact});
-		    	    my $append = $ximss->parseResponse("$time-append");
+		    	    my $append = $ximss->send({contactAppend => $contact});
 		    	    $Cpanel::CPERROR{'CommuniGate'} = $append->{response}->{errorText} if $append->{response}->{errorText};
 		    	}
 		    	$ximss->close();
@@ -5366,6 +5406,204 @@ sub api2_UnsetAccountPSTN {
     }
     $cli->Logout();
     return $result;
+}
+
+sub api2_CC_UpdateAdministrator {
+    my %OPTS = @_;
+    my $account = $OPTS{'account'};
+    my $action = $OPTS{'action'};
+    my $cli = getCLI();
+    my $error_msg = "OK";
+    if ($action eq "set") {
+	$cli->SetAccountRights($account , ['Domain', 'BasicSettings', 'PSTNSettings','CanCreateAccounts', 'CanCreateNamedTasks', 'CanAccessWebSites', 'CanCreateAliases']);  
+	$error_msg = $cli->getErrMessage();
+    }
+    if ($action eq "unset") {
+	$cli->SetAccountRights($account , []);  
+	$error_msg = $cli->getErrMessage();
+    }
+
+    $cli->Logout();
+    return $error_msg;
+}
+
+sub api2_CC_Status {
+    my %OPTS = @_;
+    my $domain = $OPTS{'domain'};
+    my $cli = getCLI();
+    my $result = {};
+    my $is_domain_rule = 0;
+    my @domains = Cpanel::Email::listmaildomains();
+    my $newrules = [];
+    # Check is there domain rule
+    $result->{"domain_rule"} = "";
+    for my $dom (@domains) {
+	if ($dom eq $domain) {
+	    $result->{"domain_rule"} = "";
+	    my $domain_rules = $cli->GetDomainSignalRules($domain);
+	    my $compare = "ccIn_" . $domain;
+	    if (ref ($domain_rules) eq 'ARRAY') {		
+		for my $rule (@$domain_rules) {
+		    if (ref ($rule) eq 'ARRAY' && $rule->[1] eq $compare) {
+			$is_domain_rule = 1;
+			$result->{"domain_rule"} = "OK";
+		    }
+		}
+		last;
+	    }
+	}
+    }
+    if ($is_domain_rule eq 1) {
+	$result->{"enabled"} = "YES";
+    } else {
+	$result->{"enabled"} = "NO";
+    }
+    $cli->Logout();
+    return $result;
+}
+
+sub api2_CC_CheckEnabled {
+    my %OPTS = @_;
+    my $cli = getCLI();
+    my $count_enabled = 0;
+    my $result = {};
+    my @domains = Cpanel::Email::listmaildomains();
+    # Check is there domain rule
+    for my $domain (@domains) {
+	my $domain_rules = $cli->GetDomainSignalRules($domain);
+	my $compare = "ccIn_" . $domain;
+	if (ref ($domain_rules) eq 'ARRAY') {		
+	    for my $rule (@$domain_rules) {
+		if (ref ($rule) eq 'ARRAY' && $rule->[1] eq $compare) {
+		    $count_enabled += 1;
+		}
+	    }
+	}
+	last;
+    }
+    $result->{"enabled"} = $count_enabled;
+    $cli->Logout();
+    return $result;
+}
+
+sub api2_CC_Enable {
+    my %OPTS = @_;
+    my $cli = getCLI();
+    my $result = {};
+    $result->{"error_msg"} = "OK";
+    my $domain = $OPTS{'domain'};
+    my @domains = Cpanel::Email::listmaildomains();
+
+    my $max = max_class_accounts($domain, "contact_center");
+    my $count_enabled = 0;
+    for my $domain (@domains) {
+	my $domain_rules = $cli->GetDomainSignalRules($domain);
+	my $compare = "ccIn_" . $domain;
+	if (ref ($domain_rules) eq 'ARRAY') {		
+	    for my $rule (@$domain_rules) {
+		if (ref ($rule) eq 'ARRAY' && $rule->[1] eq $compare) {
+		    $count_enabled += 1;
+		}
+	    }
+	}
+	last;
+    }
+    if ($count_enabled >= $max) {
+	$result->{"error_msg"} = "Limit for this account is reached!";
+	$cli->Logout();
+	return $result;
+    }
+
+    # Create pbx account
+    my $pbx_prefs = $cli-> GetAccountPrefs('pbx@' . $domain);
+    if (!@$pbx_prefs{"AccountName"}) {
+    	my $create_pbx = $cli->CreateAccount(accountName => 'pbx@' . $domain);
+    	my $error_msg = $cli->getErrMessage();
+    	unless ($cli->getErrMessage eq "OK") {
+    	    $result->{"error_msg"} = $cli->getErrMessage;
+    	    $cli->Logout();
+    	    return $result;
+    	}
+    }
+    # Set pbx rights
+    $cli->SetAccountRights('pbx@' . $domain , ['Domain', 'BasicSettings', 'CanCreateNamedTasks', 'CanAccessWebSites', 'CanCreateAliases', 'CanImpersonate']);  
+    unless ($cli->getErrMessage eq "OK") {
+	$result->{"error_msg"} = $cli->getErrMessage;
+	$cli->Logout();
+	return $result;
+    }
+    # Set domain signal rules
+    my $enable_data = [
+	"100010",
+	'ccIn_' . $domain,
+	[
+	 ['Method', 'is', 'INVITE'],
+	 ['RequestURI', 'is not', '*;fromCC=true']
+	],
+	[
+	 ['Redirect to', 'ccincoming#pbx'],
+	 ['Stop Processing'],
+	]
+    ];
+
+    my $rules = $cli->GetDomainSignalRules( $domain );
+    push @$rules, $enable_data;
+    $cli->SetDomainSignalRules($domain, $rules);
+
+    unless ($cli->getErrMessage eq "OK") {
+	$result->{"error_msg"} = $cli->getErrMessage;
+	$cli->Logout();
+	return $result;
+    }
+    $cli->Logout();
+    return $result;
+}
+
+sub api2_CC_Disable {
+    my %OPTS = @_;
+    my $cli = getCLI();
+    my $result = {};
+    $result->{"error_msg"} = "OK";
+    my $domain = $OPTS{'domain'};
+    my $accounts = $cli->ListAccounts($domain);
+    # Remove accounts rights
+    foreach my $userName (sort keys %$accounts) {
+	$cli->SetAccountRights($userName . "\@$domain" , []);  
+    }
+    # Remove domain signal rule
+    my $rule_name = "ccIn_";
+    my @domains = Cpanel::Email::listmaildomains();
+    my $newrules = [];
+    for my $dom (@domains) {
+	if ($dom eq $domain) {
+	    my $rules = $cli->GetDomainSignalRules( $domain );
+	    if (ref ($rules) eq 'ARRAY') {		
+		for my $r (@$rules) {
+		    if (ref ($r) eq 'ARRAY') {		
+			push @$newrules, $r unless $r->[1] eq $rule_name . $domain;
+		    }
+		}
+	    }
+	    $cli->SetDomainSignalRules($domain, $newrules);
+	    last;
+	}
+    }
+    unless ($cli->getErrMessage eq "OK") {
+	$result->{"error_msg"} = $cli->getErrMessage;
+	$cli->Logout();
+	return $result;
+    }
+    $cli->Logout();
+    return $result;
+}
+
+sub api2_CC_GetCCLimit {
+    my %OPTS = @_;
+    my $domain = $OPTS{'domain'};
+    my $cli = getCLI();
+    my $max = max_class_accounts($domain, "contact_center");
+    $cli->Logout();
+    return $max;
 }
 
 sub api2_getCGProServer {
