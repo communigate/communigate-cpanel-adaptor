@@ -15,11 +15,11 @@
       [% filter_option(type, "OTHER", locale.maketext("OTHER")) %]
     </select>
   </td>
-  <td><input type="text" name="URL-[% id %]" class="form-control" value="[% page.VALUE %]" /></td>
-  <td>
+  <td><input id="URL-[% id %]" type="text" name="URL-[% id %]" class="form-control" value="[% page.VALUE %]" /></td>
+  <td style="white-space: nowrap;">
     <a href="#" class="removerow">
       <span class="glyphicon glyphicon-trash"></span>
       Remove
-    </a>
+    </a><div style="width: 200px; padding-left: 100px; margin-top: -27px;" id="URL-[% id %]_error" class="col-xs-12 col-sm-6 col-md-6 col-lg-6"></div>
   </td>
 </tr>

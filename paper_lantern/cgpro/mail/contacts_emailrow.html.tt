@@ -15,11 +15,11 @@
       [% filter_option(type, "OTHER", locale.maketext("Other")) %]
     </select>
   </td>
-  <td><input type="text" name="mail-[% id %]" class="form-control" value="[% mail.VALUE %]" /></td>
+  <td><input type="text" name="mail-[% id %]" id="mail-[% id %]" class="form-control" value="[% mail.VALUE %]" /></td>
   <td style="white-space: nowrap;">
     <a href="#" class="removerow">
       <span class="glyphicon glyphicon-trash"></span>
       Remove
-    </a>
+    </a><div style="width: 200px; padding-left: 100px; margin-top: -27px;" id="mail-[% id %]_error" class="col-xs-12 col-sm-6 col-md-6 col-lg-6"></div>
   </td>
 </tr>

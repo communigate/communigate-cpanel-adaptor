@@ -13,6 +13,8 @@ SET def_addresses = Api2.exec("CommuniGate","ListDefAddress", {});
     app_key = 'cgpro_default_address'
  -%]
 
+<script type="text/javascript">
+</script>
 <div class="body-content">
   [% IF CPANEL.feature('cgpro_defaultaddress') %]
     <p id="defaultAddressDesc" class="description">
@@ -27,6 +29,13 @@ SET def_addresses = Api2.exec("CommuniGate","ListDefAddress", {});
         </tr>
         [% FOREACH hashref IN def_addresses; -%]
         <form action="def.html" method="post">
+        <colgroup>
+          <col width="20%" />
+          <col width="25%" />
+          <col width="25%" />
+          <col width="5%" />
+          <col width="30%" />
+        </colgroup>
 	  <tr>
 	    <td>
 	      [% hashref.domain %]
@@ -41,22 +50,37 @@ SET def_addresses = Api2.exec("CommuniGate","ListDefAddress", {});
 	      </select>
 	    </td>
 	    <td>
-	      <input id="text_[% loop.count %]" type="text" name="ForwardAddress" value="[% IF hashref.MailRerouteAddress != "spamtrap" %][% hashref.MailRerouteAddress %][% END %]" class="form-control text"  />	
+	      <input id="text_[% loop.count %]" type="text" name="ForwardAddress" value="[% IF hashref.MailRerouteAddress != "spamtrap" %][% hashref.MailRerouteAddress %][% END %]" class="form-control text"  />	  
+	
 	    </td>
 	    <td>
 	      <input type="hidden" name="setdefault" value="dummy" />
 	      <input type="hidden" name="domain" value="[% hashref.domain %]" />
-              <input type="submit" value="[% locale.maketext("Update") %]" class="btn btn-primary" />
+              <input id="submit_[% loop.count %]" type="submit" value="[% locale.maketext("Update") %]" class="btn btn-primary" />
 	    </td>
+	    <td>
+	      <div id="text_[% loop.count %]_error" class="col-xs-12 col-sm-6 col-md-6 col-lg-6" style="margin-left: -30px; margin-top: -17px;"></div>
+	    </td>
+	    <script type="text/javascript">
+	      var email_validator = new CPANEL.validate.validator("[% locale.maketext("Email Address") %]");
+
+	      CPANEL.validate.attach_to_form("submit_[% loop.count %]", [
+              email_validator
+	      ]);
+
+	      var selector = "text_"+[% loop.count %];
+	      email_validator.add(selector, "email(%input%, 'cpanel')", "[% locale.maketext("That is not a valid email address.")  %]");
+	      email_validator.attach();
+	    </script>
 	  </tr>
         </form>
 	[% END -%]
       </table>
       [% INCLUDE _assets/return_link.html.tt return_location='../../index.html' return_link_text=locale.maketext('Go Back') %]
-
+      [% ELSE %]
+      [% PROCESS cgpro/icn_description.html.tt %]
       [% END %]
 </div>
-
 [% END %]
 <script type="text/javascript">
 $(".action").change(function(){

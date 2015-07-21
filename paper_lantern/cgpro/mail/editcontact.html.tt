@@ -34,6 +34,7 @@ END;
                 <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
 		  <input type="text" name="GIVEN" id="GIVEN" class="form-control" value="[% vcard.N.GIVEN %]" />
 		</div>
+		<div id="GIVEN_error" class="col-xs-12 col-sm-6 col-md-6 col-lg-6"></div>	  
 	      </div>
 	    </div>
 
@@ -43,8 +44,9 @@ END;
               </label>
               <div class="row">
                 <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
-		  <input type="text" name="MIDDLE" class="form-control" value="[% vcard.N.MIDDLE %]" />
+		  <input type="text" name="MIDDLE" id="MIDDLE" class="form-control" value="[% vcard.N.MIDDLE %]" />
 		</div>
+		<div id="MIDDLE_error" class="col-xs-12 col-sm-6 col-md-6 col-lg-6"></div>	  
 	      </div>
 	    </div>
 
@@ -54,8 +56,9 @@ END;
               </label>
               <div class="row">
                 <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
-		  <input type="text" name="FAMILY" class="form-control" value="[% vcard.N.FAMILY %]" />
+		  <input type="text" name="FAMILY" id="FAMILY" class="form-control" value="[% vcard.N.FAMILY %]" />
 		</div>
+		<div id="FAMILY_error" class="col-xs-12 col-sm-6 col-md-6 col-lg-6"></div>	  
 	      </div>
 	    </div>
 
@@ -65,8 +68,9 @@ END;
               </label>
               <div class="row">
                 <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
-		  <input type="text" name="ORGNAME" class="form-control" value="[% vcard.ORG.ORGNAME %]" />
+		  <input type="text" name="ORGNAME" id="ORGNAME" class="form-control" value="[% vcard.ORG.ORGNAME %]" />
 		</div>
+		<div id="ORGNAME_error" class="col-xs-12 col-sm-6 col-md-6 col-lg-6"></div>	  
 	      </div>
 	    </div>
 
@@ -76,8 +80,9 @@ END;
               </label>
               <div class="row">
                 <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
-		  <input type="text" name="ORGUNIT" class="form-control" value="[% vcard.ORG.ORGUNIT %]" />
+		  <input type="text" name="ORGUNIT" id="ORGUNIT" class="form-control" value="[% vcard.ORG.ORGUNIT %]" />
 		</div>
+		<div id="ORGUNIT_error" class="col-xs-12 col-sm-6 col-md-6 col-lg-6"></div>	  
 	      </div>
 	    </div>
 
@@ -87,13 +92,14 @@ END;
               </label>
               <div class="row">
                 <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
-		  <input type="text" name="TITLE" class="form-control" value="[% vcard.TITLE.VALUE %]" />
+		  <input type="text" name="TITLE" id="TITLE" class="form-control" value="[% vcard.TITLE.VALUE %]" />
 		</div>
+		<div id="TITLE_error" class="col-xs-12 col-sm-6 col-md-6 col-lg-6"></div>	  
 	      </div>
 	    </div>
 
             <div class="form-group">
-              <label for="TITLE">
+              <label for="BDAY">
 		[% locale.maketext("Birthday") %]
               </label>
               <div class="row">
@@ -276,9 +282,24 @@ END;
         </form>
     </div>
 </div>
-    [% INCLUDE _assets/return_link.html.tt return_location='contacts.html?account=' _ FORM.account return_link_text=locale.maketext('Go Back') %]
-
+[% INCLUDE _assets/return_link.html.tt return_location='contacts.html?account=' _ FORM.account return_link_text=locale.maketext('Go Back') %]
 [% END %]
+
+<script type="text/javascript">
+var name_validator = new CPANEL.validate.validator("[% locale.maketext("Name") %]");
+var email_validator = new CPANEL.validate.validator("[% locale.maketext("Email Address") %]");
+
+function init_page() {
+    name_validator.add("GIVEN", "min_length(%input%, 1)", "[% locale.maketext("That is not a valid name.")  %]");
+    name_validator.attach();
+
+CPANEL.validate.attach_to_form("submit", [
+        email_validator,
+        name_validator
+    ]);
+}
+YAHOO.util.Event.onDOMReady(init_page);
+</script>
 
 [% BLOCK js_block %]
 <script type="text/javascript">
@@ -291,6 +312,16 @@ var getRow = function (e, data) {
 $(wrap).append(o.responseText);
                 var removers = YAHOO.util.Dom.getElementsByClassName('removerow');
  	        YAHOO.util.Event.addListener(removers, "click", removeRow);
+if(wrap == emailstable) {
+var selector = "mail-"+(index.value-1);
+    email_validator.add(selector, "email(%input%, 'cpanel')", "[% locale.maketext("That is not a valid email address.")  %]");
+    email_validator.attach();
+}
+if(wrap == wwwtable) {
+var selector = "URL-"+(index.value-1);
+    name_validator.add(selector, "url(%input%)", "[% locale.maketext("That is not a valid url.")  %]");
+    name_validator.attach();
+}
 	    },
 		}, null);
     index.value = parseInt(index.value) + 1;
@@ -310,5 +341,4 @@ YAHOO.util.Event.onDOMReady(function () {
  	YAHOO.util.Event.addListener(removers, "click", removeRow);
     });
 </script>
-
 [% END %]
