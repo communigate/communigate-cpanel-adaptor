@@ -82,7 +82,17 @@ sub getXIMSS {
     if ( defined( $result->{'data'} ) ) {
 	$loginData = $result->{'data'};
     } else {
-	$logger->warn("Can't login to CGPro: " . $result->{'error'});
+	my $result = Cpanel::Wrap::send_cpwrapd_request(
+	    'namespace' => 'CGPro',
+	    'module'    => 'cca',
+	    'function'  => 'GETLOGIN',
+	    'data' =>  $Cpanel::CPDATA{'USER'}
+	    );
+	if ( defined( $result->{'data'} ) ) {
+	    $loginData = $result->{'data'};
+	} else {
+	    $logger->warn("Can't login to CGPro: " . $result->{'error'});
+	}
     }
     my @loginData = split "::", $loginData;
     my $ximss = new XIMSS({
@@ -746,6 +756,8 @@ sub api2_ListExtensions {
 		  my $settings = $cli->GetAccountSettings($object);
 		  my $telnums = $pbxPrefs->{"Gateways"}->{$defaultPrefs->{"assignedTelnums"}->{$number}->{"gateway"}}->{"callInGw"}->{"telnums"};
 		  my @telnum = grep {$_->{'telnum'} eq $number} @$telnums;
+		  # use Data::Dumper;
+		  # die Dumper $number;
  		  if ($telnum[0] && $telnum[0]->{'authname'} eq $settings->{"PSTNGatewayAuthName"} && $telnum[0]->{'username'} eq $settings->{"PSTNFromName"}) {
 		      $ext->{'out'} = 1;
 		  }
@@ -940,6 +952,7 @@ sub api2_AssignExtension {
       }
   }
 
+  my $result = {};
   my $defaults = $cli->GetServerAccountDefaults();
   $result->{"classes"} = $defaults->{"ServiceClasses"};
   foreach my $domain (@domains) {
@@ -2244,6 +2257,7 @@ sub api2_DeleteAutoresponder {
         my %OPTS = @_;
 	my $cli = getCLI();
 	my $rule = undef;
+
         $cli->UpdateAutoresponder(email => $OPTS{'email'}, rule => $rule );
         $cli->Logout();
 }
@@ -2818,13 +2832,29 @@ sub api2_dumpfilters {
 }
 
 sub api2_get_archiving_configuration {
+    my %OPTS = @_;
+    my $acc = $OPTS{'account'};
+    my ($userName, $dom) = split "@", $OPTS{'account'};
     my $cli = getCLI();
     my @domains = Cpanel::Email::listmaildomains();
     my $filters = {};
     my @result;
-    for my $domain (@domains) {
-	my $defaults = $cli->GetAccountDefaults($domain);
-	push @result, { domain => $domain, ArchiveMessagesAfter => $defaults->{'ArchiveMessagesAfter'}, DeleteMessagesAfter => $defaults->{'DeleteMessagesAfter'}} if $defaults;
+    if($acc =~ /@/g) {
+	my $accounts = $cli->ListAccounts($dom);
+	for my $account (keys %$accounts) {
+	    if ($account ne "pbx" && $account ne "ivr"){
+		my $account_settings =  $cli->GetAccountSettings($acc);	
+		push @result, { account => $acc, ArchiveMessagesAfter => $account_settings->{'ArchiveMessagesAfter'}, DeleteMessagesAfter => $account_settings->{'DeleteMessagesAfter'}} if $account_settings;
+	    }
+	}
+    } else {
+	for my $domain (@domains) {	
+	    if ($domain eq $userName) {
+		my $defaults = $cli->GetAccountDefaults($domain);
+		push @result, { domain => $domain, ArchiveMessagesAfter => $defaults->{'ArchiveMessagesAfter'}, DeleteMessagesAfter => $defaults->{'DeleteMessagesAfter'}} if $defaults;
+		
+	    }
+	}
     }
     $cli->Logout();
     return @result;
@@ -2835,11 +2865,30 @@ sub api2_updatearchive {
     my $params = $OPTS{'formdump'};
     my $cli = getCLI();
     my @domains = Cpanel::Email::listmaildomains();
-    for my $domain (@domains) {
-	$cli->UpdateAccountDefaults(domain => $domain, settings => {
-	    ArchiveMessagesAfter => ((defined $params->{'ArchiveMessagesAfter-' . $domain})?$params->{'ArchiveMessagesAfter-' . $domain}:undef),
-	    DeleteMessagesAfter => ((defined $params->{'DeleteMessagesAfter-' . $domain})?$params->{'DeleteMessagesAfter-' . $domain}:undef )
-				    });
+    my $acc = $params->{'domain'};
+    my ($userName, $dom) = split "@", $acc;
+
+    use Data::Dumper;
+
+    if($acc =~ /@/g) {
+	my $accounts = $cli->ListAccounts($dom);
+	for my $account (keys %$accounts) {
+	    my $account_settings =  $cli->GetAccountSettings($acc);	
+	    $cli->UpdateAccountSettings($acc, {
+		ArchiveMessagesAfter => ((defined $params->{'ArchiveMessagesAfter-' . $acc})?$params->{'ArchiveMessagesAfter-' . $acc}:undef),
+		DeleteMessagesAfter => ((defined $params->{'DeleteMessagesAfter-' . $acc})?$params->{'DeleteMessagesAfter-' . $acc}:undef )
+					});
+	}	    
+    } else {
+	for my $domain (@domains) {
+	    if ($domain eq $userName) {
+		$cli->UpdateAccountDefaults(domain => $domain, settings => {
+		    ArchiveMessagesAfter => ((defined $params->{'ArchiveMessagesAfter-' . $domain})?$params->{'ArchiveMessagesAfter-' . $domain}:undef),
+		    DeleteMessagesAfter => ((defined $params->{'DeleteMessagesAfter-' . $domain})?$params->{'DeleteMessagesAfter-' . $domain}:undef )
+					    });
+	    }
+	    last;
+	}
     }
     $cli->Logout();
     return {msg => "Changes saved."};
@@ -3523,6 +3572,7 @@ sub api2_DeleteContactsBox {
 
 sub api2_EditContactsBox {
     my %OPTS = @_;
+    my $params = {};
     my $account = $OPTS{'account'};
     my $box = $OPTS{'box'};
     my (undef,$dom) = split "@", $account;
@@ -4165,7 +4215,6 @@ sub api2_DoAddQueue {
 		$cli->CreateAccount(accountName => "pbx\@$domain");
 		$cli->SetAccountRights("pbx\@$domain", ['Domain', 'CanImpersonate', 'CanCreateGroups']);
 	    }
-	    
 	    if ($OPTS{'queue'}) {
 	    	$cli->DeleteForwarder($OPTS{'queue'});
 	    }
@@ -4184,7 +4233,6 @@ sub api2_DoAddQueue {
 	    }
 	    my $forwarders = $cli->ListForwarders($domain);	    
 	    $cli->CreateForwarder("activequeue_" . $OPTS{'department'}, 'activequeue{' . $queuestring . '}#pbx@' . $domain);
-
 	    $cli->CreateForwarder("activequeuetoggle_" . $OPTS{'department'}, 'togglegroupmember{' . $OPTS{'department'} . ',' . "activequeuegroup_" . $OPTS{'department'} . '}#pbx@' . $domain);
 	    my $forwarders = $cli->ListForwarders($domain);	    
 	    foreach my $forwarder (@$forwarders) {
@@ -4197,7 +4245,6 @@ sub api2_DoAddQueue {
 	    }
 	}
     }
-     
     $cli->Logout();
     return $return;
 }
@@ -5421,6 +5468,21 @@ sub api2_getMxPresets {
     my $prefs = $cli->GetServerAccountPrefs();
     $cli->Logout();
     return $prefs->{"MxPresets"};
+}
+
+sub api2_getInterfaceString {
+    my %OPTS = @_;
+    my $string = $OPTS{'string'};
+    my $cli = getCLI();
+    my $prefs = $cli->GetServerAccountPrefs();
+    my $result = "";
+    if($prefs->{"cmailpro_strings"}) {
+	$result = $prefs->{"cmailpro_strings"}->{$string} || "";
+	$result =~ s/\\\"/\"/g;
+	$result =~ s/\\r\\e/\r\n/g;
+    }
+    $cli->Logout();
+    return $result;
 }
 
 sub versioncmp( $$ ) {

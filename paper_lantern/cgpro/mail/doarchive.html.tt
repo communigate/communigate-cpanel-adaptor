@@ -3,6 +3,7 @@ SET CPANEL.CPVAR.dprefix = "../../";
 SET email_add_forward = Api2.exec("CommuniGate", "updatearchive", {
 "formdump" = RAW_FORM
 });
+SET return_link = 'archive.html?domain=' _ RAW_FORM.item("domain")
 %]
 
 [% WRAPPER '_assets/master.html.tt'
@@ -27,7 +28,7 @@ SET email_add_forward = Api2.exec("CommuniGate", "updatearchive", {
     </div>
     [% END %]
 
-    [% INCLUDE _assets/return_link.html.tt return_location='archive.html' return_link_text=locale.maketext('Go Back') %]
+    [% INCLUDE _assets/return_link.html.tt return_location=return_link return_link_text=locale.maketext('Go Back') %]
 
   </div>
 </div>

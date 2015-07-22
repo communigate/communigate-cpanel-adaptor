@@ -1,21 +1,68 @@
+[% MACRO filter_option(pval, val, text) BLOCK -%]
+<option value="[% val %]"[% val == pval ? " selected='selected'" : "" %]>[% locale.maketext(text) %]</option>
+[% END -%]
 [%
 SET CPANEL.CPVAR.dprefix = "../../";
+SET mail_domains =  Api2.exec("Email", "listmaildomains", {});
+SET accounts =  Api2.exec("CommuniGate", "ListAccounts", {});
+accounts = accounts.0.accounts;
 %]
 
 [% WRAPPER '_assets/master.html.tt'
     app_key = 'cgpro_archive'
 -%]
-<div class="body-content">
+<!-- [% USE dumper %] -->
+<!-- <pre>[% dumper.dump(accounts) %]</pre> -->
 
+<div class="body-content">
     [% IF CPANEL.feature('cgpro_emailarchive') %]
         [% IF (CPANEL.CPCONF.emailarchive == "disable" ? 0 : CPANEL.CPCONF.emailarchive) %]
         <div id="descEmailArchivingAllowsYou" class="header-text">
             [% locale.maketext("Email Archiving allows you to store a copy of each incoming and outgoing message that is sent to or from a domain on your account. The archives are stored in an uncompressed maildir format so they can be browsed via an IMAP connection. Be aware that archiving email can consume disk space quickly, and you should ensure you have enough disk space available for the retention period you select.") %]
         </div>
 
+  <div class="pull-right">
+    <form method="get" action="" id="manage_list_form" class="form-inline">
+      <div class="form-group">
+        <label for="manage_list_select" id="txt_Managing" class="col-xs-12 control-label">[% locale.maketext("Managing:") %]</label>
+      </div>
+      <div class="form-group">
+        [% IF mail_domains.size() == "1" %]
+        [% mail_domains.0.domain %] <input type="hidden" id="domain" value="[%  mail_domains.0.domain %]" name="domain" />
+        [% ELSE %]
+        <select name="domain" id="manage_list_select" class="col-xs-12 form-control">
+	  [% FOR domain IN mail_domains -%]
+	  [% filter_option(FORM.domain, domain.domain, domain.domain) %]
+	  [% END %]
+	  [% FOR account IN accounts -%]
+	  [% filter_option(FORM.domain, account.key, account.key) %]
+	  [% END %]
+        </select>
+	[% END %]
+    	<input type="hidden" id="domain" value="[% FORM.domain %]" />
+      </div>
+
+      <noscript>
+        <div class="form-group">
+          <input type="submit" class="btn btn-primary" id="btn_domainSelect_go" value="[% locale.maketext("Go") %]" />
+        </div>
+      </noscript>
+    </form>
+    [% IF !RAW_FORM.item("domain") && mail_domains.size > 0 %]
+    <script>
+      YAHOO.util.Dom.get("manage_list_form").submit();
+    </script>
+    [% END %]
+    <script type="text/javascript">
+      YAHOO.util.Event.onDOMReady(function() {
+      YAHOO.util.Event.on("manage_list_select", "change", function() { YAHOO.util.Dom.get("manage_list_form").submit(); });
+      });
+    </script>
+  </div><br /></br />
+
         <div class="section">
             <h2 id="hdrManagingArchiving">[% locale.maketext("Manage Archiving") %]</h2>
-	    <form action="doarchive.html" method="post">
+	    <form action="doarchive.html?domain=[% RAW_FORM.item("domain") %]" method="post">
               <div class="table-responsive">
 		<table id="emailarchtbl" class="archives sortable truncate-table table table-striped"  custom-sort-method="onSortClick">
                   <thead>
@@ -54,3 +101,54 @@ SET CPANEL.CPVAR.dprefix = "../../";
     [% END %]
 </div>
 [% END #wrapper %]
+
+<script type="text/javascript">
+var LANG = {};
+LANG.local_extension_input = "[% locale.maketext("LocalExtension") %]";
+LANG.local_extension_input_invalid = "[% locale.maketext('LocalExtensionInvalid','{min}', '{max}') %]";
+CPANEL.validate.verify_local_extension_local = function (e) {
+    return CPANEL.validate.positive_integer(e) && CPANEL.validate.greater_than(e,200) && CPANEL.validate.less_than(e,1000);
+};
+var getExtensions = function () {
+    var select = document.getElementById("account");
+    var wrap = document.getElementById("extension");
+    wrap.innerHTML = "";
+
+    YAHOO.util.Connect.asyncRequest('GET', 'getextensions.html?domain=' + select.value.split("@")[1], {
+	    success: function(o) {
+		wrap.innerHTML = o.responseText;
+if ( $("#extension option").length > 1 ) {
+$("#assign_phone_number_did").show();
+}
+	    },
+		}, null);
+};
+
+var getExtensions2 = function () {
+    var select = document.getElementById("domain");
+    var wrap = document.getElementById("extension2");
+    wrap.innerHTML = "";
+
+    YAHOO.util.Connect.asyncRequest('GET', 'getextensionsfordomain.html?domain=' + select.value, {
+	    success: function(o) {
+
+		wrap.innerHTML = o.responseText;
+if ( $("#extension2 option").length > 1 ) {
+$("#setpstntodomain").show();
+}
+	    },
+		}, null);
+};
+
+YAHOO.util.Event.onDOMReady(function () {
+	getExtensions();
+	getExtensions2();
+	YAHOO.util.Event.addListener("account", "change", getExtensions);
+	YAHOO.util.Event.addListener("domain", "change", getExtensions2);
+	var VAL_LOCAL_EXT = new CPANEL.validate.validator(LANG.local_extension_input);
+	VAL_LOCAL_EXT.add("local_extension", 'verify_local_extension_local', YAHOO.lang.substitute(LANG.local_extension_input_invalid,{min: 200, max: 999}));
+	VAL_LOCAL_EXT.attach();
+	CPANEL.validate.attach_to_form("add_local_extension", [VAL_LOCAL_EXT]);
+    });
+</script>
+
