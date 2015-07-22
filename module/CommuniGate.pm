@@ -756,8 +756,6 @@ sub api2_ListExtensions {
 		  my $settings = $cli->GetAccountSettings($object);
 		  my $telnums = $pbxPrefs->{"Gateways"}->{$defaultPrefs->{"assignedTelnums"}->{$number}->{"gateway"}}->{"callInGw"}->{"telnums"};
 		  my @telnum = grep {$_->{'telnum'} eq $number} @$telnums;
-		  # use Data::Dumper;
-		  # die Dumper $number;
  		  if ($telnum[0] && $telnum[0]->{'authname'} eq $settings->{"PSTNGatewayAuthName"} && $telnum[0]->{'username'} eq $settings->{"PSTNFromName"}) {
 		      $ext->{'out'} = 1;
 		  }
@@ -863,7 +861,6 @@ sub api2_AssignExtension {
   my %OPTS = @_;
   my @domains = Cpanel::Email::listmaildomains();
   my $cli = getCLI();
-  my $result = {};
 
   # my ($objType, $objAddress) = split ":", $OPTS{'account'};
   # $result->{"objType"} = $objType;
@@ -2867,8 +2864,6 @@ sub api2_updatearchive {
     my @domains = Cpanel::Email::listmaildomains();
     my $acc = $params->{'domain'};
     my ($userName, $dom) = split "@", $acc;
-
-    use Data::Dumper;
 
     if($acc =~ /@/g) {
 	my $accounts = $cli->ListAccounts($dom);
@@ -5468,21 +5463,6 @@ sub api2_getMxPresets {
     my $prefs = $cli->GetServerAccountPrefs();
     $cli->Logout();
     return $prefs->{"MxPresets"};
-}
-
-sub api2_getInterfaceString {
-    my %OPTS = @_;
-    my $string = $OPTS{'string'};
-    my $cli = getCLI();
-    my $prefs = $cli->GetServerAccountPrefs();
-    my $result = "";
-    if($prefs->{"cmailpro_strings"}) {
-	$result = $prefs->{"cmailpro_strings"}->{$string} || "";
-	$result =~ s/\\\"/\"/g;
-	$result =~ s/\\r\\e/\r\n/g;
-    }
-    $cli->Logout();
-    return $result;
 }
 
 sub versioncmp( $$ ) {
