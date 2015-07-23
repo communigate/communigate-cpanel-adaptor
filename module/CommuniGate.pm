@@ -2837,11 +2837,15 @@ sub api2_get_archiving_configuration {
     my $filters = {};
     my @result;
     if($acc =~ /@/g) {
-	my $accounts = $cli->ListAccounts($dom);
-	for my $account (keys %$accounts) {
-	    if ($account ne "pbx" && $account ne "ivr"){
-		my $account_settings =  $cli->GetAccountSettings($acc);	
-		push @result, { account => $acc, ArchiveMessagesAfter => $account_settings->{'ArchiveMessagesAfter'}, DeleteMessagesAfter => $account_settings->{'DeleteMessagesAfter'}} if $account_settings;
+	for my $domain_dom (@domains) {	
+	    if ($domain_dom eq $dom) {
+		my $accounts = $cli->ListAccounts($dom);
+		for my $account (keys %$accounts) {
+		    if ($account ne "pbx" && $account ne "ivr" && ($account . "@" . $dom eq $acc)){
+			my $account_settings =  $cli->GetAccountSettings($acc);	
+			push @result, { account => $acc, ArchiveMessagesAfter => $account_settings->{'ArchiveMessagesAfter'}, DeleteMessagesAfter => $account_settings->{'DeleteMessagesAfter'}} if $account_settings;
+		    }
+		}
 	    }
 	}
     } else {
@@ -2849,7 +2853,6 @@ sub api2_get_archiving_configuration {
 	    if ($domain eq $userName) {
 		my $defaults = $cli->GetAccountDefaults($domain);
 		push @result, { domain => $domain, ArchiveMessagesAfter => $defaults->{'ArchiveMessagesAfter'}, DeleteMessagesAfter => $defaults->{'DeleteMessagesAfter'}} if $defaults;
-		
 	    }
 	}
     }
