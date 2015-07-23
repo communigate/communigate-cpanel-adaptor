@@ -10,12 +10,9 @@ var GetCCLimit = function (domain) {
 	"cpanel_jsonapi_func": "CC_GetCCLimit",
 	"domain": domain
     };
-    var data;
-    var domain_dot_pos = domain.lastIndexOf(".");
-    var domain_username = domain.substring(0, domain_dot_pos);
     // callback functions
     var success = function(o) {
-	data = $.parseJSON(o);
+	var data = $.parseJSON(o);
 	if (data.cpanelresult.data[0]) {
 	    data = data.cpanelresult.data[0];
 	    CCLIMIT = data;
@@ -44,7 +41,7 @@ var GetAccounts = function() {
 	var data = $.parseJSON(o);
 	if (data.cpanelresult.data[0]) {
 	    data = data.cpanelresult.data[0];
-	    ACCOUNTS = data.accounts;
+	    ACCOUNTS = Object.keys(data.accounts).map(function(k) { return data.accounts[k] });
 	    CLASSES = data.classes;
 	    loadTable();
 	}
@@ -57,8 +54,7 @@ var GetAccounts = function() {
 	    success: success,
 	    dataType: "text"
 	});
-    YAHOO.util.Dom.get(table_loading).innerHTML = " " + CPANEL.icons.ajax + " Please, wait...";
-    $("#accounts_table").remove();
+    $("#table_loading").html(" " + CPANEL.icons.ajax + " Please, wait...");
 };
 
 var EnableCC = function (domain) {
@@ -68,13 +64,10 @@ var EnableCC = function (domain) {
 	"cpanel_jsonapi_func": "CC_Enable",
 	"domain": domain
     };
-    var data;
-    var domain_dot_pos = domain.lastIndexOf(".");
-    var domain_username = domain.substring(0, domain_dot_pos);
     // callback functions
     var success = function(o) {
-	YAHOO.util.Dom.get(enabling_loading).innerHTML = "";
-	data = $.parseJSON(o);
+	$("#enabling_loading").html("");
+	var data = $.parseJSON(o);
 	$("#enabled_cc").show();
 	$("#disabled_cc").hide();
 	GetAccounts();	
@@ -87,7 +80,7 @@ var EnableCC = function (domain) {
 	    success: success,
 	    dataType: "text"
 	});
-    YAHOO.util.Dom.get(enabling_loading).innerHTML = " " + CPANEL.icons.ajax + " Please, wait...";
+    $("#enabling_loading").html(" " + CPANEL.icons.ajax + " Please, wait...");
 };
 
 var DisableCC = function (domain) {
@@ -97,10 +90,9 @@ var DisableCC = function (domain) {
 	"cpanel_jsonapi_func": "CC_Disable",
 	"domain": domain
     };
-    var data;
     // callback functions
     var success = function(o) {
-	YAHOO.util.Dom.get(disabling_loading).innerHTML = "";
+	$("#disabling_loading").html("");
 	$("#enabled_cc").hide();
 	$("#disabled_cc").show();
 	$("#accounts_table").remove();
@@ -113,7 +105,7 @@ var DisableCC = function (domain) {
 	    success: success,
 	    dataType: "text"
 	});
-    YAHOO.util.Dom.get(disabling_loading).innerHTML = " " + CPANEL.icons.ajax + " Please, wait...";
+    $("#disabling_loading").html(" " + CPANEL.icons.ajax + " Please, wait...");
 };
 
 var CCStatus = function (domain) {
@@ -123,14 +115,13 @@ var CCStatus = function (domain) {
 	"cpanel_jsonapi_func": "CC_Status",
 	"domain": domain
     };
-    var data;
     // callback functions
     var success = function(o) {
-	data = $.parseJSON(o);
+	var data = $.parseJSON(o);
 	if (data.cpanelresult.data[0]) {
 	    data = data.cpanelresult.data[0];
 	    if (data.enabled == "YES") {
-		YAHOO.util.Dom.get(status_loading).innerHTML = "";
+		$("#status_loading").html("");
 		$("#enabled_cc").show();
 		GetAccounts();
 	    }
@@ -147,7 +138,7 @@ var CCStatus = function (domain) {
 	    success: success,
 	    dataType: "text"
 	});
-    YAHOO.util.Dom.get(status_loading).innerHTML = " " + CPANEL.icons.ajax + " Please, wait...";
+    $("#status_loading").html(" " + CPANEL.icons.ajax + " Please, wait...");
 };
 
 var CC_CheckEnabled = function () {
@@ -156,11 +147,10 @@ var CC_CheckEnabled = function () {
 	"cpanel_jsonapi_module": "CommuniGate",
 	"cpanel_jsonapi_func": "CC_CheckEnabled"
     };
-    var data;
     // callback functions
     var success = function(o) {
-	YAHOO.util.Dom.get(status_loading).innerHTML = "";
-	data = $.parseJSON(o);
+	$("#status_loading").html("");
+	var data = $.parseJSON(o);
 	if (data.cpanelresult.data[0]) {
 	    ENABLED = data.cpanelresult.data[0].enabled;
 	}
@@ -189,7 +179,6 @@ var CC_UpdateAdministrator = function (account, action) {
 	"account": account,
 	"action": action
     };
-    var data;
     // callback functions
     var success = function(o) {
 	GetAccounts();
@@ -204,81 +193,22 @@ var CC_UpdateAdministrator = function (account, action) {
 	});
     var selector_loading = "#loading_" + account.split("@")[0];
     $(selector_loading).html(" " + CPANEL.icons.ajax + " Please, wait...");
-    // YAHOO.util.Dom.get(selector_loading).innerHTML = " " + CPANEL.icons.ajax + " Please, wait...";
 };
 
 var loadTable = function () {
-    $("#accounts_table").remove();
-    var is_sip_acc = false;
-    var is_result = false;
-    var table = $("<table></table>").addClass("table table-striped");
-    table.attr("id","accounts_table");
-    var thead = $("<thead></thead>");
-    var thead_tr = $("<tr></tr>");
-    var th1 = $("<th></th>").text("Account");
-    var th2 = $("<th></th>").text("Functions");
-    thead_tr.append(th1);
-    thead_tr.append(th2);
-    thead.append(thead_tr);
-    var colgroup = $("<colgroup></colgroup>");
-    var col1 = $("<col></col>").attr("align","left").attr("width","50%");
-    var col2 = $("<col></col>").attr("align","left").attr("width","50%");
-    colgroup.append(col1);
-    colgroup.append(col2);
-    table.append(colgroup);
-    table.append(thead);
-    for (var acc in ACCOUNTS) {
-	is_sip_acc = false;
-	var acc_split = acc.split("@");
-	acc_domain = acc_split[1];
-	acc_name = acc_split[0];
-	var acc_modes_str = "";
-	if (ACCOUNTS[acc].data.AccessModes instanceof Array) {
-	    acc_modes_str = ACCOUNTS[acc].data.AccessModes.join(",");
-	} else {
-	    acc_modes_str = ACCOUNTS[acc].data.AccessModes;
-	}
-	if (acc_domain == domain && acc_modes_str && ( acc_modes_str.indexOf("SIP") > -1 || acc_modes_str == "All") ) {
-	    is_sip_acc = true;
-	    is_result = true;
-	    }
-	
-	if (acc_domain == domain && is_sip_acc) {
-	    var row = $('<tr></tr>').addClass('accRow');
-	    var td1 = $('<td></td>').text(acc);
-	    var td2 = $('<td></td>');
-	    if (ACCOUNTS[acc].rights.join(",").indexOf("Domain") > -1 && ACCOUNTS[acc].rights.join(",").indexOf("BasicSettings") > -1 && ACCOUNTS[acc].rights.join(",").indexOf("PSTNSettings") > -1 && ACCOUNTS[acc].rights.join(",").indexOf("CanCreateAccounts") > -1 && ACCOUNTS[acc].rights.join(",").indexOf("CanCreateAliases") > -1 && ACCOUNTS[acc].rights.join(",").indexOf("CanCreateNamedTasks") > -1 && ACCOUNTS[acc].rights.join(",").indexOf("CanAccessWebSites") > -1) {
-		td1.append("<span> (Administrator)</span>");
-		td2.html('<a class="btn_unset_administrator">Unset as administrator</a><span id="loading_' + acc_name + '"></span>');
-	    }
-	    else {
-		td2.html('<a class="btn_set_administrator">Set as administrator</a><span id="loading_' + acc_name + '"></span>');
-	    }
-	    row.append(td1);
-	    row.append(td2);
-	    table.append(row);
-	}
-	$("#accountsTable").append(table);
-	YAHOO.util.Dom.get(table_loading).innerHTML = " ";
-    }
-    if (is_result == false) {	
-	var row = $('<tr></tr>');
-	var td1 = $('<td></td>').text("No accounts!");
-	var td2 = $('<td></td>');
-	row.append(td1);
-	row.append(td2);
-	table.append(row);
-    }
+    var html = new EJS({url: 'contact_center.ejs'}).render();
+    $("#accounts_table_div").html(html);
+    $("#table_loading").html("");
     $(".btn_set_administrator").click(function(e){
-	    var caller = $(this).parent().parent().find("td:first-child").text();
-	    CC_UpdateAdministrator(caller, "set");
-	});
+    	    var caller = $(this).parent().parent().find("td:first-child").text().trim();
+    	    CC_UpdateAdministrator(caller, "set");
+    	});
     $(".btn_unset_administrator").click(function(e){
-	    var caller = $(this).parent().parent().find("td:first-child").text();
-	    caller = caller.split("(");
-	    caller = caller[0];
-	    CC_UpdateAdministrator(caller, "unset");
-	});
+    	    var caller = $(this).parent().parent().find("td:first-child").text();
+    	    caller = caller.split("(");
+    	    caller = caller[0].trim();
+    	    CC_UpdateAdministrator(caller, "unset");
+    	});
 };
 
 

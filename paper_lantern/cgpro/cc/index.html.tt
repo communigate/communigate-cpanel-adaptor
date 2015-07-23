@@ -10,6 +10,7 @@ SET mail_domains =  Api2.exec("Email", "listmaildomains", {} );
 %]
 
 [% WRAPPER '_assets/master.html.tt'
+    page_scripts = ['cgpro/cc/js/contact_center.js']
     app_key = 'cgpro_contact_center'
 -%] 
 
@@ -18,7 +19,7 @@ SET mail_domains =  Api2.exec("Email", "listmaildomains", {} );
   cursor: pointer;
   }
 </style>
-
+<script type="text/javascript" src="js/ejs_production.js"></script>
 <div class="body-content">
   <div class="pull-right">
     <div class="pull-right">
@@ -86,7 +87,7 @@ SET mail_domains =  Api2.exec("Email", "listmaildomains", {} );
 
 <span id="table_loading"></span>
 <span id="enabled_error" style="display: none;">Already enabled for another domain!</span>
-<div id="accountsTable"></div>
-<script src="js/contact_center.js"></script> 
+<div id="accounts_table_div"></div>
+
 </div>
 [% END %]

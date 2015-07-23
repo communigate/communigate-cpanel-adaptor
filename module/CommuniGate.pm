@@ -5446,7 +5446,6 @@ sub api2_CC_CheckEnabled {
 		}
 	    }
 	}
-	last;
     }
     $result->{"enabled"} = $count_enabled;
     $cli->Logout();
@@ -5458,10 +5457,13 @@ sub api2_CC_Enable {
     my $cli = getCLI();
     my $result = {};
     $result->{"error_msg"} = "OK";
-    my $domain = $OPTS{'domain'};
+    my $dom = $OPTS{'domain'};
     my @domains = Cpanel::Email::listmaildomains();
 
-    my $max = max_class_accounts($domain, "contact_center");
+    my $max = max_class_accounts($dom, "contact_center");
+    if (!$max) {
+	$max = 1;
+    }
     my $count_enabled = 0;
     for my $domain (@domains) {
 	my $domain_rules = $cli->GetDomainSignalRules($domain);
@@ -5473,7 +5475,6 @@ sub api2_CC_Enable {
 		}
 	    }
 	}
-	last;
     }
     if ($count_enabled >= $max) {
 	$result->{"error_msg"} = "Limit for this account is reached!";
@@ -5482,45 +5483,54 @@ sub api2_CC_Enable {
     }
 
     # Create pbx account
-    my $pbx_prefs = $cli-> GetAccountPrefs('pbx@' . $domain);
-    if (!@$pbx_prefs{"AccountName"}) {
-    	my $create_pbx = $cli->CreateAccount(accountName => 'pbx@' . $domain);
-    	my $error_msg = $cli->getErrMessage();
-    	unless ($cli->getErrMessage eq "OK") {
-    	    $result->{"error_msg"} = $cli->getErrMessage;
-    	    $cli->Logout();
-    	    return $result;
-    	}
-    }
-    # Set pbx rights
-    $cli->SetAccountRights('pbx@' . $domain , ['Domain', 'BasicSettings', 'CanCreateNamedTasks', 'CanAccessWebSites', 'CanCreateAliases', 'CanImpersonate']);  
-    unless ($cli->getErrMessage eq "OK") {
-	$result->{"error_msg"} = $cli->getErrMessage;
-	$cli->Logout();
-	return $result;
-    }
-    # Set domain signal rules
-    my $enable_data = [
-	"100010",
-	'ccIn_' . $domain,
-	[
-	 ['Method', 'is', 'INVITE'],
-	 ['RequestURI', 'is not', '*;fromCC=true']
-	],
-	[
-	 ['Redirect to', 'ccincoming#pbx'],
-	 ['Stop Processing'],
-	]
-    ];
+    for my $domain_rule (@domains) {
+	if ($dom eq $domain_rule) {
+	    my $pbx_prefs = $cli-> GetAccountPrefs('pbx@' . $dom);
+	    if (!@$pbx_prefs{"AccountName"}) {
+		my $create_pbx = $cli->CreateAccount(accountName => 'pbx@' . $dom);
+		my $error_msg = $cli->getErrMessage();
+		unless ($cli->getErrMessage eq "OK") {
+		    $result->{"error_msg"} = $cli->getErrMessage;
+		    $cli->Logout();
+		    return $result;
+		}
+	    }
+	    # Set pbx rights
+	    my $prev_rights = $cli->GetAccountRights('pbx@' . $dom);
+	    my @new_rights = ('Domain', 'BasicSettings', 'CanCreateNamedTasks', 'CanAccessWebSites', 'CanCreateAliases', 'CanImpersonate');
 
-    my $rules = $cli->GetDomainSignalRules( $domain );
-    push @$rules, $enable_data;
-    $cli->SetDomainSignalRules($domain, $rules);
+	    my @merged = keys %{ { map { $_ => 1 } (@$prev_rights, @new_rights)} };
 
-    unless ($cli->getErrMessage eq "OK") {
-	$result->{"error_msg"} = $cli->getErrMessage;
-	$cli->Logout();
-	return $result;
+	    $cli->SetAccountRights('pbx@' . $dom , \@merged);  
+	    unless ($cli->getErrMessage eq "OK") {
+		$result->{"error_msg"} = $cli->getErrMessage;
+		$cli->Logout();
+		return $result;
+	    }
+	    # Set domain signal rules
+	    my $enable_data = [
+		"100010",
+		'ccIn_' . $dom,
+		[
+		 ['Method', 'is', 'INVITE'],
+		 ['RequestURI', 'is not', '*;fromCC=true']
+		],
+		[
+		 ['Redirect to', 'ccincoming#pbx'],
+		 ['Stop Processing'],
+		]
+		];
+
+	    my $rules = $cli->GetDomainSignalRules( $dom );
+	    push @$rules, $enable_data;
+	    $cli->SetDomainSignalRules($dom, $rules);
+	    
+	    unless ($cli->getErrMessage eq "OK") {
+		$result->{"error_msg"} = $cli->getErrMessage;
+		$cli->Logout();
+		return $result;
+	    }
+	}
     }
     $cli->Logout();
     return $result;
@@ -5533,16 +5543,19 @@ sub api2_CC_Disable {
     $result->{"error_msg"} = "OK";
     my $domain = $OPTS{'domain'};
     my $accounts = $cli->ListAccounts($domain);
-    # Remove accounts rights
-    foreach my $userName (sort keys %$accounts) {
-	$cli->SetAccountRights($userName . "\@$domain" , []);  
-    }
-    # Remove domain signal rule
-    my $rule_name = "ccIn_";
     my @domains = Cpanel::Email::listmaildomains();
-    my $newrules = [];
+
     for my $dom (@domains) {
 	if ($dom eq $domain) {
+	    # Remove accounts rights
+	    foreach my $userName (sort keys %$accounts) {
+		if ($userName ne "pbx") {
+		    $cli->SetAccountRights($userName . "\@$domain" , []);  
+		}
+	    }
+	    # Remove domain signal rule
+	    my $rule_name = "ccIn_";
+	    my $newrules = [];
 	    my $rules = $cli->GetDomainSignalRules( $domain );
 	    if (ref ($rules) eq 'ARRAY') {		
 		for my $r (@$rules) {
@@ -5552,13 +5565,12 @@ sub api2_CC_Disable {
 		}
 	    }
 	    $cli->SetDomainSignalRules($domain, $newrules);
-	    last;
+	    unless ($cli->getErrMessage eq "OK") {
+		$result->{"error_msg"} = $cli->getErrMessage;
+		$cli->Logout();
+		return $result;
+	    }
 	}
-    }
-    unless ($cli->getErrMessage eq "OK") {
-	$result->{"error_msg"} = $cli->getErrMessage;
-	$cli->Logout();
-	return $result;
     }
     $cli->Logout();
     return $result;
@@ -5569,6 +5581,9 @@ sub api2_CC_GetCCLimit {
     my $domain = $OPTS{'domain'};
     my $cli = getCLI();
     my $max = max_class_accounts($domain, "contact_center");
+    if (!$max) {
+	$max = 1;
+    }
     $cli->Logout();
     return $max;
 }
