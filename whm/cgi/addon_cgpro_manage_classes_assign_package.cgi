@@ -42,9 +42,9 @@ if ($FORM{'save'}) {
     for my $class (keys %{$defaults->{ServiceClasses}}) {
 	$data->{$FORM{'package'}}->{$class}->{'all'} = $FORM{$class . '-all'};
     }
+    $data->{$FORM{'package'}}->{'contact_center'}->{'all'} = $FORM{'contact_center'};
     Cpanel::CachedDataStore::store_ref( '/var/cpanel/cgpro/classes.yaml', $data );
 }
-
 
 Cpanel::Template::process_template(
 				   'whostmgr',

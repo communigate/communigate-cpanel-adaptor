@@ -1,0 +1,45 @@
+<table id="accounts_table" class="table table-striped">	
+  <colgroup>
+    <col width="50%" align="left">
+    <col width="50%" align="left">
+  </colgroup>
+  <thead>
+    <tr>
+      <th>Account</th>
+      <th>Functions</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% var is_result = false %>
+    <% for(var i=0; i<ACCOUNTS.length; i++) { %>
+       <% if (ACCOUNTS[i].data.AccessModes instanceof Array) {
+    	  var acc_modes_str = ACCOUNTS[i].data.AccessModes.join(",");
+    	  } else {
+    	  var acc_modes_str = ACCOUNTS[i].data.AccessModes;
+    	  } %>
+       <% if (ACCOUNTS[i]['domain'] == domain && ( acc_modes_str.indexOf("SIP") > -1 || acc_modes_str == "All") ) { %>
+    <% is_result = true; %>
+    <tr class="accRow">
+      <td><%= ACCOUNTS[i]['username'] + "@" + ACCOUNTS[i]['domain'] %>
+	<% if (ACCOUNTS[i].rights.join(",").indexOf("Domain") > -1 && ACCOUNTS[i].rights.join(",").indexOf("BasicSettings") > -1 && ACCOUNTS[i].rights.join(",").indexOf("PSTNSettings") > -1 && ACCOUNTS[i].rights.join(",").indexOf("CanCreateAccounts") > -1 && ACCOUNTS[i].rights.join(",").indexOf("CanCreateAliases") > -1 && ACCOUNTS[i].rights.join(",").indexOf("CanCreateNamedTasks") > -1 && ACCOUNTS[i].rights.join(",").indexOf("CanAccessWebSites") > -1) { %>
+	<% var is_admin = true; %>
+    	<span> (Administrator)</span>
+	<% } %>	 
+      </td>
+      <td>
+	<% if(is_admin) { %>
+	<a class="btn_unset_administrator">Unet as administrator</a><span id='loading_<%= ACCOUNTS[i]['username'] %>'></span>
+	<% } else { %>
+	<a class="btn_set_administrator">Set as administrator</a><span id='loading_<%= ACCOUNTS[i]['username'] %>'></span>
+	<% } %>
+      </td>
+    </tr>
+    <% } %>
+    <% if (is_result == false) { %>
+    <tr>
+      <td colspan="2">No accounts!</td>
+    </tr>
+    <% } %>
+    <% } %>
+  </tbody>
+</table>

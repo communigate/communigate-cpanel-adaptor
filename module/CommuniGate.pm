@@ -5450,6 +5450,219 @@ sub api2_UnsetAccountPSTN {
     return $result;
 }
 
+sub api2_CC_UpdateAdministrator {
+    my %OPTS = @_;
+    my $account = $OPTS{'account'};
+    my $action = $OPTS{'action'};
+    my $cli = getCLI();
+    my $error_msg = "OK";
+    if ($action eq "set") {
+	$cli->SetAccountRights($account , ['Domain', 'BasicSettings', 'PSTNSettings','CanCreateAccounts', 'CanCreateNamedTasks', 'CanAccessWebSites', 'CanCreateAliases']);  
+	$error_msg = $cli->getErrMessage();
+    }
+    if ($action eq "unset") {
+	$cli->SetAccountRights($account , []);  
+	$error_msg = $cli->getErrMessage();
+    }
+
+    $cli->Logout();
+    return $error_msg;
+}
+
+sub api2_CC_Status {
+    my %OPTS = @_;
+    my $domain = $OPTS{'domain'};
+    my $cli = getCLI();
+    my $result = {};
+    my $is_domain_rule = 0;
+    my @domains = Cpanel::Email::listmaildomains();
+    my $newrules = [];
+    # Check is there domain rule
+    $result->{"domain_rule"} = "";
+    for my $dom (@domains) {
+	if ($dom eq $domain) {
+	    $result->{"domain_rule"} = "";
+	    my $domain_rules = $cli->GetDomainSignalRules($domain);
+	    my $compare = "ccIn_" . $domain;
+	    if (ref ($domain_rules) eq 'ARRAY') {		
+		for my $rule (@$domain_rules) {
+		    if (ref ($rule) eq 'ARRAY' && $rule->[1] eq $compare) {
+			$is_domain_rule = 1;
+			$result->{"domain_rule"} = "OK";
+		    }
+		}
+		last;
+	    }
+	}
+    }
+    if ($is_domain_rule eq 1) {
+	$result->{"enabled"} = "YES";
+    } else {
+	$result->{"enabled"} = "NO";
+    }
+    $cli->Logout();
+    return $result;
+}
+
+sub api2_CC_CheckEnabled {
+    my %OPTS = @_;
+    my $cli = getCLI();
+    my $count_enabled = 0;
+    my $result = {};
+    my @domains = Cpanel::Email::listmaildomains();
+    # Check is there domain rule
+    for my $domain (@domains) {
+	my $domain_rules = $cli->GetDomainSignalRules($domain);
+	my $compare = "ccIn_" . $domain;
+	if (ref ($domain_rules) eq 'ARRAY') {		
+	    for my $rule (@$domain_rules) {
+		if (ref ($rule) eq 'ARRAY' && $rule->[1] eq $compare) {
+		    $count_enabled += 1;
+		}
+	    }
+	}
+    }
+    $result->{"enabled"} = $count_enabled;
+    $cli->Logout();
+    return $result;
+}
+
+sub api2_CC_Enable {
+    my %OPTS = @_;
+    my $cli = getCLI();
+    my $result = {};
+    $result->{"error_msg"} = "OK";
+    my $dom = $OPTS{'domain'};
+    my @domains = Cpanel::Email::listmaildomains();
+
+    my $max = max_class_accounts($dom, "contact_center");
+    if (!$max) {
+	$max = 1;
+    }
+    my $count_enabled = 0;
+    for my $domain (@domains) {
+	my $domain_rules = $cli->GetDomainSignalRules($domain);
+	my $compare = "ccIn_" . $domain;
+	if (ref ($domain_rules) eq 'ARRAY') {		
+	    for my $rule (@$domain_rules) {
+		if (ref ($rule) eq 'ARRAY' && $rule->[1] eq $compare) {
+		    $count_enabled += 1;
+		}
+	    }
+	}
+    }
+    if ($count_enabled >= $max) {
+	$result->{"error_msg"} = "Limit for this account is reached!";
+	$cli->Logout();
+	return $result;
+    }
+
+    # Create pbx account
+    for my $domain_rule (@domains) {
+	if ($dom eq $domain_rule) {
+	    my $pbx_prefs = $cli-> GetAccountPrefs('pbx@' . $dom);
+	    if (!@$pbx_prefs{"AccountName"}) {
+		my $create_pbx = $cli->CreateAccount(accountName => 'pbx@' . $dom);
+		my $error_msg = $cli->getErrMessage();
+		unless ($cli->getErrMessage eq "OK") {
+		    $result->{"error_msg"} = $cli->getErrMessage;
+		    $cli->Logout();
+		    return $result;
+		}
+	    }
+	    # Set pbx rights
+	    my $prev_rights = $cli->GetAccountRights('pbx@' . $dom);
+	    my @new_rights = ('Domain', 'BasicSettings', 'CanCreateNamedTasks', 'CanAccessWebSites', 'CanCreateAliases', 'CanImpersonate');
+
+	    my @merged = keys %{ { map { $_ => 1 } (@$prev_rights, @new_rights)} };
+
+	    $cli->SetAccountRights('pbx@' . $dom , \@merged);  
+	    unless ($cli->getErrMessage eq "OK") {
+		$result->{"error_msg"} = $cli->getErrMessage;
+		$cli->Logout();
+		return $result;
+	    }
+	    # Set domain signal rules
+	    my $enable_data = [
+		"100010",
+		'ccIn_' . $dom,
+		[
+		 ['Method', 'is', 'INVITE'],
+		 ['RequestURI', 'is not', '*;fromCC=true']
+		],
+		[
+		 ['Redirect to', 'ccincoming#pbx'],
+		 ['Stop Processing'],
+		]
+		];
+
+	    my $rules = $cli->GetDomainSignalRules( $dom );
+	    push @$rules, $enable_data;
+	    $cli->SetDomainSignalRules($dom, $rules);
+	    
+	    unless ($cli->getErrMessage eq "OK") {
+		$result->{"error_msg"} = $cli->getErrMessage;
+		$cli->Logout();
+		return $result;
+	    }
+	}
+    }
+    $cli->Logout();
+    return $result;
+}
+
+sub api2_CC_Disable {
+    my %OPTS = @_;
+    my $cli = getCLI();
+    my $result = {};
+    $result->{"error_msg"} = "OK";
+    my $domain = $OPTS{'domain'};
+    my $accounts = $cli->ListAccounts($domain);
+    my @domains = Cpanel::Email::listmaildomains();
+
+    for my $dom (@domains) {
+	if ($dom eq $domain) {
+	    # Remove accounts rights
+	    foreach my $userName (sort keys %$accounts) {
+		if ($userName ne "pbx") {
+		    $cli->SetAccountRights($userName . "\@$domain" , []);  
+		}
+	    }
+	    # Remove domain signal rule
+	    my $rule_name = "ccIn_";
+	    my $newrules = [];
+	    my $rules = $cli->GetDomainSignalRules( $domain );
+	    if (ref ($rules) eq 'ARRAY') {		
+		for my $r (@$rules) {
+		    if (ref ($r) eq 'ARRAY') {		
+			push @$newrules, $r unless $r->[1] eq $rule_name . $domain;
+		    }
+		}
+	    }
+	    $cli->SetDomainSignalRules($domain, $newrules);
+	    unless ($cli->getErrMessage eq "OK") {
+		$result->{"error_msg"} = $cli->getErrMessage;
+		$cli->Logout();
+		return $result;
+	    }
+	}
+    }
+    $cli->Logout();
+    return $result;
+}
+
+sub api2_CC_GetCCLimit {
+    my %OPTS = @_;
+    my $domain = $OPTS{'domain'};
+    my $cli = getCLI();
+    my $max = max_class_accounts($domain, "contact_center");
+    if (!$max) {
+	$max = 1;
+    }
+    $cli->Logout();
+    return $max;
+}
+
 sub api2_getCGProServer {
     my $cli = getCLI();
     my $loginData = $cli->{loginData};
