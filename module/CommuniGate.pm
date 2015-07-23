@@ -861,7 +861,7 @@ sub api2_AssignExtension {
   my %OPTS = @_;
   my @domains = Cpanel::Email::listmaildomains();
   my $cli = getCLI();
-
+  my $result = {};
   # my ($objType, $objAddress) = split ":", $OPTS{'account'};
   # $result->{"objType"} = $objType;
   # $result->{"objAddr"} = $objAddress;
