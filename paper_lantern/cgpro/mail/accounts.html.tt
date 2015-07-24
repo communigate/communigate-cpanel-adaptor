@@ -53,6 +53,7 @@
     page_stylesheets = ['css2-min/mail/pops.css']
 -%]
 
+<script type="text/javascript" src="js/ejs_production.js"></script>
 <script type="text/javascript">
 var MAX_EMAIL_QUOTA = [% execute("Email", "get_max_email_quota_mib").data.json() %];
 var DEFAULT_EMAIL_QUOTA = [% execute("Email", "get_default_email_quota_mib").data.json() %];
@@ -373,7 +374,8 @@ var DEFAULT_EMAIL_QUOTA = [% execute("Email", "get_default_email_quota_mib").dat
                 </div>
             </div>
         </div>
-        <div id="accounts_table" class="yui-skin-sam">	</div>
+        <div id="accounts_table_1" class="yui-skin-sam"></div>
+        <div id="accounts_table" class="yui-skin-sam"></div>
         <div id="menus_div"></div>
     </div>
 

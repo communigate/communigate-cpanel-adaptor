@@ -203,226 +203,11 @@ var show_no_accounts = function() {
 
 // destroy the current email table and build a new one from the ACCOUNTS variable
 var build_email_table = function() {
-    YAHOO.util.Dom.get("accounts_table").innerHTML = build_email_table_markup();
+    var html = new EJS({url: 'accounts_table.ejs'}).render();
+    $("#accounts_table").html(html);
     build_progress_bars();
 };
-
 // build the HTML markup for the new email table
-var build_email_table_markup = function() {
-    // set the initial row stripe
-    var row_toggle = 'rowA';
-
-    // loop through the email accounts and build the table
-    var html = '<table id="table_email_accts" class="table table-striped" border="0" cellspacing="0" cellpadding="0">';
-    html += '<thead>' + '<tr>' + '<th class="col0"> </th>' + '<th class="col1">Account</span></th>' + '<th class="col2"><span>Stats</span></th>' + '<th class="col4"><span>Type</span></th>' + '<th class="col3"><span class="col3span">References</span></th>';
-    html += '<colgroup>' + '<col>' + '<col width="30%">' + '<col width="9%">' + '<col width="10%">' + '<col width="53%">' + '</colgroup>';
-
-    for (var i = 0; i < ACCOUNTS.length; i++) {
-
-        // set the disk quota
-        if (ACCOUNTS[i]['_diskquota'] == 0 || ACCOUNTS[i]['quota'] == "unlimited") {
-            ACCOUNTS[i]['humandiskquota'] = "&infin;";
-        } else {
-            ACCOUNTS[i]['humandiskquota'] = ACCOUNTS[i]['quota'];
-        }
-
-        // convert diskused to an integer
-        ACCOUNTS[i]['used'] = parseInt(ACCOUNTS[i]['used']);
-
-        html += '<tr id="account_row_' + i + '" class="dt_info_row ' + row_toggle + '">';
-	html += '<td class="col0 dt-module" title="Change Avatar" onclick="toggle_action_div(null, {id:\'image_module_' + i + '\', index:' + i + ', action:\'image_crop\'})">';
-
-	if (ACCOUNTS[i]['vcard']
-	    && ACCOUNTS[i]['vcard']['fileData']
-	    && ACCOUNTS[i]['vcard']['fileData'][0]
-	    && ACCOUNTS[i]['vcard']['fileData'][0]['vCard']
-	    && ACCOUNTS[i]['vcard']['fileData'][0]['vCard'][0]
-	    && ACCOUNTS[i]['vcard']['fileData'][0]['vCard'][0]['PHOTO']
-	    && ACCOUNTS[i]['vcard']['fileData'][0]['vCard'][0]['PHOTO'][0]
-	    && ACCOUNTS[i]['vcard']['fileData'][0]['vCard'][0]['PHOTO'][0]['BINVAL']
-	    && ACCOUNTS[i]['vcard']['fileData'][0]['vCard'][0]['PHOTO'][0]['BINVAL'][0]) {
-	    var acc_photo = ACCOUNTS[i]['vcard']['fileData'][0]['vCard'][0]['PHOTO'][0]['BINVAL'][0];
-	    html += '<div class="img-div-rel"><img class="avatar" id="avatar_' + i + '" src="data:image/png;base64,' + acc_photo + '" alt="avatar" style="max-width: 48px; cursor: pointer;">' + '<span class="glyphicon glyphicon-edit glyph-edit"></span>' + '</img></div>';
-	} else {
-	    html += '<div class="img-div-rel"><img class="avatar" id="avatar_' + i + '">' + '<span class="glyphicon glyphicon-user avatar_span" id="span_avatar_' + i + '"></span>' + '<span class="glyphicon glyphicon-edit glyph-edit"></span>' + '</img></div>';
-	}
-	
-	html += '</td>';
-        html += '<td class="col1">';
-	if (ACCOUNTS[i]['prefs']['RealName']){
-	html += '<span style="display: block" class="realname_acc" id="realname_' + i + '">' + ACCOUNTS[i]['prefs']['RealName'] + '</span>';
-	} else {
-	html += '<span class="realname_acc" id="realname_' + i + '">' + '</span>';
-	}
-	html += ACCOUNTS[i]['prefs']['AccountName'] + '<br>';
-	for (var num in ACCOUNTS[i]['prefs']['assignedTelnums']) {
-	    if (ACCOUNTS[i]['prefs']['assignedTelnums'].hasOwnProperty(num)){
-		if (ACCOUNTS[i]['prefs']['assignedTelnums'][num]['assigned'] && ACCOUNTS[i]['prefs']['assignedTelnums'][num]['assigned'] == ("a:" + ACCOUNTS[i]['prefs']['AccountName'])) {
-		html += '<span class="glyphicon glyphicon-earphone glyphtel">' + '<span class="telnum">' + num + '</span>' + '</span>';
-		}
-	    }
-        }
-	html += '</td>';
-	if (ACCOUNTS[i]['humandiskquota'] == 0){
-	    var diskquota_acc = " ∞ ";
-	}
-	else{
-	    var diskquota_acc = ACCOUNTS[i]['humandiskquota'];
-	}
-        html += '<td class="col2">' + ACCOUNTS[i]['used'] + '<input type="hidden" id="diskused_' + i + '" value="' + ACCOUNTS[i]['used'] + '" /> / <span id="quota_' + i + '">' + diskquota_acc + '</span> <span class="megabyte_font">MB</span><br />';
-        html += '<div class="table_progress_bar" id="usage_bar_' + i + '">';
-        html += '<div class="progress">';
-        html += '<div class="progress-bar" role="progressbar" style="width: 0%;">';
-        html += '<span class="sr-only">0%</span>';
-        html += '</div>';
-        html += '</div>';
-        html += '</div>';
-	html += '<span class="glyphicon glyphicon-envelope" style="margin-top: 10px;" title="Sent"></span>' + ' ';
-	if (ACCOUNTS[i]['stats']['MessagesSent']){
-	    var sent = ACCOUNTS[i]['stats']['MessagesSent'].substring(1);
-	    html += sent + ' / ';
-	}
-	else {
-	    html += 0 + ' / ';
-
-	}
-	html += '<span class="glyphicon glyphicon-inbox" style="margin-top: 10px;" title="Received"></span>' + ' ';
-	if (ACCOUNTS[i]['stats']['MessagesReceived']){
-	    var received = ACCOUNTS[i]['stats']['MessagesReceived'].substring(1);
-	    html += received;
-	}
-	else {
-	    html += 0;
-	}
-	html += '</span>' + '</td>';
-      	html += '<td class="col4" style="white-space: nowrap; text-align: center;">';
-	var acc_class = ACCOUNTS[i]['class'];
-	
-	var acc_modes = CLASSES[acc_class]['AccessModes'];
-	var acc_modes_mail = "";
-	var acc_modes_xmpp = "";
-	var acc_modes_sip = "";
-	var acc_modes_webcal = "";
-	if (acc_modes.indexOf('Mail') > -1 || acc_modes == "All"){
-	    acc_modes_mail = "color: #000000;";
-	}
-	else {
-	    acc_modes_mail = "color: #aaaaaa;";
-	}
-	if (acc_modes.indexOf('XMPP') > -1 || acc_modes == "All"){
-	    acc_modes_xmpp = "color: #000000;";
-	}
-	else {
-	    acc_modes_xmpp = "color: #aaaaaa;";
-	}
-	if (acc_modes.indexOf('SIP') > -1 || acc_modes == "All"){
-	    acc_modes_sip = "color: #000000;";
-	}
-	else {
-	    acc_modes_sip = "color: #aaaaaa;";
-	}
-	if (acc_modes.indexOf('WebCAL') > -1 || acc_modes == "All"){
-	    acc_modes_webcal = "color: #000000;";
-	}
-	else {
-	    acc_modes_webcal = "color: #aaaaaa;";
-	}
-	html += '<span id="acc_type_' + i + '" onclick="toggle_action_div(null, {id:\'change_type_module_' + i + '\', index:' + i + ', action:\'change_type\'})">' + ACCOUNTS[i]['class'] + '</span>' + '<br>';
-	html += '<span id="icon_envelope_' + i + '" class="glyphmargin glyphicon glyphicon-envelope" onclick="toggle_action_div(null, {id:\'change_type_module_' + i + '\', index:' + i + ', action:\'change_type\'})" title="Mail" style="' + acc_modes_mail + '"></span>';
-	html += '<span id="icon_comment_' + i + '" class="glyphmargin glyphicon glyphicon-comment" onclick="toggle_action_div(null, {id:\'change_type_module_' + i + '\', index:' + i + ', action:\'change_type\'})" title="Chat/Jabber/XMPP" style="' + acc_modes_xmpp + '"></span>';
-	html += '<span id="icon_phone_' + i + '" class="glyphmargin glyphicon glyphicon-phone" onclick="toggle_action_div(null, {id:\'change_type_module_' + i + '\', index:' + i + ', action:\'change_type\'})" title="SIP (Internet calls)" style="' + acc_modes_sip + '"></span>';
-	html += '<span id="icon_calendar_' + i + '" class="glyphicon glyphicon-calendar" onclick="toggle_action_div(null, {id:\'change_type_module_' + i + '\', index:' + i + ', action:\'change_type\'})" title="Calendar" style="' + acc_modes_webcal + '"></span>';
-	html += '</td>';
-        html += '<td class="col3">';
-        html += '<table class="table_email_accts_actions" bnorder="0" cellspacing="0" cellpadding="0"><tr>';
-        // html += '<td><span class="btn btn-link" onclick="toggle_action_div(null, {id:\'show_details_module_' + i + '\', index:' + i + ', action:\'show_details\'})">' + '<span class="glyphicon glyphicon-tasks"></span>' + ' Details' + '</span></td>';
-        html += '<td><span class="btn btn-link" onclick="toggle_action_div(null, {id:\'change_password_module_' + i + '\', index:' + i + ', action:\'change_password\'})">' + '<span class="fa fa-key fa-lg"></span>' + " Password" + '</span></td>';
-        html += '<td><span class="btn btn-link" onclick="toggle_action_div(null, {id:\'change_quota_module_' + i + '\', index:' + i + ', action:\'change_quota\'})">' + '<span class="glyphicon glyphicon-cog"></span>' + ' Details' + '</span></td>';
-        html += '<td><span class="btn btn-link" onclick="toggle_action_div(null, {id:\'change_type_module_' + i + '\', index:' + i + ', action:\'change_type\'})">' + '<span class="glyphicon glyphicon-list"></span>' + ' Plan' + '</span></td>';
-        html += '<td><span class="btn btn-link" onclick="toggle_action_div(null, {id:\'delete_module_' + i + '\', index:' + i + ', action:\'delete\'})">' + '<span class="glyphicon glyphicon-trash"></span>' + " " + LANG.delete2 + '</span></td>';
-        html += '<td><div class="btn-group">';
-        html += '<button id="email_table_menu_button_' + i + '" class="btn btn-default dropdown-toggle" data-toggle="dropdown" type="button">More<span class="caret"><span></button>';
-        html += '<ul class="dropdown-menu" role="menu">';
-	if (acc_modes.indexOf('SIP') > -1 || acc_modes == "All"){
-	    html += '<li id="li_extensions_' + i + '"><a class="btn btn-link" href="../extensions.html" target="_blank">' + '<span class="btn btn-link">' + '<span class="glyphicon glyphicon-earphone"></span>' + " Extensions" + '</span>' + '</a></li>';
-	} else {
-	    	    html += '<li style="display: none;" id="li_extensions_' + i + '"><a class="btn btn-link" href="../extensions.html" target="_blank">' + '<span class="btn btn-link">' + '<span class="glyphicon glyphicon-earphone"></span>' + " Extensions" + '</span>' + '</a></li>';
-	}
-
-	html += '<li><a class="btn btn-link"><span class="btn btn-link" onclick="toggle_action_div(null, {id:\'airsync_module_' + i + '\', index:' + i + ', action:\'airsync\'})">' + '<span class="glyphicon glyphicon-transfer"></span>' + '<span class="glyphicon glyphicon-phone"></span>' + ' ActiveSync&trade;' + '</span></a></li>';
-	
-        html += '</ul>';
-        html += '</div></td>';
-        html += '</tr></table>';
-        html += '</td>';
-        html += '</tr>';
-
-        html += '<tr id="dt_module_row_' + i + '" class="' + row_toggle + ' action-row" style="border: none;"><td colspan="5">';
-        html += '<div id="show_details_module_' + i + '" class="dt_module" style="display: none; margin-left: 0;"></div>';
-        html += '<div id="change_password_module_' + i + '" class="dt_module" style="display: none"></div>';
-        html += '<div id="change_quota_module_' + i + '" class="dt_module" style="display: none"></div>';
-        html += '<div id="airsync_module_' + i + '" class="dt_module" style="display: none"></div>';
-        html += '<div id="change_type_module_' + i + '" class="dt_module" style="display: none"></div>';
-        html += '<div id="delete_module_' + i + '" class="dt_module" style="display: none"></div>';
-        html += '<div id="image_module_' + i + '" class="dt_module" style="display: none"></div>';
-        html += '<div id="status_bar_' + i + '" class="cjt_status_bar"></div>';
-        html += '</td></tr>';
-
-        // alternate row stripes
-        if (row_toggle === 'rowA') row_toggle = 'rowB';
-        else row_toggle = 'rowA';
-    }
-    html += '</table>';
-
-    // pagination
-    html += '<div id="pagination">';
-    if (PAGE_DATA.total_pages > 1) {
-        // page numbers
-        var ellipsis1 = 0;
-        var ellipsis2 = 0;
-        html += '<div id="pagination_pages">';
-        for (var i = 1; i <= PAGE_DATA.total_pages; i++) {
-            // bold the current page
-            if (i == PAGE_DATA.current_page) {
-                html += ' <span id="email_table_page_' + i + '" class="email_table_current_page">' + i + '</span> ';
-            }
-            // always show page 1 and the last page
-            else if (i == 1 || i == PAGE_DATA.total_pages) {
-                html += ' <span class="email_table_page" onclick="change_page(' + i + ')">' + i + '</span> ';
-            }
-            // show ellipsis for any pages less than 3 away
-            else if (i < PAGE_DATA.current_page - 2) {
-                if (ellipsis1 == 0) {
-                    html += '...';
-                    ellipsis1 = 1;
-                }
-            }
-            // show ellipsis for any pages more than 3 away
-            else if (i > PAGE_DATA.current_page + 2) {
-                if (ellipsis2 == 0) {
-                    html += '...';
-                    ellipsis2 = 1;
-                }
-            } else {
-                html += ' <span onclick="change_page(' + i + ')" class="email_table_page">' + i + '</span> ';
-            }
-        }
-        html += '</div>';
-
-        // prev / next buttons
-        html += '<div id="pagination_links">';
-        if (PAGE_DATA.current_page != 1) {
-            html += '<span onclick="change_page(' + (PAGE_DATA.current_page - 1) + ')" class="email_table_prev_page">&larr; ' + LANG.prev + '</span> ';
-        }
-        if (PAGE_DATA.current_page != PAGE_DATA.total_pages) {
-            html += ' <span onclick="change_page(' + (PAGE_DATA.current_page + 1) + ')" class="email_table_next_page">' + LANG.next + ' &rarr;</span>';
-        }
-        html += '</div>';
-    }
-    html += '</div>'; // close pagination_pages div
-
-    return html;
-};
 // add event handlers for the new email table
 var build_progress_bars = function() {
     for (var i = 0; i < ACCOUNTS.length; i++) {
@@ -919,6 +704,25 @@ var change_quota = function(index) {
     var mobile = YAHOO.util.Dom.get("mobile_phone_input_" + index).value;
     var workphone = YAHOO.util.Dom.get("work_phone_input_" + index).value;
 
+    // 	<?cp Email::editquota() 
+    // email=$FORM{'email'},
+    // domain=$FORM{'domain'},
+    // quota=$FORM{'quota'},
+    // realaname=$FORM{'realname'},
+    // WorkDays=$FORM{'WorkDays'},
+    // WorkDays-0=$FORM{'WorkDays-0'},
+    // WorkDays-1=$FORM{'WorkDays-1'},
+    // WorkDays-2=$FORM{'WorkDays-2'},
+    // WorkDays-3=$FORM{'WorkDays-3'},
+    // WorkDays-4=$FORM{'WorkDays-4'},
+    // WorkDays-5=$FORM{'WorkDays-5'},
+    // unit=$FORM{'unit'},
+    // mobile=$FORM{'mobile'},
+    // workphone=$FORM{'workphone'},
+    // PasswordComplexity=$FORM{'PasswordComplexity'},
+    // extension=$FORM{'extension'},
+    // local_extension=$FORM{'local_extension'} ?>
+
     // create the API variables
     var api2_call = {
         "cpanel_jsonapi_version": 2,
@@ -932,40 +736,48 @@ var change_quota = function(index) {
 	"mobile": mobile,
 	"workphone": workphone
     };
-
+    
+    var WorkDays_Sun;
     if (YAHOO.util.Dom.get("WorkDays-Sun_" + index).checked){
-    var WorkDays_Sun = YAHOO.util.Dom.get("WorkDays-Sun_" + index).value;
+    WorkDays_Sun = YAHOO.util.Dom.get("WorkDays-Sun_" + index).value;
+    }
     api2_call['WorkDays'] = WorkDays_Sun;
-    }
+    var WorkDays_Mon;
     if (YAHOO.util.Dom.get("WorkDays-Mon_" + index).checked){
-    var WorkDays_Mon = YAHOO.util.Dom.get("WorkDays-Mon_" + index).value;
-    api2_call['WorkDays-0'] = WorkDays_Mon;
+    WorkDays_Mon = YAHOO.util.Dom.get("WorkDays-Mon_" + index).value;
     } 
+    api2_call['WorkDays-0'] = WorkDays_Mon;
+    var WorkDays_Tue;
     if (YAHOO.util.Dom.get("WorkDays-Tue_" + index).checked){
-    var WorkDays_Tue = YAHOO.util.Dom.get("WorkDays-Tue_" + index).value;
+    WorkDays_Tue = YAHOO.util.Dom.get("WorkDays-Tue_" + index).value;
+    }
     api2_call['WorkDays-1'] = WorkDays_Tue;
-    }
+    var WorkDays_Wed;
     if (YAHOO.util.Dom.get("WorkDays-Wed_" + index).checked){
-    var WorkDays_Wed = YAHOO.util.Dom.get("WorkDays-Wed_" + index).value;
+    WorkDays_Wed = YAHOO.util.Dom.get("WorkDays-Wed_" + index).value;
+    }
     api2_call['WorkDays-2'] = WorkDays_Wed;
-    }
+    var WorkDays_Thu;
     if (YAHOO.util.Dom.get("WorkDays-Thu_" + index).checked){
-    var WorkDays_Thu = YAHOO.util.Dom.get("WorkDays-Thu_" + index).value;
+    WorkDays_Thu = YAHOO.util.Dom.get("WorkDays-Thu_" + index).value;
+    }
     api2_call['WorkDays-3'] = WorkDays_Thu;
-    }
+    var WorkDays_Fri;
     if (YAHOO.util.Dom.get("WorkDays-Fri_" + index).checked){
-    var WorkDays_Fri = YAHOO.util.Dom.get("WorkDays-Fri_" + index).value;
+    WorkDays_Fri = YAHOO.util.Dom.get("WorkDays-Fri_" + index).value;
+    }
     api2_call['WorkDays-4'] = WorkDays_Fri;
-    }
+    var WorkDays_Sat;
     if (YAHOO.util.Dom.get("WorkDays-Sat_" + index).checked){
-    var WorkDays_Sat = YAHOO.util.Dom.get("WorkDays-Sat_" + index).value;
-    api2_call['WorkDays-5'] = WorkDays_Sat;
+    WorkDays_Sat = YAHOO.util.Dom.get("WorkDays-Sat_" + index).value;
     }
+    api2_call['WorkDays-5'] = WorkDays_Sat;
     var PasswordComplexity = YAHOO.util.Dom.get("complex_pass_input_" + index).value;
     if (YAHOO.util.Dom.get("complex_pass_input_" + index).checked){
-    api2_call['PasswordComplexity'] = PasswordComplexity;
     }    
-
+    api2_call['PasswordComplexity'] = PasswordComplexity;
+    
+    console.log(api2_call);
 
     // callback functions
     var callback = {
