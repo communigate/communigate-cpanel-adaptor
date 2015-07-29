@@ -8,9 +8,21 @@ SET mail_groups = Api2.exec("CommuniGate", "ListGroups", {
 %]
 
 [% WRAPPER '_assets/master.html.tt'
+page_scripts = ['sharedjs/handlebars_optimized.js', 'cgpro/groups/js/groups.js']
 app_key = 'cgpro_groupmail'
 -%]
 
+<style>
+  table tbody .module_row td {
+  padding: 0;
+  border: 0;
+  }
+
+  table > tbody > .group_row > td {
+  margin-top: -1px !important;
+  }
+</style>
+<script src="js/ejs_production.js"></script>
 <div class="body-content">
   [% IF CPANEL.feature('cgpro_groupmail') %]
   <div class="section">
@@ -26,7 +38,6 @@ app_key = 'cgpro_groupmail'
 	  <div id="realname_error" class="col-xs-12 col-sm-6 col-md-6 col-lg-6"></div>	  
 	</div>
       </div>
-
 
       <div class="form-group">
 	<label for="email">Group Email Address: </label>
@@ -54,24 +65,10 @@ app_key = 'cgpro_groupmail'
 	</div>
       </div>
 
-
-      <!-- <div class="form-group"> -->
-      <!-- 	<label>[% locale.maketext("Users allowed to post messages to this group:") %]</label> -->
-      <!-- 	<div class="row"> -->
-      <!-- 	  <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6"> -->
-      <!-- 	    <select name="spectre" id="spectre" class="form-control"> -->
-      <!-- 	      <option value="0">Private-Members of this group only</option> -->
-      <!-- 	      <option value="1">Public-Anyone</option> -->
-      <!-- 	    </select>	     -->
-      <!-- 	  </div> -->
-      <!-- 	</div> -->
-      <!-- </div> -->
-
       <div class="form-group">
 	<input type="submit" id="submit" value="Create Group" class="btn btn-primary" />
       </div>
     </form>
-
 
     <h2>Current groups</h2>
 
@@ -93,36 +90,147 @@ app_key = 'cgpro_groupmail'
 	</tr>
 	[% END %]
 	[% FOREACH group IN mail_groups %]
-	<tr>
+	<tr id="group_row_[% loop.count %]" class="group_row">
 	  <td class="truncate nobrd-left">
 	    [% group.list.html() %]
 	  </td>
 	  <td class="truncate sorttable_nosort">
-	    <a href="dodelgroup.html?email=[% group.list %]" class="btn btn-link">
-	      <span class="glyphicon glyphicon-trash"></span>
-	      [% locale.maketext("Delete") %]
-	    </a>
-
-	    <a href="dorenamegroup.html?email=[% group.list %]&domain=[% group.domain %]" class="btn btn-link">
-	      <span class="glyphicon glyphicon-edit"></span>
-	      [% locale.maketext("Rename") %]
-	    </a>
-	    
-	    <a href="groupsettings.html?email=[% group.list %]" class="btn btn-link">
-	      <span class="glyphicon glyphicon-cog"></span>
-	      [% locale.maketext("Settings") %]
-	    </a>
-
-	    <a href="groupmembers.html?listname=[% group.list %]" class="btn btn-link">
-	      <span class="glyphicon glyphicon-user"></span>
-	      [% locale.maketext("Group Members") %]
-	    </a>
-
+	    <span class="btn btn-link" onclick="toggle_action_div(null, {id:'delete_module_[% loop.count %]', index: '[% loop.count %]', group: '[% group.list.html() %]', action:'delete'})">
+	      <span class="glyphicon glyphicon-trash"></span> Delete</span>
+	    <span class="btn btn-link" onclick="toggle_action_div(null, {id:'rename_module_[% loop.count %]', index: '[% loop.count %]', group: '[% group.list.html() %]', action:'rename'})">
+	      <span class="glyphicon glyphicon-pencil"></span> Rename</span>
+	    <span class="btn btn-link" onclick="toggle_action_div(null, {id:'settings_module_[% loop.count %]', index: '[% loop.count %]', group: '[% group.list.html() %]', action:'settings'})">
+	      <span class="glyphicon glyphicon-cog"></span> Settings</span>
+	    <span class="btn btn-link" onclick="toggle_action_div(null, {id:'group_members_module_[% loop.count %]', index: '[% loop.count %]', group: '[% group.list.html() %]', action:'group_members'})">
+	      <span class="glyphicon glyphicon-user"></span> Group members</span>
+	  </td>
+	</tr>
+	<tr id="module_row_[% loop.count %]" class="module_row">
+	  <td colspan="2">
+	    <div id="delete_module_[% loop.count %]" class="dt_module" style="display: none"></div>
+    	    <div id="rename_module_[% loop.count %]" class="dt_module" style="display: none"></div>
+    	    <div id="settings_module_[% loop.count %]" class="dt_module" style="display: none"></div>
+    	    <div id="group_members_module_[% loop.count %]" class="dt_module" style="display: none"></div>
+	    <div id="settings_status_[% loop.count %]"></div>
+	    <div id="members_status_[% loop.count %]"></div>
 	  </td>
 	</tr>
 	[% END %]
       </tbody>
     </table>
+    
+    <script id="delete_template" type="text/x-handlebars-template">
+      <div class="section"> 
+	<p>
+	  [% locale.maketext("Do you really want to delete group “{{group}}”?") %]</p>
+	<div class="form-group">
+	  <input id="group_{{index}}" type="hidden" value="{{group}}">
+	  <button id="delete_{{index}}" class="btn btn-primary">[% locale.maketext("Delete group") %]</button>
+	  <button class="btn btn-link" id="btn_cancel_{{index}}" onclick="toggle_action_div(null, {id:'delete_module_{{index}}', index: '{{index}}', group: '{{group}}', action:'delete'})">[% locale.maketext("Cancel") %]</button>
+	</div>
+      </div>
+      <div id="delete_status_{{index}}"></div>
+      <div id="status_bar_{{index}}"></div>
+    </script>
+
+    <script id="rename_template" type="text/x-handlebars-template">
+      <div class="section">
+	<div class="form-group">
+	  <label for="rename">[% locale.maketext("New Group Name:") %]</label>
+	  <div class="row form-group">
+	    <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	      <div class="input-group">
+		<input type="text" name="newname_{{index}}" id="newname_{{index}}" class="form-control col-xs-2"/>
+		<span class="input-group-addon">@[% RAW_FORM.item("domain") %]</span>
+	      </div>
+	    </div>
+	    <div id="newname_{{index}}_error" class="col-xs-12 col-sm-6 col-md-6 col-lg-6"></div>	  
+	  </div>
+	  <div class="form-group">
+	    <button id="rename_{{index}}" class="btn btn-primary">Rename</button>
+	    <button class="btn btn-link" id="btn_cancel_{{index}}" onclick="toggle_action_div(null, {id:'rename_module_{{index}}', index: '{{index}}', group: '{{group}}', action:'rename'})">[% locale.maketext("Cancel") %]</button>
+	  </div>
+	</div>
+      </div>
+      <div id="rename_status_{{index}}"></div>
+      <div id="status_bar_{{index}}"></div>
+    </script>
+
+    <script id="settings_template" type="text/x-handlebars-template">
+	<input type="hidden" name="SubmitMLSettings" value="true">
+	<input type="hidden" name="email" value="[% FORM.email %]">
+	<div class="form-group">
+	  <label for="realname">[% locale.maketext("Group Name:") %]</label>
+	  <div class="row">
+	    <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	      <input type="text" name="RealName" id="RealName" class="form-control col-xs-2" value="{{RealName}}"/>
+	    </div>
+	    <div id="RealName_error" class="col-xs-12 col-sm-6 col-md-6 col-lg-6"></div>	  
+	  </div>
+	</div>
+	<div class="form-group">
+	  <div class="checkbox">
+	    <input type="checkbox" name="RemoveToAndCc"  id="RemoveToAndCc" value="1" {{RemoveToAndCc}}>
+	    <label for="RemoveToAndCc">Remove To and Cc from Distribution</label>
+	  </div>
+	</div>
+	<div class="form-group">
+	  <div class="checkbox">
+	    <input type="checkbox" name="Expand" id="Expand" value="1" {{Expand}}>
+	    <label for="Expand">Expand Group Members</label>
+	  </div>
+	</div>
+	<div class="form-group">
+	  <div class="checkbox">
+	    <input type="checkbox" name="FinalDelivery" id="FinalDelivery" value="1" {{FinalDelivery}}>
+	    <label for="FinalDelivery">Report Delivery to Group</label>
+	  </div>
+	</div>
+	<div class="form-group">
+	  <div class="checkbox">
+	    <input type="checkbox" name="RejectAutomatic" id="RejectAutomatic" value="1" {{RejectAutomatic}}>
+	    <label for="RejectAutomatic">Reject Automatic Messages</label>
+	  </div>
+	</div>
+	<div class="form-group">
+	  <div class="checkbox">
+	    <input type="checkbox" name="RemoveAuthor" id="RemoveAuthor" value="1" {{RemoveAuthor}}>
+	    <label for="RemoveAuthor">Remove Author from Distribution</label>
+	  </div>
+	</div>
+	<div class="form-group">
+	  <div class="checkbox">
+	    <input type="checkbox" name="SetReplyTo" id="SetReplyTo" value="1" {{SetReplyTo}}>
+	    <label for="SetReplyTo">Set Reply-To Group</label>
+	  </div>
+	</div>
+	<div class="form-group">
+	  <div class="checkbox">
+	    <input type="checkbox" name="SignalDisabled" id="SignalDisabled" value="1" {{SignalDisabled}}>
+	    <label for="SignalDisabled">Signalling Enabled</label>
+	  </div>
+	</div>
+	<div class="form-group">
+	  <button id="settings_{{index}}" class="btn btn-primary">Save</button>
+	  <button class="btn btn-link" id="btn_cancel_{{index}}" onclick="toggle_action_div(null, {id:'settings_module_{{index}}', index: '{{index}}', group: '{{group}}', action:'settings'})">[% locale.maketext("Cancel") %]</button>
+	</div>
+	<div id="status_bar_{{index}}"></div>
+
+    <div id="err_msg_wrap" class="alert alert-danger" style="display: none;">
+      <span class="glyphicon glyphicon-remove-sign"></span>
+      <div id="err_msg" class="alert-message">
+      </div>
+    </div>
+    <div id="scc_msg_wrap" class="alert alert-success" style="display: none;">
+      <span class="glyphicon glyphicon-ok-sign"></span>
+      <div id="scc_msg" class="alert-message">
+      </div>
+    </div>
+    </script>
+
+    <script id="group_members_template" type="text/x-handlebars-template">
+      <div id="members_wrap"></div>
+    </script>
   </div>
 <script type="text/javascript">
 var name_validator = new CPANEL.validate.validator("[% locale.maketext("Group Name") %]");

@@ -2643,7 +2643,6 @@ sub api2_SetGroupSettings {
         @$Settings{'SignalDisabled'}=($OPTS{'SignalDisabled'}?'NO':'YES');;
         $cli->SetGroup($email,$Settings);
         my $error_msg = $cli->getErrMessage();
-        my @result;
         unless ($error_msg eq "OK") {
 	    $Cpanel::CPERROR{'CommuniGate'} = $error_msg;
         }
@@ -2655,7 +2654,7 @@ sub api2_SetGroupSettings {
         #         SetGroupInternal($email);
         # }
 	$cli->Logout();
-        return @result;
+        return $error_msg;
 }
 sub api2_SetDepartmentSettings {
         my %OPTS = @_;

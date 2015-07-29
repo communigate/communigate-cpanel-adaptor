@@ -1,0 +1,59 @@
+<% var members_str = ""; %>
+<% for(var i=0; i < members.length; i++) { %>
+   <% members_str += members[i]['subemail']; %>
+   <% } %> 
+   
+<div class="section">
+  <div class="form-group">
+    <label for="realname">Email Addresses</label>
+    <div class="row">
+      <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">	  
+	<select id="account_<%= obj.index %>" name="account" class="form-control">
+	  <% for(var account in accounts) { %>
+	     <% if (!(members_str.indexOf(account) > -1)) { %>
+	     <option value="<%= account %>"><%= account %></option>
+	     <% } %>
+	     <% } %>
+	</select>
+      </div>
+    </div>
+  </div>
+  <div class="form-group">
+    <button name="" id="add_member_btn_<%= obj.index %>" value="Add Member" class="btn btn-primary add_member">Add Member</button>
+    <span id="add_member_status_<%= obj.index %>" style="line-height: 35px;"></span>
+  </div>
+  
+  <table class="sortable truncate-table table">
+    <thead>
+      <tr>
+	<th class="clickable">Email Address</th>
+	<th class="clickable sorttable_nosort" colspan="4">Functions</th>
+      </tr>
+    </thead>
+    <colgroup>
+      <col width="40%">
+      <col width="60%">
+    </colgroup>
+    
+    <tbody id="members_table_<%= obj.index %>">
+    <% if (members.length > 0) { %>
+      <% for(var i=0; i < members.length; i++) { %>
+	 <tr id="member_row_<%= i %>" style="padding: 5px;">
+	   <td class="truncate nobrd-left" style="padding: 5px;">
+	     <%= members[i]['subemail'] %>
+	   </td>
+	   <td class="truncate sorttable_nosort" style="padding: 5px;">
+	     <button id="<%= i %>" value="<%= members[i]['subemail'] %>" class="btn btn-primary remove-btn" >Remove</button>
+	     <span id="members_status_row_<%= i %>" style="line-height: 35px;"></span>
+	   </td>
+	 </tr>
+	 <% } %>
+    <% } else { %>
+      <tr id="no_members"> 
+	<td class="truncate nobrd-left">Currently there are no group members</td>
+	<td class="truncate nobrd-left"></td>
+      </tr>
+    <% } %>
+    </tbody>
+  </table>
+</div>
