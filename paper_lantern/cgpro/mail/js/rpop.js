@@ -76,8 +76,8 @@ var after_hide_module = function(o) {
     }
     if (o.action == 'edit') {
 	$("#rename_" + o.index).unbind("click");
-	$("#scc_msg_wrap").hide();
-	$("#err_msg_wrap").hide();
+	$("#scc_msg_wrap_" + o.index).hide();
+	$("#err_msg_wrap_" + o.index).hide();
     }
 };
 
@@ -207,11 +207,11 @@ var set_rpop = function(obj) {
     	data = data.cpanelresult.data;
 	$("#edit_status_" + obj.index).html("");
 	if (data[0]['account']) {
-	    $("#scc_msg_wrap").show();
-	    $("#scc_msg").html("Settings were successfully saved.");
+	    $("#scc_msg_wrap_" + obj.index).show();
+	    $("#scc_msg_" + obj.index).html("Settings were successfully saved.");
 	} else {
-	    $("#err_msg_wrap").show();
-	    $("#err_msg").html("Error!");
+	    $("#err_msg_wrap_" + obj.index).show();
+	    $("#err_msg_" + obj.index).html("Error!");
 	}
     };
 

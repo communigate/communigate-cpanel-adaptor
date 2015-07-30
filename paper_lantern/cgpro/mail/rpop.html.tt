@@ -238,14 +238,14 @@ app_key = 'cgpro_rpop'
     <button id="submit_{{index}}" class="btn btn-primary" value="Save" name="save">Save</button>
   </div>
   <div id="status_bar_{{index}}"></div>
-  <div id="err_msg_wrap" class="alert alert-danger" style="display: none;">
+  <div id="err_msg_wrap_{{index}}" class="alert alert-danger" style="display: none;">
     <span class="glyphicon glyphicon-remove-sign"></span>
-    <div id="err_msg" class="alert-message">
+    <div id="err_msg_{{index}}" class="alert-message">
     </div>
   </div>
-  <div id="scc_msg_wrap" class="alert alert-success" style="display: none;">
+  <div id="scc_msg_wrap_{{index}}" class="alert alert-success" style="display: none;">
     <span class="glyphicon glyphicon-ok-sign"></span>
-    <div id="scc_msg" class="alert-message">
+    <div id="scc_msg_{{index}}" class="alert-message">
     </div>
   </div>
 </script>
