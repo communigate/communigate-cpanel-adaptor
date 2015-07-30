@@ -14,9 +14,21 @@ SET departments = Api2.exec("CommuniGate", "ListDepartments", {
 %]
 
 [% WRAPPER '_assets/master.html.tt'
+page_scripts = ['sharedjs/handlebars_optimized.js', 'cgpro/departments/js/groups.js'],
 app_key = 'cgpro_departments'
 -%]
 
+<script src="js/ejs_production.js"></script>
+<style>
+  table tbody .module_row td {
+  padding: 0;
+  border: 0;
+  }
+
+  table > tbody > .group_row > td {
+  margin-top: -1px !important;
+  }
+</style>
 <div class="body-content">
   [% IF CPANEL.feature('cgpro_departments') %]
   <h3>Add Department Member</h3>
@@ -104,17 +116,119 @@ app_key = 'cgpro_departments'
       <td colspan="5">Currently there aren't any departments!</td>
       [% ELSE %]
       [% FOREACH department IN departments %]
-      <tr>
+      <tr id="group_row_[% loop.count %]" class="group_row">
 	<td>[% department.list %]</td>
-	<td><a href="dodelgroup.html?email=[% department.list %]&domain=[% department.domain %]"><span class="glyphicon glyphicon-trash"></span> Delete</a></td>
-	<td><a href="dorenamegroup.html?email=[% department.list %]&domain=[% department.domain %]"><span class="glyphicon glyphicon-pencil"></span> Rename</a></td>
-	<td><a href="groupsettings.html?email=[% department.list %]&domain=[% department.domain %]"><span class="glyphicon glyphicon-cog"></span> Settings</a></td>
-	<td><a href="groupmembers.html?listname=[% department.list %]"><span class="glyphicon glyphicon-user"></span> Department Members</a></td>
+	<td>
+	  <span class="btn btn-link" onclick="toggle_action_div(null, {id:'delete_module_[% loop.count %]', index: '[% loop.count %]', group: '[% department.list.html() %]', action:'delete'})">
+	    <span class="glyphicon glyphicon-trash"></span> Delete</span>
+	<td>
+	  <span class="btn btn-link" onclick="toggle_action_div(null, {id:'rename_module_[% loop.count %]', index: '[% loop.count %]', group: '[% department.list.html() %]', action:'rename'})">
+	    <span class="glyphicon glyphicon-pencil"></span> Rename</span>
+	<td>
+	  <span class="btn btn-link" onclick="toggle_action_div(null, {id:'settings_module_[% loop.count %]', index: '[% loop.count %]', group: '[% department.list.html() %]', action:'settings'})">
+	    <span class="glyphicon glyphicon-cog"></span> Settings</span>
+	<td>
+	  <span class="btn btn-link" onclick="toggle_action_div(null, {id:'group_members_module_[% loop.count %]', index: '[% loop.count %]', group: '[% department.list.html() %]', action:'group_members'})">
+	    <span class="glyphicon glyphicon-user"></span> Department members</span>
+      </tr>
+      <tr id="module_row_[% loop.count %]" class="module_row">
+	<td colspan="5">
+	  <div id="delete_module_[% loop.count %]" class="dt_module" style="display: none"></div>
+    	  <div id="rename_module_[% loop.count %]" class="dt_module" style="display: none"></div>
+    	  <div id="settings_module_[% loop.count %]" class="dt_module" style="display: none"></div>
+    	  <div id="group_members_module_[% loop.count %]" class="dt_module" style="display: none"></div>
+	  <div id="settings_status_[% loop.count %]"></div>
+	  <div id="members_status_[% loop.count %]"></div>
+	</td>
       </tr>
       [% END %]
       [% END %]
     </tbody>
   </table>
+
+  <script id="delete_template" type="text/x-handlebars-template">
+    <div class="section"> 
+      <p>
+	[% locale.maketext("Do you really want to delete department “{{group}}”?") %]</p>
+      <div class="form-group">
+	<input id="group_{{index}}" type="hidden" value="{{group}}">
+	<button id="delete_{{index}}" class="btn btn-primary">[% locale.maketext("Delete department") %]</button>
+	<button class="btn btn-link" id="btn_cancel_{{index}}" onclick="toggle_action_div(null, {id:'delete_module_{{index}}', index: '{{index}}', group: '{{group}}', action:'delete'})">[% locale.maketext("Cancel") %]</button>
+      </div>
+    </div>
+    <div id="delete_status_{{index}}"></div>
+    <div id="status_bar_{{index}}"></div>
+  </script>
+    <script id="rename_template" type="text/x-handlebars-template">
+      <div class="section">
+	<div class="form-group">
+	  <label for="rename">[% locale.maketext("New Group Name:") %]</label>
+	  <div class="row form-group">
+	    <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	      <div class="input-group">
+		<input type="text" name="newname_{{index}}" id="newname_{{index}}" class="form-control col-xs-2"/>
+		<span class="input-group-addon">@[% RAW_FORM.item("domain") %]</span>
+	      </div>
+	    </div>
+	    <div id="newname_{{index}}_error" class="col-xs-12 col-sm-6 col-md-6 col-lg-6"></div>	  
+	  </div>
+	  <div class="form-group">
+	    <button id="rename_{{index}}" class="btn btn-primary">Rename</button>
+	    <button class="btn btn-link" id="btn_cancel_{{index}}" onclick="toggle_action_div(null, {id:'rename_module_{{index}}', index: '{{index}}', group: '{{group}}', action:'rename'})">[% locale.maketext("Cancel") %]</button>
+	  </div>
+	</div>
+      </div>
+      <div id="rename_status_{{index}}"></div>
+      <div id="status_bar_{{index}}"></div>
+    </script>
+
+    <script id="settings_template" type="text/x-handlebars-template">
+	<input type="hidden" name="SubmitMLSettings" value="true">
+	<input type="hidden" name="email" value="[% FORM.email %]">
+	<div class="form-group">
+	  <label for="realname">[% locale.maketext("Group Name:") %]</label>
+	  <div class="row">
+	    <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	      <input type="text" name="RealName" id="RealName" class="form-control col-xs-2" value="{{RealName}}"/>
+	    </div>
+	    <div id="RealName_error" class="col-xs-12 col-sm-6 col-md-6 col-lg-6"></div>	  
+	  </div>
+	</div>
+	<div class="form-group">
+	  <div class="checkbox">
+	    <input type="checkbox" name="Expand" id="Expand" value="1" {{Expand}}>
+	    <label for="Expand">Expand Group Members</label>
+	  </div>
+	</div>
+	<div class="form-group">
+	  <div class="checkbox">
+	    <input type="checkbox" name="EmailDisabled" id="EmailDisabled" value="1" {{EmailDisabled}}>
+	    <label for="EmailDisabled">Emails Enabled</label>
+	  </div>
+	</div>
+	<div class="form-group">
+	  <button id="settings_{{index}}" class="btn btn-primary">Save</button>
+	  <button class="btn btn-link" id="btn_cancel_{{index}}" onclick="toggle_action_div(null, {id:'settings_module_{{index}}', index: '{{index}}', group: '{{group}}', action:'settings'})">[% locale.maketext("Cancel") %]</button>
+	</div>
+	<div id="status_bar_{{index}}"></div>
+
+	<div id="err_msg_wrap" class="alert alert-danger" style="display: none;">
+	  <span class="glyphicon glyphicon-remove-sign"></span>
+	  <div id="err_msg" class="alert-message">
+	  </div>
+	</div>
+	<div id="scc_msg_wrap" class="alert alert-success" style="display: none;">
+	  <span class="glyphicon glyphicon-ok-sign"></span>
+	  <div id="scc_msg" class="alert-message">
+	  </div>
+	</div>
+    </script>
+
+    <script id="group_members_template" type="text/x-handlebars-template">
+      <div id="members_wrap"></div>
+    </script>
+
+
 <script type="text/javascript">
 var name_validator = new CPANEL.validate.validator("[% locale.maketext("Group Name") %]");
 var email_validator = new CPANEL.validate.validator("[% locale.maketext("Group Email Address") %]");
