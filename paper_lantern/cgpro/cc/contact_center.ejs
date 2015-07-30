@@ -12,7 +12,7 @@
   <tbody>
     <% var is_result = false %>
 	<% var is_admin = false; %>
-    <% for(var i=0; i<ACCOUNTzS.length; i++) { %>
+    <% for(var i=0; i<ACCOUNTS.length; i++) { %>
 	<% is_admin = false; %>
        <% if (ACCOUNTS[i].data.AccessModes instanceof Array) {
     	  var acc_modes_str = ACCOUNTS[i].data.AccessModes.join(",");
