@@ -11,7 +11,9 @@
   </thead>
   <tbody>
     <% var is_result = false %>
-    <% for(var i=0; i<ACCOUNTS.length; i++) { %>
+	<% var is_admin = false; %>
+    <% for(var i=0; i<ACCOUNTzS.length; i++) { %>
+	<% is_admin = false; %>
        <% if (ACCOUNTS[i].data.AccessModes instanceof Array) {
     	  var acc_modes_str = ACCOUNTS[i].data.AccessModes.join(",");
     	  } else {
@@ -22,13 +24,13 @@
     <tr class="accRow">
       <td><%= ACCOUNTS[i]['username'] + "@" + ACCOUNTS[i]['domain'] %>
 	<% if (ACCOUNTS[i].rights.join(",").indexOf("Domain") > -1 && ACCOUNTS[i].rights.join(",").indexOf("BasicSettings") > -1 && ACCOUNTS[i].rights.join(",").indexOf("PSTNSettings") > -1 && ACCOUNTS[i].rights.join(",").indexOf("CanCreateAccounts") > -1 && ACCOUNTS[i].rights.join(",").indexOf("CanCreateAliases") > -1 && ACCOUNTS[i].rights.join(",").indexOf("CanCreateNamedTasks") > -1 && ACCOUNTS[i].rights.join(",").indexOf("CanAccessWebSites") > -1) { %>
-	<% var is_admin = true; %>
+	<% is_admin = true; %>
     	<span> (Administrator)</span>
 	<% } %>	 
       </td>
       <td>
 	<% if(is_admin) { %>
-	<a class="btn_unset_administrator">Unet as administrator</a><span id='loading_<%= ACCOUNTS[i]['username'] %>'></span>
+	<a class="btn_unset_administrator">Unset as administrator</a><span id='loading_<%= ACCOUNTS[i]['username'] %>'></span>
 	<% } else { %>
 	<a class="btn_set_administrator">Set as administrator</a><span id='loading_<%= ACCOUNTS[i]['username'] %>'></span>
 	<% } %>
