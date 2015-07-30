@@ -21,7 +21,7 @@ app_key = 'cgpro_departments'
 <script src="js/ejs_production.js"></script>
 <style>
   table tbody .module_row td {
-  padding: 0;
+  padding: 0 20px;
   border: 0;
   }
 

@@ -21,9 +21,21 @@ rpop = rpop.0;
 [% END %]
 
 [% WRAPPER '_assets/master.html.tt'
-    app_key = 'cgpro_rpop'
+page_scripts = ['sharedjs/handlebars_optimized.js', 'cgpro/mail/js/rpop.js']
+app_key = 'cgpro_rpop'
 -%] 
 
+<script src="js/ejs_production.js"></script>
+<style>
+  table tbody .module_row td {
+  padding: 0 20px;
+  border: 0;
+  }
+
+  table > tbody > .group_row > td {
+  margin-top: -1px !important;
+  }
+</style>
 <div class="body-content">
   [% IF CPANEL.feature('cgpro_rpop') %]
   [% IF RAW_FORM.item("account") %]
@@ -81,21 +93,25 @@ rpop = rpop.0;
       [% IF rpop.rpop.size() %]
       <tbody>
 	[% FOR pop IN rpop.rpop.keys -%]
-	<tr>
+	<tr id="rpop_row_[% loop.count %]">
 	  <td class="truncate nobrd-left">[% pop %]</td>
 	  <td class="truncate sorttable_nosort">
 	    [% rpop.rpopInfo.$pop.completed.replace("(\#T|\_)"," ") %]
 	    [% rpop.rpopInfo.$pop.errorCode %]
 	  </td>
 	  <td class="truncate sorttable_nosort">
-	    <a href="editrpop.html?account=[% FORM.account %]&amp;rpop=[% pop %]" class="btn btn-link">
-	      <span class="glyphicon glyphicon-edit"></span>
-	      [% locale.maketext("View/Edit") %]
-	    </a>
-	    <a href="deleterpop.html?account=[% FORM.account %]&amp;rpop=[% pop %]" class="btn btn-link">
-	      <span class="glyphicon glyphicon-trash"></span>
-	      [% locale.maketext("Delete") %]
-	    </a>
+	    <span class="btn btn-link" onclick="toggle_action_div(null, {id:'edit_module_[% loop.count %]', index: '[% loop.count %]', rpop: '[% pop %]', account: '[% RAW_FORM.item('account') %]', action:'edit'})">
+	      <span class="glyphicon glyphicon-edit"></span> View/Edit</span>
+	    <span class="btn btn-link" onclick="toggle_action_div(null, {id:'delete_module_[% loop.count %]', index: '[% loop.count %]', rpop: '[% pop %]', account: '[% RAW_FORM.item('account') %]', action:'delete'})">
+	      <span class="glyphicon glyphicon-trash"></span> Delete</span>
+
+	</tr>
+	<tr id="module_row_[% loop.count %]" class="module_row">
+	  <td colspan="3">
+	    <div id="delete_module_[% loop.count %]" class="dt_module" style="display: none"></div>
+    	    <div id="edit_module_[% loop.count %]" class="dt_module" style="display: none"></div>
+	    <div id="edit_status_[% loop.count %]"></div>
+	  </td>
 	</tr>
 	[% END -%]
 	[% ELSE -%]
@@ -109,4 +125,129 @@ rpop = rpop.0;
   [% END %]
   [% END %]
 </div>
+<script id="delete_template" type="text/x-handlebars-template">
+  <div class="section"> 
+    <p>
+      [% locale.maketext("Do you really want to delete Remote POP “{{rpop}}”?") %]</p>
+    <div class="form-group">
+      <input id="group_{{index}}" type="hidden" value="{{rpop}}">
+      <button id="delete_{{index}}" class="btn btn-primary">[% locale.maketext("Delete") %]</button>
+      <button class="btn btn-link" id="btn_cancel_{{index}}" onclick="toggle_action_div(null, {id:'delete_module_{{index}}', index: '{{index}}', rpop: '{{rpop}}', action:'delete'})">[% locale.maketext("Cancel") %]</button>
+    </div>
+  </div>
+  <div id="delete_status_{{index}}"></div>
+  <div id="status_bar_{{index}}"></div>
+</script>
+
+<script id="edit_template" type="text/x-handlebars-template">
+  <div class="form-group">
+    <label for="name">[% locale.maketext("Display Name") %]</label>
+    <div class="row">
+      <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	<input type="text" name="name" id="name_{{index}}" class="form-control col-xs-2" value="{{displayName}}" readonly=""/>
+      </div>
+      <div id="name_error" class="col-xs-12 col-sm-6 col-md-6 col-lg-6"></div>	  
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label for="name">[% locale.maketext("Account") %]</label>
+    <div class="row">
+      <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	<input type="text" name="authName" id="authName_{{index}}" class="form-control col-xs-2" value="{{authName}}"/>
+      </div>
+      <div id="authName_error" class="col-xs-12 col-sm-6 col-md-6 col-lg-6"></div>	  
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label for="name">[% locale.maketext("Host") %]</label>
+    <div class="row">
+      <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	<input type="text" name="domain" id="domain_{{index}}" class="form-control col-xs-2" value="{{domain}}"/>
+      </div>
+      <div id="domain_error" class="col-xs-12 col-sm-6 col-md-6 col-lg-6"></div>	  
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label for="name">[% locale.maketext("Password") %]</label>
+    <div class="row">
+      <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	<input type="password" name="password" id="password_{{index}}" class="form-control col-xs-2" value="{{password}}"/>
+      </div>
+      <div id="password_error" class="col-xs-12 col-sm-6 col-md-6 col-lg-6"></div>	  
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label for="name">[% locale.maketext("Mailbox") %]</label>
+    <div class="row">
+      <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	<input type="text" name="mailbox" id="mailbox_{{index}}" class="form-control col-xs-2" value="{{mailbox}}"/>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <div class="checkbox">
+      <input type="checkbox" id="leave_{{index}}" name="leave" value="YES" {{leave}}>
+      <label for="leave_{{index}}">[% locale.maketext("Leave Messages On Server") %]</label>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <div class="checkbox">
+      <input type="checkbox" id="APOP_{{index}}" name="APOP" value="YES" {{APOP}}>
+      <label for="APOP_{{index}}">[% locale.maketext("APOP") %]</label>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <div class="checkbox">
+      <input type="checkbox" id="TLS_{{index}}" name="TLS" value="YES" {{TLS}}>
+      <label for="TLS_{{index}}">[% locale.maketext("TLS") %]</label>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label for="name">[% locale.maketext("Pull Every") %]</label>
+    <div class="row">
+      <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	<select id="period_{{index}}" name="period" class="form-control">
+	  <option value="120s">2m</option>
+	  <option value="180s">3m</option>
+	  <option value="300s">5m</option>
+	  <option value="600s">10m</option>
+	  <option value="750s">15m</option>
+	  <option value="1200s">20m</option>
+	  <option value="1800s">30m</option>
+	  <option value="3600s">60m</option>
+	  <option value="7200s">2h</option>
+	  <option value="10800s">3h</option>
+	  <option value="18000s">5h</option>
+	  <option value="21600s">6h</option>
+	  <option value="22800s">8h</option>
+	  <option value="86400s">24h</option>
+	  <option value="1000000000s">Disabled</option>
+	</select>
+      </div>
+    </div>
+  </div>
+  <div class="form-group">
+    <button id="submit_{{index}}" class="btn btn-primary" value="Save" name="save">Save</button>
+  </div>
+  <div id="status_bar_{{index}}"></div>
+  <div id="err_msg_wrap" class="alert alert-danger" style="display: none;">
+    <span class="glyphicon glyphicon-remove-sign"></span>
+    <div id="err_msg" class="alert-message">
+    </div>
+  </div>
+  <div id="scc_msg_wrap" class="alert alert-success" style="display: none;">
+    <span class="glyphicon glyphicon-ok-sign"></span>
+    <div id="scc_msg" class="alert-message">
+    </div>
+  </div>
+</script>
 [% END %]
+
