@@ -55,6 +55,7 @@ app_key = 'cgpro_sounds_manager'
 	  <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
 	    <form action="" class="form-inline" method="GET" id="selectDomain">
 	      [% IF domains.size == 1 %]
+	      <input type="hidden" id="domain" value="[% domains.0.domain %]" name="domain">
 	      <span>[% domains.0.domain %]</span>
 	      [% ELSE %]
 	      <select id="domain" class="form-control" onchange="toggle_domain()" name="domain">
