@@ -120,26 +120,7 @@ var after_show_module = function(id) {
     id = split[1];
 
     if (type == "edit") {
-        // set up validation
-        CHANGE_VALID["priority"] = new CPANEL.validate.validator(LANG.MX_priority);
-        CHANGE_VALID["priority"].add("priority_" + id, "positive_integer", LANG.MX_priority_positive_integer);
-        CHANGE_VALID["priority"].attach();
-
-        CHANGE_VALID["destination"] = new CPANEL.validate.validator(LANG.MX_destination);
-        CHANGE_VALID["destination"].add("destination_" + id, "fqdn", LANG.MX_destination_fqdn);
-        CHANGE_VALID["destination"].attach();
-
-        CHANGE_VALID["content_changed"] = new CPANEL.validate.validator(LANG.content_changed);
-        CHANGE_VALID["content_changed"].add("old_destination_" + id, function() {
-            return content_changed(id);
-        }, LANG.must_change_before_edit);
-        CHANGE_VALID["content_changed"].attach();
-
-        CPANEL.validate.attach_to_form("confirm_edit_" + id, CHANGE_VALID, function() {
-            edit_mx_record(id)
-        });
-
-        CPANEL.util.catch_enter(["priority_" + id, "destination_" + id], "confirm_edit_" + id);
+	$("#confirm_edit_" + id).click(function() { edit_mx_record(id) });
     }
 };
 
@@ -577,27 +558,6 @@ var update_mxcheck_state_ui = function() {
     }
 };
 
-var add_validation = function() {
-
-    var disallow_ip = function() {
-        var value = document.getElementById('destination').value;
-        if (CPANEL.validate.ip(value)) {
-            return false;
-        }
-        return CPANEL.validate.fqdn(value);
-    }
-
-    VALID["priority"] = new CPANEL.validate.validator(LANG.MX_priority);
-    VALID["priority"].add("priority", "positive_integer", LANG.MX_priority_positive_integer);
-    VALID["priority"].attach();
-
-    VALID["destination"] = new CPANEL.validate.validator(LANG.MX_destination);
-    VALID["destination"].add("destination", disallow_ip, LANG.MX_destination_fqdn);
-    VALID["destination"].attach();
-
-    CPANEL.validate.attach_to_form("submit_mx_record", VALID, add_mx_record);
-};
-
 var toggle_domain = function() {
     var domain = YAHOO.util.Dom.get("domain").value;
     if (domain != "_select_") {
@@ -609,7 +569,7 @@ var toggle_domain = function() {
 };
 
 var init_page = function() {
-    add_validation();
+    // add_validation();
 
     CPANEL.util.catch_enter(["priority", "destination"], "submit_mx_record");
 
