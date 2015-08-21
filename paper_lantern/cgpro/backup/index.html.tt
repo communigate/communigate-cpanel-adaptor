@@ -9,7 +9,7 @@ IF CPANEL.feature("mysql");
 END;
 
 SET email_list_system_filter_info = [];
-IF CPANEL.feature("blockers");
+IF CPANEL.feature("cgpro_user_filters");
     SET email_list_system_filter_info = Api2.exec("Email", "list_system_filter_info", {});
 END;
 
@@ -263,7 +263,7 @@ SET accounts = Api2.exec("CommuniGate", "ListAccountsBackups");
         register_truncate_table('accountstbl');
         inputs_buttons['file10_id'] = 'file10-submit-button';
     [% END %]
-    [% IF CPANEL.feature("blockers") %]
+    [% IF CPANEL.feature("cgpro_user_filters") %]
         register_truncate_table('filtertbl');
         inputs_buttons['file3_id'] = 'file3-submit-button';
     [% END %]
