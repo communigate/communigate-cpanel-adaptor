@@ -44,6 +44,11 @@ listmxs = api2_result_Email_listmxs.0.entries;
   background: #F9F9F9;
   }
 
+  #predefined_loading {
+  padding: 20px;
+  padding-left: 0px;
+  }
+
   #clear_loading {
   padding-left: 10px;
   display: inline;
@@ -102,7 +107,7 @@ listmxs = api2_result_Email_listmxs.0.entries;
       YAHOO.util.Event.on("manage_list_select", "change", function() { YAHOO.util.Dom.get("manage_list_form").submit(); });
       });
     </script>
-  </div><br /></br />
+  </div><br>
 
     <div id="mx_input_and_table" [% IF (CPANEL.CPVAR.item('maildomainscount') > "1") %]style="display: none"[% END %] >
         <div class="section">
@@ -125,7 +130,7 @@ listmxs = api2_result_Email_listmxs.0.entries;
 	    <div class="form-group">
 	      <div class="checkbox">
 		<input type="radio" id="mx_btn_[% loop.count - 1 %]" name="mx_record" value="[% button_name_ids %]" checked>
-		<label for="mx_btn_[% loop.count - 1 %]">[% button_name_ids %]</label>
+		<label for="mx_btn_[% loop.count - 1 %]">[% button_name %]</label>
 	      </div>
 	    </div>
 	    <input type="hidden" class="all_data_[% button_name_ids %]" id="mx_data_[% button_name_ids %]" value="[% button %]" />
@@ -140,7 +145,7 @@ listmxs = api2_result_Email_listmxs.0.entries;
 	    <div class="form-group">
 	      <div class="checkbox">
 		<input type="radio" id="mx_btn_[% loop.count - 1 %]" name="mx_record" value="[% button_name_ids %]">
-		<label for="mx_btn_[% loop.count - 1 %]">[% button_name_ids %]</label>
+		<label for="mx_btn_[% loop.count - 1 %]">[% button_name %]</label>
 	      </div>
 	    </div>
 	    <input type="hidden" class="all_data_[% button_name_ids %]" id="mx_data_[% button_name_ids %]" value="[% button %]" />
