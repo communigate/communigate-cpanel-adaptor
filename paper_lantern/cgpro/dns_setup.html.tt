@@ -44,11 +44,6 @@ listmxs = api2_result_Email_listmxs.0.entries;
   background: #F9F9F9;
   }
 
-  #predefined_loading {
-  padding: 20px;
-  padding-left: 0px;
-  }
-
   #clear_loading {
   padding-left: 10px;
   display: inline;
@@ -186,11 +181,10 @@ listmxs = api2_result_Email_listmxs.0.entries;
             </div>
 	    </div>
               <div class="form-group">
-		<input class="btn btn-primary" id="submit_mx_record" type="button" value="Add Record" />
+		<input class="btn btn-primary" id="submit_mx_record" type="button" value="Change Record" />
 		<div id="add_new_record_status"></div>
               </div>
               <div class="cjt_status_bar" id="add_new_record_status_bar" style="margin: 5px -5px 0px -5px"></div>
-	    <div id="predefined_loading"></div>
             <div class="section">
               <h3 id="hdrMxEntries">[% locale.maketext("MX Records") %]</h3>
               <div class="form-group" style="display: inline">
@@ -263,295 +257,191 @@ listmxs = api2_result_Email_listmxs.0.entries;
 	    [% locale.maketext("'By enabling this setting, you will be able to share contacts in your address book with external systems that also use the CardDAV protocol. This can be of particular use for home / office situations or when you want to share address resources with a partner company or colleague that uses a different system.") %]
 	  </p>
 	  [% IF CPANEL.CPVAR.carddav_enabled -%]
-	  <p>
+	  <p style="margin-bottom: 30px;">
 	    <span class="disabled success btn" style="color:green">[% locale.maketext("Enabled") %]</span>
 	    <a class="input-button btn btn-primary" href="set_carddav.html?domain=[% FORM.domain %]&action=uninstall">[% locale.maketext("Disable") %]</a>
 	  </p>
 	  [% ELSE -%]
-	  <p>
+	  <p style="margin-bottom: 30px;">
 	    <span class="disabled btn">[% locale.maketext("Disabled") %]</span>
 	    <a class="input-button btn btn-primary" href="set_carddav.html?domain=[% FORM.domain %]&action=install">[% locale.maketext("Enable") %]</a>
 	  </p>
 	  [% END -%]
 	</div>
 	[% END %]
-        <div class="section" style="display: none;">
-          <h2 id="hdrEmailRouting">[% locale.maketext("Email Routing") %]</h2>
+    </div>
+</div>
+<script>
+  $('input:radio[name="mx_record"]').change(
+  function(){
+  if ($(this).is(':checked') && $(this).val() == 'custom') {
+  $("#custom_input").show();
+  } else {
+  $("#custom_input").hide();
+  }
+  });
 
-          <div class="alert alert-warning">
-            <span class="glyphicon glyphicon-exclamation-sign"></span>
-            <div class="alert-message">
-              [% locale.maketext("[output,strong,Warning:] Setting the wrong option here can break receiving mail on your server. If you are at all unsure about which option to select, contact your system administrator.") %]
-            </div>
-          </div>
-          <div id="mxcheck_options_div">
+  $("#clear_mx_records").click(function() {
+  delete_all_records();
+  });
+  $("#submit_mx_record").click(function() {
+  var caller = $('input[name=mx_record]:checked').val();
+  if (caller == "custom") {
+  add_custom_record();
+  } else {
+  delete_all_records(caller);
+  }
+  });
 
-            <div class="form-group">
-              <label id="mxcheck_auto_label">
-                <input type="radio" name="mxcheck" id="mxcheck_auto" value="auto" />
-                [% locale.maketext("Automatically Detect Configuration") %]
-              </label>
-              <span class="status" id="mxcheck_auto_current_setting" style="font-weight: bold"></span>
-              ([% locale.maketext("recommended") %])
-              <span class="action_link" id="mxcheck_auto_toggle" onclick="CPANEL.util.toggle_more_less(this, 'mxcheck_auto_desc');">
-                [% locale.maketext("more »")  %]
-              </span>
+  function add_custom_record(){
+  var exchanger = $("#destination").val();
+  var preference = $("#priority").val();
+  var api2_call = {
+  "cpanel_jsonapi_version": 2,
+  "cpanel_jsonapi_module": "Email",
+  "cpanel_jsonapi_func": "addmx",
+  "domain": YAHOO.util.Dom.get("domain").value,
+  "exchanger": exchanger,
+  "preference": preference
+  };
+  $.ajax({
+  type: "GET",
+  url: CPANEL.urls.json_api() + '&' + $.param(api2_call),
+  data: api2_call,
+  success: function(){
+  $("#clear_loading").html("").css("padding","0");
+  update_mx_records_table();
+  }
+  });
+  $("#clear_loading").html(CPANEL.icons.ajax + " Please wait...").css("padding","20px");
+  }
 
-              <div id="mxcheck_auto_desc" style="display: none">
-                <ul class="mxcheck_autolist" id="listMxCheck">
-                  <li>
-                    [% locale.maketext("Local Mail Exchanger") %]
-                    <span id="mxcheck_detected_state_local"></span><br />
-                    <em>
-                      [% locale.maketext("If the lowest numbered mail exchanger points to an IP address on this server, the server will be configured to accept mail locally and from outside the server.") %]
-                    </em>
-                  </li>
-                  <li>
-                    [% locale.maketext("Backup Mail Exchanger") %]
-                    <span id="mxcheck_detected_state_secondary"></span><br />
-                    <em>
-                      [% locale.maketext("If a mail exchanger that is not the lowest numbered mail exchanger points to an IP address on this server, the server will be configured to act as a backup mail exchanger.") %]
-                    </em>
-                  </li>
-                  <li>
-                    [% locale.maketext("Remote Mail Exchanger") %]
-                    <span id="mxcheck_detected_state_remote"></span><br />
-                    <em>
-                      [% locale.maketext("If there are no mail exchangers that point to an IP address on this server, the server will not accept mail locally and will send mail to the lowest MX record.") %]
-                    </em>
-                  </li>
-                </ul>
-                <p>
-                  [% locale.maketext("[output,strong,Note:] Automatic detection of MX configuration is not possible if MX entries do not resolve (i.e., you mistype a domain name or enter one that does not exist). If your MX configuration is set to auto and you add or edit an MX record that does not resolve, you will see a warning and MX configuration will default back the last known setting.") %]
-                </p>
-              </div>
-            </div>
+  var add_mx_record_predef = function(caller) {
+  var do_add_mx_record_predefined = function(data) {
+  var data_arr = data.split(",");
+  var data_arr_couples = [];
+  for (i = 0, j=0; j < data_arr.length; i++,j+=2) {
+		       data_arr_couples[i] = data_arr[j] + "," + data_arr[j+1];
+		       }
+		       var i = 0;
+		       function sendAjax(){
+		       YAHOO.util.Dom.get("clear_loading").innerHTML = CPANEL.icons.ajax + " Please wait...";
+		       var couple = data_arr_couples[i].split(",");
+		       exchanger_couple = couple[0];
+		       preference_couple = couple[1];
+		       var api2_call = {
+		       "cpanel_jsonapi_version": 2,
+		       "cpanel_jsonapi_module": "Email",
+		       "cpanel_jsonapi_func": "addmx",
+		       "domain": YAHOO.util.Dom.get("domain").value,
+		       "exchanger": exchanger_couple,
+		       "preference": preference_couple
+		       };
+		       $.ajax({
+		       type: "GET",
+		       url: CPANEL.urls.json_api() + '&' + $.param(api2_call),
+		       data: api2_call,
+		       success: function(){
+		       $("#clear_loading").html("").css("padding","0");
+		       i++;
+		       if (i >= data_arr_couples.length) update_mx_records_table();
+    if (i < data_arr_couples.length) sendAjax();
+	    }
+	    });
+	    }
+	    sendAjax();
+	    change_mxcheck_default("remote");
+	    }
+	    var data = $("#mx_data_" + caller).val();
+	    do_add_mx_record_predefined(data);
+	    };
 
-            <div class="form-group">
-              <label id="mxcheck_local_label">
-                <input type="radio" name="testradio" id="mxcheck_local" value="local" />
-                [% locale.maketext("Local Mail Exchanger") %]
-              </label>
-              <span class="action_link" id="lnkMoreLocal" onclick="CPANEL.util.toggle_more_less(this, 'mxcheck_local_desc');">[% locale.maketext("more »")  %]</span>
-              <div id="mxcheck_local_desc" style="display: none">
-                <p class="highlight-accordian-desc" id="descConfigMailServer">
-                  <em>
-                    [% locale.maketext("Configure server to always accept mail. Mail will be delivered locally on the server when sent from the server or outside the server.") %]
-                  </em>
-                </p>
-              </div>
-            </div>
+	    function delete_all_records(caller){
+	    var rowCount = $('.record-row').length;
+	    if (rowCount == 0) {
+	    if (caller) {
+	    if (caller == "custom") {
+	    add_custom_record();
+	    } else {
+	    add_mx_record_predef(caller);
+	    }
+	    }
+	    }
+	    if (!rowCount == 0) {
+	    var delete_data = [];
+	    var index = 0;
+	    $(".record-row").each( function() {
+	    index++;
+	    var priority = $(this).find('td.priority').text().trim(); 
+	    var destination = $(this).find('td.destination').text().trim(); 
+	    delete_data[index - 1] = [];
+	    delete_data[index - 1][0] = priority;
+	    delete_data[index - 1][1] = destination;
+	    });
 
-            <div class="form-group">
-              <label id="mxcheck_secondary_label">
-                <input type="radio" name="mxcheck" id="mxcheck_secondary" value="secondary" />
-                [% locale.maketext("Backup Mail Exchanger") %]
-              </label>
-              <span class="action_link" id="lnkMoreSecondary" onclick="CPANEL.util.toggle_more_less(this, 'mxcheck_secondary_desc');">
-                [% locale.maketext("more »")  %]
-              </span>
-              <div id="mxcheck_secondary_desc" style="display: none">
-                <p class="highlight-accordian-desc" id="descConfigMailExchangeBackup">
-                  <em>[% locale.maketext("Configure server as a backup mail exchanger. Mail will be held until a lower number mail exchanger is available.") %]
-                  </em>
-                </p>
-              </div>
-            </div>
+	    var count = 0;
+	    function deleteRow(){
+	    YAHOO.util.Dom.get("clear_loading").innerHTML = CPANEL.icons.ajax + " Please wait...";
+	    var couple = delete_data[count];
+	    exchange = couple[0];
+	    preference = couple[1];
+	    var api2_call = {
+	    "cpanel_jsonapi_version": 2,
+	    "cpanel_jsonapi_module": "Email",
+	    "cpanel_jsonapi_func": "delmx",
+	    "domain": YAHOO.util.Dom.get("domain").value,
+	    "exchange": preference,
+	    "preference": exchange
+	    };
 
-            <div class="form-group">
-              <label id="mxcheck_remote_label">
-                <input type="radio" name="mxcheck" id="mxcheck_remote" value="remote" />
-                [% locale.maketext("Remote Mail Exchanger") %]
-              </label>
-              <span class="action_link" id="lnkMoreRemote" onclick="CPANEL.util.toggle_more_less(this, 'mxcheck_remote_desc');">[% locale.maketext("more »")  %]</span>
-              <div id="mxcheck_remote_desc" style="display: none">
-                <p class="highlight-accordian-desc" id="descConfigNoMail">
-                  <em>
-                    [% locale.maketext("Configure server to not accept mail locally and send mail to the lowest MX record.") %]
-                  </em>
-                </p>
-              </div>
-            </div>
-
-            <div class="form-group">
-              <input class="btn btn-primary" type="button" value="[% locale.maketext("Change") %]" id="change_mxcheck_button" onclick="change_mxcheck();" />
-              <span class="help-block" id="txtHelpBlock">[% locale.maketext("Current setting is shown in [output,strong,bold].") %]</span>
-              <span id="mxcheck_status"></span>
-            </div>
-          </div>
-        </div>
-
-	<script>
-	  $('input:radio[name="mx_record"]').change(
-	  function(){
-	  if ($(this).is(':checked') && $(this).val() == 'custom') {
-	  $("#custom_input").show();
-	  } else {
-	  $("#custom_input").hide();
-	  }
-	  });
-
-	  $("#clear_mx_records").click(function() {
-	  delete_all_records();
-	  });
-	  $("#submit_mx_record").click(function() {
-	  var caller = $('input[name=mx_record]:checked').val();
-	  if (caller == "custom") {
-	  add_custom_record();
-	  } else {
-	  delete_all_records(caller);
-	  }
-	  });
-
-	  function add_custom_record(){
-	  var exchanger = $("#destination").val();
-	  var preference = $("#priority").val();
-	  var api2_call = {
-	  "cpanel_jsonapi_version": 2,
-	  "cpanel_jsonapi_module": "Email",
-	  "cpanel_jsonapi_func": "addmx",
-	  "domain": YAHOO.util.Dom.get("domain").value,
-	  "exchanger": exchanger,
-	  "preference": preference
-	  };
-	  $.ajax({
-	  type: "GET",
-	  url: CPANEL.urls.json_api() + '&' + $.param(api2_call),
-	  data: api2_call,
-	  success: function(){
-	  $("#predefined_loading").html("").css("padding","0");
-	  update_mx_records_table();
-	  }
-	  });
-	  $("#predefined_loading").html(CPANEL.icons.ajax + " Please wait...").css("padding","20px");
-	  }
-
-	  var add_mx_record_predef = function(caller) {
-	  var do_add_mx_record_predefined = function(data) {
-	  var data_arr = data.split(",");
-	  var data_arr_couples = [];
-	  for (i = 0, j=0; j < data_arr.length; i++,j+=2) {
-			       data_arr_couples[i] = data_arr[j] + "," + data_arr[j+1];
-			       }
-			       var i = 0;
-			       function sendAjax(){
-			       $("#predefined_loading").html(CPANEL.icons.ajax + " Please wait...").css("padding","20px");
-			       var couple = data_arr_couples[i].split(",");
-			       exchanger_couple = couple[0];
-			       preference_couple = couple[1];
-			       var api2_call = {
-			       "cpanel_jsonapi_version": 2,
-			       "cpanel_jsonapi_module": "Email",
-			       "cpanel_jsonapi_func": "addmx",
-			       "domain": YAHOO.util.Dom.get("domain").value,
-			       "exchanger": exchanger_couple,
-			       "preference": preference_couple
-			       };
-			       $.ajax({
-			       type: "GET",
-			       url: CPANEL.urls.json_api() + '&' + $.param(api2_call),
-			       data: api2_call,
-			       success: function(){
-			       $("#predefined_loading").html("").css("padding","0");
-			       i++;
-			       if (i < data_arr_couples.length) sendAjax();
-				       update_mx_records_table();
-				       }
-				       });
-				       }
-				       sendAjax();
-				       change_mxcheck_default("remote");
-				       }
-				       var data = $("#mx_data_" + caller).val();
-				       do_add_mx_record_predefined(data);
-				       };
-
-				       function delete_all_records(caller){
-				       var rowCount = $('.record-row').length;
-				       if (rowCount == 0) {
-				       if (caller) {
-				       if (caller == "custom") {
-				       add_custom_record();
-				       } else {
-				       add_mx_record_predef(caller);
-				       }
-				       }
-				       }
-				       if (!rowCount == 0) {
-				       var delete_data = [];
-				       var index = 0;
-				       $(".record-row").each( function() {
-				       index++;
-				       var priority = $(this).find('td.priority').text().trim(); 
-				       var destination = $(this).find('td.destination').text().trim(); 
-				       delete_data[index - 1] = [];
-				       delete_data[index - 1][0] = priority;
-				       delete_data[index - 1][1] = destination;
-				       });
-
-				       var count = 0;
-				       function deleteRow(){
-				       YAHOO.util.Dom.get("clear_loading").innerHTML = CPANEL.icons.ajax + " Please wait...";
-				       var couple = delete_data[count];
-				       exchange = couple[0];
-				       preference = couple[1];
-				       var api2_call = {
-				       "cpanel_jsonapi_version": 2,
-				       "cpanel_jsonapi_module": "Email",
-				       "cpanel_jsonapi_func": "delmx",
-				       "domain": YAHOO.util.Dom.get("domain").value,
-				       "exchange": preference,
-				       "preference": exchange
-				       };
-
-				       $.ajax({
-				       type: "GET",
-				       url: CPANEL.urls.json_api() + '&' + $.param(api2_call),
-				       success: function(){
-				       YAHOO.util.Dom.get("clear_loading").innerHTML = "";
-				       count++;
-				       if (count < delete_data.length) { 
-						   deleteRow();
-						   } else {
-						   if (caller) {
-						   if (caller == "custom") {
-						   add_custom_record();
-						   } else {
-						   add_mx_record_predef(caller);
-						   }
-						   }
-						   }
-						   update_mx_records_table();
-						   }
-						   });
-						   }
-						   deleteRow();
-						   change_mxcheck_default("local");
-						   }
-						   }
-						   </script>
-	<script type="text/javascript">
-	  var LANG = {
-	  MX_priority_positive_integer : "[% locale.maketext('Priority must be a positive integer.') %]",
-	  MX_destination : "[% locale.maketext('Destination') %]",
-	  MX_priority : "[% locale.maketext('Priority') %]",
-	  MX_destination_fqdn : "[% locale.maketext('Destination must be a FQDN (fully-qualified domain name).') %]",
-	  content_changed : "[% locale.maketext('Content Changed') %]",
-	  must_change_before_edit : "[% locale.maketext('You must change something before you can edit.') %]",
-	  MX_added_record : "[% locale.maketext('Added MX Record') %]",
-	  MX_adding_record : "[% locale.maketext('Adding record …') %]",
-	  MX_deleting_record : "[% locale.maketext('Deleting record …') %]",
-	  MX_editing_record : "[% locale.maketext('Editing record …') %]",
-	  MX_changed_record : "[% locale.maketext('Changed Record') %]",
-	  MX_no_records_set : "[% locale.maketext('No MX Records set. Defaulting to the A record for this domain.') %]",
-	  MX_changing : "[% locale.maketext('Changing …') %]",
-	  MX_current_detected_setting : "[% locale.maketext('Current Detected Setting') %]",
-	  MX_Local : "[% locale.maketext('Local') %]",
-	  MX_Backup : "[% locale.maketext('Backup') %]",
-	  MX_Remote : "[% locale.maketext('Remote') %]"
-	  };
-	</script>
-	[% END %]
-    </div><!-- end body-content -->
-    [% END %]
-
+	    $.ajax({
+	    type: "GET",
+	    url: CPANEL.urls.json_api() + '&' + $.param(api2_call),
+	    success: function(){
+	    count++;
+	    if (count >= delete_data.length) {
+      update_mx_records_table(); 
+      YAHOO.util.Dom.get("clear_loading").innerHTML = "";
+      }
+      if (count < delete_data.length) { 
+		  deleteRow();
+		  } else {
+		  if (caller) {
+		  if (caller == "custom") {
+		  add_custom_record();
+		  } else {
+		  add_mx_record_predef(caller);
+		  }
+		  }
+		  }
+		  }
+		  });
+		  }
+		  deleteRow();
+		  change_mxcheck_default("local");
+		  }
+		  }
+		  </script>
+<script type="text/javascript">
+  var LANG = {
+  MX_priority_positive_integer : "[% locale.maketext('Priority must be a positive integer.') %]",
+  MX_destination : "[% locale.maketext('Destination') %]",
+  MX_priority : "[% locale.maketext('Priority') %]",
+  MX_destination_fqdn : "[% locale.maketext('Destination must be a FQDN (fully-qualified domain name).') %]",
+  content_changed : "[% locale.maketext('Content Changed') %]",
+  must_change_before_edit : "[% locale.maketext('You must change something before you can edit.') %]",
+  MX_added_record : "[% locale.maketext('Added MX Record') %]",
+  MX_adding_record : "[% locale.maketext('Adding record …') %]",
+  MX_deleting_record : "[% locale.maketext('Deleting record …') %]",
+  MX_editing_record : "[% locale.maketext('Editing record …') %]",
+  MX_changed_record : "[% locale.maketext('Changed Record') %]",
+  MX_no_records_set : "[% locale.maketext('No MX Records set. Defaulting to the A record for this domain.') %]",
+  MX_changing : "[% locale.maketext('Changing …') %]",
+  MX_current_detected_setting : "[% locale.maketext('Current Detected Setting') %]",
+  MX_Local : "[% locale.maketext('Local') %]",
+  MX_Backup : "[% locale.maketext('Backup') %]",
+  MX_Remote : "[% locale.maketext('Remote') %]"
+  };
+</script>
+[% END %]
+[% END %]
