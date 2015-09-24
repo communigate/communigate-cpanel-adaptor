@@ -329,7 +329,7 @@ YAHOO.util.Event.onDOMReady(function () {
 	    </select>
 	  </form>
 	  
-	  [% IF !RAW_FORM.item("rsip_account") && rsip_accounts %]
+	  [% IF !RAW_FORM.item("rsip_account") && rsip_accounts.size > 0 %]
 	  <script type="text/javascript">
 	    YAHOO.util.Dom.get("selectAccount").submit();
 	  </script>
