@@ -1119,7 +1119,12 @@ var airsync_load = function(o){
 		var selector_airsync_wrap = "#airsync_wrap_" + index;
 		$(selector_airsync_wrap).css("display", "block");
 
-		var airsync_allowed_str = data.cpanelresult.data[0].AirSyncAllowed.join(", ");
+                if ($.isArray(data.cpanelresult.data[0].AirSyncAllowed)) {
+                    var airsync_allowed_str = data.cpanelresult.data[0].AirSyncAllowed.join(", ");
+                } else {
+                    var airsync_allowed_str = data.cpanelresult.data[0].AirSyncAllowed;
+                }
+
 		$(selector_airsync_allowed).val(airsync_allowed_str);
 		var selector_table = "#mailtbl_" + index;
 		var selector_table_tbody = "#mailtbl_" + index + " tbody";
