@@ -7,8 +7,8 @@ SET settings = Api2.exec("CommuniGate", "AccountDefaults", {save=RAW_FORM.item("
 [% accountDefaultPrefs = settings.0.accountDefaultPrefs %]
 [% serverDomainDefaults => settings.0.serverDomainDefaults %]
 [% serverAccountPrefs => settings.0.serverAccountPrefs %]
-[% outhoingNumber => settings.0.number %]
-[% outhoingNumbers => settings.0.numbers %]
+[% outhoingNumber => settings.0.outhoingNumber %]
+[% outhoingNumbers => settings.0.outhoingNumbers %]
 [% domain => settings.0.domain %]
 
 [% WRAPPER '_assets/master.html.tt'
