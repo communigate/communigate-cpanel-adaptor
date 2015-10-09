@@ -1,0 +1,26 @@
+<div class="avatar_template">
+  <label class="avatar_label">Avatar</label>
+  <div class="cropme" id="crop_<%= account_id %>" style="width: 100px; height: 100px;">
+    <span class="glyphicon glyphicon-camera" style="font-size: 70px;"></span>
+    <% if (accounts[account_id].vcard
+       && accounts[account_id].vcard.fileData
+       && accounts[account_id].vcard.fileData[0]
+       && accounts[account_id].vcard.fileData[0].vCard
+       && accounts[account_id].vcard.fileData[0].vCard[0]
+       && accounts[account_id].vcard.fileData[0].vCard[0].PHOTO
+       && accounts[account_id].vcard.fileData[0].vCard[0].PHOTO[0]
+       && accounts[account_id].vcard.fileData[0].vCard[0].PHOTO[0].BINVAL
+       && accounts[account_id].vcard.fileData[0].vCard[0].PHOTO[0].BINVAL[0]) { 
+       var acc_photo = accounts[account_id].vcard.fileData[0].vCard[0].PHOTO[0].BINVAL[0]; %>
+    <% } %>
+    <% if (acc_photo) { %>
+    <img id="acc_avatar_<%= account_id %>" src="data:image/png;base64,<%= acc_photo %>" style="width: 100%; position: relative; top: -100px;"></img> 
+    <% } %>
+  </div>
+  <div class="clear"></div>
+  <div id="change_avatar_input_<%= account_id %>" class="form-group" style="display: block;">
+    <div class="loading_avatar_status"></div>      
+    <input type="button" id="change_avatar_confirm_<%= account_id %>" class="btn btn-primary" value="Change Avatar" />
+    <button id="cancel_btn_<%= account_id %>" class="btn btn-link cancel_btn">Cancel</button>
+  </div>
+</div>

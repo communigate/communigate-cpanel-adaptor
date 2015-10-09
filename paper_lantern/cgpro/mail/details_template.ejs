@@ -1,0 +1,117 @@
+<div class="details_template">
+  <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+    <div class="form-group">
+      <label for="realname_input_<%= account_id %>">Real Name</label>
+      <div class="row">
+	<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+          <input type="text" id="realname_input_<%= account_id %>" class="form-control" name="realname" value="<%= account.prefs.RealName %>" />
+	</div>
+	<div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+          <span id="realname_input_<%= account_id %>_error"></span>
+	</div>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="quota">Mailbox Quota</label>
+      <input type="hidden" id="current_quota_<%= account_id %>" value="<%= account.quota %>" />
+      <div class="row">
+	<div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+          <div class="form-inline">
+            <input type="radio" id="quota_number_<%= account_id %>" name="quota_<%= account_id %>" value="custom_qouta" <% if (account.quota != "unlimited") { %>checked<% } %> />
+            <input type="text" id="quota_number_input_<%= account_id %>" class="form-control" size="7" maxlength="7" <% if (account.quota == "unlimited") { %>value="0" disabled<% } else { %>value="<%= account.quota %>"<% } %> />
+            <span>MB</span>
+          </div>
+	</div>
+	<div id="quota_number_input_<%= account_id %>_error" class="col-xs-12 col-sm-6 col-md-6 col-lg-6"></div>
+      </div>
+
+      <div class="row">
+	<div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+          <label class="form-inline">
+            <input type="radio" name="quota_<%= account_id %>" id="quota_unlimited_<%= account_id %>" value="unlimited" <% if (account.quota == "unlimited") { %>checked<% } %> />
+            <span>Unlimited</span>
+          </label>
+	</div>
+	<div id="quota_unlimited_<%= account_id %>_error" class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	</div>
+      </div>
+    </div>
+
+    <div class="form-group" style="margin-bottom: 0;">
+      <label>Work Days</label>
+    </div>
+
+    <% var wd = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map(function (item) {return (account.prefs.WorkDays.indexOf(item) > -1)?"checked":""}); %>
+    <div class="form-group">
+      <input name="work_days" value="Mon" id="work_days_mon_<%= account_id %>" type="checkbox" <% if (wd[0] == "checked") { %>checked<% } %> >
+      <label for="work_days_mon_<%= account_id %>">Mon</label>
+      <input name="work_days" value="Tue" id="work_days_tue_<%= account_id %>" type="checkbox" <% if (wd[1] == "checked") { %>checked<% } %>>
+      <label for="work_days_tue_<%= account_id %>">Tue</label>
+      <input name="work_days" value="Wed" id="work_days_wed_<%= account_id %>" type="checkbox" <% if (wd[2] == "checked") { %>checked<% } %>>
+      <label for="work_days_wed_<%= account_id %>">Wed</label>
+      <input name="work_days" value="Thu" id="work_days_thu_<%= account_id %>" type="checkbox" <% if (wd[3] == "checked") { %>checked<% } %>>
+      <label for="work_days_thu_<%= account_id %>">Thu</label>
+      <input name="work_days" value="Fri" id="work_days_fri_<%= account_id %>" type="checkbox" <% if (wd[4] == "checked") { %>checked<% } %>>
+      <label for="work_days_fri_<%= account_id %>">Fri</label>
+      <input name="work_days" value="Sat" id="work_days_sat_<%= account_id %>" type="checkbox" <% if (wd[5] == "checked") { %>checked<% } %>>
+      <label for="work_days_sat_<%= account_id %>">Sat</label>
+      <input name="work_days" value="Sun" id="work_days_sun_<%= account_id %>" type="checkbox" <% if (wd[6] == "checked") { %>checked<% } %>>
+      <label for="work_days_sun_<%= account_id %>">Sun</label>
+    </div>
+
+    <div class="form-group">
+      <div class="checkbox">
+	<label for="complex_pass_input_<%= account_id %>"><strong>Force use complex password</strong>
+          <input type="checkbox" id="complex_pass_input_<%= account_id %>" value="1" name="PasswordComplexity" <% if (account.data.PasswordComplexity == "MixedCaseDigit") { %>checked<% } %> />
+	</label>
+      </div>
+      <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	<span id="complex_pass_input_{{index}}_error"></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+    <div class="form-group">
+      <label for="ou_input_<%= account_id %>">Organisation Unit</label>
+      <div class="row">
+	<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+          <input type="text" id="ou_input_<%= account_id %>" class="form-control" name="unit" value="<%= account.data.ou %>" />
+	</div>
+	<div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+          <span id="ou_input_<%= account_id %>_error"></span>
+	</div>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="mobile_phone_input_<%= account_id %>">Mobile Phone</label>
+      <div class="row">
+	<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+          <input type="text" id="mobile_phone_input_<%= account_id %>" class="form-control" name="mobile" value="<%= account.data.MobilePhone %>" />
+	</div>
+	<div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+          <span id="mobile_phone_input_<%= account_id %>_error"></span>
+	</div>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="work_phone_input_<%= account_id %>">Work Phone</label>
+      <div class="row">
+	<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+          <input type="text" id="work_phone_input_<%= account_id %>" class="form-control" name="workphone" value="<%= account.data.WorkPhone %>" />
+	</div>
+	<div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+          <span id="work_phone_input_<%= account_id %>_error"></span>
+	</div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="form-group col-xs-12 col-sm-12 col-md-12 col-lg-12" id="change_quota_input_<%= account_id %>">
+    <input type="button" id="change_details_btn_<%= account_id %>" class="btn btn-primary change_quota_btn" value="Change Details" />
+    <button id="cancel_btn_<%= account_id %>" class="btn btn-link cancel_btn">Cancel</button>
+  </div>
+</div>

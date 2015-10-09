@@ -1,883 +1,131 @@
 [%-
-    CPANEL.CPVAR.dprefix = "../../",
-    CPANEL.CPVAR.userdefined_quota_default_value = execute("Email", "get_default_email_quota_mib").data;
+CPANEL.CPVAR.dprefix = "../../",
+CPANEL.CPVAR.userdefined_quota_default_value = execute("Email", "get_default_email_quota_mib").data;
 
-    IF CPANEL.feature('popaccts');
+# list domains
+SET domains = Api2.exec("Email", "listmaildomains", {} );
 
-        IF (CPANEL.CPCONF.email_account_quota_userdefined_default_value);
-            SET CPANEL.CPVAR.userdefined_quota_default_value = CPANEL.CPCONF.email_account_quota_userdefined_default_value.html();
-        END;
-
-        IF !(CPANEL.CPCONF.email_account_quota_default_selected == "unlimited");
-            SET CPANEL.CPVAR.quota_selected_userdefined = "checked",
-                CPANEL.CPVAR.default_quota_selected = "userdefined";
-        END;
-
-        IF !(CPANEL.CPVAR.quota_selected_userdefined);
-            SET CPANEL.CPVAR.quota_selected_unlimited = "checked",
-                CPANEL.CPVAR.default_quota_selected = "unlimited";
-        END;
-
-        # list domains
-        Api2.pre_exec("Email", "listmaildomains");
-        SET api2_result_Email_listmaildomains =  Api2.exec("Email", "listmaildomains", {} );
-        Api2.post_exec("Email", "listmaildomains");
-
-        # Fetch the required strength
-        Api2.pre_exec("PasswdStrength", "get_required_strength");
-        SET required_strength_resp = Api2.exec("PasswdStrength", "get_required_strength", {"app"=>"pop"} );
-        Api2.post_exec("PasswdStrength", "get_required_strength");
-
-        IF required_strength_resp.size();
-            SET required_strength = required_strength_resp.0.strength;
-        END;
-
-        # stats bar
-        Api2.pre_exec("StatsBar", "stat");
-        SET email_account_stats = Api2.exec("StatsBar", "stat", {"warnings"=>"1", "infinitylang"=>"true", "warninglevel"=>"80", "display"=>"emailac_counts"} );
-        Api2.post_exec("StatsBar", "stat");
-        SET accounts_maxed = (CPANEL.CPVAR.item('statsbar_emailac_counts_maxed'));
-
-        Api1.pre_exec("Email", "checkfastmail");
-        SET check_fast_mail = Api1.exec("Email", "checkfastmail", [undef]);
-        Api1.post_exec("Email", "checkfastmail");
-
-    END;
--%]
-[% js_code = PROCESS js_block %]
+# Fetch the required strength
+SET required_strength = Api2.exec("PasswdStrength", "get_required_strength", {"app"=>"pop"} );
+%]
 
 [% WRAPPER '_assets/master.html.tt'
     app_key = 'cgpro_accounts'
-    page_js = js_code
-    page_scripts = ['sharedjs/handlebars_optimized.js', 'cgpro/mail/js/pops.js']
-    page_stylesheets = ['css2-min/mail/pops.css']
 -%]
 
-<script type="text/javascript" src="js/ejs_production.js"></script>
-<script type="text/javascript">
-var MAX_EMAIL_QUOTA = [% execute("Email", "get_max_email_quota_mib").data.json() %];
-var DEFAULT_EMAIL_QUOTA = [% execute("Email", "get_default_email_quota_mib").data.json() %];
-</script>
-
+<!-- SimpleCropper files -->
 <link rel="stylesheet" type="text/css" href="js/SimpleCropper/css/style.css" /> 
 <link rel="stylesheet" type="text/css" href="js/SimpleCropper/css/style-example.css" />
 <link rel="stylesheet" type="text/css" href="js/SimpleCropper/css/jquery.Jcrop.css" />
 
-<style>
-  .hidden {
-  display: none;
-  }
+<link rel="stylesheet" type="text/css" href="accounts.css" /> 
+<script src="js/ejs_production.js"></script>
 
-  .col2, col4 {
-  white-space: nowrap; 
-  text-align: center;
-  }
-
-  .change_quota_first {
-  padding-left: 0;
-  }
-
-  .settings td {
-  padding-right: 10px;
-  }
-
-  a {
-  cursor: pointer;
-  }
-
-  .dropdown-menu a.btn-link {
-  color: #428BCA;
-  text-align: left;
-  }
-
-  .dropdown-menu a.btn-link:hover {
-  color: #428BCA;
-  }
-
-  .dropdown-menu li a.btn-link span{
-  padding-left: 0;
-  padding-top: 0;
-  padding-bottom: 0;  
-  }
-
-  .col2span {
-  margin-left: 15px;
-  }
-
-  .col4span, .col3span {
-  margin-left: 30px;
-  }
-
-  .dt_info_row td{
-  margin-top: -1px;
-  }
-  
-  .table>tbody>.action-row>td {
-  border: none;
-  }
-
-  .action-row {
-  border: none;
-  }
-
-  .avatar {
-  max-width: 48px;
-  cursor: pointer;
-  }
-
-  .glyph-edit {
-  display: none;
-  position: absolute;
-  left: 0;
-  top: 0;
-  font-size: 18px;
-  background: rgba(220,220,220,0.7);
-  }
-  
-  .img-div-rel {
-  position: relative
-  }
-
-  .avatar_span {
-  font-size: 48px; 
-  cursor: pointer;
-  display: inline;
-  }
-
-  .realname_acc {
-  font-weight: bold;
-  }
-
-  .progress {
-  border-radius: 0; 
-  height: 2px;
-  }
-
-  .glyphmargin {
-  margin-right: 3px;
-  }
-  
-  .telnum {
-  font-family: "Open Sans";
-  padding-left: 5px;
-  }
-
-  .glyphtel {
-  margin-right: 10px;
-
-  }
-
-  .change_quota_btn {
-  max-width: 130px;
-  }
-
-  .change_quota_status {
-  line-height: 35px;
-  }
-
-  .loading_avatar_status {
-  margin-bottom: 10px;
-  }
-</style>
-
-<div class="body-content">
-[% IF CPANEL.feature('cgpro_accounts') %]
-    <p id="descEmailAccounts" class="description">
-        [%-
-            IF (CPANEL.CPVAR.item('maildomainscount') >= "1");
-                locale.maketext("Manage the accounts associated with your domain. For more information, read the [output,url,_1,documentation,target,_2,id,_3].", "//go.cpanel.net/PLDAccounts", "_blank", "lnkAccountsDocumentation");
-            END
-        -%]
-    </p>
-
-    [% IF email_account_stats.size() %]
-        <div class="alert alert-warning">
-            <span class="glyphicon glyphicon-exclamation-sign"></span>
-            <div class="alert-message">
-                [% locale.maketext("[output,strong,Warning]: You currently use [numf,_1] out of [numf,_2]", email_account_stats.0.count, email_account_stats.0.max) %]
-            </div>
+<div>
+  <!-- Create Account form -->
+  <div class="add_account_wrap">
+    <h2>Add Account</h2>
+    <div class="form-group">
+      <label for="add_email_account">Email</label>
+      <div class="row">
+        <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+          <div class="input-group">
+            <input type="text" id="add_email_account" class="form-control" />
+            <span class="input-group-addon">@[% IF domains.size == 1 %][% domains.0.domain %][% END %]</span>
+          </div>
         </div>
-     [% END %]
+	<div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+          <div id="add_email_account_error"></div>
+        </div>
+      </div>
+      [% IF domains.size == 1 %]
+      <input id="add_email_domain" type="hidden" value="[% domains.0.domain %]" />
+      [% END %]
+    </div>
 
-    <div class="section">
-        <h2 id="hdrAddEmailAccount">[% locale.maketext("Add Account") %]</h2>
-
-        [% IF accounts_maxed %]
-            <div id="usingMaximumNumberOfEmailAccounts" class="alert alert-warning">
-                <span id="usingMaximumNumberOfEmailAccountsImg" class="glyphicon glyphicon-exclamation-sign"></span>
-                <div id="usingMaximumNumberOfEmailAccountsMsg" class="alert-message">
-                    [% locale.maketext("[output,strong,Warning:] You are currently using the maximum number of Email Accounts.") %]
-                    [% locale.maketext("If you need more, contact your service provider.") %]
-                </div>
-            </div>
-        [% END %]
-
-        [% IF accounts_maxed %]
-            <div id="new_email_account_input_div" class="section hide">
-        [% ELSE %]
-            <div id="new_email_account_input_div" class="section">
-        [% END %]
-            <div class="form-group">
-                <label id="lblAddEmailAccount" for="add_email_account">
-                    [% locale.maketext("Email") %]
-                </label>
-                <div class="row">
-                    <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
-                        <div class="input-group">
-                            [% IF (CPANEL.CPVAR.maildomainscount == "1") %]
-                                <input id="add_email_account" type="text" class="form-control" />
-                                <span id="spanAddEmailAccountDomains" class="input-group-addon">
-                                    @[% IF api2_result_Email_listmaildomains.size(); %]
-                                           [% FOREACH hashref IN api2_result_Email_listmaildomains %]
-                                                [% hashref.domain.html(); %]
-                                                <input id="add_email_domain" type="hidden" value="[%  hashref.domain.html() %]" />
-                                           [% END %]
-                                        [% END %]
-                                </span>
-                            [% ELSE %]
-                                <input id="add_email_account" type="text" class="form-control" />
-                                <span id="atSignAddEmailAccount" class="input-group-addon">
-                                    @
-                                </span>
-                            [% END %]
-                        </div>
-
-                    </div>
-                    <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
-                        <div id="add_email_account_error"></div>
-                    </div>
-                </div>
-            </div>
-            [% IF (CPANEL.CPVAR.maildomainscount > "1") %]
-            <div class="form-group">
-                <label id="lblAddEmailDomain" for="add_email_domain">
-                    [% locale.maketext("Domain")  %]
-                </label>
-                <div class="row">
-                    <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
-                        <select id="add_email_domain" class="form-control">
-                            [% IF api2_result_Email_listmaildomains.size(); %]
-                               [% FOREACH hashref IN api2_result_Email_listmaildomains; %]
-                                    <option value="[%  hashref.domain.html() %]">
-                                        [%  hashref.domain.html() %]
-                                    </option>
-                                [% END %]
-                            [% END %]
-                        </select>
-                    </div>
-                    <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
-                    </div>
-                </div>
-            </div>
+    [% IF domains.size > 1 %]
+    <div class="form-group">
+      <label for="add_email_domain">Domain</label>
+      <div class="row">
+        <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+          <select id="add_email_domain" class="form-control">
+            [% FOREACH domain IN domains %]
+            <option value="[% domain %]">[% domain.domain %]</option>
             [% END %]
-            <div class="form-group">
-                <label id="lblAddEmailPassword" for="add_email_password1">
-                    [% locale.maketext("Password") %]
-                </label>
-                <div class="row">
-                    <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
-                        <input type="password" id="add_email_password1" class="form-control" />
-                    </div>
-                    <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
-                        <div id="add_email_password1_error"></div>
-                    </div>
-                </div>
-            </div>
-            <div class="form-group">
-                <label id="lblAddEmailPassword2" for="add_email_password2">
-                    [% locale.maketext("Password (Again)") %]
-                </label>
-                <div class="row">
-                    <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
-                        <input type="password" id="add_email_password2" class="form-control" />
-                    </div>
-                    <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
-                        <div id="add_email_password2_error"></div>
-                    </div>
-                </div>
-            </div>
-            <div class="form-group">
-                <label id="lblPasswordStrength">
-                    [% locale.maketext("Strength") %]
-                    <span id="why_strong_passwords_link" class="glyphicon glyphicon-info-sign"></span>
-                </label>
-                [% INCLUDE _assets/why_strong_passwords.html.tt %]
-                <div class="row">
-                    <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
-                        <div id="password_strength" class="password_strength"></div>
-                    </div>
-                    <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
-                        <input id="create_strong_password" type="button" class="btn btn-default" value="[% locale.maketext("Password Generator") %]" tabindex="-1" />
-                    </div>
-                </div>
-            </div>
-            <div class="form-group">
-                 <div class="row">
-                    <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
-                        <div class="form-inline">
-                            <input id="quota_number" type="hidden" name="quota" checked />
-                            <input id="quota_number_input" type="hidden" class="form-control" size="7" maxlength="7" value="250" />
-                        </div>
-                    </div>
-                    <div id="quota_number_input_error" class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
-                        <label class="form-inline">
-                            <input id="quota_unlimited" type="hidden" name="quota" />
-                        </label>
-                    </div>
-                    <div id="quota_unlimited_error" class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
-                    </div>
-                </div>
-            </div>
-            <div class="form-group">
-                <input id="add_email_create" class="btn btn-primary" type="button" value="[% locale.maketext("Create Account") %]" />
-                <div id="add_email_create_status"></div>
-            </div>
-            <div id="add_email_status_bar" style="margin:0 -5px;" class="cjt_status_bar"></div>
-        </div><!-- end create email account -->
+          </select>
+        </div>
+        <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+        </div>
+      </div>
+    </div>
+    [% END %]
+
+    <div class="form-group">
+      <label for="add_email_password1">Password</label>
+      <div class="row">
+        <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+          <input type="password" id="add_email_password1" class="form-control" />
+        </div>
+        <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+          <div id="add_email_password1_error"></div>
+        </div>
+      </div>
     </div>
 
-    <div class="section">
-        <h2 id="hdrEmailAccounts">[% locale.maketext("Accounts")  %]</h2>
-        <div class="row">
-            <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
-                <div class="row">
-                    <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
-		      <label>[% locale.maketext("Search")  %]</label>
-                        <input id="email_table_search_input" type="text" class="form-control" />
-                    </div>
-                    <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
-                        <input id="email_table_clear_search" type="button" class="btn btn-primary" value="[% locale.maketext("Clear")  %]" style="display:none; margin-top: 23px;" onclick="clear_search()" />
-                    </div>
-                </div>
-            </div>
-            <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6" style="display: none;">
-                <div class="row">
-                    <div class="col-xs-9">
-                        <label id="lblPageSize" for="email_table_items_per_page" class="pull-right">
-                            [% locale.maketext("Page Size")  %]
-                        </label>
-                    </div>
-                    <div class="col-xs-3">
-                        <div class="form-group">
-                            <select id="email_table_items_per_page" class="form-control">
-                                <option value="10">10</option>
-                                <option value="25">25</option>
-                                <option value="50">50</option>
-                                <option value="100">100</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-            </div>
+    <div class="form-group">
+      <label for="add_email_password2">Password (Again)</label>
+      <div class="row">
+        <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+          <input type="password" id="add_email_password2" class="form-control" />
         </div>
-        <div id="accounts_table_1" class="yui-skin-sam"></div>
-        <div id="accounts_table" class="yui-skin-sam"></div>
-        <div id="menus_div"></div>
+        <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+          <div id="add_email_password2_error"></div>
+        </div>
+      </div>
     </div>
 
-    <script id="change_password_template" type="text/x-handlebars-template">
-        <div class="form-group" style="margin-top: 10px;">
-            <label>[% locale.maketext('Password') %]</label>
-            <div class="row">
-                <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
-                    <input type="password" id="change_password_input_1_{{index}}" class="form-control" />
-                </div>
-                <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
-                    <span id="change_password_input_1_{{index}}_error"></span>
-                </div>
-            </div>
+    <div class="form-group">
+      <label>Strength<span id="why_strong_passwords_link" class="glyphicon glyphicon-info-sign"></span></label>
+      [% INCLUDE _assets/why_strong_passwords.html.tt %]
+      <div class="row">
+        <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+          <div id="password_strength" class="password_strength"></div>
         </div>
-        <div class="form-group">
-            <label>[% locale.maketext("Password (Again)") %]</label>
-            <div class="row">
-                <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
-                    <input type="password" id="change_password_input_2_{{index}}" class="form-control" />
-                </div>
-                <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
-                    <span id="change_password_input_2_{{index}}_error"></span>
-                </div>
-            </div>
+        <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+          <input id="create_strong_password_add_email" type="button" class="btn btn-default" value="Password Generator" tabindex="-1" />
         </div>
-        <div class="form-group">
-            <label>[% locale.maketext("Strength") %]</label>
-            <div class="row">
-                <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
-                </div>
-                <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
-                    <div id="password_strength_bar_{{index}}" class="password_strength"></div>
-                </div>
-                <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
-                    <input type="button" id="create_strong_password_{{index}}" class="btn btn-default" value="[% locale.maketext("Password Generator") %]" tabindex="-1" />
-                </div>
-            </div>
-
-        </div>
-        <div class="form-group" id="change_password_input_{{index}}">
-            <input type="button" class="btn btn-primary" value="[% locale.maketext('Change Password') %]" id="email_table_change_password_confirm_{{index}}" />
-            <button class="btn btn-link" id="email_table_change_password_cancel_{{index}}">[% locale.maketext("Cancel") %]</button>
-        </div>
-        <div id="change_password_status_{{index}}"></div>
-    </script>
-
-    <script id="change_quota_template" type="text/x-handlebars-template">
-      <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6 change_quota_first">
-        <div class="form-group" style="margin-top: 10px;">
-            <label>[% locale.maketext('Real Name:') %]</label>
-            <div class="row">
-                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-                    <input type="text" id="realname_input_{{index}}" value="{{real_name}}" name="realname" class="form-control" />
-                </div>
-                <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
-                    <span id="realname_input_{{index}}_error"></span>
-                </div>
-            </div>
-        </div>
-
-        <div class="form-group">
-            <span id="current_quota_{{index}}_error" style="display: none"></span>
-            <label for="quota">
-                [% locale.maketext("Mailbox Quota")  %]
-            </label>
-            <input type="hidden" id="current_quota_{{index}}" value="{{quota}}" />
-            <div class="row">
-                <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
-                    <div class="form-inline">
-                        <input type="radio" name="quota_{{index}}" id="quota_number_{{index}}" {{#unless isUnlimited}}checked="checked"{{/unless}} />
-                        <input type="text" class="form-control" size="7" maxlength="7" {{#if isUnlimited}}value="{{quotaDefaultValue}}"{{else}}value="{{quota}}"{{/if}} id="quota_number_input_{{index}}" />
-                        <span>MB</span>
-                    </div>
-                </div>
-                <div id="quota_number_input_{{index}}_error" class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
-                     <label class="form-inline">
-                        <input type="radio" name="quota_{{index}}" id="quota_unlimited_{{index}}" {{#if isUnlimited}}checked="checked"{{/if}} />
-                        <span>[% locale.maketext("Unlimited") %]</span>
-                    </label>
-                </div>
-                <div id="quota_unlimited_{{index}}_error" class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
-                </div>
-            </div>
-        </div>
-
-
-        <div class="form-group" style="margin-bottom: 0;">
-          <label>[% locale.maketext('Work Days:') %]</label>
-	</div>
-
-        <div class="form-group">
-	  <input name="WorkDays" value="Mon" id="WorkDays-Mon_{{index}}" type="checkbox" {{work_days_1}}>
-	  <label for="WorkDays-Mon_{{index}}">Mon</label>
-	  <input name="WorkDays" value="Tue" id="WorkDays-Tue_{{index}}" type="checkbox" {{work_days_2}}>
-	  <label for="WorkDays-Tue_{{index}}">Tue</label>
-	  <input name="WorkDays" value="Wed" id="WorkDays-Wed_{{index}}" type="checkbox" {{work_days_3}}>
-	  <label for="WorkDays-Wed_{{index}}">Wed</label>
-	  <input name="WorkDays" value="Thu" id="WorkDays-Thu_{{index}}" type="checkbox" {{work_days_4}}>
-	  <label for="WorkDays-Thu_{{index}}">Thu</label>
-	  <input name="WorkDays" value="Fri" id="WorkDays-Fri_{{index}}" type="checkbox" {{work_days_5}}>
-	  <label for="WorkDays-Fri_{{index}}">Fri</label>
-	  <input name="WorkDays" value="Sat" id="WorkDays-Sat_{{index}}" type="checkbox" {{work_days_6}}>
-	  <label for="WorkDays-Sat_{{index}}">Sat</label>
-	  <input name="WorkDays" value="Sun" id="WorkDays-Sun_{{index}}" type="checkbox" {{work_days_7}}>
-	  <label for="WorkDays-Sun_{{index}}">Sun</label>
-        </div>
-
-        <div class="form-group">
-          <div class="checkbox">
-	    <label for="complex_pass_input_{{index}}"><strong>[% locale.maketext('Force use complex password') %]</strong>
-            <input type="checkbox" id="complex_pass_input_{{index}}" value="1" name="PasswordComplexity" {{strong_password}}/>
-	    </label>
-	  </div>
-          <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
-            <span id="complex_pass_input_{{index}}_error"></span>
-          </div>
-        </div>
+      </div>
     </div>
-   </div>
 
-	<div class="col-xs-12 col-sm-6 col-md-6 col-lg-6" style="margin-top: 10px;">
-          <div class="form-group">
-            <label>[% locale.maketext('Organisation Unit:') %]</label>
-            <div class="row">
-              <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-                <input type="text" id="ou_input_{{index}}" value="{{organisation_unit}}" name="unit" class="form-control" />
-              </div>
-              <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
-                <span id="ou_input_{{index}}_error"></span>
-              </div>
-            </div>
-          </div>
-          <div class="form-group">
-            <label>[% locale.maketext('Mobile Phone:') %]</label>
-            <div class="row">
-              <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-                <input type="text" id="mobile_phone_input_{{index}}" value="{{mobile_phone}}" name="mobile" class="form-control" />
-              </div>
-              <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
-                <span id="mobile_phone_input_{{index}}_error"></span>
-              </div>
-            </div>
-          </div>
-          <div class="form-group">
-            <label>[% locale.maketext('Work Phone:') %]</label>
-            <div class="row">
-              <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-                <input type="text" id="work_phone_input_{{index}}" value="{{work_phone}}" name="workphone" class="form-control" />
-              </div>
-              <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
-                <span id="work_phone_input_{{index}}_error"></span>
-              </div>
-            </div>
-          </div>
-	</div>
-
-    <div class="form-group col-xs-12 col-sm-12 col-md-12 col-lg-12" id="change_quota_input_{{index}}">
-      <input type="button" class="btn btn-primary col-xs-6 col-sm-2 col-md-2 col-lg-2 change_quota_btn" value="[% locale.maketext('Change Details') %]" id="change_quota_confirm_{{index}}" />
-      <button class="btn btn-link col-xs-6 col-sm-1 col-md-1 col-lg-1" id="email_table_change_quota_cancel_{{index}}">[% locale.maketext("Cancel") %]</button>
-      <div class="col-xs-6 col-sm-3 col-md-3 col-lg-3 change_quota_status" id="change_quota_status_{{index}}"></div>
+    <div class="form-group">
+      <input id="add_email_create" class="btn btn-primary" type="button" value="Create Account" />
+      <div id="add_email_create_status"></div>
     </div>
-    </script>
-
-    <script id="delete_template" type="text/x-handlebars-template">
-      <div class="form-group"style="margin-top: 10px;">
-        <p>[% locale.maketext("Delete") %] {{email}}?</p>
+    <div id="add_email_status_bar" style="margin:0 -5px;" class="cjt_status_bar"></div>
+  </div> <!-- End Create Account form -->
+  <div id="add_status_bar" class="status_bar"></div>
+  
+  <!-- Accounts wrap div -->
+  <div class="accounts_wrap_div">
+    <h2>Accounts</h2>
+    <div class="row">
+      <div class="col-xs-12 col-sm-3 col-md-3 col-lg-3">
+    	<label>Search</label>
+        <input id="search_input" type="text" class="form-control" />
       </div>
-      <div class="form-group" id="delete_confirm_input_{{index}}">
-        <input type="button" class="btn btn-primary" id="email_table_delete_confirm_{{index}}" value="[% locale.maketext("Delete")  %]" />
-        <button class="btn btn-link" id="email_table_delete_cancel_{{index}}">[% locale.maketext("Cancel") %]</button>
+      <div class="col-xs-12 col-sm-3 col-md-3 col-lg-3">
+        <input id="clear_search" type="button" class="btn btn-primary" value="Clear" style="margin-top: 23px;" onclick="clear_search()" />
       </div>
-      <div id="delete_email_status_{{index}}"></div>
-    </script>
-
-    <script id="airsync_template" type="text/x-handlebars-template">
-      <div id="airsync_wrap_{{index}}" style="display: none;">
-	<div class="form-group">
-          <h3>[% locale.maketext('Allowed Mobile Devices:') %]</h3>
-          <div class="row">
-            <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
-	      <input class="form-control" type="text" id="airsync_allowed_{{index}}" name="AirSyncAllowed" value="" />
-	      <p>[% locale.maketext("Comma (',') separated device IDs or asterisk ('*') for any.") %]</p>
-	      <input class="btn btn-primary" type="button" value="[% locale.maketext('Save') %]" id="loadairsync_{{index}}" />
-	      <button class="btn btn-link" id="airsync_cancel_{{index}}">[% locale.maketext("Cancel") %]</button>
-            </div>
-          </div>
-	    <div id="allowed_save_loading_{{index}}" style="display: block; padding-top: 10px;"></div>
-	    <div id="allowed_save_status_{{index}}" class="cjt_status_bar" style="display: block; padding: 0;"></div>
-	</div>
-
-	<h3>[% locale.maketext("Device List") %]</h3>
-	<table cellpadding="5" id="mailtbl_{{index}}" class="table table-striped">
-	  <thead>
-	    <tr>
-	      <th class="cell">[% locale.maketext("DeviceID") %]</th>
-	      <th class="cell">[% locale.maketext("DeviceType") %]</th>
-	      <th class="cell">[% locale.maketext("LastAccess") %]</th>
-	      <th class="cell">[% locale.maketext("Wiped") %]</th>
-	      <th class="cell-end sorttable_nosort">[% locale.maketext("Functions") %]</th>
-	    </tr>
-	  </thead>
-	  <tbody>
-	  </tbody>
-	</table>
-
-	<h3>[% locale.maketext('Setup') %]</h3>
-	<div class="col-xs-12 col-sm-4 col-md-4 col-lg-4" style="background: #f9f9f9; margin-bottom: 15px; padding: 10px; max-width: 350px;">
-	  <table class="settings settings_ssl">
-	    <tbody>
-	      <tr>
-		<th colspan="2" style="text-align: center;">[% locale.maketext("SecureSSL/TLSSettings") %] <br />
-		  ([% locale.maketext("Recommended") %])
-		</th>
-	      </tr>
-	      <tr>
-		<td>[% locale.maketext('Username') %]:</td>
-		<td class="data">
-		  <span id="airsync_username_{{index}}" style="font-weight: bold;">
-		  </span>
-		</td>
-	      </tr>
-	      <tr>
-		<td>[% locale.maketext("Password") %]:</td>
-		<td class="escape-note"><em>( [% locale.maketext("Use the email account’s password.") %] )</em></td>
-	      </tr>
-	      <tr>
-		<td>[% locale.maketext("Domain") %]:</td>
-		<td class="data">
-		  <span id="airsync_domain_{{index}}" style="font-weight: bold;">
-		  </span>
-		</td>
-	      </tr>
-	      <tr>
-		<td>[% locale.maketext("Server") %]:</td>
-		<td class="data">
-		  <span id="airsync_server_{{index}}" style="font-weight: bold;">
-		  </span>
-		</td>
-	      </tr>
-	      <tr>
-		<td>[% locale.maketext("Port") %]:</td>
-		<td class="data">
-		  <strong>443</strong>
-		</td>
-	      </tr>
-	      <tr>
-		<td>[% locale.maketext("Use SSL") %]:</td>
-		<td><strong>[% locale.maketext("Leave Ticked") %]</strong></td>
-	      </tr>
-	    </tbody>
-	  </table>
-	</div>
-
-	<div class="col-xs-12 col-sm-4 col-md-4 col-lg-4" style="margin-bottom: 15px; padding: 10px; max-width: 350px;">
-	  <table class="settings">
-	    <tbody>
-	      <tr>
-		<th colspan="2" style="text-align: center;">[% locale.maketext("Non Secure Settings") %] <br />
-		  ([% locale.maketext("NOT Recommended") %])
-		</th>
-	      <tr>
-		<td>[% locale.maketext("Username") %]:</td>
-		<td class="data">
-		  <span id="airsync_username_non_ssl_{{index}}" style="font-weight: bold;">
-		  </span>
-		</td>
-	      </tr>
-	      <tr>
-		<td>[% locale.maketext("CGPPassword") %]:</td>
-		<td class="escape-note"><em>( [% locale.maketext("Use the email account’s password.") %] )</em></td>
-	      </tr>
-	      <tr>
-		<td>[% locale.maketext("CGPDomain") %]:</td>
-		<td class="data">
-		  <span id="airsync_domain_non_ssl_{{index}}" style="font-weight: bold;">
-		  </span>
-		</td>
-	      </tr>
-	      <tr>
-		<td>[% locale.maketext("CGPServer") %]:</td>
-		<td class="data">
-		  <span id="airsync_server_non_ssl_{{index}}" style="font-weight: bold;">
-		  </span>
-		</td>
-	      </tr>
-	      <tr>
-		<td>[% locale.maketext("CGPPort") %]:</td>
-		<td class="data">
-		  <strong>80</strong>
-		</td>
-	      </tr>
-	      <tr>
-		<td>[% locale.maketext("CGPuseSSL") %]:</td>
-		<td><strong>[% locale.maketext("CGPleaveUnticked") %]</strong></td>
-	      </tr>
-	      </tr>
-	    </tbody>
-	  </table>
-	</div>
-      </div>
-      <div id="airsync_status_{{index}}" style="padding: 20px;"></div>
-    </script>
-
-    <script id="image_template" type="text/x-handlebars-template">
-      <label style="display: block; margin-top: 10px;">Avatar:</label>
-      <div class="cropme" id="crop_{{index}}" style="width: 100px; height: 100px;">
-	<span class="glyphicon glyphicon-camera" style="font-size: 70px;"></span>
-	{{#if acc_photo}}
-	<img id="acc_avatar_{{index}}" src="data:image/png;base64,{{acc_photo}}" style="width: 100%; position: relative; top: -100px;"></img> 
-	{{/if}}
-      </div>
-      <div class="clear"></div>
-      <div class="form-group" style="display: block;" id="change_avatar_input_{{index}}">
-	<div class="loading_avatar_status"></div>      
-        <input type="button" class="btn btn-primary" value="[% locale.maketext('Change Avatar') %]" id="change_avatar_confirm_{{index}}" />
-        <button class="btn btn-link" id="change_avatar_cancel_{{index}}">[% locale.maketext("Cancel") %]</button>
-      </div>
-      <div id="change_avatar_status_{{index}}"></div>      
-    </script>
-    
-    <script id="change_type_template" type="text/x-handlebars-template">
-      <div class="form-group" style="margin-top: 10px;">
-        <div class="row">
-          <div class="col-xs-3 col-sm-1 col-md-1 col-lg-1" style="max-width: 15px;">
-	    <input type="radio" id="class_{{type}}_{{index}}" value="{{type}}" name="class_{{index}}" {{checked}} />
-          </div>
-          <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
-	    <label for="class_{{type}}_{{index}}">
-	      <span class="glyphicon glyphicon-envelope" {{#if access_modes_mail}}style="color: #000000"{{else}}style="color: #aaaaaa"{{/if}}></span>
-	      <span class="glyphicon glyphicon-comment" {{#if access_modes_xmpp}}style="color: #000000"{{else}}style="color: #aaaaaa"{{/if}}></span>
-	      <span class="glyphicon glyphicon-phone" {{#if access_modes_sip}}style="color: #000000"{{else}}style="color: #aaaaaa"{{/if}}></span>
-	      <span class="glyphicon glyphicon-calendar" {{#if access_modes_webcal}}style="color: #000000"{{else}}style="color: #aaaaaa"{{/if}}></span>
-	      {{type}}
-	     
-	    </label>
-	  </div>
-        </div>
-      </div>
-    </script>
-
-    <script id="change_type_template_submit" type="text/x-handlebars-template">
-      <!-- <div class="form-group"> -->
-      <!--   <div class="row"> -->
-      <!--     <div class="col-xs-3 col-sm-1 col-md-1 col-lg-1" style="max-width: 15px;"> -->
-      <!--       <input type="checkbox" id="restrictAccess_{{index}}" value="1" name="restrictAccess" /> -->
-      <!--     </div> -->
-      <!--     <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6"> -->
-      <!-- 	    <label for="restrictAccess_{{index}}">[% locale.maketext('Restrict account access to Client IP Adresses:') %]</label> -->
-      <!-- 	  </div> -->
-      <!--     <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6"> -->
-      <!--       <span id="restrictAccess_{{index}}_error"></span> -->
-      <!--     </div> -->
-      <!--   </div> -->
-      <!-- </div> -->
-      <div class="form-group" id="change_type_confirm_input_{{index}}">
-        <input type="button" class="btn btn-primary" id="change_type_confirm_{{index}}" value="[% locale.maketext("Change Type")  %]" />
-        <button class="btn btn-link" id="change_type_cancel_{{index}}">[% locale.maketext("Cancel") %]</button>
-      </div>
-      <div id="change_type_status_{{index}}"></div>
-    </script>
-
-    <script id="show_details_template" type="text/x-handlebars-template" style="margin-left: 0;">
-      <table class="table table-striped" style="margin-top: -1px; margin-bottom: 15px; margin-top: 15px;">
-	<colgroup>
-	  <col width="20%">
-	  <col width="80%">
-	</colgroup>
-	<tr>
-	  <td>
-	    <span class="glyphicon glyphicon-user"></span>
-	    <strong>[% locale.maketext("Real Name:") %]</strong>
-	  </td>
-	  <td>{{real_name}}</td>
-	</tr>
-	<tr>
-	  <td>
-	    <span class="glyphicon glyphicon-home"></span>
-	    <strong>[% locale.maketext("Organisation Unit:") %]</strong>
-	  </td>
-	  <td>{{organisation_unit}}</td>
-	</tr>
-	<tr>
-	  <td>
-	    <span class="glyphicon glyphicon-phone"></span>
-	    <strong>[% locale.maketext("Mobile Phone:") %]</strong>
-	  </td>
-	  <td>{{mobile_phone}}</td>
-	</tr>
-	<tr>
-	  <td>
-	    <span class="glyphicon glyphicon-phone-alt"></span>
-	    <strong>[% locale.maketext("Work Phone:") %]</strong>
-	  </td>
-	  <td>{{work_phone}}</td>
-	</tr>
-	<tr>
-	  <td>
-	    <span class="glyphicon glyphicon-hdd"></span>
-	    <strong>[% locale.maketext("Quota:") %]</strong>
-	  </td>
-	  <td>{{quota}}</td>
-	</tr>
-	<tr>
-	  <td>
-	    <span class="glyphicon glyphicon-envelope"></span>
-	    <strong>[% locale.maketext("Sent Messages:") %]</strong>
-	  </td>
-	  <td>{{sent_messages}}</td>
-	</tr>
-	<tr>
-	  <td style="border-bottom: 1px solid #dddddd;">
-	    <span class="glyphicon glyphicon-inbox"></span>
-	    <strong>[% locale.maketext("Received Messages:") %]</strong>
-	  </td>
-	  <td style="border-bottom: 1px solid #dddddd;">{{received_messages}}</td>
-	</tr>
-	<tr>
-      </table>
-    </script>
-[% END %]
-<!-- end cpanelfeature popaccts -->
-
-[% IF !CPANEL.feature('popaccts') %]
-    [%  Api1.exec("include", ["../refresh.html"]) %]
-[% END %]
-
-</div><!-- end body-content div -->
-[% END #wrapper %]
-
-[% BLOCK js_block %]
-<script type="text/javascript">
-var MORE_IMG = '<span class="caret"></span>';
-
-var WEBMAIL_ENABLED = false;
-[% IF CPANEL.feature('webmail') %]
-    WEBMAIL_ENABLED = true;
-[% END %]
-
-var REQUIRED_PASSWORD_STRENGTH = parseInt('[% required_strength %]', 10) || 5;
-var USERDEFINED_QUOTA_DEFAULT_VALUE = [% CPANEL.CPVAR.userdefined_quota_default_value.json() %] || [% execute("Email", "get_default_email_quota_mib").data.json() %];
-var DEFAULT_QUOTA_SELECTED = '[% CPANEL.CPVAR.default_quota_selected.html() %]';
-var LANG = {
-    search_email : "[% locale.maketext("Search Email")  %]",
-    change_password_br : "[% locale.maketext("Change Password") %]",
-    change_quota_br : "[% locale.maketext("Change Quota") %]",
-    delete2 : "[% locale.maketext("Delete")  %]",
-    more : "[% locale.maketext("More")  %]",
-    password : "[% locale.maketext("Password")  %]",
-    password2 : "[% locale.maketext("Password (Again)")  %]",
-    strength : "[% locale.maketext("Strength")  %]",
-    password_generator : "[% locale.maketext("Password Generator")  %]",
-    change_password : "[% locale.maketext("Change Password")  %]",
-    mailbox_quota : "[% locale.maketext("Mailbox Quota")  %]",
-    change_quota : "[% locale.maketext("Change Quota")  %]",
-    access_webmail : "[% locale.maketext("Access Webmail")  %]",
-    configure_email_client : "[% locale.maketext("Configure Email Client")  %]",
-    next : "[% locale.maketext("Next")  %]",
-    prev : '[% locale.maketext("[output,abbr,Prev,Previous]") %]',
-    loading : "[% locale.maketext("Loading …") %]",
-    deleting : "[% locale.maketext("Deleting …") %]",
-    changing_password : "[% locale.maketext("Changing password …") %]",
-    changing_quota : "[% locale.maketext("Changing quota …") %]",
-    ajax_failure : "[% locale.maketext("[asis,AJAX] Failure. Refresh the page and try again.") %]",
-    creating_account : "[% locale.maketext("Creating account …") %]",
-    created_account : "[% locale.maketext("Created account.") %]",
-    not_valid_email : "[% locale.maketext("That is not a valid email address.")  %]",
-    email_max_128_char : "[% locale.maketext("Email address cannot be longer than 128 characters.")  %]",
-    email_quota_2gig : "[% locale.maketext("Quotas cannot exceed [format_bytes,_1].", execute("Email", "get_max_email_quota").data)  %]",
-    email_quota_number_or_unlimited : "[% locale.maketext("Quota must be a number or you must set the quota to either a number or [output,em,unlimited].")  %]",
-    email_quota_number : "[% locale.maketext("Quota must be a positive integer.")  %]",
-    account_name : "[% locale.maketext("Account Name")  %]",
-    deleted : "[% locale.maketext("Deleted")  %]",
-    Unlimited : "[% locale.maketext("Unlimited")  %]",
-    permission_401 : "[% locale.maketext("HTTP Status: 401 Permission Denied")  %]",
-    ajax_failure : "[% locale.maketext("AJAX Failure.")  %]",
-    retrying_3_seconds : "[% locale.maketext("Retrying in 3 seconds …")  %]",
-    no_accounts_found : "[% locale.maketext("No Accounts Found")  %]",
-    must_change_before_edit : "[% locale.maketext("You must change something before you can edit.")  %]",
-    password_changed : "[% locale.maketext("Password Changed")  %]",
-    account_created : "[% locale.maketext("Account Created")  %]",
-    unknown_error : "[% locale.maketext("Unknown Error")  %]",
-    More : "[% locale.maketext("More")  %]",
-    Changed_Quota : "[% locale.maketext("Changed Quota")  %]",
-    Quota : "[% locale.maketext("Quota")  %]"
-};
-[% IF CPANEL.feature('defaultaddress') AND CPANEL.CPVAR.maindiscard != "1" %]
-YAHOO.util.Event.onDOMReady(function() {
- // CPANEL.panels.create_help("default_account_help", "default_account_help_text");
-});
-[% END %]
-
-[%# INSERT 'sharedjs/handlebars_optimized.js' -%]
+    </div>
+    <div id="load_accounts_status_bar" class="status_bar"></div>
+    <div id="accounts_table"></div>
+    <div id="menus_div"></div>
+  </div>
+</div>
+<script>
+  var REQUIRED_PASSWORD_STRENGTH = parseInt('[% required_strength %]', 10) || 5;
 </script>
 <script type="text/javascript" src="js/SimpleCropper/scripts/jquery.Jcrop.js"></script>
 <script type="text/javascript" src="js/SimpleCropper/scripts/jquery.SimpleCropper.js"></script>
-[% END #js_block %]
+<script src="js/accounts.js"></script>
+[% END %]

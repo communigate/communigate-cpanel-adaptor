@@ -1,0 +1,9 @@
+<div class="delete_template">
+  <div class="form-group">
+    <p>Delete <%= account.prefs.AccountName %>?</p>
+  </div>
+  <div class="form-group" id="delete_confirm_input_<%= account_id %>">
+    <input type="button" id="delete_account_btn_<%= account_id %>" class="btn btn-primary" value="Delete" />
+    <button id="cancel_btn_<%= account_id %>" class="btn btn-link cancel_btn">Cancel</button>
+  </div>
+</div>

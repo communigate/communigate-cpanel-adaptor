@@ -1,4 +1,4 @@
-<table id="table_email_accts" class="table table-striped">
+<table class="accounts_table table table-striped">
   <colgroup>
     <col>
     <col width="30%">
@@ -8,144 +8,116 @@
   </colgroup>
   <thead>
     <tr>
-      <th class="col0"></th>
-      <th class="col1">Account</th>
-      <th class="col2"><span>Stats</span></th>
-      <th class="col4"><span>Type</span></th>
-      <th class="col3"><span class="col3span">References</span></th>
+      <th></th>
+      <th>Account</th>
+      <th class="stats_td">Stats</th>
+      <th class="plan_td">Type</th>
+      <th>References</th>
     </tr>
   </thead>
   <tbody>
-    <% var diskquota_acc; %>
-    <% var row_toggle = 'rowA' %>
-    <% for (var i=0; i < ACCOUNTS.length; i++) { %>
-    <tr id="account_row_<%= i %>" class="dt_info_row <%= row_toggle %>">
-
-      <td class="col0 dt-module" title="Change Avatar" onclick="toggle_action_div(null, {id:'image_module_<%= i %>', index:<%= i %>, action:'image_crop'})">
-	<% if (ACCOUNTS[i]['vcard']
-	   && ACCOUNTS[i]['vcard']['fileData']
-	   && ACCOUNTS[i]['vcard']['fileData'][0]
-	   && ACCOUNTS[i]['vcard']['fileData'][0]['vCard']
-	   && ACCOUNTS[i]['vcard']['fileData'][0]['vCard'][0]
-	   && ACCOUNTS[i]['vcard']['fileData'][0]['vCard'][0]['PHOTO']
-	   && ACCOUNTS[i]['vcard']['fileData'][0]['vCard'][0]['PHOTO'][0]
-	   && ACCOUNTS[i]['vcard']['fileData'][0]['vCard'][0]['PHOTO'][0]['BINVAL']
-	   && ACCOUNTS[i]['vcard']['fileData'][0]['vCard'][0]['PHOTO'][0]['BINVAL'][0]) { 
-	   var acc_photo = ACCOUNTS[i]['vcard']['fileData'][0]['vCard'][0]['PHOTO'][0]['BINVAL'][0]; %>
+    <% for (var i = 0; i < accounts.length; i++) { %>
+    <tr>
+      <td class="avatar_td" title="Change avatar">
+	<% if (accounts[i].vcard
+	   && accounts[i].vcard.fileData
+	   && accounts[i].vcard.fileData[0]
+	   && accounts[i].vcard.fileData[0].vCard
+	   && accounts[i].vcard.fileData[0].vCard[0]
+	   && accounts[i].vcard.fileData[0].vCard[0].PHOTO
+	   && accounts[i].vcard.fileData[0].vCard[0].PHOTO[0]
+	   && accounts[i].vcard.fileData[0].vCard[0].PHOTO[0].BINVAL
+	   && accounts[i].vcard.fileData[0].vCard[0].PHOTO[0].BINVAL[0]) { 
+	   var acc_photo = accounts[i].vcard.fileData[0].vCard[0].PHOTO[0].BINVAL[0]; %>
 	<div class="img-div-rel">
-	  <img id="avatar_<% i %>" class="avatar" style="max-width: 48px; cursor: pointer;" alt="avatar" src="data:image/png;base64,<%= acc_photo %>"></img>
+	  <img id="change_avatar_template_btn_<%= i %>" class="avatar change_avatar_template_btn" alt="Avatar" src="data:image/png;base64,<%= acc_photo %>"></img>
 	  <span style="display: none;" class="glyphicon glyphicon-edit glyph-edit"></span>
 	</div>
 	<% } else { %>
 	<div class="img-div-rel">
-	  <img id="avatar_<% i %>" class="avatar">
-	  <span class="glyphicon glyphicon-user avatar_span" id="span_avatar_<%= i %>"></span>
+	  <img class="avatar">
+	  <span id="change_avatar_template_btn_<%= i %>" class="glyphicon glyphicon-user avatar_span change_avatar_template_btn"></span>
 	  <span class="glyphicon glyphicon-edit glyph-edit"></span></img>
 	</div>
 	<% } %>
       </td>
 
-      <td class="col1">
-      <% if(ACCOUNTS[i]['prefs']['RealName']) { %>
-      <span style="display: block" class="realname_acc" id="realname_<%= i %>"><%= ACCOUNTS[i]['prefs']['RealName'] %></span>
-      <% } else { %>
-      <span class="realname_acc" id="realname_<%= i %>"></span>
-      <% } %>
-      <span><%= ACCOUNTS[i]['prefs']['AccountName'] %></span><br>
-      <% for (var num in ACCOUNTS[i]['prefs']['assignedTelnums']) {
-	 if (ACCOUNTS[i]['prefs']['assignedTelnums'].hasOwnProperty(num)){
-	 if (ACCOUNTS[i]['prefs']['assignedTelnums'][num]['assigned'] && ACCOUNTS[i]['prefs']['assignedTelnums'][num]['assigned'] == ("a:" + ACCOUNTS[i]['prefs']['AccountName'])) { %>
-	 <span class="glyphicon glyphicon-earphone glyphtel"><span class="telnum"><%= num %></span></span>
-	 <% }}} %>
+      <td>
+	<% if (accounts[i].prefs.RealName) { %>
+	<span style="display: block" class="acc_realname"><%= accounts[i].prefs.RealName %></span>
+	<% } %>
+	<span style="display: block"><%= accounts[i].prefs.AccountName %></span>
       </td>
+      
+      <% var acc_discquota; %>
+      <% if(accounts[i].quota == "0" || accounts[i].quota == "unlimited") { acc_diskquota = " ∞ " } else { acc_diskquota = accounts[i].quota } %>
+      <% accounts[i].used = parseInt(accounts[i].used) %>
+      <td class="stats_td">
+	<span><%= accounts[i].used %> /</span>
+	<span><%= acc_diskquota %></span>
+	<span>MB</span>
 
-      <% (ACCOUNTS[i]['quota'] == 0) ? diskquota_acc = " ∞ " : diskquota_acc = ACCOUNTS[i]['quota'] %>
-      <% ACCOUNTS[i]['used'] = parseInt(ACCOUNTS[i]['used']); %>
-
-      <td class="col2">
-	<span><%= ACCOUNTS[i]['used'] %></span>
-	<input id="diskused_<%= i %>" value="<%= ACCOUNTS[i]['used'] %>" type="hidden">/
-	<span id="quota_<%= i %>"><%= diskquota_acc %></span>
-	<span class="megabyte_font">MB</span><br>
-
-	<div id="usage_bar_<%= i %>" class="table_progress_bar">
+	<div class="table_progress_bar">
 	  <div class="progress">
-	    <div class="progress-bar" role="progressbar" style="width: 0%;">
+	    <div class="progress-bar" role="progressbar" style="width: 0%">
 	      <span class="sr-only">0%</span>
 	    </div>
 	  </div> 
 	</div>
 
-	<span class="glyphicon glyphicon-envelope" style="margin-top: 10px;" title="Sent"></span>
-	<%= (ACCOUNTS[i]['stats']['MessagesSent']) ? ACCOUNTS[i]['stats']['MessagesSent'].substring(1) : " 0 / " %>
-	<span class="glyphicon glyphicon-inbox" style="margin-top: 10px;" title="Received"></span>
-	<%= (ACCOUNTS[i]['stats']['MessagesReceived']) ? ACCOUNTS[i]['stats']['MessagesReceived'].substring(1) : " 0 " %>
+	<span class="glyphicon glyphicon-envelope" style="margin-top: 10px" title="Sent"></span>
+	<%= (accounts[i].stats.MessagesSent) ? accounts[i].stat.MessagesSent.substring(1) : " 0 / " %>
+	<span class="glyphicon glyphicon-inbox" style="margin-top: 10px" title="Received"></span>
+	<%= (accounts[i].stats.MessagesReceived) ? accounts[i].stat.MessagesReceived.substring(1) : " 0" %>
       </td>
-      
-      <% var acc_class = ACCOUNTS[i]['class']; %>
-      <% var acc_modes = CLASSES[acc_class]['AccessModes']; %>
+
+      <% var acc_modes = accounts[i].data.AccessModes; %>
+ 
       <% var acc_modes_mail, acc_modes_xmpp, acc_modes_sip, acc_modes_webcal = ""; %>
       <% (acc_modes.indexOf('Mail') > -1 || acc_modes == "All") ? acc_modes_mail = 'color: #000000' : acc_modes_mail = 'color: #aaaaaa'; %>
       <% (acc_modes.indexOf('XMPP') > -1 || acc_modes == "All") ? acc_modes_xmpp = 'color: #000000' : acc_modes_xmpp = 'color: #aaaaaa'; %>
       <% (acc_modes.indexOf('SIP') > -1 || acc_modes == "All") ? acc_modes_sip = 'color: #000000' : acc_modes_sip = 'color: #aaaaaa'; %>
       <% (acc_modes.indexOf('WebCAL') > -1 || acc_modes == "All") ? acc_modes_webcal = 'color: #000000' : acc_modes_webcal = 'color: #aaaaaa'; %>
-      <td class="col4" style="white-space: nowrap; text-align: center;">
-	<span id="acc_type_<%= i %>" onclick="toggle_action_div(null, {id:'change_type_module_<%= i %>', index:<%= i %>, action:'change_type'})"><%= ACCOUNTS[i]['class'] %></span><br>
-	<span id="icon_envelope_<%= i %>" class="glyphmargin glyphicon glyphicon-envelope" onclick="toggle_action_div(null, {id:'change_type_module_<%= i %>', index:<%= i %>, action:'change_type'})" title="Mail" style="<%= acc_modes_mail %>"></span>
-	<span id="icon_comment_<%= i %>" class="glyphmargin glyphicon glyphicon-comment" onclick="toggle_action_div(null, {id:'change_type_module_<%= i %>', index:<%= i %>, action:'change_type'})" title="Chat/Jabber/XMPP" style="<%= acc_modes_xmpp %>"></span>
-	<span id="icon_phone_<%= i %>" class="glyphmargin glyphicon glyphicon-phone" onclick="toggle_action_div(null, {id:'change_type_module_<%= i %>', index:<%= i %>, action:'change_type'})" title="SIP (Internet calls)" style="<%= acc_modes_sip %>"></span>
-	<span id="icon_calendar_<%= i %>" class="glyphicon glyphicon-calendar" onclick="toggle_action_div(null, {id:'change_type_module_<%= i %>', index:<%= i %>, action:'change_type'})" title="Calendar" style="<%= acc_modes_webcal %>"></span>
+      <td id="<%= i %>" class="plan_td">
+	<span class="plan_template_btn" style="display: block"><%= accounts[i]['class'] %></span>
+	<span class="glyphicon glyphicon-envelope plan_template_btn" title="Mail" style="<%= acc_modes_mail %>"></span>
+	<span class="glyphicon glyphicon-comment plan_template_btn" title="Chat/Jabber/XMPP" style="<%= acc_modes_xmpp %>"></span>
+	<span class="glyphicon glyphicon-phone plan_template_btn" title="SIP (Internet calls)" style="<%= acc_modes_sip %>"></span>
+	<span class="glyphicon glyphicon-calendar plan_template_btn" title="Calendar" style="<%= acc_modes_webcal %>"></span>
       </td>
-      
-      <td class="col3">
-	<table class="table_email_accts_actions" cellspacing="0" celpadding="0" bnorder="0">
-	  <tbody>
-	    <tr>
-	      <td>
-		<span class="btn btn-link" onclick="toggle_action_div(null, {id:'change_password_module_<%= i %>', index:<%= i %>, action:'change_password'})"><span class="fa fa-key fa-lg"></span> Password</span>
-	      </td>
-	      <td>
-		<span class="btn btn-link" onclick="toggle_action_div(null, {id:'change_quota_module_<%= i %>', index:<%= i %>, action:'change_quota'})"><span class="glyphicon glyphicon-cog"></span> Details</span>
-	      </td>
-	      <td>
-		<span class="btn btn-link" onclick="toggle_action_div(null, {id:'change_type_module_<%= i %>', index:<%= i %>, action:'change_type'})"><span class="glyphicon glyphicon-list"></span> Plan</span>
-	      </td>
-	      <td>
-		<span class="btn btn-link" onclick="toggle_action_div(null, {id:'delete_module_<%= i %>', index:<%= i %>, action:'delete'})">
-		  <span class="glyphicon glyphicon-trash"></span> Delete</span>
-	      </td>
-	      <td>
-		<div class="btn-group">
-		  <button id="email_table_menu_button_<%= i %>" class="btn btn-default dropdown-toggle" data-toggle="dropdown" type="button">More<span class="caret"></span>
-		  </button>
-		  <ul class="dropdown-menu" role="menu">
-		    <% 	if (acc_modes.indexOf('SIP') > -1 || acc_modes == "All"){ var show_ext_link = "display: inline" } else {var show_ext_link = "display: none"} %>
-		    <li id="li_extensions_<%= i %>" style="<%= show_ext_link %>">
-		      <a class="btn btn-link" href="../extensions.html" target="_blank"><span class="btn btn-link"><span class="glyphicon glyphicon-earphone"></span> Extensions</span></a>
-		    </li>
-		    <li><a class="btn btn-link"><span class="btn btn-link" onclick="toggle_action_div(null, {id:'airsync_module_<%= i %>', index:<%= i %>, action:'airsync'})"><span class="glyphicon glyphicon-transfer"></span><span class="glyphicon glyphicon-phone"></span> ActiveSync™</span></a>
-		    </li>
-		  </ul>
-		</div>
-	      </td>
-	    </tr>
-	  </tbody>
-	</table>
+
+      <td class="settings_td">
+	<span id="password_template_btn_<%= i %>" class="btn btn-link password_template_btn settings_item"><span class="fa fa-key fa-lg"></span> Password</span>
+	<span id="details_template_btn_<%= i %>" class="btn btn-link details_template_btn settings_item"><span class="glyphicon glyphicon-cog"></span> Details</span>
+	<span id="plan_template_btn_<%= i %>" class="btn btn-link plan_template_btn settings_item plan_template_btn"><span class="glyphicon glyphicon-list"></span> Plan</span>
+	<span id="delete_template_btn_<%= i %>" class="btn btn-link delete_template_btn settings_item"><span class="glyphicon glyphicon-trash"></span> Delete</span>
+	<div class="btn-group settings_item">
+	  <button class="btn btn-default dropdown-toggle" data-toggle="dropdown" type="button">More<span class="caret"></span></button>
+	  <ul class="dropdown-menu" role="menu">
+	    <% 	if (acc_modes.indexOf('SIP') > -1 || acc_modes == "All"){ var show_ext_link = "display: inline" } else {var show_ext_link = "display: none"} %>
+	    <li style="<%= show_ext_link %>">
+	      <a class="btn btn-link" href="../extensions.html" target="_blank"><span class="btn btn-link"><span class="glyphicon glyphicon-earphone"></span> Extensions</span></a>
+	    </li>
+	    <li id="active_sync_template_btn_<%= i %>" class="active_sync_template_btn"><a class="btn btn-link"><span class="btn btn-link"><span class="glyphicon glyphicon-transfer"></span><span class="glyphicon glyphicon-phone"></span> ActiveSync™</span></a>
+	    </li>
+	  </ul>
+	</div>
       </td>
     </tr>
-    <tr id="dt_module_row_<%= i %>" class="rowA action-row" style="border: none;">
+
+    <tr>
       <td colspan="5">
-    	<div id="show_details_module_<%= i %>" class="dt_module" style="display: none; margin-left: 0;"></div>
-    	<div id="change_password_module_<%= i %>" class="dt_module" style="display: none"></div>
-    	<div id="change_quota_module_<%= i %>" class="dt_module" style="display: none"></div>
-    	<div id="airsync_module_<%= i %>" class="dt_module" style="display: none"></div>
-    	<div id="change_type_module_<%= i %>" class="dt_module" style="display: none"></div>
-    	<div id="delete_module_<%= i %>" class="dt_module" style="display: none"></div>
-    	<div id="image_module_<%= i %>" class="dt_module" style="display: none"></div><div id="status_bar_<%= i %>" class="cjt_status_bar"></div>
+    	<div id="show_template_<%= i %>" class="show_template"></div>
+    	<div id="status_bar_<%= i %>" class="status_bar"></div>
       </td>
     </tr>
-    <% (row_toggle == 'rowA') ? row_toggle = 'rowB' : row_toggle = 'rowA' %>
-    <% } %> <!-- End of for each account -->
+    <% } %>
+    <% if (accounts.length < 1) { %>
+    <tr>
+      <td colspan="5">
+    	<div><span>No accounts!</span></div>
+      </td>
+    </tr>
+    <% } %>
   </tbody>
 </table>
-
