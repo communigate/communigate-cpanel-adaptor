@@ -51,7 +51,7 @@ sub connect {
       $this->{SID} = $response->{"session"}->{"urlID"};
   }
   else {
-      warn $response->status_line;
+      # warn $response->status_line;
   }
   1;
 }
@@ -70,7 +70,7 @@ sub send {
     return XMLin(encode_utf8 $response->content, KeyAttr => "IgnoreKeyAttr", forceArray => ($options->{forceArray} || 0));
   }
   else {
-      warn $response->status_line;
+      # warn $response->status_line;
       return undef;
   }
 }
