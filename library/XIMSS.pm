@@ -105,7 +105,7 @@ sub close {
         # urlID
     }
     else {
-        warn $response->status_line;
+        # warn $response->status_line;
     }
 
 }
