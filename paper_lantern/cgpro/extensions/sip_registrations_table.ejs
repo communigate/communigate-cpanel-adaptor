@@ -1,0 +1,35 @@
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th>SIP registrations</th>
+      <th>Status</th>
+      <th>Functions</th>
+    </tr>
+  </thead>
+  <tbody>
+    [% FOR sip IN rsip.keys.sort -%]
+    <tr>
+      <td class="truncate">[% sip %][% IF settings.PSTNFromName == rsip.$sip.fromName && settings.PSTNGatewayAuthName == rsip.$sip.authName %] ([% locale.maketext("Outgoing") %])[% END %]</td>
+      <td class="truncate">
+	[% rsipInfo.$sip.completed.replace("(\#T|\_)"," ") %]
+	[% rsipInfo.$sip.errorCode %]
+      </td>
+      <td>
+	<a href="editrsip.html?account=[% FORM.rsip_account %]&amp;rsip=[% sip %]"><span class="glyphicon glyphicon-pencil"></span> [% locale.maketext('View/Edit') %]</a> ,
+	<a href="deletersip.html?account=[% FORM.rsip_account %]&amp;rsip=[% sip %]"><span class="glyphicon glyphicon-trash"></span> [% locale.maketext('Delete') %]</a>
+	[% IF settings.PSTNFromName == rsip.$sip.fromName && settings.PSTNGatewayAuthName == rsip.$sip.authName %]
+	, <a href="unsetaccountpstn.html?account=[% FORM.rsip_account %]"><span class="glyphicon glyphicon-remove"></span> [% locale.maketext('Unset As Outgoing') %]</a>
+	[% END %]
+	[% UNLESS settings.PSTNFromName == rsip.$sip.fromName && settings.PSTNGatewayAuthName == rsip.$sip.authName %]
+	, <a href="updatepstn.html?account=[% FORM.rsip_account %]&amp;rsip=[% sip %]"><span class="glyphicon glyphicon-arrow-right"></span> [% locale.maketext('Set as outgoing') %]</a>
+	[% END -%]
+      </td>
+    </tr>
+    [% END -%]
+    [% UNLESS rsip.keys.size -%]
+    <tr>
+      <td class="truncate" colspan="4">[% locale.maketext("No SIP registrations.") %]</td>
+    </tr>
+    [% END -%]
+  </tbody>
+</table>

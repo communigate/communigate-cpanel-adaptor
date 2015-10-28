@@ -1,0 +1,43 @@
+<h3>Assign Local Extension</h3>
+<div class="form-group">
+  <label for="local_account">Assign To</label>
+  <div class="row">
+    <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+      <select id="local_account" class="form-control">
+	<% for (var account in accounts) { %>
+	<% if (account.split("@")[0] != "pbx" && account.split("@")[0] != "ivr") { %>
+	<% var myclass = accounts[account].details.ServiceClass %>
+	<% if (classes[myclass].AccessModes == "All" || classes[myclass].AccessModes.indexOf("SIP") > -1) { %>
+	<option value="a:<%= account %>"><%= account %> (Account)</option>
+	<% } %>
+	<% } %>
+	<% } %>
+	
+	<% for (var i = 0; i < departments.length; i++) { %>
+	<option value="<%= departments[i] %>"><%= departments[i] %> (Department)</option>
+	<% } %>
+
+	<% for (var i = 0; i < queues.length; i++) { %>
+	<option value="<%= queues[i].value %>"><%= queues[i].name %> (Queue)</option>
+	<option value="<%= queues[i].toggle %>"><%= queues[i].name %> (Queue toggle agent)</option>
+	<% } %>
+
+	<% for (var i = 0; i < ivrs.length; i++) { %>
+	<option value="<%= ivrs[i].value %>"><%= ivrs[i].name %> (IVR menu)</option>
+	<% } %>
+      </select>
+    </div>
+  </div>
+</div>
+<div class="form-group">
+  <label for="local_extension">Local Extension</label>
+  <div class="row">
+    <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+      <input type="text" id="local_extension" class="form-control"/>
+    </div>
+    <div id="local_extension_error" class="col-xs-12 col-sm-6 col-md-6 col-lg-6"></div>	  
+  </div>
+</div>
+<div class="form-group">
+  <input type="submit" id="add_local_extension" class="btn btn-primary" value="Assign Local Extension" />
+</div>

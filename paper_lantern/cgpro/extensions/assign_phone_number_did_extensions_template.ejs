@@ -1,0 +1,15 @@
+<div class="form-group">
+  <label for="account_extension">Extension</label>
+  <div class="row">
+    <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+      <select id="account_extension" class="form-control" <% if(account_extensions.length < 1) { %>disabled<% } %>>
+	<% for (var i = 0; i < account_extensions.length; i++) { %>
+	<option value="<%= account_extensions[i].extension %>"><%= account_extensions[i].extension %></option>
+	<% } %>
+	<% if(account_extensions.length < 1) { %>
+	   <option value="">No avaiable extensions for this domain!</option>
+	<% } %>
+      </select>
+    </div>
+  </div>
+</div>

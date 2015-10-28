@@ -1,0 +1,68 @@
+<div class="rsip">
+  <h3>SIP Registration</h3>
+  <div class="form-group">
+    <label>[% locale.maketext("Account") %]:</label>
+    <div class="row">
+      <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	<form action="" class="" method="GET" id="selectAccount">
+	  <select id="rsip_account" class="form-control" onchange="toggle_account()" name="rsip_account">
+	    [% FOR account IN rsip_accounts.sort -%]
+	    [% filter_option(FORM.rsip_account, account, account) %]
+	    [% END -%]
+	  </select>
+	</form>
+	
+	[% IF !RAW_FORM.item("rsip_account") %]
+	<script type="text/javascript">
+	  YAHOO.util.Dom.get("selectAccount").submit();
+	</script>
+	[% END %]
+      </div>
+    </div>
+  </div>
+  <script type="text/javascript">
+    function toggle_account () {
+    document.getElementById("selectAccount").submit();
+    }
+  </script>    
+  [% IF RAW_FORM.item("rsip_account") %]
+  <div class="form-group">
+    <a class="btn btn-primary" href="editrsip.html?account=[% FORM.rsip_account %]">[% locale.maketext("Add SIP Registration") %]</a>
+  </div>
+  <table border="0" cellpadding="5" cellspacing="0" id="mailtbl" class="table table-striped">
+    <thead>
+      <tr>
+	<th class="cell">[% locale.maketext("SIP registrations") %]</th>
+	<th class="cell">[% locale.maketext("Status") %]</th>
+	<th class="cell-end sorttable_nosort">[% locale.maketext("Functions") %]</th>
+      </tr>
+    </thead>
+    <tbody>
+      [% FOR sip IN rsip.keys.sort -%]
+      <tr>
+	<td class="truncate">[% sip %][% IF settings.PSTNFromName == rsip.$sip.fromName && settings.PSTNGatewayAuthName == rsip.$sip.authName %] ([% locale.maketext("Outgoing") %])[% END %]</td>
+	<td class="truncate">
+	  [% rsipInfo.$sip.completed.replace("(\#T|\_)"," ") %]
+	  [% rsipInfo.$sip.errorCode %]
+	</td>
+	<td>
+	  <a href="editrsip.html?account=[% FORM.rsip_account %]&amp;rsip=[% sip %]"><span class="glyphicon glyphicon-pencil"></span> [% locale.maketext('View/Edit') %]</a> ,
+	  <a href="deletersip.html?account=[% FORM.rsip_account %]&amp;rsip=[% sip %]"><span class="glyphicon glyphicon-trash"></span> [% locale.maketext('Delete') %]</a>
+	  [% IF settings.PSTNFromName == rsip.$sip.fromName && settings.PSTNGatewayAuthName == rsip.$sip.authName %]
+	  , <a href="unsetaccountpstn.html?account=[% FORM.rsip_account %]"><span class="glyphicon glyphicon-remove"></span> [% locale.maketext('Unset As Outgoing') %]</a>
+	  [% END %]
+	  [% UNLESS settings.PSTNFromName == rsip.$sip.fromName && settings.PSTNGatewayAuthName == rsip.$sip.authName %]
+	  , <a href="updatepstn.html?account=[% FORM.rsip_account %]&amp;rsip=[% sip %]"><span class="glyphicon glyphicon-arrow-right"></span> [% locale.maketext('Set as outgoing') %]</a>
+	  [% END -%]
+	</td>
+      </tr>
+      [% END -%]
+      [% UNLESS rsip.keys.size -%]
+      <tr>
+	<td class="truncate" colspan="4">[% locale.maketext("No SIP registrations.") %]</td>
+      </tr>
+      [% END -%]
+    </tbody>
+  </table>
+  [% END %]
+</div>

@@ -1,0 +1,49 @@
+<div class="assign_phone_number_did">
+  <h3>Assign outgoing number to account</h3>
+  <div class="form-group">
+    <label for="account">Assign To</label>
+    <div class="row">
+      <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	<select id="account" class="form-control">
+	  <% for (var account in accounts) { %>
+	  <% if (account.split("@")[0] != "pbx" && account.split("@")[0] != "ivr") { %>
+	  <% var myclass = accounts[account].details.ServiceClass %>
+	  <% if (classes[myclass].AccessModes == "All" || classes[myclass].AccessModes.indexOf("SIP") > -1) { %>
+	  <option value="a:<%= account %>"><%= account %> (Account)</option>
+	  <% } %>
+	  <% } %>
+	  <% } %>
+
+	  <% for (var i = 0; i < departments.length; i++) { %>
+	  <option value="g:<%= departments[i] %>"><%= departments[i] %> (Department)</option>
+	  <% } %>
+
+	  <% for (var i = 0; i < queues.length; i++) { %>
+	  <option value="q:<%= queues[i].value %>"><%= queues[i].name %> (Queue)</option>
+	  <% } %>
+
+	  <% for (var i = 0; i < ivrs.length; i++) { %>
+	  <option value="i:<%= ivrs[i].value %>"><%= ivrs[i].name %> (IVR menu)</option>
+	  <% } %>
+	</select>
+      </div>
+    </div>
+  </div>
+  
+  <div id="account_extensions_wrap">
+    <div class="form-group">
+      <label for="account_extension">Extension</label>
+      <div class="row">
+	<div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	  <select id="account_extension" class="form-control" disabled>
+	    <option></option>
+	  </select>
+	</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <input type="submit" id="new_email_submit" class="btn btn-primary" value="AssignExtension" />
+  </div>
+</div>

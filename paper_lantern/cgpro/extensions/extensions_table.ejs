@@ -1,0 +1,47 @@
+<table id="mailtbl" class="table table-striped">
+  <colgroup>
+    <col width="12%" align="left" />
+    <col width="25%" align="left" />
+    <col width="30%" align="center" />
+  </colgroup>
+  <thead>
+    <tr>
+      <th>Extensions / Phone Numbers (DID) </th>
+      <th>Assigned To</th>
+      <th>Functions</th>
+    </tr>
+  </thead>
+  <% for (var i = 0; i < extensions.length; i++) { %>  
+  <tr>
+    <td><%= extensions[i].html_dest %></td>
+    <td><%= extensions[i].html_forward %></td>
+    <td>
+      <a><span class="glyphicon glyphicon-trash"></span> Delete</a>
+      <% if( extensions[i].type == "number" && extensions[i].assignedType == "a" ) { %>
+      <% if (!extensions[i].out) { %>
+      <a><span class="glyphicon glyphicon-arrow-right"></span> Set As Outgoing</a>
+      <% }else{ %>
+      <a><span class="glyphicon glyphicon-remove"></span> Unset As Outgoing</a>
+      <% } %>
+      <% } %>
+    </td>
+  </tr>
+  <% } %>
+  <% for (var i = 0; i < aliases.length; i++) { %>  
+     <% if (aliases[i].aliases) { %>
+     <% for (var j = 0; j < aliases[i].aliases.length; j++) { %>
+     <tr>
+       <td><%= aliases[i].aliases[j] %></td>
+       <td><%= aliases[i].account %></td>
+       <td><a href="deletealias.html?alias=[% alias %]&account=[% account %]"><span class="glyphicon glyphicon-trash"></span>Delete</a></td>
+     </tr>
+     <% } %>
+     <% } %>
+  <% } %>
+
+  <% if (extensions.length < 1 && aliases.length < 1) { %>
+  <tr>
+    <td colspan="3">Currently there aren't any extensions!</td>
+  </tr>
+  <% } %>
+</table>

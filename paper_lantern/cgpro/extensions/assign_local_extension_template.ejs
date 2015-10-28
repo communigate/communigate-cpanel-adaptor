@@ -1,0 +1,47 @@
+<h3>[% locale.maketext("Assign Local Extension") %]</h3>
+<form id="mainform" method="post" action="" name="mainform">
+  [% IF CPANEL.CPERROR.CommuniGate_local_extension -%]
+  <pre>
+    [% CPANEL.CPERROR.CommuniGate_local_extension | ucfirst %].
+  </pre>
+  [% END -%]
+  <div class="form-group">
+    <label>[% locale.maketext("Assign To:") %]</label>
+    <div class="row">
+      <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	<select name="account" class="form-control">
+	  [% FOR account = accounts.keys.sort -%]
+	  [% myclass = accounts.$account.details.ServiceClass -%]
+	  [% classstring = classes.$myclass.AccessModes.join(',') -%]
+	  [% IF classstring == 'All' || classstring.search("SIP") -%]
+	  <option value="a:[% account %]">[% account %] ([% locale.maketext("Account") %])</option>
+	  [% END -%]
+	  [% END -%]
+	  [% FOR account = departments -%]
+	  <option value="[% account %]">[% account %] ([% locale.maketext("Department") %])</option>
+	  [% END -%]
+	  [% FOR queue = queues -%]
+	  <option value="[% queue.value %]">[% queue.name %] ([% locale.maketext("Queue") %])</option>
+	  <option value="[% queue.toggle %]">[% queue.name %] ([% locale.maketext("Queue Toggle Agent") %])</option>
+	  [% END -%]
+	  [% FOR ivr = ivrs -%]
+	  <option value="[% ivr.value %]">[% ivr.name %] ([% locale.maketext("IVRMenu") %])</option>
+	  [% END -%]
+	</select>
+      </div>
+      <div id="realname_error" class="col-xs-12 col-sm-6 col-md-6 col-lg-6"></div>	  
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="email">[% locale.maketext("LocalExtension") %]:</label>
+    <div class="row">
+      <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	<input type="text" name="local_extension" id="local_extension" class="form-control"/>
+      </div>
+      <div id="local_extension_error" class="col-xs-12 col-sm-6 col-md-6 col-lg-6"></div>	  
+    </div>
+  </div>
+  <div class="form-group">
+    <input id="add_local_extension" class="btn btn-primary" type="submit" value="[% locale.maketext("Assign Local Extension") %]" tabindex="5" />
+  </div>
+</form>

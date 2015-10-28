@@ -1,0 +1,51 @@
+<div class="sip_registration">
+  <h3>SIP Registration</h3>
+  <div class="form-group">
+    <label for="sip_account">Account</label>
+    <div class="row">
+      <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	<select id="sip_account" class="form-control">
+	  <% for (var i = 0; i < accounts.length; i++) { %>
+	  <option value="<%= accounts[i].username + '@' + accounts[i].domain %>"><%= accounts[i].username + '@' + accounts[i].domain %></option>
+	  <% } %>
+	</select>
+      </div>
+    </div>
+  </div>
+  <div class="form-group">
+    <a class="btn btn-primary">Add SIP Registration</a>
+  </div>
+
+  <table class="table table-striped">
+    <thead>
+      <tr>
+	<th>SIP registrations</th>
+	<th>Status</th>
+	<th>Functions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% for (var rsip in rsip_data.rsip) { %>
+      <tr>
+	<td>
+	  <%= rsip %>
+	  <% if(rsip_data.settings.PSTNFromName && (rsip_data.settings.PSTNFromName == rsip_data.rsip[rsip].fromName) && (rsip_data.settings.PSTNGatewayAuthName == rsip_data.rsip[rsip].authName) ) { %>(Outgoing)<% } %>
+	</td>
+	<td>
+	  <%= rsip_data.rsipInfo[rsip].completed.replace(/(\#T|\_)/g, " ") %>
+	  <%= rsip_data.rsipInfo[rsip].errorCode %>
+	</td>
+	<td>
+	  <a><span class="glyphicon glyphicon-pencil"></span> View/Edit</a>
+	  <a><span class="glyphicon glyphicon-trash"></span> Delete</a>
+	  <% if(rsip_data.settings.PSTNFromName && (rsip_data.settings.PSTNFromName == rsip_data.rsip[rsip].fromName) && (rsip_data.settings.PSTNGatewayAuthName == rsip_data.rsip[rsip].authName) ) { %>
+	  <a><span class="glyphicon glyphicon-remove"></span> Unset As Outgoing</a>
+	  <% }else{ %>
+	  <a><span class="glyphicon glyphicon-arrow-right"></span> Set As Outgoing</a>
+	  <% } %>
+	</td>
+      </tr>
+      <% } %>
+    </tbody>
+  </table>
+</div>

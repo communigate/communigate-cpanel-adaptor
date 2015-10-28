@@ -1,0 +1,38 @@
+<div class="assign_to_domain_template">
+  <h3>Assign outgoing number to domain</h3>
+  <div class="form-group">
+    <label for="domain">Assign To</label>
+    <div class="row">
+      <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	<select id="domain" class="form-control" name="domain">
+	  <% for (var i = 0; i < domains.length; i++) { %>
+	     <option value="<%= domains[i].domain %>" <% if (domains[i].domain == selected_domain) { %>selected<% } %> ><%= domains[i].domain %></option>
+	     <% } %>
+	</select>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label for="domain_extension">Extension</label>
+    <div class="row">
+      <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	<select id="domain_extension" class="form-control" name="domain_extension" <% if (extensions.result.length < 1) { %>disabled<% } %> >
+	  <% for (var j = 0; j < extensions.result.length; j++) { %>
+	     
+	     <option value="<%= extensions.result[j].extension %>" <% if(extensions.selected.PSTNGatewayAuthName == extensions.result[j].telnum.authname) { %>selected<% } %> ><%= extensions.result[j].extension %></option>
+	     <% } %>
+
+	     <% if (extensions.result.length < 1) { %>
+		<option value="">No avaiable extensions for this domain!</option>
+		<% } %>
+	</select>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <input type="button" id="assign_to_domain" class="btn btn-primary" value="Assign outgoing number to domain" />
+    <span id="assign_to_domain_loading" style="margin-left: 20px;"></span>
+  </div>
+</div>
