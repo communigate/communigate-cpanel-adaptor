@@ -146,19 +146,22 @@ sub api2_AccountsOverview {
 	my $return_accounts = {};
 	my $freeExtensions = {};
 	my $ximss = getXIMSS($cli->{loginData}->[2] . '@' . $cli->MainDomainName(), $cli->{loginData}->[3]);
+	
+	
 	foreach my $domain (@domains) {
 	    my $accounts=$cli->ListAccounts($domain);
 	    foreach my $userName (sort keys %$accounts) {
 		next if $userName eq 'pbx' || $userName eq 'ivr';
 		my $accountData = $cli->GetAccountEffectiveSettings("$userName\@$domain");
+		my $accInfo = $cli->GetAccountInfo("$userName\@$domain");
 		my $accountStats = $cli->GetAccountStat("$userName\@$domain");
 		my $service = @$accountData{'ServiceClass'} || '';
 		my $accountPrefs = $cli->GetAccountEffectivePrefs("$userName\@$domain");
 		my $diskquota = @$accountData{'MaxAccountSize'} || '';
 		$diskquota =~ s/M//g;
-		my $_diskused = $cli->GetStorageFileInfo("$userName\@$domain");
-		$_diskused->[0] =~ s/\D+//g;
-		my $diskused = $_diskused->[0] / 1024 /1024;
+		my $_diskused = $accInfo->{'StorageUsed'};
+		$_diskused =~ s/\D+//g;
+		my $diskused = $_diskused / 1024 /1024;
 		my $diskusedpercent;
 		if ($diskquota eq "unlimited") {
 		    $diskusedpercent = 0;
@@ -815,6 +818,32 @@ sub api2_ListExtensions {
   return @result;
 }
 
+sub api2_GetAliases {
+  my %OPTS = @_;
+  my $cli = getCLI();
+
+  my @domains = Cpanel::Email::listmaildomains();
+  my $all_accounts = [];
+  for my $domain (@domains) {
+      my $accounts = $cli->ListAccounts($domain);
+      for my $account (keys %$accounts) {
+	  push @$all_accounts, $account . "@" . $domain; 
+      }
+  }
+
+  my $all_aliases;
+  for my $acc (@$all_accounts) {
+      my @acc_data = split "@", $acc;
+      if ($acc_data[0] ne "pbx" && $acc_data[0] ne "ivr") {
+	  my $account_aliases = {"aliases" => $cli->GetAccountAliases($acc), "account" => $acc};
+	  push @$all_aliases, $account_aliases;
+      }
+  }
+
+  $cli->Logout();
+  return $all_aliases;
+}
+
 sub api2_GetAccountAliases {
   my %OPTS = @_;
   my $cli = getCLI();
@@ -1061,11 +1090,6 @@ sub api2_GetExtensions {
 	  last;
       }
   }
-  if ($#result < -1) {
-      push @result, {extension => "", short => "No extansion available for $domain"};
-  } else {
-      unshift @result, {extension => "", short => "-- Please Select --"};
-  }
   
   $cli->Logout();
   return @result;
@@ -1076,13 +1100,13 @@ sub api2_GetExtensionsForPSTN {
   my $domain = $OPTS{'domain'};
   my @domains = Cpanel::Email::listmaildomains();
   my $cli = getCLI();
+  my $return = {};
   my @result;
   for my $dom (@domains) {
       if ($dom eq $domain) {
 	  my $domainPrefs = $cli->GetAccountDefaultPrefs($domain);
 	  my $domainDefaults = $cli->GetAccountDefaults($domain);
-	  push @result, {selected => $domainDefaults};
-	  push @result, {extension => "none", short => "None"};
+	  $return->{'selected'} =$domainDefaults;
 	  my $defaultDomain = $cli->MainDomainName();
 	  if ($domainPrefs->{assignedTelnums}) {
 	      foreach my $number (keys %{$domainPrefs->{assignedTelnums}}) {
@@ -1095,14 +1119,10 @@ sub api2_GetExtensionsForPSTN {
 	  last;
       }
   }
-  if ($#result == 0) {
-      push @result, {extension => "", short => "No extansion available for $domain"};
-  } else {
-      unshift @result, {extension => "", short => "-- Please Select --"};
-  }
   
   $cli->Logout();
-  return @result;
+  $return->{'result'} = \@result;
+  return $return;
 }
 
 sub api2_GetXMPPStatus {
@@ -2643,7 +2663,6 @@ sub api2_SetGroupSettings {
         @$Settings{'SignalDisabled'}=($OPTS{'SignalDisabled'}?'NO':'YES');;
         $cli->SetGroup($email,$Settings);
         my $error_msg = $cli->getErrMessage();
-        my @result;
         unless ($error_msg eq "OK") {
 	    $Cpanel::CPERROR{'CommuniGate'} = $error_msg;
         }
@@ -2655,7 +2674,7 @@ sub api2_SetGroupSettings {
         #         SetGroupInternal($email);
         # }
 	$cli->Logout();
-        return @result;
+        return $error_msg;
 }
 sub api2_SetDepartmentSettings {
         my %OPTS = @_;
