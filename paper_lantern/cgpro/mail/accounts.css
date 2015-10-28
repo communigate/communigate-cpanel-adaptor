@@ -97,7 +97,11 @@ a {
 }
 
 .active_sync_setup_div_ssl {
-    background: #f9f9f9;
+    background: #aaaaaa;
+}
+
+.active_sync_template .active_sync_setup_div_ssl table tr th {
+    background: #aaaaaa;
 }
 
 #accounts_table table.accounts_table table.settings tr{

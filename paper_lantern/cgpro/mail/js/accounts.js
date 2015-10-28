@@ -620,6 +620,7 @@ var change_details = function(account_id) {
     };
 
     var work_days = $('input:checkbox[name=work_days]:checked').map(function() { return this.value; }).get();
+    console.log(work_days);
     for (var i=0; i < work_days.length; i++) {
     	switch(work_days[i]) {
     	case "Sun": api2_call['WorkDays'] = work_days[i];
