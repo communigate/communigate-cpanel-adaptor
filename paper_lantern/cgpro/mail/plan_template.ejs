@@ -1,0 +1,25 @@
+<div class="plan_template">
+  <div class="form-group">
+    <% for (var plan in account.data.ServiceClasses) { %>
+    <div class="row">
+      <div class="col-xs-3 col-sm-1 col-md-1 col-lg-1" style="max-width: 15px;">
+	<input type="radio" id="class_<%= plan %>_<%= account_id %>" value="<%= plan %>" name="class_<%= account_id %>" <% if (account.class == plan) { %>checked<% } %> />
+      </div>
+      <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+	<label for="class_<%= plan %>_<%= account_id %>">
+	  <span class="glyphicon glyphicon-envelope" <% if ( account.data.ServiceClasses[plan].AccessModes.indexOf("Mail") > -1 || account.data.ServiceClasses[plan].AccessModes == "All" ) { %>style="color: #000000"<% }else{ %>style="color: #aaaaaa"<% } %>></span>
+	  <span class="glyphicon glyphicon-comment" <% if ( account.data.ServiceClasses[plan].AccessModes.indexOf("XMPP") > -1 || account.data.ServiceClasses[plan].AccessModes == "All" ) { %>style="color: #000000"<% }else{ %>style="color: #aaaaaa"<% } %>></span>
+	  <span class="glyphicon glyphicon-phone" <% if ( account.data.ServiceClasses[plan].AccessModes.indexOf("SIP") > -1 || account.data.ServiceClasses[plan].AccessModes == "All" ) { %>style="color: #000000"<% }else{ %>style="color: #aaaaaa"<% } %>></span>
+	  <span class="glyphicon glyphicon-calendar" <% if ( account.data.ServiceClasses[plan].AccessModes.indexOf("WebCAL") > -1 || account.data.ServiceClasses[plan].AccessModes == "All" ) { %>style="color: #000000"<% }else{ %>style="color: #aaaaaa"<% } %>></span>
+	  <span><%= plan %></span>
+	</label>
+      </div>
+    </div>
+    <% } %>
+  </div>
+
+  <div class="form-group">
+    <input type="button" id="change_type_btn_<%= account_id %>" class="btn btn-primary" value="Change type" />
+    <button id="cancel_btn_<%= account_id %>" class="btn btn-link cancel_btn">Cancel</button>
+  </div>
+</div>

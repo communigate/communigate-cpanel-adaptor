@@ -1,0 +1,155 @@
+table {
+    margin-bottom: 20px;
+}
+
+a {
+    cursor: pointer;
+}
+
+#accounts_table table.accounts_table tr, #accounts_table table.accounts_table tr td {
+    margin-top: -1px;
+    border: none;
+}
+
+#accounts_table table.accounts_table tr:nth-child(odd) {
+    border-top: 1px solid #dddddd;
+}
+
+#accounts_table table.accounts_table tr:nth-child(even) td {
+    padding: 0;
+}
+
+#accounts_table table.accounts_table thead tr {
+    border: none !important;
+}
+
+.stats_td, .plan_td {
+    white-space: nowrap; 
+    text-align: center;
+}
+
+.settings_td .settings_item {
+    margin-right: 10px;
+}
+
+.dropdown-menu a.btn-link {
+    color: #428BCA;
+    text-align: left;
+}
+
+.dropdown-menu a.btn-link:hover {
+    color: #428BCA;
+}
+
+.dropdown-menu li a.btn-link span{
+    padding-left: 0;
+    padding-top: 0;
+    padding-bottom: 0;  
+}
+
+.avatar {
+    max-width: 48px;
+    cursor: pointer;
+}
+
+.glyph-edit {
+    display: none;
+    position: absolute;
+    left: 0;
+    top: 0;
+    font-size: 18px;
+    background: rgba(220,220,220,0.7);
+}
+
+.img-div-rel {
+    position: relative
+}
+
+.avatar_span {
+    font-size: 48px; 
+    cursor: pointer;
+    display: inline;
+    display: block;
+    margin-top: -20px;
+}
+
+.acc_realname {
+    font-weight: bold;
+}
+
+.progress {
+    border-radius: 0; 
+    height: 2px;
+}
+
+.password_template, .plan_template, .delete_template {
+    padding-left: 15px;
+}
+
+.password_template, .details_template, .plan_template, .delete_template {
+    padding-top: 15px;
+}
+
+.active_sync_setup_div {
+    margin-bottom: 15px;
+    padding: 10px;
+    max-width: 350px;
+}
+
+.active_sync_setup_div_ssl {
+    background: #aaaaaa;
+}
+
+.active_sync_template .active_sync_setup_div_ssl table tr th {
+    background: #aaaaaa;
+}
+
+#accounts_table table.accounts_table table.settings tr{
+    border: none;
+}
+
+#accounts_table table.accounts_table table.settings tr td{
+    border: none;
+    padding: 0;
+    padding-top: 10px;
+    padding-left: 10px;
+}
+
+.status_bar {
+    display: none;
+    padding: 15px;
+}
+
+.status_bar_success {
+    height: 50px;
+    background: #dff2d5;
+    border: 1px solid #27ae60;
+}
+.status_bar_success span {
+    color: #27ae60;
+}
+
+.status_bar_error {
+    height: 50px;
+    background: #f8c9c4;
+    border: 1px solid #a94442;
+}
+.status_bar_error span {
+    color: #a94442;
+}
+
+.active_sync_template table tr td {
+    padding: 10px !important;
+}
+
+.active_sync_template table tr th {
+    background-color: #fafafa;
+}
+
+.avatar_template {
+    padding: 15px;
+}
+
+.avatar_label {
+    display: block;
+}

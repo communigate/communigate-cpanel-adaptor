@@ -82,7 +82,6 @@
         var reader = new FileReader();
 
         reader.onload = function(e) {
-	    console.log("image selected");
 	    $('.loading_avatar_status').html(CPANEL.icons.ajax + " Loading...");
 	    
           // Clear the current image.
@@ -96,7 +95,6 @@
           current_image.style['maxHeight'] = image_dimension_y + 'px';
           current_image.onload = function() {
 	      $('.loading_avatar_status').html("");
-	      console.log("image loaded");
             // Calculate scaled image dimensions
             if (current_image.width > image_dimension_x || current_image.height > image_dimension_y) {
               if (current_image.width > current_image.height) {

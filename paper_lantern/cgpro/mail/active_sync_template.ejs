@@ -1,0 +1,145 @@
+<% if (active_sync_data.AirSyncAllowed instanceof Array) { 
+   var allowed_devices_str = active_sync_data.AirSyncAllowed.join(", ");
+   } else {
+   var allowed_devices_str = active_sync_data.AirSyncAllowed;
+   }%>
+
+<div class="active_sync_template">
+  <div class="form-group">
+    <h3>Allowed Mobile Devices</h3>
+    <div class="row">
+      <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	<input type="text" id="active_sync_allowed_<%= account_id %>" class="form-control" name="active_sync_allowed" value="<%= allowed_devices_str %>" />
+	<p>Comma (',') separated device IDs or asterisk ('*') for any.</p>
+	<input type="button" id="change_active_sync_btn_<%= account_id %>" class="btn btn-primary" value="Save" />
+	<button id="cancel_btn_<%= account_id %>" class="btn btn-link cancel_btn">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <h3>Device List</h3>
+  <table class="table table-striped">
+    <thead>
+      <tr>
+	<th>Device ID</th>
+	<th>Device Type</th>
+	<th>Last Access</th>
+	<th>Wiped</th>
+	<th>Functions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% if (active_sync_data.airSyncs) { %>
+      <% for (var device in active_sync_data.airSyncs) { %>
+      <tr>
+	<td><%= device %></td>
+	<td><%= active_sync_data.airSyncs[device]['User-Agent'] %></td>
+	<td><%= active_sync_data.airSyncs[device].Date.replace("#T", "").replace("_"," / ") %></td>
+	<td>
+	  <% if(active_sync_data.airSyncs[device].wiped) { %><%= active_sync_data.airSyncs[device].wiped.replace("#T", "").replace("_"," / ") %><% } %>
+	  <% if(active_sync_data.airSyncs[device].doWipe) { %> Pending <% } %>
+	</td>
+	<td>
+	  <% if(active_sync_data.airSyncs[device].doWipe) { %><button id="active_sync_wipe_cancel_<%= device %>" class="btn btn-link active_sync_wipe_cancel_btn" value="<%= device %>">Cancel Wipe Out</button><% } else { %><button id="active_sync_wipe_<%= device %>" class="btn btn-link active_sync_wipe_btn" value="<%= device %>">Wipe Out</button><% } %>
+	</td>
+      </tr>
+      <% } %>
+      <% }else{ %>
+      <tr>
+	<td colspan="5" style="padding: 10px">No devices!</td>
+      </tr>
+      <% } %>
+    </tbody>
+  </table>
+
+  <h3>Setup</h3>
+  <div class="active_sync_setup_div active_sync_setup_div_ssl col-xs-12 col-sm-4 col-md-4 col-lg-4" >
+    <table class="settings settings_ssl">
+      <tbody>
+	<tr>
+	  <th colspan="2" style="text-align: center;"><span style="display: block;">Secure SSL/TLS Settings</span>
+	    (Recommended)
+	  </th>
+	</tr>
+	<tr>
+	  <td>Username:</td>
+	  <td class="data">
+	    <span style="font-weight: bold;"><%= account.prefs.AccountName %></span>
+	  </td>
+	</tr>
+	<tr>
+	  <td>Password:</td>
+	  <td><em>( Use the email account’s password. )</em></td>
+	</tr>
+	<tr>
+	  <td>Domain:</td>
+	  <td class="data">
+	    <span style="font-weight: bold;"><%= account.domain %></span>
+	  </td>
+	</tr>
+	<tr>
+	  <td>Server:</td>
+	  <td class="data">
+	    <span style="font-weight: bold;"><%= account.domain %></span>
+	  </td>
+	</tr>
+	<tr>
+	  <td>Port:</td>
+	  <td class="data">
+	    <strong>443</strong>
+	  </td>
+	</tr>
+	<tr>
+	  <td>Use SSL:</td>
+	  <td><strong>Leave Ticked</strong></td>
+	</tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="active_sync_setup_div col-xs-12 col-sm-4 col-md-4 col-lg-4" >
+    <table class="settings">
+      <tbody>
+	<tr>
+	  <th colspan="2" style="text-align: center;"><span style="display: block;">Non Secure Settings</span>
+	    (NOT Recommended)
+	  </th>
+	</tr>
+	<tr>
+	  <td>Username:</td>
+	  <td class="data">
+	    <span style="font-weight: bold;"><%= account.prefs.AccountName %></span>
+	  </td>
+	</tr>
+	<tr>
+	  <td>Password:</td>
+	  <td><em>( Use the email account’s password. )</em></td>
+	</tr>
+	<tr>
+	  <td>Domain:</td>
+	  <td class="data">
+	    <span style="font-weight: bold;"><%= account.domain %></span>
+	  </td>
+	</tr>
+	<tr>
+	  <td>Server:</td>
+	  <td class="data">
+	    <span style="font-weight: bold;"><%= account.domain %></span>
+	  </td>
+	</tr>
+	<tr>
+	  <td>Port:</td>
+	  <td class="data">
+	    <strong>80</strong>
+	  </td>
+	</tr>
+	<tr>
+	  <td>Use SSL:</td>
+	  <td><strong>Leave Unticked</strong></td>
+	</tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div id="airsync_status_{{index}}" style="padding: 20px;"></div>
+</div>

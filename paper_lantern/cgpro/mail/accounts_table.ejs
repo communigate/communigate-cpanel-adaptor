@@ -1,0 +1,123 @@
+<table class="accounts_table table table-striped">
+  <colgroup>
+    <col>
+    <col width="30%">
+    <col width="9%">
+    <col width="10%">
+    <col width="53%">
+  </colgroup>
+  <thead>
+    <tr>
+      <th></th>
+      <th>Account</th>
+      <th class="stats_td">Stats</th>
+      <th class="plan_td">Type</th>
+      <th>References</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% for (var i = 0; i < accounts.length; i++) { %>
+    <tr>
+      <td class="avatar_td" title="Change avatar">
+	<% if (accounts[i].vcard
+	   && accounts[i].vcard.fileData
+	   && accounts[i].vcard.fileData[0]
+	   && accounts[i].vcard.fileData[0].vCard
+	   && accounts[i].vcard.fileData[0].vCard[0]
+	   && accounts[i].vcard.fileData[0].vCard[0].PHOTO
+	   && accounts[i].vcard.fileData[0].vCard[0].PHOTO[0]
+	   && accounts[i].vcard.fileData[0].vCard[0].PHOTO[0].BINVAL
+	   && accounts[i].vcard.fileData[0].vCard[0].PHOTO[0].BINVAL[0]) { 
+	   var acc_photo = accounts[i].vcard.fileData[0].vCard[0].PHOTO[0].BINVAL[0]; %>
+	<div class="img-div-rel">
+	  <img id="change_avatar_template_btn_<%= i %>" class="avatar change_avatar_template_btn" alt="Avatar" src="data:image/png;base64,<%= acc_photo %>"></img>
+	  <span style="display: none;" class="glyphicon glyphicon-edit glyph-edit"></span>
+	</div>
+	<% } else { %>
+	<div class="img-div-rel">
+	  <img class="avatar">
+	  <span id="change_avatar_template_btn_<%= i %>" class="glyphicon glyphicon-user avatar_span change_avatar_template_btn"></span>
+	  <span class="glyphicon glyphicon-edit glyph-edit"></span></img>
+	</div>
+	<% } %>
+      </td>
+
+      <td>
+	<% if (accounts[i].prefs.RealName) { %>
+	<span style="display: block" class="acc_realname"><%= accounts[i].prefs.RealName %></span>
+	<% } %>
+	<span style="display: block"><%= accounts[i].prefs.AccountName %></span>
+      </td>
+      
+      <% var acc_discquota; %>
+      <% if(accounts[i].quota == "0" || accounts[i].quota == "unlimited") { acc_diskquota = " ∞ " } else { acc_diskquota = accounts[i].quota } %>
+      <% accounts[i].used = parseInt(accounts[i].used) %>
+      <td class="stats_td">
+	<span><%= accounts[i].used %> /</span>
+	<span><%= acc_diskquota %></span>
+	<span>MB</span>
+
+	<div class="table_progress_bar">
+	  <div class="progress">
+	    <div class="progress-bar" role="progressbar" style="width: <%= accounts[i].usedpercent %>%">
+	      <span class="sr-only">0%</span>
+	    </div>
+	  </div> 
+	</div>
+
+	<span class="glyphicon glyphicon-envelope" style="margin-top: 10px" title="Sent"></span>
+	<%= (accounts[i].stats.MessagesSent) ? accounts[i].stats.MessagesSent.substring(1) : " 0 / " %>
+	<span class="glyphicon glyphicon-inbox" style="margin-top: 10px" title="Received"></span>
+	<%= (accounts[i].stats.MessagesReceived) ? accounts[i].stats.MessagesReceived.substring(1) : " 0" %>
+      </td>
+
+      <% var acc_modes = accounts[i].data.AccessModes; %>
+ 
+      <% var acc_modes_mail, acc_modes_xmpp, acc_modes_sip, acc_modes_webcal = ""; %>
+      <% (acc_modes.indexOf('Mail') > -1 || acc_modes == "All") ? acc_modes_mail = 'color: #000000' : acc_modes_mail = 'color: #aaaaaa'; %>
+      <% (acc_modes.indexOf('XMPP') > -1 || acc_modes == "All") ? acc_modes_xmpp = 'color: #000000' : acc_modes_xmpp = 'color: #aaaaaa'; %>
+      <% (acc_modes.indexOf('SIP') > -1 || acc_modes == "All") ? acc_modes_sip = 'color: #000000' : acc_modes_sip = 'color: #aaaaaa'; %>
+      <% (acc_modes.indexOf('WebCAL') > -1 || acc_modes == "All") ? acc_modes_webcal = 'color: #000000' : acc_modes_webcal = 'color: #aaaaaa'; %>
+      <td id="<%= i %>" class="plan_td">
+	<span class="plan_template_btn" style="display: block"><%= accounts[i]['class'] %></span>
+	<span class="glyphicon glyphicon-envelope plan_template_btn" title="Mail" style="<%= acc_modes_mail %>"></span>
+	<span class="glyphicon glyphicon-comment plan_template_btn" title="Chat/Jabber/XMPP" style="<%= acc_modes_xmpp %>"></span>
+	<span class="glyphicon glyphicon-phone plan_template_btn" title="SIP (Internet calls)" style="<%= acc_modes_sip %>"></span>
+	<span class="glyphicon glyphicon-calendar plan_template_btn" title="Calendar" style="<%= acc_modes_webcal %>"></span>
+      </td>
+
+      <td class="settings_td">
+	<span id="password_template_btn_<%= i %>" class="btn btn-link password_template_btn settings_item"><span class="fa fa-key fa-lg"></span> Password</span>
+	<span id="details_template_btn_<%= i %>" class="btn btn-link details_template_btn settings_item"><span class="glyphicon glyphicon-cog"></span> Details</span>
+	<span id="plan_template_btn_<%= i %>" class="btn btn-link plan_template_btn settings_item plan_template_btn"><span class="glyphicon glyphicon-list"></span> Plan</span>
+	<span id="delete_template_btn_<%= i %>" class="btn btn-link delete_template_btn settings_item"><span class="glyphicon glyphicon-trash"></span> Delete</span>
+	<div class="btn-group settings_item">
+	  <button class="btn btn-default dropdown-toggle" data-toggle="dropdown" type="button">More<span class="caret"></span></button>
+	  <ul class="dropdown-menu" role="menu">
+	    <% 	if (acc_modes.indexOf('SIP') > -1 || acc_modes == "All"){ var show_ext_link = "display: inline" } else {var show_ext_link = "display: none"} %>
+	    <li style="<%= show_ext_link %>">
+	      <a class="btn btn-link" href="../extensions.html" target="_blank"><span class="btn btn-link"><span class="glyphicon glyphicon-earphone"></span> Extensions</span></a>
+	    </li>
+	    <li id="active_sync_template_btn_<%= i %>" class="active_sync_template_btn"><a class="btn btn-link"><span class="btn btn-link"><span class="glyphicon glyphicon-transfer"></span><span class="glyphicon glyphicon-phone"></span> ActiveSync™</span></a>
+	    </li>
+	  </ul>
+	</div>
+      </td>
+    </tr>
+
+    <tr>
+      <td colspan="5">
+    	<div id="show_template_<%= i %>" class="show_template"></div>
+    	<div id="status_bar_<%= i %>" class="status_bar"></div>
+      </td>
+    </tr>
+    <% } %>
+    <% if (accounts.length < 1) { %>
+    <tr>
+      <td colspan="5">
+    	<div><span>No accounts!</span></div>
+      </td>
+    </tr>
+    <% } %>
+  </tbody>
+</table>
