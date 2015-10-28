@@ -8,8 +8,10 @@ var get_accounts = function () {
         "cpanel_jsonapi_func": "AccountsOverview"
     };
 
+
     // callback
     var success = function (res) {
+	
 	$("#load_accounts_status_bar").html("").slideUp("slow");
 	$("#add_status_bar").removeClass("status_bar_success status_bar_error").html("").slideUp("slow");
 	var data = JSON.parse(res);
@@ -264,8 +266,9 @@ function load_delete_template (item) {
     	});
     if ($("#show_template_" + account_id).find("div.delete_template").length < 1) {
     	var delete_tmpl_html = new EJS({url: 'delete_template.ejs'}).render({"account": account, "account_id": account_id});
-    	$("#show_template_" + account_id).hide();
-    	$("#show_template_" + account_id).html(delete_tmpl_html).slideDown("slow");
+	$("#show_template_" + account_id).hide().html(delete_tmpl_html).promise().done(function(){
+		setTimeout( function () {$("#show_template_" + account_id).slideDown("slow");}, 1);
+	    });
     	$("#cancel_btn_" + account_id).click(function() {
     		$("#show_template_" + account_id).slideUp("slow").html("");
     	    });
@@ -288,7 +291,9 @@ function load_details_template (item) {
 	});
     if ($("#show_template_" + account_id).find("div.details_template").length < 1) {
 	var details_tmpl_html = new EJS({url: 'details_template.ejs'}).render({"account": account, "account_id": account_id});
-	$("#show_template_" + account_id).hide().html(details_tmpl_html).slideDown("slow");
+	$("#show_template_" + account_id).hide().html(details_tmpl_html).promise().done(function(){
+		setTimeout( function () {$("#show_template_" + account_id).slideDown("slow");}, 1);
+	    });
 	$("#cancel_btn_" + account_id).click(function() {
 		$("#show_template_" + account_id).slideUp("slow").html("");
 	    });
@@ -325,7 +330,9 @@ function load_password_template (item) {
 	});
     if ($("#show_template_" + account_id).find("div.password_template").length < 1) {
 	var pass_tmpl_html = new EJS({url: 'password_template.ejs'}).render({"account": account, "account_id": account_id});
-	$("#show_template_" + account_id).hide().html(pass_tmpl_html).slideDown("slow");
+	$("#show_template_" + account_id).hide().html(pass_tmpl_html).promise().done(function(){
+		setTimeout( function () {$("#show_template_" + account_id).slideDown("slow");}, 1);
+	    });
 	$("#create_strong_password_" + account_id).click(function() {
 		create_strong_password(account_id);
 	    });		    
@@ -377,7 +384,9 @@ function load_plan_template (item) {
 	});
     if ($("#show_template_" + account_id).find("div.plan_template").length < 1) {
 	var plan_tmpl_html = new EJS({url: 'plan_template.ejs'}).render({"account": account, "account_id": account_id});
-	$("#show_template_" + account_id).hide().html(plan_tmpl_html).slideDown("slow");
+	$("#show_template_" + account_id).hide().html(plan_tmpl_html).promise().done(function(){
+		setTimeout( function () {$("#show_template_" + account_id).slideDown("slow");}, 1);
+	    });
 	$("#cancel_btn_" + account_id).click(function() {
 		$("#show_template_" + account_id).slideUp("slow").html("");
 	    });
@@ -389,7 +398,8 @@ function load_plan_template (item) {
     }
 }
 
-function load_avatar_template (item) {
+var load_avatar_template = function (item) {
+    remove_cropper_element();    
     var account_id = item.attr("id").replace("change_avatar_template_btn_","");
     var account = accounts[account_id];
     $(".show_template").each(function() {
@@ -400,14 +410,21 @@ function load_avatar_template (item) {
 	});
     if ($("#show_template_" + account_id).find("div.avatar_template").length < 1) {
 	var change_avatar_tmpl_html = new EJS({url: 'avatar_template.ejs'}).render({"account": account, "account_id": account_id});
-	$("#show_template_" + account_id).hide().html(change_avatar_tmpl_html).slideDown("slow");
+	$("#show_template_" + account_id).hide().html(change_avatar_tmpl_html).promise().done(function(){
+		setTimeout( function () {
+			$("#show_template_" + account_id).slideDown("slow");
+			    }, 1);
+	    });
+	
+
+	$jq("#crop_" + account_id).simpleCropper();
+
 	$("#cancel_btn_" + account_id).click(function() {
 		$("#show_template_" + account_id).slideUp("slow").html("");
 	    });
 	$("#change_avatar_confirm_" + account_id).click(function() {
 		change_avatar(account_id);
 	    });
-	$("#crop_" + account_id).simpleCropper();
     } else {
     	$("#show_template_" + account_id).slideUp("slow", function(){$(this).html("")});
 	remove_cropper_element();
@@ -417,7 +434,9 @@ function load_avatar_template (item) {
 function load_active_sync_template (account_id, data) {
     var account = accounts[account_id];
     var active_sync_tmpl_html = new EJS({url: 'active_sync_template.ejs'}).render({"account": account, "account_id": account_id, "active_sync_data": data});
-    $("#show_template_" + account_id).hide().html(active_sync_tmpl_html).slideDown("slow");
+    $("#show_template_" + account_id).hide().html(active_sync_tmpl_html).promise().done(function(){
+	    setTimeout( function () {$("#show_template_" + account_id).slideDown("slow");}, 1);
+	});
     $("#change_active_sync_btn_" + account_id).click(function() {
 	    change_active_sync(account_id);	
 	});
@@ -440,8 +459,11 @@ function load_active_sync_data (item) {
 	    }
 	});
     if ($("#show_template_" + item).find("div.active_sync_template").length < 1) {
-	$("#status_bar_" + item).slideDown("slow", function(){$(this).html(CPANEL.icons.ajax + " Loading...")});
-	var api2_call = {
+
+	$("#status_bar_" + item).hide().promise().done(function(){
+		setTimeout( function () {$("#status_bar_" + item).slideDown("slow", function(){$(this).html(CPANEL.icons.ajax + " Loading...")});}, 1);
+	    });
+ 	var api2_call = {
 	    "cpanel_jsonapi_version": 2,
 	    "cpanel_jsonapi_module": "CommuniGate",
 	    "cpanel_jsonapi_func": "ListAirSyncs",

@@ -6,6 +6,10 @@ SET email_add_forward = Api2.exec("CommuniGate", "updatearchive", {
 SET return_link = 'archive.html?domain=' _ RAW_FORM.item("domain")
 %]
 
+[% USE Dumper; %]
+<pre>[% Dumper.dump(email_add_forward) %]</pre>
+
+
 [% WRAPPER '_assets/master.html.tt'
     app_key = 'cgpro_archive'
  -%]

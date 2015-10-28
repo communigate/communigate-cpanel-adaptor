@@ -138,6 +138,10 @@ a {
     padding: 10px !important;
 }
 
+.active_sync_template table tr th {
+    background-color: #fafafa;
+}
+
 .avatar_template {
     padding: 15px;
 }

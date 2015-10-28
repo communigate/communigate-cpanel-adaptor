@@ -10,16 +10,19 @@ SET required_strength = Api2.exec("PasswdStrength", "get_required_strength", {"a
 %]
 
 [% WRAPPER '_assets/master.html.tt'
-    app_key = 'cgpro_accounts'
+page_scripts = ['cgpro/mail/js/SimpleCropper/scripts/jquery.Jcrop.js', 'cgpro/mail/js/SimpleCropper/scripts/jquery.SimpleCropper.js', 'cgpro/mail/js/accounts.js'],
+app_key = 'cgpro_accounts'
 -%]
 
 <!-- SimpleCropper files -->
 <link rel="stylesheet" type="text/css" href="js/SimpleCropper/css/style.css" /> 
 <link rel="stylesheet" type="text/css" href="js/SimpleCropper/css/style-example.css" />
 <link rel="stylesheet" type="text/css" href="js/SimpleCropper/css/jquery.Jcrop.css" />
-
 <link rel="stylesheet" type="text/css" href="accounts.css" /> 
 <script src="js/ejs_production.js"></script>
+<script>
+    $jq = $.noConflict();  
+</script>
 
 <div>
   <!-- Create Account form -->
@@ -125,7 +128,4 @@ SET required_strength = Api2.exec("PasswdStrength", "get_required_strength", {"a
 <script>
   var REQUIRED_PASSWORD_STRENGTH = parseInt('[% required_strength %]', 10) || 5;
 </script>
-<script type="text/javascript" src="js/SimpleCropper/scripts/jquery.Jcrop.js"></script>
-<script type="text/javascript" src="js/SimpleCropper/scripts/jquery.SimpleCropper.js"></script>
-<script src="js/accounts.js"></script>
 [% END %]
