@@ -2,6 +2,11 @@
 SET accounts = Api2.exec("CommuniGate", "ListAccounts", {});
 accounts = accounts.0.accounts;
 %]
+[%
+SET selected = RAW_FORM.item('selected');
+selected = selected.split("@");
+%]
+
 
 [% count = 0 %]
 [% FOREACH acc IN accounts %]
@@ -13,7 +18,7 @@ accounts = accounts.0.accounts;
 [% IF count == 1 %]
 [% FOREACH acc IN accounts %]
 [% IF RAW_FORM.item("domain") == acc.value.domain %]
-<option value="[% acc.value.username %]" >[% acc.value.username %]</option>
+<option value="[% acc.value.username %]" [% IF selected.0 == acc.value.username %]selected[% END %]>[% acc.value.username %]</option>
 [% END %]
 [% END %]
 [% ELSE %]

@@ -30,7 +30,7 @@ var getAccounts = function () {
     var wrap = document.getElementById("accounts");
     wrap.innerHTML = "";
 
-    YAHOO.util.Connect.asyncRequest('GET', 'getaccountsfordomain.html?domain=' + select.value, {
+    YAHOO.util.Connect.asyncRequest('GET', 'getaccountsfordomain.html?selected=[% FORM.email %]&domain=' + select.value, {
 	    success: function(o) {
               wrap.innerHTML = o.responseText;
 	    },
