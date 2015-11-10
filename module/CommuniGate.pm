@@ -859,7 +859,7 @@ sub api2_DeleteAlias {
   my %OPTS = @_;
   my $cli = getCLI();
   my $result = {};
-  
+  my $return = {};
   my $aliases = $cli->GetAccountAliases($OPTS{'account'});
   $result->{"aliases"} = $aliases;
   my $arrSize = @$aliases;
@@ -875,19 +875,34 @@ sub api2_DeleteAlias {
   my $set_aliases = $cli->SetAccountAliases($OPTS{'account'}, $aliases);
   my $error_msg = $cli->getErrMessage();
   if ($error_msg eq "OK") {
-      $result->{"error_msg"} = $error_msg;
+      $return->{"success"} = "Extension deleted successfully!";
   } else {
       $Cpanel::CPERROR{'CommuniGate'} = $error_msg;
-      $result->{"error_msg"} = $error_msg;
+      $return->{"error"} = $error_msg;
   }
 
   $result->{"aliases"} = $aliases;
   $cli->Logout();
-  return $result;
+  return $return;
+}
+
+sub api2_doAssignExtension {
+  my %OPTS = @_;
+  use Data::Dumper;
+  warn Dumper \%OPTS;
+  
+  my @domains = Cpanel::Email::listmaildomains();
+  my $cli = getCLI();
+  my $result = {};
+
+
 }
 
 sub api2_AssignExtension {
   my %OPTS = @_;
+  use Data::Dumper;
+  warn Dumper \%OPTS;
+  
   my @domains = Cpanel::Email::listmaildomains();
   my $cli = getCLI();
   my $result = {};
@@ -914,7 +929,6 @@ sub api2_AssignExtension {
 	      $result->{"objAddr"} = $objAddress;
 
   	      if ( $OPTS{'local_extension'} && ($objType eq "a") ) {
-		  
   	      	  my $aliases = $cli->GetAccountAliases($objAddress);
   	      	  $result->{"old_aliases"} = $aliases;
 
@@ -928,23 +942,20 @@ sub api2_AssignExtension {
   	      	  my $set_aliases = $cli->SetAccountAliases($objAddress, $aliases);
 
   	      	  my $error_msg = $cli->getErrMessage();
-  	      	  if ($error_msg eq "OK") {
-  	      	  } else {
-  	      	      $Cpanel::CPERROR{'CommuniGate_local_extension'} = $error_msg;
+  	      	  if (!$error_msg eq "OK") {
+		      $result->{'error'} = $error_msg;
   	      	  }
   	      } else {
 		  if ($objType eq "a" || $objType eq "g" || $objType eq "i" || $objType eq "q" ) {
 		      $cli->CreateForwarder($OPTS{'extension'} . "\@$domain", $objAddress);
 		      unless ($cli->getErrMessage eq "OK") {
-			  $Cpanel::CPERROR{'CommuniGate_local_extension'} = $cli->getErrMessage;
-			  $result->{"error_msg"} = $cli->getErrMessage;
+			  $result->{"error"} = $cli->getErrMessage;
 			  last;
 		      }
 		  } else {
 		      $cli->CreateForwarder($OPTS{'local_extension'} . "\@$domain", $objType);
 		      unless ($cli->getErrMessage eq "OK") {
-			  $Cpanel::CPERROR{'CommuniGate_local_extension'} = $cli->getErrMessage;
-			  $result->{"error_msg"} = $cli->getErrMessage;
+			  $result->{"error"} = $cli->getErrMessage;
 			  last;
 		      }
 		  }
@@ -955,6 +966,10 @@ sub api2_AssignExtension {
   		      my $telnums = $cli->GetAccountTelnums($objAddress);
   		      push @$telnums, $OPTS{"extension"} unless grep {$_ == $OPTS{"extension"}} @$telnums;
   		      $cli->SetAccountTelnums($objAddress, $telnums);
+		      my $error_msg = $cli->getErrMessage();
+		      if (!$error_msg eq "OK") {
+			  $result->{'error'} = $error_msg;
+		      }
   		  } else {
   		      my $rules = $cli->GetServerSignalRules();
   		      push @$rules, [
@@ -964,6 +979,10 @@ sub api2_AssignExtension {
   			  [["Redirect to", $objAddress]]
   		      ] unless grep {$_->[1] eq $OPTS{"extension"} . '@' . $domain} @$rules; # LOAD possible
   		      $cli->SetServerSignalRules($rules);
+		      my $error_msg = $cli->getErrMessage();
+		      if (!$error_msg eq "OK") {
+			  $result->{'error'} = $error_msg;
+		      }
   		  }
   		  my $prefs = $cli->GetAccountDefaultPrefs($domain);
   		  $prefs->{'assignedTelnums'}->{$OPTS{"extension"}}->{"assigned"} = $OPTS{"account"};
@@ -972,13 +991,16 @@ sub api2_AssignExtension {
   		      settings => {
   			  assignedTelnums => $prefs->{'assignedTelnums'}
   		      });
+		  my $error_msg = $cli->getErrMessage();
+		  if (!$error_msg eq "OK") {
+		      $result->{'error'} = $error_msg;
+		  }
   	      }
   	      last;
   	  }
       }
   }
 
-  my $result = {};
   my $defaults = $cli->GetServerAccountDefaults();
   $result->{"classes"} = $defaults->{"ServiceClasses"};
   foreach my $domain (@domains) {
@@ -1027,6 +1049,7 @@ sub api2_AssignExtension {
 
 sub api2_DeleteExtension {
   my %OPTS = @_;
+  my $return = {};
   my @domains = Cpanel::Email::listmaildomains();
   my $cli = getCLI();
   if ($OPTS{'extension'}) {
@@ -1035,6 +1058,12 @@ sub api2_DeleteExtension {
 	  if ($dom eq $domain) {
 	      if ($number =~ m/^\d{3}$/) {
 		  $cli->DeleteForwarder($OPTS{'extension'});
+		  if (!$cli->getErrMessage eq "OK") {
+		      $Cpanel::CPERROR{'CommuniGate'} = $cli->getErrMessage;
+		      $return->{'error'} = $cli->getErrMessage;
+		  } else {
+		      $return->{'success'} = "Extension deleted successfully!";
+		  }
 	      } else {
 		  $cli->DeleteForwarder($OPTS{'extension'});
 		  my $prefs = $cli->GetAccountDefaultPrefs($domain);
@@ -1057,15 +1086,20 @@ sub api2_DeleteExtension {
 		  	      assignedTelnums => $prefs->{'assignedTelnums'}
 		  	  });
 	      }
-	      unless ($cli->getErrMessage eq "OK") {
+	      if (!$cli->getErrMessage eq "OK") {
 		  $Cpanel::CPERROR{'CommuniGate'} = $cli->getErrMessage;
+		  $return->{'error'} = $cli->getErrMessage;
+	      } else {
+		  $return->{'success'} = "Extension deleted successfully!";
 	      }
 	      last;
 	  }
       }
   }
+  use Data::Dumper;
+  warn Dumper $return;
   $cli->Logout();
-  return "";
+  return $return;
 }
 
 sub api2_GetExtensions {
@@ -1102,6 +1136,7 @@ sub api2_GetExtensionsForPSTN {
   my $cli = getCLI();
   my $return = {};
   my @result;
+
   for my $dom (@domains) {
       if ($dom eq $domain) {
 	  my $domainPrefs = $cli->GetAccountDefaultPrefs($domain);
@@ -5418,7 +5453,7 @@ sub api2_SetAccountPSTN {
     my @domains = Cpanel::Email::listmaildomains();
     my $cli = getCLI();
 
-    my $result = {};
+    my $return = {};
     for my $domain (@domains) {
 	if ($domain eq $dom) {
 	    my $defaultDomain = $cli->MainDomainName();
@@ -5437,11 +5472,16 @@ sub api2_SetAccountPSTN {
 	    	    PSTNGatewayVia => $telnum[0]->{'domain'}
 					    });
 	    }
+	    if (!$cli->getErrMessage eq "OK") {
+		$return->{'error'} = $cli->getErrMessage;
+	    } else {
+		$return->{'success'} = "Extension deleted successfully!";
+	    }
 	    last;
 	}
     }
     $cli->Logout();
-    return $result;
+    return $return;
 }
 
 sub api2_UnsetAccountPSTN {
@@ -5450,7 +5490,7 @@ sub api2_UnsetAccountPSTN {
     my ($number,$dom) = split "@", $extension;
     my @domains = Cpanel::Email::listmaildomains();
     my $cli = getCLI();
-    my $result = {};
+    my $return = {};
     for my $domain (@domains) {
 	if ($domain eq $dom) {
 	    my $defaultDomain = $cli->MainDomainName();
@@ -5465,11 +5505,16 @@ sub api2_UnsetAccountPSTN {
 	    	    PSTNGatewayVia => "default"
 					    });
 	    }
+	    if (!$cli->getErrMessage eq "OK") {
+		$return->{'error'} = $cli->getErrMessage;
+	    } else {
+		$return->{'success'} = "Extension deleted successfully!";
+	    }
 	    last;
 	}
     }
     $cli->Logout();
-    return $result;
+    return $return;
 }
 
 sub api2_CC_UpdateAdministrator {
