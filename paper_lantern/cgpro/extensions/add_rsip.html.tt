@@ -1,0 +1,14 @@
+[%
+SET CPANEL.CPVAR.dprefix = "../";
+%]
+
+[% WRAPPER '_assets/master.html.tt'
+app_key = 'cgpro_extensions'
+-%]
+<script src="js/ejs_production.js"></script>
+<div class="body-content">
+  
+</div>
+[% INCLUDE _assets/return_link.html.tt return_location="extensions.html" return_link_text=locale.maketext('Go Back') %]
+<script src="js/add_rsip.js"></script>
+[% END %]

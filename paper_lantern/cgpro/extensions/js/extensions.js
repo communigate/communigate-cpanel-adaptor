@@ -45,19 +45,47 @@ var get_accounts = function () {
 };
 get_accounts();
 
-function list_rsip (accounts) {
+function list_rsip (accounts, selected) {
+    var account;
+    if (selected) {
+	account = selected;
+    } else {
+	account = accounts[0].username + "@" + accounts[0].domain;
+	selected = accounts[0].username + "@" + accounts[0].domain;
+    }
     var api2_call = {
         "cpanel_jsonapi_version": 2,
         "cpanel_jsonapi_module": "CommuniGate",
         "cpanel_jsonapi_func": "ListRSIP",
-	"account": accounts[0].username + "@" + accounts[0].domain
+	"account": account
     };
     // callback
     var success = function (res) {
 	var data = JSON.parse(res);
 	var rsip_data = data.cpanelresult.data[0];
-	var html_sip_registration = new EJS({url: 'sip_registration.ejs'}).render({"accounts": accounts, "rsip_data": rsip_data});
+	var html_sip_registration = new EJS({url: 'sip_registration.ejs'}).render({"accounts": accounts, "rsip_data": rsip_data, "selected": selected});
 	$("#sip_registration").html(html_sip_registration);	
+	$("#sip_account").change(function(){
+		list_rsip(accounts, $(this).val());
+	    });
+
+	$("#add_sip_registration").click(function() {
+		var url = "add_rsip.html?account=" + $("#sip_account").val();
+		console.log(url);
+		window.location = url;
+	    });
+
+	$(".delete_rsip").click(function() {
+		if (confirm("Are you sure you want to delete " + $(this).val() + "?")) {
+		    delete_rsip_account($("#sip_account").val(), $(this).val(), $(this).nextAll(".delete_loading"), accounts, selected);
+		}
+	    });
+	$(".set_outgoing").click(function() {
+		set_outgoing($("#sip_account").val(), $(this).val(), $(this).nextAll(".delete_loading"), accounts, selected);
+	    });
+	$(".unset_outgoing").click(function() {
+		unset_outgoing($("#sip_account").val(), $(this).nextAll(".delete_loading"), accounts, selected);
+	    });
     };
     // send the request
     $.ajax({
@@ -109,7 +137,6 @@ function set_extensions_for_pstn () {
     // callback
     var success = function (res) {
     	var data = JSON.parse(res);
-	console.log(data);
 	if (data.cpanelresult.event.result == "1") {
 	    $("#assign_to_domain_loading").html("Success assigning number!");
 	} else {
@@ -177,7 +204,9 @@ function get_assign_extension () {
 		$('#account_extension').attr('disabled', 'disabled');
 		get_account_extensions($(this).val().split("@")[1]);
 	    });
-
+	$("#assign_account_extension_btn").click(function() {
+		set_account_extension();
+	    });
 	get_account_extensions($("#account").val().split("@")[1]);
     };
     // send the request
@@ -209,9 +238,11 @@ function get_assign_local_extension () {
 		classes[class_].AccessModes = classes[class_].AccessModes.join(", ");
 	    }
 	}
-
 	var html_assign_local_extension = new EJS({url: 'assign_to_local_extension.ejs'}).render({"accounts": accounts, "classes": classes, "departments": departments, "ivrs": ivrs, "queues": queues});
 	$("#assign_local_extension").html(html_assign_local_extension);	
+	$("#assign_local_extension_btn").click(function() {
+		assign_local_extension();
+	    });
     };
     // send the request
     $.ajax({
@@ -255,6 +286,23 @@ function get_all_aliases (all_extensions) {
 	var all_aliases = data.cpanelresult.data;
 	var html_extensions_table = new EJS({url: 'extensions_table.ejs'}).render({"extensions": all_extensions, "aliases": all_aliases});
 	$("#extensions_table").html(html_extensions_table);	
+	$('.delete_extension').click(function() {
+		if (confirm("Are you sure you want to delete " + $(this).val() + "?")) {
+		    unset_account_pstn($(this).val(), $(this).attr("id").split("_")[1]);
+		    delete_account_extension($(this).val(), $(this).attr("id").split("_")[1]);
+		}
+	    });
+	$('.set-outgoing').click(function() {
+		set_account_pstn($(this).val(), $(this).attr("id").split("_")[1]);
+	    });
+	$('.unset-outgoing').click(function() {
+		unset_account_pstn($(this).val(), $(this).attr("id").split("_")[1]);
+	    });
+	$(".delete-local").click(function() {
+		if (confirm("Are you sure you want to delete " + $(this).val() + "?")) {
+		    delete_local_extension($(this).val().split("/")[0], $(this).val().split("/")[1], $(this).next(".delete_loading"));
+		}
+	    });
     };
     // send the request
     $.ajax({
@@ -262,4 +310,250 @@ function get_all_aliases (all_extensions) {
 		url: CPANEL.urls.json_api() + '&' + $.param(api2_call),
 		success: success
 	});
+};
+
+function set_account_extension () {
+    var api2_call = {
+        "cpanel_jsonapi_version": 2,
+        "cpanel_jsonapi_module": "CommuniGate",
+        "cpanel_jsonapi_func": "AssignExtension",
+	"account": $("#account").val(),
+	"extension": $("#account_extension").val()
+    };
+    // callback
+    var success = function (res) {
+    	var data = JSON.parse(res);
+	data = data.cpanelresult.data[0];
+	if (data.error) {
+	    $("#assign_account_extension_loading").html(data.error);
+	} else {
+	    $("#assign_account_extension_loading").html("Extension added successfully!");
+	    get_assign_extension();
+	    get_all_extensions();
+	}
+    };
+    $("#assign_account_extension_loading").html(CPANEL.icons.ajax + " Loading...");
+    // send the request
+    $.ajax({
+    	    type: "GET",
+    		url: CPANEL.urls.json_api() + '&' + $.param(api2_call),
+    		success: success
+    	});
+};
+
+function set_account_pstn (extension, id) {
+    var api2_call = {
+        "cpanel_jsonapi_version": 2,
+        "cpanel_jsonapi_module": "CommuniGate",
+        "cpanel_jsonapi_func": "SetAccountPSTN",
+    	"extension": extension
+    };
+    // callback
+    var success = function (res) {
+    	var data = JSON.parse(res);
+    	data = data.cpanelresult.data[0];
+    	if (data.success) {
+	    get_assign_extension();
+	    get_all_extensions();
+    	} else {
+    	    $("#delete_extension_loading_" + id).html("Error deleting extension!");
+    	}
+    };
+    // send the request
+    $("#delete_extension_loading_" + id).html(CPANEL.icons.ajax + " Loading...");
+    $.ajax({
+    	    type: "GET",
+    		url: CPANEL.urls.json_api() + '&' + $.param(api2_call),
+    		success: success
+    	});
+};
+
+function unset_account_pstn (extension, id) {
+    var api2_call = {
+        "cpanel_jsonapi_version": 2,
+        "cpanel_jsonapi_module": "CommuniGate",
+        "cpanel_jsonapi_func": "UnsetAccountPSTN",
+    	"extension": extension
+    };
+    // callback
+    var success = function (res) {
+    	var data = JSON.parse(res);
+    	data = data.cpanelresult.data[0];
+    	if (data.success) {	    
+	    get_assign_extension();
+	    get_all_extensions();
+	} else {
+	    $("#delete_extension_loading_" + id).html("Error deleting extension!");
+    	}
+    };
+    // send the request
+    $("#delete_extension_loading_" + id).html(CPANEL.icons.ajax + " Loading...");
+    $.ajax({
+    	    type: "GET",
+    		url: CPANEL.urls.json_api() + '&' + $.param(api2_call),
+    		success: success
+    	});
+};
+
+function delete_account_extension (extension, id) {
+    var api2_call = {
+        "cpanel_jsonapi_version": 2,
+        "cpanel_jsonapi_module": "CommuniGate",
+        "cpanel_jsonapi_func": "DeleteExtension",
+    	"extension": extension
+    };
+    // callback
+    var success = function (res) {
+    	var data = JSON.parse(res);
+	data = data.cpanelresult.data[0];
+	if (data.success) {
+	    get_assign_extension();
+	    get_all_extensions();
+	} else {
+	    $("#delete_extension_loading_" + id).html("Error deleting extension!");
+	}
+    };
+    // send the request
+    $("#delete_extension_loading_" + id).html(CPANEL.icons.ajax + " Loading...");
+    $.ajax({
+    	    type: "GET",
+    		url: CPANEL.urls.json_api() + '&' + $.param(api2_call),
+    		success: success
+    	});
+};
+
+function assign_local_extension () {
+    var api2_call = {
+        "cpanel_jsonapi_version": 2,
+        "cpanel_jsonapi_module": "CommuniGate",
+        "cpanel_jsonapi_func": "AssignExtension",
+	"account": $("#local_account").val(),
+	"local_extension": $("#local_extension").val()
+    };
+    // callback
+    var success = function (res) {
+    	var data = JSON.parse(res);
+	data = data.cpanelresult.data[0];
+	if (data.error) {
+	    $("#assign_local_extension_loading").html(data.error);
+	} else {
+	    $("#assign_local_extension_loading").html("Extension added successfully!");
+	    get_assign_local_extension();
+	    get_all_extensions();
+	}
+    };
+    $("#assign_local_extension_loading").html(CPANEL.icons.ajax + " Loading...");
+    // send the request
+    $.ajax({
+    	    type: "GET",
+    		url: CPANEL.urls.json_api() + '&' + $.param(api2_call),
+    		success: success
+    	});
+};
+
+function delete_local_extension (alias, account, loading) {
+    var api2_call = {
+        "cpanel_jsonapi_version": 2,
+        "cpanel_jsonapi_module": "CommuniGate",
+        "cpanel_jsonapi_func": "DeleteAlias",
+    	"alias": alias,
+	"account": account
+    };
+    // callback
+    var success = function (res) {
+    	var data = JSON.parse(res);
+    	data = data.cpanelresult.data[0];
+    	if (data.success) {
+    	    get_assign_extension();
+    	    get_all_extensions();
+    	} else {
+    	}
+    };
+    // send the request
+    loading.html(CPANEL.icons.ajax + " Loading...");
+    $.ajax({
+    	    type: "GET",
+    		url: CPANEL.urls.json_api() + '&' + $.param(api2_call),
+    		success: success
+    	});
+};
+
+function delete_rsip_account (account, rsip, loading, accounts, selected) {
+    var api2_call = {
+        "cpanel_jsonapi_version": 2,
+        "cpanel_jsonapi_module": "CommuniGate",
+        "cpanel_jsonapi_func": "DeleteRSIP",
+    	"rsip": rsip,
+    	"account": account
+    };
+    // callback
+    var success = function (res) {
+    	var data = JSON.parse(res);
+    	data = data.cpanelresult;
+    	if (data.event.result) {
+    	    list_rsip(accounts, selected);
+    	} else {
+    	    loading.html("Error deleting SIP account!");
+    	}
+    };
+    // send the request
+    loading.html(CPANEL.icons.ajax + " Loading...");
+    $.ajax({
+    	    type: "GET",
+    		url: CPANEL.urls.json_api() + '&' + $.param(api2_call),
+    		success: success
+    	});
+};
+
+function set_outgoing (account, rsip, loading, accounts, selected) {
+    var api2_call = {
+        "cpanel_jsonapi_version": 2,
+        "cpanel_jsonapi_module": "CommuniGate",
+        "cpanel_jsonapi_func": "UpdatePSTN",
+    	"rsip": rsip,
+    	"account": account
+    };
+    // callback
+    var success = function (res) {
+    	var data = JSON.parse(res);
+    	data = data.cpanelresult;
+    	if (data.event.result) {
+    	    list_rsip(accounts, selected);
+    	} else {
+    	    loading.html("Error setting as outgoing!");
+    	}
+    };
+    // send the request
+    loading.html(CPANEL.icons.ajax + " Loading...");
+    $.ajax({
+    	    type: "GET",
+    		url: CPANEL.urls.json_api() + '&' + $.param(api2_call),
+    		success: success
+    	});
+};
+
+function unset_outgoing (account, loading, accounts, selected) {
+    var api2_call = {
+        "cpanel_jsonapi_version": 2,
+        "cpanel_jsonapi_module": "CommuniGate",
+        "cpanel_jsonapi_func": "UnsetPSTN",
+    	"account": account
+    };
+    // callback
+    var success = function (res) {
+    	var data = JSON.parse(res);
+    	data = data.cpanelresult;
+    	if (data.event.result) {
+    	    list_rsip(accounts, selected);
+    	} else {
+    	    loading.html("Error unsetting as outgoing!");
+    	}
+    };
+    // send the request
+    loading.html(CPANEL.icons.ajax + " Loading...");
+    $.ajax({
+    	    type: "GET",
+    		url: CPANEL.urls.json_api() + '&' + $.param(api2_call),
+    		success: success
+    	});
 };

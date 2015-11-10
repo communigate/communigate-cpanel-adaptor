@@ -1,0 +1,90 @@
+<div class="body-content">
+  <% if (rsip) { %>
+  <h3>Edit Remote SIP</h3>
+  <% } else { %>
+  <h3>Add Remote SIP</h3>
+  <% } %>
+  <div class="form-group">
+    <label for="name">Display Name</label>
+    <div class="row">
+      <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	<input type="text" id="name" class="form-control" value="<%= rsip.name %>" <% if (rsip.name) { %>readonly=""<% } %>/>
+      </div>
+      <div id="name_error" class="col-xs-12 col-sm-6 col-md-6 col-lg-6"></div>	  
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="fromName">Account</label>
+    <div class="row">
+      <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	<input type="text" id="fromName" class="form-control" value="<%= rsip.fromName %>" />
+      </div>
+      <div id="fromName_error" class="col-xs-12 col-sm-6 col-md-6 col-lg-6"></div>	  
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="domain">Host</label>
+    <div class="row">
+      <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	<input type="text" id="domain" class="form-control" value="<%= rsip.domain %>" />
+      </div>
+      <div id="domain_error" class="col-xs-12 col-sm-6 col-md-6 col-lg-6"></div>	  
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="authName">Authentication Name</label>
+    <div class="row">
+      <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	<input type="text" id="authName" class="form-control" value="<%= rsip.authName %>" />
+      </div>
+      <div id="authName_error" class="col-xs-12 col-sm-6 col-md-6 col-lg-6"></div>	  
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="password">Password</label>
+    <div class="row">
+      <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	<input type="password" id="password" class="form-control" value="<%= rsip.password %>" />
+      </div>
+      <div id="password_error" class="col-xs-12 col-sm-6 col-md-6 col-lg-6"></div>	  
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="targetName">Target</label>
+    <div class="row">
+      <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	<input type="text" id="targetName" class="form-control" value="<%= rsip.targetName %>" />
+      </div>
+      <div id="targetName_error" class="col-xs-12 col-sm-6 col-md-6 col-lg-6"></div>	  
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="period">Pull Every</label>
+    <div class="row">
+      <div class="col-xs-12 col-sm-2 col-md-2 col-lg-2">
+	<select id="period" class="form-control">
+	  <option value="120s" <% if (rsip.period == "120s") { %>selected<% } %>>2m</option>
+	  <option value="180s" <% if (rsip.period == "180s") { %>selected<% } %>>3m</option>
+	  <option value="300s" <% if (rsip.period == "300s") { %>selected<% } %>>5m</option>
+	  <option value="600s" <% if (rsip.period == "600s" || !rsip.period) { %>selected<% } %>>10m</option>
+	  <option value="750s" <% if (rsip.period == "750s") { %>selected<% } %>>15m</option>
+	  <option value="1200s" <% if (rsip.period == "1200s") { %>selected<% } %>>20m</option>
+	  <option value="1800s" <% if (rsip.period == "1800s") { %>selected<% } %>>30m</option>
+	  <option value="3600s" <% if (rsip.period == "3600s") { %>selected<% } %>>60m</option>
+	  <option value="7200s" <% if (rsip.period == "7200s") { %>selected<% } %>>2h</option>
+	  <option value="10800s" <% if (rsip.period == "10800s") { %>selected<% } %>>3h</option>
+	  <option value="18000s" <% if (rsip.period == "18000s") { %>selected<% } %>>5h</option>
+	  <option value="21600s" <% if (rsip.period == "21600s") { %>selected<% } %>>6h</option>
+	  <option value="22800s" <% if (rsip.period == "22800s") { %>selected<% } %>>8h</option>
+	  <option value="86400s" <% if (rsip.period == "86400s") { %>selected<% } %>>24h</option>
+	  <option value="1000000000s" <% if (rsip.period == "1000000000s") { %>selected<% } %>>Disabled</option>
+	</select>
+      </div>
+      <div id="targetName_error" class="col-xs-12 col-sm-6 col-md-6 col-lg-6"></div>	  
+    </div>
+  </div>
+  <div class="form-group">
+    <button id="save" class="btn btn-primary" value="Save">Save</button>
+    <span id="save_loading" style="margin-left: 20px;"></span>
+  </div>
+</div>

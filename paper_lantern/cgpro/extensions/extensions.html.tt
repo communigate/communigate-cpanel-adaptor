@@ -1,0 +1,22 @@
+[%
+SET CPANEL.CPVAR.dprefix = "../";
+%]
+
+[% WRAPPER '_assets/master.html.tt'
+app_key = 'cgpro_extensions'
+-%]
+<script src="js/ejs_production.js"></script>
+<style>
+  .delete_loading, #assign_local_extension_loading {
+  margin-left: 20px;
+  }
+</style>
+<div class="body-content">
+  <div id="assign_to_domain_wrap"></div>
+  <div id="assign_phone_number_did"></div>
+  <div id="assign_local_extension"></div>
+  <div id="extensions_table"></div>
+  <div id="sip_registration"></div>
+</div>
+<script src="js/extensions.js"></script>
+[% END %]

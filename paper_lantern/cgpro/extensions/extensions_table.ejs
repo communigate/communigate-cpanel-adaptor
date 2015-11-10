@@ -16,14 +16,15 @@
     <td><%= extensions[i].html_dest %></td>
     <td><%= extensions[i].html_forward %></td>
     <td>
-      <a><span class="glyphicon glyphicon-trash"></span> Delete</a>
+      <button id="delete_<%= i %>" class="btn btn-link delete_extension" value="<%= extensions[i].uri_dest %>"><span class="glyphicon glyphicon-trash"></span> Delete</button>
       <% if( extensions[i].type == "number" && extensions[i].assignedType == "a" ) { %>
       <% if (!extensions[i].out) { %>
-      <a><span class="glyphicon glyphicon-arrow-right"></span> Set As Outgoing</a>
-      <% }else{ %>
-      <a><span class="glyphicon glyphicon-remove"></span> Unset As Outgoing</a>
+      <button id="set-outgoing_<%= i %>" class="btn btn-link set-outgoing" value="<%= extensions[i].uri_dest %>"><span class="glyphicon glyphicon-arrow-right"></span> Set as outgoing</button>
+      <% } else { %>
+      <button id="unset-outgoing_<%= i %>" class="btn btn-link unset-outgoing" value="<%= extensions[i].uri_dest %>"><span class="glyphicon glyphicon-arrow-right"></span> Unset as outgoing</button>
       <% } %>
       <% } %>
+      <span id="delete_extension_loading_<%= i %>" class="delete_loading"></span>
     </td>
   </tr>
   <% } %>
@@ -33,7 +34,10 @@
      <tr>
        <td><%= aliases[i].aliases[j] %></td>
        <td><%= aliases[i].account %></td>
-       <td><a href="deletealias.html?alias=[% alias %]&account=[% account %]"><span class="glyphicon glyphicon-trash"></span>Delete</a></td>
+       <td>
+	 <button class="btn btn-link delete-local" value="<%= aliases[i].aliases[j] %>/<%= aliases[i].account %>"><span class="glyphicon glyphicon-trash"></span> Delete</button>
+	 <span class="delete_loading"></span>
+       </td>
      </tr>
      <% } %>
      <% } %>

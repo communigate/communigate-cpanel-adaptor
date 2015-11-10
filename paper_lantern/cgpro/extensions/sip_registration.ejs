@@ -6,14 +6,14 @@
       <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
 	<select id="sip_account" class="form-control">
 	  <% for (var i = 0; i < accounts.length; i++) { %>
-	  <option value="<%= accounts[i].username + '@' + accounts[i].domain %>"><%= accounts[i].username + '@' + accounts[i].domain %></option>
+	  <option value="<%= accounts[i].username + '@' + accounts[i].domain %>" <% if(selected && selected == (accounts[i].username + '@' + accounts[i].domain)) { %>selected<% } %>><%= accounts[i].username + '@' + accounts[i].domain %></option>
 	  <% } %>
 	</select>
       </div>
     </div>
   </div>
   <div class="form-group">
-    <a class="btn btn-primary">Add SIP Registration</a>
+    <button id="add_sip_registration" class="btn btn-primary">Add SIP Registration</button>
   </div>
 
   <table class="table table-striped">
@@ -32,20 +32,28 @@
 	  <% if(rsip_data.settings.PSTNFromName && (rsip_data.settings.PSTNFromName == rsip_data.rsip[rsip].fromName) && (rsip_data.settings.PSTNGatewayAuthName == rsip_data.rsip[rsip].authName) ) { %>(Outgoing)<% } %>
 	</td>
 	<td>
+	  <% if (rsip_data.rsipInfo[rsip]) { %>
 	  <%= rsip_data.rsipInfo[rsip].completed.replace(/(\#T|\_)/g, " ") %>
 	  <%= rsip_data.rsipInfo[rsip].errorCode %>
+	  <% } %>
 	</td>
 	<td>
-	  <a><span class="glyphicon glyphicon-pencil"></span> View/Edit</a>
-	  <a><span class="glyphicon glyphicon-trash"></span> Delete</a>
+	  <a class="btn btn-link" href="add_rsip.html.tt?account=<%= selected %>&rsip=<%= rsip %>"><span class="glyphicon glyphicon-pencil"></span> View/Edit</a>
+	  <button class="btn btn-link delete_rsip" value="<%= rsip %>"><span class="glyphicon glyphicon-trash"></span> Delete</button>
 	  <% if(rsip_data.settings.PSTNFromName && (rsip_data.settings.PSTNFromName == rsip_data.rsip[rsip].fromName) && (rsip_data.settings.PSTNGatewayAuthName == rsip_data.rsip[rsip].authName) ) { %>
-	  <a><span class="glyphicon glyphicon-remove"></span> Unset As Outgoing</a>
+	  <button class="btn btn-link unset_outgoing" value="<%= rsip %>"><span class="glyphicon glyphicon-remove"></span> Unset as outgoing</button>
 	  <% }else{ %>
-	  <a><span class="glyphicon glyphicon-arrow-right"></span> Set As Outgoing</a>
+	  <button class="btn btn-link set_outgoing" value="<%= rsip %>"><span class="glyphicon glyphicon-arrow-right"></span> Set as outgoing</button>
 	  <% } %>
+	  <span class="delete_loading"></span>
 	</td>
       </tr>
       <% } %>
+      <% if(jQuery.isEmptyObject(rsip_data.rsip)) { %>
+	 <tr>
+	   <td colspan="3">Currently there are no sip registrations!</td>
+	 </tr>
+	 <% } %>
     </tbody>
   </table>
 </div>
