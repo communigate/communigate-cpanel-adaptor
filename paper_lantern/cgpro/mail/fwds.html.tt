@@ -2,7 +2,7 @@
 USE Api2;
 SET CPANEL.CPVAR.dprefix = "../../";
 
-IF CPANEL.feature('forwarders');
+IF CPANEL.feature('cgpro_forwardersemail');
 SET api2_result_Email_listforwards = Api2.exec("CommuniGate", "listforwards", {});
 END;
 %]
