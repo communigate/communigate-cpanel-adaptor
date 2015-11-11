@@ -1,0 +1,44 @@
+<div class="section">
+  <h2>Add a New Forwarder</h2>
+  <h3>Address</h3>
+
+  <div class="form-group">
+    <label for="email">Address to Forward</label>
+    <div class="row">
+      <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+        <div class="input-group">
+          <select id="email" class="form-control">
+          </select>
+          <span class="input-group-addon">@</span>
+        </div>
+      </div>
+      <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6" id="email_error"></div>
+    </div>
+    
+    <label for="domain">Domain</label>
+    <div class="row">
+      <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+        <select id="domain" class="form-control">
+          [% FOREACH hashref IN mail_domains.data %]
+          <option value="[% hashref.domain.html() %]">[% hashref.domain.html() %]</option>
+          [% END %]
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <h3>Destination</h3>
+  <div class="form-group">
+    <label for="fwdemail">Forward to Email Address</label>
+    <div class="row">
+      <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+        <input type="text" id="fwdemail" class="form-control" />
+      </div>
+      <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6" id="fwdemail_error"></div>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <button id="save" class="btn btn-primary" value="">Add Forwarder</button>
+  </div>
+</div>

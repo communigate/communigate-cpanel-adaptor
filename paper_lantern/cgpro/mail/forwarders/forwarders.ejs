@@ -1,0 +1,46 @@
+<div class="section">
+  <h2>Create an Email Account Forwarder</h2>
+  <button id="add_forwarder" class="btn btn-primary">Add Forwarder</button>
+  <h2>Email Account Forwarders</h2>
+  <div>
+    <table class="table table-striped">
+      <colgroup>
+        <col width="40%" />
+        <col width="40%" />
+        <col width="20%" />
+      </colgroup>
+      <thead>
+        <tr>
+	  <th>Email Address</th>
+          <th>Forward To</th>
+          <th>Actions</th>
+	</tr>
+      </thead>
+      <tbody>
+	<% for (var i = 0; i < forwarders.length; i++) { %>
+	<tr>
+          <td>
+	    <%= forwarders[i].html_dest %>
+          </td>
+          <td>
+	    <%= forwarders[i].html_forward %>
+          </td>
+          <td>
+            <button id="delete_<%= i %>" class="btn btn-link delete_forwarder" value="<%= forwarders[i].html_dest %>/<%= forwarders[i].html_forward %>"><span class="glyphicon glyphicon-trash"></span> Delete</button>
+	    <input type="hidden" id="dest_<%= i %>" class="dest" value="<%= forwarders[i].html_dest %>"/>
+	    <input type="hidden" id="forward_<%= i %>" class="forward" value="<%= forwarders[i].html_forward %>"/>
+	    <span class="loading"></span>
+          </td>
+	</tr>
+	<% } %>
+	<% if (!forwarders.length) { %>
+	<tr>
+          <td colspan="5">
+             There are no forwarders configured for the current domain!
+          </td>
+	</tr>
+	<% } %>
+      </tbody>      
+    </table>
+  </div>
+</div>
