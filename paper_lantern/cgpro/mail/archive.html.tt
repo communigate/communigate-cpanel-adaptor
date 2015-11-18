@@ -93,10 +93,6 @@ accounts = accounts.0.accounts;
 
         [% END %]
     [% END %]
-
-    [% IF !(CPANEL.CPCONF.emailarchive == "disable" ? 0 : CPANEL.CPCONF.emailarchive) %]
-        [% locale.maketext("Email archiving is disabled.") %]
-    [% END %]
 </div>
 [% END #wrapper %]
 
