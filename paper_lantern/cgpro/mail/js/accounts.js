@@ -730,10 +730,14 @@ function clear_search () {
 function search_accounts () {
     var tmp_accounts = [];
     var searchregex = $("#search_input").val();
-    for (var i=0; i < accounts.length; i++) {
-	var res = accounts[i].prefs.AccountName.match(searchregex);
-	if (res) {
-	    tmp_accounts.push(accounts[i]);
+    for (var j=0; j < accounts.length; j++) {
+	tmp_accounts.push(accounts[j]);
+    }
+    for (var i=0; i < tmp_accounts.length; i++) {
+	if (accounts[i].prefs.AccountName.indexOf(searchregex) > -1) {
+	    tmp_accounts[i].in_search = true;
+	} else {
+	    tmp_accounts[i].in_search = false;
 	}
     }
     var html = new EJS({url: 'accounts_table.ejs'}).render({"accounts": tmp_accounts});
