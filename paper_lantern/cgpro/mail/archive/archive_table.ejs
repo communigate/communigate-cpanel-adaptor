@@ -1,0 +1,68 @@
+<h2>Manage Archiving</h2>
+<table id="archive-table" class="table table-striped">
+  <colgroup>
+    <col width="40%">
+    <col width="60%">
+  </colgroup>
+  <thead>
+    <tr>
+      <th>Archiving</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><% if (item.account) { %><%= item.account %> (Account)<% } else { %><%= item.domain %> (Domain)<% } %></td>
+      <td>
+	<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+	  <div class="col-xs-12 col-sm-4 col-md-4 col-lg-4"> 
+	    <label style="line-height: 34px; margin-bottom: 0">Archive Messages after:</label>
+	  </div>
+	  <div class="col-xs-12 col-sm-8 col-md-8 col-lg-8"> 
+	    <select id="archive-after" class="form-control" style="margin-bottom: 10px;">
+	      <option value="" <% if (item.ArchiveMessagesAfter == "") { %>selected<% } %> >default</option>
+	      <option value="0" <% if (item.ArchiveMessagesAfter == "0") { %>selected<% } %>>never</option>
+	      <option value="1d" <% if (item.ArchiveMessagesAfter == "1d") { %>selected<% } %>>24 hours</option>
+	      <option value="2d" <% if (item.ArchiveMessagesAfter == "2d") { %>selected<% } %>>2 days</option>
+	      <option value="3d" <% if (item.ArchiveMessagesAfter == "3d") { %>selected<% } %>>3 days</option>
+	      <option value="5d" <% if (item.ArchiveMessagesAfter == "5d") { %>selected<% } %>>5 days</option>
+	      <option value="7d" <% if (item.ArchiveMessagesAfter == "7d") { %>selected<% } %>>7 days</option>
+	      <option value="14d" <% if (item.ArchiveMessagesAfter == "14d") { %>selected<% } %>>2 weeks</option>
+	      <option value="30d" <% if (item.ArchiveMessagesAfter == "30d") { %>selected<% } %>>30 days</option>
+	      <option value="90d" <% if (item.ArchiveMessagesAfter == "90d") { %>selected<% } %>>90 days</option>
+	      <option value="180d" <% if (item.ArchiveMessagesAfter == "180d") { %>selected<% } %>>180 days</option>
+	      <option value="365d" <% if (item.ArchiveMessagesAfter == "365d") { %>selected<% } %>>365 days</option>
+	      <option value="730d" <% if (item.ArchiveMessagesAfter == "730d") { %>selected<% } %>>730 days</option>
+	    </select>
+	  </div>
+	</div>
+	<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+	  <div class="col-xs-12 col-sm-4 col-md-4 col-lg-4"> 
+	    <label style="line-height: 34px; margin-bottom: 0">Delete Messages after:</label>
+	  </div>
+	  <div class="col-xs-12 col-sm-8 col-md-8 col-lg-8"> 
+	    <select id="delete-after" class="form-control">
+	      <option value="" <% if (item.DeleteMessagesAfter == "") { %>selected<% } %>>default</option>
+	      <option value="0" <% if (item.DeleteMessagesAfter == "0") { %>selected<% } %>>never</option>
+	      <option value="1d" <% if (item.DeleteMessagesAfter == "1d") { %>selected<% } %>>24 hours</option>
+	      <option value="2d" <% if (item.DeleteMessagesAfter == "2d") { %>selected<% } %>>2 days</option>
+	      <option value="3d" <% if (item.DeleteMessagesAfter == "3d") { %>selected<% } %>>3 days</option>
+	      <option value="5d" <% if (item.DeleteMessagesAfter == "5d") { %>selected<% } %>>5 days</option>
+	      <option value="7d" <% if (item.DeleteMessagesAfter == "7d") { %>selected<% } %>>7 days</option>
+	      <option value="14d" <% if (item.DeleteMessagesAfter == "14d") { %>selected<% } %>>2 weeks</option>
+	      <option value="30d" <% if (item.DeleteMessagesAfter == "30d") { %>selected<% } %>>30 days</option>
+	      <option value="90d" <% if (item.DeleteMessagesAfter == "90d") { %>selected<% } %>>90 days</option>
+	      <option value="180d" <% if (item.DeleteMessagesAfter == "180d") { %>selected<% } %>>180 days</option>
+	      <option value="365d" <% if (item.DeleteMessagesAfter == "365d") { %>selected<% } %>>365 days</option>
+	      <option value="730d" <% if (item.DeleteMessagesAfter == "730d") { %>selected<% } %>>730 days</option>
+	    </select>
+	  </div>
+	</div>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<div class="form-group">
+  <button id="save-btn" class="btn btn-primary">Save</button>
+  <span id="save-loading" style="margin-left: 20px;"></span>
+</div>

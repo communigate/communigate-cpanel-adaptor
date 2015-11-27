@@ -2945,6 +2945,40 @@ sub api2_updatearchive {
     return {msg => "Changes saved."};
 }
 
+sub api2_updateEmailArchive {
+    my %OPTS = @_;
+    my $acc = %OPTS->{'domain'};
+    my $archive_after = %OPTS->{'archive_after'};
+    my $delete_after = %OPTS->{'delete_after'};
+
+    my $cli = getCLI();
+    my @domains = Cpanel::Email::listmaildomains();
+    my ($userName, $dom) = split "@", $acc;
+
+    if($acc =~ /@/g) {
+	my $accounts = $cli->ListAccounts($dom);
+	for my $account (keys %$accounts) {
+	    my $account_settings =  $cli->GetAccountSettings($acc);	
+	    $cli->UpdateAccountSettings($acc, {
+		ArchiveMessagesAfter => ((defined $archive_after)?$archive_after:undef),
+		DeleteMessagesAfter => ((defined $delete_after)?$delete_after:undef )
+					});
+	}	    
+    } else {
+	for my $domain (@domains) {
+	    if ($domain eq $userName) {
+		$cli->UpdateAccountDefaults(domain => $domain, settings => {
+		    ArchiveMessagesAfter => ((defined $archive_after)?$archive_after:undef),
+		    DeleteMessagesAfter => ((defined $delete_after)?$delete_after:undef )
+					    });
+	    }
+	    last;
+	}
+    }
+    $cli->Logout();
+    return {msg => "Changes saved."};
+}
+
 sub api2_listSignalRules {
     my $cli = getCLI();
     my @domains = Cpanel::Email::listmaildomains();
@@ -5743,6 +5777,17 @@ sub api2_getMxPresets {
     $cli->Logout();
     return $prefs->{"MxPresets"};
 }
+
+# Email Archive functions
+sub api2_getDomainsAndAccounts {
+    my $return = {};
+    my @domains = Cpanel::Email::listmaildomains();
+    my $accounts = api2_ListAccounts();
+    $return->{'domains'} = \@domains;
+    $return->{'accounts'} = $accounts->{'accounts'};
+    return $return;
+}
+
 
 sub versioncmp( $$ ) {
     my @A = ($_[0] =~ /([-.]|\d+|[^-.\d]+)/g);

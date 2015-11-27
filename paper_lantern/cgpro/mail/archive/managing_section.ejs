@@ -1,0 +1,17 @@
+<div class="pull-right">
+  <div class="form-group">
+    <div class="col-xs-12 col-sm-4 col-md-4 col-lg-4"> 
+      <label for="select-manage" class="col-xs-12" style="line-height: 35px;">Managing:</label>
+    </div>
+    <div class="col-xs-12 col-sm-8 col-md-8 col-lg-8"> 
+      <select id="select-manage" class="form-control">
+	<% for (var i = 0; i < domains.length; i++) { %>
+	   <option value="<%= domains[i] %>"><%= domains[i] %></option>
+	   <% } %>
+	   <% for (var j = 0; j < accounts.length; j++) { %>
+	      <option value="<%= accounts[j] %>"><%= accounts[j] %></option>
+	      <% } %>
+      </select>
+    </div>
+  </div>
+</div>
