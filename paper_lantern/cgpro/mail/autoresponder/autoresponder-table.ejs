@@ -1,0 +1,39 @@
+<h2>Current Autoresponders</h2>
+<table class="table table-striped">
+  <colgroup>
+    <col width="30%">
+    <col width="20%">
+    <col width="15%">
+    <col width="30%">
+  </colgroup>
+  <thead>
+    <tr>
+      <th>Email</th>
+      <th>Subject</th>
+      <th>Actions</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <% for (var i = 0; i < data.length; i++) { %>
+       <tr>
+	 <td><%= data[i].email %></td>
+	 <td><%= data[i].subject %></td>
+	 <td>
+           <a onclick="getAutoresponder('<%= data[i].email %>', '<%= i %>')"><span class="glyphicon glyphicon-pencil"></span> Edit</a>
+           <a onclick="deleteAutoresponder('<%= data[i].email %>', '<%= i %>')"><span class="glyphicon glyphicon-trash"></span> Delete</a>
+	 </td>
+	 <td>
+	   <span id="loading_<%= i %>"></span>
+	 </td>
+       </tr>
+       <% } %>
+       <% if (!data.length) { %>
+       <tr>
+	 <td colspan="3">
+           Currently there are no autoresponders!
+	 </td>
+       </tr>
+       <% } %>
+  </tbody>
+</table>

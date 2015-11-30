@@ -1,0 +1,65 @@
+<div class="form-group">
+  <label for="subject">Subject</label>
+  <div class="row">
+    <div class="col-xs-12 col-sm-4 col-md-4 col-lg-4">
+      <input type="text" id="subject" class="form-control" <% if(autoresponder) { %>value="<%= autoresponder.subject %>"<% } %> />
+    </div>
+    <div class="col-xs-12 col-sm-3 col-md-3 col-lg-3 error-div" id="subject_error"></div>
+  </div>
+</div>
+
+<div class="form-group">
+  <label for="body">Body</label>
+  <div class="row">
+    <div class="col-xs-9">
+      <textarea id="body" class="form-control" cols="80" rows="8"><% if(autoresponder) { %><%= autoresponder.body %><% } %></textarea>
+    </div>
+    <div class="col-xs-12 col-sm-3 col-md-3 col-lg-3 error-div" id="body_error"></div>
+  </div>
+</div>
+
+<div class="form-group">
+  <label for="start_control">Start</label>
+  <div class="row">
+    <div class="col-xs-12 col-sm-3 col-md-3 col-lg-3">
+      <div class="radio">
+        <label>
+          <input type="radio" name="start_control" value="0" checked="checked" />
+          Immediately
+        </label>
+      </div>
+      <div class="radio">
+        <input type="radio" id="start-date-radio" name="start_control" value="1" <% if(autoresponder && autoresponder.start) { %>checked<% } %> />
+	<input id="start_date" class="input form-control" <% if(autoresponder && autoresponder.start) { %>value="<%= autoresponder.start %>"<% } %> >
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="form-group">
+  <label for="stop_control">Stop</label>
+  <div class="row">
+    <div class="col-xs-12 col-sm-3 col-md-3 col-lg-3">
+      <div class="radio">
+        <label>
+          <input type="radio" name="stop_control" value="0" checked="checked" />
+          Never
+        </label>
+      </div>
+      <div class="radio">
+        <label>
+          <input type="radio" id="stop-date-radio" name="stop_control" value="1" <% if(autoresponder && autoresponder.stop) { %>checked<% } %>  />
+	  <input id="stop_date" class="input form-control" <% if(autoresponder && autoresponder.stop) { %>value="<%= autoresponder.stop %>"<% } %> >
+        </label>
+      </div>
+      <div id="stop_container"></div>
+      <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 error-div" id="date-error" style=""></div>
+    </div>
+  </div>
+</div>
+
+<div class="form-group">
+  <button id="save-btn" class="btn btn-primary">Save</button>
+  <button id="cancel-btn" class="btn btn-link">Cancel</button>
+  <span id="save-loading" style="margin-left: 10px;"></span>
+</div>

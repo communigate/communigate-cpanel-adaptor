@@ -1,0 +1,42 @@
+<h2>Modify/Add Auto Responder</h2>
+<div class="filthypillow"></div>
+
+<p>When configuring an auto responder, you can use the following tags to insert information into the response email:</p>
+<span class="bold">^S</span>
+<p>The subject of the message sent to the auto responder.</p>
+<span class="bold">^F</span>
+<p>From address of the original message (decoded, converted to UTF-8, including the \"Real name\" part).</p>
+<span class="bold">^E</span>
+<p>The incoming email sender’s address only.</p>
+<div class="form-group">
+  <label for="email">Email</label>
+  <div class="row">
+    <div class="col-xs-12 col-sm-4 col-md-4 col-lg-4">
+      <div class="input-group">
+	<select id="email" class="form-control">
+	  <% for (var a = 0; a < accounts.length; a++) { %>
+	     <% if ( accounts[a] != "pbx" && accounts[a] != "ivr" ) { %>
+	     <option <% if(autoresponder && autoresponder.email.split('@')[0] == accounts[a]) { %>selected<% } %> ><%= accounts[a] %></option>
+	     <% } %>
+	  <% } %>
+	</select>
+        <span class="input-group-addon">@</span>
+      </div>
+    </div>
+    <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6" id="email_error"></div>
+  </div>
+</div>
+<div class="form-group">
+  <label for="domain">Domain</label>
+  <div class="row">
+    <div class="col-xs-12 col-sm-4 col-md-4 col-lg-4">
+      <select id="domain" class="form-control">
+	<% for (var i = 0; i < domains.length; i++) { %>
+	<option <% if(domains[i].domain == domain) { %>selected<% } %> ><%= domains[i].domain %></option>
+	<% } %>
+      </select>
+    </div>
+    <span id="domain-loading" style="line-height: 35px; margin-left: 10px;"></span>
+  </div>
+</div>
+

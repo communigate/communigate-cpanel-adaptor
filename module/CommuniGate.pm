@@ -140,7 +140,14 @@ sub api2_getEmailDomains {
 }
 
 sub api2_getAccountsAndDomains {
-    return Cpanel::Email::listmaildomains();
+    my $accounts = api2_ListAccounts();
+    $accounts = $accounts->{'accounts'};
+    my @domains = Cpanel::Email::listmaildomains();
+    my $return = {
+	"accounts" => $accounts,
+	"domains" => \@domains
+    };
+    return $return;
 }
 
 sub api2_AccountsOverview {
