@@ -69,8 +69,9 @@
   /*
   Label the data
   */
-  table.responsive-table td:nth-of-type(1):before { content: "Department Address"; }
-  table.responsive-table td:nth-of-type(2):before { content: "Functions"; }
+  table.responsive-table td:nth-of-type(1):before { content: "Email"; }
+  table.responsive-table td:nth-of-type(2):before { content: "Subject"; }
+  table.responsive-table td:nth-of-type(3):before { content: "Actions"; }
   }
 </style>
 <div class="body-content">
