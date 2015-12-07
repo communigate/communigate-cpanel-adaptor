@@ -17,6 +17,7 @@
   </thead>
   <tbody>
     <% for (var i = 0; i < accounts.length; i++) { %>
+       <% if (!accounts[i].in_search) { continue; } %>
     <tr>
       <td class="avatar_td" title="Change avatar">
 	<% if (accounts[i].vcard
