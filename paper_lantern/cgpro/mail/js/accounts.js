@@ -12,11 +12,15 @@ var get_accounts = function () {
 	$("#load_accounts_status_bar").html("").slideUp("slow");
 	$("#add_status_bar").removeClass("status_bar_success status_bar_error").html("").slideUp("slow");
 	var data = JSON.parse(res);
-	accounts = Object.keys(data.cpanelresult.data[0].accounts).map(function(k) { return data.cpanelresult.data[0].accounts[k] });
-	var html = new EJS({url: 'accounts_table.ejs'}).render({"accounts": accounts});
-	$("#accounts_table").html(html);
-	load_events();	
-	search_accounts();
+	if (data.cpanelresult.event.result) {
+	    accounts = Object.keys(data.cpanelresult.data[0].accounts).map(function(k) { return data.cpanelresult.data[0].accounts[k] });
+	    var html = new EJS({url: 'accounts_table.ejs'}).render({"accounts": accounts});
+	    $("#accounts_table").html(html);
+	    load_events();	
+	    search_accounts();
+	} else {
+	    $("#accounts_table").html("Error loading accounts!");
+	}
     };
     // send the request
     $.ajax({
@@ -263,16 +267,16 @@ function load_delete_template (item) {
     if ($("#show_template_" + account_id).find("div.delete_template").length < 1) {
     	var delete_tmpl_html = new EJS({url: 'delete_template.ejs'}).render({"account": account, "account_id": account_id});
 	$("#show_template_" + account_id).hide().html(delete_tmpl_html).promise().done(function(){
-		setTimeout( function () {$("#show_template_" + account_id).slideDown("slow");}, 1);
+		setTimeout( function () {$("#show_template_" + account_id).slideDown("slow"); item.parent().parent().next('tr').addClass('extended');}, 1);
 	    });
     	$("#cancel_btn_" + account_id).click(function() {
-    		$("#show_template_" + account_id).slideUp("slow").html("");
+    		$("#show_template_" + account_id).slideUp("slow", function() { item.parent().parent().next('tr').removeClass('extended'); } ).html("");
     	    });
 	$("#delete_account_btn_" + account_id).click(function() {
 		delete_account(account_id);	
  	    });
     } else {
-    	$("#show_template_" + account_id).slideUp("slow", function(){$(this).html("")});
+    	$("#show_template_" + account_id).slideUp("slow", function(){$(this).html(""); item.parent().parent().next('tr').removeClass('extended'); });
     }
 }
 
@@ -288,16 +292,16 @@ function load_details_template (item) {
     if ($("#show_template_" + account_id).find("div.details_template").length < 1) {
 	var details_tmpl_html = new EJS({url: 'details_template.ejs'}).render({"account": account, "account_id": account_id});
 	$("#show_template_" + account_id).hide().html(details_tmpl_html).promise().done(function(){
-		setTimeout( function () {$("#show_template_" + account_id).slideDown("slow");}, 1);
+		setTimeout( function () {$("#show_template_" + account_id).slideDown("slow"); item.parent().parent().next('tr').addClass('extended')}, 1);
 	    });
 	$("#cancel_btn_" + account_id).click(function() {
-		$("#show_template_" + account_id).slideUp("slow").html("");
+		$("#show_template_" + account_id).slideUp("slow", function() {item.parent().parent().next('tr').removeClass('extended')}).html("");
 	    });
 	$("#change_details_btn_" + account_id).click(function() {
 		change_details(account_id);	
  	    });
     } else {
-    	$("#show_template_" + account_id).slideUp("slow", function(){$(this).html("")});
+    	$("#show_template_" + account_id).slideUp("slow", function(){$(this).html(""); item.parent().parent().next('tr').removeClass('extended'); });
     }
 		
     $('input:radio').click(function() {
@@ -327,13 +331,13 @@ function load_password_template (item) {
     if ($("#show_template_" + account_id).find("div.password_template").length < 1) {
 	var pass_tmpl_html = new EJS({url: 'password_template.ejs'}).render({"account": account, "account_id": account_id});
 	$("#show_template_" + account_id).hide().html(pass_tmpl_html).promise().done(function(){
-		setTimeout( function () {$("#show_template_" + account_id).slideDown("slow");}, 1);
+		setTimeout( function () {$("#show_template_" + account_id).slideDown("slow"); item.parent().parent().next('tr').addClass('extended')}, 1);
 	    });
 	$("#create_strong_password_" + account_id).click(function() {
 		create_strong_password(account_id);
 	    });		    
 	$("#cancel_btn_" + account_id).click(function() {
-		$("#show_template_" + account_id).slideUp("slow").html("");
+		$("#show_template_" + account_id).slideUp("slow", function() {item.parent().parent().next('tr').removeClass('extended');} ).html("");
 	    });
 		    
 	var password1 = "change_password_input_1_" + account_id;
@@ -360,7 +364,7 @@ function load_password_template (item) {
 		change_password(account_id);	
  	    });
     } else {
-    	$("#show_template_" + account_id).slideUp("slow", function(){$(this).html("")});
+    	$("#show_template_" + account_id).slideUp("slow", function(){$(this).html(""); item.parent().parent().next('tr').removeClass('extended')});
     }
 }
 
@@ -381,16 +385,16 @@ function load_plan_template (item) {
     if ($("#show_template_" + account_id).find("div.plan_template").length < 1) {
 	var plan_tmpl_html = new EJS({url: 'plan_template.ejs'}).render({"account": account, "account_id": account_id});
 	$("#show_template_" + account_id).hide().html(plan_tmpl_html).promise().done(function(){
-		setTimeout( function () {$("#show_template_" + account_id).slideDown("slow");}, 1);
+		setTimeout( function () {$("#show_template_" + account_id).slideDown("slow"); item.parent().parent().next('tr').addClass('extended') }, 1);
 	    });
 	$("#cancel_btn_" + account_id).click(function() {
-		$("#show_template_" + account_id).slideUp("slow").html("");
+		$("#show_template_" + account_id).slideUp("slow", function() {item.parent().parent().next('tr').removeClass('extended')}).html("");
 	    });
 	$("#change_type_btn_" + account_id).click(function() {
 		change_type(account_id);	
  	    });
     } else {
-    	$("#show_template_" + account_id).slideUp("slow", function(){$(this).html("")});
+    	$("#show_template_" + account_id).slideUp("slow", function(){$(this).html(""); item.parent().parent().next('tr').removeClass('extended')});
     }
 }
 
@@ -409,25 +413,26 @@ var load_avatar_template = function (item) {
 	$("#show_template_" + account_id).hide().html(change_avatar_tmpl_html).promise().done(function(){
 		setTimeout( function () {
 			$("#show_template_" + account_id).slideDown("slow");
+			item.parent().parent().parent().next('tr').addClass('extended');
 			    }, 1);
 	    });
 	
-
 	$jq("#crop_" + account_id).simpleCropper();
 
 	$("#cancel_btn_" + account_id).click(function() {
-		$("#show_template_" + account_id).slideUp("slow").html("");
+		$("#show_template_" + account_id).slideUp("slow", function() {item.parent().parent().parent().next('tr').removeClass('extended');}).html("");
 	    });
 	$("#change_avatar_confirm_" + account_id).click(function() {
 		change_avatar(account_id);
 	    });
     } else {
-    	$("#show_template_" + account_id).slideUp("slow", function(){$(this).html("")});
+    	$("#show_template_" + account_id).slideUp("slow", function(){$(this).html(""); item.parent().parent().parent().next('tr').removeClass('extended');});
 	remove_cropper_element();
     }
 }
 
 function load_active_sync_template (account_id, data) {
+    console.log(account_id);
     var account = accounts[account_id];
     var active_sync_tmpl_html = new EJS({url: 'active_sync_template.ejs'}).render({"account": account, "account_id": account_id, "active_sync_data": data});
     $("#show_template_" + account_id).hide().html(active_sync_tmpl_html).promise().done(function(){
@@ -730,14 +735,10 @@ function clear_search () {
 function search_accounts () {
     var tmp_accounts = [];
     var searchregex = $("#search_input").val();
-    for (var j=0; j < accounts.length; j++) {
-	tmp_accounts.push(accounts[j]);
-    }
-    for (var i=0; i < tmp_accounts.length; i++) {
-	if (accounts[i].prefs.AccountName.indexOf(searchregex) > -1) {
-	    tmp_accounts[i].in_search = true;
-	} else {
-	    tmp_accounts[i].in_search = false;
+    for (var i=0; i < accounts.length; i++) {
+	var res = accounts[i].prefs.AccountName.match(searchregex);
+	if (res) {
+	    tmp_accounts.push(accounts[i]);
 	}
     }
     var html = new EJS({url: 'accounts_table.ejs'}).render({"accounts": tmp_accounts});

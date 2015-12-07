@@ -12,52 +12,68 @@
       </div>
     </div>
 
-    <div class="form-group">
-      <label for="quota">Mailbox Quota</label>
-      <input type="hidden" id="current_quota_<%= account_id %>" value="<%= account.quota %>" />
-      <div class="row">
-	<div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
-          <div class="form-inline">
-            <input type="radio" id="quota_number_<%= account_id %>" name="quota_<%= account_id %>" value="custom_qouta" <% if (account.quota != "unlimited") { %>checked<% } %> />
-            <input type="text" id="quota_number_input_<%= account_id %>" class="form-control" size="7" maxlength="7" <% if (account.quota == "unlimited") { %>value="0" disabled<% } else { %>value="<%= account.quota %>"<% } %> />
-            <span>MB</span>
-          </div>
-	</div>
-	<div id="quota_number_input_<%= account_id %>_error" class="col-xs-12 col-sm-6 col-md-6 col-lg-6"></div>
+    <label for="quota">Mailbox Quota</label>
+    <input type="hidden" id="current_quota_<%= account_id %>" value="<%= account.quota %>" />
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" style="padding-left: 0;">
+      <div class="col-xs-1 col-sm-1 col-md-1 col-lg-1" style="padding-left: 0; max-width: 15px;">
+        <input type="radio" id="quota_number_<%= account_id %>" name="quota_<%= account_id %>" value="custom_qouta" style="margin-top: 10px;" <% if (account.quota != "unlimited") { %>checked<% } %> />
       </div>
+      <div class="col-xs-11 col-sm-11 col-md-11 col-lg-11">
+	<div class="col-xs-8 col-sm-8 col-md-5 col-lg-5" style="padding-left: 0;">
+          <input type="text" id="quota_number_input_<%= account_id %>" class="form-control" size="7" maxlength="7" <% if (account.quota == "unlimited") { %>value="0" disabled<% } else { %>value="<%= account.quota %>"<% } %> />
+	</div>
+	<div class="col-xs-3 col-md-5 col-lg-5" style="padding-left: 0;">
+          <span style="line-height: 35px">MB</span>
+	</div>
+      </div>
+      <div id="quota_number_input_<%= account_id %>_error" class="col-xs-12 col-sm-6 col-md-6 col-lg-6"></div>
+    </div>
 
-      <div class="row">
-	<div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
-          <label class="form-inline">
-            <input type="radio" name="quota_<%= account_id %>" id="quota_unlimited_<%= account_id %>" value="unlimited" <% if (account.quota == "unlimited") { %>checked<% } %> />
-            <span>Unlimited</span>
-          </label>
-	</div>
-	<div id="quota_unlimited_<%= account_id %>_error" class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" style="padding-left: 0;">
+      <div class="col-xs-1 col-sm-1 col-md-1 col-lg-1" style="padding-left: 0; max-width: 15px;">
+        <input type="radio" name="quota_<%= account_id %>" id="quota_unlimited_<%= account_id %>" value="unlimited" style="margin-top: 10px;" <% if (account.quota == "unlimited") { %>checked<% } %> />
+      </div>
+      <div class="col-xs-11 col-sm-11 col-md-11 col-lg-11">
+	<div class="col-xs-8 col-md-8 col-lg-5" style="padding-left: 0;">
+          <span style="line-height: 35px;">Unlimited</span>
 	</div>
       </div>
+      <div id="quota_unlimited_<%= account_id %>_error" class="col-xs-12 col-sm-6 col-md-6 col-lg-6"></div>
     </div>
 
     <div class="form-group" style="margin-bottom: 0;">
       <label>Work Days</label>
     </div>
-
     <% var wd = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map(function (item) {return (account.prefs.WorkDays.indexOf(item) > -1)?"checked":""}); %>
     <div class="form-group">
-      <input name="work_days" value="Mon" id="work_days_mon_<%= account_id %>" type="checkbox" <% if (wd[0] == "checked") { %>checked<% } %> >
-      <label for="work_days_mon_<%= account_id %>">Mon</label>
-      <input name="work_days" value="Tue" id="work_days_tue_<%= account_id %>" type="checkbox" <% if (wd[1] == "checked") { %>checked<% } %>>
-      <label for="work_days_tue_<%= account_id %>">Tue</label>
-      <input name="work_days" value="Wed" id="work_days_wed_<%= account_id %>" type="checkbox" <% if (wd[2] == "checked") { %>checked<% } %>>
-      <label for="work_days_wed_<%= account_id %>">Wed</label>
-      <input name="work_days" value="Thu" id="work_days_thu_<%= account_id %>" type="checkbox" <% if (wd[3] == "checked") { %>checked<% } %>>
-      <label for="work_days_thu_<%= account_id %>">Thu</label>
-      <input name="work_days" value="Fri" id="work_days_fri_<%= account_id %>" type="checkbox" <% if (wd[4] == "checked") { %>checked<% } %>>
-      <label for="work_days_fri_<%= account_id %>">Fri</label>
-      <input name="work_days" value="Sat" id="work_days_sat_<%= account_id %>" type="checkbox" <% if (wd[5] == "checked") { %>checked<% } %>>
-      <label for="work_days_sat_<%= account_id %>">Sat</label>
-      <input name="work_days" value="Sun" id="work_days_sun_<%= account_id %>" type="checkbox" <% if (wd[6] == "checked") { %>checked<% } %>>
-      <label for="work_days_sun_<%= account_id %>">Sun</label>
+      <span style="white-space: nowrap">
+	<input name="work_days" value="Mon" id="work_days_mon_<%= account_id %>" type="checkbox" <% if (wd[0] == "checked") { %>checked<% } %> >
+	<label for="work_days_mon_<%= account_id %>">Mon</label>
+      </span>
+      <span style="white-space: nowrap">
+	<input name="work_days" value="Tue" id="work_days_tue_<%= account_id %>" type="checkbox" <% if (wd[1] == "checked") { %>checked<% } %>>
+	<label for="work_days_tue_<%= account_id %>">Tue</label>
+      </span>
+      <span style="white-space: nowrap">
+	<input name="work_days" value="Wed" id="work_days_wed_<%= account_id %>" type="checkbox" <% if (wd[2] == "checked") { %>checked<% } %>>
+	<label for="work_days_wed_<%= account_id %>">Wed</label>
+      </span>
+      <span style="white-space: nowrap">
+	<input name="work_days" value="Thu" id="work_days_thu_<%= account_id %>" type="checkbox" <% if (wd[3] == "checked") { %>checked<% } %>>
+	<label for="work_days_thu_<%= account_id %>">Thu</label>
+      </span>
+      <span style="white-space: nowrap">
+	<input name="work_days" value="Fri" id="work_days_fri_<%= account_id %>" type="checkbox" <% if (wd[4] == "checked") { %>checked<% } %>>
+	<label for="work_days_fri_<%= account_id %>">Fri</label>
+      </span>
+      <span style="white-space: nowrap">
+	<input name="work_days" value="Sat" id="work_days_sat_<%= account_id %>" type="checkbox" <% if (wd[5] == "checked") { %>checked<% } %>>
+	<label for="work_days_sat_<%= account_id %>">Sat</label>
+      </span>
+      <span style="white-space: nowrap">
+	<input name="work_days" value="Sun" id="work_days_sun_<%= account_id %>" type="checkbox" <% if (wd[6] == "checked") { %>checked<% } %>>
+	<label for="work_days_sun_<%= account_id %>">Sun</label>
+      </span>
     </div>
 
     <div class="form-group">
