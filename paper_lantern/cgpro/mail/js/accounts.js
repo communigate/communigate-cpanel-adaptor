@@ -240,7 +240,7 @@ function load_events () {
 
     $(".active_sync_template_btn").click(function() {
 	    var account_id = $(this).attr("id").replace("active_sync_template_btn_","");
-	    load_active_sync_data(account_id);
+	    load_active_sync_data(account_id, $(this));
 	    $(".status_bar").each(function(){
 		    $(this).removeClass("status_bar_success").removeClass("status_bar_error").html("").hide();
 		});
@@ -429,10 +429,9 @@ var load_avatar_template = function (item) {
     	$("#show_template_" + account_id).slideUp("slow", function(){$(this).html(""); item.parent().parent().parent().next('tr').removeClass('extended');});
 	remove_cropper_element();
     }
-}
+};
 
-function load_active_sync_template (account_id, data) {
-    console.log(account_id);
+function load_active_sync_template (account_id, data, element) {
     var account = accounts[account_id];
     var active_sync_tmpl_html = new EJS({url: 'active_sync_template.ejs'}).render({"account": account, "account_id": account_id, "active_sync_data": data});
     $("#show_template_" + account_id).hide().html(active_sync_tmpl_html).promise().done(function(){
@@ -448,11 +447,11 @@ function load_active_sync_template (account_id, data) {
 	    active_sync_wipe(account_id, $(this).val(), "cancel");	
 	});
     $("#cancel_btn_" + account_id).click(function() {
-	    $("#show_template_" + account_id).slideUp("slow").html("");
+	    $("#show_template_" + account_id).slideUp("slow", function(){element.parent().parent().parent().parent().next('tr').removeClass('extended');}).html("");
 	});
 }
 
-function load_active_sync_data (item) {
+function load_active_sync_data (item, element) {
     $(".show_template").each(function() {
 	    if ($(this).attr("id") != "show_template_" + item) {
 		$(this).slideUp("slow");
@@ -462,6 +461,7 @@ function load_active_sync_data (item) {
     if ($("#show_template_" + item).find("div.active_sync_template").length < 1) {
 
 	$("#status_bar_" + item).hide().promise().done(function(){
+		element.parent().parent().parent().parent().next('tr').addClass('extended');
 		setTimeout( function () {$("#status_bar_" + item).slideDown("slow", function(){$(this).html(CPANEL.icons.ajax + " Loading...")});}, 1);
 	    });
  	var api2_call = {
@@ -475,7 +475,7 @@ function load_active_sync_data (item) {
 	    $("#status_bar_" + item).slideUp("slow", function(){$(this).html("")});
 	    var data = JSON.parse(res);
 	    data = data.cpanelresult.data[0];
-	    load_active_sync_template(item, data);
+	    load_active_sync_template(item, data, element);
 	};
     
 	// send the request
@@ -486,7 +486,7 @@ function load_active_sync_data (item) {
 		    });
     } else {
 	$("#status_bar_" + item).slideUp("slow", function(){$(this).html("")});
-	$("#show_template_" + item).slideUp("slow", function(){$(this).html("")});
+	$("#show_template_" + item).slideUp("slow", function(){$(this).html("");element.parent().parent().parent().parent().next('tr').removeClass('extended');});
     }
 }
 

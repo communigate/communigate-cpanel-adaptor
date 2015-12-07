@@ -1,3 +1,98 @@
+<style>
+  table.settings {
+  width: 100%;
+  }
+  
+  @media (max-width: 768px) {
+
+  /* Force table to not be like tables anymore */
+  table#device-table,table#device-table thead,table#device-table tbody,table#device-table th,table#device-table td,table#device-table tr { 
+  display: block !important; 
+  }
+  
+  /* Hide table headers (but not display: none;, for accessibility) */
+  table#device-table thead tr { 
+  position: absolute;
+  top: -9999px;
+  left: -9999px;
+  }
+  
+  table#device-table tr:first-child { 
+  border-top: none !important;
+  }
+
+  table#device-table>tr:nth-of-type(even) { 
+  background: #ffffff !important; 
+  }
+  
+  table#device-table>tbody>tr>td { 
+  /* Behave  like a "row" */
+  border: none;
+  position: relative;
+  padding-left: 50% !important;
+  text-align: left !important;
+  min-height: 35px !important;
+  word-wrap: break-word;
+  }
+
+  table#device-table>td:before { 
+  /* Now like a table header */
+  position: absolute;
+  /* Top/left values mimic padding */
+  top: 0px !important;
+  line-height: 35px !important;
+  left: 6px;
+  width: 45%; 
+  padding-right: 10px; 
+  white-space: nowrap;
+  font-weight: bold !important;
+  }
+
+  table#device-table tr, table#device-table tr td {
+  margin-top: 0 !important;
+  }
+
+  table#device-table tr.account-row td {
+  padding-top: 8px;
+  }
+
+  table.settings tr:nth-child(2n) {
+  background: #aaa !important;
+  max-height: 100% !important;
+  }
+
+  table.settings tr td {
+  display: table-cell !important;
+  }
+
+  .active_sync_setup_div_non_ssl {
+  margin-top: 20px;
+  margin-bottom: 20px;
+  }
+
+  .active_sync_setup_div_non_ssl, .active_sync_setup_div_non_ssl tr, .active_sync_setup_div_non_ssl tr td, .active_sync_setup_div_non_ssl th {
+  background: #eeeeee !important;
+  }
+
+  table .active_sync_setup_div_non_ssl tr:nth-child(2n) {
+  background: #eeeeee !important;
+  }
+
+  table#device-table tr.account-row:first-child {
+  border-top: 1px solid #aaa;
+  }
+  
+  /*
+  Label the data
+  */
+  table#device-table td:nth-of-type(1):before { content: "Device ID" !important; }
+  table#device-table td:nth-of-type(2):before { content: "Device Type" !important; }
+  table#device-table td:nth-of-type(3):before { content: "Last Access" !important; }
+  table#device-table td:nth-of-type(4):before { content: "Wiped" !important; }
+  table#device-table td:nth-of-type(5):before { content: "Functions" !important; }
+  }
+</style>
+
 <% if (active_sync_data.AirSyncAllowed instanceof Array) { 
    var allowed_devices_str = active_sync_data.AirSyncAllowed.join(", ");
    } else {
@@ -5,7 +100,7 @@
    }%>
 
 <div class="active_sync_template">
-  <div class="form-group">
+  <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
     <h3>Allowed Mobile Devices</h3>
     <div class="row">
       <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
@@ -16,129 +111,133 @@
       </div>
     </div>
   </div>
-
-  <h3>Device List</h3>
-  <table class="table table-striped">
-    <thead>
-      <tr>
-	<th>Device ID</th>
-	<th>Device Type</th>
-	<th>Last Access</th>
-	<th>Wiped</th>
-	<th>Functions</th>
-      </tr>
-    </thead>
-    <tbody>
-      <% if (active_sync_data.airSyncs) { %>
-      <% for (var device in active_sync_data.airSyncs) { %>
-      <tr>
-	<td><%= device %></td>
-	<td><%= active_sync_data.airSyncs[device]['User-Agent'] %></td>
-	<td><%= active_sync_data.airSyncs[device].Date.replace("#T", "").replace("_"," / ") %></td>
-	<td>
-	  <% if(active_sync_data.airSyncs[device].wiped) { %><%= active_sync_data.airSyncs[device].wiped.replace("#T", "").replace("_"," / ") %><% } %>
-	  <% if(active_sync_data.airSyncs[device].doWipe) { %> Pending <% } %>
-	</td>
-	<td>
-	  <% if(active_sync_data.airSyncs[device].doWipe) { %><button id="active_sync_wipe_cancel_<%= device %>" class="btn btn-link active_sync_wipe_cancel_btn" value="<%= device %>">Cancel Wipe Out</button><% } else { %><button id="active_sync_wipe_<%= device %>" class="btn btn-link active_sync_wipe_btn" value="<%= device %>">Wipe Out</button><% } %>
-	</td>
-      </tr>
-      <% } %>
-      <% }else{ %>
-      <tr>
-	<td colspan="5" style="padding: 10px">No devices!</td>
-      </tr>
-      <% } %>
-    </tbody>
-  </table>
-
-  <h3>Setup</h3>
-  <div class="active_sync_setup_div active_sync_setup_div_ssl col-xs-12 col-sm-4 col-md-4 col-lg-4" >
-    <table class="settings settings_ssl">
+  
+  <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+    <h3>Device List</h3>
+    <table id="device-table" class="table table-striped">
+      <thead>
+	<tr>
+	  <th>Device ID</th>
+	  <th>Device Type</th>
+	  <th>Last Access</th>
+	  <th>Wiped</th>
+	  <th>Functions</th>
+	</tr>
+      </thead>
       <tbody>
+	<% if (active_sync_data.airSyncs) { %>
+	<% for (var device in active_sync_data.airSyncs) { %>
 	<tr>
-	  <th colspan="2" style="text-align: center;"><span style="display: block;">Secure SSL/TLS Settings</span>
-	    (Recommended)
-	  </th>
-	</tr>
-	<tr>
-	  <td>Username:</td>
-	  <td class="data">
-	    <span style="font-weight: bold;"><%= account.prefs.AccountName %></span>
+	  <td><%= device %></td>
+	  <td><%= active_sync_data.airSyncs[device]['User-Agent'] %></td>
+	  <td><%= active_sync_data.airSyncs[device].Date.replace("#T", "").replace("_"," / ") %></td>
+	  <td>
+	    <% if(active_sync_data.airSyncs[device].wiped) { %><%= active_sync_data.airSyncs[device].wiped.replace("#T", "").replace("_"," / ") %><% } %>
+	    <% if(active_sync_data.airSyncs[device].doWipe) { %> Pending <% } %>
+	  </td>
+	  <td>
+	    <% if(active_sync_data.airSyncs[device].doWipe) { %><button id="active_sync_wipe_cancel_<%= device %>" class="btn btn-link active_sync_wipe_cancel_btn" value="<%= device %>">Cancel Wipe Out</button><% } else { %><button id="active_sync_wipe_<%= device %>" class="btn btn-link active_sync_wipe_btn" value="<%= device %>">Wipe Out</button><% } %>
 	  </td>
 	</tr>
+	<% } %>
+	<% }else{ %>
 	<tr>
-	  <td>Password:</td>
-	  <td><em>( Use the email account’s password. )</em></td>
+	  <td colspan="5" style="padding: 10px">No devices!</td>
 	</tr>
-	<tr>
-	  <td>Domain:</td>
-	  <td class="data">
-	    <span style="font-weight: bold;"><%= account.domain %></span>
-	  </td>
-	</tr>
-	<tr>
-	  <td>Server:</td>
-	  <td class="data">
-	    <span style="font-weight: bold;"><%= account.domain %></span>
-	  </td>
-	</tr>
-	<tr>
-	  <td>Port:</td>
-	  <td class="data">
-	    <strong>443</strong>
-	  </td>
-	</tr>
-	<tr>
-	  <td>Use SSL:</td>
-	  <td><strong>Leave Ticked</strong></td>
-	</tr>
+	<% } %>
       </tbody>
     </table>
   </div>
 
-  <div class="active_sync_setup_div col-xs-12 col-sm-4 col-md-4 col-lg-4" >
-    <table class="settings">
-      <tbody>
-	<tr>
-	  <th colspan="2" style="text-align: center;"><span style="display: block;">Non Secure Settings</span>
-	    (NOT Recommended)
-	  </th>
-	</tr>
-	<tr>
-	  <td>Username:</td>
-	  <td class="data">
-	    <span style="font-weight: bold;"><%= account.prefs.AccountName %></span>
-	  </td>
-	</tr>
-	<tr>
-	  <td>Password:</td>
-	  <td><em>( Use the email account’s password. )</em></td>
-	</tr>
-	<tr>
-	  <td>Domain:</td>
-	  <td class="data">
-	    <span style="font-weight: bold;"><%= account.domain %></span>
-	  </td>
-	</tr>
-	<tr>
-	  <td>Server:</td>
-	  <td class="data">
-	    <span style="font-weight: bold;"><%= account.domain %></span>
-	  </td>
-	</tr>
-	<tr>
-	  <td>Port:</td>
-	  <td class="data">
-	    <strong>80</strong>
-	  </td>
-	</tr>
-	<tr>
-	  <td>Use SSL:</td>
-	  <td><strong>Leave Unticked</strong></td>
-	</tr>
-      </tbody>
-    </table>
+  <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+    <h3>Setup</h3>
+    <div class="active_sync_setup_div active_sync_setup_div_ssl col-xs-12 col-sm-6 col-md-4 col-lg-4" >
+      <table class="settings settings_ssl">
+	<tbody>
+	  <tr>
+	    <th colspan="2" style="text-align: center;"><span style="display: block;">Secure SSL/TLS Settings</span>
+	      (Recommended)
+	    </th>
+	  </tr>
+	  <tr>
+	    <td>Username:</td>
+	    <td class="data">
+	      <span style="font-weight: bold;"><%= account.prefs.AccountName %></span>
+	    </td>
+	  </tr>
+	  <tr>
+	    <td>Password:</td>
+	    <td><em>( Use the email account’s password. )</em></td>
+	  </tr>
+	  <tr>
+	    <td>Domain:</td>
+	    <td class="data">
+	      <span style="font-weight: bold;"><%= account.domain %></span>
+	    </td>
+	  </tr>
+	  <tr>
+	    <td>Server:</td>
+	    <td class="data">
+	      <span style="font-weight: bold;"><%= account.domain %></span>
+	    </td>
+	  </tr>
+	  <tr>
+	    <td>Port:</td>
+	    <td class="data">
+	      <strong>443</strong>
+	    </td>
+	  </tr>
+	  <tr>
+	    <td>Use SSL:</td>
+	    <td><strong>Leave Ticked</strong></td>
+	  </tr>
+	</tbody>
+      </table>
+    </div>
+
+    <div class="active_sync_setup_div active_sync_setup_div_non_ssl col-xs-12 col-sm-6 col-md-4 col-lg-4" >
+      <table class="settings non-ssl">
+	<tbody>
+	  <tr>
+	    <th colspan="2" style="text-align: center;"><span style="display: block;">Non Secure Settings</span>
+	      (NOT Recommended)
+	    </th>
+	  </tr>
+	  <tr>
+	    <td>Username:</td>
+	    <td class="data">
+	      <span style="font-weight: bold;"><%= account.prefs.AccountName %></span>
+	    </td>
+	  </tr>
+	  <tr>
+	    <td>Password:</td>
+	    <td><em>( Use the email account’s password. )</em></td>
+	  </tr>
+	  <tr>
+	    <td>Domain:</td>
+	    <td class="data">
+	      <span style="font-weight: bold;"><%= account.domain %></span>
+	    </td>
+	  </tr>
+	  <tr>
+	    <td>Server:</td>
+	    <td class="data">
+	      <span style="font-weight: bold;"><%= account.domain %></span>
+	    </td>
+	  </tr>
+	  <tr>
+	    <td>Port:</td>
+	    <td class="data">
+	      <strong>80</strong>
+	    </td>
+	  </tr>
+	  <tr>
+	    <td>Use SSL:</td>
+	    <td><strong>Leave Unticked</strong></td>
+	  </tr>
+	</tbody>
+      </table>
+    </div>
   </div>
 
   <div id="airsync_status_{{index}}" style="padding: 20px;"></div>
