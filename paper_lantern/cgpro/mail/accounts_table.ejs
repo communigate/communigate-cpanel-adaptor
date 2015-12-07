@@ -112,7 +112,8 @@
   </thead>
   <tbody>
     <% for (var i = 0; i < accounts.length; i++) { %>
-    <tr class="account-row">
+       <% if (!accounts[i].in_search) { continue; } %>
+       <tr class="account-row">
       <td class="avatar_td" title="Change avatar">
 	<% if (accounts[i].vcard
 	   && accounts[i].vcard.fileData
