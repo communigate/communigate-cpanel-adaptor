@@ -25,8 +25,76 @@ SET mail_domains = execute("Email", "list_mail_domains", {});
   .table tbody tr.info td {
   background: #F9F9F9;
   }
-</style>
 
+  @media (max-width: 768px) {
+
+  /* Force table to not be like tables anymore */
+  table.responsive-table,table.responsive-table thead,table.responsive-table tbody,table.responsive-table th,table.responsive-table td,table.responsive-table tr { 
+  display: block; 
+  }
+  
+  /* Hide table headers (but not display: none;, for accessibility) */
+  table.responsive-table thead tr { 
+  position: absolute;
+  top: -9999px;
+  left: -9999px;
+  }
+  
+  table.responsive-table tr:first-child { 
+  border-top: none !important;
+  }
+
+  table.responsive-table tr:nth-of-type(even) td { 
+  background: #ffffff !important; 
+  }
+  
+  table.responsive-table tbody tr td { 
+  /* Behave  like a "row" */
+  border: none;
+  position: relative;
+  padding-left: 50% !important;
+  text-align: left !important;
+  min-height: 35px !important;
+  word-wrap: break-word;
+  }
+
+  table.responsive-table tbody tr td.functions_td a:first-child { 
+  margin-left: 0;
+  }
+  
+  table.responsive-table td:before { 
+  /* Now like a table header */
+  position: absolute;
+  /* Top/left values mimic padding */
+  top: 0px !important;
+  line-height: 35px !important;
+  left: 6px;
+  width: 45%; 
+  padding-right: 10px; 
+  white-space: nowrap;
+  font-weight: bold !important;
+  }
+
+  table.responsive-table tr.list_row {
+  border-top: none;
+  border-bottom: 1px solid #aaa;
+  }
+
+  table.responsive-table tr.list_row td {
+  padding-top: 8px;
+  }
+
+  table.responsive-table tr.list_row:first-child {
+  border-top: 1px solid #aaa;
+  }
+  
+  /*
+  Label the data
+  */
+  table.responsive-table td:nth-of-type(1):before { content: "List Name"; }
+  table.responsive-table td:nth-of-type(2):before { content: "Functions"; }
+  }
+</style>
 <div class="body-content">
   [% IF CPANEL.feature('cgpro_maillist') %]
     <p id="descMailingList" class="description">
@@ -125,7 +193,7 @@ SET mail_domains = execute("Email", "list_mail_domains", {});
                 </thead>
                 <tbody>
 		  [% FOR list IN lists -%]
-                    <tr>
+                    <tr class="list_row">
                         <td>
 			  [% list.list %]
                         </td>

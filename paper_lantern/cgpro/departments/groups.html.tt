@@ -66,16 +66,16 @@ app_key = 'cgpro_departments'
   font-weight: bold !important;
   }
 
-  table.responsive-table tr.service_row {
+  table.responsive-table tr.group_row {
   border-top: none;
   border-bottom: 1px solid #aaa;
   }
 
-  table.responsive-table tr.service_row td {
+  table.responsive-table tr.group_row td {
   padding-top: 8px;
   }
 
-  table.responsive-table tr.service_row:first-child {
+  table.responsive-table tr.group_row:first-child {
   border-top: 1px solid #aaa;
   }
   
@@ -173,7 +173,7 @@ app_key = 'cgpro_departments'
       <td colspan="5">Currently there aren't any departments!</td>
       [% ELSE %]
       [% FOREACH department IN departments %]
-      <tr>
+      <tr class="group_row">
 	<td>[% department.list %]</td>
 	<td><a href="dodelgroup.html?email=[% department.list %]&domain=[% department.domain %]"><span class="glyphicon glyphicon-trash"></span> Delete</a></td>
 	<td><a href="dorenamegroup.html?email=[% department.list %]&domain=[% department.domain %]"><span class="glyphicon glyphicon-pencil"></span> Rename</a></td>
