@@ -9,55 +9,163 @@
     app_key = 'cgpro_xmpp_roster'
 -%]
 
+<style>
+  .managing-menu {
+  margin-top: 23px;
+  }
+
+  .managing-label-wrap {
+  text-align: right;
+  margin-right: 10px;
+  }
+
+  .managing-label-wrap>label {
+  padding-left: 0;
+  line-height: 35px;
+  }
+
+  .form-inline div {
+  padding: 0;
+  }
+  
+  @media screen and (max-width: 767px) {
+  .managing-menu {
+  width: 100%;
+  margin-bottom: 10px;
+  }
+
+  .managing-label-wrap {
+  text-align: left;
+  }
+
+  .managing-label-wrap>label {
+  line-height: initial;
+  }
+  }
+
+  @media (max-width: 768px) {
+
+  /* Force table to not be like tables anymore */
+  table.responsive-table,table.responsive-table thead,table.responsive-table tbody,table.responsive-table th,table.responsive-table td,table.responsive-table tr { 
+  display: block; 
+  }
+  
+  /* Hide table headers (but not display: none;, for accessibility) */
+  table.responsive-table thead tr { 
+  position: absolute;
+  top: -9999px;
+  left: -9999px;
+  }
+  
+  table.responsive-table tr:first-child { 
+  border-top: none !important;
+  }
+
+  table.responsive-table tr:nth-of-type(even) td { 
+  background: #ffffff !important; 
+  }
+  
+  table.responsive-table tbody tr td { 
+  /* Behave  like a "row" */
+  border: none;
+  position: relative;
+  padding-left: 50% !important;
+  text-align: left !important;
+  min-height: 35px !important;
+  word-wrap: break-word;
+  }
+
+  table.responsive-table tbody tr td.functions_td a:first-child { 
+  margin-left: 0;
+  }
+  
+  table.responsive-table td:before { 
+  /* Now like a table header */
+  position: absolute;
+  /* Top/left values mimic padding */
+  top: 0px !important;
+  line-height: 35px !important;
+  left: 6px;
+  width: 45%; 
+  padding-right: 10px; 
+  white-space: nowrap;
+  font-weight: bold !important;
+  }
+
+  table.responsive-table tr.xmpp_row {
+  border-top: none;
+  border-bottom: 1px solid #aaa;
+  }
+
+  table.responsive-table tr.xmpp_row td {
+  padding-top: 8px;
+  }
+
+  table.responsive-table tr.xmpp_row:first-child {
+  border-top: 1px solid #aaa;
+  }
+  
+  /*
+  Label the data
+  */
+  table.responsive-table td:nth-of-type(1):before { content: "Buddy"; }
+  table.responsive-table td:nth-of-type(2):before { content: "Name"; }
+  table.responsive-table td:nth-of-type(3):before { content: "Group"; }
+  table.responsive-table td:nth-of-type(4):before { content: "Actions"; }
+  }
+</style>
 <div class="body-content">
   [% IF CPANEL.feature('cgpro_xmpp_roster') %]
-  <div class="pull-right">
-    <div id="manage-list">
+  <div class="pull-right managing-menu">
+    <div id="manage-list" class="form-inline">
       <form method="get" action="" id="manage_list_form" class="form-inline">
-        <div class="form-group">
-          <label for="manage_list_select" id="txt_Managing" class="col-xs-12 control-label">[% locale.maketext("Managing:") %]</label>
-        </div>
-        <div class="form-group">
-          [% SET accounts = Api2.exec("CommuniGate", "AccountsOverview", {}) %]
-          <select name="account" id="manage_list_select" class="col-xs-12 form-control">
-            [% SET premium_accounts = 0 %]
-	    [% FOR account IN accounts.0.accounts.keys -%]
-	    [% myclass = accounts.0.accounts.$account.class -%]
-	    [% classstring = accounts.0.classes.$myclass.AccessModes.join(',') -%]
-	    [% IF classstring.search("XMPP") || classstring == "All" -%]
-            [% premium_accounts = 1 %]
-	    [% filter_option(FORM.account, account,account) %]
-	    [% END -%]
-	    [% END -%]
-          </select>
+	<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+	  <div class="col-xs-5 col-sm-5 col-md-5 col-lg-5 managing-label-wrap">
+            <label for="manage_list_select" id="txt_Managing" class="col-xs-12 control-label">[% locale.maketext("Managing:") %]</label>
+	  </div>
+	  <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+            [% SET accounts = Api2.exec("CommuniGate", "AccountsOverview", {}) %]
+            <select name="account" id="manage_list_select" class="col-xs-12 form-control">
+              [% SET premium_accounts = 0 %]
+	      [% FOR account IN accounts.0.accounts.keys -%]
+	      [% myclass = accounts.0.accounts.$account.class -%]
+	      [% classstring = accounts.0.classes.$myclass.AccessModes.join(',') -%]
+	      [% IF classstring.search("XMPP") || classstring == "All" -%]
+              [% premium_accounts = 1 %]
+	      [% filter_option(FORM.account, account,account) %]
+	      [% END -%]
+	      [% END -%]
+            </select>
 	    [% IF !RAW_FORM.item("account") && accounts.0.accounts.keys.size > 0 && premium_accounts == 1 %]
 	    <script type="text/javascript">
 	      YAHOO.util.Dom.get("manage_list_form").submit();
 	    </script>
 	    [% END %]
 	    [% IF premium_accounts == 0 %]
-						   <script>
-						     $("#manage_list_select").hide();
-						   </script>
-	  <p style="margin-top: 10px">No accounts!</p>
+	    <script>
+	      $("#manage_list_select").hide();
+	    </script>
+	    <p style="margin-top: 10px">No accounts!</p>
 	    [% END %]
-        </div>
-        <noscript>
-          <div class="form-group">
-            <input type="submit" class="btn btn-primary" id="btn_domainSelect_go" value="[% locale.maketext("Go") %]" />
-          </div>
-        </noscript>
+	  </div>
+	</div>
       </form>
     </div>
-    <script type="text/javascript">
-      YAHOO.util.Event.onDOMReady(function() {
-      YAHOO.util.Event.on("manage_list_select", "change", function() { YAHOO.util.Dom.get("manage_list_form").submit(); });
-      });
-    </script>
-  </div><br /></br />
+    <div class="clear"></div>
+  </div>
+  <noscript>
+    <div class="form-group">
+      <input type="submit" class="btn btn-primary" id="btn_domainSelect_go" value="[% locale.maketext("Go") %]" />
+    </div>
+  </noscript>
+  <script type="text/javascript">
+    YAHOO.util.Event.onDOMReady(function() {
+    YAHOO.util.Event.on("manage_list_select", "change", function() { YAHOO.util.Dom.get("manage_list_form").submit(); });
+    });
+  </script>
 
   [% IF RAW_FORM.item('account') -%]
-
+  
 <div class="section">
   <h2>[% locale.maketext("Add buddy") %]</h2>
 
@@ -112,7 +220,7 @@
   %]
   <div class="section">
     <h2>[% locale.maketext("XMPP roster of") %] [% FORM.item('account') %]</h2>
-    <table id="mailtbl" class="sortable truncate-table table table-striped">
+    <table id="mailtbl" class="sortable truncate-table table table-striped responsive-table">
       <tr>
 	<th class="cell">[% locale.maketext("Buddy") %]</th>
 	<th class="cell">[% locale.maketext("Name") %]</th>
@@ -120,7 +228,7 @@
 	<th class="cell-end sorttable_nosort">[% locale.maketext("Actions") %]</th>
       </tr>
       [% FOR buddy IN roster.0.roster -%]
-      <tr>
+      <tr class="xmpp_row">
 	<td>[% buddy.peer %]</td>
 	<td>[% buddy.name  %]</td>
 	<td>[% buddy.group %]</td>

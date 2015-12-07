@@ -5,15 +5,120 @@
 [% WRAPPER '_assets/master.html.tt'
 app_key = 'cgpro_xmpp_clients'
 -%]
+<style>
+  .managing-menu {
+  margin-top: 23px;
+  }
+
+  .managing-label-wrap {
+  text-align: right;
+  margin-right: 10px;
+  }
+
+  .managing-label-wrap>label {
+  padding-left: 0;
+  line-height: 35px;
+  }
+
+  .form-inline div {
+  padding: 0;
+  }
+  
+  @media screen and (max-width: 767px) {
+  .managing-menu {
+  width: 100%;
+  margin-bottom: 10px;
+  }
+
+  .managing-label-wrap {
+  text-align: left;
+  }
+
+  .managing-label-wrap>label {
+  line-height: initial;
+  }
+  }
+
+  @media (max-width: 768px) {
+
+  /* Force table to not be like tables anymore */
+  table.responsive-table,table.responsive-table thead,table.responsive-table tbody,table.responsive-table th,table.responsive-table td,table.responsive-table tr { 
+  display: block; 
+  }
+  
+  /* Hide table headers (but not display: none;, for accessibility) */
+  table.responsive-table thead tr { 
+  position: absolute;
+  top: -9999px;
+  left: -9999px;
+  }
+  
+  table.responsive-table tr:first-child { 
+  border-top: none !important;
+  }
+
+  table.responsive-table tr:nth-of-type(even) td { 
+  background: #ffffff !important; 
+  }
+  
+  table.responsive-table tbody tr td { 
+  /* Behave  like a "row" */
+  border: none;
+  position: relative;
+  padding-left: 50% !important;
+  text-align: left !important;
+  min-height: 35px !important;
+  word-wrap: break-word;
+  }
+
+  table.responsive-table tbody tr td.functions_td a:first-child { 
+  margin-left: 0;
+  }
+  
+  table.responsive-table td:before { 
+  /* Now like a table header */
+  position: absolute;
+  /* Top/left values mimic padding */
+  top: 0px !important;
+  line-height: 35px !important;
+  left: 6px;
+  width: 45%; 
+  padding-right: 10px; 
+  white-space: nowrap;
+  font-weight: bold !important;
+  }
+
+  table.responsive-table tr.xmpp_row {
+  border-top: none;
+  border-bottom: 1px solid #aaa;
+  }
+
+  table.responsive-table tr.xmpp_row td {
+  padding-top: 8px;
+  }
+
+  table.responsive-table tr.xmpp_row:first-child {
+  border-top: 1px solid #aaa;
+  }
+  
+  /*
+  Label the data
+  */
+  table.responsive-table td:nth-of-type(1):before { content: "Name"; }
+  table.responsive-table td:nth-of-type(2):before { content: "Platform(s)"; }
+  table.responsive-table td:nth-of-type(3):before { content: "Details"; }
+  }
+</style>
 <div class="body-content">
   [% IF CPANEL.feature('cgpro_xmpp_clients') %]
-  <div class="pull-right">
-    <div id="manage-list">
+  <div class="pull-right managing-menu">
+    <div id="manage-list" class="form-inline">
       <form method="get" action="" id="manage_list_form" class="form-inline">
-        <div class="form-group">
+      <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+	<div class="col-xs-5 col-sm-5 col-md-5 col-lg-5 managing-label-wrap">
           <label for="manage_list_select" id="txt_Managing" class="col-xs-12 control-label">[% locale.maketext("Managing:") %]</label>
-        </div>
-        <div class="form-group">
+	</div>
+	<div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
           [% SET accounts = Api2.exec("CommuniGate", "AccountsOverview", {}) %]
           <select name="account" id="manage_list_select" class="col-xs-12 form-control">
             [% SET premium_accounts = 0 %]
@@ -37,20 +142,22 @@ app_key = 'cgpro_xmpp_clients'
 						   </script>
 	  <p style="margin-top: 10px">No accounts!</p>
 	    [% END %]
-        </div>
-        <noscript>
-          <div class="form-group">
-            <input type="submit" class="btn btn-primary" id="btn_domainSelect_go" value="[% locale.maketext("Go") %]" />
-          </div>
-        </noscript>
-      </form>
+	</div>
+      </div>
     </div>
-    <script type="text/javascript">
-      YAHOO.util.Event.onDOMReady(function() {
-      YAHOO.util.Event.on("manage_list_select", "change", function() { YAHOO.util.Dom.get("manage_list_form").submit(); });
-      });
-    </script>
-  </div><br /></br />
+    <div class="clear"></div>
+  </div>
+  <noscript>
+    <div class="form-group">
+      <input type="submit" class="btn btn-primary" id="btn_domainSelect_go" value="[% locale.maketext("Go") %]" />
+    </div>
+  </noscript>
+  <script type="text/javascript">
+    YAHOO.util.Event.onDOMReady(function() {
+    YAHOO.util.Event.on("manage_list_select", "change", function() { YAHOO.util.Dom.get("manage_list_form").submit(); });
+    });
+  </script>
+
 
   [% IF RAW_FORM.item('account') -%]
 
@@ -122,62 +229,60 @@ app_key = 'cgpro_xmpp_clients'
 	</tbody>
       </table>
     </div>
-
   </div>
-
   [% END -%]
 
   <div class="section">
     <h2>[% locale.maketext("XMPP Clients") %]</h2>
     [% locale.maketext("An XMPP client is any software or application that enables you to connect to an XMPP for instant messaging with other people over the Internet. There are many free clients you can use to do this, for many different devices and operating systems.") %]
-    <table class="sortable truncate-table table table-striped">
+    <table class="sortable truncate-table table table-striped responsive-table">
       <tbody>
-	<tr class="row-1">
+	<tr class="row-1 xmpp_row">
 	  <th class="column-1">Name</th><th class="column-2">Platform(s)</th><th class="column-4">Details</th>
 	</tr>
-	<tr class="row-17">
+	<tr class="row-17 xmpp_row">
 	  <td class="column-1">Coccinella</td><td class="column-2">GNU/Linux, Mac OS X, Windows</td><td class="column-4"><a href="http://coccinella.im/" target="_blank">coccinella.im</a></td>
 	</tr>
-	<tr class="row-59">
+	<tr class="row-59 xmpp_row">
 	  <td class="column-1">Mozilla Thunderbird</td><td class="column-2">GNU/Linux, Mac OS X, Windows</td><td class="column-4"><a href="http://www.mozilla.org/thunderbird/" target="_blank">mozilla.org/thunderbird</a></td>
 	</tr>
-	<tr class="row-65">
+	<tr class="row-65 xmpp_row">
 	  <td class="column-1">Pidgin</td><td class="column-2">GNU/Linux, Mac OS X, Windows</td><td class="column-4"><a href="http://pidgin.im/" target="_blank">pidgin.im</a></td>
 	</tr>
-	<tr class="row-68">
+	<tr class="row-68 xmpp_row">
 	  <td class="column-1">Psi</td><td class="column-2">GNU/Linux, Mac OS X, Windows</td><td class="column-4"><a href="http://psi-im.org/" target="_blank">psi-im.org</a></td>
 	</tr>
-	<tr class="row-28">
+	<tr class="row-28 xmpp_row">
 	  <td class="column-1">Gajim</td><td class="column-2">GNU/Linux, Windows</td><td class="column-4"><a href="http://gajim.org/" target="_blank">gajim.org</a></td>
 	</tr>
-	<tr class="row-25">
+	<tr class="row-25 xmpp_row">
 	  <td class="column-1">Empathy</td><td class="column-2">GNU/Linux</td><td class="column-4"><a href="http://live.gnome.org/Empathy" target="_blank">live.gnome.org</a></td>
 	</tr>
-	<tr class="row-52">
+	<tr class="row-52 xmpp_row">
 	  <td class="column-1">Kopete</td><td class="column-2">GNU/Linux</td><td class="column-4"><a href="http://kopete.kde.org/" target="_blank">kopete.kde.org</a></td>
 	</tr>
-	<tr class="row-2">
+	<tr class="row-2 xmpp_row">
 	  <td class="column-1">Adium</td><td class="column-2">Mac OS X</td><td class="column-4"><a href="http://adium.im/" target="_blank">adium.im</a></td>
 	</tr>
-	<tr class="row-34">
+	<tr class="row-34 xmpp_row">
 	  <td class="column-1">iChat</td><td class="column-2">Mac OS X</td><td class="column-4"><a href="http://www.apple.com/macosx/features/ichat.html" target="_blank">apple.com</a></td>
 	</tr>
-	<tr class="row-12">
+	<tr class="row-12 xmpp_row">
 	  <td class="column-1">ChatSecure</td><td class="column-2">Mobile (iOS)</td><td class="column-4"><a href='http://chrisballinger.info/apps/chatsecure/'>chrisballinger.info</a></td>
 	</tr>
-	<tr class="row-7">
+	<tr class="row-7 xmpp_row">
 	  <td class="column-1">Beem</td><td class="column-2">Mobile (Android)</td><td class="column-4"><a href="http://www.beem-project.com/" target="_blank">beem-project.com</a></td>
 	</tr>
-	<tr class="row-30">
+	<tr class="row-30 xmpp_row">
 	  <td class="column-1">Gibberbot</td><td class="column-2">Mobile (Android)</td><td class="column-4"><a href='https://guardianproject.info/apps/gibber/'>guardianproject.info</a></td>
 	</tr>
-	<tr class="row-94">
+	<tr class="row-94 xmpp_row">
 	  <td class="column-1">Xabber</td><td class="column-2">Mobile (Android)</td><td class="column-4"><a href="http://www.xabber.com/" target="_blank">xabber.com</a></td>
 	</tr>
-	<tr class="row-97">
+	<tr class="row-97 xmpp_row">
 	  <td class="column-1">Yaxim</td><td class="column-2">Mobile (Android)</td><td class="column-4"><a href="http://slideme.org/application/yaxim" target="_blank">slideme.org</a></td>
 	</tr>
-	<tr class="row-50">
+	<tr class="row-50 xmpp_row">
 	  <td class="column-1">JWChat</td><td class="column-2">Browser</td><td class="column-4"><a href="http://stefan-strigler.de/jwchat/" target="_blank">stefan-strigler.de/jwchat</a></td>
 	</tr>
       </tbody>
@@ -186,7 +291,6 @@ app_key = 'cgpro_xmpp_clients'
   </div>
   [% END -%] <!-- END feature -->
   [% INCLUDE _assets/return_link.html.tt return_location='../index.html' return_link_text=locale.maketext('Go Back') %]
-
 </div><!-- end body-content -->
 [% END %]
 

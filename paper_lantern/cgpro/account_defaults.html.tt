@@ -14,52 +14,85 @@ SET settings = Api2.exec("CommuniGate", "AccountDefaults", {save=RAW_FORM.item("
 [% WRAPPER '_assets/master.html.tt'
 app_key = 'cgpro_domain_settings'
 -%]
+<style>
+  .managing-menu {
+  margin-top: 23px;
+  }
+
+  .managing-label-wrap {
+  text-align: right;
+  margin-right: 10px;
+  }
+
+  .managing-label-wrap>label {
+  padding-left: 0;
+  line-height: 35px;
+  }
+
+  .form-inline div {
+  padding: 0;
+  }
+  
+  @media screen and (max-width: 767px) {
+  .managing-menu {
+  width: 100%;
+  margin-bottom: 10px;
+  }
+
+  .managing-label-wrap {
+  text-align: left;
+  }
+
+  .managing-label-wrap>label {
+  line-height: initial;
+  }
+  }
+</style>
 <div class="body-content">
   [% IF CPANEL.feature('cgpro_account_defaults') %]
   [% IF !(ExpVar.expand('$appname') == "webmail") %]
-  <div class="pull-right">
-    <div id="manage-list">
+  <div class="pull-right managing-menu">
+    <div id="manage-list" class="form-inline">
       <form method="get" action="" id="manage_list_form" class="form-inline">
-        <div class="form-group">
-          <label for="manage_list_select" id="txt_Managing" class="col-xs-12 control-label">[% locale.maketext("Managing:") %]</label>
-        </div>
-        <div class="form-group">
-	  [% IF domain.size() < 1 %]
-				
-				[% END %]
+	<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+	  <div class="col-xs-5 col-sm-5 col-md-5 col-lg-5 managing-label-wrap">
+            <label for="manage_list_select" id="txt_Managing" class="col-xs-12 control-label">[% locale.maketext("Managing:") %]</label>
+	  </div>
+	  <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6" style="line-height: 35px;">
+	    [% IF domain.size() < 1 %]
+				  
+				  [% END %]
 
-        [% IF domain.size() == "1" %]
-        [% domain %] <input type="hidden" id="domain" value="[% domain %]" name="domain" />
-
-	[% IF !RAW_FORM.item("domain") && domain.size() > 0 %]
-	<script type="text/javascript">
-	  YAHOO.util.Event.onDOMReady(function() {      
-	  if (YAHOO.util.Dom.get("domain").value) {
-	  YAHOO.util.Dom.get("manage_list_form").submit();
-	  }
-	  });
-	</script>
-	[% END %]
-	[% ELSE %]
-        <select name="domain" id="manage_list_select" class="col-xs-12 form-control">
-          <option value="">[% locale.maketext("Select a domain.") %]</option>
-          [% Api1.pre_exec("Email", "listmaildomainsoptndef") ;   Api1.exec("Email", "listmaildomainsoptndef", [RAW_FORM.item('domain')]) ;  Api1.post_exec("Email", "listmaildomainsoptndef") %]
-          </select>
-	[% END %]
-        </div>
-        <noscript>
-          <div class="form-group">
-            <input type="submit" class="btn btn-primary" id="btn_domainSelect_go" value="[% locale.maketext("Go") %]" />
-          </div>
-        </noscript>
+				  
+				  [% IF !RAW_FORM.item("domain") && domain.size() > 0 %]
+	      <script type="text/javascript">
+		YAHOO.util.Event.onDOMReady(function() {      
+		if (YAHOO.util.Dom.get("domain").value) {
+		YAHOO.util.Dom.get("manage_list_form").submit();
+		}
+		});
+	      </script>
+	      [% END %]
+              <select name="domain" id="manage_list_select" class="col-xs-12 form-control">
+		<option value="">[% locale.maketext("Select a domain.") %]</option>
+		[% Api1.pre_exec("Email", "listmaildomainsoptndef") ;   Api1.exec("Email", "listmaildomainsoptndef", [RAW_FORM.item('domain')]) ;  Api1.post_exec("Email", "listmaildomainsoptndef") %]
+              </select>
+	  </div>
+	</div>
       </form>
     </div>
-    <script type="text/javascript">
-      YAHOO.util.Event.onDOMReady(function() {
-      YAHOO.util.Event.on("manage_list_select", "change", function() { YAHOO.util.Dom.get("manage_list_form").submit(); });
-      });
-    </script>
-  </div><br /></br />
+    <div class="clear"></div>
+  </div>
+  <noscript>
+    <div class="form-group">
+      <input type="submit" class="btn btn-primary" id="btn_domainSelect_go" value="[% locale.maketext("Go") %]" />
+    </div>
+  </noscript>
+  <script type="text/javascript">
+    YAHOO.util.Event.onDOMReady(function() {
+    YAHOO.util.Event.on("manage_list_select", "change", function() { YAHOO.util.Dom.get("manage_list_form").submit(); });
+    });
+  </script>
   [% END %]
 
 [% IF RAW_FORM.item('domain') -%]
