@@ -29,7 +29,7 @@ USE Encoder;
                     END;
                 END;
             %]
-            <tr class="row-[% oddeven %]">
+            <tr class="row-[% oddeven %] archive_row">
                 <td truncate="50">
 		     [% IF dom.domain %]		  
                      [% dom.domain FILTER html FILTER replace('\.', '.&#8203;') %] (Domain)
