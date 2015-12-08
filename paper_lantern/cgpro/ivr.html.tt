@@ -14,12 +14,6 @@ app_key = 'cgpro_ivr'
 -%]
 
 <style>
-.ivr-btn-add {
-max-width: 121px;
-padding-left: 0;
-padding-right: 0;
-}
-
 .ivr-label-for {
 line-height: 35px;
 max-width: 30px;
@@ -34,12 +28,86 @@ clear: both;
 }
 </style>
 
+<style>
+  @media (max-width: 768px) {
+
+  /* Force table to not be like tables anymore */
+  table.responsive-table,table.responsive-table thead,table.responsive-table tbody,table.responsive-table th,table.responsive-table td,table.responsive-table tr { 
+  display: block; 
+  }
+  
+  /* Hide table headers (but not display: none;, for accessibility) */
+  table.responsive-table thead tr { 
+  position: absolute;
+  top: -9999px;
+  left: -9999px;
+  }
+  
+  table.responsive-table tr:first-child { 
+  border-top: none !important;
+  }
+
+  table.responsive-table tr:nth-of-type(even) td { 
+  background: #ffffff !important; 
+  }
+  
+  table.responsive-table tbody tr td { 
+  /* Behave  like a "row" */
+  border: none;
+  position: relative;
+  padding-left: 50% !important;
+  text-align: left !important;
+  min-height: 35px !important;
+  word-wrap: break-word;
+  }
+
+  table.responsive-table tbody tr td.functions_td a:first-child { 
+  margin-left: 0;
+  }
+  
+  table.responsive-table td:before { 
+  /* Now like a table header */
+  position: absolute;
+  /* Top/left values mimic padding */
+  top: 0px !important;
+  line-height: 35px !important;
+  left: 6px;
+  width: 45%; 
+  padding-right: 10px; 
+  white-space: nowrap;
+  font-weight: bold !important;
+  }
+
+  table.responsive-table tr.ivr_row {
+  border-top: none;
+  border-bottom: 1px solid #aaa;
+  }
+
+  table.responsive-table tr.ivr_row td {
+  padding-top: 8px;
+  }
+
+  table.responsive-table tr.ivr_row:first-child {
+  border-top: 1px solid #aaa;
+  }
+  
+  /*
+  Label the data
+  */
+  table.responsive-table td:nth-of-type(1):before { content: "Name"; }
+  table.responsive-table td:nth-of-type(2):before { content: "Functions"; }
+  }
+  
+  a {
+  white-space: nowrap;
+  }
+</style>
 <div class="body-content">
   [% IF CPANEL.feature('cgpro_ivr') %]
   <div class="section">
     <form action="editivr.html" method="get">
       <div class="form-group">
-	<div class="ivr-btn-add col-xs-12 col-sm-2 col-md-2 col-lg-2">
+	<div class="ivr-btn-add col-xs-12 col-sm-3 col-md-2 col-lg-2">
 	  <input type="submit" class="btn btn-primary" value="Add IVR menu" />
 	</div>
 	<div class="ivr-label-for col-xs-12 col-sm-1 col-md-1 col-lg-1">for</div>
@@ -66,7 +134,7 @@ clear: both;
   </div>
 
   <h3>IVR menus</h3>
-  <table border="0" cellpadding="5" cellspacing="0" id="mailtbl" class="table table-striped">
+  <table border="0" cellpadding="5" cellspacing="0" id="mailtbl" class="table table-striped responsive-table">
     <colgroup>
       <col width="70%" align="left" />
       <col width="15%" align="center" />
@@ -79,12 +147,12 @@ clear: both;
     </thead>
     <tbody>
       [% IF ivrs.size == 0 %]
-      <tr>
+      <tr class="ivr_row">
 	<td colspan="2">Currently there aren't any IVR menus!</td>
       </tr>
       [% ELSE %]
       [% FOREACH ivr IN ivrs %]
-      <tr>
+      <tr class="ivr_row">
 	<td>[% ivr.name %]</td>
 	<td>
 	  <a href="editivr.html?ivr=[% ivr.id %]&domain=[% ivr.domain %]" ><span class="glyphicon glyphicon-pencil"></span> View/Edit</a>

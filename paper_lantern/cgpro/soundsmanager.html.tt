@@ -40,53 +40,162 @@ app_key = 'cgpro_sounds_manager'
   }
 </style>
 
+<style>
+  .managing-menu {
+  min-width: 300px;
+  margin-top: 35px;
+  }
+
+  .managing-label-wrap {
+  text-align: right;
+  margin-right: 10px;
+  }
+
+  .managing-label-wrap>label {
+  line-height: 35px;
+  }
+
+  .form-inline div {
+  padding: 0;
+  }
+  
+  @media screen and (max-width: 767px) {
+  .managing-menu {
+  width: 100%;
+  margin-bottom: 10px;
+  }
+
+  .managing-label-wrap {
+  text-align: left;
+  }
+
+  .managing-label-wrap>label {
+  line-height: initial;
+  }
+  }
+
+  @media (max-width: 768px) {
+
+  /* Force table to not be like tables anymore */
+  table.responsive-table,table.responsive-table thead,table.responsive-table tbody,table.responsive-table th,table.responsive-table td,table.responsive-table tr { 
+  display: block; 
+  }
+  
+  /* Hide table headers (but not display: none;, for accessibility) */
+  table.responsive-table thead tr { 
+  position: absolute;
+  top: -9999px;
+  left: -9999px;
+  }
+  
+  table.responsive-table tr:first-child { 
+  border-top: none !important;
+  }
+
+  table.responsive-table tr:nth-of-type(even) td { 
+  background: #ffffff !important; 
+  }
+  
+  table.responsive-table tbody tr td { 
+  /* Behave  like a "row" */
+  border: none;
+  position: relative;
+  padding-left: 50% !important;
+  text-align: left !important;
+  min-height: 35px !important;
+  word-wrap: break-word;
+  }
+
+  table.responsive-table tbody tr td.functions_td a:first-child { 
+  margin-left: 0;
+  }
+  
+  table.responsive-table td:before { 
+  /* Now like a table header */
+  position: absolute;
+  /* Top/left values mimic padding */
+  top: 0px !important;
+  line-height: 35px !important;
+  left: 6px;
+  width: 45%; 
+  padding-right: 10px; 
+  white-space: nowrap;
+  font-weight: bold !important;
+  }
+
+  table.responsive-table tr.sound_row {
+  border-top: none;
+  border-bottom: 1px solid #aaa;
+  }
+
+  table.responsive-table tr.sound_row td {
+  padding-top: 8px;
+  }
+
+  table.responsive-table tr.sound_row:first-child {
+  border-top: 1px solid #aaa;
+  }
+  
+  /*
+  Label the data
+  */
+  table.responsive-table td:nth-of-type(1):before { content: "Name"; }
+  }
+</style>
+
+[% FOR language IN languages -%]
+<style>  
+  @media (max-width: 768px) {
+  table.responsive-table td:nth-of-type([% loop.count +1 %]):before { content: "[% language %]"; }
+  }
+</style>
+[% END %]
+
 <div class="body-content"> 
   [% IF CPANEL.feature('cgpro_sounds_manager') %]
   [% MACRO filter_option(pval, val, text) BLOCK -%]
   <option value="[% val %]"[% val == pval ? " selected='selected'" : "" %]>[% locale.maketext(text) %]</option>
   [% END -%]
-  <div class="pull-right">
+  <div class="pull-right managing-menu">
     <div class="form-inline">
-      <div class="form-group">
-	<label class="control-label" style="margin: 0 15px;">[% locale.maketext("Domain") %]:</label>
-      </div>
-      <div class="form-group">
-	<div class="row">
-	  <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
-	    <form action="" class="form-inline" method="GET" id="selectDomain">
-	      [% IF domains.size == 1 %]
-	      <input type="hidden" id="domain" value="[% domains.0.domain %]" name="domain">
-	      <span>[% domains.0.domain %]</span>
-	      [% ELSE %]
-	      <select id="domain" class="form-control" onchange="toggle_domain()" name="domain">
-		[% FOR domain IN domains.sort -%]
-		[% filter_option(FORM.domain, domain.domain, domain.domain) %]
-		[% END -%]
-	      </select>
-	      [% END %]
-	    </form>
-	    [% IF !RAW_FORM.item("domain") %]
-	    <script type="text/javascript">
-	      YAHOO.util.Dom.get("selectDomain").submit();
-	    </script>
+      <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+	<div class="col-xs-5 col-sm-5 col-md-5 col-lg-5 managing-label-wrap">
+	  <label class="control-label">Domain</label>
+	</div>
+	<div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	  <form action="" class="form-inline" method="GET" id="selectDomain">
+	    [% IF domains.size == 1 %]
+	    <input type="hidden" id="domain" value="[% domains.0.domain %]" name="domain">
+	    <span>[% domains.0.domain %]</span>
+	    [% ELSE %]
+	    <select id="domain" class="form-control" onchange="toggle_domain()" name="domain">
+	      [% FOR domain IN domains.sort -%]
+	      [% filter_option(FORM.domain, domain.domain, domain.domain) %]
+	      [% END -%]
+	    </select>
 	    [% END %]
-	  </div>
+	  </form>
+	  [% IF !RAW_FORM.item("domain") %]
+	  <script type="text/javascript">
+	    YAHOO.util.Dom.get("selectDomain").submit();
+	  </script>
+	  [% END %]
 	</div>
       </div>
     </div>
     <div class="clear"></div>
-    <script type="text/javascript">
-      function toggle_domain () {
-      document.getElementById("selectDomain").submit();
-      }
-    </script>
-  </div><br /></br />
+  </div>
+  <script type="text/javascript">
+    function toggle_domain () {
+    document.getElementById("selectDomain").submit();
+    }
+  </script>
 
   <h3>[% locale.maketext("Sounds") %]</h3>
   <p>
     <a class="btn btn-primary" href="updatewav.html?domain=[% list_domain %]">[% locale.maketext("Add new sound (english)") %]</a>
   </p>
-  <table id="mailtbl" class="table table-striped">
+  <table id="mailtbl" class="table table-striped responsive-table">
     <thead>
       <tr>
 	<th>[% locale.maketext("Name") %]</th>
@@ -97,7 +206,7 @@ app_key = 'cgpro_sounds_manager'
     </thead>
     <tbody>
       [% FOR file IN sounds.english.keys.sort -%]
-      <tr class="row-[% loop.count % 2 ? 'odd' : 'even' %]">
+      <tr class="row-[% loop.count % 2 ? 'odd' : 'even' %] sound_row">
 	<td class="truncate">[% file %]</td>
 	[% FOR language IN languages -%]
 	<td style="text-align: left; white-space: nowrap;">
