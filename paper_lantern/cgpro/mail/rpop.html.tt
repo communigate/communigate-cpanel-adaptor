@@ -24,48 +24,152 @@ rpop = rpop.0;
     app_key = 'cgpro_rpop'
 -%] 
 
+<style>
+  .managing-label-wrap {
+  text-align: right;
+  margin-right: 10px;
+  }
+
+  .managing-label-wrap>label {
+  line-height: 35px;
+  }
+
+  .form-inline div {
+  padding: 0;
+  }
+  
+  @media screen and (max-width: 767px) {
+  .managing-menu {
+  width: 100%;
+  margin-bottom: 10px;
+  }
+
+  .managing-label-wrap {
+  text-align: left;
+  }
+
+  .managing-label-wrap>label {
+  line-height: initial;
+  }
+  }
+
+  @media (max-width: 768px) {
+
+  /* Force table to not be like tables anymore */
+  table.responsive-table,table.responsive-table thead,table.responsive-table tbody,table.responsive-table th,table.responsive-table td,table.responsive-table tr { 
+  display: block; 
+  }
+  
+  /* Hide table headers (but not display: none;, for accessibility) */
+  table.responsive-table thead tr { 
+  position: absolute;
+  top: -9999px;
+  left: -9999px;
+  }
+  
+  table.responsive-table tr:first-child { 
+  border-top: none !important;
+  }
+
+  table.responsive-table tr:nth-of-type(even) td { 
+  background: #ffffff !important; 
+  }
+  
+  table.responsive-table tbody tr td { 
+  /* Behave  like a "row" */
+  border: none;
+  position: relative;
+  padding-left: 50% !important;
+  text-align: left !important;
+  min-height: 35px !important;
+  word-wrap: break-word;
+  }
+
+  table.responsive-table tbody tr td.functions_td a:first-child { 
+  margin-left: 0;
+  }
+  
+  table.responsive-table td:before { 
+  /* Now like a table header */
+  position: absolute;
+  /* Top/left values mimic padding */
+  top: 0px !important;
+  line-height: 35px !important;
+  left: 6px;
+  width: 45%; 
+  padding-right: 10px; 
+  white-space: nowrap;
+  font-weight: bold !important;
+  }
+
+  table.responsive-table tr.rpop_row {
+  border-top: none;
+  border-bottom: 1px solid #aaa;
+  }
+
+  table.responsive-table tr.rpop_row td {
+  padding-top: 8px;
+  }
+
+  table.responsive-table tr.rpop_row:first-child {
+  border-top: 1px solid #aaa;
+  }
+  
+  /*
+  Label the data
+  */
+  table.responsive-table td:nth-of-type(1):before { content: "Remote POP"; }
+  table.responsive-table td:nth-of-type(2):before { content: "Status"; }
+  table.responsive-table td:nth-of-type(3):before { content: "Functions"; }
+  }
+</style>
 <div class="body-content">
   [% IF CPANEL.feature('cgpro_rpop') %]
   [% IF RAW_FORM.item("account") %]
   <h3>[% locale.maketext("Remote POP “[_1]”", FORM.account ) %]</h3>
   [% END %]
 
-  <div class="pull-right">
-    <form method="get" action="" id="manage_list_form" class="form-inline">
-      <div class="form-group">
-        <label for="manage_list_select" id="txt_Managing" class="col-xs-12 control-label">[% locale.maketext("Managing:") %]</label>
+  <div class="pull-right managing-menu">
+    <div class="form-inline">
+      <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+	<form method="get" action="" id="manage_list_form" class="form-inline">
+	  <div class="col-xs-5 col-sm-5 col-md-5 col-lg-5 managing-label-wrap">
+            <label for="manage_list_select" id="txt_Managing" class="control-label">[% locale.maketext("Managing:") %]</label>
+	  </div>
+	  <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+            <select name="account" id="manage_list_select" class="col-xs-12 form-control">
+	      [% FOR account IN accounts.sort -%]
+	      [% filter_option(FORM.account, account,account) %]
+	      [% END -%]
+            </select>
+	    [% IF !RAW_FORM.item("account") && accounts.size > 0 %]
+	    <script type="text/javascript">
+	      YAHOO.util.Dom.get("manage_list_form").submit();
+	    </script>
+	    [% END %]
+	  </div>
+	</form>
       </div>
-      <div class="form-group">
-        <select name="account" id="manage_list_select" class="col-xs-12 form-control">
-	  [% FOR account IN accounts.sort -%]
-	  [% filter_option(FORM.account, account,account) %]
-	  [% END -%]
-        </select>
-	[% IF !RAW_FORM.item("account") && accounts.size > 0 %]
-	<script type="text/javascript">
-	  YAHOO.util.Dom.get("manage_list_form").submit();
-	</script>
-	[% END %]
+    </div>
+    <div class="clear"></div>
   </div>
-      <noscript>
-        <div class="form-group">
-          <input type="submit" class="btn btn-primary" id="btn_domainSelect_go" value="[% locale.maketext("Go") %]" />
-        </div>
-      </noscript>
-    </form>
-    <script type="text/javascript">
-      YAHOO.util.Event.onDOMReady(function() {
-      YAHOO.util.Event.on("manage_list_select", "change", function() { YAHOO.util.Dom.get("manage_list_form").submit(); });
-      });
-    </script>
-  </div><br /></br />
+  <noscript>
+    <div class="form-group">
+      <input type="submit" class="btn btn-primary" id="btn_domainSelect_go" value="[% locale.maketext("Go") %]" />
+    </div>
+  </noscript>
+  <script type="text/javascript">
+    YAHOO.util.Event.onDOMReady(function() {
+    YAHOO.util.Event.on("manage_list_select", "change", function() { YAHOO.util.Dom.get("manage_list_form").submit(); });
+    });
+  </script>
 
   [% IF RAW_FORM.item("account") %]
   <div class="section">
     <p>
       <a class="btn btn-primary" href="editrpop.html?account=[% FORM.account %]">[% locale.maketext("Add Remote POP") %]</a>
     </p>
-    <table border="0" cellpadding="5" cellspacing="0" id="mailtbl" class="sortable truncate-table table table-striped" width="650">
+    <table border="0" cellpadding="5" cellspacing="0" id="mailtbl" class="table table-striped responsive-table" width="650">
       <thead>
 	<tr>
 	  <th class="clickable sorttable_sorted">[% locale.maketext("Remote POP") %]</th>
@@ -81,7 +185,7 @@ rpop = rpop.0;
       [% IF rpop.rpop.size() %]
       <tbody>
 	[% FOR pop IN rpop.rpop.keys -%]
-	<tr>
+	<tr class="rpop_row">
 	  <td class="truncate nobrd-left">[% pop %]</td>
 	  <td class="truncate sorttable_nosort">
 	    [% rpop.rpopInfo.$pop.completed.replace("(\#T|\_)"," ") %]
