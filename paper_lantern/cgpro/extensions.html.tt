@@ -75,6 +75,85 @@ app_key = 'cgpro_extensions'
   }
 </style>
 
+<style>
+  @media (max-width: 768px) {
+
+  /* Force table to not be like tables anymore */
+  table.responsive-table,table.responsive-table thead,table.responsive-table tbody,table.responsive-table th,table.responsive-table td,table.responsive-table tr { 
+  display: block; 
+  }
+  
+  /* Hide table headers (but not display: none;, for accessibility) */
+  table.responsive-table thead tr { 
+  position: absolute;
+  top: -9999px;
+  left: -9999px;
+  }
+  
+  table.responsive-table tr:first-child { 
+  border-top: none !important;
+  }
+
+  table.responsive-table tr:nth-of-type(even) td { 
+  background: #ffffff !important; 
+  }
+  
+  table.responsive-table tbody tr td { 
+  /* Behave  like a "row" */
+  border: none;
+  position: relative;
+  padding-left: 50% !important;
+  text-align: left !important;
+  min-height: 35px !important;
+  word-wrap: break-word;
+  }
+
+  table.responsive-table tbody tr td.functions_td a:first-child { 
+  margin-left: 0;
+  }
+  
+  table.responsive-table td:before { 
+  /* Now like a table header */
+  position: absolute;
+  /* Top/left values mimic padding */
+  top: 0px !important;
+  line-height: 35px !important;
+  left: 6px;
+  width: 45%; 
+  padding-right: 10px; 
+  white-space: nowrap;
+  font-weight: bold !important;
+  }
+
+  table.responsive-table tr.ext_row {
+  border-top: none;
+  border-bottom: 1px solid #aaa;
+  }
+
+  table.responsive-table tr.ext_row td {
+  padding-top: 8px;
+  }
+
+  table.responsive-table tr.ext_row:first-child {
+  border-top: 1px solid #aaa;
+  }
+  
+  /*
+  Label the data
+  */
+  table.responsive-table td:nth-of-type(1):before { content: "Extensions / Phone Numbers (DID)"; white-space: normal; }
+  table.responsive-table td:nth-of-type(2):before { content: "Assigned To"; }
+  table.responsive-table td:nth-of-type(3):before { content: "Functions"; }
+
+  table.sip-table td:nth-of-type(1):before { content: "SIP Registrations"; }
+  table.sip-table td:nth-of-type(2):before { content: "Status"; }
+  table.sip-table td:nth-of-type(3):before { content: "Functions"; }
+  }
+  
+  a {
+  white-space: nowrap !important;
+  }
+</style>
 <div class="body-content">
   [% IF CPANEL.feature('cgpro_extensions') %]
   <div class="section">
@@ -254,7 +333,7 @@ YAHOO.util.Event.onDOMReady(function () {
     });
 </script>
 
-  <table border="0" cellpadding="5" width="550" cellspacing="0" id="mailtbl" class="table table-striped">
+  <table border="0" cellpadding="5" width="550" cellspacing="0" id="mailtbl" class="table table-striped responsive-table">
     <colgroup>
       <col width="12%" align="left" />
       <col width="25%" align="left" />
@@ -269,7 +348,7 @@ YAHOO.util.Event.onDOMReady(function () {
     </thead>
     
     [% FOR extension IN extensions -%]
-    <tr class="row-[% loop.count % 2 ? 'even' : 'odd' %]">
+    <tr class="row-[% loop.count % 2 ? 'even' : 'odd' %] ext_row">
       <td class="truncate">[% extension.html_dest %]</td>
       <td class="truncate">[% extension.html_forward %]</td>
       <td>
@@ -346,7 +425,7 @@ YAHOO.util.Event.onDOMReady(function () {
     <div class="form-group">
       <a class="btn btn-primary" href="editrsip.html?account=[% FORM.rsip_account %]">[% locale.maketext("Add SIP Registration") %]</a>
     </div>
-    <table border="0" cellpadding="5" cellspacing="0" id="mailtbl" class="table table-striped">
+    <table border="0" cellpadding="5" cellspacing="0" id="mailtbl" class="table table-striped responsive-table sip-table">
       <thead>
 	<tr>
 	  <th class="cell">[% locale.maketext("SIP registrations") %]</th>
@@ -356,7 +435,7 @@ YAHOO.util.Event.onDOMReady(function () {
       </thead>
       <tbody>
 	[% FOR sip IN rsip.keys.sort -%]
-	<tr>
+	<tr class="ext_row">
 	  <td class="truncate">[% sip %][% IF settings.PSTNFromName == rsip.$sip.fromName && settings.PSTNGatewayAuthName == rsip.$sip.authName %] ([% locale.maketext("Outgoing") %])[% END %]</td>
 	  <td class="truncate">
 	    [% rsipInfo.$sip.completed.replace("(\#T|\_)"," ") %]
