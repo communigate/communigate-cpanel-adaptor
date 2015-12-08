@@ -15,10 +15,10 @@
       <td><% if (item.account) { %><%= item.account %> (Account)<% } else { %><%= item.domain %> (Domain)<% } %></td>
       <td>
 	<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-	  <div class="col-xs-12 col-sm-4 col-md-4 col-lg-4"> 
+	  <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6"> 
 	    <label style="line-height: 34px; margin-bottom: 0">Archive Messages after:</label>
 	  </div>
-	  <div class="col-xs-12 col-sm-8 col-md-8 col-lg-8"> 
+	  <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6"> 
 	    <select id="archive-after" class="form-control" style="margin-bottom: 10px;">
 	      <option value="" <% if (item.ArchiveMessagesAfter == "") { %>selected<% } %> >default</option>
 	      <option value="0" <% if (item.ArchiveMessagesAfter == "0") { %>selected<% } %>>never</option>
@@ -37,10 +37,10 @@
 	  </div>
 	</div>
 	<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-	  <div class="col-xs-12 col-sm-4 col-md-4 col-lg-4"> 
+	  <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6"> 
 	    <label style="line-height: 34px; margin-bottom: 0">Delete Messages after:</label>
 	  </div>
-	  <div class="col-xs-12 col-sm-8 col-md-8 col-lg-8"> 
+	  <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6"> 
 	    <select id="delete-after" class="form-control">
 	      <option value="" <% if (item.DeleteMessagesAfter == "") { %>selected<% } %>>default</option>
 	      <option value="0" <% if (item.DeleteMessagesAfter == "0") { %>selected<% } %>>never</option>
