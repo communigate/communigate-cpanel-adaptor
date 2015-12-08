@@ -2,46 +2,8 @@
 [% WRAPPER '_assets/master.html.tt'
     app_key = 'cgpro_autoresponders'
  -%]
-<style>
-  table a {
-  margin-right: 10px;
-  cursor: pointer;
-  }
-
-  table a:hover {
-  text-decoration: none;
-  }
-
-  span.bold {
-  font-weight: bold;
-  }
-
-  .rd-day-body {
-  padding: 5px;
-  }
-
-  .body-content {
-  margin-bottom: 150px;
-  }
-
-  #start-date-radio, #stop-date-radio{
-  margin-top: 10px;
-  }
-
-  .error-div {
-  line-height: 32px;
-  padding-left: 10px;
-  background: #F8C9C4;
-  border: 1px solid #A94442;
-  display: none;
-  }
-
-  #add-autoresponder-btn-loading {
-  margin-left: 20px;
-  }
-</style>
-
 <link rel="stylesheet" type="text/css" href="js/rome.css">
+<link rel="stylesheet" type="text/css" href="js/main.css">
 
 <div class="body-content">
   [% IF CPANEL.feature('cgpro_autoresponders') %]
@@ -53,14 +15,9 @@
   <div id="autoresponder-add-email"></div>
   <div id="autoresponder-add"></div>
 
-
   <script type="text/javascript" src="js/rome.js"></script>
-
   <script src="js/ejs_production.js"></script>
   <script src="js/autoresponder.js"></script>
-
-
-
   [% INCLUDE _assets/return_link.html.tt return_location='../../../index.html' return_link_text=locale.maketext('Go Back') %]
   [% END %]<!-- end cpanelfeature autoresponders -->
 </div><!-- end body-content -->
