@@ -15,6 +15,9 @@ function load_forwarders () {
 	}
     };
     // send the request
+    if ( !$('.body-content').children().length ) {
+	$('.init-loading').html(CPANEL.icons.ajax + " Loading...");
+    }
     $.ajax({
 	    type: "GET",
 		url: CPANEL.urls.json_api() + '&' + $.param(api2_call),
@@ -33,6 +36,7 @@ function load_extensions (forwarders) {
 	var data = JSON.parse(data);
 	data = data.cpanelresult;
 	if (data.event.result) {
+	    $('.init-loading').html("");
 	    var extensions = data.data;
 	    var excluded_string = "";
 	    for (var i = 0; i < forwarders.length; i++) {
@@ -90,7 +94,6 @@ function delete_forwarder (email, forward, loading) {
 	} else {
 	    loading.html("Error deleting forwarder!");
 	}
-	console.log(data);
     };
     // send the request
     loading.html(CPANEL.icons.ajax + " Loading...");
@@ -114,7 +117,7 @@ function load_add_forwarder () {
 	if (data.event.result) {
 	    var domains = data.data;
 	    if (domains.length) {
-		get_accounts_and_domains(domains[0]);
+		getAccountsForDomain(domains[0], domains, domains[0]);
 	    }
 	    // var html_add = new EJS({url: 'add_forwarder.ejs'}).render();
 	    // $(".body-content").html(html_add);	
@@ -122,6 +125,7 @@ function load_add_forwarder () {
 	}
     };
     // send the request
+    $('#add-loading').html(CPANEL.icons.ajax + " Loading...");
     $.ajax({
     	    type: "GET",
     		url: CPANEL.urls.json_api() + '&' + $.param(api2_call),
@@ -129,30 +133,79 @@ function load_add_forwarder () {
     		});
 };
 
-function get_accounts_and_domains (domain) {
+function getAccountsForDomain(domain, domains, selected) {
     var api2_call = {
         "cpanel_jsonapi_version": 2,
         "cpanel_jsonapi_module": "CommuniGate",
-        "cpanel_jsonapi_func": "getAccountsAndDomains"
+        "cpanel_jsonapi_func": "getAccountsForDomain",
+	domain: domain
     };
     // callback
     var success = function (data) {
     	var data = JSON.parse(data);
     	data = data.cpanelresult;
 	if (data.event.result) {
-	    var domains = data.data;
-	    if (domains.length) {
-		getAccountsForDomain(domains[0]);
-	    }
-	    // var html_add = new EJS({url: 'add_forwarder.ejs'}).render();
-	    // $(".body-content").html(html_add);	
-	} else {
-	}
+	    $('#add-loading').html("");
+	    var accounts = data.data[0].accounts;
+	    var html_add = new EJS({url: 'add_forwarder.ejs'}).render({'accounts': accounts, 'domains': domains, 'selected': selected});
+	    $(".body-content").html(html_add);	
+	    $('#email').attr('disabled', false);
+	    $('#domain').change(function() {
+		    getAccountsForDomain( $(this).val(), domains, $(this).val() );
+		});
+	    $('#fwdemail').keyup( function() { validate_fwdemail(); } );
+	    $('#save').click(function() { addForwarder( $('#email').val(), $('#domain').val(), $('#fwdemail').val() ); });
+	    $('#cancel').click(function() { load_forwarders(); $('#save-loading').html(CPANEL.icons.ajax + " Loading..."); });
+	} 
     };
     // send the request
+    $('#email').attr('disabled', 'disabled');
     $.ajax({
     	    type: "GET",
     		url: CPANEL.urls.json_api() + '&' + $.param(api2_call),
     		success: success
     		});
+};
+
+function addForwarder(email, domain, fwdemail) {
+    var api2_call = {
+        "cpanel_jsonapi_version": 2,
+        "cpanel_jsonapi_module": "CommuniGate",
+        "cpanel_jsonapi_func": "addforward",
+	domain: domain,
+	email: email,
+	fwdemail: fwdemail
+    };
+    // callback
+    var success = function (data) {
+    	var data = JSON.parse(data);
+    	data = data.cpanelresult;
+	if (data.event.result) {
+	    $('#save-loading').html(CPANEL.icons.ajax + " Forwarder successfully saved! Please wait...");
+	    load_forwarders();
+	} else {
+	    $('#save-loading').html("Error saving forwarder");
+	}
+    };
+    // send the request
+    if ( validate_fwdemail() ) {
+	$('#save-loading').html(CPANEL.icons.ajax + " Loading...");
+	$.ajax({
+		type: "GET",
+		    url: CPANEL.urls.json_api() + '&' + $.param(api2_call),
+		    success: success
+		    });
+    }
+};
+
+function validate_fwdemail() {
+    var fwdemail = $('#fwdemail').val();
+    var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    var regtest = re.test(fwdemail);
+    if(regtest) {
+	$('#fwdemail-error').hide();
+	return true;
+    }
+    $('#fwdemail-error').show().html("This is not a valid record!");
+    return false;
 };

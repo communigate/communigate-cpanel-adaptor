@@ -8,6 +8,9 @@
       <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
         <div class="input-group">
           <select id="email" class="form-control">
+	    <% for (var i = 0; i < accounts.length; i++) { %>
+	       <option value="<%= accounts[i] %>"><%= accounts[i] %></option>
+	       <% } %>
           </select>
           <span class="input-group-addon">@</span>
         </div>
@@ -19,9 +22,9 @@
     <div class="row">
       <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
         <select id="domain" class="form-control">
-          [% FOREACH hashref IN mail_domains.data %]
-          <option value="[% hashref.domain.html() %]">[% hashref.domain.html() %]</option>
-          [% END %]
+	  <% for (var i = 0; i < domains.length; i++) { %>
+	     <option value="<%= domains[i] %>" <% if(domains[i] == selected) { %>selected<% } %> ><%= domains[i] %></option>
+	     <% } %>
         </select>
       </div>
     </div>
@@ -34,11 +37,19 @@
       <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
         <input type="text" id="fwdemail" class="form-control" />
       </div>
-      <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6" id="fwdemail_error"></div>
+      <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	<div id="fwdemail-error" class="error"></div>
+      </div>
     </div>
   </div>
 
-  <div class="form-group">
-    <button id="save" class="btn btn-primary" value="">Add Forwarder</button>
+  <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 no-padding-left">
+    <div class="col-xs-12 col-sm-4 col-md-6 col-lg-6 no-padding-left">
+      <button id="save" class="btn btn-primary" value="">Add Forwarder</button>
+      <button id="cancel" class="btn btn-link" value="">Cancel</button>
+    </div>
+    <div class="col-xs-12 col-sm-8 col-md-6 col-lg-6 no-padding-left line-height">
+      <span id="save-loading"></span>
+    </div>
   </div>
 </div>

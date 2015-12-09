@@ -1,15 +1,14 @@
 [%
-SET CPANEL.CPVAR.dprefix = "../";
+SET CPANEL.CPVAR.dprefix = "../../../";
 %]
 
 [% WRAPPER '_assets/master.html.tt'
 app_key = 'cgpro_forwarders'
 -%]
-<script src="js/ejs_production.js"></script>
-<style>
-</style>
-<div class="body-content">
+<link rel="stylesheet" type="text/css" href="js/main.css">
 
-</div>
+<script src="js/ejs_production.js"></script>
+<div class="init-loading"></div>
+<div class="body-content"></div>
 <script src="js/forwarders.js"></script>
 [% END %]
