@@ -1,0 +1,19 @@
+[% SET CPANEL.CPVAR.dprefix = "../../../"; %]
+
+[% WRAPPER '_assets/master.html.tt'
+    app_key = 'cgpro_default_address'
+ -%]
+<link rel="stylesheet" type="text/css" href="js/main.css">
+<div class="body-content">
+  [% IF CPANEL.feature('cgpro_defaultaddress') %]
+  <p>
+    The default email address will "catch" any mail that is sent to an invalid email address for your domain. You can also choose to Discard, Reject, or Accept and bounce any mails sent to an invalid email address for your domain. 
+  </p>
+  <div id="main-loading"></div>
+  <div id="default-address-table"></div>
+  <script src="js/ejs_production.js"></script>
+  <script src="js/default_address.js"></script>
+  [% INCLUDE _assets/return_link.html.tt return_location='../../../index.html' return_link_text=locale.maketext('Go Back') %]
+  [% END %]
+</div>
+[% END %]

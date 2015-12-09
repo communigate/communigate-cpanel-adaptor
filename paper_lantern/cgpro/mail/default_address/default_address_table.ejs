@@ -1,0 +1,44 @@
+<h2>Default Address Maintenance</h2>
+<table class="table table-striped responsive-table">
+  <thead>
+    <tr>
+      <th>Domain</th>
+      <th colspan="4">Behaviour</th>
+    </tr>
+  </thead>
+  <% for (var i = 0; i < data.length; i++) { %>
+     <colgroup>
+      <col width="20%" />
+      <col width="25%" />
+      <col width="25%" />
+      <col width="5%" />
+      <col width="30%" />
+    </colgroup>
+    <tr class="responsive-row">
+      <td>
+	<%= data[i].domain %>
+      </td>
+      <td>
+	<select id="action_<%= i %>" name="action" class="form-control action">
+	  <option value=""> -- </option>
+	  <option <%= data[i].discard %> value="DefDiscard">Discard email</option>
+	  <option <%= data[i].reject %> value="DefReject">Reject email</option>
+          <option <%= data[i].forward %> value="DefForward">Forward to this address</option>
+	  <option <%= data[i].acceptedandbounced %> value="DefAcceptedAndBounced">Accept and bounce</option>
+	</select>
+      </td>
+      <td>
+	<input id="text_<%= i %>" type="text" value="<% if ( data[i].MailRerouteAddress != 'spamtrap') { %><%= data[i].MailRerouteAddress %><% } %>" class="form-control text" <% if ( !data[i].forward ) { %>disabled="disabled"<% } %> />	  
+      </td>
+      <td>
+	<input type="hidden" name="setdefault" value="dummy" />
+	<input type="hidden" name="domain" value="[% hashref.domain %]" />
+        <input id="submit_<%= i %>" type="submit" value="Update" class="btn btn-primary save-btn" onclick="updateDefaultAddress('<%= data[i].domain %>', '<%= i %>')" />
+      </td>
+      <td>
+	<div id="text_<%= i %>_error" class="error"></div>
+	<div id="save_loading_<%= i %>"></div>
+      </td>
+    </tr>
+    <% } %>
+</table>
