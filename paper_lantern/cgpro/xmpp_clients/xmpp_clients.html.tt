@@ -1,0 +1,23 @@
+[% MACRO filter_option(pval, val, text) BLOCK -%]
+<option value="[% val %]"[% val == pval ? " selected='selected'" : "" %]>[% locale.maketext(text) %]</option>
+[% END -%]
+
+[% SET CPANEL.CPVAR.dprefix = "../../" %]
+[% WRAPPER '_assets/master.html.tt'
+app_key = 'cgpro_xmpp_clients'
+-%]
+<link rel="stylesheet" type="text/css" href="js/main.css">
+
+<div class="body-content">
+  [% IF CPANEL.feature('cgpro_xmpp_clients') %]
+  <div id="main-loading"></div>
+  <div id="managing-menu"></div>
+  <div id="settings-menu"></div>
+  <div id="clients-menu"></div>
+  [% END -%] <!-- END feature -->
+  [% INCLUDE _assets/return_link.html.tt return_location='../index.html' return_link_text=locale.maketext('Go Back') %]
+  <script src="js/ejs_production.js"></script>
+  <script src="js/xmpp_clients.js"></script>
+</div><!-- end body-content -->
+[% END %]
+
