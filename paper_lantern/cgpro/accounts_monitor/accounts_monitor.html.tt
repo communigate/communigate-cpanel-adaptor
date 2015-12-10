@@ -1,0 +1,25 @@
+[%
+SET CPANEL.CPVAR.dprefix = "../../";
+
+SET accounts = Api2.exec("CommuniGate", "ListAccounts", {
+});
+accounts = accounts.0.accounts;
+
+SET status = Api2.exec("CommuniGate", "GetXMPPStatus", {
+"account" = "spalazliev@sevdip.bg"
+});
+%]
+
+[% WRAPPER '_assets/master.html.tt'
+    app_key = 'cgpro_account_status_monitor'
+-%]
+<link rel="stylesheet" type="text/css" href="js/main.css">
+
+<div class="body-content">
+  [% IF CPANEL.feature('cgpro_account_status_monitor') %]
+  <div id="accounts-table"></div>
+  <script src="js/ejs_production.js"></script>
+  <script src="js/accounts_monitor.js"></script>
+  [% END %]
+</div>
+[% END %]

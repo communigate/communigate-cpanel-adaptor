@@ -150,6 +150,29 @@ sub api2_getAccountsAndDomains {
     return $return;
 }
 
+sub api2_getAccountsForDomain {
+    my %OPTS = @_;
+    my $domain = $OPTS{'domain'};
+    my $return = {};
+
+    my $accounts = api2_ListAccounts();
+    $accounts = $accounts->{'accounts'};
+    my @domains = Cpanel::Email::listmaildomains();
+    for my $dom (@domains) {
+	if ($dom eq $domain) {
+	    $return->{'accounts'} = [];
+	    for my $acc (%$accounts) {
+		if ($accounts->{$acc}->{'domain'} eq $domain) {
+		    my @part_acc = split /@/, $acc;
+		    push $return->{'accounts'}, @part_acc->[0];
+		}
+	    }
+	    last;
+	}
+    }
+    return $return;
+}
+
 sub api2_AccountsOverview {
 	my %OPTS = @_;
 	my $invert = $OPTS{'invert'};
@@ -1195,7 +1218,7 @@ sub api2_delforward {
     if ($account) {
 	my $Rules = $cli->GetAccountMailRules("$user") || die "Error: ".$cli->getErrMessage.", quitting";
 	foreach my $Rule (@$Rules) {
-	    if ($Rule->[1] eq "#Redirect") {
+	    if (ref($Rule) eq "ARRAY" && $Rule->[1] eq "#Redirect") {
 		my @dest = split(",",$Rule->[3]->[0]->[1]);
 		$Rule->[3]->[0]->[1] ="";
 		my $found=0;
@@ -5792,6 +5815,19 @@ sub api2_getDomainsAndAccounts {
     my $accounts = api2_ListAccounts();
     $return->{'domains'} = \@domains;
     $return->{'accounts'} = $accounts->{'accounts'};
+    return $return;
+}
+
+# Account status monitor functions
+sub api2_getAccountsStatusMonitor {
+    my %OPTS = @_;
+    my $return = {};
+    my $accounts = api2_ListAccounts();
+    for my $acc (keys $accounts->{'accounts'}) {
+	my @status = api2_GetXMPPStatus("account" => $acc);
+	my $real_status = @status->[0]->{'status'};
+	$return->{$acc}->{'status'} = $real_status;
+    }
     return $return;
 }
 

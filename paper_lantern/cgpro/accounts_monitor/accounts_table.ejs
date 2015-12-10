@@ -1,0 +1,60 @@
+<h2>Accounts</h2>
+
+<div class="row search-row">
+  <div class="col-xs-12 col-sm-8 col-md-6 col-lg-6">
+    <div class="row">
+      <div class="col-xs-8 col-sm-8 col-md-6 col-lg-6">
+	<label for="search_input">Search</label>
+	<input id="search_input" type="text" class="form-control" />
+      </div>
+      <div class="col-xs-4 col-sm-4 col-md-6 col-lg-6">
+	<input id="email_table_clear_search" type="button" class="btn btn-primary" value="Clear" style="margin-top: 23px;" onclick="clear_search()" />
+      </div>
+    </div>
+  </div>
+</div>
+
+<div>	
+  <table class="table table-striped responsive-table">
+    <thead>
+      <tr>
+	<th>Account</th>
+	<th>Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% if (!Object.keys(data).length) { %>
+      <tr class="responsive-row"><td>No accounts!</td></tr>
+      <% } else { %>
+      <% for (var acc in data) { %>
+      <tr class="result_rows responsive-row">
+	<td class="td1"><%= acc %></td>
+	<% if (data[acc].status == "#NULL#") { %>
+	<td><span class="glyphicon glyphicon-off"></span> offline</td>
+	<% } else { %>
+	<td>
+	  <% if (data[acc].status == "online") { %>
+	  <span class="glyphicon glyphicon-user" style="color: #64BB0F"></span>
+	  <% } else if (data[acc].status == "busy") { %>
+	  <span class="glyphicon glyphicon-minus-sign" style="color: #ff0000"></span>
+	  <% } else if (data[acc].status == "be-back") { %>
+	  <span class="glyphicon glyphicon-tag" style="color: #D8C101"></span>
+	  <% } else if (data[acc].status == "on-phone") { %>
+	  <span class="glyphicon glyphicon-earphone" style="color: #ff0000"></span>
+	  <% } else if (data[acc].status == "away") { %>
+	  <span class="glyphicon glyphicon-user" style="color: #D8C101"></span>
+	  <% } else if (data[acc].status == "in-meeting") { %>
+	  <span class="glyphicon glyphicon-minus-sign" style="color: #ff0000"></span>
+	  <% } else if (data[acc].status == "out-lunch") { %>
+	  <span class="glyphicon glyphicon-cutlery"></span>
+	  <% } %>
+	  <% } %>
+	</td>
+      </tr>
+      <% } %>
+      <% } %>
+      <tr class="no_results" style="display: none;"><td colspan="2">No results!</td></tr>
+    </tbody>
+  </table>
+</div>
+<div id="menus_div"></div>
