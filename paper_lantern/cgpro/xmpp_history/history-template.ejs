@@ -1,0 +1,27 @@
+<div class="section">
+  <h2>XMPP history for <%= data.account %></h2>
+  <table class="table table-striped responsive-table">
+    <thead>
+      <tr class="row-1 responsive-row">
+	<th>Contact</th>
+	<th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% for (var contact in data.files) { %>
+      <tr class="responsive-row">
+	<td><%= contact %></td>
+	<td>
+	  <a href="../getXmppHistory.live.cgi?account=<%= data.account %>&amp;file=<%= contact %>">Download XMPP history file</a>
+	</td>
+      </tr>
+      <% } %>
+
+      <% if ( !data.files ) { %>
+      <tr>
+	<td colspan="2">No results!</td>
+      </tr>
+      <% } %>
+    </tbody>
+  </table>
+</div>
