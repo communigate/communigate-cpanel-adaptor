@@ -1,0 +1,17 @@
+<div class="section">
+  <% for (var acc in accounts) { %>
+  <% if (acc != selected) { %>
+  <div class="form-group">
+    <label>
+      <input type="checkbox" name="buddy" id="<%= acc %>" value="<%= acc %>" checked="checked" />
+      <%= acc %>
+    </label>
+  </div>
+  <% } %>
+  <% } %>
+  <div class="form-group">
+    <button id="submit_local" class="btn btn-primary">Import accounts to roster</button>
+    <button id="cancel_local" class="btn btn-link">Cancel</button>
+    <span id="local_loading"></span>
+  </div>
+</div>

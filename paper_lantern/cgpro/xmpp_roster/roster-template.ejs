@@ -1,0 +1,88 @@
+<div class="section">
+  <h2>Add buddy</h2>
+
+  <div class="form-group">
+    <label for="jid">Jabber ID</label>
+    <div class="row">
+      <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	<input type="text" id="jid" class="form-control" />
+      </div>
+      <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	<div id="jid_error" class="error"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label for="name">Real name</label>
+    <div class="row">
+      <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	<input type="text" id="name" class="form-control" />
+      </div>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label for="group">Group name</label>
+    <div class="row">
+      <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	<input type="text" id="group" class="form-control" />
+      </div>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <button id="submit" class="btn btn-primary">Add buddy</button>
+    <span id="add-loading"></span>
+  </div>
+
+  <p>
+    <a onclick="loadLocalRoster()" class="btn btn-default">Import local accounts XMPP to roster</a>
+  </p>
+</div>
+
+<div class="section">
+  <h2>XMPP roster of <%= selected %></h2>
+  <table class="table table-striped responsive-table">
+    <colgroup>
+      <col width="30%">
+      <col width="20%">
+      <col width="20%">
+      <col width="20%">
+      <col width="10%">
+    </colgroup>
+    <thead>
+      <tr class="row-1 responsive-row">
+	<th>Buddy</th>
+	<th>Name</th>
+	<th>Group</th>
+	<th colspan="2">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% if (data) { %>
+      <% for (var i=0; i < data.roster.length; i++) { %>
+      <tr class="responsive-row">
+	<td><%= data.roster[i].peer %></td>
+	<td><%= data.roster[i].name %></td>
+	<td><%= data.roster[i].group %></td>
+	<td>
+	  <a title="Remove buddy" onclick="removeBuddy('<%= selected %>','<%= data.roster[i].peer %>','<%= i %>')">
+	    <span class="glyphicon glyphicon-trash"></span> Remove buddy
+	  </a>
+	</td>
+	<td>
+	  <span id="loading_<%= i %>"></span>
+	</td>
+      </tr>
+      <% } %>
+      <% } %>
+
+      <% if ( !data ) { %>
+      <tr>
+	<td colspan="5">No results!</td>
+      </tr>
+      <% } %>
+    </tbody>
+  </table>
+</div>

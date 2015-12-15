@@ -1,0 +1,19 @@
+[% SET CPANEL.CPVAR.dprefix = "../../" %]
+[% WRAPPER '_assets/master.html.tt'
+app_key = 'cgpro_xmpp_roster'
+-%]
+<link rel="stylesheet" type="text/css" href="js/main.css">
+
+<div class="body-content">
+  [% IF CPANEL.feature('cgpro_xmpp_roster') %]
+  <div id="main-loading"></div>
+  <div id="managing-menu"></div>
+  <div id="roster-menu"></div>
+  <div id="local-roster"></div>
+  [% END -%] <!-- END feature -->
+  [% INCLUDE _assets/return_link.html.tt return_location='../../index.html' return_link_text=locale.maketext('Go Back') %]
+  <script src="js/ejs_production.js"></script>
+  <script src="js/xmpp_roster.js"></script>
+</div><!-- end body-content -->
+[% END %]
+
