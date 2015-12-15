@@ -1,0 +1,197 @@
+<div class="section">
+  <h2>Default account settings</h2>
+  [% MACRO filter_option(pval, val, text) BLOCK -%]
+  <option value="[% val %]"[% val == pval ? " selected='selected'" : "" %]>[% locale.maketext(text) %]</option>
+  [% END -%]
+
+  [% MACRO filter_check(name, pval, val, text) BLOCK -%]
+  <input type="checkbox" name="[% name %]" value="[% val %]" id="[% name %]-[% val %]"[% IF pval.join("").search(val); " checked='checked'"; END %] />
+  <label for="[% name %]-[% val %]">[% text %]</label>
+  [% END -%]
+
+
+  <div class="form-group">
+    <label for="MailToAllAction">
+      Mail to All is distributed for (all@<%= domain %>):
+    </label>
+    <div class="row">
+      <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	<select id="MailToAllAction" class="form-control">
+	  <option value="default" >Default (<%= serverDomainDefaults.MailToAllAction %>)</option>
+	  <option value="anybody" <% if(domainSettings.MailToAllAction == "anybody") %>selected<% } %> >Anybody</option>
+	  <option value="clients" <% if(domainSettings.MailToAllAction == "clients") %>selected<% } %> >Clients</option>
+	  <option value="Authenticated Users" <% if(domainSettings.MailToAllAction == "Authenticated Users") %>selected<% } %> >Authenticated Users</option>
+	  <option value="Authenticated Domain Users" <% if(domainSettings.MailToAllAction == "Authenticated Domain Users") %>selected<% } %> >Authenticated Domain Users</option>
+	  <option value="Authenticated Administrator" <% if(domainSettings.MailToAllAction == "Authenticated Administrator") %>selected<% } %> >Authenticated Administrator</option>
+	  <option value="nobody" <% if(domainSettings.MailToAllAction == "nobody") %>selected<% } %> >Nobody</option>
+	</select>
+      </div>
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="TimeZone">Time Zone:</label>
+    <div class="row">
+      <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	<select id="TimeZone" class="form-control">
+	  <option value="default" >Default (<%= (serverAccountPrefs.TimeZone == "HostOS" ? "Fictitious Server Zone" : serverAccountPrefs.TimeZone ) %>)</option>
+	  <option value="HostOS" <% if(accountDefaultPrefs.TimeZone == "HostOS") %>selected<% } %> >Fictitious Server Zone</option>
+	  <option value="Europe/Eastern" <% if(accountDefaultPrefs.TimeZone == "HostOS") %>selected<% } %> >Europe/Eastern</option>
+	  <option value="Europe/Western" <% if(accountDefaultPrefs.TimeZone == "Europe/Western") %>selected<% } %> >Europe/Western</option>
+	  <option value="Europe/Moscow" <% if(accountDefaultPrefs.TimeZone == "Europe/Moscow") %>selected<% } %> >Europe/Moscow</option>
+	  <option value="NorthAmerica/Alaska" <% if(accountDefaultPrefs.TimeZone == "NorthAmerica/Alaska") %>selected<% } %> >NorthAmerica/Alaska</option>
+	  <option value="NorthAmerica/Pacific" <% if(accountDefaultPrefs.TimeZone == "NorthAmerica/Pacific") %>selected<% } %> >NorthAmerica/Pacific</option>
+	  <option value="NorthAmerica/Mountain" <% if(accountDefaultPrefs.TimeZone == "NorthAmerica/Mountain") %>selected<% } %> >NorthAmerica/Mountain</option>
+	  <option value="NorthAmerica/Eastern" <% if(accountDefaultPrefs.TimeZone == "NorthAmerica/Eastern") %>selected<% } %> >NorthAmerica/Eastern</option>
+	  <option value="NorthAmerica/Atlantic" <% if(accountDefaultPrefs.TimeZone == "NorthAmerica/Atlantic") %>selected<% } %> >NorthAmerica/Atlantic</option>
+	  <option value="Newfoundland" <% if(accountDefaultPrefs.TimeZone == "Newfoundland") %>selected<% } %> >Newfoundland</option>
+	  <option value="Russia/Ekaterinburg" <% if(accountDefaultPrefs.TimeZone == "Russia/Ekaterinburg") %>selected<% } %> >Russia/Ekaterinburg</option>
+	  <option value="Russia/Novosibirsk" <% if(accountDefaultPrefs.TimeZone == "Russia/Novosibirsk") %>selected<% } %> >Russia/Novosibirsk</option>
+	  <option value="Russia/Krasnoyarsk" <% if(accountDefaultPrefs.TimeZone == "Russia/Krasnoyarsk") %>selected<% } %> >Russia/Krasnoyarsk</option>
+	  <option value="Russia/Irkutsk" <% if(accountDefaultPrefs.TimeZone == "Russia/Irkutsk") %>selected<% } %> >Russia/Irkutsk</option>
+	  <option value="Russia/Yakutsk" <% if(accountDefaultPrefs.TimeZone == "Russia/Yakutsk") %>selected<% } %> >Russia/Yakutsk</option>
+	  <option value="Russia/Vladivostok" <% if(accountDefaultPrefs.TimeZone == "Russia/Vladivostok") %>selected<% } %> >Russia/Vladivostok</option>
+	  <option value="Russia/Magadan" <% if(accountDefaultPrefs.TimeZone == "Russia/Magadan") %>selected<% } %> >Russia/Magadan</option>
+	  <option value="Russia/Kamchatka" <% if(accountDefaultPrefs.TimeZone == "Russia/Kamchatka") %>selected<% } %> >Russia/Kamchatka</option>
+	  <option value="SouthAmerica/Chile" <% if(accountDefaultPrefs.TimeZone == "SouthAmerica/Chile") %>selected<% } %> >SouthAmerica/Chile</option>
+	  <option value="SouthAmerica/Brasil" <% if(accountDefaultPrefs.TimeZone == "SouthAmerica/Brasil") %>selected<% } %> >SouthAmerica/Brasil</option>
+	  <option value="SouthAmerica/Paraguay" <% if(accountDefaultPrefs.TimeZone == "SouthAmerica/Paraguay") %>selected<% } %> >SouthAmerica/Paraguay</option>
+	  <option value="Australia/Adelaide" <% if(accountDefaultPrefs.TimeZone == "Australia/Adelaide") %>selected<% } %> >Australia/Adelaide</option>
+ 	  <option value="Australia/NorthernTerritory" <% if(accountDefaultPrefs.TimeZone == "Australia/NorthernTerritory") %>selected<% } %> >Australia/NorthernTerritory</option>
+ 	  <option value="Australia/East" <% if(accountDefaultPrefs.TimeZone == "Australia/East") %>selected<% } %> >Australia/East</option>
+ 	  <option value="NewZealand/Auckland" <% if(accountDefaultPrefs.TimeZone == "NewZealand/Auckland") %>selected<% } %> >NewZealand/Auckland</option>
+ 	  <option value="Asia/Lebanon" <% if(accountDefaultPrefs.TimeZone == "Asia/Lebanon") %>selected<% } %> >Asia/Lebanon</option>
+ 	  <option value="Asia/Jordan" <% if(accountDefaultPrefs.TimeZone == "Asia/Jordan") %>selected<% } %> >Asia/Jordan</option>
+ 	  <option value="Asia/Syria" <% if(accountDefaultPrefs.TimeZone == "Asia/Syria") %>selected<% } %> >Asia/Syria</option>
+ 	  <option value="Asia/Israel" <% if(accountDefaultPrefs.TimeZone == "Asia/Israel") %>selected<% } %> >Asia/Israel</option>
+ 	  <option value="Asia/Iraq" <% if(accountDefaultPrefs.TimeZone == "Asia/Iraq") %>selected<% } %> >Asia/Iraq</option>
+ 	  <option value="Asia/Iran" <% if(accountDefaultPrefs.TimeZone == "Asia/Iran") %>selected<% } %> >Asia/Iran</option>
+ 	  <option value="Asia/Afghanistan" <% if(accountDefaultPrefs.TimeZone == "Asia/Afghanistan") %>selected<% } %> >Asia/Afghanistan</option>
+ 	  <option value="Asia/India" <% if(accountDefaultPrefs.TimeZone == "Asia/India") %>selected<% } %> >Asia/India</option>
+ 	  <option value="(-1100) Samoa" <% if(accountDefaultPrefs.TimeZone == "(-1100) Samoa") %>selected<% } %> >(-1100) Samoa</option>
+ 	  <option value="(-1000) Hawaii/Tahiti" <% if(accountDefaultPrefs.TimeZone == "(-1000) Hawaii/Tahiti") %>selected<% } %> >(-1000) Hawaii/Tahiti</option>
+ 	  <option value="(-0900) Marquesas Islands" <% if(accountDefaultPrefs.TimeZone == "(-0900) Marquesas Islands") %>selected<% } %> >(-0900) Marquesas Islands</option>
+ 	  <option value="(-0700) Arizona" <% if(accountDefaultPrefs.TimeZone == "(-0700) Arizona") %>selected<% } %> >(-0700) Arizona</option>
+ 	  <option value="(-0600) Central America" <% if(accountDefaultPrefs.TimeZone == "(-0600) Central America") %>selected<% } %>>(-0600) Central America</option>
+ 	  <option value="(-0500) Haiti/Peru" <% if(accountDefaultPrefs.TimeZone == "(-0500) Haiti/Peru") %>selected<% } %> >(-0500) Haiti/Peru</option>
+ 	  <option value="(-0400) Venezuela/Guyana" <% if(accountDefaultPrefs.TimeZone == "(-0400) Venezuela/Guyana") %>selected<% } %> >(-0400) Venezuela/Guyana</option>
+ 	  <option value="(-0300) Argentina/Uruguay" <% if(accountDefaultPrefs.TimeZone == "(-0300) Argentina/Uruguay") %>selected<% } %> >(-0300) Argentina/Uruguay</option>
+ 	  <option value="GMT (+0000)" <% if(accountDefaultPrefs.TimeZone == "GMT (+0000)") %>selected<% } %> >GMT (+0000)</option>
+ 	  <option value="(+0100) Algeria/Congo" <% if(accountDefaultPrefs.TimeZone == "(+0100) Algeria/Congo") %>selected<% } %> >(+0100) Algeria/Congo</option>
+ 	  <option value="(+0200) Egypt/South Africa" <% if(accountDefaultPrefs.TimeZone == "(+0200) Egypt/South Africa") %>selected<% } %> >(+0200) Egypt/South Africa</option>
+ 	  <option value="(+0300) Saudi Arabia" <% if(accountDefaultPrefs.TimeZone == "(+0300) Saudi Arabia") %>selected<% } %> >(+0300) Saudi Arabia</option>
+ 	  <option value="(+0400) Oman" <% if(accountDefaultPrefs.TimeZone == "(+0400) Oman") %>selected<% } %> >(+0400) Oman</option>
+ 	  <option value="(+0500) Pakistan" <% if(accountDefaultPrefs.TimeZone == "(+0500) Pakistan") %>selected<% } %> >(+0500) Pakistan</option>
+ 	  <option value="(+0600) Bangladesh" <% if(accountDefaultPrefs.TimeZone == "(+0600) Bangladesh") %>selected<% } %> >(+0600) Bangladesh</option>
+ 	  <option value="(+0700) Thailand/Vietnam" <% if(accountDefaultPrefs.TimeZone == "(+0700) Thailand/Vietnam") %>selected<% } %> >(+0700) Thailand/Vietnam</option>
+ 	  <option value="(+0800) China/Malaysia" <% if(accountDefaultPrefs.TimeZone == "(+0800) China/Malaysia") %>selected<% } %> >(+0800) China/Malaysia</option>
+ 	  <option value="(+0900) Japan/Korea" <% if(accountDefaultPrefs.TimeZone == "(+0900) Japan/Korea") %>selected<% } %> >(+0900) Japan/Korea</option>
+ 	  <option value="(+1000) Queensland" <% if(accountDefaultPrefs.TimeZone == "(+1000) Queensland") %>selected<% } %> >(+1000) Queensland</option>
+ 	  <option value="(+1100) Micronesia" <% if(accountDefaultPrefs.TimeZone == "(+1100) Micronesia") %>selected<% } %> >(+1100) Micronesia</option>
+ 	  <option value="(+1200) Fiji" <% if(accountDefaultPrefs.TimeZone == "(+1200) Fiji") %>selected<% } %> >(+1200) Fiji</option>
+	</select>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label for="WorkDayStart">Working Hours (start):</label>
+    <div class="row">
+      <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	<select id="WorkDayStart" class="form-control">
+	  <option value="default" >Default (<%= (serverAccountPrefs.WorkDayStart div 3600) + (serverAccountPrefs.WorkDayStart % 3600) ? ":30" : ":00") %>)</option>
+	  <% for (var i = 0; i <= 24; i++) { %>
+	     <option value="<%= i * 3600 %>" <% if(accountDefaultPrefs.WorkDayStart == (i * 3600) ) %>selected<% } %> ><%= i + ":00" %></option>
+	     <option value="<%= (i + 0.5) * 3600 %>" <% if(accountDefaultPrefs.WorkDayStart == ( (i + 0.5) * 3600) ) %>selected<% } %> ><%= i + ":30" %></option>
+	     <% } %>
+	</select>
+      </div>
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="WorkDayEnd">Working Hours (end):</label>
+    <div class="row">
+      <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	<select id="WorkDayEnd" class="form-control">
+	  <option value="default" >Default (<%= (serverAccountPrefs.WorkDayEnd div 3600) + (serverAccountPrefs.WorkDayEnd % 3600) ? ":30" : ":00") %>)</option>
+	  <% for (var i = 0; i <= 24; i++) { %>
+	     <option value="<%= i * 3600 %>" <% if(accountDefaultPrefs.WorkDayEnd == (i * 3600) ) %>selected<% } %> ><%= i + ":00" %></option>
+	     <option value="<%= (i + 0.5) * 3600 %>" <% if(accountDefaultPrefs.WorkDayEnd == ( (i + 0.5) * 3600) ) %>selected<% } %> ><%= i + ":30" %></option>
+	     <% } %>
+	</select>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label for="WeekStart">Week start:</label>
+    <div class="row">
+      <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	<select id="WeekStart" class="form-control">
+	  <option value="default" >Default (<%= serverAccountPrefs.WeekStart %>)</option>
+	  <option value="Sun" <% if(accountDefaultPrefs.WeekStart == "Sun" ) %>selected<% } %> >Sun</option>
+	  <option value="Mon" <% if(accountDefaultPrefs.WeekStart == "Mon" ) %>selected<% } %> >Sun</option>
+	  <option value="Tue" <% if(accountDefaultPrefs.WeekStart == "Tue" ) %>selected<% } %> >Sun</option>
+	  <option value="Wed" <% if(accountDefaultPrefs.WeekStart == "Wed" ) %>selected<% } %> >Sun</option>
+	  <option value="Thu" <% if(accountDefaultPrefs.WeekStart == "Thu" ) %>selected<% } %> >Sun</option>
+	  <option value="Fri" <% if(accountDefaultPrefs.WeekStart == "Fri" ) %>selected<% } %> >Sun</option>
+	  <option value="Sat" <% if(accountDefaultPrefs.WeekStart == "Sat" ) %>selected<% } %> >Sun</option>
+	</select>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label>Work Days:</label>
+    <div class="row">
+      <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	<input type="checkbox" name="WorkDays" value="Sun" id="WorkDays-Sun"<% if ( (accountDefaultPrefs.WorkDays || serverAccountPrefs.WorkDays).join("").indexOf("Sun") > -1 ) { %>checked='checked'<% } %> />
+	  <label for="WorkDays-Sun">Sun</label>
+	  <input type="checkbox" name="WorkDays" value="Mon" id="WorkDays-Mon"<% if ( (accountDefaultPrefs.WorkDays || serverAccountPrefs.WorkDays).join("").indexOf("Mon") > -1 ) { %>checked='checked'<% } %> />
+	  <label for="WorkDays-Mon">Mon</label>
+	  <input type="checkbox" name="WorkDays" value="Tue" id="WorkDays-Tue"<% if ( (accountDefaultPrefs.WorkDays || serverAccountPrefs.WorkDays).join("").indexOf("Tue") > -1 ) { %>checked='checked'<% } %> />
+	  <label for="WorkDays-Tue">Tue</label>
+	  <input type="checkbox" name="WorkDays" value="Wed" id="WorkDays-Wed"<% if ( (accountDefaultPrefs.WorkDays || serverAccountPrefs.WorkDays).join("").indexOf("Wed") > -1 ) { %>checked='checked'<% } %> />
+	  <label for="WorkDays-Thu">Thu</label>
+	  <input type="checkbox" name="WorkDays" value="Thu" id="WorkDays-Thu"<% if ( (accountDefaultPrefs.WorkDays || serverAccountPrefs.WorkDays).join("").indexOf("Thu") > -1 ) { %>checked='checked'<% } %> />
+	  <label for="WorkDays-Thu">Thu</label>
+	  <input type="checkbox" name="WorkDays" value="Fri" id="WorkDays-Fri"<% if ( (accountDefaultPrefs.WorkDays || serverAccountPrefs.WorkDays).join("").indexOf(Fri) > -1 ) { %>checked='checked'<% } %> />
+	  <label for="WorkDays-Fri">Fri</label>
+	  <input type="checkbox" name="WorkDays" value="Sat" id="WorkDays-Sat"<% if ( (accountDefaultPrefs.WorkDays || serverAccountPrefs.WorkDays).join("").indexOf(Sat) > -1 ) { %>checked='checked'<% } %> />
+	  <label for="WorkDays-Sat">Sat</label>
+      </div>
+    </div>
+  </div>
+
+  <% if ( CPANEL.feature("cgpro_extensions") ) { %>
+  <div class="form-group">
+    <label for="number">Default outgoing telephone number:</label>
+    <div class="row">
+      <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	<select id="number" class="form-control">
+	  <option value="">None</option>
+	  <% for (var number in numbers) { %>
+	  <option value="number" <% if (outhoingNumber == number) { %>selected<% } %> ><%= number %></option>
+	  <% } %>
+	</select>
+      </div>
+    </div>
+  </div>
+  <% } %>
+  <div class="form-group">
+    <label for="ips">Client IP addresses:</label>
+    <div class="row">
+      <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	<!-- <em>Example:</em> -->
+	<!-- <pre> -->
+	<!--   10.10.12.24               ; our back-up -->
+	<!--   10.10.13.32-10.10.13.191  ; our dial-ups -->
+	<!--   64.173.55.169             ; our other office -->
+	<!-- </pre> -->
+	<textarea id="ips" class="form-control" rows="8" cols="45"><%= domainSettings.ClientIPs.replace('\\\e', "\n") %></textarea>
+      </div>
+    </div>
+  </div>
+  <div class="form-group">
+    <button value="Save" class="btn btn-primary" />
+  </div>
+</div>
