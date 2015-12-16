@@ -4135,11 +4135,12 @@ sub api2_AddBuddy {
     my $account = $OPTS{'account'};
     my (undef,$domain) = split "@", $account;
     my $cli = getCLI();
-    my $result;
+    my $result = {};
     foreach my $dom (@domains) {
 	if ($dom eq $domain) {
 	    my $time = time();
 	    my $password = $cli->GetAccountPlainPassword($account);
+	    
 	    if ($password) {
 		my $ximss = getXIMSS($account, $password);
 		my $params = {
@@ -4150,7 +4151,9 @@ sub api2_AddBuddy {
 		$params->{"name"} = $OPTS{"name"} if $OPTS{"name"};
 		$params->{"group"} = [$OPTS{'group'}] if $OPTS{'group'};
 		my $roster = $ximss->send({rosterSet => $params});
+		$result->{'success'} = $roster->{response};
 		$Cpanel::CPERROR{'CommuniGate'} = $roster->{response}->{errorText} if ref($roster) eq "HASH" && $roster->{response}->{errorText};
+		$result->{'error'} = $roster->{response}->{errorText} if ref($roster) eq "HASH" && $roster->{response}->{errorText};
 		$ximss->close();
 	    }
 	    last;
@@ -4179,7 +4182,9 @@ sub api2_RemoveBuddy {
 		    subscription => "remove"
 		};
 		my $roster = $ximss->send({rosterSet => $params});
+		$result->{'success'} = $roster;
 		$Cpanel::CPERROR{'CommuniGate'} = $roster->{response}->{errorText} if ref($roster) eq "HASH" && $roster->{response}->{errorText};
+		$result->{'error'} = $roster->{response}->{errorText} if ref($roster) eq "HASH" && $roster->{response}->{errorText};
 		$ximss->close();
 	    }
 	    last;
@@ -4191,19 +4196,19 @@ sub api2_RemoveBuddy {
 
 sub api2_ImportLocalRoster {
     my %OPTS = @_;
-    my $params = $OPTS{'formdump'};
 
     my @domains = Cpanel::Email::listmaildomains();
-    my $account = $params->{'account'};
+    my $account = %OPTS->{'account'};
     my (undef,$domain) = split "@", $account;
     my $cli = getCLI();
-    my $result;
+    my $result = {};
     foreach my $dom (@domains) {
 	if ($dom eq $domain) {
 	    my $time = time();
 	    my $password = $cli->GetAccountPlainPassword($account);
 	    if ($password) {
-		my $buddies = [map {$params->{$_}} grep {/^buddy/} keys %$params];
+		my $buddies = decode_json %OPTS->{'buddies'};
+
 		my $ximss = getXIMSS($account, $password);
 		for my $buddy (@$buddies) {
 		    my $userdata = $cli->GetAccountEffectiveSettings($buddy);
@@ -4215,7 +4220,9 @@ sub api2_ImportLocalRoster {
 		    $param->{"name"} = $userdata->{'RealName'} if $userdata->{'RealName'};
 		    $ximss->send({rosterSet => $param});
 		    my $roster = $ximss->parseResponse("$time-roster");
+		    $result->{'success'} = $roster;
 		    $Cpanel::CPERROR{'CommuniGate'} = $roster->{response}->{errorText} if ref($roster) eq "HASH" && $roster->{response}->{errorText};
+		    $result->{'error'} = $roster->{response}->{errorText} if ref($roster) eq "HASH" && $roster->{response}->{errorText};
 		}
 		 $ximss->close();
 	    }

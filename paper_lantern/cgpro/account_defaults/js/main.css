@@ -1,0 +1,36 @@
+#save-loading {
+    margin-left: 15px;
+}
+
+.managing-menu {
+    min-width: 350px;
+}
+
+.managing-label-wrap {
+    text-align: right;
+    margin-right: 10px;
+}
+
+.managing-label-wrap>label {
+    line-height: 35px;
+}
+
+.form-inline div {
+    padding: 0;
+}
+
+@media screen and (max-width: 767px) {
+    .managing-menu {
+	min-width: 0;
+	width: 100%;
+	margin-bottom: 10px;
+    }
+
+    .managing-label-wrap {
+	text-align: left;
+    }
+
+    .managing-label-wrap>label {
+	line-height: initial;
+    }
+}
