@@ -1,0 +1,11 @@
+<div class="section"> 
+  <p>
+    [% locale.maketext("Do you really want to delete Remote POP “{{rpop}}”?") %]</p>
+  <div class="form-group">
+    <input id="group_{{index}}" type="hidden" value="{{rpop}}">
+    <button id="delete_{{index}}" class="btn btn-primary">[% locale.maketext("Delete") %]</button>
+    <button class="btn btn-link" id="btn_cancel_{{index}}" onclick="toggle_action_div(null, {id:'delete_module_{{index}}', index: '{{index}}', rpop: '{{rpop}}', action:'delete'})">[% locale.maketext("Cancel") %]</button>
+  </div>
+</div>
+<div id="delete_status_{{index}}"></div>
+<div id="status_bar_{{index}}"></div>

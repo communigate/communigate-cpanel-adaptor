@@ -1,0 +1,45 @@
+<div class="section">
+  <button id="add-btn" class="btn btn-primary">Add Remote POP</button>
+  <table id="mailtbl" class="table table-striped responsive-table">
+    <thead>
+      <tr>
+	<th>Remote POP</th>
+	<th>Status</th>
+	<th colspan="2">Functions</th>
+      </tr>
+    </thead>
+    <colgroup>
+      <col width="30%">
+      <col width="30%">
+      <col width="20%">
+      <col width="20%">
+    </colgroup>
+    <tbody>
+      <% for (var pop in rpop) { %>
+      <tr class="responsive-row">
+	<td><%= pop %></td>
+	<td>
+	  <% if(rpopInfo[pop] && rpopInfo[pop].completed) { %>
+	  <%= rpopInfo[pop].completed.replace(/\#T|\_/g," ") %>
+	  <% } %>
+	  <% if(rpopInfo[pop] && rpopInfo[pop].errorCode) { %>
+	  <%= rpopInfo[pop].errorCode %>
+	  <% } %>
+	</td>
+	<td>
+	  <span onclick="getRPOP('<%= pop %>')" class="btn btn-link edit-rpop"><span class="glyphicon glyphicon-edit"></span> View/Edit</span>
+	  <span onclick="deleteRPOP('<%= pop %>')" class="btn btn-link"><span class="glyphicon glyphicon-trash"></span> Delete</span>
+	</td>
+	<td>
+	  <span id="<%= pop %>-loading"></span>
+	</td>
+      </tr>
+      <% } %>
+      <% if (!Object.keys(rpop).length) { %>
+      <tr>
+	<td colspan="4">No Remote POPs.</td>
+      </tr>
+      <% } %>
+    </tbody>
+  </table>
+</div>

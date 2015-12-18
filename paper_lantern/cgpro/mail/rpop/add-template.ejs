@@ -1,0 +1,104 @@
+<div class="section">
+  <h3> <% if (edit) { %>Edit<% } else { %>Add<% } %> Remote POP</h3>
+
+  <div class="form-group">
+    <label for="name">Display Name</label>
+    <div class="row">
+      <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	<input type="text" id="name" class="form-control" value="<%= rpop_name %>" <% if (edit) { %> readonly=""<% } %>/>
+      </div>
+      <div id="name_error" class="col-xs-12 col-sm-6 col-md-6 col-lg-6"></div>	  
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label for="authName">Account</label>
+    <div class="row">
+      <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	<input type="text" id="authName" class="form-control" <% if (rpop && rpop.rpop) { %>value="<%= rpop.rpop.authName %>"<% } %> />
+      </div>
+      <div id="authName_error" class="col-xs-12 col-sm-6 col-md-6 col-lg-6"></div>	  
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label for="domain">Host</label>
+    <div class="row">
+      <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	<input type="text" id="domain" class="form-control" <% if (rpop && rpop.rpop) { %>value="<%= rpop.rpop.domain %>"<% } %> />
+      </div>
+      <div id="domain_error" class="col-xs-12 col-sm-6 col-md-6 col-lg-6"></div>	  
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label for="password">Password</label>
+    <div class="row">
+      <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	<input type="password" id="password" class="form-control" <% if (rpop && rpop.rpop) { %>value="<%= rpop.rpop.password %>"<% } %> />
+      </div>
+      <div id="password_error" class="col-xs-12 col-sm-6 col-md-6 col-lg-6"></div>	  
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label for="mailbox">Mailbox</label>
+    <div class="row">
+      <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	<input type="text" id="mailbox" class="form-control" <% if (rpop && rpop.rpop) { %>value="<%= rpop.rpop.mailbox %>"<% } %> />
+      </div>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <div class="checkbox">
+      <input type="checkbox" id="leave" name="leave" value="YES" <% if (rpop && rpop.rpop && rpop.rpop.leave) { %>checked<% } %> >
+      <label for="leave">Leave Messages On Server</label>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <div class="checkbox">
+      <input type="checkbox" id="APOP" name="APOP" value="YES" <% if (rpop && rpop.rpop && rpop.rpop.APOP) { %>checked<% } %>> 
+      <label for="APOP">APOP</label>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <div class="checkbox">
+      <input type="checkbox" id="TLS" name="TLS" value="YES" <% if (rpop && rpop.rpop && rpop.rpop.TLS) { %>checked<% } %>>
+      <label for="TLS">TLS</label>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label for="period">Pull Every</label>
+    <div class="row">
+      <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	<select id="period" class="form-control">
+	  <option value="120s" <% if (rpop && rpop.rpop && rpop.rpop.period == "120s") { %>selected<% } %> >2m</option>
+	  <option value="180s" <% if (rpop && rpop.rpop && rpop.rpop.period == "180s") { %>selected<% } %> >3m</option>
+	  <option value="300s" <% if (rpop && rpop.rpop && rpop.rpop.period == "300s") { %>selected<% } %> >5m</option>
+	  <option value="600s" <% if ( (rpop && rpop.rpop && rpop.rpop.period == "600s") || !rpop ) { %>selected<% } %> >10m</option>
+	  <option value="750s" <% if (rpop && rpop.rpop && rpop.rpop.period == "750s") { %>selected<% } %> >15m</option>
+	  <option value="1200s" <% if (rpop && rpop.rpop && rpop.rpop.period == "1200s") { %>selected<% } %> >20m</option>
+	  <option value="1800s" <% if (rpop && rpop.rpop && rpop.rpop.period == "1800s") { %>selected<% } %> >30m</option>
+	  <option value="3600s" <% if (rpop && rpop.rpop && rpop.rpop.period == "3600s") { %>selected<% } %> >60m</option>
+	  <option value="7200s" <% if (rpop && rpop.rpop && rpop.rpop.period == "7200s") { %>selected<% } %> >2h</option>
+	  <option value="10800s" <% if (rpop && rpop.rpop && rpop.rpop.period == "10800s") { %>selected<% } %> >3h</option>
+	  <option value="18000s" <% if (rpop && rpop.rpop && rpop.rpop.period == "18000s") { %>selected<% } %> >5h</option>
+	  <option value="21600s" <% if (rpop && rpop.rpop && rpop.rpop.period == "21600s") { %>selected<% } %> >6h</option>
+	  <option value="22800s" <% if (rpop && rpop.rpop && rpop.rpop.period == "22800s") { %>selected<% } %> >8h</option>
+	  <option value="86400s" <% if (rpop && rpop.rpop && rpop.rpop.period == "86400s") { %>selected<% } %> >24h</option>
+	  <option value="1000000000s" <% if (rpop && rpop.rpop && rpop.rpop.period == "1000000000s") { %>selected<% } %> >Disabled</option>
+	</select>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <button id="save-btn" class="btn btn-primary" value="Save">Save</button>
+    <span id="cancel-btn" class="btn btn-link">Cancel</span>
+    <span id="save-loading"></span>
+  </div>
+</div>
