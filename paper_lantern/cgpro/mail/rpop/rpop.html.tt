@@ -1,17 +1,5 @@
 [% SET CPANEL.CPVAR.dprefix = "../../../"; %]
 
-[% SET accounts = Api2.exec("CommuniGate", "ListAccounts", {})
-accounts = accounts.0.accounts;
-%]
-
-[% IF RAW_FORM.item("account") %]
-[% SET rpop = Api2.exec("CommuniGate", "ListRPOP", {
-"account" = RAW_FORM.item("account")
-})
-rpop = rpop.0;
- %]
-[% END %]
-
 [% WRAPPER '_assets/master.html.tt'
 app_key = 'cgpro_rpop'
 -%] 
