@@ -79,7 +79,7 @@ var create_account = function(account_id) {
     if (error_messages.length === 0) {
         // create the API variables
 	var email = $("#add_email_account").val();
-	var domain = $("#add_email_domain").find(":selected").text();
+	var domain = $("#add_email_domain").find(":selected").text() || $("#add_email_domain").val();
 	var password = $("#add_email_password1").val();
 	var quota = 250;
 
