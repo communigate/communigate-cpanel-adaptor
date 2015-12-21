@@ -34,15 +34,19 @@ app_key = 'cgpro_accounts'
         <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
           <div class="input-group">
             <input type="text" id="add_email_account" class="form-control" />
-            <span class="input-group-addon">@</span>
+            <span class="input-group-addon">@[% IF domains.size == 1 %][% domains.0.domain %][% END %]</span>
           </div>
         </div>
 	<div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
           <div id="add_email_account_error"></div>
         </div>
       </div>
+      [% IF domains.size == 1 %]
+      <input id="add_email_domain" type="hidden" value="[% domains.0.domain %]" />
+      [% END %]
     </div>
 
+    [% IF domains.size > 1 %]
     <div class="form-group">
       <label for="add_email_domain">Domain</label>
       <div class="row">
@@ -57,6 +61,7 @@ app_key = 'cgpro_accounts'
         </div>
       </div>
     </div>
+    [% END %]
 
     <div class="form-group">
       <label for="add_email_password1">Password</label>
