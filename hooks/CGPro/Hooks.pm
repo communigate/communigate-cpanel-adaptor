@@ -170,7 +170,9 @@ sub passwdpop {
     my $domain = $args->{'domain'};
     my $user= $args->{'email'};
     my $pass= $args->{'password'};
-    do_passwdpop($user, $domain, $pass, $args->{'quota'}, $args->{'reset'});
+    if ( $params->{"output"}->[0]->{"result"} ) {
+        do_passwdpop($user, $domain, $pass, $args->{'quota'}, $args->{'reset'});
+    }
 }
 
 sub passwdpop1 {
