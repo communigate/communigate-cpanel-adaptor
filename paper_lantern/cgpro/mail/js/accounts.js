@@ -517,7 +517,7 @@ var change_password = function(account_id) {
 	    if (data.cpanelresult.data[0].result == "1") {
 		$("#status_bar_" + account_id).removeClass("status_bar_error").addClass("status_bar_success").html("<span class='glyphicon glyphicon-ok'></span> Password changed successfully!").show();
 	    } else {
-		$("#status_bar_" + account_id).removeClass("status_bar_success").addClass("status_bar_error").html("<span class='glyphicon glyphicon-remove'></span> Error changing password! Error:" + + data.cpanelresult.data[0].reason).show();
+		$("#status_bar_" + account_id).removeClass("status_bar_success").addClass("status_bar_error").html("<span class='glyphicon glyphicon-remove'></span> Error changing password! Error: " + data.cpanelresult.data[0].reason).show();
 	    }
 	};
 
