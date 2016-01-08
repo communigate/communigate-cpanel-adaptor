@@ -113,9 +113,18 @@
   <tbody>
     <% for (var i = 0; i < accounts.length; i++) { %>
        <% if (!accounts[i].in_search) { continue; } %>
+       <% if (accounts[i].error) { %>
        <tr class="account-row">
-      <td class="avatar_td" title="Change avatar">
-	<% if (accounts[i].vcard
+	 <td colspan="5">
+	   <strong><%= accounts[i].username + "@" + accounts[i].domain %></strong>
+	   Error getting account information!
+	 </td>
+       </tr>
+       <tr></tr>
+       <% } else { %>
+       <tr class="account-row">
+	 <td class="avatar_td" title="Change avatar">
+	   <% if (accounts[i].vcard
 	   && accounts[i].vcard.fileData
 	   && accounts[i].vcard.fileData[0]
 	   && accounts[i].vcard.fileData[0].vCard
@@ -214,6 +223,7 @@
     	<div><span>No accounts!</span></div>
       </td>
     </tr>
+    <% } %>
     <% } %>
   </tbody>
 </table>

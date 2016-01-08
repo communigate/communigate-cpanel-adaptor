@@ -147,54 +147,95 @@ sub api2_AccountsOverview {
 	my $freeExtensions = {};
 	my $ximss = getXIMSS($cli->{loginData}->[2] . '@' . $cli->MainDomainName(), $cli->{loginData}->[3]);
 	
-	
 	foreach my $domain (@domains) {
 	    my $accounts=$cli->ListAccounts($domain);
 	    foreach my $userName (sort keys %$accounts) {
 		next if $userName eq 'pbx' || $userName eq 'ivr';
 		my $accountData = $cli->GetAccountEffectiveSettings("$userName\@$domain");
+		my $error_msg_acc_data = $cli->getErrMessage();
 		my $accInfo = $cli->GetAccountInfo("$userName\@$domain");
+		my $error_msg_acc_info = $cli->getErrMessage();
 		my $accountStats = $cli->GetAccountStat("$userName\@$domain");
+		my $error_msg_acc_stats = $cli->getErrMessage();
 		my $service = @$accountData{'ServiceClass'} || '';
 		my $accountPrefs = $cli->GetAccountEffectivePrefs("$userName\@$domain");
+		my $error_msg_acc_prefs = $cli->getErrMessage();
 		my $diskquota = @$accountData{'MaxAccountSize'} || '';
-		$diskquota =~ s/M//g;
-		my $_diskused = $accInfo->{'StorageUsed'};
-		$_diskused =~ s/\D+//g;
-		my $diskused = $_diskused / 1024 /1024;
-		my $diskusedpercent;
-		if ($diskquota eq "unlimited") {
-		    $diskusedpercent = 0;
+
+		use Data::Dumper;
+		if ( !($error_msg_acc_data eq "OK") ) {
+		    $return_accounts->{$userName . "@" . $domain} = {
+		    	error => $error_msg_acc_data,
+		    	domain => $domain,
+		    	username => $userName,
+			prefs => { AccountName => $userName . "@" . $domain }
+		    };
+		    $Cpanel::CPERROR{'CommuniGate'} = $error_msg_acc_data;
+		    warn Dumper $error_msg_acc_data;
+		} elsif ( !($error_msg_acc_info eq "OK") ) {
+		    $return_accounts->{$userName . "@" . $domain} = {
+		    	error => $error_msg_acc_info,
+		    	domain => $domain,
+		    	username => $userName,
+			prefs => { AccountName => $userName . "@" . $domain }
+		    };
+		    $Cpanel::CPERROR{'CommuniGate'} = $error_msg_acc_info;
+		    warn Dumper $error_msg_acc_info;
+		} elsif ( !($error_msg_acc_stats eq "OK") ) {
+		    $return_accounts->{$userName . "@" . $domain} = {
+		    	error => $error_msg_acc_stats,
+		    	domain => $domain,
+		    	username => $userName,
+			prefs => { AccountName => $userName . "@" . $domain }
+		    };
+		    $Cpanel::CPERROR{'CommuniGate'} = $error_msg_acc_stats;
+		    warn Dumper $error_msg_acc_stats;
+		} elsif ( !($error_msg_acc_prefs eq "OK") ) {
+		    $return_accounts->{$userName . "@" . $domain} = {
+		    	error => $error_msg_acc_prefs,
+		    	domain => $domain,
+		    	username => $userName,
+			prefs => { AccountName => $userName . "@" . $domain }
+		    };
+		    $Cpanel::CPERROR{'CommuniGate'} = $error_msg_acc_prefs;
+		    warn Dumper $error_msg_acc_prefs;
 		} else {
-		  if ($diskquota) {
-		    $diskusedpercent = $diskused / $diskquota * 100;
-		  } else {
-		    $diskusedpercent = 100;
-		  }
-		}
-		$return_accounts->{$userName . "@" . $domain} = {
-		    domain => $domain,
-		    username => $userName,
-		    class => $service,
-		    quota => $diskquota,
-		    used => $diskused,
-		    data => $accountData,
-		    prefs => $accountPrefs,
-		    usedpercent => $diskusedpercent,
-		    stats => $accountStats,
-		    md5 => md5_hex(lc $userName . "@" . $domain),
-		};
-		# Fetch vCard
-
-		my $time = time();
-		$return_accounts->{$userName . "@" . $domain}->{"vcard"} = $ximss->send({
-		    fileRead => {
-			id => "$time-vcard",
-			type => "vcard",
-			filename => "~$userName\@$domain/profile.vcf"
+		    $diskquota =~ s/M//g;
+		    my $_diskused = $accInfo->{'StorageUsed'};
+		    $_diskused =~ s/\D+//g;
+		    my $diskused = $_diskused / 1024 /1024;
+		    my $diskusedpercent;
+		    if ($diskquota eq "unlimited") {
+			$diskusedpercent = 0;
+		    } else {
+			if ($diskquota) {
+			    $diskusedpercent = $diskused / $diskquota * 100;
+			} else {
+			    $diskusedpercent = 100;
+			}
 		    }
-											}, {forceArray => 1});
-
+		    $return_accounts->{$userName . "@" . $domain} = {
+		    	domain => $domain,
+		    	username => $userName,
+		    	class => $service,
+		    	quota => $diskquota,
+		    	used => $diskused,
+		    	data => $accountData,
+		    	prefs => $accountPrefs,
+		    	usedpercent => $diskusedpercent,
+		    	stats => $accountStats,
+		    	md5 => md5_hex(lc $userName . "@" . $domain),
+		    };
+		    # Fetch vCard
+		    my $time = time();
+		    $return_accounts->{$userName . "@" . $domain}->{"vcard"} = $ximss->send({
+			fileRead => {
+			    id => "$time-vcard",
+			    type => "vcard",
+			    filename => "~$userName\@$domain/profile.vcf"
+			}
+											    }, {forceArray => 1});
+		}
 	    }
 	    $ximss->close();
 
