@@ -1,0 +1,47 @@
+<h2>Current groups</h2>
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th>Group Email Address</th>
+      <thcolspan="4">Functions</th>
+    </tr>
+  </thead>
+  <colgroup>
+    <col width="40%">
+    <col width="60%">
+  </colgroup>
+  <tbody>
+    <% if (!mail_groups.length) %>
+    <tr>
+      <td colspan="2">Currently there are no groups!</td>
+    </tr>
+    <% } %>
+    <% for (var group in mail_groups) { %>
+    <tr id="group_row_[% loop.count %]" class="group_row">
+      <td>
+	<%= group.list %>
+      </td>
+      <td>
+	<span class="btn btn-link" onclick="toggle_action_div(null, {id:'delete_module_[% loop.count %]', index: '[% loop.count %]', group: '[% group.list.html() %]', action:'delete'})">
+	  <span class="glyphicon glyphicon-trash"></span> Delete</span>
+	<span class="btn btn-link" onclick="toggle_action_div(null, {id:'rename_module_[% loop.count %]', index: '[% loop.count %]', group: '[% group.list.html() %]', action:'rename'})">
+	  <span class="glyphicon glyphicon-pencil"></span> Rename</span>
+	<span class="btn btn-link" onclick="toggle_action_div(null, {id:'settings_module_[% loop.count %]', index: '[% loop.count %]', group: '[% group.list.html() %]', action:'settings'})">
+	  <span class="glyphicon glyphicon-cog"></span> Settings</span>
+	<span class="btn btn-link" onclick="toggle_action_div(null, {id:'group_members_module_[% loop.count %]', index: '[% loop.count %]', group: '[% group.list.html() %]', action:'group_members'})">
+	  <span class="glyphicon glyphicon-user"></span> Group members</span>
+      </td>
+    </tr>
+    <tr id="module_row_[% loop.count %]" class="module_row">
+      <td colspan="2">
+	<div id="delete_module_[% loop.count %]" class="dt_module" style="display: none"></div>
+    	<div id="rename_module_[% loop.count %]" class="dt_module" style="display: none"></div>
+    	<div id="settings_module_[% loop.count %]" class="dt_module" style="display: none"></div>
+    	<div id="group_members_module_[% loop.count %]" class="dt_module" style="display: none"></div>
+	<div id="settings_status_[% loop.count %]"></div>
+	<div id="members_status_[% loop.count %]"></div>
+      </td>
+    </tr>
+    <% } %>
+  </tbody>
+</table>

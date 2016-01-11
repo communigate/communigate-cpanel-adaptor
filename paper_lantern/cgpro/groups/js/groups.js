@@ -1,11 +1,145 @@
 var OPEN_ACTION_DIV = 0;
 
-
 var Handlebars = window.Handlebars;
 var delete_template = Handlebars.compile(DOM.get("delete_template").text.trim());
 var rename_template = Handlebars.compile(DOM.get("rename_template").text.trim());
 var settings_template = Handlebars.compile(DOM.get("settings_template").text.trim());
 var group_members_template = Handlebars.compile(DOM.get("group_members_template").text.trim());
+
+
+
+var rename_confirm = function(o) {
+    var index = o.index;
+    var selector_rename_input = "#newname_" + index;
+    var newname = $(selector_rename_input).val();
+    var selector_name = "#group_row_" + index + " td:first";
+    // create the API variables
+    var api2_call = {
+        cpanel_jsonapi_version: 2,
+        cpanel_jsonapi_module: "CommuniGate",
+        cpanel_jsonapi_func: "RenameGroup",
+        email: $(selector_name).html().trim(),
+    	newname: newname
+    };
+
+    var reset_module = function() {
+        YAHOO.util.Dom.get("rename_status_" + index).innerHTML = '';
+        toggle_action_div(null, {
+            "id": "rename_module_" + index,
+            "index": index,
+            "action": "rename"
+        });
+    };
+
+    // callback functions
+    var success = function(o) {
+    	var data = $.parseJSON(o);
+    	data = data.cpanelresult.data;
+    	// update the table and display the status
+    	if (data[0] && data[0]['email'] == api2_call.email) {
+	    reset_module();
+	    var domain = api2_call.email.split("@")[1];
+	    $(selector_name).html(api2_call.newname + "@" + domain);
+    	} else {
+    	    $(selector_rename_loading).html("");
+    	    CPANEL.widgets.status_bar("status_bar_" + index, "error", CPANEL.lang.Error, "Unknown error.");
+    	}
+    };
+
+    // send the AJAX request
+    $.ajax({
+    	    type: "GET",
+    	    url: CPANEL.urls.json_api() + '&' + $.param(api2_call),
+    	    success: success,
+    	    dataType: "text"
+    		});
+
+    // show the ajax loading icon
+    var selector_rename_loading = "#rename_status_" + index;
+    $(selector_rename_loading).html(CPANEL.icons.ajax + " Renaming...");
+};
+
+var get_group_settings = function(obj) {
+    // create the API variables
+    var api2_call = {
+        cpanel_jsonapi_version: 2,
+        cpanel_jsonapi_module: "CommuniGate",
+        cpanel_jsonapi_func: "GetGroupSettings",
+        email: obj.group
+    };
+    var el = YAHOO.util.Dom.get(obj.id);
+    var html = '';
+    // callback functions
+    var success = function(o) {
+    	var data = $.parseJSON(o);
+    	data = data.cpanelresult.data;
+    	// update the table and display the status
+    	if (data[0]) {
+	    data = data[0];
+	    html += settings_template({
+		    index: obj.index,
+			Expand: (data.Expand == 'YES') ? 'checked' : '', 
+			RealName: (data.RealName) ? data.RealName : '',
+			RejectAutomatic: (data.RejectAutomatic == 'YES') ? 'checked' : '',
+			RemoveAuthor: (data.RemoveAuthor == 'YES') ? 'checked' : '',
+			RemoveToAndCc: (data.RemoveToAndCc == 'YES') ? 'checked' : '',
+			SetReplyTo: (data.SetReplyTo == 'YES') ? 'checked' : '',
+			SignalDisabled: (data.SignalDisabled == 'NO') ? 'checked' : '',
+			FinalDelivery: (data.FinalDelivery == 'YES') ? 'checked' : '',
+			});
+	    el.innerHTML = html;
+	    var selector_settings_status = "#settings_status_" + obj.index;
+	    $(selector_settings_status).html("");
+	    $(selector_settings_status).css("padding", "0px");
+	    var selector_settings_btn = "#settings_" + obj.index;
+	    $(selector_settings_btn).click(function() {set_group_settings(obj);});
+    	} else {
+    	    // $(selector_rename_loading).html("");
+    	    CPANEL.widgets.status_bar("status_bar_" + index, "error", CPANEL.lang.Error, "Unknown error.");
+    	}
+    };
+
+    // send the AJAX request
+    $.ajax({
+    	    type: "GET",
+    	    url: CPANEL.urls.json_api() + '&' + $.param(api2_call),
+    	    success: success,
+    	    dataType: "text"
+    		});
+};
+
+function loadGroups(domain) {
+    var api2_call = {
+        cpanel_jsonapi_version: 2,
+        cpanel_jsonapi_module: "CommuniGate",
+        cpanel_jsonapi_func: "ListGroups",
+	domain: domain
+    };
+    var success = function(o) {
+    	var data = $.parseJSON(o);
+    	data = data.cpanelresult.data;
+	$("#settings_status_" + obj.index).html("");
+	if (data[0] == "OK") {
+	    $("#scc_msg_wrap").show();
+	    $("#scc_msg").html("Settings were successfully saved.");
+	} else {
+	    $("#err_msg_wrap").show();
+	    $("#err_msg").html(data[0]);
+	}
+    };
+    $.ajax({
+    	    type: "GET",
+    	    url: CPANEL.urls.json_api() + '&' + $.param(api2_call),
+    	    success: success,
+    	    dataType: "text"
+    		});
+
+    $("#settings_status_" + obj.index).html(CPANEL.icons.ajax + " Loading...");
+};
+
+
+
+
 
 var toggle_action_div = function(e, o) {
     // if a div, that is not o, is already open, close it

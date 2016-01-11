@@ -1,0 +1,63 @@
+<div class="form-group">
+  <label for="realname">Group Name</label>
+  <div class="row">
+    <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+      <input type="text" id="RealName" class="form-control col-xs-2" value="<%= data.realName %>"/>
+    </div>
+    <div id="realName_error" class="col-xs-12 col-sm-6 col-md-6 col-lg-6"></div>	  
+  </div>
+</div>
+
+<div class="form-group">
+  <div class="checkbox">
+    <input type="checkbox" name="RemoveToAndCc"  id="RemoveToAndCc" value="1" <%= RemoveToAndCc %>>
+    <label for="RemoveToAndCc">Remove To and Cc from Distribution</label>
+  </div>
+</div>
+
+<div class="form-group">
+  <div class="checkbox">
+    <input type="checkbox" name="Expand" id="Expand" value="1" <%= Expand %> >
+    <label for="Expand">Expand Group Members</label>
+  </div>
+</div>
+
+<div class="form-group">
+  <div class="checkbox">
+    <input type="checkbox" name="FinalDelivery" id="FinalDelivery" value="1" <%= FinalDelivery %> >
+    <label for="FinalDelivery">Report Delivery to Group</label>
+  </div>
+</div>
+
+<div class="form-group">
+  <div class="checkbox">
+    <input type="checkbox" name="RejectAutomatic" id="RejectAutomatic" value="1" <%= RejectAutomatic %> >
+    <label for="RejectAutomatic">Reject Automatic Messages</label>
+  </div>
+</div>
+
+<div class="form-group">
+  <div class="checkbox">
+    <input type="checkbox" name="RemoveAuthor" id="RemoveAuthor" value="1" <%= RemoveAuthor %> >
+    <label for="RemoveAuthor">Remove Author from Distribution</label>
+  </div>
+</div>
+
+<div class="form-group">
+  <div class="checkbox">
+    <input type="checkbox" name="SetReplyTo" id="SetReplyTo" value="1" <%= SetReplyTo %> >
+    <label for="SetReplyTo">Set Reply-To Group</label>
+  </div>
+</div>
+
+<div class="form-group">
+  <div class="checkbox">
+    <input type="checkbox" name="SignalDisabled" id="SignalDisabled" value="1" <%= SignalDisabled %> >
+    <label for="SignalDisabled">Signalling Enabled</label>
+  </div>
+</div>
+
+<div class="form-group">
+  <button id="settings_<%= index %>" class="btn btn-primary">Save</button>
+  <button class="btn btn-link" id="btn_cancel_<%= index %>">Cancel</button>
+</div>

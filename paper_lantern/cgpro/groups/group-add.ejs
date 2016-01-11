@@ -1,0 +1,40 @@
+<h2>Create Group</h2>
+<div class="form-group">
+  <label for="realname">Group Name</label>
+  <div class="row">
+    <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+      <input type="text" id="realname" class="form-control col-xs-2"/>
+    </div>
+    <div id="realname_error" class="col-xs-12 col-sm-6 col-md-6 col-lg-6"></div>	  
+  </div>
+</div>
+
+<div class="form-group">
+  <label for="email">Group Email Address: </label>
+  <div class="row">
+    <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+      <div class="input-group">
+	<input type="text" id="email" class="form-control col-xs-2" />
+	<span class="input-group-addon">@</span>
+      </div>
+    </div>
+    <div id="email_error" class="col-xs-12 col-sm-6 col-md-6 col-lg-6"></div>	  
+  </div>
+</div>
+
+<div class="form-group">
+  <label for="domain">Domain</label>
+  <div class="row">
+    <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+      <select name="domain" id="domain" class="form-control">
+	<% for (var domain in mail_domains.data) { %>
+        <option value="<%= domain %>"><%= domain %></option>
+	<% } %>
+      </select>
+    </div>
+  </div>
+</div>
+
+<div class="form-group">
+  <button id="save-btn" class="btn btn-primary">Save</button>
+</div>
