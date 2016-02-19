@@ -1193,23 +1193,25 @@ sub api2_delforward {
 	# IF forwarding existing account
 	if ($account) {
 	  my $Rules = $cli->GetAccountMailRules("$user") || die "Error: ".$cli->getErrMessage.", quitting";
-	  foreach my $Rule (@$Rules) {
-	    if ($Rule->[1] eq "#Redirect") {
-	      my @dest = split(",",$Rule->[3]->[0]->[1]);
-	      $Rule->[3]->[0]->[1] ="";
-	      my $found=0;
-	      foreach my $value (@dest) {
-		if ((!($value eq $fwdemail)) || $found) {
-		  if ($Rule->[3]->[0]->[1]) {
-		    $Rule->[3]->[0]->[1]  .=	",".$value;
-		  } else {
-		    $Rule->[3]->[0]->[1]  =     $value;
+	  if (ref($Rules) eq "ARRAY") {
+	      foreach my $Rule (@$Rules) {
+		  if (ref($Rule) eq "ARRAY" && $Rule->[1] eq "#Redirect") {
+		      my @dest = split(",",$Rule->[3]->[0]->[1]);
+		      $Rule->[3]->[0]->[1] ="";
+		      my $found=0;
+		      foreach my $value (@dest) {
+			  if ((!($value eq $fwdemail)) || $found) {
+			      if ($Rule->[3]->[0]->[1]) {
+				  $Rule->[3]->[0]->[1]  .=	",".$value;
+			      } else {
+				  $Rule->[3]->[0]->[1]  =     $value;
+			      }
+			  } else {
+			      $found = 1;
+			  }
+		      }
 		  }
-		} else {
-		  $found = 1;
-		}
 	      }
-	    }
 	  }
 	  $cli->SetAccountMailRules("$user",$Rules);
 	  my $error_msg = $cli->getErrMessage();
