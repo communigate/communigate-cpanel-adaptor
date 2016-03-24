@@ -1,0 +1,36 @@
+[%
+USE Api2;
+
+SET CPANEL.CPVAR.dprefix = "../../";
+%]
+
+[%
+SET upload_file = Api2.exec("CommuniGate", "UploadFile");
+
+SET import_contacts = Api2.exec("CommuniGate", "ImportContacts", {
+"box" => RAW_FORM.item("box"),
+"account" => RAW_FORM.item("account"),
+"header" => RAW_FORM.item("header")
+});
+
+SET return_link = "./contacts.html?account=" _ RAW_FORM.item("account");
+%]
+
+[% WRAPPER '_assets/master.html.tt'
+    app_key = 'cgpro_contacts'
+-%]
+
+<div class="body-content">
+  <div class="section">
+    <div class="alert alert-success">
+      <span class="glyphicon glyphicon-ok-sign"></span>
+      <div class="alert-message">
+	Contacts imported!
+      </div>
+    </div>
+    [% INCLUDE _assets/return_link.html.tt return_location=return_link return_link_text=locale.maketext('Go Back') %]
+  </div>
+</div>
+[% END %]
+
+

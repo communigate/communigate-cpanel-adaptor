@@ -10,34 +10,241 @@ END;
     app_key = 'cgpro_contacts'
  -%]
 <div class="body-content">
-    <div class="section">
-      <h2>Import contacts</h2>
+  <div class="section">
+    <h2>Import contacts</h2>
+  </div>
+  <form action="doimportcontacts.html.tt" method="post" enctype="multipart/form-data">
+    <div class="form-group">
+      <label for="file">
+	[% locale.maketext("VCF or CSV file.") %]
+      </label>
+      <div class="row">
+        <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	  <input type="file" name="file" id="file" class="" value="" />
+	</div>
+      </div>
     </div>
-    <form action="contactsimport.live.cgi" method="post" enctype="multipart/form-data">
-            <div class="form-group">
-              <label for="file">
-		[% locale.maketext("VCF or CSV file.") %]
-              </label>
-              <div class="row">
-                <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
-		  <input type="file" name="file" id="file" class="" value="" />
-		</div>
-	      </div>
-	    </div>
-            <div class="form-group">
-              <label for="headers">
-		<input type="checkbox" name="header" id="headers" />
-		[% locale.maketext("Header row in .csv file") %]
-              </label>
-	    </div>
-	    <div class="form-group">
-	      <input type="hidden" name="account" value="[% FORM.item("account") %]"  />
-	      <input type="hidden" name="box" value="[% FORM.item("box") %]"  />
-	      <input class="btn btn-primary" type="submit" id="submit" name="save" value="[% locale.maketext("Import contacts") %]" />
-	    </div>
-	</form>
-	[% INCLUDE _assets/return_link.html.tt return_location='contacts.html?account=' _ FORM.account return_link_text=locale.maketext('Go Back') %]
-
+    <div class="form-group">
+      <label for="headers">
+	<input type="checkbox" name="header" id="headers" />
+	[% locale.maketext("Header row in .csv file") %]
+      </label>
+    </div>
+    <div class="form-group">
+      <input type="hidden" name="account" value="[% FORM.item("account") %]"  />
+      <input type="hidden" name="box" value="[% FORM.item("box") %]"  />
+      <input class="btn btn-primary" type="submit" id="submit" name="save" value="[% locale.maketext("Import contacts") %]" />
+    </div>
+  </form>
+  <div>
+    <a class="btn btn-default" href="Contacts_blank.csv">Download a blank .CSV</a>
+    <table class="sortable truncate-table table table-striped responsive-table">
+        <colgroup>
+          <col width="40%" />
+          <col width="40%" />
+          <col width="20%" />
+        </colgroup>
+      <tr>
+	<th>
+	  Field Number
+	</th>
+	<th>
+	  Content
+	</th>
+	<th>
+	  Note
+	</th>
+      </tr>
+      <tr>
+	<td>1</td>
+	<td>FIRST NAME</td>
+	<td></td>
+      </tr>
+      <tr>
+	<td>2</td>
+	<td>MIDDLE NAME</td>
+	<td></td>
+      </tr>
+      <tr>
+	<td>3</td>
+	<td>FAMILY NAME</td>
+	<td></td>
+      </tr>
+      <tr>
+	<td>4</td>
+	<td>NICKNAME</td>
+	<td></td>
+      </tr>
+      <tr>
+	<td>5</td>
+	<td>HOME E-MAIL</td>
+	<td rowspan="9">Separate with "," if you need more than one value.</td>
+      </tr>
+      <tr>
+	<td>6</td>
+	<td>WORK E-MAIL</td>
+      </tr>
+      <tr>
+	<td>7</td>
+	<td>OTHER E-MAIL</td>
+      </tr>
+      <tr>
+	<td>8</td>
+	<td>HOME PHONE</td>
+      </tr>
+      <tr>
+	<td>9</td>
+	<td>WORK PHONE</td>
+      </tr>
+      <tr>
+	<td>10</td>
+	<td>CELL PHONE</td>
+      </tr>
+      <tr>
+	<td>11</td>
+	<td>FAX</td>
+      </tr>
+      <tr>
+	<td>12</td>
+	<td>VIDEO PHONE</td>
+      </tr>
+      <tr>
+	<td>13</td>
+	<td>OTHER PHONE</td>
+      </tr>
+      <tr>
+	<td>14</td>
+	<td>HOME POBOX</td>
+	<td rowspan="6">Home Address fields.</td>
+      </tr>
+      <tr>
+	<td>15</td>
+	<td>HOME COUNTRY</td>
+      </tr>
+      <tr>
+	<td>16</td>
+	<td>HOME ADDRESS</td>
+      </tr>
+      <tr>
+	<td>17</td>
+	<td>HOME CITY</td>
+      </tr>
+      <tr>
+	<td>18</td>
+	<td>HOME STATE</td>
+      </tr>
+      <tr>
+	<td>19</td>
+	<td>HOME ZIPCODE</td>
+      </tr>
+      <tr>
+	<td>20</td>
+	<td>WORK POBOX</td>
+	<td rowspan="6">Work Address fields.</td>
+      </tr>
+      <tr>
+	<td>21</td>
+	<td>WORK COUNTRY</td>
+      </tr>
+      <tr>
+	<td>22</td>
+	<td>WORK ADDRESS</td>
+      </tr>
+      <tr>
+	<td>23</td>
+	<td>WORK CITY</td>
+      </tr>
+      <tr>
+	<td>24</td>
+	<td>WORK STATE</td>
+      </tr>
+      <tr>
+	<td>25</td>
+	<td>WORK ZIPCODE</td>
+      </tr>
+      <tr>
+	<td>26</td>
+	<td>OTHER POBOX</td>
+	<td rowspan="6">Other Address fields.</td>
+      </tr>
+      <tr>
+	<td>27</td>
+	<td>OTHER COUNTRY</td>
+      </tr>
+      <tr>
+	<td>28</td>
+	<td>OTHER ADDRESS</td>
+      </tr>
+      <tr>
+	<td>29</td>
+	<td>OTHER CITY</td>
+      </tr>
+      <tr>
+	<td>30</td>
+	<td>OTHER STATE</td>
+      </tr>
+      <tr>
+	<td>31</td>
+	<td>OTHER ZIPCODE</td>
+      </tr>
+      <tr>
+	<td>32</td>
+	<td>COMPANY</td>
+	<td></td>
+      </tr>
+      <tr>
+	<td>33</td>
+	<td>DEPARTMENT</td>
+	<td></td>
+      </tr>
+      <tr>
+	<td>34</td>
+	<td>JOB TITLE</td>
+	<td></td>
+      </tr>
+      <tr>
+	<td>35</td>
+	<td>BIRTHDAY</td>
+	<td>Format: yyyy-mm-dd</td>
+      </tr>
+      <tr>
+	<td>36</td>
+	<td>HOME WEBSITE</td>
+	<td></td>
+      </tr>
+      <tr>
+	<td>37</td>
+	<td>WORK WEBSITE</td>
+	<td></td>
+      </tr>
+      <tr>
+	<td>38</td>
+	<td>OTHER WEBSITE</td>
+	<td></td>
+      </tr>
+      <tr>
+	<td>39</td>
+	<td>BUSINESS CATEGORY</td>
+	<td></td>
+      </tr>
+      <tr>
+	<td>40</td>
+	<td>TIME ZONE</td>
+	<td></td>
+      </tr>
+      <tr>
+	<td>41</td>
+	<td>GEOGRAPHIC POSITION</td>
+	<td>Format: +00,0000000;-00,0000000</td>
+      </tr>
+      <tr>
+	<td>42</td>
+	<td>NOTE</td>
+	<td></td>
+      </tr>
+    </table>
+  </div>  
+  [% INCLUDE _assets/return_link.html.tt return_location='contacts.html?account=' _ FORM.account return_link_text=locale.maketext('Go Back') %]
 </div>
 [% END %]
 

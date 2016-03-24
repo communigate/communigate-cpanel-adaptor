@@ -3760,13 +3760,16 @@ sub api2_ImportContacts {
     my (undef,$domain) = split "@", $account;
     my $cli = getCLI();
     my $result;
-    
+
+    my $filename = $Cpanel::CPVAR{"filename"};
+    my $filepath = $Cpanel::CPVAR{"filepath"};
+
     foreach my $dom (@domains) {
 	if ($dom eq $domain) {
-	    if ($Cpanel::CPVAR{"filepath"} && $Cpanel::CPVAR{"filename"} =~ m/\.vcf/i && $OPTS{'box'}) {
+	    if ($filepath && $filename =~ m/\.vcf/i && $OPTS{'box'}) {
 		my $buffer;
 		my $filedata;
-		open(FI, "<", $Cpanel::CPVAR{"filepath"});
+		open(FI, "<", $filepath);
 		binmode FI;
 		while ( read( FI, $buffer, 16 ) ) {
 		    $filedata .= $buffer;
@@ -3893,8 +3896,8 @@ sub api2_ImportContacts {
 			$ximss->close();
 		    }
 		}
-	    } elsif ($Cpanel::CPVAR{"filepath"} && $Cpanel::CPVAR{"filename"} =~ m/\.csv/i && $OPTS{'box'}) {
-		my $file = $Cpanel::CPVAR{"filepath"};
+	    } elsif ($filepath && $filename =~ m/\.csv/i && $OPTS{'box'}) {
+		my $file = $filepath;
                 system '/usr/local/cpanel/bin/csvprocess', $file, ( $OPTS{'header'} ? 1 : 0 ), ',';
 		my $importdata = Storable::lock_retrieve( $file  . '.parsed' );
 
