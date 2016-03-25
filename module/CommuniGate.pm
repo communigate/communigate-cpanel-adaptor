@@ -4033,8 +4033,8 @@ sub api2_ImportContacts {
 		    	$ximss->close();
 		    }
 		}
-		# unlink $file;
-		# unlink $file . '.parsed';
+		unlink $file;
+		unlink $file . '.parsed';
 	     } else {
 		 $Cpanel::CPERROR{'CommuniGate'} = "Error!";
 	     }
