@@ -24,6 +24,7 @@ use Cpanel::CPAN::MIME::Base64::Perl qw(decode_base64 encode_base64);
 use Cpanel::Version;
 use URI::Escape;
 use JSON;
+use Text::ParseWords;
 
 require Exporter;
 @ISA    = qw(Exporter);
@@ -3752,6 +3753,7 @@ sub api2_exportContacts {
     return $return;
 }
 
+
 sub api2_ImportContacts {
     my %OPTS = @_;
     my @domains = Cpanel::Email::listmaildomains();
@@ -3760,21 +3762,22 @@ sub api2_ImportContacts {
     my (undef,$domain) = split "@", $account;
     my $cli = getCLI();
     my $result;
-
+    
     my $filename = $Cpanel::CPVAR{"filename"};
     my $filepath = $Cpanel::CPVAR{"filepath"};
-
+    
     foreach my $dom (@domains) {
 	if ($dom eq $domain) {
-	    if ($filepath && $filename =~ m/\.vcf/i && $OPTS{'box'}) {
+	    if ($filepath && $filename =~ m/\.vcf/i && $OPTS{'box'}) {	           	
 		my $buffer;
 		my $filedata;
+
 		open(FI, "<", $filepath);
-		binmode FI;
-		while ( read( FI, $buffer, 16 ) ) {
-		    $filedata .= $buffer;
+		while ( readline( FI ) ) {
+		    $filedata .= $_;
 		}
 		close FI;
+
 		my @file_array = split /\n/, $filedata;
 		my $data = [];
 		my $contact = [];
@@ -3898,8 +3901,36 @@ sub api2_ImportContacts {
 		}
 	    } elsif ($filepath && $filename =~ m/\.csv/i && $OPTS{'box'}) {
 		my $file = $filepath;
-                system '/usr/local/cpanel/bin/csvprocess', $file, ( $OPTS{'header'} ? 1 : 0 ), ',';
-		my $importdata = Storable::lock_retrieve( $file  . '.parsed' );
+
+		my $line = 0;
+		my $dataref = { 'data' => [], 'header' => [] };
+		if ( open my $csv_fh, '<', $file ) {
+		    while ( readline($csv_fh) ) {
+			my @columns = Text::ParseWords::parse_line(',', 0, $_);
+			next if isblank( \@columns );
+			$line++;
+			if ( $line == 1 && $OPTS{'header'} ) {
+			    $dataref->{'header'} = \@columns;
+			}
+			else {
+			    push @{ $dataref->{'data'} }, \@columns;
+			}
+			$dataref->{'columns'} = ( $dataref->{'columns'} > scalar @columns ? $dataref->{'columns'} : scalar @columns );
+		    }
+		    close $csv_fh;
+		}
+
+		sub isblank {
+		    my $colref = shift;
+		    return 1 if !ref $colref;
+
+		    foreach my $val ( @{$colref} ) {
+			return 0 if $val;
+		    }
+		    return 1;
+		}
+
+		my $importdata = $dataref;
 
                 for my $row (@{$importdata->{data}}) {
 		    my $message = {};
@@ -4002,16 +4033,17 @@ sub api2_ImportContacts {
 		    	$ximss->close();
 		    }
 		}
-		unlink $file;
-		unlink $file . '.parsed';
+		# unlink $file;
+		# unlink $file . '.parsed';
 	     } else {
-		$Cpanel::CPERROR{'CommuniGate'} = "Error!";
-	    }
+		 $Cpanel::CPERROR{'CommuniGate'} = "Error!";
+	     }
 	    last;
 	}
     }
     $cli->Logout();
-    return $result;
+    
+    return;
 }
 
 sub api2_ListXmppHistory {
