@@ -111,20 +111,26 @@
 </table>
 <script type="text/javascript">
     window.onload = function() { checkaddrembuttons('rule'); };
+document.addEventListener("DOMContentLoaded", function() {
+	require(["frameworksBuild"], function() {
+		require(["jquery"], function($) {
     
-    $("#filterform").submit(function( event ) {
-    var is_filled = 0;
+			$("#filterform").submit(function( event ) {
+				var is_filled = 0;
     
-    $(".rule_field").each( function(){
-      if ( $(this).val() == "" ) {
-        is_filled += 1;
-      }
-    });
+				$(".rule_field").each( function(){
+					if ( $(this).val() == "" ) {
+					    is_filled += 1;
+					}
+				    });
     
-    if ( xis_filled != 0 ) {
-    alert( "Please fill rule fields!" );
-    event.preventDefault();
-    }
+				if ( xis_filled != 0 ) {
+				    alert( "Please fill rule fields!" );
+				    event.preventDefault();
+				}
+			    });
+		    });
+	    });
     });
 </script>
 <br />

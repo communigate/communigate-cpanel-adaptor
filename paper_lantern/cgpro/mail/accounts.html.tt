@@ -10,8 +10,8 @@ SET required_strength = Api2.exec("PasswdStrength", "get_required_strength", {"a
 %]
 
 [% WRAPPER '_assets/master.html.tt'
-page_scripts = ['cgpro/mail/js/SimpleCropper/scripts/jquery.Jcrop.js', 'cgpro/mail/js/SimpleCropper/scripts/jquery.SimpleCropper.js', 'cgpro/mail/js/accounts.js'],
-app_key = 'cgpro_accounts'
+app_key = 'cgpro_accounts',
+page_scripts = ['cgpro/mail/js/ejs_production.js', 'cgpro/mail/js/SimpleCropper/scripts/jquery.Jcrop.js', 'cgpro/mail/js/SimpleCropper/scripts/jquery.SimpleCropper.js', 'cgpro/mail/js/accounts.js']
 -%]
 
 <!-- SimpleCropper files -->
@@ -19,11 +19,6 @@ app_key = 'cgpro_accounts'
 <link rel="stylesheet" type="text/css" href="js/SimpleCropper/css/style-example.css" />
 <link rel="stylesheet" type="text/css" href="js/SimpleCropper/css/jquery.Jcrop.css" />
 <link rel="stylesheet" type="text/css" href="accounts.css" /> 
-<script src="js/ejs_production.js"></script>
-<script>
-    $jq = $.noConflict();  
-</script>
-
 <div>
   <!-- Create Account form -->
   <div class="add_account_wrap">
@@ -117,7 +112,7 @@ app_key = 'cgpro_accounts'
         <input id="search_input" type="text" class="form-control" />
       </div>
       <div class="col-xs-4 col-sm-3 col-md-3 col-lg-3">
-        <input id="clear_search" type="button" class="btn btn-primary" value="Clear" style="margin-top: 23px;" onclick="clear_search()" />
+        <input id="clear_search" type="button" class="btn btn-primary" value="Clear" style="margin-top: 23px;" />
       </div>
     </div>
     <div id="load_accounts_status_bar" class="status_bar"></div>

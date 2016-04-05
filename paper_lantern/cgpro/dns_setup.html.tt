@@ -272,155 +272,163 @@ listmxs = api2_result_Email_listmxs.0.entries;
     </div>
 </div>
 <script>
-  $('input:radio[name="mx_record"]').change(
-  function(){
-  if ($(this).is(':checked') && $(this).val() == 'custom') {
-  $("#custom_input").show();
-  } else {
-  $("#custom_input").hide();
-  }
-  });
+      document.addEventListener("DOMContentLoaded", function() {
+	      require(["frameworksBuild"], function() {
+		      require(["jquery"], function($) {
 
-  $("#clear_mx_records").click(function() {
-  delete_all_records();
-  });
-  $("#submit_mx_record").click(function() {
-  var caller = $('input[name=mx_record]:checked').val();
-  if (caller == "custom") {
-  add_custom_record();
-  } else {
-  delete_all_records(caller);
-  }
-  });
+			      $('input:radio[name="mx_record"]').change(
+									function(){
+									    if ($(this).is(':checked') && $(this).val() == 'custom') {
+										$("#custom_input").show();
+									    } else {
+										$("#custom_input").hide();
+									    }
+									});
 
-  function add_custom_record(){
-  var exchanger = $("#destination").val();
-  var preference = $("#priority").val();
-  var api2_call = {
-  "cpanel_jsonapi_version": 2,
-  "cpanel_jsonapi_module": "Email",
-  "cpanel_jsonapi_func": "addmx",
-  "domain": YAHOO.util.Dom.get("domain").value,
-  "exchanger": exchanger,
-  "preference": preference
-  };
-  $.ajax({
-  type: "GET",
-  url: CPANEL.urls.json_api() + '&' + $.param(api2_call),
-  data: api2_call,
-  success: function(){
-  $("#clear_loading").html("").css("padding","0");
-  update_mx_records_table();
-  }
-  });
-  $("#clear_loading").html(CPANEL.icons.ajax + " Please wait...").css("padding","20px");
-  }
+			      $("#clear_mx_records").click(function() {
+				      delete_all_records();
+				  });
+			      $("#submit_mx_record").click(function() {
+				      var caller = $('input[name=mx_record]:checked').val();
+				      if (caller == "custom") {
+					  add_custom_record();
+				      } else {
+					  delete_all_records(caller);
+				      }
+				  });
 
-  var add_mx_record_predef = function(caller) {
-  var do_add_mx_record_predefined = function(data) {
-  var data_arr = data.split(",");
-  var data_arr_couples = [];
-  for (i = 0, j=0; j < data_arr.length; i++,j+=2) {
-		       data_arr_couples[i] = data_arr[j] + "," + data_arr[j+1];
-		       }
-		       var i = 0;
-		       function sendAjax(){
-		       YAHOO.util.Dom.get("clear_loading").innerHTML = CPANEL.icons.ajax + " Please wait...";
-		       var couple = data_arr_couples[i].split(",");
-		       exchanger_couple = couple[0];
-		       preference_couple = couple[1];
-		       var api2_call = {
-		       "cpanel_jsonapi_version": 2,
-		       "cpanel_jsonapi_module": "Email",
-		       "cpanel_jsonapi_func": "addmx",
-		       "domain": YAHOO.util.Dom.get("domain").value,
-		       "exchanger": exchanger_couple,
-		       "preference": preference_couple
-		       };
-		       $.ajax({
-		       type: "GET",
-		       url: CPANEL.urls.json_api() + '&' + $.param(api2_call),
-		       data: api2_call,
-		       success: function(){
-		       $("#clear_loading").html("").css("padding","0");
-		       i++;
-		       if (i >= data_arr_couples.length) update_mx_records_table();
-    if (i < data_arr_couples.length) sendAjax();
-	    }
-	    });
-	    }
-	    sendAjax();
-	    change_mxcheck_default("remote");
-	    }
-	    var data = $("#mx_data_" + caller).val();
-	    do_add_mx_record_predefined(data);
-	    };
+			      function add_custom_record(){
+				  var exchanger = $("#destination").val();
+				  var preference = $("#priority").val();
+				  var api2_call = {
+				      "cpanel_jsonapi_version": 2,
+				      "cpanel_jsonapi_module": "Email",
+				      "cpanel_jsonapi_func": "addmx",
+				      "domain": YAHOO.util.Dom.get("domain").value,
+				      "exchanger": exchanger,
+				      "preference": preference
+				  };
+				  $.ajax({
+					  type: "GET",
+					      url: CPANEL.urls.json_api() + '&' + $.param(api2_call),
+					      data: api2_call,
+					      success: function(){
+					      $("#clear_loading").html("").css("padding","0");
+					      update_mx_records_table();
+					  }
+				      });
+				  $("#clear_loading").html(CPANEL.icons.ajax + " Please wait...").css("padding","20px");
+			      }
 
-	    function delete_all_records(caller){
-	    var rowCount = $('.record-row').length;
-	    if (rowCount == 0) {
-	    if (caller) {
-	    if (caller == "custom") {
-	    add_custom_record();
-	    } else {
-	    add_mx_record_predef(caller);
-	    }
-	    }
-	    }
-	    if (!rowCount == 0) {
-	    var delete_data = [];
-	    var index = 0;
-	    $(".record-row").each( function() {
-	    index++;
-	    var priority = $(this).find('td.priority').text().trim(); 
-	    var destination = $(this).find('td.destination').text().trim(); 
-	    delete_data[index - 1] = [];
-	    delete_data[index - 1][0] = priority;
-	    delete_data[index - 1][1] = destination;
-	    });
+			      var add_mx_record_predef = function(caller) {
+				  var do_add_mx_record_predefined = function(data) {
+				      var data_arr = data.split(",");
+				      var data_arr_couples = [];
+				      for (i = 0, j=0; j < data_arr.length; i++,j+=2) {
+					  data_arr_couples[i] = data_arr[j] + "," + data_arr[j+1];
+				      }
+				      var i = 0;
+				      function sendAjax(){
+					  YAHOO.util.Dom.get("clear_loading").innerHTML = CPANEL.icons.ajax + " Please wait...";
+					  var couple = data_arr_couples[i].split(",");
+					  exchanger_couple = couple[0];
+					  preference_couple = couple[1];
+					  var api2_call = {
+					      "cpanel_jsonapi_version": 2,
+					      "cpanel_jsonapi_module": "Email",
+					      "cpanel_jsonapi_func": "addmx",
+					      "domain": YAHOO.util.Dom.get("domain").value,
+					      "exchanger": exchanger_couple,
+					      "preference": preference_couple
+					  };
+					  $.ajax({
+						  type: "GET",
+						      url: CPANEL.urls.json_api() + '&' + $.param(api2_call),
+						      data: api2_call,
+						      success: function(){
+						      $("#clear_loading").html("").css("padding","0");
+						      i++;
+						      if (i >= data_arr_couples.length) update_mx_records_table();
+						      if (i < data_arr_couples.length) sendAjax();
+						  }
+					      });
+				      }
+				      sendAjax();
+				      change_mxcheck_default("remote");
+				  }
+				  var data = $("#mx_data_" + caller).val();
+				  do_add_mx_record_predefined(data);
+			      };
 
-	    var count = 0;
-	    function deleteRow(){
-	    YAHOO.util.Dom.get("clear_loading").innerHTML = CPANEL.icons.ajax + " Please wait...";
-	    var couple = delete_data[count];
-	    exchange = couple[0];
-	    preference = couple[1];
-	    var api2_call = {
-	    "cpanel_jsonapi_version": 2,
-	    "cpanel_jsonapi_module": "Email",
-	    "cpanel_jsonapi_func": "delmx",
-	    "domain": YAHOO.util.Dom.get("domain").value,
-	    "exchange": preference,
-	    "preference": exchange
-	    };
+			      function delete_all_records(caller){
+				  var rowCount = $('.record-row').length;
+				  if (rowCount == 0) {
+				      if (caller) {
+					  if (caller == "custom") {
+					      add_custom_record();
+					  } else {
+					      add_mx_record_predef(caller);
+					  }
+				      }
+				  }
+				  if (!rowCount == 0) {
+				      var delete_data = [];
+				      var index = 0;
+				      $(".record-row").each( function() {
+					      index++;
+					      var priority = $(this).find('td.priority').text().trim(); 
+					      var destination = $(this).find('td.destination').text().trim(); 
+					      delete_data[index - 1] = [];
+					      delete_data[index - 1][0] = priority;
+					      delete_data[index - 1][1] = destination;
+					  });
 
-	    $.ajax({
-	    type: "GET",
-	    url: CPANEL.urls.json_api() + '&' + $.param(api2_call),
-	    success: function(){
-	    count++;
-	    if (count >= delete_data.length) {
-      update_mx_records_table(); 
-      YAHOO.util.Dom.get("clear_loading").innerHTML = "";
-      }
-      if (count < delete_data.length) { 
-		  deleteRow();
-		  } else {
-		  if (caller) {
-		  if (caller == "custom") {
-		  add_custom_record();
-		  } else {
-		  add_mx_record_predef(caller);
-		  }
-		  }
-		  }
-		  }
+				      var count = 0;
+				      function deleteRow(){
+					  YAHOO.util.Dom.get("clear_loading").innerHTML = CPANEL.icons.ajax + " Please wait...";
+					  var couple = delete_data[count];
+					  exchange = couple[0];
+					  preference = couple[1];
+					  var api2_call = {
+					      "cpanel_jsonapi_version": 2,
+					      "cpanel_jsonapi_module": "Email",
+					      "cpanel_jsonapi_func": "delmx",
+					      "domain": YAHOO.util.Dom.get("domain").value,
+					      "exchange": preference,
+					      "preference": exchange
+					  };
+
+					  $.ajax({
+						  type: "GET",
+						      url: CPANEL.urls.json_api() + '&' + $.param(api2_call),
+						      success: function(){
+						      count++;
+						      if (count >= delete_data.length) {
+							  update_mx_records_table(); 
+							  YAHOO.util.Dom.get("clear_loading").innerHTML = "";
+						      }
+						      if (count < delete_data.length) { 
+							  deleteRow();
+						      } else {
+							  if (caller) {
+							      if (caller == "custom") {
+								  add_custom_record();
+							      } else {
+								  add_mx_record_predef(caller);
+							      }
+							  }
+						      }
+						  }
+					      });
+				      }
+				      deleteRow();
+				      change_mxcheck_default("local");
+				  }
+			      }
+			  });
 		  });
-		  }
-		  deleteRow();
-		  change_mxcheck_default("local");
-		  }
-		  }
+	  });
+
 		  </script>
 <script type="text/javascript">
   var LANG = {

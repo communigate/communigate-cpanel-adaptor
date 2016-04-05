@@ -150,32 +150,38 @@ SET def_addresses = Api2.exec("CommuniGate","ListDefAddress", {});
 </div>
 [% END %]
 <script type="text/javascript">
-$(".action").change(function(){
-var caller_id = this.id;
-var separator = caller_id.indexOf("_");
-var caller = caller_id.substr(separator + 1);
-var value = $(this).find(":selected").val();
-var selector_text = "#text_" + caller;
-$(selector_text).val("");
-if (value == "DefForward") {
-$(selector_text).removeAttr('disabled');
-} else {
-$(selector_text).attr('disabled', 'disabled');
-}
-});
+		  document.addEventListener("DOMContentLoaded", function() {
+			  require(["frameworksBuild"], function() {
+				  require(["jquery"], function($) {
+					  $(".action").change(function(){
+						  var caller_id = this.id;
+						  var separator = caller_id.indexOf("_");
+						  var caller = caller_id.substr(separator + 1);
+						  var value = $(this).find(":selected").val();
+						  var selector_text = "#text_" + caller;
+						  $(selector_text).val("");
+						  if (value == "DefForward") {
+						      $(selector_text).removeAttr('disabled');
+						  } else {
+						      $(selector_text).attr('disabled', 'disabled');
+						  }
+					      });
 
-$(".action").each(function() {
-var caller_id = this.id;
-var separator = caller_id.indexOf("_");
-var caller = caller_id.substr(separator + 1);
-var value = $(this).find(":selected").val();
-var selector_text = "#text_" + caller;
-if (value == "DefForward") {
-$(selector_text).removeAttr('disabled');
-} else {
-$(selector_text).attr('disabled', 'disabled');
-}
-});
+					  $(".action").each(function() {
+						  var caller_id = this.id;
+						  var separator = caller_id.indexOf("_");
+						  var caller = caller_id.substr(separator + 1);
+						  var value = $(this).find(":selected").val();
+						  var selector_text = "#text_" + caller;
+						  if (value == "DefForward") {
+						      $(selector_text).removeAttr('disabled');
+						  } else {
+						      $(selector_text).attr('disabled', 'disabled');
+						  }
+					      });
+				      });
+			      });
+		      });
 </script>
 
 [% BLOCK js_block %]
@@ -246,5 +252,6 @@ function loaddest() {
     cpanel_jsonapi2(defcallback,'Email','listdefaultaddresses','domain',domain);
 }
 YAHOO.util.Event.onDOMReady(loaddest);
+
 </script>
 [% END %]

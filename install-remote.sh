@@ -68,6 +68,10 @@ if [ `perldoc -l YAML::Syck | wc -l` == 0 ]
 then
     /usr/local/cpanel/bin/cpanm -f -q YAML::Syck
 fi
+if [ `perldoc -l JSON::XS | wc -l` == 0 ]
+then
+    /usr/local/cpanel/bin/cpanm -f -q JSON::XS
+fi
 chmod +x ${PACKSRC}/scripts/install_cpanel_module.pl
 ${PACKSRC}/scripts/install_cpanel_module.pl MIME::QuotedPrint::Perl
 ${PACKSRC}/scripts/install_cpanel_module.pl XML::SAX
@@ -213,7 +217,7 @@ chmod +x ${BASEDIR}/paper_lantern/cgpro/playwav.live.cgi
 chmod +x ${BASEDIR}/paper_lantern/cgpro/getwav.live.cgi
 
 /usr/local/cpanel/bin/sprite_generator --all
-# END paper_lantern 
+# END paper_lantern
 
 # Install CommuniGate Plugin Webmail
 BASEDIR='/usr/local/cpanel/base/webmail';

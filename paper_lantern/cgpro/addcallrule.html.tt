@@ -188,52 +188,60 @@ app_key = 'cgpro_call_rules'
 
 
     <script type="text/javascript">
-      $("#fromHour").keyup(function(event){
-      if ( $("#fromHour").val() > 24 ) {
-      $("#fromHour").val(24);
-      }
-      if ( $("#fromHour").val() < 0 ) {
-      $("#fromHour").val(0);
-      }
-      });
+      document.addEventListener("DOMContentLoaded", function() {
+	      require(["frameworksBuild"], function() {
+		      require(["jquery"], function($) {
 
-      $("#fromMinutes").keyup(function(event){
-      if ( $("#fromMinutes").val() > 59 ) {
-      $("#fromMinutes").val(59);
-      }
-      if ( $("#fromMinutes").val() < 0 ) {
-      $("#fromMinutes").val(0);
-      }
-      });
+			      $("#fromHour").keyup(function(event){
+				      if ( $("#fromHour").val() > 24 ) {
+					  $("#fromHour").val(24);
+				      }
+				      if ( $("#fromHour").val() < 0 ) {
+					  $("#fromHour").val(0);
+				      }
+				  });
 
-      $("#toHour").keyup(function(event){
-      if ( $("#toHour").val() > 24 ) {
-      $("#toHour").val(24);
-      }
-      if ( $("#toHour").val() < 0 ) {
-      $("#toHour").val(0);
-      }
-      });
+			      $("#fromMinutes").keyup(function(event){
+				      if ( $("#fromMinutes").val() > 59 ) {
+					  $("#fromMinutes").val(59);
+				      }
+				      if ( $("#fromMinutes").val() < 0 ) {
+					  $("#fromMinutes").val(0);
+				      }
+				  });
 
-      $("#toMinutes").keyup(function(event){
-      if ( $("#toMinutes").val() > 59 ) {
-      $("#toMinutes").val(59);
-      }
-      if ( $("#toMinutes").val() < 0 ) {
-      $("#toMinutes").val(0);
-      }
-      });
+			      $("#toHour").keyup(function(event){
+				      if ( $("#toHour").val() > 24 ) {
+					  $("#toHour").val(24);
+				      }
+				      if ( $("#toHour").val() < 0 ) {
+					  $("#toHour").val(0);
+				      }
+				  });
+
+			      $("#toMinutes").keyup(function(event){
+				      if ( $("#toMinutes").val() > 59 ) {
+					  $("#toMinutes").val(59);
+				      }
+				      if ( $("#toMinutes").val() < 0 ) {
+					  $("#toMinutes").val(0);
+				      }
+				  });
       
-      var sel = document.getElementById("action");
-      var inp = document.getElementById("actionText");
-      var showHideInput = function () {
-      inp.style.display = "none";
-      if (sel.value ==  "Redirect to" || sel.value ==  "Fork to") {
-      inp.style.display = "inline";
-      };
-      };
-      showHideInput();
-      sel.onchange=function(){showHideInput()};
+			      var sel = document.getElementById("action");
+			      var inp = document.getElementById("actionText");
+			      var showHideInput = function () {
+				  inp.style.display = "none";
+				  if (sel.value ==  "Redirect to" || sel.value ==  "Fork to") {
+				      inp.style.display = "inline";
+				  };
+			      };
+			      showHideInput();
+			      sel.onchange=function(){showHideInput()};
+			  });
+		  });
+	  });
+
     </script>
 
     <div class="form-group">

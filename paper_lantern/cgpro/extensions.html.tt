@@ -284,52 +284,58 @@ app_key = 'cgpro_extensions'
   </div>
 
 <script type="text/javascript">
-var LANG = {};
+      var LANG = {};
 LANG.local_extension_input = "[% locale.maketext("LocalExtension") %]";
 LANG.local_extension_input_invalid = "[% locale.maketext('LocalExtensionInvalid','{min}', '{max}') %]";
 CPANEL.validate.verify_local_extension_local = function (e) {
     return CPANEL.validate.positive_integer(e) && CPANEL.validate.greater_than(e,200) && CPANEL.validate.less_than(e,1000);
 };
-var getExtensions = function () {
-    var select = document.getElementById("account");
-    var wrap = document.getElementById("extension");
-    wrap.innerHTML = "";
+document.addEventListener("DOMContentLoaded", function() {
+	require(["frameworksBuild"], function() {
+		require(["jquery"], function($) {
 
-    YAHOO.util.Connect.asyncRequest('GET', 'getextensions.html?domain=' + select.value.split("@")[1], {
-	    success: function(o) {
-		wrap.innerHTML = o.responseText;
-if ( $("#extension option").length > 1 ) {
-$("#assign_phone_number_did").show();
-}
-	    },
-		}, null);
-};
+			var getExtensions = function () {
+			    var select = document.getElementById("account");
+			    var wrap = document.getElementById("extension");
+			    wrap.innerHTML = "";
 
-var getExtensions2 = function () {
-    var select = document.getElementById("domain");
-    var wrap = document.getElementById("extension2");
-    wrap.innerHTML = "";
+			    YAHOO.util.Connect.asyncRequest('GET', 'getextensions.html?domain=' + select.value.split("@")[1], {
+				    success: function(o) {
+					wrap.innerHTML = o.responseText;
+					if ( $("#extension option").length > 1 ) {
+					    $("#assign_phone_number_did").show();
+					}
+				    },
+					}, null);
+			};
 
-    YAHOO.util.Connect.asyncRequest('GET', 'getextensionsfordomain.html?domain=' + select.value, {
-	    success: function(o) {
+			var getExtensions2 = function () {
+			    var select = document.getElementById("domain");
+			    var wrap = document.getElementById("extension2");
+			    wrap.innerHTML = "";
 
-		wrap.innerHTML = o.responseText;
-if ( $("#extension2 option").length > 1 ) {
-$("#setpstntodomain").show();
-}
-	    },
-		}, null);
-};
+			    YAHOO.util.Connect.asyncRequest('GET', 'getextensionsfordomain.html?domain=' + select.value, {
+				    success: function(o) {
 
-YAHOO.util.Event.onDOMReady(function () {
-	getExtensions();
-	getExtensions2();
-	YAHOO.util.Event.addListener("account", "change", getExtensions);
-	YAHOO.util.Event.addListener("domain", "change", getExtensions2);
-	var VAL_LOCAL_EXT = new CPANEL.validate.validator(LANG.local_extension_input);
-	VAL_LOCAL_EXT.add("local_extension", 'verify_local_extension_local', YAHOO.lang.substitute(LANG.local_extension_input_invalid,{min: 200, max: 999}));
-	VAL_LOCAL_EXT.attach();
-	CPANEL.validate.attach_to_form("add_local_extension", [VAL_LOCAL_EXT]);
+					wrap.innerHTML = o.responseText;
+					if ( $("#extension2 option").length > 1 ) {
+					    $("#setpstntodomain").show();
+					}
+				    },
+					}, null);
+			};
+			YAHOO.util.Event.onDOMReady(function () {
+				getExtensions();
+				getExtensions2();
+				YAHOO.util.Event.addListener("account", "change", getExtensions);
+				YAHOO.util.Event.addListener("domain", "change", getExtensions2);
+				var VAL_LOCAL_EXT = new CPANEL.validate.validator(LANG.local_extension_input);
+				VAL_LOCAL_EXT.add("local_extension", 'verify_local_extension_local', YAHOO.lang.substitute(LANG.local_extension_input_invalid,{min: 200, max: 999}));
+				VAL_LOCAL_EXT.attach();
+				CPANEL.validate.attach_to_form("add_local_extension", [VAL_LOCAL_EXT]);
+			    });
+		    });
+	    });
     });
 </script>
 
