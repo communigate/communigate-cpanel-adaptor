@@ -163,7 +163,6 @@ sub api2_AccountsOverview {
 		my $error_msg_acc_prefs = $cli->getErrMessage();
 		my $diskquota = @$accountData{'MaxAccountSize'} || '';
 
-		use Data::Dumper;
 		if ( !($error_msg_acc_data eq "OK") ) {
 		    $return_accounts->{$userName . "@" . $domain} = {
 		    	error => $error_msg_acc_data,
@@ -172,7 +171,6 @@ sub api2_AccountsOverview {
 			prefs => { AccountName => $userName . "@" . $domain }
 		    };
 		    $Cpanel::CPERROR{'CommuniGate'} = $error_msg_acc_data;
-		    warn Dumper $error_msg_acc_data;
 		} elsif ( !($error_msg_acc_info eq "OK") ) {
 		    $return_accounts->{$userName . "@" . $domain} = {
 		    	error => $error_msg_acc_info,
@@ -181,7 +179,6 @@ sub api2_AccountsOverview {
 			prefs => { AccountName => $userName . "@" . $domain }
 		    };
 		    $Cpanel::CPERROR{'CommuniGate'} = $error_msg_acc_info;
-		    warn Dumper $error_msg_acc_info;
 		} elsif ( !($error_msg_acc_stats eq "OK") ) {
 		    $return_accounts->{$userName . "@" . $domain} = {
 		    	error => $error_msg_acc_stats,
@@ -190,7 +187,6 @@ sub api2_AccountsOverview {
 			prefs => { AccountName => $userName . "@" . $domain }
 		    };
 		    $Cpanel::CPERROR{'CommuniGate'} = $error_msg_acc_stats;
-		    warn Dumper $error_msg_acc_stats;
 		} elsif ( !($error_msg_acc_prefs eq "OK") ) {
 		    $return_accounts->{$userName . "@" . $domain} = {
 		    	error => $error_msg_acc_prefs,
@@ -199,7 +195,6 @@ sub api2_AccountsOverview {
 			prefs => { AccountName => $userName . "@" . $domain }
 		    };
 		    $Cpanel::CPERROR{'CommuniGate'} = $error_msg_acc_prefs;
-		    warn Dumper $error_msg_acc_prefs;
 		} else {
 		    $diskquota =~ s/M//g;
 		    my $_diskused = $accInfo->{'StorageUsed'};
@@ -231,7 +226,7 @@ sub api2_AccountsOverview {
 		    my $time = time();
 		    $return_accounts->{$userName . "@" . $domain}->{"vcard"} = $ximss->send({
 			fileRead => {
-			    id => "$time-vcard",
+ 			    id => "$time-vcard",
 			    type => "vcard",
 			    filename => "~$userName\@$domain/profile.vcf"
 			}
@@ -260,15 +255,7 @@ sub api2_AccountsOverview {
 	return { accounts => $return_accounts,
 		 classes => $defaults->{'ServiceClasses'},
 		 freeExtensions => $freeExtensions,
-		 data => $data,
-		 sort_keys_by => sub {
-		     my $hash = shift;
-		     my $sort_field = shift;
-		     my $reverse = shift;
-		     $sort_field = 'username' if $sort_field !~ /^\w+$/;
-		     return sort { $hash->{$b}->{$sort_field} cmp $hash->{$a}->{$sort_field} || $hash->{$b}->{'username'} cmp $hash->{$a}->{'username'} || $hash->{$b}->{'domain'} cmp $hash->{$a}->{'domain'}} keys %$hash if $reverse == 1;
-		     return sort { $hash->{$a}->{$sort_field} cmp $hash->{$b}->{$sort_field} || $hash->{$a}->{'username'} cmp $hash->{$b}->{'username'} || $hash->{$a}->{'domain'} cmp $hash->{$b}->{'domain'}} keys %$hash;
-		 }
+		 data => $data
 	};
 }
 
