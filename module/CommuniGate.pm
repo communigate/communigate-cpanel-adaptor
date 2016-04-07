@@ -735,6 +735,7 @@ sub api2_listforwards {
                                      dest => "$userName\@$domain",
                                      uri_forward => "$value",
                                      html_forward => "$value" ,
+				     type => "Mirror",
                                      forward => "$value" } );
             }
           }
@@ -747,6 +748,7 @@ sub api2_listforwards {
                                  dest => "$alias\@$domain",
                                  uri_forward => "$userName%40$domain",
                                  html_forward => "$userName\@$domain" ,
+				 type => "Alias",
                                  forward => "$userName\@$domain" } );
             }
         }
@@ -763,6 +765,7 @@ sub api2_listforwards {
                                dest => "$forwarder\@$domain",
                                uri_forward => "$fwd",
                                html_forward => "$fwd" ,
+			       type => "Forwarder",
                                forward => "$fwd" } );
           }
       }

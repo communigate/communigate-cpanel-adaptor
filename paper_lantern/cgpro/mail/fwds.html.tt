@@ -115,6 +115,7 @@ SET extensions = Api2.exec("CommuniGate", "ListExtensions", {
         <tr>
           <th id="tblHead_EmailAddress">[% locale.maketext("Email Address")  %]</th>
           <th id="tblHead_ForwardTo">[% locale.maketext("Forward To")  %]</th>
+          <th id="tblHead_ForwardTo">[% locale.maketext("Type")  %]</th>
           <th id="tblHead_ForwarderFunctions" class="sorttable_nosort">[% locale.maketext("Actions")  %]</th>
         </tr>
 
@@ -147,6 +148,9 @@ SET extensions = Api2.exec("CommuniGate", "ListExtensions", {
           </td>
           <td class="truncate">
             [% hashref.item('html_forward').html() %]
+          </td>
+          <td class="truncate">
+            [% hashref.item('type').html() %]
           </td>
           <td class="nobrd">
             <a class="btn btn-link" href="dodelfwdconfirm.html?domain=[% FORM.item('domain') %]&amp;email=[% hashref.item('html_dest').html() %]&amp;emaildest=[% hashref.item('html_forward').html() %]">
