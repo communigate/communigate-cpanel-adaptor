@@ -4513,7 +4513,9 @@ sub api2_GetIVRSounds {
     my $result = {};
     foreach my $dom (@domains) {
 	if ($dom eq $domain) {
-	    $result->{files} = $cli->ListStockPBXFiles();
+            my $domainFiles = $cli->ListDomainPBXFiles($domain);
+            my $serverFiles = $cli->ListStockPBXFiles();
+            %{$result->{files}} = (%$domainFiles, %$serverFiles);
 	    last;
 	}
     }
