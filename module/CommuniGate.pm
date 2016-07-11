@@ -1191,7 +1191,8 @@ sub api2_delforward {
 		      $Rule->[3]->[0]->[1] ="";
 		      my $found=0;
 		      foreach my $value (@dest) {
-			  if ((!($value eq $fwdemail)) || $found) {
+			  $value =~ s/^\s*(.*?)\s*$/$1/;
+                          if ((!($value eq $fwdemail)) || $found) {
 			      if ($Rule->[3]->[0]->[1]) {
 				  $Rule->[3]->[0]->[1]  .=	",".$value;
 			      } else {
