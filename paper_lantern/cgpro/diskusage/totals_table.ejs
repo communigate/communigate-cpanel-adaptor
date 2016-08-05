@@ -1,4 +1,7 @@
 <style>
+  .table {
+  margin-bottom: 0;
+  }
   @media (max-width: 768px) {
 
   /* Force table to not be like tables anymore */
@@ -17,10 +20,6 @@
   border-top: none !important;
   }
 
-  table.responsive-table tr:nth-of-type(even) { 
-  background: #ffffff !important; 
-  }
-  
   table.responsive-table tbody tr td { 
   /* Behave  like a "row" */
   border: none;
@@ -53,21 +52,8 @@
   margin-top: 0 !important;
   }
 
-  table.responsive-table tr:nth-child(2n) {
-  max-height: 0 !important;
-  overflow: hidden !important;
-  }
-
   table.responsive-table tr.extended {
   max-height: 100% !important;
-  }
-
-  table.responsive-table tr:nth-child(2n) td {
-  padding-left: 0 !important;
-  }
-
-  table.responsive-table tr:nth-child(2n) td:before {
-  content: none;
   }
 
   table.responsive-table tr.account-row td {
@@ -81,8 +67,16 @@
   /*
   Label the data
   */
-  table.responsive-table td:nth-of-type(1):before { content: "Domain"; }
-  table.responsive-table td:nth-of-type(2):before { content: "Diskusage"; }
+  table.responsive-table td:nth-of-type(1):before { content: attr(data-th); }
+  table.responsive-table td:nth-of-type(2):before { content: attr(data-th); }
+  table.responsive-table td:nth-of-type(3):before { content: attr(data-th); }
+  table.responsive-table td:nth-of-type(4):before { content: attr(data-th); }
+  table.responsive-table td:nth-of-type(5):before { content: attr(data-th); }
+  table.responsive-table td:nth-of-type(6):before { content: attr(data-th); }
+  }
+
+  .search-row {
+  margin-bottom: 20px;
   }
 </style>
 
@@ -107,15 +101,15 @@
   <tbody>
     <% for (var domain in totals.domains) { %>
        <tr class="account-row">
-         <td>
+         <td data-th="Domain">
 	   <%= domain %>
          </td>
          
-         <td class="stats_td">
+         <td data-th="Disk Usage" class="stats_td">
 	   <span><%= totals.domains[domain].diskUsage %> MB</span>
          </td>
 
-         <td>
+         <td data-th="Messages">
            <div>
 	     Sent: <span class="bold"><%= (totals.domains[domain].stats.MessagesSent) ? totals.domains[domain].stats.MessagesSent.substring(1) : " 0" %></span>
            </div>
@@ -124,7 +118,7 @@
            </div>
          </td>
          
-         <td>
+         <td data-th="Calls">
            <div>
 	     Sent: <span class="bold"><%= (totals.domains[domain].stats.CallsSent) ? totals.domains[domain].stats.CallsSent.substring(1) : " 0" %></span>
            </div>
@@ -133,7 +127,7 @@
            </div>
          </td>
 
-         <td>
+         <td data-th="Bytes">
            <div>
 	     Sent: <span class="bold"><%= (totals.domains[domain].stats.BytesSent) ? totals.domains[domain].stats.BytesSent.substring(1) : " 0" %></span>
            </div>
@@ -159,11 +153,11 @@
   </thead>
   <tbody>
     <tr class="account-row">
-      <td>
+      <td data-th="cPanel Account">
         <%= totals.account.account %>
       </td>
       
-      <td class="stats_td">
+      <td data-th="Disk Usage" class="stats_td">
 	<span><%= totals.account.used %> MB</span>
       </td>
     </tr>

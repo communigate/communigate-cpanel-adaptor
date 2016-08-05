@@ -1,4 +1,7 @@
 <style>
+  .table {
+  margin-bottom: 0;
+  }
   @media (max-width: 768px) {
 
   /* Force table to not be like tables anymore */
@@ -17,10 +20,6 @@
   border-top: none !important;
   }
 
-  table.responsive-table tr:nth-of-type(even) { 
-  background: #ffffff !important; 
-  }
-  
   table.responsive-table tbody tr td { 
   /* Behave  like a "row" */
   border: none;
@@ -53,21 +52,8 @@
   margin-top: 0 !important;
   }
 
-  table.responsive-table tr:nth-child(2n) {
-  max-height: 0 !important;
-  overflow: hidden !important;
-  }
-
   table.responsive-table tr.extended {
   max-height: 100% !important;
-  }
-
-  table.responsive-table tr:nth-child(2n) td {
-  padding-left: 0 !important;
-  }
-
-  table.responsive-table tr:nth-child(2n) td:before {
-  content: none;
   }
 
   table.responsive-table tr.account-row td {
@@ -81,11 +67,13 @@
   /*
   Label the data
   */
-  table.responsive-table td:nth-of-type(1):before { content: "Account"; }
-  table.responsive-table td:nth-of-type(2):before { content: "Name"; }
-  table.responsive-table td:nth-of-type(3):before { content: "Stats"; }
-  table.responsive-table td:nth-of-type(4):before { content: "Type"; }
-  table.responsive-table td:nth-of-type(5):before { content: "Preferences"; }
+  table.responsive-table td:nth-of-type(1):before { content: attr(data-th); }
+  table.responsive-table td:nth-of-type(2):before { content: attr(data-th); }
+  table.responsive-table td:nth-of-type(3):before { content: attr(data-th); }
+  table.responsive-table td:nth-of-type(4):before { content: attr(data-th); }
+  table.responsive-table td:nth-of-type(5):before { content: attr(data-th); }
+  table.responsive-table td:nth-of-type(6):before { content: attr(data-th); }
+  table.responsive-table td:nth-of-type(7):before { content: attr(data-th); }
   }
 
   .search-row {
@@ -131,7 +119,7 @@
        <tr></tr>
        <% } else { %>
        <tr class="account-row">
-         <td>
+         <td data-th="Account">
 	   <% if (accounts[i].prefs.RealName) { %>
 	   <span style="display: block" class="acc_realname"><%= accounts[i].prefs.RealName %></span>
 	   <% } %>
@@ -139,12 +127,12 @@
          </td>
          
          <% accounts[i].used = parseInt(accounts[i].used) %>
-         <td class="stats_td">
+         <td data-th="Disk Usage" class="stats_td">
 	   <span><%= accounts[i].used %></span>
 	   <span>MB</span>
          </td>
 
-         <td>
+         <td data-th="Messages">
            <div>
 	     Sent: <span class="bold"><%= (accounts[i].stats.MessagesSent) ? accounts[i].stats.MessagesSent.substring(1) : " 0" %></span>
            </div>
@@ -153,7 +141,7 @@
            </div>
          </td>
          
-         <td>
+         <td data-th="Calls">
            <div>
 	     Sent: <span class="bold"><%= (accounts[i].stats.CallsSent) ? accounts[i].stats.CallsSent.substring(1) : " 0" %></span>
            </div>
@@ -162,7 +150,7 @@
            </div>
          </td>
 
-         <td>
+         <td data-th="Bytes">
            <div>
 	     Sent: <span class="bold"><%= (accounts[i].stats.BytesSent) ? accounts[i].stats.BytesSent.substring(1) : " 0" %></span>
            </div>
@@ -171,7 +159,7 @@
            </div>
          </td>
 
-         <td>
+         <td data-th="Last Login">
            <div>
 	     IP: <span class="bold"><%= (accounts[i].info.LastAddress) ? accounts[i].info.LastAddress.replace(/[\[\]]/g, "") : "unknown" %></span>
            </div>
@@ -180,7 +168,7 @@
            </div>
          </td>
 
-         <td>
+         <td data-th="Logins">
 	   <span class="bold"><%= (accounts[i].stats.Logins) ? accounts[i].stats.Logins.substring(1) : " 0" %></span>
          </td>
 
