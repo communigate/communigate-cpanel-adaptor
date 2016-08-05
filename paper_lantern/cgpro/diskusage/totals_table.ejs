@@ -1,0 +1,171 @@
+<style>
+  @media (max-width: 768px) {
+
+  /* Force table to not be like tables anymore */
+  table.responsive-table,table.responsive-table thead,table.responsive-table tbody,table.responsive-table th,table.responsive-table td,table.responsive-table tr { 
+  display: block; 
+  }
+  
+  /* Hide table headers (but not display: none;, for accessibility) */
+  table.responsive-table thead tr { 
+  position: absolute;
+  top: -9999px;
+  left: -9999px;
+  }
+  
+  table.responsive-table tr:first-child { 
+  border-top: none !important;
+  }
+
+  table.responsive-table tr:nth-of-type(even) { 
+  background: #ffffff !important; 
+  }
+  
+  table.responsive-table tbody tr td { 
+  /* Behave  like a "row" */
+  border: none;
+  position: relative;
+  padding-left: 50% !important;
+  text-align: left !important;
+  min-height: 35px !important;
+  word-wrap: break-word;
+  }
+
+  table.responsive-table td:before { 
+  /* Now like a table header */
+  position: absolute;
+  /* Top/left values mimic padding */
+  top: 0px !important;
+  line-height: 35px !important;
+  left: 6px;
+  width: 45%; 
+  padding-right: 10px; 
+  white-space: nowrap;
+  font-weight: bold !important;
+  }
+
+  table.responsive-table tr.account-row {
+  border-top: none !important;
+  border-bottom: 1px solid #aaa !important;
+  }
+
+  table.responsive-table tr, table.responsive-table tr td {
+  margin-top: 0 !important;
+  }
+
+  table.responsive-table tr:nth-child(2n) {
+  max-height: 0 !important;
+  overflow: hidden !important;
+  }
+
+  table.responsive-table tr.extended {
+  max-height: 100% !important;
+  }
+
+  table.responsive-table tr:nth-child(2n) td {
+  padding-left: 0 !important;
+  }
+
+  table.responsive-table tr:nth-child(2n) td:before {
+  content: none;
+  }
+
+  table.responsive-table tr.account-row td {
+  padding-top: 8px;
+  }
+
+  table.responsive-table tr.account-row:first-child {
+  border-top: 1px solid #aaa;
+  }
+  
+  /*
+  Label the data
+  */
+  table.responsive-table td:nth-of-type(1):before { content: "Domain"; }
+  table.responsive-table td:nth-of-type(2):before { content: "Diskusage"; }
+  }
+</style>
+
+<table class="accounts_table table table-striped responsive-table">
+  <colgroup>
+    <col width="30%">
+    <col>
+    <col>
+    <col>
+    <col>
+    <col>
+  </colgroup>
+  <thead>
+    <tr>
+      <th>Domain</th>
+      <th>Disk Usage</th>
+      <th>Messages Sent / Received</th>
+      <th>Calls Sent / Received</th>
+      <th>Bytes Sent / Received</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% for (var domain in totals.domains) { %>
+       <tr class="account-row">
+         <td>
+	   <%= domain %>
+         </td>
+         
+         <td class="stats_td">
+	   <span><%= totals.domains[domain].diskUsage %> MB</span>
+         </td>
+
+         <td>
+           <div>
+	     Sent: <span class="bold"><%= (totals.domains[domain].stats.MessagesSent) ? totals.domains[domain].stats.MessagesSent.substring(1) : " 0" %></span>
+           </div>
+           <div>
+	     Received: <span class="bold"><%= (totals.domains[domain].stats.MessagesReceived) ? totals.domains[domain].stats.MessagesReceived.substring(1) : " 0" %></span>
+           </div>
+         </td>
+         
+         <td>
+           <div>
+	     Sent: <span class="bold"><%= (totals.domains[domain].stats.CallsSent) ? totals.domains[domain].stats.CallsSent.substring(1) : " 0" %></span>
+           </div>
+           <div>
+	     Received: <span class="bold"><%= (totals.domains[domain].stats.CallsReceived) ? totals.domains[domain].stats.CallsReceived.substring(1) : " 0" %></span>
+           </div>
+         </td>
+
+         <td>
+           <div>
+	     Sent: <span class="bold"><%= (totals.domains[domain].stats.BytesSent) ? totals.domains[domain].stats.BytesSent.substring(1) : " 0" %></span>
+           </div>
+           <div>
+	     Received: <span class="bold"><%= (totals.domains[domain].stats.BytesReceived) ? totals.domains[domain].stats.BytesReceived.substring(1) : " 0" %></span>
+           </div>
+         </td>
+         <% } %>
+       </tr>
+  </tbody>
+</table>
+
+<table class="accounts_table table table-striped responsive-table">
+  <colgroup>
+    <col>
+    <col width="30%">
+  </colgroup>
+  <thead>
+    <tr>
+      <th>cPanel account</th>
+      <th>Disk Usage</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr class="account-row">
+      <td>
+        <%= totals.account.account %>
+      </td>
+      
+      <td class="stats_td">
+	<span><%= totals.account.used %> MB</span>
+      </td>
+    </tr>
+  </tbody>
+</table>

@@ -1,0 +1,198 @@
+<style>
+  @media (max-width: 768px) {
+
+  /* Force table to not be like tables anymore */
+  table.responsive-table,table.responsive-table thead,table.responsive-table tbody,table.responsive-table th,table.responsive-table td,table.responsive-table tr { 
+  display: block; 
+  }
+  
+  /* Hide table headers (but not display: none;, for accessibility) */
+  table.responsive-table thead tr { 
+  position: absolute;
+  top: -9999px;
+  left: -9999px;
+  }
+  
+  table.responsive-table tr:first-child { 
+  border-top: none !important;
+  }
+
+  table.responsive-table tr:nth-of-type(even) { 
+  background: #ffffff !important; 
+  }
+  
+  table.responsive-table tbody tr td { 
+  /* Behave  like a "row" */
+  border: none;
+  position: relative;
+  padding-left: 50% !important;
+  text-align: left !important;
+  min-height: 35px !important;
+  word-wrap: break-word;
+  }
+
+  table.responsive-table td:before { 
+  /* Now like a table header */
+  position: absolute;
+  /* Top/left values mimic padding */
+  top: 0px !important;
+  line-height: 35px !important;
+  left: 6px;
+  width: 45%; 
+  padding-right: 10px; 
+  white-space: nowrap;
+  font-weight: bold !important;
+  }
+
+  table.responsive-table tr.account-row {
+  border-top: none !important;
+  border-bottom: 1px solid #aaa !important;
+  }
+
+  table.responsive-table tr, table.responsive-table tr td {
+  margin-top: 0 !important;
+  }
+
+  table.responsive-table tr:nth-child(2n) {
+  max-height: 0 !important;
+  overflow: hidden !important;
+  }
+
+  table.responsive-table tr.extended {
+  max-height: 100% !important;
+  }
+
+  table.responsive-table tr:nth-child(2n) td {
+  padding-left: 0 !important;
+  }
+
+  table.responsive-table tr:nth-child(2n) td:before {
+  content: none;
+  }
+
+  table.responsive-table tr.account-row td {
+  padding-top: 8px;
+  }
+
+  table.responsive-table tr.account-row:first-child {
+  border-top: 1px solid #aaa;
+  }
+  
+  /*
+  Label the data
+  */
+  table.responsive-table td:nth-of-type(1):before { content: "Account"; }
+  table.responsive-table td:nth-of-type(2):before { content: "Name"; }
+  table.responsive-table td:nth-of-type(3):before { content: "Stats"; }
+  table.responsive-table td:nth-of-type(4):before { content: "Type"; }
+  table.responsive-table td:nth-of-type(5):before { content: "Preferences"; }
+  }
+
+  .search-row {
+  margin-bottom: 20px;
+  }
+</style>
+
+<table class="accounts_table table table-striped responsive-table">
+  <colgroup>
+    <col width="20%">
+    <col>
+    <col>
+    <col>
+    <col>
+    <col>
+  </colgroup>
+  <thead>
+    <tr>
+      <th>Account</th>
+      <th>Disk Usage</th>
+      <th>Messages Sent / Received</th>
+      <th>Calls Sent / Received</th>
+      <th>Bytes Sent / Received</th>
+      <th>Last Login</th>
+      <th>Logins</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% var inSearchCount = 0; %>
+    <% for (var i = 0; i < accounts.length; i++) { %>
+       <% if (!accounts[i].in_search) {
+          inSearchCount += 1;
+          continue;
+          } %>
+
+       <% if (accounts[i].error) { %>
+       <tr class="account-row">
+	 <td colspan="2">
+	   <strong><%= accounts[i].username + "@" + accounts[i].domain %></strong>
+	   Error getting account information!
+	 </td>
+       </tr>
+       <tr></tr>
+       <% } else { %>
+       <tr class="account-row">
+         <td>
+	   <% if (accounts[i].prefs.RealName) { %>
+	   <span style="display: block" class="acc_realname"><%= accounts[i].prefs.RealName %></span>
+	   <% } %>
+	   <span style="display: block"><%= accounts[i].prefs.AccountName %></span>
+         </td>
+         
+         <% accounts[i].used = parseInt(accounts[i].used) %>
+         <td class="stats_td">
+	   <span><%= accounts[i].used %></span>
+	   <span>MB</span>
+         </td>
+
+         <td>
+           <div>
+	     Sent: <span class="bold"><%= (accounts[i].stats.MessagesSent) ? accounts[i].stats.MessagesSent.substring(1) : " 0" %></span>
+           </div>
+           <div>
+	     Received: <span class="bold"><%= (accounts[i].stats.MessagesReceived) ? accounts[i].stats.MessagesReceived.substring(1) : " 0" %></span>
+           </div>
+         </td>
+         
+         <td>
+           <div>
+	     Sent: <span class="bold"><%= (accounts[i].stats.CallsSent) ? accounts[i].stats.CallsSent.substring(1) : " 0" %></span>
+           </div>
+           <div>
+	     Received: <span class="bold"><%= (accounts[i].stats.CallsReceived) ? accounts[i].stats.CallsReceived.substring(1) : " 0" %></span>
+           </div>
+         </td>
+
+         <td>
+           <div>
+	     Sent: <span class="bold"><%= (accounts[i].stats.BytesSent) ? accounts[i].stats.BytesSent.substring(1) : " 0" %></span>
+           </div>
+           <div>
+	     Received: <span class="bold"><%= (accounts[i].stats.BytesReceived) ? accounts[i].stats.BytesReceived.substring(1) : " 0" %></span>
+           </div>
+         </td>
+
+         <td>
+           <div>
+	     IP: <span class="bold"><%= (accounts[i].info.LastAddress) ? accounts[i].info.LastAddress.replace(/[\[\]]/g, "") : "unknown" %></span>
+           </div>
+           <div>
+	     Date: <span class="bold"><%= (accounts[i].info.LastLogin) ? accounts[i].info.LastLogin.substring(1).replace(/[T_]/g, " ") : "unknown" %></span>
+           </div>
+         </td>
+
+         <td>
+	   <span class="bold"><%= (accounts[i].stats.Logins) ? accounts[i].stats.Logins.substring(1) : " 0" %></span>
+         </td>
+
+         <% } %>
+         <% } %>
+         
+         <% if (inSearchCount == accounts.length) { %>
+       <tr>
+         <td colspan="2">
+    	   <div><span>No accounts!</span></div>
+         </td>
+       </tr>
+       <% } %>
+  </tbody>
+</table>

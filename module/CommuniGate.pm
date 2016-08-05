@@ -218,6 +218,7 @@ sub api2_AccountsOverview {
 		    	used => $diskused,
 		    	data => $accountData,
 		    	prefs => $accountPrefs,
+		    	info => $accInfo,
 		    	usedpercent => $diskusedpercent,
 		    	stats => $accountStats,
 		    	md5 => md5_hex(lc $userName . "@" . $domain),
@@ -259,6 +260,32 @@ sub api2_AccountsOverview {
 	};
 }
 
+sub api2_getDomainsWithStat {
+    my %OPTS = @_;
+    my @domains = Cpanel::Email::listmaildomains();
+    my $cli = getCLI();
+    my $return_domains = {};
+    my $ximss = getXIMSS($cli->{loginData}->[2] . '@' . $cli->MainDomainName(), $cli->{loginData}->[3]);
+    
+    foreach my $domain (@domains) {
+        my $domainStats = $cli->GetDomainStat("$domain");
+        my $error_msg_domain_stats = $cli->getErrMessage();
+        if ( !($error_msg_domain_stats eq "OK") ) {
+            $return_domains->{$domain} = {
+                error => $error_msg_domain_stats,
+                domain => $domain
+            };
+            $Cpanel::CPERROR{'CommuniGate'} = $error_msg_domain_stats;
+        } else {
+            $return_domains->{$domain} = {
+                domain => $domain,
+                stats => $domainStats
+            };
+        }
+    }
+    return $return_domains;
+}
+
 sub api2_UpdateVCard {
     my %OPTS = @_;
     
@@ -293,6 +320,7 @@ sub api2_ListAccounts {
     my $cli = getCLI();
     my $return_accounts = {};
     foreach my $domain (@domains) {
+
 	my $accounts=$cli->ListAccounts($domain);
 	foreach my $userName (sort keys %$accounts) {
 	    next if $userName eq 'pbx' || $userName eq 'ivr';
@@ -310,6 +338,7 @@ sub api2_ListAccounts {
 	}
     }
 
+    
     my $return = {
 	accounts => $return_accounts
     };
@@ -4514,9 +4543,9 @@ sub api2_GetIVRSounds {
     my $result = {};
     foreach my $dom (@domains) {
 	if ($dom eq $domain) {
-            my $domainFiles = $cli->ListDomainPBXFiles($domain);
-            my $serverFiles = $cli->ListStockPBXFiles();
-            %{$result->{files}} = (%$domainFiles, %$serverFiles);
+	    my $domainFiles = $cli->ListDomainPBXFiles($domain);
+	    my $serverFiles = $cli->ListStockPBXFiles();
+	    %{$result->{files}} = (%$domainFiles, %$serverFiles);
 	    last;
 	}
     }
@@ -5296,6 +5325,7 @@ sub api2_createAccount {
     my %OPTS = @_;
     AddCGPAccount($OPTS{'email'},$OPTS{'password'},$OPTS{'quota'});
     my $cli = getCLI();
+
     $cli->UpdateAccountSettings($OPTS{'email'}, {RealName => $OPTS{'realname'}}) if $OPTS{'realname'};
     if ($OPTS{'autorpop'}) {
 	my $settings = $cli->GetAccountRPOPs($OPTS{'email'});
@@ -5761,6 +5791,10 @@ sub api2_getCGProServer {
     my $loginData = $cli->{loginData};
     $cli->Logout();
     return $loginData->[0];
+}
+
+sub api2_getCpanelAccount {
+    return $Cpanel::CPDATA{'USER'};
 }
 
 sub api2_getMxPresets {
