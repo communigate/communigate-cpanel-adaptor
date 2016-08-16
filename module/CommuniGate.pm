@@ -60,7 +60,8 @@ sub getCLI {
 				  login => $loginData[2],
 				  password => $loginData[3]
 				});
-	unless($cli) {
+        
+unless($cli) {
 	    $logger->warn("Can't login to CGPro: ".$CGP::ERR_STRING);
 	}
 	$cli->{loginData} = \@loginData;
@@ -2321,17 +2322,23 @@ sub api2_SetAutoresponder {
 	  push @$conditions, ["Current Date", "less than", $stop];
 	}
 
-	my $rule = [2,"#Vacation",$conditions,[
-				     [
-				      "Reply with",
-				      $body
-				     ],
-				     ["Remember 'From' in", 'RepliedAddresses']
-				    ]];
-	
+        my $notify = [
+            ($OPTS{'notify'}?"Forward to":""),
+            ($OPTS{'notifyList'}?$OPTS{'notifyList'}:"null")
+            ];
+        my $notNotify = ["Remember 'From' in", 'RepliedAddresses'];
+        my $status = ($OPTS{'status'}?2:0);
+        
+	my $rule = [$status,"#Vacation",$conditions,[
+                        [
+                         "Reply with",
+                         $body
+                        ],
+                        (@$notify[0]?$notify:$notNotify)
+                    ]];
+        
         $cli->UpdateAutoresponder(email => $OPTS{'email'} . '@' . $OPTS{'domain'}, rule => $rule );
         $cli->Logout();
-
 }
 
 sub api2_DeleteAutoresponder {
@@ -2345,7 +2352,6 @@ sub api2_DeleteAutoresponder {
 
 sub api2_ListAutoresponders {
         my %OPTS = @_;
-
 	my @domains = Cpanel::Email::listmaildomains();
 	my $cli = getCLI();
 	my @result;
@@ -2360,16 +2366,18 @@ sub api2_ListAutoresponders {
 		    next unless $account =~ /$qstr/;
 		  }
 		  my $rule = $cli->GetAutoresponder(account => $account);
-		  if ( $rule->[0] == 2 ) {
-		    my $subject = $rule->[3]->[0]->[1];
-		    $subject =~ s/^\+Subject\: (.*?)\\e.*?$/$1/;
-		    push( @result, {
-				    email => $account,
-				    subject => $subject,
-				    domain => $domain,
-				   });
-		  }
-		}
+                  if ($rule->[1] eq "#Vacation") {
+                      my $status = ($rule->[0] == 2 ? "enabled" : "disabled");
+                      my $subject = $rule->[3]->[0]->[1];
+                      $subject =~ s/^\+Subject\: (.*?)\\e.*?$/$1/;
+                      push( @result, {
+                          status => $status,
+                          email => $account,
+                          subject => $subject,
+                          domain => $domain,
+                            });
+                  }
+                }
 	}
 	$cli->Logout();
 	return @result;
@@ -2418,13 +2426,24 @@ sub api2_EditAutoresponder {
     }
   }
 
+  my $status = ($rule->[0] == 2 ? "enabled" : "disabled");
+  my @notify = ($rule->[3]->[1]->[0], $rule->[3]->[1]->[1]);
+
+  my $notifyData = {};
+  if ( $notify[0] eq "Forward to" ) {
+      $notifyData->{'notify'} = 1;
+      $notifyData->{'notifyList'} = $notify[1];
+  }
+
   $cli->Logout();
   return {
-	  subject => $subject,
-	  body => $body,
-	  start => $start,
-	  stop => $stop
-	 };
+      status => $status,
+      subject => $subject,
+      body => $body,
+      start => $start,
+      stop => $stop,
+      notify => $notifyData
+  };
 }
 
 

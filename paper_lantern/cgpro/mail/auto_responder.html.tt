@@ -144,6 +144,31 @@
         </div>
 
         <div class="form-group">
+          <div class="checkbox">
+            <label for="status"><strong>Enabled</strong>
+              <input type="checkbox" id="status" name="status" [% IF get_auto_responder.0.status == "enabled" %]checked[% END %] />
+            </label>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <div class="checkbox">
+            <label for="notify"><strong>Notify</strong>
+              <input type="checkbox" id="notify" name="notify" [% IF get_auto_responder.0.notify.notify %]checked[% END %] />
+            </label>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <div class="row">
+            <div class="col-xs-9">
+              <textarea id="notify-list" name="notify-list" class="form-control" cols="80" rows="8">[% get_auto_responder.0.notify.notifyList %]</textarea>
+            </div>
+            <div class="col-xs-3" id="arbody_error"></div>
+          </div>
+        </div>
+
+        <div class="form-group">
            <input type="submit" id="submit-button" class="btn btn-primary" value="[% locale.maketext("Create") %]/[% locale.maketext("Modify") %]" />
         </div>
     </form>

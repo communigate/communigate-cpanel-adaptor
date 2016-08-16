@@ -126,6 +126,7 @@
                 <tr>
                     <th id="lblMailEmail">[% locale.maketext("Email") %]</th>
                     <th id="lblMailSubject">[% locale.maketext("Subject") %]</th>
+                    <th id="lblMailSubject">[% locale.maketext("Status") %]</th>
                     <th id="lblMailFunctions" class="sorttable_nosort">
                         [% locale.maketext("Actions") %]
                     </th>
@@ -137,12 +138,13 @@
                 SET auto_responders = Api2.exec("CommuniGate" , "ListAutoresponders" , {});
                 Api2.post_exec("CommuniGate", "ListAutoresponders");
             %]
-	    
+
             [% IF auto_responders.size; %]
                 [% FOREACH hashref IN auto_responders; %]
                 <tr class="row-[% loop.index % 2 == 0 ? "even" : "odd" %] autores_row">
                     <td class="nobrd-center-t" id="[% hashref.email.uri() %]">[% hashref.email.html() %]</td>
                     <td>&nbsp;[% hashref.subject.html() %]</td>
+                    <td>[% hashref.status %]</td>
                     <td class="nobrd">
                         <a class="btn btn-link" href="addars.html?email=[% hashref.email.uri() %]&amp;redirectdomain=[% RAW_FORM.domain.uri %]">
                             <span class="glyphicon glyphicon-pencil"></span> [% locale.maketext("Edit") %]

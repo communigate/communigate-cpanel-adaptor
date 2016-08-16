@@ -1,7 +1,7 @@
 [% SET CPANEL.CPVAR.dprefix = "../../" %]
 
 [%
-    SET add_responder = Api2.exec("CommuniGate", "SetAutoresponder", {email=RAW_FORM.item("email"), subject=RAW_FORM.item("subject"), body=RAW_FORM.item("arbody"), domain=RAW_FORM.item("domain"), start=RAW_FORM.item("start"), stop=RAW_FORM.item("stop")});
+    SET add_responder = Api2.exec("CommuniGate", "SetAutoresponder", {email=RAW_FORM.item("email"), subject=RAW_FORM.item("subject"), body=RAW_FORM.item("arbody"), domain=RAW_FORM.item("domain"), start=RAW_FORM.item("start"), stop=RAW_FORM.item("stop"), notify=RAW_FORM.item("notify"), notifyList=RAW_FORM.item("notify-list"), status=RAW_FORM.item("status")});
 %]
 
 [% WRAPPER '_assets/master.html.tt'
