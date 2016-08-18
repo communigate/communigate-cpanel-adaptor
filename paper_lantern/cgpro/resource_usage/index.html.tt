@@ -10,13 +10,13 @@ SET domains = Api2.exec("Email", "listmaildomains", {} );
 %]
 
 [% WRAPPER '_assets/master.html.tt'
-app_key = 'cgpro_diskusage',
-page_scripts = ['cgpro/diskusage/js/ejs_production.min.js', 'cgpro/diskusage/js/diskusage.min.js']
+app_key = 'cgpro_resource_usage',
+page_scripts = ['cgpro/resource_usage/js/ejs_production.min.js', 'cgpro/resource_usage/js/index.min.js']
 -%]
 
-<link rel="stylesheet" type="text/css" href="css/diskusage.css" />
+<link rel="stylesheet" type="text/css" href="css/main.css" />
 <div>
-  [% IF CPANEL.feature('cgpro_diskusage') %]
+  [% IF CPANEL.feature('cgpro_resource_usage') %]
   <div class="accounts_wrap_div">
     <div class="row search-row">
       <div class="col-xs-8 col-sm-6 col-md-4 col-lg-4">
