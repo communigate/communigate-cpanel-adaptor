@@ -99,7 +99,7 @@
       <th>Disk Usage</th>
       <th>Messages Sent / Received</th>
       <th>Calls Sent / Received</th>
-      <th>Bytes Sent / Received</th>
+      <th>MB Sent / Received</th>
       <th>Last Login</th>
       <th>Logins</th>
     </tr>
@@ -155,10 +155,10 @@
 
          <td data-th="Bytes">
            <div>
-	     Sent: <span class="bold"><%= (accounts[i].stats.BytesSent) ? accounts[i].stats.BytesSent.substring(1) : " 0" %></span>
+	     Sent: <span class="bold"><%= accounts[i].stats.MBSent %></span>
            </div>
            <div>
-	     Received: <span class="bold"><%= (accounts[i].stats.BytesReceived) ? accounts[i].stats.BytesReceived.substring(1) : " 0" %></span>
+	     Received: <span class="bold"><%= accounts[i].stats.MBReceived %></span>
            </div>
          </td>
 

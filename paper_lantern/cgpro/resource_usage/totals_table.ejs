@@ -98,7 +98,7 @@
       <th>Disk Usage</th>
       <th>Messages Sent / Received</th>
       <th>Calls Sent / Received</th>
-      <th>Bytes Sent / Received</th>
+      <th>MB Sent / Received</th>
     </tr>
   </thead>
   <tbody>
@@ -130,12 +130,12 @@
            </div>
          </td>
 
-         <td data-th="Bytes">
+         <td data-th="MB">
            <div>
-	     Sent: <span class="bold"><%= (totals.domains[domain].stats.BytesSent) ? totals.domains[domain].stats.BytesSent.substring(1) : " 0" %></span>
+	     Sent: <span class="bold"><%= totals.domains[domain].stats.MBSent %></span>
            </div>
            <div>
-	     Received: <span class="bold"><%= (totals.domains[domain].stats.BytesReceived) ? totals.domains[domain].stats.BytesReceived.substring(1) : " 0" %></span>
+	     Received: <span class="bold"><%= totals.domains[domain].stats.MBReceived %></span>
            </div>
          </td>
          <% } %>
