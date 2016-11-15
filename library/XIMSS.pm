@@ -43,7 +43,7 @@ sub connect {
   my $ua = LWP::UserAgent->new(
       ssl_opts => { verify_hostname => 0 }
       );
-  $ua->timeout(15);
+  $ua->timeout(30);
   $ua->env_proxy;
    my $response = $ua->get("https://" . $this->{"connParams"}->{"PeerAddr"} . ":9100/ximsslogin/?username=" . $this->{"authData"} . "&password=" . $this->{"password"});
   if ($response->is_success) {
@@ -51,7 +51,7 @@ sub connect {
       $this->{SID} = $response->{"session"}->{"urlID"};
   }
   else {
-      # warn $response->status_line;
+      warn $response->status_line;
   }
   1;
 }
@@ -70,7 +70,7 @@ sub send {
     return XMLin(encode_utf8 $response->content, KeyAttr => "IgnoreKeyAttr", forceArray => ($options->{forceArray} || 0));
   }
   else {
-      # warn $response->status_line;
+      warn $response->status_line;
       return undef;
   }
 }
@@ -101,11 +101,11 @@ sub close {
     my $response = $ua->post("https://" . $this->{"connParams"}->{"PeerAddr"} . ":9100/Session/" . $this->{"SID"} . "/sync", Content => "<XIMSS>" . $command.  "</XIMSS>");
 
     if ($response->is_success) {
-        # warn XMLin($response->content, KeyAttr => "IgnoreKeyAttr");
+        warn XMLin($response->content, KeyAttr => "IgnoreKeyAttr");
         # urlID
     }
     else {
-        # warn $response->status_line;
+        warn $response->status_line;
     }
 
 }
