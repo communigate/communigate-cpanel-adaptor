@@ -85,44 +85,43 @@ js_code = PROCESS js_block;
 
 [% SET ajax_request = CPANEL.ENV.cp_security_token _ "/frontend/paper_lantern/cgpro/mail/live_csvimport-step4.html?csvimportid=" _ RAW_FORM.csvimportid.uri() _ "&importtype=" _ RAW_FORM.importtype.uri() _ "&domain=" _ RAW_FORM.domain.uri(); %]
 <script type="text/javascript">
-    var fullbar = 530;
+    document.addEventListener("DOMContentLoaded", function() {
+	require(["frameworksBuild"], function() {
+	    require(["jquery"], function($) {
+                var fullbar = 530;
+                function setcompletestatus(incount,totalcount) {
+                    var incountEl = document.getElementById('incount'),
+                        totalCountEl = document.getElementById('totalcount'),
+                        uploadBarEl = document.getElementById('uploadbar'),
+                        progressBarEl = document.getElementById('progressbar');
+                    if (incountEl !== null) {
+                        incountEl.innerHTML = incount;
+                    }
+                    if (totalCountEl !== null) {
+                        totalCountEl.innerHTML = totalcount;
+                    }
+                    if (uploadBarEl !== null) {
+                        uploadBarEl.width = parseInt(incount/totalcount*fullbar, 10);
+                    }
+                    if (progressBarEl !== null) {
+                        progressBarEl.style.display = '';
+                    }
+                }
 
-    function setcompletestatus(incount,totalcount) {
-
-        var incountEl = document.getElementById('incount'),
-            totalCountEl = document.getElementById('totalcount'),
-            uploadBarEl = document.getElementById('uploadbar'),
-            progressBarEl = document.getElementById('progressbar');
-
-        if (incountEl !== null) {
-            incountEl.innerHTML = incount;
-        }
-
-        if (totalCountEl !== null) {
-            totalCountEl.innerHTML = totalcount;
-        }
-
-        if (uploadBarEl !== null) {
-            uploadBarEl.width = parseInt(incount/totalcount*fullbar, 10);
-        }
-
-        if (progressBarEl !== null) {
-            progressBarEl.style.display = '';
-        }
-
-    }
-
-    // must be here to give control back to the new version of jquery we are including
-    // cpanel-all-min-en.js uses an old version of jquery
-    jQuery.noConflict();
-    $(document).ready(function() {
-        $.get("[% ajax_request %]")
-        .done(function(data) {
-            $("#import-output-formatted").html(data);
-        })
-        .fail(function() {
-            $("#import-output-formatted").html("[% locale.maketext('An error occurred while processing your request.') %]")
-        });
+                // must be here to give control back to the new version of jquery we are including
+                // cpanel-all-min-en.js uses an old version of jquery
+                jQuery.noConflict();
+                $(document).ready(function() {
+                    $.get("[% ajax_request %]")
+                        .done(function(data) {
+                            $("#import-output-formatted").html(data);
+                        })
+                        .fail(function() {
+                            $("#import-output-formatted").html("[% locale.maketext('An error occurred while processing your request.') %]")
+                        });
+                });
+	    });
+	});
     });
 </script>
 [% END #js_block %]
