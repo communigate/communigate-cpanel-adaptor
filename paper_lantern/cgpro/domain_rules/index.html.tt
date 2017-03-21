@@ -1,0 +1,749 @@
+[% MACRO filter_option(pval, val, text) BLOCK -%]
+<option value="[% val %]"[% val == pval ? " selected='selected'" : "" %]>[% locale.maketext(text) %]</option>
+[% END -%]
+[%
+SET CPANEL.CPVAR.dprefix = "../../";
+SET domains =  Api2.exec("Email", "listmaildomains", {});
+SET rule = Api2.exec("CommuniGate", "getDomainMailRules", {domain='webface.bg'} );
+rule = rule.0;
+
+SET rules = Api2.exec("CommuniGate", "getDomainRules", {domain='webface.bg'} );
+
+# SET string = Api2.exec("CommuniGate", "getInterfaceString", {
+#        "string" = "5_email_rules_main_descr_" _ (CPANEL.CPDATA.LOCALE == "bg" ? "bg": "en")
+#   });
+-%]
+
+[% js_code = PROCESS js_block %]
+[% css_code = PROCESS css_block %]
+[% WRAPPER '_assets/master.html.tt'
+        app_key = 'cgpro_domain_rules'
+        page_js = js_code
+        page_scripts = ['/yui/calendar/calendar.js', '/cjt/calendar.js']
+        page_stylesheets = ['/yui/assets/skins/sam/calendar.css', 'css/calendar.css']
+        page_styles = css_code
+  -%]
+[% INCLUDE _assets/_ajaxapp_header.html.tt %]
+
+<div class="body-content">
+  [% IF CPANEL.feature('cgpro_domain_rules') %]
+    <p align="justify" style="padding-bottom: 10px;">[%- string.0 %]</p>
+
+    <div class="pull-right managing-menu">
+      <form method="get" action="" id="manage_list_form" class="form-inline">
+        <div class="form-inline">
+          <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+            <div class="col-xs-5 col-sm-5 col-md-5 col-lg-5">
+              <label for="manage_list_select" id="txt_Managing" class="col-xs-12 control-label">Managing:</label>
+            </div>
+            <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+              [% IF domains.size() == "1" %]
+                [% domains.0.domain %] <input type="hidden" id="domain" value="[%  domains.0.domain %]" name="domain" />
+              [% ELSE %]
+                <select name="domain" id="manage_list_select" class="col-xs-12 form-control">
+                  [% FOR domain IN domains -%]
+                    [% filter_option(FORM.domain, domain.key, domain.key) %]
+                  [% END %]
+                </select>
+              [% END %]
+              <input type="hidden" id="domain" value="[% FORM.domain %]" />
+            </div>
+          </div>
+        </div>
+        <noscript>
+          <div class="form-group">
+            <input type="submit" class="btn btn-primary" id="btn_domainSelect_go" value="[% locale.maketext("Go") %]" />
+          </div>
+        </noscript>
+      </form>
+      [% IF !RAW_FORM.item("domain") && domains.size > 0 %]
+        <script>
+          YAHOO.util.Dom.get("manage_list_form").submit();
+        </script>
+      [% END %]
+      <script type="text/javascript">
+        YAHOO.util.Event.onDOMReady(function() {
+          YAHOO.util.Event.on("manage_list_select", "change", function() { YAHOO.util.Dom.get("manage_list_form").submit(); });
+        });
+      </script>
+    </div>
+
+    <div class="section">
+      <form method="post" id="mainform" name="mainform" action="set_rules.html">
+
+        <div class="form-group">
+          <div class="checkbox">
+            <label for="status"><strong>Enable Vacation Mode</strong>
+              <input type="checkbox" id="status" name="status" [% IF rule.status == "enabled" %]checked[% END %] />
+            </label>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="subject">
+            [% locale.maketext("Subject:") %]
+          </label>
+          <div class="row">
+            <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+              <input type="text" class="form-control" size="39" id="subject" name="subject" value="[% rule.subject FILTER html %]" />
+            </div>
+            <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6" id="subject_error"></div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label id="lblARBody" for="arbody">
+            [% locale.maketext("Body:") %]
+          </label>
+          <div class="row">
+            <div class="col-xs-9">
+              <textarea id="arbody" name="arbody" class="form-control" cols="80" rows="8">[% rule.body FILTER html %]</textarea>
+            </div>
+            <div class="col-xs-3" id="arbody_error"></div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label id="lblStartControl" for="start_control">
+            [% locale.maketext('Start[boolean,_1,:]',1) %]
+          </label>
+          <div class="row">
+            <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+              <div class="radio">
+                <label id="lblStartControlImmeadiately">
+                  <input type="radio" name="start_control" value="0" checked="checked" onclick="DOM.get('start_ts').value = ''; validator.verify()" />
+                  [% locale.maketext("Immediately") %]
+                </label>
+              </div>
+              <div class="radio">
+                <label id="lblStartControlCustom">
+                  <input type="radio" name="start_control" value="1" onclick="if (!customized_dates.start) custom_start(DOM.getNextSibling(this));" />
+                  <a id="start_link" style="visibility:hidden" href="#" onclick="custom_start(this); return false">[% locale.maketext("Custom") %]</a>
+                </label>
+              </div>
+              <div id="start_container"></div>
+              <input id="start_ts" name="start" type="hidden" value="[% rule.start %]" />
+            </div>
+            <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6" id="start_ts_error"></div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="stop_control">
+            [% locale.maketext('Stop[boolean,_1,:]',1) %]
+          </label>
+          <div class="row">
+            <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+              <div class="radio">
+                <label id="lblStopControlNever">
+                  <input id="chkStopControl" type="radio" name="stop_control" value="0" checked="checked" onclick="DOM.get('stop_ts').value = ''; validator.verify()" />
+                  [% locale.maketext("Never") %]
+                </label>
+              </div>
+              <div class="radio">
+                <label id="lblStopControlCustom">
+                  <input type="radio" name="stop_control" value="1" onclick="if (!customized_dates.stop) custom_stop(DOM.getNextSibling(this));" />
+                  <a id="stop_link" style="visibility:hidden" href="#" onclick="custom_stop(this); return false">[% locale.maketext("Custom") %]</a>
+                </label>
+              </div>
+              <div id="stop_container"></div>
+              <input id="stop_ts" name="stop" type="hidden" value="[% rule.stop %]" />
+            </div>
+            <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6" id="stop_ts_error"></div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <div class="checkbox">
+            <label for="notify"><strong>Notify</strong>
+              <input type="checkbox" id="notify" name="notify" [% IF rule.notify.notify %]checked[% END %] />
+            </label>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="notify-list"><strong>Emails to notify</strong></label>
+          <div class="row">
+            <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+              <textarea id="notify-list" name="notify-list" class="form-control" cols="40" rows="4">[% rule.notify.notifyList %]</textarea>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <input type="hidden" value="[%  RAW_FORM.item('domain') %]" name="domain" />
+          <input type="submit" id="submit-button" class="btn btn-primary" value="[% locale.maketext("Save") %]" />
+        </div>
+      </form>
+    </div>
+
+    <div class="section">
+      [% IF rules.size == 0 %]
+        <h3>[% locale.maketext("Currently there aren't any filters!") %]</h3>
+      [% ELSE %]
+        <h3>[% locale.maketext("Current Filters") %]</h3>
+      [% END %]
+      <div id="filter_container">
+        [% IF rules.size;
+          FOREACH hashref IN rules;
+            %]
+            <div class="filter_wrapper">
+              <div class="filter" id="[% hashref.1.html() %]-filter" title="[% locale.maketext('Drag to reorder.') %]">
+                <div class="filter-title">[%  hashref.1.html() %]</div>
+                <div class="actions">
+                  <a class="btn btn-link" href="editfilter.html?domain=[% RAW_FORM.item('domain').uri %]&filtername=[% hashref.1.uri() %]">
+                    <span class="glyphicon glyphicon-pencil"></span>
+                    [% locale.maketext("Edit") %]
+                  </a>
+                  <a class="btn btn-link" href="delfilter.html?domain=[% RAW_FORM.item('domain').uri %]&filtername=[% hashref.1.uri() %]">
+                    <span class="glyphicon glyphicon-trash"></span>
+                    [% locale.maketext("Delete") %]
+                  </a>
+                </div>
+                <div class="clear"></div>
+              </div>
+            </div>
+          [% END %]
+        [% END %]
+      </div>
+    </div>
+
+    <div class="section">
+      <a id="btnCreateFilter" href="editfilter.html?domain=[% RAW_FORM.item('domain').uri %]&amp;filtername=" class="btn btn-primary">[% locale.maketext("Create a New Filter") %]</a>
+    </div>
+
+    <div id="start_calendar" style="display:none;"></div>
+    <div id="stop_calendar" style="display:none;"></div>
+    [% INCLUDE _assets/_calendar.html.tt %]
+    [% INCLUDE _assets/return_link.html.tt return_location='../../index.html' return_link_text=locale.maketext('Go Back') %]
+  [% ELSE %]
+    [% PROCESS cgpro/icn_description.html.tt %]
+  [% END %]
+
+  [% INCLUDE _assets/_ajaxapp_footer.html.tt %]
+</div><!-- end body-content -->
+[% END %]
+
+<script type="text/javascript">
+  var waitpanel;
+
+  function stop_is_after_start() {
+    var stop_text = DOM.get("stop_ts").value;
+    if ( !stop_text ) return true;
+
+    var start_text = DOM.get("start_ts").value;
+    if ( !start_text ) {
+      return ( (new Date()).getTime() < (parseInt(stop_text) * 1000) );
+    }
+
+    return parseInt(start_text) < parseInt(stop_text);
+  }
+
+  function interval_under_max() {
+    var interval_text = DOM.get("interval").value;
+    if ( !interval_text ) return true;
+    return parseInt(interval_text) <= 720; // 720 hour (30 day) maximum
+  }
+
+  var VALIDATORS = [];
+  var init = function() {
+
+    var validator,
+      VALIDATION = CPANEL.validate;
+
+    validator = new CPANEL.validate.validator("Stop Time");
+    validator.add("stop_ts", stop_is_after_start, "[% locale.maketext("The stop time must be later than the start time.")  %]");
+    VALIDATORS.push(validator);
+
+    validator = new VALIDATION.validator(LOCALE.maketext("City"));
+    VALIDATORS.push(validator);
+
+    if (YAHOO.util.Dom.inDocument("email") == true) {
+      validator = new VALIDATION.validator(LOCALE.maketext("Email"));
+      validator.add("email", "min_length(%input%, 1)", "[% locale.maketext("The Email field cannot be empty.")  %]");
+      validator.add("email", "no_chars(%input%,'@')", "[% locale.maketext("Cannot use a domain in this field.")  %]");
+      validator.add("email", "local_part_email(%input%,'cpanel')", "[% locale.maketext("The Email field has an invalid local part.")  %]");
+      VALIDATORS.push(validator);
+    }
+
+
+    validator = new VALIDATION.validator(LOCALE.maketext("Subject"));
+    validator.add("subject", "min_length(%input%, 1)", "[% locale.maketext("The Subject field cannot be empty.")  %]");
+    VALIDATORS.push(validator);
+
+    validator = new VALIDATION.validator(LOCALE.maketext("Body"));
+    validator.add("arbody", "min_length(%input%, 1)", "[% locale.maketext("The Body field cannot be empty.")  %]");
+    VALIDATORS.push(validator);
+
+    // Attach the validators.
+    for (var i = 0, l = VALIDATORS.length; i < l; i++) {
+      VALIDATORS[i].attach();
+    }
+
+    CPANEL.validate.attach_to_form("submit-button", VALIDATORS);
+  };
+
+  YAHOO.util.Event.onDOMReady(init);
+
+  var show_loading = function(action, body) {
+    if (!waitpanel) {
+      var panel_options = {
+        width: "252px",
+        fixedcenter: true,
+        close: false,
+        draggable: false,
+        modal: true,
+        visible: false
+      };
+      waitpanel = new YAHOO.widget.Panel("waitpanel", panel_options);
+    }
+    waitpanel.setHeader("<div class='lt'></div><span>" + action + "</span><div class='rt'></div>");
+    var loadingimg = '<img src="img/yui/rel_interstitial_loading.gif" />';
+    if (body) {
+      waitpanel.setBody(body + '<br />' + loadingimg);
+    }
+    else {
+      waitpanel.setBody(loadingimg);
+    }
+
+    waitpanel.render(document.body);
+    waitpanel.show();
+  };
+
+  var FORM = {};
+  parseForm();
+
+  function parseForm() {
+    var query = window.location.search.substring(1);
+    var parms = query.split('&');
+    for (var i=0; i<parms.length; i++) {
+      var pos = parms[i].indexOf('=');
+      if (pos > 0) {
+        var key = parms[i].substring(0,pos);
+        var val = parms[i].substring(pos+1);
+        FORM[key] = val;
+      }
+    }
+  }
+</script>
+<script type="text/javascript">
+  var now = new Date();
+  var calendar_options = {
+    mindate: now,
+    default_hours: now.getHours(),
+    default_minutes: now.getMinutes(),
+    selected: [now.getMonth()+1, now.getDate(), now.getFullYear()].join("/"),
+    locale_weekdays: "1char",
+    close: true,
+    draggable: true,
+    navigator: true,
+    iframe: false  //since Overlay does this already
+  };
+
+  var start = DOM.get("mainform").start.value.trim();
+  var stop = DOM.get("mainform").stop.value.trim();
+
+  var customized_dates = { start:start, stop:stop };
+
+  var start_options = {
+    title: "[% locale.maketext("Start[boolean,_1,:]", "0") %]"
+  };
+  if (start) {
+    start = new Date( start * 1000 );
+    CPANEL.util.set_text_content( "start_link", start.toCpLocaleString() );
+    DOM.get("mainform")["start_control"][1].checked = true;
+    start_options.default_hours = start.getHours();
+    start_options.default_minutes = start.getMinutes();
+    start_options.selected = [start.getMonth()+1, start.getDate(), start.getFullYear()].join("/");
+  }
+  YAHOO.lang.augmentObject( start_options, calendar_options );
+  var stop_options = {
+    title: "[% locale.maketext("Stop[boolean,_1,:]", "0") %]"
+  };
+  if (stop) {
+    stop = new Date( stop * 1000 );
+    CPANEL.util.set_text_content( "stop_link", stop.toCpLocaleString() );
+    DOM.get("mainform")["stop_control"][1].checked = true;
+    stop_options.default_hours = stop.getHours();
+    stop_options.default_minutes = stop.getMinutes();
+    stop_options.selected = [stop.getMonth()+1, stop.getDate(), stop.getFullYear()].join("/");
+  }
+  YAHOO.lang.augmentObject( stop_options, calendar_options );
+
+  DOM.get("start_link").style.visibility = "";
+  DOM.get("stop_link").style.visibility = "";
+
+  var start_cal = new CPANEL.widgets.Calendar_With_Time( "start_calendar", start_options );
+  var stop_cal  = new CPANEL.widgets.Calendar_With_Time( "stop_calendar", stop_options );
+
+  var cals = { start:start_cal, stop:stop_cal };
+
+  //YUI Calendar's custom events don't set context to the Calendar object (grr..)
+  var update_form = function(type, selected, cal) {
+    var the_date = cals[cal].getSelectedDates()[0];
+    if ( the_date ) {
+      DOM.get("mainform")[cal].value = Math.floor(the_date.getTime() / 1000);
+      CPANEL.util.set_text_content( cal+"_link", the_date.toCpLocaleString() );
+    }
+    customized_dates[cal] = true;
+
+    for (var i = 0, l = VALIDATORS.length; i < l; i++) {
+      VALIDATORS[i].verify();
+    }
+  };
+
+  start_cal.selectEvent.subscribe(update_form, "start");
+  start_cal.hours_change_event.subscribe(update_form, "start");
+  start_cal.minutes_change_event.subscribe(update_form, "start");
+  start_cal.ampm_change_event.subscribe(update_form, "start");
+
+  stop_cal.selectEvent.subscribe(update_form, "stop");
+  stop_cal.hours_change_event.subscribe(update_form, "stop");
+  stop_cal.minutes_change_event.subscribe(update_form, "stop");
+  stop_cal.ampm_change_event.subscribe(update_form, "stop");
+
+  start_cal.render();
+  stop_cal.render();
+
+  EVENT.throwErrors = true;
+  CPANEL.util.catch_enter( [start_cal.hours_input,start_cal.minutes_input], function(e) {
+    EVENT.stopPropagation(e);
+    start_cal.hide();
+  } );
+  CPANEL.util.catch_enter( [stop_cal.hours_input,stop_cal.minutes_input], function(e) {
+    EVENT.stopPropagation(e);
+    stop_cal.hide();
+  } );
+
+  (function() {
+    var _contains = YAHOO.util.Region.prototype.contains;
+    var Region = YAHOO.util.Region;
+    Region.prototype.contains = function(region_or_point) {
+      if ( region_or_point instanceof Region ) {
+        return _contains.apply(this,arguments);
+      }
+      else return
+      this.left < region_or_point[0]
+      && region_or_point[0] < this.right
+      && this.top < region_or_point[1]
+      && region_or_point[1] < this.bottom
+      ;
+    };
+  })();
+
+  //YUI accommodates a bug in old Mac Gecko versions that no longer
+  //appears to be a problem, but it does make the tab loop focus the
+  //overlay's container pointlessly. So, we prevent this here.
+  YAHOO.widget.Overlay.prototype.showMacGeckoScrollbars
+    = YAHOO.widget.Overlay.prototype.hideMacGeckoScrollbars
+    = function() {}
+  ;
+
+  function custom_start(link_el, stop_instead) {
+    var the_cal = stop_instead ? stop_cal : start_cal;
+
+    var the_radio = DOM.get("mainform")[stop_instead ? "stop_control" : "start_control"][1];
+    the_radio.checked = true;
+
+    if (!the_cal._overlay) {
+      var the_div = the_cal.oDomContainer;
+
+      var insertion_point = link_el;
+      if (link_el.parentNode.tagName.toLowerCase() === "label") {
+        insertion_point = link_el.parentNode;
+      }
+
+      var overlay = the_cal._overlay = new YAHOO.widget.Overlay( DOM.generateId(), {
+        visible : false,
+        zIndex  : 1005,  //so the overlay will sit above validation errors
+        context : [ link_el, "bl", "tl" ]
+      } );
+      overlay.setBody(the_div);
+      overlay.render(document.body);
+      insertion_point.parentNode.insertBefore( overlay.element, insertion_point.nextSibling );
+
+
+      //The callback has to be defined as a local variable or else
+      //IE will not recognize "clicker" as a reference within removeListener.
+      var clicker = function (e) {
+        var target = YAHOO.util.Event.getTarget(e) || this;
+
+        if (target === the_div) return;
+        if (target === link_el) return;
+        if (target === the_radio) return;
+        if (DOM.isAncestor(the_div,target)) return;
+
+        //in case we drag
+        var xy = YAHOO.util.Event.getXY(e);
+        if ( !DOM.getRegion(the_div).contains(xy) ) {
+          the_cal.hide();
+        }
+      };
+
+      overlay.beforeShowEvent.subscribe( function() {
+        update_form(null, null, stop_instead ? "stop" : "start");
+        this.align();
+        EVENT.on( document.body, "click", clicker );
+      } );
+      overlay.hideEvent.subscribe( function() {
+        update_form(null, null, stop_instead ? "stop" : "start");
+        EVENT.removeListener( document.body, "click", clicker );
+      } );
+
+
+      //Calendar rewrites all of its HTML when you change the month,
+      //so we need to refresh the drag/drop listeners whenever that happens.
+      var attach_drag_drop = function() {
+        if ( the_cal._dd ) {
+          the_cal._dd.unreg();
+        }
+
+        var title_el = DOM.getElementsByClassName("title","div",the_div)[0];
+        if ( !title_el.id ) title_el.id = DOM.generateId();
+        the_cal._dd = new YAHOO.util.DD(overlay.element, {
+          dragOnly: true
+        } );
+        if ( overlay.cfg.getProperty("iframe") ) {
+          the_cal._dd.onDrag = function() {
+            overlay.syncPosition();
+            overlay.syncIframe();
+          };
+        }
+        the_cal._dd.setHandleElId( title_el.id );
+      };
+
+      attach_drag_drop();
+      the_cal.renderEvent.subscribe( attach_drag_drop );
+      the_cal.hideEvent.subscribe( overlay.hide, overlay, true );
+      the_cal.showEvent.subscribe( overlay.show, overlay, true );
+    }
+
+    the_cal.show();
+  }
+
+  function custom_stop(link_el) {
+    return custom_start(link_el, true);
+  }
+</script>
+
+[% BLOCK css_block %]
+<!--[if IE 6]>
+<link rel="stylesheet" type="text/css" href="../css/calendar_ie6.css" />
+<![endif]-->
+<!--[if lt IE 9]>
+<link rel="stylesheet" type="text/css" href="../css/calendar_ie678.css" />
+<![endif]-->
+<!--[if IE 9]>
+<link rel="stylesheet" type="text/css" href="../css/calendar_ie9.css" />
+<![endif]-->
+
+<style type="text/css">
+  .yui-skin-sam .yui-calendar {
+    margin: 0 auto;
+  }
+  .yui-calcontainer .title {
+    cursor: move;
+  }
+</style>
+<!--[if lt IE 8]>
+<style type="text/css">
+    /* IE6 and IE7 will take margin:auto and expand the margins.
+       The downside of this fix is that the calendar isn't centered in IE6/IE7. :(
+    */
+    .yui-skin-sam .yui-calendar {
+        margin: 0;
+    }
+</style>
+<![endif]-->
+[% END %]
+
+[% BLOCK js_block %]
+<script>
+  var dditem = function() {
+    dditem.superclass.constructor.apply(this,arguments);
+  };
+
+  var DOMAIN = [% RAW_FORM.domain.json() || 'null' %];
+
+  function get_order() {
+    var filter_els = DOM.getElementsByClassName( "filter", "div", "filter_container" );
+    return filter_els.map( function(el) {
+      return el.id.replace(/-filter$/,"");
+    } );
+  }
+
+  var saved_notice = null;
+  function save_order() {
+    var api_vars = { domain: DOMAIN };
+    var filter_els = DOM.getElementsByClassName( "filter", "div", "filter_container" );
+    filter_els.forEach( function(el,idx) {
+      var filter_name = el.id.replace(/-filter$/,"");
+      api_vars["filter"+idx] = filter_name;
+    } );
+
+    if (saved_notice && !DOM.inDocument(saved_notice.element)) {
+      saved_notice = null;
+    }
+    var success = function() {
+      old_order_joined = get_order().join();
+      saved_notice = new CPANEL.ajax.Dynamic_Notice( {
+        level: "success",
+        content: "[% locale.maketext("Filter order saved.")  %]",
+        replaces: saved_notice
+      } );
+      YAHOO.util.DragDropMgr.unlock();
+    };
+
+    YAHOO.util.DragDropMgr.lock();
+    CPANEL.api( {
+      module:   "CommuniGate",
+      func:     "reorderDomainFilters",
+      data:     api_vars,
+      callback: CPANEL.ajax.build_callback( success, null, {
+        on_error: function() { YAHOO.util.DragDropMgr.unlock() }
+      } )
+    } );
+  }
+
+  var old_order_joined = get_order().join();
+  function order_changed() {
+    var new_order_joined = get_order().join();
+    return new_order_joined !== old_order_joined;
+  }
+
+  YAHOO.extend( dditem, CPANEL.dragdrop.DDItem, {
+    endDrag: function() {
+      CPANEL.dragdrop.DDItem.prototype.endDrag.apply(this,arguments);
+      if ( order_changed() ) {
+        save_order();
+      }
+    }
+  } );
+
+  var containers = CPANEL.dragdrop.containers( "filter_container", undefined, {
+    item_constructor: dditem
+  } );
+
+  var save_timeout = null;
+  function queue_save() {
+    clearTimeout(save_timeout);
+    save_timeout = setTimeout( save_order, 500 );
+  }
+
+  function move_up(link) {
+    var wrapper = DOM.getAncestorByClassName(link,"filter_wrapper");
+    var previous_wrapper = DOM.getPreviousSibling(wrapper);
+    if (previous_wrapper) {
+      wrapper.parentNode.insertBefore(wrapper,previous_wrapper);
+      link.focus();
+      queue_save();
+    }
+  }
+  function move_down(link) {
+    var wrapper = DOM.getAncestorByClassName(link,"filter_wrapper");
+    var next_wrapper = DOM.getNextSibling(wrapper);
+    if (next_wrapper) {
+      var next_next = DOM.getNextSibling(next_wrapper);
+      if (next_next) {
+        wrapper.parentNode.insertBefore(wrapper,next_next);
+      }
+      else {
+        wrapper.parentNode.appendChild(wrapper);
+      }
+
+      link.focus();
+      queue_save();
+    }
+  }
+</script>
+[% END %]
+
+[% BLOCK css_block %]
+<style type="text/css">
+  .filter {
+    cursor:move;
+    border-bottom: 1px solid #dadada;
+    padding: 5px;
+    text-align: center;
+    background-color: #fff;
+    zoom: 1;
+  }
+  #ygddfdiv .filter {
+    background-color: #e0e0e0;
+  }
+
+  ul.move {
+    list-style: none;
+    margin:0px;
+    padding:0px;
+  }
+
+  ul.move li.up {
+    background: transparent url(../../images/uparrow1.png) top left no-repeat;
+    width: 7px;
+    height: 20px;
+    padding-bottom: 3px;
+    margin-bottom: 3px;
+    border-width: 0 0 1px 0;
+    border-bottom: 1px dotted #999;
+    -webkit-padding-start: 0px !important;
+    padding-top:0px !important;
+    margin-top:0px !important;
+  }
+  ul.move li.up:hover {
+    background: url(../../images/uparrow2.png) top left no-repeat;
+  }
+  ul.move li.down {
+    background: transparent url(../../images/down-arrow1.png) top left no-repeat;
+    width: 7px;
+    height: 10px;
+  }
+  ul.move li.down:hover {
+    background: url(../../images/down-arrow2.png) top left no-repeat;
+    width:7px;
+    height:10px;
+  }
+
+  ul, menu, dir {
+    -webkit-padding-start: 0px !important;
+  }
+
+  ul.move li a {
+    display: block;
+    width: 7px;
+    height: 9px;
+    text-indent: -9999px;
+  }
+  .arrows {
+    float:left;
+    width:10px;
+  }
+  .arrows2 {
+    float:right;
+    width:10px;
+  }
+  .filter-title {
+    float:left;
+    padding-left:10px;
+    text-align:left;
+    text-shadow: 0 1px 0 #fff;
+    padding-top:3px;
+  }
+  .actions {
+    float:right;
+    width:150px;
+    padding-top:3px;
+  }
+  .actions a {
+    padding-left:5px;
+    display:inline-block;
+  }
+  .actions a.delete {
+
+  }
+  .clear {
+    height: 0;  /* IE */
+    clear:both;
+  }
+</style>
+[% END %]

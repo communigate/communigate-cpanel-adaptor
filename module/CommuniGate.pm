@@ -287,6 +287,279 @@ sub api2_getDomainsWithStat {
     return $return_domains;
 }
 
+sub api2_getDomainMailRules {
+	my %OPTS = @_;
+	my $domain = $OPTS{'domain'};
+	my $cli = getCLI();
+	my $rule = [];
+	my $return = {};
+	my @domains = Cpanel::Email::listmaildomains();
+	for my $dom (@domains) {
+		if ($dom eq $domain) {
+			my $ExistingRules = $cli->GetDomainMailRules($domain) || die "Error: ".$cli->getErrMessage.", quitting";
+			foreach my $Rule (@$ExistingRules) {
+				if (@$Rule[1] eq '#Vacation') {
+					$rule = $Rule;
+					last;
+				}
+			}
+			$cli->Logout();
+
+			my $reply = $rule->[3]->[0]->[1];
+			$reply =~ m/^\+Subject\: (.*?)\\e.*?\\e\\e(.*?)$/;
+			my $subject = $1;
+			my $body = $2;
+			$body =~ s/\\r\\e/\n/g;
+			my $start = undef;
+			my $stop = undef;
+			for my $condition (@{$rule->[2]}) {
+				if ($condition->[0] eq 'Current Date') {
+					my %months = (
+						'Jan' => 0,
+						'Feb' => 1,
+						'Mar' => 2,
+						'Apr' => 3,
+						'May' => 4,
+						'Jun' => 5,
+						'Jul' => 6,
+						'Aug' => 7,
+						'Sep' => 8,
+						'Oct' => 9,
+						'Nov' => 10,
+						'Dec' => 11
+					);
+					my @date = split " ", $condition->[2];
+					if ($condition->[1] eq 'greater than') {
+						$start = timelocal_nocheck( $date[5], $date[4], $date[3], $date[0], $months{$date[1]},
+							($date[2] - 1900) );
+					} elsif ($condition->[1] eq 'less than') {
+						$stop = timelocal_nocheck( $date[5], $date[4], $date[3], $date[0], $months{$date[1]},
+							($date[2] - 1900) );
+					}
+				}
+			}
+
+			my $status = ($rule->[0] == 2 ? "enabled" : "disabled");
+			my @notify = ($rule->[3]->[1]->[0], $rule->[3]->[1]->[1]);
+
+			my $notifyData = { };
+			if ($notify[0] eq "Forward to") {
+				$notifyData->{'notify'} = 1;
+				$notifyData->{'notifyList'} = $notify[1];
+			}
+
+			$return = {
+				status  => $status,
+				subject => $subject,
+				body    => $body,
+				start   => $start,
+				stop    => $stop,
+				notify  => $notifyData
+			};
+		}
+	}
+	return $return;
+}
+
+sub api2_setDomainMailRules {
+	my %OPTS = @_;
+	my $domain  = $OPTS{'domain'};
+	my $cli = getCLI();
+	my @result;
+	my @domains = Cpanel::Email::listmaildomains();
+	my @NewRules;
+	for my $dom (@domains) {
+		if ($dom eq $domain) {
+			@NewRules=();
+			my $ExistingRules=$cli->GetDomainMailRules($domain) || die "Error: ".$cli->getErrMessage.", quitting";
+			my $body = '+Subject: ' . $OPTS{'subject'} . "\n";
+			$body .= "In-Reply-To: ^I\n";
+			$body .= "From: ^F \n\n";
+			$body .= $OPTS{'body'};
+
+			my $conditions = [
+				["Human Generated", "---"],
+				['From', "not in", "#RepliedAddresses"]
+			];
+			if ($OPTS{'start'}) {
+				my $start = scalar localtime ($OPTS{'start'});
+				$start =~ m/^\w{3}\s+(\w{3})\s+(\d+)\s+(.*?)\s+(\d{4})$/;
+				$start = sprintf('%02d', $2) . " $1 $4 $3";
+				push @$conditions, ["Current Date", "greater than", $start];
+			}
+			if ($OPTS{'stop'}) {
+				my $stop = scalar localtime ($OPTS{'stop'});
+				$stop =~ m/^\w{3}\s+(\w{3})\s+(\d+)\s+(.*?)\s+(\d{4})$/;
+				$stop = sprintf('%02d', $2) . " $1 $4 $3";
+				push @$conditions, ["Current Date", "less than", $stop];
+			}
+
+			my $notify = [
+				($OPTS{'notify'}?"Forward to":""),
+				($OPTS{'notifyList'}?$OPTS{'notifyList'}:"null")
+			];
+			my $notNotify = ["Remember 'From' in", 'RepliedAddresses'];
+			my $status = ($OPTS{'status'}?2:0);
+			my $rule = [];
+			@$ExistingRules = grep { @$_[1] ne '#Vacation' } @$ExistingRules;
+
+			$rule = [$status,"#Vacation",$conditions,[
+					[
+						"Reply with",
+						$body
+					],
+					(@$notify[0]?$notify:$notNotify)
+				]];
+			push(@NewRules,$rule);
+			foreach my $Rule (@$ExistingRules) {
+				push(@NewRules,$Rule);
+			}
+			$cli->SetDomainMailRules($domain,\@NewRules) || die "Error: ".$cli->getErrMessage.", quitting";
+		}
+	}
+
+	$cli->Logout();
+	return 1;
+}
+
+sub api2_getDomainRules {
+	my %OPTS = @_;
+	my $domain = $OPTS{'domain'};
+	my $cli = getCLI();
+	my $ExistingRules = [];
+	my @domains = Cpanel::Email::listmaildomains();
+	for my $dom (@domains) {
+		if ($dom eq $domain) {
+			$ExistingRules = $cli->GetDomainMailRules($domain) || die "Error: ".$cli->getErrMessage.", quitting";
+			@$ExistingRules = grep { @$_[1] ne '#Vacation' } @$ExistingRules;
+			last;
+		}
+	}
+	return $ExistingRules;
+}
+
+sub api2_getDomainFilter {
+	my %OPTS = @_;
+	my $cli = getCLI();
+	my $rules = $cli->GetDomainMailRules($OPTS{domain});
+	for my $rule (@$rules) {
+		if ($rule->[1] eq $OPTS{filtername}) {
+			my $filter = {};
+			$filter->{data}->{filtername} = $rule->[1];
+			for my $condition (@{$rule->[2]}) {
+				push @{$filter->{data}->{rules}}, {part => $condition->[0], match => $condition->[1], val => $condition->[2]};
+			}
+			for my $action (@{$rule->[3]}) {
+				push @{$filter->{data}->{actions}}, {action => $action->[0], dest => $action->[1]};
+			}
+			$cli->Logout();
+			return {filter => $filter};
+		}
+	}
+	$cli->Logout();
+	return { filter => { data => { filtername => "Rule 1", actions => [{}], rules => [{}] } } };
+}
+
+sub api2_reorderDomainFilters {
+	my %OPTS = @_;
+	my $cli = getCLI();
+	my $domain = $OPTS{'domain'};
+	my $order = {};
+	for my $filter (keys %OPTS) {
+		if ($filter =~ m/^filter(\d+)$/) {
+			$order->{$OPTS{$filter}} = $1;
+		}
+	}
+	my $rules = $cli->GetDomainMailRules($domain);
+	if ($rules) {
+		my $newrules = [];
+		for my $rule (@$rules) {
+			if (defined $order->{$rule->[1]}) {
+				$rule->[0] = 9 - $order->{$rule->[1]};
+				$rule->[0] = 1 if $rule->[0] < 1;
+			}
+			push @$newrules, $rule;
+		}
+		$cli->SetDomainMailRules($domain,$newrules);
+	}
+	$cli->Logout();
+	return;
+}
+
+sub api2_storeDomainFilter {
+	my %OPTS = @_;
+	my $params = $OPTS{'formdump'};
+	# for my $row (split "\n", $formdump) {
+	# 	if ($row =~ m/^(\S+)\s\=\s(.*?)$/) {
+	# 	    my $key =$1;
+	# 	    my $value = $2;
+	# 	    if ($key =~ m/^(\S+)(\d+)$/) {
+	# 		$params->{$1}->[$2 - 1] = $value;
+	# 	    } else {
+	# 		$params->{$key} = $value;
+	# 	    }
+	# 	}
+	# }
+	my $cli = getCLI();
+	my $rules = $cli->GetDomainMailRules($params->{domain});
+	if ($rules) {
+		my $conditions = [];
+		my $actions = [];
+		for (my $i = 1; $i <= 1000; $i++) {
+			last unless $params->{"part" . $i};
+			push @$conditions, [$params->{"part" . $i}, $params->{"match" . $i}, $params->{"val" . $i}];
+		}
+		for (my $i = 1; $i <= 1000; $i++) {
+			last unless $params->{"action" . $i};
+			my $action = [$params->{"action" . $i}];
+			push @$action, $params->{"dest" . $i} if $params->{"dest" . $i};
+			push @$actions, $action;
+		}
+		my $therule = [
+			5,
+			$params->{filtername},
+			$conditions,
+			$actions
+		];
+		my $newrules = [];
+		my $found = 0;
+		for my $rule (@$rules) {
+			if ($rule->[1] eq $params->{oldfiltername}) {
+				push @$newrules, $therule;
+				$found = 1;
+			} else {
+				push @$newrules, $rule;
+			}
+		}
+		push @$newrules, $therule unless $found;
+		use Data::Dumper;
+		warn Dumper $newrules;
+		$cli->SetDomainMailRules($params->{domain},$newrules);
+	}
+	$cli->Logout();
+	return;
+}
+
+sub api2_deleteDomainFilter {
+	my %OPTS = @_;
+	my $cli = getCLI();
+	my $domain = $OPTS{'domain'};
+	my $filtername = $OPTS{'filtername'};
+
+	my $rules = $cli->GetDomainMailRules($domain);
+	if ($rules) {
+		my $newrules = [];
+		for my $rule (@$rules) {
+			if ($rule->[1] ne $filtername) {
+				push @$newrules, $rule;
+			}
+		}
+		$cli->SetDomainMailRules($domain,$newrules);
+	}
+	$cli->Logout();
+	return { };
+}
+
 sub api2_UpdateVCard {
     my %OPTS = @_;
     

@@ -1,0 +1,32 @@
+[% SET CPANEL.CPVAR.dprefix = "../../" %]
+
+[%
+SET set_rules = Api2.exec("CommuniGate", "setDomainMailRules", {subject=RAW_FORM.item("subject"), body=RAW_FORM.item("arbody"), domain=RAW_FORM.item("domain"), start=RAW_FORM.item("start"), stop=RAW_FORM.item("stop"), notify=RAW_FORM.item("notify"), notifyList=RAW_FORM.item("notify-list"), status=RAW_FORM.item("status")});
+%]
+
+[% WRAPPER '_assets/master.html.tt'
+        app_key = 'cgpro_domain_rules'
+    %]
+
+<div class="body-content">
+  <div class="section">
+    <h2>[% locale.maketext("Set domain rules") %]</h2>
+    <div class="alert alert-success">
+      <span class="glyphicon glyphicon-ok-sign"></span>
+      <div class="alert-message">
+          [% IF !CPANEL.CPERROR.item('email') %]
+            <strong>[% locale.maketext("Domain rules successfully saved!") %]</strong>
+          [% END %]
+      </div>
+    </div>
+
+      [% IF CPANEL.CPERROR.item('email') %]
+        <div class="alert alert-danger">
+          <p>[% locale.maketext("There was a problem saving domain rules:") %] </p>
+          <p>[% CPANEL.CPERROR.item('email').html %]</p>
+        </div>
+      [% END %]
+  </div>
+    [% INCLUDE _assets/return_link.html.tt return_location='../../index.html' return_link_text=locale.maketext('Go Back') %]
+</div>
+[% END %]
