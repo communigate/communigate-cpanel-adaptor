@@ -1200,13 +1200,8 @@ sub api2_DeleteAlias {
   my $arrSize = @$aliases;
   $result->{"arr_size"} = $arrSize;
 
-  my $index = 0;
-  for (my $i=0; $i <= $arrSize; $i++) {
-      if ($aliases->[$i] eq $OPTS{'alias'}) {
-  	    $result->{"found"} = $aliases->[$i];
-	    splice($aliases, $index, 1);
-      }
-  }
+  @$aliases = grep { $_ != $OPTS{'alias'} } @$aliases;
+
   my $set_aliases = $cli->SetAccountAliases($OPTS{'account'}, $aliases);
   my $error_msg = $cli->getErrMessage();
   if ($error_msg eq "OK") {
