@@ -42,7 +42,7 @@ SET rules = Api2.exec("CommuniGate", "getDomainRules", {domain='webface.bg'} );
               [% ELSE %]
                 <select name="domain" id="manage_list_select" class="col-xs-12 form-control">
                   [% FOR domain IN domains -%]
-                    [% filter_option(FORM.domain, domain.key, domain.key) %]
+                    [% filter_option(FORM.domain, domain.domain, domain.domain) %]
                   [% END %]
                 </select>
               [% END %]
