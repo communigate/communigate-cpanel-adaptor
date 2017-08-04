@@ -147,7 +147,7 @@ sub api2_AccountsOverview {
 
 	my $return_accounts = {};
 	my $freeExtensions = {};
-	my $ximss = getXIMSS($cli->{loginData}->[2] . '@' . $cli->MainDomainName(), $cli->{loginData}->[3]);
+	my $ximss = getXIMSS($cli->{loginData}->[2], $cli->{loginData}->[3]);
 	
 	foreach my $domain (@domains) {
 	    my $accounts=$cli->ListAccounts($domain);
@@ -266,7 +266,7 @@ sub api2_getDomainsWithStat {
     my @domains = Cpanel::Email::listmaildomains();
     my $cli = getCLI();
     my $return_domains = {};
-    my $ximss = getXIMSS($cli->{loginData}->[2] . '@' . $cli->MainDomainName(), $cli->{loginData}->[3]);
+    my $ximss = getXIMSS($cli->{loginData}->[2], $cli->{loginData}->[3]);
     
     foreach my $domain (@domains) {
         my $domainStats = $cli->GetDomainStat("$domain");
@@ -532,8 +532,6 @@ sub api2_storeDomainFilter {
 			}
 		}
 		push @$newrules, $therule unless $found;
-		use Data::Dumper;
-		warn Dumper $newrules;
 		$cli->SetDomainMailRules($params->{domain},$newrules);
 	}
 	$cli->Logout();
