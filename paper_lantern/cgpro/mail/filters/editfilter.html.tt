@@ -3,41 +3,47 @@ SET CPANEL.CPVAR.dprefix = "../../../";
 SET email_acct = execute( 'Email', 'account_name', {"account"=>RAW_FORM.account, "display"=>"0"}).data;
 SET app_name = 'cgpro_user_filters';
 %]
+[%
+SET string = Api2.exec("CommuniGate", "getInterfaceString", {
+        "string" = "5_email_rules_manage_createfilter_" _ (CPANEL.CPDATA.LOCALE == "bg" ? "bg": "en")
+    });
+-%]
 
 [% js_code = PROCESS js_block %]
 [% css_code = PROCESS css_block %]
 [% WRAPPER '_assets/master.html.tt'
-    app_key = app_name
-    page_js = js_code
-    page_styles = css_code
-    page_stylesheets = ['mail/filters/assets/css/folders/tree.css']
-    page_scripts = ['js2-min/mail/filters/editfilter.js', '/yui/treeview/treeview.js']
-%]
+        app_key = app_name
+        page_js = js_code
+        page_styles = css_code
+        page_stylesheets = ['mail/filters/assets/css/folders/tree.css']
+        page_scripts = ['cgpro/mail/filters/js/filters.min.js', '/yui/treeview/treeview.js']
+    %]
 
     [% INCLUDE _assets/_ajaxapp_header.html.tt %]
 
-    <div class="body-content">
-        [% INCLUDE cgpro/mail/filters/filter.html.tt %]
+<div class="body-content">
+  <p align="justify" style="padding-bottom: 10px;">[%- string.0 %]</p>
+    [% INCLUDE cgpro/mail/filters/filter.html.tt %]
 
-        [% IF (CPANEL.CPVAR.spam_as_acl) && CPANEL.CPVAR.spamstatus %]
-        <p id="descSpamStatus" class="description">
-            [% locale.maketext("[output,strong,Hint:] To filter all mail that SpamAssassin has marked as spam, just choose “Spam Status” and “begins with”, then enter “Yes” in the box.") %]
-        </p>
-        <p id="descSpamBar" class="description">
-            [% locale.maketext("[output,strong,Hint]: To filter all mail that [asis,SpamAssassin] has marked with a spam score of 5.0 or greater, choose [output,em,Spam Bar] and [output,em,contains], then enter “[asis,+++++]” in the box (Note: If you wanted to match a spam score of 4, you would use [asis,++++]`. A spam score of 3 would be [asis,+++], etc).") %]
-        </p>
-        [% END %]
+    [% IF (CPANEL.CPVAR.spam_as_acl) && CPANEL.CPVAR.spamstatus %]
+      <p id="descSpamStatus" class="description">
+          [% locale.maketext("[output,strong,Hint:] To filter all mail that SpamAssassin has marked as spam, just choose “Spam Status” and “begins with”, then enter “Yes” in the box.") %]
+      </p>
+      <p id="descSpamBar" class="description">
+          [% locale.maketext("[output,strong,Hint]: To filter all mail that [asis,SpamAssassin] has marked with a spam score of 5.0 or greater, choose [output,em,Spam Bar] and [output,em,contains], then enter “[asis,+++++]” in the box (Note: If you wanted to match a spam score of 4, you would use [asis,++++]`. A spam score of 3 would be [asis,+++], etc).") %]
+      </p>
+    [% END %]
 
     [% IF FORM.account %]
         [% INCLUDE _assets/return_link.html.tt return_location='userfilters.html?account=' _ FORM.account _ '' return_link_text=locale.maketext('Go Back') %]
     [% ELSE %]
         [% INCLUDE _assets/return_link.html.tt return_location='userfilters.html' return_link_text=locale.maketext('Go Back') %]
     [% END %]
-    </div>
+</div>
 
-    <div id="treeviewCont" style='display:none; position:absolute; z-index: 12; border: 1px solid #000; background-color: #fff; padding: 0; margin: 0;'>
-        <div id="treeview" style='overflow: auto; padding: 0; margin: 0;'></div>
-    </div>
+<div id="treeviewCont" style='display:none; position:absolute; z-index: 12; border: 1px solid #000; background-color: #fff; padding: 0; margin: 0;'>
+  <div id="treeview" style='overflow: auto; padding: 0; margin: 0;'></div>
+</div>
 
     [% INCLUDE _assets/_ajaxapp_footer.html.tt %]
 
@@ -45,33 +51,33 @@ SET app_name = 'cgpro_user_filters';
 
 [% BLOCK css_block %]
 <style type="text/css">
-    .frow {
-        padding-top: 3px;
-        padding-bottom: 3px;
-    }
-    #ruletbl tr {
-        height: 50px;
-    }
+  .frow {
+    padding-top: 3px;
+    padding-bottom: 3px;
+  }
+  #ruletbl tr {
+    height: 50px;
+  }
 
-    #actiontbl tr {
-        height: 35px;
-    }
+  #actiontbl tr {
+    height: 35px;
+  }
 
-    #filterform {
-        padding: 8px;
-    }
+  #filterform {
+    padding: 8px;
+  }
 </style>
 [% END %]
 
 [% BLOCK js_block %]
 <script type="text/javascript">
-    var WE_ARE_EDITING = !![% RAW_FORM.filtername.json() || 'null' %];
+  var WE_ARE_EDITING = !![% RAW_FORM.filtername.json() || 'null' %];
 
-    var HAS_SPAM_AS_ACL = !!parseInt([% CPANEL.CPVAR.spam_as_acl.html.json() || 'null' %]);
-    var SPAM_ASSASSIN_ENABLED = !!parseInt([% CPANEL.CPVAR.spamstatus.html.json() || 'null' %]);
+  var HAS_SPAM_AS_ACL = !!parseInt([% CPANEL.CPVAR.spam_as_acl.html.json() || 'null' %]);
+  var SPAM_ASSASSIN_ENABLED = !!parseInt([% CPANEL.CPVAR.spamstatus.html.json() || 'null' %]);
 
-    var ACCOUNT_NAME = [% email_acct.json %];
+  var ACCOUNT_NAME = [% email_acct.json %];
 
-    var GO_BACK_URL = "userfilters.html?account=" + encodeURIComponent([% RAW_FORM.account.json() || 'null' %]);
+  var GO_BACK_URL = "userfilters.html?account=" + encodeURIComponent([% RAW_FORM.account.json() || 'null' %]);
 </script>
 [% END %]
